@@ -32,10 +32,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Component for a projection plot.
  *
- * TODO:
- *  Color "hot point"
- *  Tool-tips
- *  Option of connecting data-points with lines
+ * TODO: Color "hot point" Tool-tips Option of connecting data-points with lines
  */
 public class ProjectionComponent extends WorkspaceComponent {
 
@@ -80,8 +77,8 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     /**
-     * Create a projection component from an existing set of data.
-     * Used in deserializing.
+     * Create a projection component from an existing set of data. Used in
+     * deserializing.
      *
      * @param model projection model
      * @param name name of component
@@ -109,8 +106,8 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     protected void initializeConsumers() {
         dimensionList.clear();
-        projectionConsumerType = new AttributeType(this, "Dimension", "setValue",
-                double.class, true);
+        projectionConsumerType = new AttributeType(this, "Dimension",
+                "setValue", double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
             addDimension(i);
@@ -224,7 +221,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         try {
             int i = Integer.parseInt(objectKey);
             Dimension dimension = getDimension(i);
-            return  dimension;
+            return dimension;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }
@@ -253,7 +250,8 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public static ProjectionComponent open(InputStream input,
             final String name, final String format) {
-        ProjectionModel model = (ProjectionModel)ProjectionModel.getXStream().fromXML(input);
+        ProjectionModel model = (ProjectionModel) ProjectionModel.getXStream()
+                .fromXML(input);
         return new ProjectionComponent(model, name);
     }
 
@@ -325,7 +323,11 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Change projection.
      */
     public void changeProjection() {
-        projectionModel.getProjector().getCurrentProjectionMethod().project(); // Should this have happened already?
+        projectionModel.getProjector().getCurrentProjectionMethod().project(); // Should
+                                                                               // this
+                                                                               // have
+                                                                               // happened
+                                                                               // already?
         resetChartDataset();
     }
 
@@ -341,20 +343,23 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Used for debugging model.
      */
     public void debug() {
-        System.out.println("------------ Print contents of dataset ------------");
+        System.out
+                .println("------------ Print contents of dataset ------------");
         Projector projector = projectionModel.getProjector();
         for (int i = 0; i < projector.getNumPoints(); i++) {
-                System.out.println("<" + i + "> " + projector.getProjectedPoint(i)[0] + "," + projector.getProjectedPoint(i)[1]);
-            }
+            System.out.println("<" + i + "> "
+                    + projector.getProjectedPoint(i)[0] + ","
+                    + projector.getProjectedPoint(i)[1]);
+        }
         System.out.println("--------------------------------------");
     }
 
-	/**
-	 * @return the projectionModel
-	 */
-	public ProjectionModel getProjectionModel() {
-		return projectionModel;
-	}
+    /**
+     * @return the projectionModel
+     */
+    public ProjectionModel getProjectionModel() {
+        return projectionModel;
+    }
 
     /**
      * Object which adds data to one dimension of a projection component.

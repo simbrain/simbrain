@@ -25,7 +25,7 @@ import org.simbrain.network.util.Comparators;
 
 /**
  * Connect each source neuron to a single target.
- * 
+ *
  * @author jyoshimi
  */
 public class OneToOne extends ConnectNeurons {
@@ -45,7 +45,7 @@ public class OneToOne extends ConnectNeurons {
 
     /**
      * Used for populating combo box with orientation types.
-     * 
+     *
      * @return Array of connection types.
      */
     public static Comparator[] getOrientationTypes() {
@@ -71,7 +71,7 @@ public class OneToOne extends ConnectNeurons {
 
     /**
      * Returns a sorted list of neurons, given a comparator.
-     * 
+     *
      * @param neuronList the base list of neurons.
      * @param comparator the comparator.
      * @return the sorted list.
@@ -88,8 +88,8 @@ public class OneToOne extends ConnectNeurons {
     /** @inheritDoc */
     public List<Synapse> connectNeurons() {
 
-    	ArrayList<Synapse> syns = new ArrayList<Synapse>();
-    	
+        ArrayList<Synapse> syns = new ArrayList<Synapse>();
+
         // TODO: Flags for which comparator to use, including no comparator
         // (Some users might want random but 1-1 couplings)
 
@@ -98,9 +98,9 @@ public class OneToOne extends ConnectNeurons {
 
         for (Iterator<Neuron> sources = getSortedNeuronList(sourceNeurons,
                 connectOrientation).iterator(); sources.hasNext();) {
-            Neuron source = (Neuron) sources.next();
+            Neuron source = sources.next();
             if (targetsX.hasNext()) {
-                Neuron target = (Neuron) targetsX.next();
+                Neuron target = targetsX.next();
                 Synapse synapse = baseSynapse.instantiateTemplateSynapse(
                         source, target, network);
                 network.addSynapse(synapse);

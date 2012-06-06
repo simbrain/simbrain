@@ -22,5 +22,4 @@ public class StationaryBehavior implements Behavior {
     public void collissionY() {
     }
 
-
 }

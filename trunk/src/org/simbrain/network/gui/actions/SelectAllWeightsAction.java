@@ -29,12 +29,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Select all weights.
  */
-public final class SelectAllWeightsAction
-    extends AbstractAction {
+public final class SelectAllWeightsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new select all weights action with the specified network panel.

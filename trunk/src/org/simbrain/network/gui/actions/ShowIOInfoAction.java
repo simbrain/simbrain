@@ -28,12 +28,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Show input/output information.
  */
-public final class ShowIOInfoAction
-    extends AbstractAction {
+public final class ShowIOInfoAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new show input/output information action with the specified
@@ -52,7 +50,6 @@ public final class ShowIOInfoAction
         this.networkPanel = networkPanel;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
@@ -60,7 +57,7 @@ public final class ShowIOInfoAction
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        //networkPanel.setInOutMode(cb.isSelected());
+        // networkPanel.setInOutMode(cb.isSelected());
 
     }
 }

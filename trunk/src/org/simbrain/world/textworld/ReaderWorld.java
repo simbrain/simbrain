@@ -75,7 +75,7 @@ public class ReaderWorld extends TextWorld {
         this.addListener(new TextListener() {
 
             public void textChanged() {
-                //System.out.println("In textchanged");
+                // System.out.println("In textchanged");
                 resetMatcher();
             }
 
@@ -83,7 +83,7 @@ public class ReaderWorld extends TextWorld {
             }
 
             public void positionChanged() {
-                //System.out.println("In position changed");
+                // System.out.println("In position changed");
                 resetMatcher();
             }
 
@@ -100,7 +100,7 @@ public class ReaderWorld extends TextWorld {
     void resetMatcher() {
         int begin = getPosition();
         int end = getText().length();
-        //System.out.println(begin + "," + end);
+        // System.out.println(begin + "," + end);
         matcher = pattern.matcher(getText());
         matcher.region(begin, end);
         positionAfterLastDelimeter = begin;
@@ -125,8 +125,9 @@ public class ReaderWorld extends TextWorld {
                 }
 
             } else {
-                //System.out.println("here");
-                //setCurrentItem(new TextItem(getPosition(), getPosition(), ""));
+                // System.out.println("here");
+                // setCurrentItem(new TextItem(getPosition(), getPosition(),
+                // ""));
                 setPosition(1);
             }
         } else if (parseStyle == ParseStyle.WORD) {
@@ -154,10 +155,11 @@ public class ReaderWorld extends TextWorld {
                         // System.out.println(getCurrentItem());
                     } else {
                         matcherInValidState = false;
-                        //System.out.println("nothing found");
+                        // System.out.println("nothing found");
                         setCurrentItem(new TextItem(getPosition(),
                                 getPosition(), ""));
-                        setPosition(0); //TODO:Option to reset to beginning of text
+                        setPosition(0); // TODO:Option to reset to beginning of
+                                        // text
                     }
                 } else {
                     setCurrentItem(new TextItem(getPosition(), getPosition(),

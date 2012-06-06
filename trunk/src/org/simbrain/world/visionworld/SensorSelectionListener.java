@@ -23,8 +23,7 @@ import java.util.EventListener;
 /**
  * Sensor selection listener.
  */
-public interface SensorSelectionListener
-    extends EventListener {
+public interface SensorSelectionListener extends EventListener {
 
     /**
      * Notify this listener that the sensor selection changed.

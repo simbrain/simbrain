@@ -35,7 +35,6 @@ public final class ReceptiveField {
     /** Height. */
     private final int height;
 
-
     /**
      * Create a new receptive field.
      *
@@ -44,14 +43,14 @@ public final class ReceptiveField {
      * @param width width of this receptive field
      * @param height height of this receptive field
      */
-    // todo:  can this ctr be kept package private?
-    public ReceptiveField(final int x, final int y, final int width, final int height) {
+    // todo: can this ctr be kept package private?
+    public ReceptiveField(final int x, final int y, final int width,
+            final int height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
     }
-
 
     /**
      * Return the x offset for this receptive field.

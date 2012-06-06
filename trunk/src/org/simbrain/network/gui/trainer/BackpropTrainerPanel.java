@@ -19,12 +19,10 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -37,19 +35,19 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * Panel for controlling iterative trainers.  Can be reused by any GUI element that 
- * invokes an iterative trainer (i.e. any subclass of IterableTtrainer).
- * 
+ * Panel for controlling iterative trainers. Can be reused by any GUI element
+ * that invokes an iterative trainer (i.e. any subclass of IterableTtrainer).
+ *
  * @author jeffyoshimi
  */
 public class BackpropTrainerPanel extends JPanel {
-	
+
     /** Parent frame. */
     private GenericFrame parentFrame;
-    
+
     /** Reference to trainer object. */
     private final BackpropTrainer trainer;
-    
+
     /** Reference to network panel. */
     private final NetworkPanel panel;
 
@@ -60,58 +58,59 @@ public class BackpropTrainerPanel extends JPanel {
      * @param trainer the trainer to control
      */
     public BackpropTrainerPanel(final NetworkPanel networkPanel,
-			BackpropTrainer trainer) {
-    	this.trainer = trainer;
-    	this.panel = networkPanel;
+            BackpropTrainer trainer) {
+        this.trainer = trainer;
+        this.panel = networkPanel;
         setLayout(new BorderLayout());
-        
+
         // Use iterative controls for main panel
-    	add("Center", new IterativeControlsPanel(networkPanel, trainer));
-    	
-    	// Put backprop specific controls at the bottom
-    	JPanel southPanel = new JPanel(new BorderLayout());
-    	southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
-    	JPanel panel = new JPanel();
-    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
-    	//propertiesButton.setHideActionText(true);
-    	panel.add(propertiesButton);
-    	panel.add(new JButton(randomizeAction));
-    	southPanel.add("Center", panel);
-    	add("South", southPanel);
-    	
+        add("Center", new IterativeControlsPanel(networkPanel, trainer));
+
+        // Put backprop specific controls at the bottom
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
+        JPanel panel = new JPanel();
+        JButton propertiesButton = new JButton(
+                TrainerGuiActions.getPropertiesDialogAction(trainer));
+        // propertiesButton.setHideActionText(true);
+        panel.add(propertiesButton);
+        panel.add(new JButton(randomizeAction));
+        southPanel.add("Center", panel);
+        add("South", southPanel);
+
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
 
             public void errorUpdated() {
                 parentFrame.pack();
             }
-            
+
         });
 
-	}
-    
+    }
+
     /**
      * Action for randomizing the underlying network.
      */
-	Action randomizeAction = new AbstractAction() {
+    Action randomizeAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-			putValue(NAME, "Randomize");
-			putValue(SHORT_DESCRIPTION, "Randomize network");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+            putValue(NAME, "Randomize");
+            putValue(SHORT_DESCRIPTION, "Randomize network");
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void actionPerformed(ActionEvent arg0) {
-			if (trainer != null) {
-				trainer.randomize();
-				panel.getNetwork().fireNetworkChanged();
-			}
-		}
-	};
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            if (trainer != null) {
+                trainer.randomize();
+                panel.getNetwork().fireNetworkChanged();
+            }
+        }
+    };
 
     /**
      * @param parentFrame the parentFrame to set

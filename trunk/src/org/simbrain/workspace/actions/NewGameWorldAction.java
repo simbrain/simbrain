@@ -32,15 +32,12 @@ public final class NewGameWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create a new odor world action with the specified
-     * workspace.
+     * Create a new odor world action with the specified workspace.
      */
     public NewGameWorldAction(Workspace workspace) {
         super("Game World", workspace);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

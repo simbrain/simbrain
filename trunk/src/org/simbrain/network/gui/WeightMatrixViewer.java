@@ -26,8 +26,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.util.Comparators;
@@ -47,7 +47,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     /** JTable contained in scroller. */
     private SimbrainJTable table;
 
-   /**
+    /**
      * Embed the scrollpanel in a widget with a toolbar.
      *
      * @param scroller the scroller to embed
@@ -76,8 +76,8 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         ArrayList<Neuron> targetList = panel.getSelectedModelNeurons();
 
         // By default the lists are sorted horizontally.
-        //  TODO: Allow for vertical sorting, or for some appropriate sorting
-        //      when displaying an adjacency matrix
+        // TODO: Allow for vertical sorting, or for some appropriate sorting
+        // when displaying an adjacency matrix
         Collections.sort(sourceList, Comparators.X_ORDER);
         Collections.sort(targetList, Comparators.X_ORDER);
 
@@ -156,7 +156,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                  */
                 parentNetwork = weights[row][col].getNetwork();
             }
-            //TODO: Below ok with large changes?
+            // TODO: Below ok with large changes?
             if (parentNetwork != null) {
                 parentNetwork.fireNetworkChanged();
             }

@@ -27,12 +27,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Clear source neurons action.
  */
-public final class ClearSourceNeurons
-    extends AbstractAction {
+public final class ClearSourceNeurons extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Construct action.

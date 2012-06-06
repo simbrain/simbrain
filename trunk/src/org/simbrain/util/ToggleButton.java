@@ -28,17 +28,15 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 /**
- * Toggle button.  Used when a button iterates through a sequence of modes.
+ * Toggle button. Used when a button iterates through a sequence of modes.
  */
-public final class ToggleButton
-    extends JButton {
+public final class ToggleButton extends JButton {
 
     /** List of actions. */
     private final List actions;
 
     /** Index to current action. */
     private int index;
-
 
     /**
      * Create a new toggle button with the specified list of actions.
@@ -61,19 +59,18 @@ public final class ToggleButton
         updateAction();
 
         addActionListener(new ActionListener() {
-                /** @see ActionListener */
-                public void actionPerformed(final ActionEvent event) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            /** @see Runnable */
-                            public void run() {
-                                incrementIndex();
-                                updateAction();
-                            }
-                        });
-                }
-            });
+            /** @see ActionListener */
+            public void actionPerformed(final ActionEvent event) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    /** @see Runnable */
+                    public void run() {
+                        incrementIndex();
+                        updateAction();
+                    }
+                });
+            }
+        });
     }
-
 
     /**
      * Increment index.

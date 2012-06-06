@@ -39,21 +39,21 @@ public abstract class ProjectionMethod {
     /** Logger. */
     private Logger logger = Logger.getLogger(ProjectionMethod.class);
 
-     /**
-      * A set of hi-d datapoints, each of which is an array of doubles
-      * The data to be projected.
-      */
+    /**
+     * A set of hi-d datapoints, each of which is an array of doubles The data
+     * to be projected.
+     */
     protected Dataset upstairs;
 
     /**
-     * A set of low-d datapoints, each of which is an array of doubles
-     * The projection of the upstairs data.
+     * A set of low-d datapoints, each of which is an array of doubles The
+     * projection of the upstairs data.
      */
     protected Dataset downstairs;
 
     /**
-     * Reference to an object which contains information which must persist between
-     * re-inits of the projector.
+     * Reference to an object which contains information which must persist
+     * between re-inits of the projector.
      */
     protected Settings theSettings;
 
@@ -61,7 +61,8 @@ public abstract class ProjectionMethod {
      * Initialize the projector with high and low-d data.
      *
      * @param up Reference to high dimensional dataset
-     * @param down Reference to low dimensional dataset.  Pass NULL if not available
+     * @param down Reference to low dimensional dataset. Pass NULL if not
+     *            available
      */
     public void init(final Dataset up, final Dataset down) {
 
@@ -80,7 +81,8 @@ public abstract class ProjectionMethod {
 
             // Initially use coordinate projection
             // Creates a new projector.
-            ProjectCoordinate initialProjection = new ProjectCoordinate(theSettings);
+            ProjectCoordinate initialProjection = new ProjectCoordinate(
+                    theSettings);
             initialProjection.init(upstairs, downstairs);
             initialProjection.project();
 
@@ -94,7 +96,8 @@ public abstract class ProjectionMethod {
      * Check validity of datasets.
      */
     public void checkDatasets() {
-        if ((upstairs == null) || (downstairs == null) || (upstairs.getNumPoints() == 0)) {
+        if ((upstairs == null) || (downstairs == null)
+                || (upstairs.getNumPoints() == 0)) {
             logger.debug("Could not invoke ProjectionMethod.init()");
             return;
         }
@@ -132,7 +135,8 @@ public abstract class ProjectionMethod {
     /**
      * Add new high-d datapoints and reinitialize the datasets.
      *
-     * @param theFile file containing the high-d data, forwarded to a dataset method
+     * @param theFile file containing the high-d data, forwarded to a dataset
+     *            method
      */
     public void addUpstairs(final File theFile) {
         String[][] values = null;
@@ -155,7 +159,7 @@ public abstract class ProjectionMethod {
             dataPoint = new double[values[0].length];
 
             for (int j = 0; j < line.length; j++) {
-                //System.out.print(" " + line[j]);
+                // System.out.print(" " + line[j]);
                 dataPoint[j] = Double.parseDouble(line[j]);
             }
 
@@ -177,25 +181,32 @@ public abstract class ProjectionMethod {
      */
     public boolean compareDatasets() {
         if (downstairs.getDimensions() < 1) {
-            System.out.println("WARNING: The dimension of the low dimensional data set");
+            System.out
+                    .println("WARNING: The dimension of the low dimensional data set");
             System.out.println("cannot be less than 1");
 
             return false;
         }
 
         if (downstairs.getDimensions() > upstairs.getDimensions()) {
-            System.out.println("WARNING: The dimension of the low dimensional data set");
-            System.out.println("cannot be greater than the dimension of the hi");
+            System.out
+                    .println("WARNING: The dimension of the low dimensional data set");
+            System.out
+                    .println("cannot be greater than the dimension of the hi");
             System.out.println("dimensional data set.\n");
-            System.out.println("hiDimension = " + upstairs.getDimensions() + "\n");
+            System.out.println("hiDimension = " + upstairs.getDimensions()
+                    + "\n");
             System.out.println("lowD = " + downstairs.getDimensions());
 
             return false;
         }
 
         if (downstairs.getNumPoints() != upstairs.getNumPoints()) {
-            System.out.println("WARNING: The number of points in the hi-d set (" + upstairs.getNumPoints() + ""
-                               + ") does not match that in the low-d set (" + downstairs.getNumPoints() + ")\n");
+            System.out
+                    .println("WARNING: The number of points in the hi-d set ("
+                            + upstairs.getNumPoints() + ""
+                            + ") does not match that in the low-d set ("
+                            + downstairs.getNumPoints() + ")\n");
 
             return false;
         }
@@ -204,12 +215,14 @@ public abstract class ProjectionMethod {
     }
 
     /**
-     * Perform operations necessay to project the data. For iterable functions this is just a stub.
+     * Perform operations necessay to project the data. For iterable functions
+     * this is just a stub.
      */
     public abstract void project();
 
     /**
-     * Iterate, if it is iterable.  For non iterable-projectors this is just a stub
+     * Iterate, if it is iterable. For non iterable-projectors this is just a
+     * stub
      *
      * @return the current error
      */
@@ -253,25 +266,26 @@ public abstract class ProjectionMethod {
      * @return true if the point was added, false otherwise.
      */
     public boolean addDatapoint(final double[] point) {
-       // logger.debug("addDatapoint called");
+        // logger.debug("addDatapoint called");
 
         double tolerance = theSettings.getTolerance();
         double[] newPoint = null;
         if (upstairs.addPoint(point, tolerance)) {
-            //For 1-d datasets plot points on a horizontal line
+            // For 1-d datasets plot points on a horizontal line
             if (point.length == 1) {
-                newPoint = new double[] {point[0], 0 };
+                newPoint = new double[] { point[0], 0 };
                 downstairs.addPoint(newPoint);
                 return true;
             }
 
-            //TODO: To be refactored.
+            // TODO: To be refactored.
 
             if (this instanceof ProjectSammon) {
 
                 // Add the downstairs point differently depending on the add
-                // method The first case is the default case: add the points and run
-                // the projection.  The other cases are custom add methods
+                // method The first case is the default case: add the points and
+                // run
+                // the projection. The other cases are custom add methods
                 if (theSettings.getSammonAddMethod() == SammonAddMethod.REFRESH) {
                     newPoint = AddData.coordinate(theSettings.getHiD1(),
                             theSettings.getHiD2(), point);
@@ -290,8 +304,6 @@ public abstract class ProjectionMethod {
         }
         return false;
     }
-
-
 
     /**
      * @return distance within which points are considered unique
@@ -322,15 +334,16 @@ public abstract class ProjectionMethod {
     }
 
     /**
-     * @return reference to object which contains preferences which persist  when the projector is re-initialized
+     * @return reference to object which contains preferences which persist when
+     *         the projector is re-initialized
      */
     public Settings getTheSettings() {
         return theSettings;
     }
 
     /**
-     * @param settings reference to object which contains preferences which persist  when the projector is
-     *        re-initialized
+     * @param settings reference to object which contains preferences which
+     *            persist when the projector is re-initialized
      */
     public void setTheSettings(final Settings settings) {
         theSettings = settings;

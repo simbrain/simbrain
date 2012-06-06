@@ -26,8 +26,7 @@ import java.beans.PropertyChangeListener;
 /**
  * Mutable implementation of VisionWorldModel.
  */
-public final class MutableVisionWorldModel
-    extends AbstractVisionWorldModel {
+public final class MutableVisionWorldModel extends AbstractVisionWorldModel {
 
     /** Pixel matrix. */
     private PixelMatrix pixelMatrix;
@@ -42,19 +41,17 @@ public final class MutableVisionWorldModel
     private static final SensorMatrix EMPTY_SENSOR_MATRIX = new EmptySensorMatrix();
 
     /** No filter. */
-    private static final Filter NO_FILTER = new Filter()
-        {
-            /** {@inheritDoc} */
-            public double filter(final BufferedImage image) {
-                return 0.0d;
-            }
+    private static final Filter NO_FILTER = new Filter() {
+        /** {@inheritDoc} */
+        public double filter(final BufferedImage image) {
+            return 0.0d;
+        }
 
-            /** {@inheritDoc} */
-            public String getDescription() {
-                return "None";
-            }
-        };
-
+        /** {@inheritDoc} */
+        public String getDescription() {
+            return "None";
+        }
+    };
 
     /**
      * Create a new mutable vision world model.
@@ -66,16 +63,16 @@ public final class MutableVisionWorldModel
     }
 
     /**
-     * Create a new immutable vision world model with the specified
-     * pixel matrix and sensor matrix.
+     * Create a new immutable vision world model with the specified pixel matrix
+     * and sensor matrix.
      *
      * @param pixelMatrix pixel matrix for this immutable vision world model,
-     *    must not be null
+     *            must not be null
      * @param sensorMatrix sensor matrix for this immutable vision world model,
-     *    must not be null
+     *            must not be null
      */
     public MutableVisionWorldModel(final PixelMatrix pixelMatrix,
-                                     final SensorMatrix sensorMatrix) {
+            final SensorMatrix sensorMatrix) {
         super();
         if (pixelMatrix == null) {
             throw new IllegalArgumentException("pixelMatrix must not be null");
@@ -86,7 +83,6 @@ public final class MutableVisionWorldModel
         this.pixelMatrix = pixelMatrix;
         this.sensorMatrix = sensorMatrix;
     }
-
 
     /** {@inheritDoc} */
     public PixelMatrix getPixelMatrix() {
@@ -125,12 +121,11 @@ public final class MutableVisionWorldModel
     /**
      * Empty pixel matrix.
      */
-    private static class EmptyPixelMatrix
-        implements PixelMatrix {
+    private static class EmptyPixelMatrix implements PixelMatrix {
 
         /** Empty image. */
-        private final Image emptyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-
+        private final Image emptyImage = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
 
         /** {@inheritDoc} */
         public int getWidth() {
@@ -154,37 +149,41 @@ public final class MutableVisionWorldModel
 
         /** {@inheritDoc} */
         public void setPixel(final int x, final int y, final Color color) {
-            throw new UnsupportedOperationException("setPixel operation not supported"
-                                                    + " by this pixel matrix");
+            throw new UnsupportedOperationException(
+                    "setPixel operation not supported"
+                            + " by this pixel matrix");
         }
 
         /** {@inheritDoc} */
         public Image view(final ReceptiveField receptiveField) {
             if (receptiveField == null) {
-                throw new IllegalArgumentException("receptiveField must not be null");
+                throw new IllegalArgumentException(
+                        "receptiveField must not be null");
             }
             return emptyImage;
         }
 
         /** {@inheritDoc} */
-        public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        public void addPropertyChangeListener(
+                final PropertyChangeListener listener) {
             // empty
         }
 
         /** {@inheritDoc} */
         public void addPropertyChangeListener(final String propertyName,
-                                              final PropertyChangeListener listener) {
+                final PropertyChangeListener listener) {
             // empty
         }
 
         /** {@inheritDoc} */
-        public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        public void removePropertyChangeListener(
+                final PropertyChangeListener listener) {
             // empty
         }
 
         /** {@inheritDoc} */
         public void removePropertyChangeListener(final String propertyName,
-                                                 final PropertyChangeListener listener) {
+                final PropertyChangeListener listener) {
             // empty
         }
     }
@@ -192,8 +191,7 @@ public final class MutableVisionWorldModel
     /**
      * Empty sensor matrix.
      */
-    private static class EmptySensorMatrix
-        implements SensorMatrix {
+    private static class EmptySensorMatrix implements SensorMatrix {
 
         /** {@inheritDoc} */
         public int rows() {
@@ -222,7 +220,8 @@ public final class MutableVisionWorldModel
 
         /** {@inheritDoc} */
         public Sensor getSensor(final int row, final int column) {
-            throw new IndexOutOfBoundsException("EmptySensorMatrix has no rows or columns");
+            throw new IndexOutOfBoundsException(
+                    "EmptySensorMatrix has no rows or columns");
         }
     }
 }

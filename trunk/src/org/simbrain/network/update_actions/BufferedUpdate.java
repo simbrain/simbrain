@@ -23,7 +23,7 @@ import org.simbrain.network.core.NetworkUpdateAction;
 
 /**
  * Buffered update of loose items (neurons and synapses), i.e. items not in
- * groups.  (Buffered update means order of update does not matter).
+ * groups. (Buffered update means order of update does not matter).
  *
  * @author jyoshimi
  */
@@ -39,20 +39,20 @@ public class BufferedUpdate implements NetworkUpdateAction {
         this.network = network;
     }
 
-	@Override
+    @Override
     public void invoke() {
         network.bufferedUpdateAllNeurons();
         network.updateAllSynapses();
     }
-    
-	@Override
+
+    @Override
     public String getDescription() {
         return "Buffered update";
     }
 
-	@Override
-	public String getLongDescription() {
+    @Override
+    public String getLongDescription() {
         return "Buffered update of loose items";
-	}
+    }
 
 }

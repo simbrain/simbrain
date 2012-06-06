@@ -19,8 +19,8 @@
 package org.simbrain.workspace.updater;
 
 /**
- * The listener interface for observers interested in events related to
- * the workspace updater.
+ * The listener interface for observers interested in events related to the
+ * workspace updater.
  */
 public interface WorkspaceUpdaterListener {
 

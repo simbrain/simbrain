@@ -28,17 +28,19 @@ import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 public interface PixelMatrixImageNodeEditor {
 
     /**
-     * Return the editor component for this pixel matrix image node editor.
-     * The editor component will not be null.
+     * Return the editor component for this pixel matrix image node editor. The
+     * editor component will not be null.
      *
      * @return the editor component for this pixel matrix image node editor
      */
     Component getEditorComponent();
 
     /**
-     * Set the pixel matrix image node to edit to <code>pixelMatrixImageNode</code>.
+     * Set the pixel matrix image node to edit to
+     * <code>pixelMatrixImageNode</code>.
      *
-     * @param pixelMatrixImageNode pixel matrix image node to edit, must not be null
+     * @param pixelMatrixImageNode pixel matrix image node to edit, must not be
+     *            null
      */
     void setPixelMatrixImageNode(final PixelMatrixImageNode pixelMatrixImageNode);
 }

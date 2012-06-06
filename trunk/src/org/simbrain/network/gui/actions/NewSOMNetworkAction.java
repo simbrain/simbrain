@@ -28,16 +28,13 @@ import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
 /**
  * New winner take all network action.
  */
-public final class NewSOMNetworkAction
-    extends AbstractAction {
+public final class NewSOMNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new new SOM network action with the specified
-     * network panel.
+     * Create a new new SOM network action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -51,7 +48,6 @@ public final class NewSOMNetworkAction
 
         this.networkPanel = networkPanel;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

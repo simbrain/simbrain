@@ -42,9 +42,10 @@ import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
+ * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw
+ * data to input nodes.
  */
-public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> { 
+public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,7 +65,8 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private JMenuItem saveItem = new JMenuItem("Save");
 
     /** Determines whether table is in iteration mode. */
-    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
+    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem(
+            "Iteration mode");
 
     /** Component. */
     private final DataWorldComponent component;
@@ -190,8 +192,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         pack();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.workspace.gui.GuiComponent#update()
      */
     @Override
@@ -199,6 +202,5 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         super.update();
         table.updateRowSelection();
     }
-
 
 }

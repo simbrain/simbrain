@@ -22,9 +22,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
@@ -66,18 +66,29 @@ public final class NetworkComponent extends WorkspaceComponent {
     private void init() {
 
         // Initialize attribute types and their default visibility
-        addProducerType(new AttributeType(this, "Neuron", "getActivation", double.class, true));
-        addProducerType(new AttributeType(this, "Neuron", "getUpperBound", double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "getLowerBound", double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "getLabel", String.class, false));
-        addProducerType(new AttributeType(this, "Synapse", "getStrength", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getActivation",
+                double.class, true));
+        addProducerType(new AttributeType(this, "Neuron", "getUpperBound",
+                double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getLowerBound",
+                double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getLabel",
+                String.class, false));
+        addProducerType(new AttributeType(this, "Synapse", "getStrength",
+                double.class, false));
 
-        addConsumerType(new AttributeType(this, "Neuron", "setInputValue", double.class, true));
-        addConsumerType(new AttributeType(this, "Neuron", "setActivation", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setUpperBound", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setLowerBound", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setLabel", String.class, false));
-        addConsumerType(new AttributeType(this, "Synapse", "setStrength", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setInputValue",
+                double.class, true));
+        addConsumerType(new AttributeType(this, "Neuron", "setActivation",
+                double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setUpperBound",
+                double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setLowerBound",
+                double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setLabel",
+                String.class, false));
+        addConsumerType(new AttributeType(this, "Synapse", "setStrength",
+                double.class, false));
 
         network.addNeuronListener(new NeuronListener() {
             /**
@@ -113,7 +124,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
             public void neuronChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
-           }
+            }
         });
 
         network.addSynapseListener(new SynapseListener() {
@@ -133,7 +144,8 @@ public final class NetworkComponent extends WorkspaceComponent {
                 firePotentialAttributesChanged();
             }
 
-            public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
+            public void synapseTypeChanged(
+                    NetworkEvent<SynapseUpdateRule> networkEvent) {
                 setChangedSinceLastSave(true);
             }
 
@@ -148,12 +160,16 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
-                    returnList.add(getAttributeManager().createPotentialConsumer(neuron, type, description));
+                    returnList
+                            .add(getAttributeManager().createPotentialConsumer(
+                                    neuron, type, description));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
-                    returnList.add(getAttributeManager().createPotentialConsumer(synapse, type, description));
+                    returnList
+                            .add(getAttributeManager().createPotentialConsumer(
+                                    synapse, type, description));
                 }
             }
 
@@ -168,12 +184,16 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
-                    returnList.add(getAttributeManager().createPotentialProducer(neuron, type, description));
+                    returnList
+                            .add(getAttributeManager().createPotentialProducer(
+                                    neuron, type, description));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
-                    returnList.add(getAttributeManager().createPotentialProducer(synapse, type, description));
+                    returnList
+                            .add(getAttributeManager().createPotentialProducer(
+                                    synapse, type, description));
                 }
             }
         }
@@ -193,9 +213,9 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public String getKeyFromObject(Object object) {
         if (object instanceof Neuron) {
-            return ((Neuron)object).getId();
+            return ((Neuron) object).getId();
         } else if (object instanceof Synapse) {
-            return ((Synapse)object).getId();
+            return ((Synapse) object).getId();
         }
         return null;
     }
@@ -203,7 +223,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     /**
      * {@inheritDoc}
      */
-     public static NetworkComponent open(final InputStream input, final String name, final String format) {
+    public static NetworkComponent open(final InputStream input,
+            final String name, final String format) {
         Network newNetwork = (Network) Network.getXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }

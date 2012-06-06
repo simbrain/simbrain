@@ -76,7 +76,7 @@ public class SinusoidalRule extends NeuronUpdateRule {
         double range = upperBound - lowerBound;
         double val = ((range / 2) * Math.sin(frequency
                 * neuron.getNetwork().getTime() + phase))
-            + ((upperBound + lowerBound) / 2);
+                + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

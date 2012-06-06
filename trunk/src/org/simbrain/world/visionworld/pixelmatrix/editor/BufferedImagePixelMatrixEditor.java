@@ -51,9 +51,8 @@ import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 /**
  * Buffered image pixel matrix editor.
  */
-public final class BufferedImagePixelMatrixEditor
-    extends JPanel
-    implements PixelMatrixEditor {
+public final class BufferedImagePixelMatrixEditor extends JPanel implements
+        PixelMatrixEditor {
 
     /** Empty image checkbox. */
     private JCheckBox emptyImage;
@@ -77,7 +76,7 @@ public final class BufferedImagePixelMatrixEditor
     private Action openImageFile;
 
     /** Array of file extensions available to be opened within a vision world. */
-    private String[] extensions = {"jpg", "gif", "jpeg", "png"};
+    private String[] extensions = { "jpg", "gif", "jpeg", "png" };
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Buffered image pixel matrix";
@@ -95,8 +94,8 @@ public final class BufferedImagePixelMatrixEditor
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
     /** Current file directory. */
-    private String currentDirectory = VisionWorldPreferences.getCurrentDirectory();
-
+    private String currentDirectory = VisionWorldPreferences
+            .getCurrentDirectory();
 
     /**
      * Create a new buffered image pixel matrix editor.
@@ -108,44 +107,41 @@ public final class BufferedImagePixelMatrixEditor
         layoutComponents();
     }
 
-
     /**
      * Initialize components.
      */
     private void initComponents() {
         emptyImage = new JCheckBox("Empty image", true);
         emptyImage.addActionListener(new ActionListener() {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    if (emptyImage.isSelected()) {
-                        height.setEnabled(true);
-                        width.setEnabled(true);
-                        openImageFile.setEnabled(false);
-                    }
-                    else {
-                        height.setEnabled(false);
-                        width.setEnabled(false);
-                        openImageFile.setEnabled(true);
-                    }
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                if (emptyImage.isSelected()) {
+                    height.setEnabled(true);
+                    width.setEnabled(true);
+                    openImageFile.setEnabled(false);
+                } else {
+                    height.setEnabled(false);
+                    width.setEnabled(false);
+                    openImageFile.setEnabled(true);
                 }
-            });
+            }
+        });
 
         existingImage = new JCheckBox("Existing image", false);
         existingImage.addActionListener(new ActionListener() {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    if (existingImage.isSelected()) {
-                        height.setEnabled(false);
-                        width.setEnabled(false);
-                        openImageFile.setEnabled(true);
-                    }
-                    else {
-                        height.setEnabled(true);
-                        width.setEnabled(true);
-                        openImageFile.setEnabled(false);
-                    }
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                if (existingImage.isSelected()) {
+                    height.setEnabled(false);
+                    width.setEnabled(false);
+                    openImageFile.setEnabled(true);
+                } else {
+                    height.setEnabled(true);
+                    width.setEnabled(true);
+                    openImageFile.setEnabled(false);
                 }
-            });
+            }
+        });
 
         ButtonGroup group = new ButtonGroup();
         group.add(emptyImage);
@@ -159,12 +155,13 @@ public final class BufferedImagePixelMatrixEditor
         openImageFile = new AbstractAction("...") {
             /** {@inheritDoc} */
             public void actionPerformed(final ActionEvent event) {
-                SFileChooser chooser = new SFileChooser(currentDirectory, "All Supported Images");
-                
+                SFileChooser chooser = new SFileChooser(currentDirectory,
+                        "All Supported Images");
+
                 for (String extension : extensions) {
                     chooser.addExtension(extension);
                 }
-                
+
                 chooser.setUseImagePreview(true);
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
@@ -184,7 +181,8 @@ public final class BufferedImagePixelMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME),
+                new EmptyBorder(6, 6, 6, 6)));
         setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
@@ -288,11 +286,9 @@ public final class BufferedImagePixelMatrixEditor
             }
             BufferedImage image = ImageIO.read(imageFile);
             return new BufferedImagePixelMatrix(image);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new PixelMatrixEditorException(e);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new PixelMatrixEditorException(e);
         }
     }
@@ -307,7 +303,7 @@ public final class BufferedImagePixelMatrixEditor
      *
      * @param dir current directory
      */
-    // TODO:  protected?  this class is final
+    // TODO: protected? this class is final
     protected void setCurrentDirectory(final String dir) {
         this.currentDirectory = dir;
         VisionWorldPreferences.setCurrentDirectory(dir);

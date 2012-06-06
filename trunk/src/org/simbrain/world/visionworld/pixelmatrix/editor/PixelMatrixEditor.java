@@ -28,21 +28,21 @@ import org.simbrain.world.visionworld.PixelMatrix;
 public interface PixelMatrixEditor {
 
     /**
-     * Return the editor component for this pixel matrix editor.
-     * The editor component will not be null.
+     * Return the editor component for this pixel matrix editor. The editor
+     * component will not be null.
      *
      * @return the editor component for this pixel matrix editor
      */
     Component getEditorComponent();
 
     /**
-     * Create a new instance of PixelMatrix from the properties of this
-     * pixel matrix editor.  The pixel matrix will not be null.
+     * Create a new instance of PixelMatrix from the properties of this pixel
+     * matrix editor. The pixel matrix will not be null.
      *
-     * @return a new instance of PixelMatrix created from the properties
-     *    of this pixel matrix editor
+     * @return a new instance of PixelMatrix created from the properties of this
+     *         pixel matrix editor
      * @throws PixelMatrixEditorException if a PixelMatrix cannot properly be
-     *    created from the properties of this pixel matrix editor
+     *             created from the properties of this pixel matrix editor
      */
     PixelMatrix createPixelMatrix() throws PixelMatrixEditorException;
 }

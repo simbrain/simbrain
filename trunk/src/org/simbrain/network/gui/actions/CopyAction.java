@@ -33,12 +33,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Copy action.
  */
-public final class CopyAction
-    extends AbstractAction {
+public final class CopyAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new copy action with the specified network panel.
@@ -55,7 +53,8 @@ public final class CopyAction
         this.networkPanel = networkPanel;
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C,
+                toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
@@ -64,11 +63,11 @@ public final class CopyAction
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**

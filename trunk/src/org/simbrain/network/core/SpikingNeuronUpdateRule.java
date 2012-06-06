@@ -28,11 +28,10 @@ import org.simbrain.network.core.Network.TimeType;
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
-
     /** Parent neuron. */
     private Neuron parentNeuron;
 
-    /** Time of last spike.  */
+    /** Time of last spike. */
     private double lastSpikeTime;
 
     /** Whether a spike has occurred in the current time. */
@@ -68,8 +67,7 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      */
     public void setHasSpiked(final boolean hasSpiked) {
         if (hasSpiked == true) {
-            lastSpikeTime = parentNeuron.getNetwork()
-                    .getTime();
+            lastSpikeTime = parentNeuron.getNetwork().getTime();
         }
         this.hasSpiked = hasSpiked;
     }

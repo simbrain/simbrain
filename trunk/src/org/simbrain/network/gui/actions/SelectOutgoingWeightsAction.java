@@ -20,7 +20,6 @@ package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -33,16 +32,13 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 /**
  * Clamps weights action.
  */
-public final class SelectOutgoingWeightsAction
-    extends AbstractAction {
+public final class SelectOutgoingWeightsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new clamp weights action with the specified
-     * network panel.
+     * Create a new clamp weights action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */

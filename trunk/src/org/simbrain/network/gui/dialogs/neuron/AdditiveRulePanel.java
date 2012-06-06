@@ -30,7 +30,6 @@ import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>AdditiveNeuronPanel</b>.
  */
@@ -89,20 +88,24 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class, "getLambda")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
+                "getLambda")) {
             tfLambda.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class, "getResistance")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
+                "getResistance")) {
             tfResistance.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
+                "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
+                "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -149,7 +152,8 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
             }
 
             if (!tfResistance.getText().equals(NULL_STRING)) {
-                neuronRef.setResistance(Double.parseDouble(tfResistance.getText()));
+                neuronRef.setResistance(Double.parseDouble(tfResistance
+                        .getText()));
             }
 
             if (!isAddNoise.isNull()) {

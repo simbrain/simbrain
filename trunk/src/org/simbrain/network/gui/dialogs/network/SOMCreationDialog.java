@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -33,6 +32,7 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -96,12 +96,15 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        SOM som = new SOM(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        SOM som = new SOM(networkPanel.getNetwork(),
+                Integer.parseInt(tfNumNeurons.getText()), layout);
         som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
+        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
+                .getText()));
         som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
+        som.setNeighborhoodDecayAmount(Double
+                .parseDouble(tfNeigborhoodDecayAmount.getText()));
         networkPanel.getNetwork().addGroup(som);
         networkPanel.repaint();
         super.closeDialogOk();
@@ -124,7 +127,8 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
         logicPanel.addItem("Initial Neighborhood Size", tfNeighborhoodSize);
         logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
         logicPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
-        logicPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+        logicPanel.addItem("Neighborhood Decay Amount",
+                tfNeigborhoodDecayAmount);
 
         // Set up tab panels
         tabLogic.add(logicPanel);
@@ -141,12 +145,11 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
         /* no implementation */
     }
 
-
     /**
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        //SOM som = new SOM();
+        // SOM som = new SOM();
         tfAlpha.setText("" + .6);
         tfNeighborhoodSize.setText("" + 100);
         tfNumNeurons.setText("" + 25);

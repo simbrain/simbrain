@@ -33,7 +33,7 @@ public class AllToAll extends ConnectNeurons {
 
     /**
      * Construct all to all connection object.
-     * 
+     *
      * @param network parent network
      * @param neurons base neurons
      * @param neurons2 target neurons
@@ -45,9 +45,8 @@ public class AllToAll extends ConnectNeurons {
     }
 
     /**
-     * Construct all to all connection object specifying only
-     * the parent network
-     * 
+     * Construct all to all connection object specifying only the parent network
+     *
      * @param network parent network
      */
     public AllToAll(final Network network) {
@@ -65,50 +64,53 @@ public class AllToAll extends ConnectNeurons {
 
     /** {@inheritDoc} */
     public List<Synapse> connectNeurons() {
-    	ArrayList<Synapse> syns = new ArrayList<Synapse>();
-    	Random rGen = new Random();
-    	int numConnects = 0;
- 
-    	numConnects = sourceNeurons.size() * targetNeurons.size();
-    	
+        ArrayList<Synapse> syns = new ArrayList<Synapse>();
+        Random rGen = new Random();
+        int numConnects = 0;
+
+        numConnects = sourceNeurons.size() * targetNeurons.size();
+
         int numEx = (int) (excitatoryRatio * numConnects);
         int numIn = numConnects - numEx;
-    	
-        //TODO: percent excititory currently not guaranteed for recurrent
-        //connections (source list == target list) when self connection is
-        //not allowed
-        
-        for(Neuron source : sourceNeurons) {
-        	for(Neuron target : targetNeurons) {
-        		if(!(!(Network.getSynapse(source, target) == null) ||
-        				(!allowSelfConnection && (source == target)))) {
-        			Synapse synapse = null;
-        			int ex = rGen.nextInt(numEx + numIn);
-        			if(ex < numEx) {
-        				numEx--;
-        				synapse = baseExcitatorySynapse.
-        					instantiateTemplateSynapse(source, target, network);
-        				if(enableExcitatoryRandomization){
-    	    				synapse.setStrength(excitatoryRandomizer.getRandom());
-    	    			} else {
-    	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
-    	    			}
-        			} else {
-        				numIn--;
-        				synapse = baseInhibitorySynapse.
-    						instantiateTemplateSynapse(source, target, network);
-        				if(enableInhibitoryRandomization){
-        					synapse.setStrength(inhibitoryRandomizer.getRandom());
-        				} else {
-        					synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
-        				}
-        			}
-        			network.addSynapse(synapse);
-        			syns.add(synapse);
-        		}
-        	}
+
+        // TODO: percent excititory currently not guaranteed for recurrent
+        // connections (source list == target list) when self connection is
+        // not allowed
+
+        for (Neuron source : sourceNeurons) {
+            for (Neuron target : targetNeurons) {
+                if (!(!(Network.getSynapse(source, target) == null) || (!allowSelfConnection && (source == target)))) {
+                    Synapse synapse = null;
+                    int ex = rGen.nextInt(numEx + numIn);
+                    if (ex < numEx) {
+                        numEx--;
+                        synapse = baseExcitatorySynapse
+                                .instantiateTemplateSynapse(source, target,
+                                        network);
+                        if (enableExcitatoryRandomization) {
+                            synapse.setStrength(excitatoryRandomizer
+                                    .getRandom());
+                        } else {
+                            synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+                        }
+                    } else {
+                        numIn--;
+                        synapse = baseInhibitorySynapse
+                                .instantiateTemplateSynapse(source, target,
+                                        network);
+                        if (enableInhibitoryRandomization) {
+                            synapse.setStrength(inhibitoryRandomizer
+                                    .getRandom());
+                        } else {
+                            synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+                        }
+                    }
+                    network.addSynapse(synapse);
+                    syns.add(synapse);
+                }
+            }
         }
-        
+
         return syns;
 
     }

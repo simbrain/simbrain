@@ -24,53 +24,51 @@ import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.Utils;
 
 /**
- * An action  that opens a help file in an external web browser.
+ * An action that opens a help file in an external web browser.
  */
 public final class ShowHelpAction extends AbstractAction {
 
     /** Documentation URL. */
     private final String theURL;
 
-    //TODO: Construct with URL; throw exceptions for bad pages
+    // TODO: Construct with URL; throw exceptions for bad pages
 
     /**
-     * Create a help action that opens the specified URL (relative to Simbrain/docs).
+     * Create a help action that opens the specified URL (relative to
+     * Simbrain/docs).
      *
      * @param actionName the name associated with this action
      * @param url the url to open.
      */
     public ShowHelpAction(final String actionName, final String url) {
         super(actionName);
-    	this.theURL = url;
+        this.theURL = url;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
     /**
-     * Create a help action that opens the specified URL (relative to the "Pages"
-     * directory in Simbrain/docs).
+     * Create a help action that opens the specified URL (relative to the
+     * "Pages" directory in Simbrain/docs).
      *
      * @param url the url to open.
      */
     public ShowHelpAction(final String url) {
         super("Help");
-    	this.theURL = url;
+        this.theURL = url;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    	
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    Utils.showHelpPage(theURL);
-                }
-            });
-    }
 
+        SwingUtilities.invokeLater(new Runnable() {
+            /** @see Runnable */
+            public void run() {
+                Utils.showHelpPage(theURL);
+            }
+        });
+    }
 
 }

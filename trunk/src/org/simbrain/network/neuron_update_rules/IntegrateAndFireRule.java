@@ -22,7 +22,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
  *
@@ -82,8 +81,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
         }
 
         double val = neuron.getActivation()
-                + (neuron.getParentNetwork().getTimeStep()
-                        / timeConstant * (restingPotential
+                + (neuron.getParentNetwork().getTimeStep() / timeConstant * (restingPotential
                         - neuron.getActivation() + (resistance * inputs)));
 
         if (val > threshold) {

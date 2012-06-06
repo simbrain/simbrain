@@ -96,8 +96,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         // Layout layout = layoutPanel.getNeuronLayout();
         GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numUnits));
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Hopfield hop = new Hopfield(networkPanel.getNetwork(), numUnits,
-                layout);
+        Hopfield hop = new Hopfield(networkPanel.getNetwork(), numUnits, layout);
         hop.setUpdateOrder(getUpdateType());
         networkPanel.getNetwork().addGroup(hop);
         networkPanel.repaint();
@@ -142,10 +141,10 @@ public class HopfieldCreationDialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        //REDO: Pull default values
+        // REDO: Pull default values
         numberOfUnits.setText("" + 9);
-//        Hopfield dh = new Hopfield();
-//        numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
+        // Hopfield dh = new Hopfield();
+        // numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
     }
 
 }

@@ -51,7 +51,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  */
 public class OdorWorldPanel extends JPanel implements KeyListener {
 
-    //TODO: Move most of this input stuff to an input manager...
+    // TODO: Move most of this input stuff to an input manager...
     private static final long serialVersionUID = 1L;
 
     /** Reference to model world. */
@@ -150,49 +150,54 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         });
     }
 
-//    final ActionListener copyListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            WorldClipboard.copyItem(selectedEntity);
-//        }
-//    };
-//    
-//    final ActionListener cutListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
-////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-//        }
-//    };
-//    
-//    final ActionListener pasteListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
-////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-//        }
-//    };
-//    
-//    final ActionListener clearAllListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            world.clearAllEntities();
-////            getParentFrame().repaint();
-////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);   
-//        }
-//    };
+    // final ActionListener copyListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // WorldClipboard.copyItem(selectedEntity);
+    // }
+    // };
+    //
+    // final ActionListener cutListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
+    // //
+    // getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+    // }
+    // };
+    //
+    // final ActionListener pasteListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
+    // //
+    // getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+    // }
+    // };
+    //
+    // final ActionListener clearAllListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // world.clearAllEntities();
+    // // getParentFrame().repaint();
+    // //
+    // getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+    // }
+    // };
 
-    //    final ActionListener wallListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            drawingWalls = true;
-////            getParentFrame().repaint();
-////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-//        }
-//    };
-//        
-//    final ActionListener wallPropsListener = new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//            showWallDialog((Wall) selectedEntity);
-////            getParentFrame().repaint();
-////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-//        }
-//    };
+    // final ActionListener wallListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // drawingWalls = true;
+    // // getParentFrame().repaint();
+    // //
+    // getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+    // }
+    // };
+    //
+    // final ActionListener wallPropsListener = new ActionListener() {
+    // public void actionPerformed(ActionEvent e) {
+    // showWallDialog((Wall) selectedEntity);
+    // // getParentFrame().repaint();
+    // //
+    // getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+    // }
+    // };
 
     /**
      * Handle button clicks on Odor World main panel.
@@ -201,6 +206,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         /**
          * Task to perform when mouse button is pressed.
+         *
          * @param mouseEvent Mouse event
          */
         public void mousePressed(final MouseEvent mouseEvent) {
@@ -208,8 +214,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             // Select Entity
             selectedEntity = null;
             selectedPoint = mouseEvent.getPoint();
-            for(OdorWorldEntity sprite: world.getObjectList()) {
-                if(sprite.getBounds().contains(selectedPoint))  {
+            for (OdorWorldEntity sprite : world.getObjectList()) {
+                if (sprite.getBounds().contains(selectedPoint)) {
                     selectedEntity = sprite;
                 }
             }
@@ -227,7 +233,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             // Show context menu for right click
-            if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+            if (mouseEvent.isControlDown()
+                    || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
                 final JPopupMenu menu = buildPopupMenu(selectedEntity);
                 if (menu != null) {
                     menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(),
@@ -236,9 +243,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             // Handle Double clicks
-            else if (mouseEvent.getClickCount() == 2) { 
-                if(selectedEntity != null) {
-                    ShowEntityDialogAction action = new ShowEntityDialogAction(selectedEntity);
+            else if (mouseEvent.getClickCount() == 2) {
+                if (selectedEntity != null) {
+                    ShowEntityDialogAction action = new ShowEntityDialogAction(
+                            selectedEntity);
                     action.actionPerformed(null);
                 }
             }
@@ -247,6 +255,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         /**
          * Task to perform when mouse button is released.
+         *
          * @param mouseEvent Mouse event
          */
         public void mouseReleased(final MouseEvent mouseEvent) {
@@ -263,6 +272,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
         /**
          * Task to perform when mouse button is held and mouse moved.
+         *
          * @param e Mouse event
          */
         public void mouseDragged(final MouseEvent e) {
@@ -276,20 +286,23 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             if (selectedEntity != null) {
 
                 // Build a rectangle that corresponds to the bounds where the
-                // agent will be in the next moment. Then shrink it a bit to control the way
+                // agent will be in the next moment. Then shrink it a bit to
+                // control the way
                 // agents "bump" into
                 // the edge of the world when dragged.
-                final Point test = new Point(e.getPoint().x + distanceX, e
-                        .getPoint().y + distanceY);
+                final Point test = new Point(e.getPoint().x + distanceX,
+                        e.getPoint().y + distanceY);
                 final Rectangle testRect = new Rectangle((int) test.getX(),
                         (int) test.getY(), selectedEntity.getWidth(),
                         selectedEntity.getHeight());
-                testRect.grow(-5, -5); // TODO: Do this shrinking in a more principled way
+                testRect.grow(-5, -5); // TODO: Do this shrinking in a more
+                                       // principled way
 
-                // Only draw change the entity location if it's in the world bounds.
+                // Only draw change the entity location if it's in the world
+                // bounds.
                 if (getBounds().contains((testRect.getBounds()))) {
-                    selectedEntity.setX((int) test.x);
-                    selectedEntity.setY((int) test.y);
+                    selectedEntity.setX(test.x);
+                    selectedEntity.setY(test.y);
                     repaint();
                 }
             }
@@ -298,6 +311,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     /**
      * Task to perform when keyboard button is released.
+     *
      * @param k Keyboard event.
      */
     public void keyReleased(final KeyEvent k) {
@@ -305,6 +319,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     /**
      * Task to perform when keyboard button is typed.
+     *
      * @param k Keyboard event.
      */
     public void keyTyped(final KeyEvent k) {
@@ -312,35 +327,38 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     /**
      * Task to perform when keyboard button is pressed.
+     *
      * @param k Keyboard event.
      */
     public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
-            //this.fireWorldChanged();
+            // this.fireWorldChanged();
         }
 
-        //        if (k.getKeyCode() == KeyEvent.VK_UP) {
-        //            world.getCurrentCreature().moveStraight();
-        //        } else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
-        //            world.getCurrentCreature().goStraightBackward(1);
-        //        } else if (k.getKeyCode() == KeyEvent.VK_RIGHT) {
-        //            world.getCurrentCreature().turnRight(OdorWorld.manualMotionTurnIncrement);
-        //        } else if (k.getKeyCode() == KeyEvent.VK_LEFT) {
-        //            world.getCurrentCreature().turnLeft(OdorWorld.manualMotionTurnIncrement);
-        //        } else if ((k.getKeyCode() == KeyEvent.VK_DELETE) || (k.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-        //            world.removeEntity(selectedEntity);
-        //            this.getParentFrame().repaint();
-        //        }
+        // if (k.getKeyCode() == KeyEvent.VK_UP) {
+        // world.getCurrentCreature().moveStraight();
+        // } else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
+        // world.getCurrentCreature().goStraightBackward(1);
+        // } else if (k.getKeyCode() == KeyEvent.VK_RIGHT) {
+        // world.getCurrentCreature().turnRight(OdorWorld.manualMotionTurnIncrement);
+        // } else if (k.getKeyCode() == KeyEvent.VK_LEFT) {
+        // world.getCurrentCreature().turnLeft(OdorWorld.manualMotionTurnIncrement);
+        // } else if ((k.getKeyCode() == KeyEvent.VK_DELETE) || (k.getKeyCode()
+        // == KeyEvent.VK_BACK_SPACE)) {
+        // world.removeEntity(selectedEntity);
+        // this.getParentFrame().repaint();
+        // }
 
         if (k.getKeyCode() != KeyEvent.VK_SPACE) {
-            //this.fireWorldChanged();
+            // this.fireWorldChanged();
         }
 
         repaint();
     }
 
     /**
-     * passed two points, determineUpperLeft returns the upperleft point of the rect. they form
+     * passed two points, determineUpperLeft returns the upperleft point of the
+     * rect. they form
      *
      * @param p1 the first point
      * @param p2 the second point
@@ -388,7 +406,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         final JPopupMenu ret = new JPopupMenu();
 
         // No entity was clicked on
-        if(theEntity == null) {
+        if (theEntity == null) {
             ret.add(new JMenuItem(new AddEntityAction(this)));
             ret.add(new JMenuItem(new AddAgentAction(this)));
             ret.addSeparator();
@@ -396,20 +414,20 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             return ret;
         }
 
-        //ret.add(menu.getCopyItem());
-        //ret.add(menu.getCutItem());
-        //        if (theEntity instanceof BasicEntity) {
-        //            ret.addSeparator();
-        //            ret.add(menu.getObjectPropsItem());
-        //        } else if (theEntity instanceof Wall) {
-        //            ret.addSeparator();
-        //            ret.add(menu.getWallPropsItem());
-        //        } else {
-                
-        //        if (WorldClipboard.getClipboardEntity() != null) {
-        //            ret.add(menu.getPasteItem());
-        //            ret.addSeparator();
-        //        }
+        // ret.add(menu.getCopyItem());
+        // ret.add(menu.getCutItem());
+        // if (theEntity instanceof BasicEntity) {
+        // ret.addSeparator();
+        // ret.add(menu.getObjectPropsItem());
+        // } else if (theEntity instanceof Wall) {
+        // ret.addSeparator();
+        // ret.add(menu.getWallPropsItem());
+        // } else {
+
+        // if (WorldClipboard.getClipboardEntity() != null) {
+        // ret.add(menu.getPasteItem());
+        // ret.addSeparator();
+        // }
 
         ret.add(new JMenuItem(new ShowEntityDialogAction(theEntity)));
 
@@ -418,13 +436,12 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             ret.addSeparator();
             ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
         }
-        
+
         ret.addSeparator();
         ret.add(new JMenuItem(new AddTileSensorsAction(theEntity)));
 
         ret.addSeparator();
         ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
-
 
         return ret;
     }
@@ -438,6 +455,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     /**
      * Sets the background color of the world.
+     *
      * @param backgroundColor Color
      */
     public void setBackgroundColor(final int backgroundColor) {
@@ -491,8 +509,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      *
      * @return the last selected point
      */
-	public Point getSelectedPoint() {
-		return selectedPoint;
-	}
+    public Point getSelectedPoint() {
+        return selectedPoint;
+    }
 
 }

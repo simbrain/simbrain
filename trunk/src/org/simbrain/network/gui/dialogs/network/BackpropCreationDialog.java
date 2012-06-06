@@ -22,11 +22,10 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-
 
 /**
  * <b>BackpropDialog</b> is a dialog box for creating a Backprop network
@@ -41,6 +40,7 @@ public class BackpropCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
+     *
      * @param np Network panel
      */
     public BackpropCreationDialog(final NetworkPanel np) {
@@ -52,7 +52,7 @@ public class BackpropCreationDialog extends StandardDialog {
      * This method initialises the components on the panel.
      */
     private void init() {
-        //Initialize Dialog
+        // Initialize Dialog
         setTitle("New Backprop Network");
 
         fillFieldValues();
@@ -68,7 +68,7 @@ public class BackpropCreationDialog extends StandardDialog {
     private void fillFieldValues() {
         networkTopology.setText("5,3,5");
     }
-    
+
     /**
      * Called when dialog closes.
      */
@@ -84,10 +84,11 @@ public class BackpropCreationDialog extends StandardDialog {
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
         // Create the layered network
-        networkPanel.getNetwork().addGroup(new BackpropNetwork(networkPanel.getNetwork(), 
-                topology, lastClicked));
-        
-      networkPanel.repaint();
-      super.closeDialogOk();
+        networkPanel.getNetwork().addGroup(
+                new BackpropNetwork(networkPanel.getNetwork(), topology,
+                        lastClicked));
+
+        networkPanel.repaint();
+        super.closeDialogOk();
     }
 }

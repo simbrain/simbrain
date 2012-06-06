@@ -20,15 +20,14 @@ package org.simbrain.world.odorworld;
 
 import javax.swing.JMenuItem;
 
-
 /**
  * <b>OdorWorldMenu</b>.
  */
 public class OdorWorldMenu {
 
-	/** Parent world. */
+    /** Parent world. */
     private OdorWorldPanel parentWorld;
-    
+
     /** Delete menu item. */
     private JMenuItem deleteItem = new JMenuItem("Delete object");
     /** Add agent menu item. */
@@ -61,14 +60,14 @@ public class OdorWorldMenu {
      * Build the popup menu displayed when users right-click in world.
      */
     public void initMenu() {
-//        getDeleteItem().addActionListener(parentWorld.deleteListener);
-//        getObjectPropsItem().addActionListener(parentWorld.objectPropsListener);
-//        getPropsItem().addActionListener(parentWorld.propsListener);
-//        getWallItem().addActionListener(parentWorld.wallListener);
-//        getWallPropsItem().addActionListener(parentWorld.wallPropsListener);
-//        getCutItem().addActionListener(parentWorld.cutListener);
-//        getCopyItem().addActionListener(parentWorld.copyListener);
-//        getPasteItem().addActionListener(parentWorld.pasteListener);
+        // getDeleteItem().addActionListener(parentWorld.deleteListener);
+        // getObjectPropsItem().addActionListener(parentWorld.objectPropsListener);
+        // getPropsItem().addActionListener(parentWorld.propsListener);
+        // getWallItem().addActionListener(parentWorld.wallListener);
+        // getWallPropsItem().addActionListener(parentWorld.wallPropsListener);
+        // getCutItem().addActionListener(parentWorld.cutListener);
+        // getCopyItem().addActionListener(parentWorld.copyListener);
+        // getPasteItem().addActionListener(parentWorld.pasteListener);
     }
 
     /**

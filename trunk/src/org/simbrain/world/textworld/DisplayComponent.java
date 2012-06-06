@@ -29,7 +29,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
- * <b>DisplayComponent</b> is a component which wraps a display world with consumers.
+ * <b>DisplayComponent</b> is a component which wraps a display world with
+ * consumers.
  */
 public class DisplayComponent extends WorkspaceComponent {
 
@@ -58,7 +59,7 @@ public class DisplayComponent extends WorkspaceComponent {
         world = newWorld;
         init();
     }
-    
+
     /**
      * Initialize attribute types.
      */
@@ -90,7 +91,8 @@ public class DisplayComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("StringReader")) {
-                returnList.add(new PotentialConsumer(this, world, "addText", String.class, "StringReader"));                
+                returnList.add(new PotentialConsumer(this, world, "addText",
+                        String.class, "StringReader"));
             }
             if (type.getTypeName().equalsIgnoreCase("WordReader")) {
                 for (String word : world.getDictionary()) {
@@ -98,19 +100,19 @@ public class DisplayComponent extends WorkspaceComponent {
                             "addTextIfAboveThreshold", new Class<?>[] {
                                     double.class, String.class },
                             new Object[] { word }, word));
-                }                
+                }
             }
         }
-       return returnList;
+        return returnList;
     }
-
 
     /**
      * {@inheritDoc}
      */
     public static DisplayComponent open(InputStream input, String name,
             String format) {
-        DisplayWorld newWorld = (DisplayWorld) DisplayWorld.getXStream().fromXML(input);
+        DisplayWorld newWorld = (DisplayWorld) DisplayWorld.getXStream()
+                .fromXML(input);
         return new DisplayComponent(name, newWorld);
     }
 
@@ -138,7 +140,7 @@ public class DisplayComponent extends WorkspaceComponent {
     public DisplayWorld getWorld() {
         return world;
     }
-    
+
     @Override
     public Object getObjectFromKey(String objectKey) {
         return world;

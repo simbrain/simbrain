@@ -42,11 +42,11 @@ public class PlotActionManager {
 
     /**
      * Plot component action manager.
+     *
      * @param component Gui component.
      */
     @SuppressWarnings("unchecked")
     public PlotActionManager(GuiComponent component) {
-
 
         openPlotAction = new OpenPlotAction(component);
         savePlotAction = new SavePlotAction(component);
@@ -57,7 +57,8 @@ public class PlotActionManager {
      * @return the open/save plot actions.
      */
     public List<Action> getOpenSavePlotActions() {
-        return Arrays.asList(new Action[] {openPlotAction, savePlotAction, savePlotAsAction});
+        return Arrays.asList(new Action[] { openPlotAction, savePlotAction,
+                savePlotAsAction });
     }
 
     /**

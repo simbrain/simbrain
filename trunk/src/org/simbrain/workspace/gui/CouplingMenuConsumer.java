@@ -41,8 +41,8 @@ public class CouplingMenuConsumer extends JMenu {
     /**
      * Construct the menu.
      *
-     * @param menuName  the name of the menu
-     * @param workspace  the workspace
+     * @param menuName the name of the menu
+     * @param workspace the workspace
      * @param consumer the target consuming attribute.
      */
     public CouplingMenuConsumer(final String menuName,
@@ -64,13 +64,13 @@ public class CouplingMenuConsumer extends JMenu {
             for (PotentialAttribute potentialProducer : component
                     .getPotentialProducers()) {
                 CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
-                        potentialProducer.getDescription(), potentialProducer, consumer );
+                        potentialProducer.getDescription(), potentialProducer,
+                        consumer);
                 componentMenu.add(menuItem);
             }
 
             this.add(componentMenu);
         }
     }
-
 
 }

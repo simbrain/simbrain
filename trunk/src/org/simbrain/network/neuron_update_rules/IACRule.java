@@ -45,14 +45,14 @@ public class IACRule extends NeuronUpdateRule {
     private boolean clipping = true;
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public IACRule deepCopy() {
         IACRule iac = new IACRule();
@@ -65,14 +65,14 @@ public class IACRule extends NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void update(Neuron neuron) {
         double val = neuron.getActivation();

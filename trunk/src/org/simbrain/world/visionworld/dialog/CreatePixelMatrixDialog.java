@@ -50,8 +50,7 @@ import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditors;
 /**
  * Create pixel matrix dialog.
  */
-public final class CreatePixelMatrixDialog
-    extends JDialog {
+public final class CreatePixelMatrixDialog extends JDialog {
 
     /** Pixel matrices. */
     private JComboBox pixelMatrices;
@@ -83,7 +82,6 @@ public final class CreatePixelMatrixDialog
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new pixel matrix dialog.
      *
@@ -101,7 +99,6 @@ public final class CreatePixelMatrixDialog
         layoutComponents();
     }
 
-
     /**
      * Initialize components.
      */
@@ -112,36 +109,39 @@ public final class CreatePixelMatrixDialog
         pixelMatrixEditorPlaceholder.setLayout(new BorderLayout());
 
         pixelMatrices.addActionListener(new ActionListener() {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    pixelMatrixEditorPlaceholder.remove(pixelMatrixEditor.getEditorComponent());
-                    pixelMatrixEditor = (PixelMatrixEditor) pixelMatrices.getModel().getSelectedItem();
-                    pixelMatrixEditorPlaceholder.add("Center", pixelMatrixEditor.getEditorComponent());
-                    pixelMatrixEditorPlaceholder.invalidate();
-                    getContentPane().validate();
-                }
-            });
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                pixelMatrixEditorPlaceholder.remove(pixelMatrixEditor
+                        .getEditorComponent());
+                pixelMatrixEditor = (PixelMatrixEditor) pixelMatrices
+                        .getModel().getSelectedItem();
+                pixelMatrixEditorPlaceholder.add("Center",
+                        pixelMatrixEditor.getEditorComponent());
+                pixelMatrixEditorPlaceholder.invalidate();
+                getContentPane().validate();
+            }
+        });
 
         ok = new AbstractAction("OK") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    ok();
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                ok();
+            }
+        };
 
         cancel = new AbstractAction("Cancel") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    setVisible(false);
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                setVisible(false);
+            }
+        };
 
         help = new AbstractAction("Help") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    // empty
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                // empty
+            }
+        };
         help.setEnabled(false);
     }
 
@@ -186,7 +186,8 @@ public final class CreatePixelMatrixDialog
         c.gridx = 0;
         c.gridy++;
         c.weightx = 1.0f;
-        pixelMatrixEditorPlaceholder.add("Center", pixelMatrixEditor.getEditorComponent());
+        pixelMatrixEditorPlaceholder.add("Center",
+                pixelMatrixEditor.getEditorComponent());
         panel.add(pixelMatrixEditorPlaceholder, c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -212,8 +213,9 @@ public final class CreatePixelMatrixDialog
         JButton okButton = new JButton(ok);
         JButton cancelButton = new JButton(cancel);
         JButton helpButton = new JButton(help);
-        Dimension d = new Dimension(Math.max(cancelButton.getPreferredSize().width, 70),
-                                    cancelButton.getPreferredSize().height);
+        Dimension d = new Dimension(Math.max(
+                cancelButton.getPreferredSize().width, 70),
+                cancelButton.getPreferredSize().height);
         okButton.setPreferredSize(d);
         cancelButton.setPreferredSize(d);
         helpButton.setPreferredSize(d);
@@ -234,9 +236,10 @@ public final class CreatePixelMatrixDialog
         PixelMatrix pixelMatrix = null;
         try {
             pixelMatrix = pixelMatrixEditor.createPixelMatrix();
-        }
-        catch (PixelMatrixEditorException e) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot create pixel matrix", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+        } catch (PixelMatrixEditorException e) {
+            JOptionPane.showInternalMessageDialog(this,
+                    "Cannot create pixel matrix", e.getMessage(),
+                    JOptionPane.ERROR_MESSAGE);
             pixelMatrices.requestFocus();
         }
         visionWorld.getModel().setPixelMatrix(pixelMatrix);
@@ -246,13 +249,11 @@ public final class CreatePixelMatrixDialog
     /**
      * Pixel matrix editors combo box model.
      */
-    private static class PixelMatrixEditorsComboBoxModel
-        extends AbstractListModel
-        implements ComboBoxModel {
+    private static class PixelMatrixEditorsComboBoxModel extends
+            AbstractListModel implements ComboBoxModel {
 
         /** Selected pixel matrix editor. */
         private PixelMatrixEditor selection;
-
 
         /**
          * Create a new pixel matrix editors combo box model.
@@ -261,7 +262,6 @@ public final class CreatePixelMatrixDialog
             super();
             selection = PixelMatrixEditors.VALUES.get(0);
         }
-
 
         /** {@inheritDoc} */
         public int getSize() {

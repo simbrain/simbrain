@@ -18,69 +18,41 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.AddNeuronsDialog;
-import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
-import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 
 /**
  * Creates a group of neurons.
  */
-public final class AddNeuronsAction
-    extends AbstractAction {
+public final class AddNeuronsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-/*
-    class ShowNeuronDialog extends AbstractAction{
-
-    	private ArrayList<NeuronNode> nodes;
-    	
-    	public ShowNeuronDialog(ArrayList<NeuronNode> nodes){
-    		super("Neuron Parameters");
-    		this.nodes = nodes;
-    	}
-    	
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			NeuronDialog nDialog = new NeuronDialog(nodes){
-				protected void closeDialogOk(){
-					super.closeDialogOk();
-			        commitChanges();
-			        LayoutDialog dialog = new LayoutDialog(networkPanel);
-			        dialog.pack();
-			        dialog.setLocationRelativeTo(null);
-			        dialog.setVisible(true);
-				}
-			};
-			nDialog.pack();
-			nDialog.setLocationRelativeTo(null);
-			nDialog.setVisible(true);
-		}
-    	
-    }
-    
-    private Action nDialog;
-    */
+    /*
+     * class ShowNeuronDialog extends AbstractAction{
+     *
+     * private ArrayList<NeuronNode> nodes;
+     *
+     * public ShowNeuronDialog(ArrayList<NeuronNode> nodes){
+     * super("Neuron Parameters"); this.nodes = nodes; }
+     *
+     * @Override public void actionPerformed(ActionEvent arg0) { NeuronDialog
+     * nDialog = new NeuronDialog(nodes){ protected void closeDialogOk(){
+     * super.closeDialogOk(); commitChanges(); LayoutDialog dialog = new
+     * LayoutDialog(networkPanel); dialog.pack();
+     * dialog.setLocationRelativeTo(null); dialog.setVisible(true); } };
+     * nDialog.pack(); nDialog.setLocationRelativeTo(null);
+     * nDialog.setVisible(true); }
+     *
+     * }
+     *
+     * private Action nDialog;
+     */
     /**
      * Create a new neuron action with the specified network panel.
      *
@@ -94,17 +66,16 @@ public final class AddNeuronsAction
         }
 
         this.networkPanel = networkPanel;
-        //putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
-        //putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
-        //networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
-        //networkPanel.getActionMap().put(this, this);
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
+        // putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
+        // networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
+        // networkPanel.getActionMap().put(this, this);
 
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    	AddNeuronsDialog and = new AddNeuronsDialog(networkPanel);
+        AddNeuronsDialog and = new AddNeuronsDialog(networkPanel);
         and.pack();
         and.setLocationRelativeTo(null);
         and.setVisible(true);

@@ -23,11 +23,11 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule {
+public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
+        DifferentiableUpdateRule {
 
     /** Slope. */
     private double slope = 1;
@@ -45,21 +45,21 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     private boolean clipping = true;
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public LinearRule deepCopy() {
         LinearRule ln = new LinearRule();
@@ -72,7 +72,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void update(Neuron neuron) {
         double wtdInput = neuron.getWeightedInputs();

@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
@@ -119,8 +118,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
         mainPanel.addItem("Objects block movement", inhibitMovement);
         mainPanel.addItem("Enable boundaries (if not, agents wrap around)",
                 useLocalBounds);
-        mainPanel.addItem("Update network while dragging objects",
-                updateDrag);
+        mainPanel.addItem("Update network while dragging objects", updateDrag);
         mainPanel.addItem("Set Background Color", colorChoice);
 
         setContentPane(mainPanel);
@@ -161,7 +159,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
     /**
      * Performs an appropriate action on the given event.
-     * 
+     *
      * @param e the parameter activating this method
      */
     public void actionPerformed(final ActionEvent e) {
@@ -184,7 +182,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
     /**
      * Show the color pallette and get a color.
-     * 
+     *
      * @return selected color
      */
     public Color getColor() {

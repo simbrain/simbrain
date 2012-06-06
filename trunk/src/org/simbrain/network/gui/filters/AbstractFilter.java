@@ -24,11 +24,10 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /**
- * Abstract filter, implements both <code>PNodeFilter</code>
- * and <code>Predicate</code> interfaces.
+ * Abstract filter, implements both <code>PNodeFilter</code> and
+ * <code>Predicate</code> interfaces.
  */
-public abstract class AbstractFilter
-    implements PNodeFilter, Predicate {
+public abstract class AbstractFilter implements PNodeFilter, Predicate {
 
     /** @see Predicate */
     public boolean evaluate(final Object object) {

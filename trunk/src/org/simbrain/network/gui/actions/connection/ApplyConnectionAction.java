@@ -93,11 +93,13 @@ public final class ApplyConnectionAction extends AbstractAction {
                 optionsPanel = new RadialPanel((Radial) connection);
                 optionsPanel.fillFieldValues();
             } else if (connection instanceof Sparse) {
-                optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
+                optionsPanel = new SparsePanel((Sparse) connection,
+                        networkPanel);
                 optionsPanel.fillFieldValues();
             }
             ConnectionDialog dialog = new ConnectionDialog();
-            ShowHelpAction helpAction = new ShowHelpAction("Network/connections.html");
+            ShowHelpAction helpAction = new ShowHelpAction(
+                    "Network/connections.html");
             dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
             dialog.setLocationRelativeTo(null);

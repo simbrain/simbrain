@@ -36,18 +36,17 @@ public final class SaveWorkspaceAction extends DesktopAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a save workspace action with the specified
-     * workspace.
+     * Create a save workspace action with the specified workspace.
      */
     public SaveWorkspaceAction(SimbrainDesktop desktop) {
         super("Save Workspace", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
         putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

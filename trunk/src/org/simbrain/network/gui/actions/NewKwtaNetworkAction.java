@@ -28,16 +28,13 @@ import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
 /**
  * New Kwta network action.
  */
-public final class NewKwtaNetworkAction
-    extends AbstractAction {
+public final class NewKwtaNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new new Kwta network action with the specified
-     * network panel.
+     * Create a new new Kwta network action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -52,7 +49,6 @@ public final class NewKwtaNetworkAction
         this.networkPanel = networkPanel;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
@@ -61,11 +57,11 @@ public final class NewKwtaNetworkAction
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
-//        if (!dialog.hasUserCancelled()) {
-//            Competitive compNet = new Competitive(dialog.getNumberOfNeurons());
-//            compNet.setEpsilon(dialog.getEpsilon());
-//            this.addNetwork(compNet, "Line");
-//       }
-//       renderObjects();
+        // if (!dialog.hasUserCancelled()) {
+        // Competitive compNet = new Competitive(dialog.getNumberOfNeurons());
+        // compNet.setEpsilon(dialog.getEpsilon());
+        // this.addNetwork(compNet, "Line");
+        // }
+        // renderObjects();
     }
 }

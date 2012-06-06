@@ -29,16 +29,14 @@ import org.simbrain.network.gui.NetworkSelectionListener;
 /**
  * Set neuron properties.
  */
-public final class SetNeuronPropertiesAction
-    extends AbstractAction {
+public final class SetNeuronPropertiesAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new set neuron properties action with the specified
-     * network panel.
+     * Create a new set neuron properties action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -56,11 +54,11 @@ public final class SetNeuronPropertiesAction
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**

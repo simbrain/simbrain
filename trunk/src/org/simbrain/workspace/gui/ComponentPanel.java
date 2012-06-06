@@ -43,7 +43,8 @@ import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
  * of the represented component. Once it's fixed, the test of this will be
  * setting component properties via terminal and seeing the change reflected.
  */
-public class ComponentPanel extends JPanel implements WorkspaceListener, WorkspaceUpdaterListener  {
+public class ComponentPanel extends JPanel implements WorkspaceListener,
+        WorkspaceUpdaterListener {
 
     /** Table representing workspace components. */
     private JTable componentTable;
@@ -59,6 +60,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
 
     /**
      * Workspace component list panel constructor.
+     *
      * @param desktop reference.
      */
     public ComponentPanel(final SimbrainDesktop desktop) {
@@ -98,7 +100,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
      * {@inheritDoc}
      */
     public void componentAdded(WorkspaceComponent component) {
-       model.addRow(component);
+        model.addRow(component);
     }
 
     /**
@@ -135,10 +137,10 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     class ComponentTableModel extends AbstractTableModel {
 
         /** Column names. */
-        String[] columnNames = {"Component", "Type", "Gui On", "Update On"};
+        String[] columnNames = { "Component", "Type", "Gui On", "Update On" };
 
         /** Internal list of components. */
-        private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();      
+        private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();
 
         /**
          * {@inheritDoc}
@@ -269,8 +271,9 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     }
 
     public void changedUpdateController() {
-    	//TODO:
-        //updateLabel.setText("Current updater: " + desktop.getWorkspace().getUpdator().getCurrentUpdatorName());        
+        // TODO:
+        // updateLabel.setText("Current updater: " +
+        // desktop.getWorkspace().getUpdator().getCurrentUpdatorName());
     }
 
     public void updatedCouplings(int update) {

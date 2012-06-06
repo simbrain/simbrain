@@ -34,21 +34,21 @@ public final class Filters {
 
     /** Neuron node filter. */
     private static final AbstractFilter NEURON_NODE_FILTER = new AbstractFilter() {
-            /** @see AbstractFilter */
-            public boolean accept(final PNode node) {
-                return ((node instanceof NeuronNode) && (!isGrouped(node)));
-            }
-        };
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return ((node instanceof NeuronNode) && (!isGrouped(node)));
+        }
+    };
 
     /** Synapse node filter. */
     private static final AbstractFilter SYNAPSE_NODE_FILTER = new AbstractFilter() {
-            /** @see AbstractFilter */
-            public boolean accept(final PNode node) {
-                return ((node instanceof SynapseNode) && (!isGrouped(node)));
-            }
-        };
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return ((node instanceof SynapseNode) && (!isGrouped(node)));
+        }
+    };
 
-        /** Neuron node filter. */
+    /** Neuron node filter. */
     private static final AbstractFilter MODEL_GROUP_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -58,46 +58,44 @@ public final class Filters {
 
     /** Neuron or synapse node filter. Don't worry about grouping for this. */
     private static final AbstractFilter NEURON_OR_SYNAPSE_NODE_FILTER = new AbstractFilter() {
-         /** @see AbstractFilter */
-         public boolean accept(final PNode node) {
-             return ((node instanceof NeuronNode) || (node instanceof SynapseNode));
-         }
-     };
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return ((node instanceof NeuronNode) || (node instanceof SynapseNode));
+        }
+    };
 
-     /** Text object filter. */
-     private static final AbstractFilter TEXT_NODE_FILTER = new AbstractFilter() {
-         /** @see AbstractFilter */
-         public boolean accept(final PNode node) {
-             return (node instanceof TextNode);
-         }
-     };
+    /** Text object filter. */
+    private static final AbstractFilter TEXT_NODE_FILTER = new AbstractFilter() {
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return (node instanceof TextNode);
+        }
+    };
 
-   /**
-    * Helper method to determine if nodes are grouped.
-    *
-    * @param node node to check
-    * @return whether the node is grouped or not
-    */
-   private static boolean isGrouped(final PNode node) {
-       if (node instanceof ScreenElement) {
-           return ((ScreenElement) node).isGrouped();
-       }
-       return false;
-   }
+    /**
+     * Helper method to determine if nodes are grouped.
+     *
+     * @param node node to check
+     * @return whether the node is grouped or not
+     */
+    private static boolean isGrouped(final PNode node) {
+        if (node instanceof ScreenElement) {
+            return ((ScreenElement) node).isGrouped();
+        }
+        return false;
+    }
 
-        /** Selectable filter. */
+    /** Selectable filter. */
     private static final AbstractFilter SELECTABLE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-                return (((node instanceof NeuronNode) && (!isGrouped(node)))
-                        || ((node instanceof SynapseNode) && (!isGrouped(node)))
-                        || ((node instanceof TextNode) && (!isGrouped(node)))                       
-                        || (node instanceof ViewGroupNode));
-            }
+            return (((node instanceof NeuronNode) && (!isGrouped(node)))
+                    || ((node instanceof SynapseNode) && (!isGrouped(node)))
+                    || ((node instanceof TextNode) && (!isGrouped(node))) || (node instanceof ViewGroupNode));
+        }
     };
 
-
-        /** Subnetwork node filter. */
+    /** Subnetwork node filter. */
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
@@ -105,14 +103,12 @@ public final class Filters {
         }
     };
 
-
     /**
-         * Private constructor.
-         */
+     * Private constructor.
+     */
     private Filters() {
         // empty
     }
-
 
     /**
      * Return the neuron node filter.

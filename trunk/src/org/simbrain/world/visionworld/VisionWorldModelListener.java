@@ -21,11 +21,9 @@ package org.simbrain.world.visionworld;
 import java.util.EventListener;
 
 /**
- * Event listener that receives notification of changes
- * to a VisionWorldModel.
+ * Event listener that receives notification of changes to a VisionWorldModel.
  */
-public interface VisionWorldModelListener
-    extends EventListener {
+public interface VisionWorldModelListener extends EventListener {
 
     /**
      * Notify this listener the pixel matrix changed in a vision world model.

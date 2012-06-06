@@ -50,9 +50,9 @@ public class TimeSeriesModel extends ChartModel {
     /** Whether this chart if fixed width or not. */
     private boolean fixedWidth = true;
 
-
     /**
      * Time series model constructor.
+     *
      * @param parent component
      */
     public TimeSeriesModel() {
@@ -75,8 +75,8 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
+     * Create specified number of set of data sources. Adds these two existing
+     * data sources.
      *
      * @param numDataSources number of data sources to initialize plot with
      */
@@ -135,8 +135,7 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
@@ -234,28 +233,32 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * Update the model; currently used to remove unused data when in "fixed width" mode.
+     * Update the model; currently used to remove unused data when in
+     * "fixed width" mode.
      */
     public void update() {
 
         // Trim appropriately if fixed width
 
-        // TODO: This does not work well in trainer.gui.   Concurrency issues.  So disabling for now.
-//        if (isFixedWidth()) {
-//            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-//            for (Iterator iterator = getDataset().getSeries().iterator(); iterator
-//                    .hasNext();) {
-//                XYSeries series = (XYSeries) iterator.next();
-//                if (series.getItemCount() > getWindowSize()) {
-//                    int diff = Math
-//                            .abs(series.getItemCount() - getWindowSize());
-//                    System.out.println("diff:" + diff);
-//                    for (int i = 0; i < diff; i++) {
-//                        series.remove(i);
-//                    }
-//                }
-//            }
-//        }
+        // TODO: This does not work well in trainer.gui. Concurrency issues. So
+        // disabling for now.
+        // if (isFixedWidth()) {
+        // System.out.println("Dataset Size: " +
+        // dataset.getSeries(0).getItemCount());
+        // for (Iterator iterator = getDataset().getSeries().iterator();
+        // iterator
+        // .hasNext();) {
+        // XYSeries series = (XYSeries) iterator.next();
+        // if (series.getItemCount() > getWindowSize()) {
+        // int diff = Math
+        // .abs(series.getItemCount() - getWindowSize());
+        // System.out.println("diff:" + diff);
+        // for (int i = 0; i < diff; i++) {
+        // series.remove(i);
+        // }
+        // }
+        // }
+        // }
 
     }
 

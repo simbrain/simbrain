@@ -30,12 +30,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * New neuron action.
  */
-public final class NewNeuronAction
-    extends AbstractAction {
+public final class NewNeuronAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new neuron action with the specified network panel.
@@ -58,7 +56,6 @@ public final class NewNeuronAction
         networkPanel.getActionMap().put(this, this);
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

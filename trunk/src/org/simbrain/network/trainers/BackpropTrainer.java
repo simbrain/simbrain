@@ -19,9 +19,6 @@
 package org.simbrain.network.trainers;
 
 import java.awt.Point;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +26,6 @@ import java.util.List;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -37,8 +33,6 @@ import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
-import org.simbrain.network.util.SimnetUtils;
 
 /**
  * Backprop trainer. An implementation of the backpropagation learning
@@ -79,16 +73,15 @@ public class BackpropTrainer extends IterableTrainer {
      * @param layers the layers to train
      */
     public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
-    	super(network);
-    	this.layers = layers;
+        super(network);
+        this.layers = layers;
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
         iteration = 0;
         rmsError = 0;
-        //SimnetUtils.printLayers(layers);
+        // SimnetUtils.printLayers(layers);
     }
-
 
     // One pass through the training data
     @Override
@@ -96,7 +89,7 @@ public class BackpropTrainer extends IterableTrainer {
         rmsError = 0;
         int numRows = getMinimumNumRows(network);
         int numInputs = network.getInputNeurons().size();
-        //System.out.println("Data:" + numInputs + "/" + numRows);
+        // System.out.println("Data:" + numInputs + "/" + numRows);
 
         if ((numRows == 0) || (numInputs == 0)) {
             return;
@@ -106,7 +99,8 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Set activations on input layer
             for (int i = 0; i < numInputs; i++) {
-            	network.getInputNeurons().get(i).setActivation(network.getInputData()[row][i]);
+                network.getInputNeurons().get(i)
+                        .setActivation(network.getInputData()[row][i]);
             }
 
             // Update network
@@ -117,9 +111,9 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Update weights
             for (Synapse synapse : weightDeltaMap.keySet()) {
-                //System.out.println(synapse.getId() + ":"
-                //        + Utils.round(synapse.getStrength(), 2) + " + "
-                //        + Utils.round(weightDeltaMap.get(synapse), 2));
+                // System.out.println(synapse.getId() + ":"
+                // + Utils.round(synapse.getStrength(), 2) + " + "
+                // + Utils.round(weightDeltaMap.get(synapse), 2));
                 synapse.setStrength(synapse.getStrength()
                         + weightDeltaMap.get(synapse));
             }
@@ -135,7 +129,8 @@ public class BackpropTrainer extends IterableTrainer {
         }
 
         // Update RMS error.
-        rmsError = Math.sqrt(rmsError / (numRows * network.getOutputNeurons().size()));
+        rmsError = Math.sqrt(rmsError
+                / (numRows * network.getOutputNeurons().size()));
         iteration++;
         fireErrorUpdated();
     }
@@ -172,10 +167,10 @@ public class BackpropTrainer extends IterableTrainer {
                     for (Synapse synapse : hiddenLayerNeuron.getFanOut()) {
                         Neuron nextLayerNeuron = synapse.getTarget();
                         // TODO: Why do I need this check?
-                        //  Happens on 2 layer case?
+                        // Happens on 2 layer case?
                         if (errorMap.get(nextLayerNeuron) != null) {
-                            sumFanOutErrors += (errorMap.get(nextLayerNeuron)
-                                    * synapse.getStrength());
+                            sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse
+                                    .getStrength());
                         }
                     }
                     // Compute errors and deltas for previous layer
@@ -198,8 +193,9 @@ public class BackpropTrainer extends IterableTrainer {
         // Store error signal for this neuron
         double errorSignal = 0;
         if (neuron.getUpdateRule() instanceof DifferentiableUpdateRule) {
-            double derivative = ((DifferentiableUpdateRule) neuron.getUpdateRule())
-                    .getDerivative(neuron.getWeightedInputs(), neuron);
+            double derivative = ((DifferentiableUpdateRule) neuron
+                    .getUpdateRule()).getDerivative(neuron.getWeightedInputs(),
+                    neuron);
             errorSignal = error * derivative;
             errorMap.put(neuron, errorSignal);
         }
@@ -213,8 +209,7 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Compute and store bias delta for this neuron
         if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-            biasDeltaMap.put(neuron,
-                    learningRate * errorSignal);
+            biasDeltaMap.put(neuron, learningRate * errorSignal);
         }
     }
 
@@ -268,7 +263,7 @@ public class BackpropTrainer extends IterableTrainer {
     private void updateNetwork(Trainable network) {
         for (List<Neuron> layer : layers) {
             if (layers.indexOf(layer) != 0) {
-            	Network.updateNeurons(layer);
+                Network.updateNeurons(layer);
             }
         }
     }
@@ -295,7 +290,8 @@ public class BackpropTrainer extends IterableTrainer {
      * @return least number of rows
      */
     private int getMinimumNumRows(Trainable network) {
-        if ((network.getInputData() == null) || (network.getTrainingData() == null)) {
+        if ((network.getInputData() == null)
+                || (network.getTrainingData() == null)) {
             return 0;
         }
         int inputRows = network.getInputData().length;
@@ -306,7 +302,6 @@ public class BackpropTrainer extends IterableTrainer {
             return targetRows;
         }
     }
-
 
     /**
      * Test method.
@@ -336,7 +331,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -353,7 +348,8 @@ public class BackpropTrainer extends IterableTrainer {
             network.addNeuron(neuron);
             hiddenLayer.add(neuron);
         }
-        layout.setInitialLocation(new Point(10, initialYPosition - layerInterval ));
+        layout.setInitialLocation(new Point(10, initialYPosition
+                - layerInterval));
         layout.layoutNeurons(hiddenLayer);
 
         // Set up hidden layer 2
@@ -363,9 +359,10 @@ public class BackpropTrainer extends IterableTrainer {
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             hiddenLayer2.add(neuron);
-            //System.out.println("Hidden2-" + i + " = " + neuron.getId());
+            // System.out.println("Hidden2-" + i + " = " + neuron.getId());
         }
-        layout.setInitialLocation(new Point(10, initialYPosition - layerInterval*2));
+        layout.setInitialLocation(new Point(10, initialYPosition
+                - layerInterval * 2));
         layout.layoutNeurons(hiddenLayer2);
 
         // Set up output layer
@@ -376,7 +373,8 @@ public class BackpropTrainer extends IterableTrainer {
             network.addNeuron(neuron);
             outputLayer.add(neuron);
         }
-        layout.setInitialLocation(new Point(10, initialYPosition - layerInterval*3));
+        layout.setInitialLocation(new Point(10, initialYPosition
+                - layerInterval * 3));
         layout.layoutNeurons(outputLayer);
 
         // Connect input layer to hidden layer
@@ -397,25 +395,25 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Initialize the trainer
         // REDO
-//        Backprop trainer = new Backprop(network, inputLayer, outputLayer);
-//        network.setLearningRate(.9);
-//        trainer.setInputData(inputData);
-//        trainer.setTrainingData(trainingData);
-//        trainer.init();
-//        int epochs = 10000; // Takes 10K iteration to get < 0.1
-//        for (int i = 0; i < epochs; i++) {
-//            trainer.apply();
-//            System.out.println("Epoch " + i + ", error = " + trainer.getError());
-//        }
-//
-//        String FILE_OUTPUT_LOCATION = "./";
-//        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
-//        try {
-//            Network.getXStream().toXML(network,
-//                    new FileOutputStream(theFile));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        // Backprop trainer = new Backprop(network, inputLayer, outputLayer);
+        // network.setLearningRate(.9);
+        // trainer.setInputData(inputData);
+        // trainer.setTrainingData(trainingData);
+        // trainer.init();
+        // int epochs = 10000; // Takes 10K iteration to get < 0.1
+        // for (int i = 0; i < epochs; i++) {
+        // trainer.apply();
+        // System.out.println("Epoch " + i + ", error = " + trainer.getError());
+        // }
+        //
+        // String FILE_OUTPUT_LOCATION = "./";
+        // File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
+        // try {
+        // Network.getXStream().toXML(network,
+        // new FileOutputStream(theFile));
+        // } catch (FileNotFoundException e) {
+        // e.printStackTrace();
+        // }
 
     }
 

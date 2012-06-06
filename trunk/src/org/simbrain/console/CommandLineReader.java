@@ -7,7 +7,7 @@
  *                                                                           *
  *  The contents of this file are subject to the Sun Public License Version  *
  *  1.0 (the "License"); you may not use this file except in compliance with *
- *  the License. A copy of the License is available at http://www.sun.com    * 
+ *  the License. A copy of the License is available at http://www.sun.com    *
  *                                                                           *
  *  The Original Code is BeanShell. The Initial Developer of the Original    *
  *  Code is Pat Niemeyer. Portions created by Pat Niemeyer are Copyright     *
@@ -42,7 +42,7 @@ import java.io.Reader;
  * This is a quick hack to turn empty lines entered interactively on the command
  * line into ';\n' empty lines for the interpreter. It's just more pleasant to
  * be able to hit return on an empty line and see the prompt reappear.
- * 
+ *
  * This is *not* used when text is sourced from a file non-interactively.
  */
 class CommandLineReader extends FilterReader {

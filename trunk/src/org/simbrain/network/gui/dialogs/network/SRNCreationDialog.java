@@ -9,18 +9,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
+import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
  * Creates a GUI dialog to set the parameters for and then build a simple
  * recurrent network.
+ *
  * @author ztosi
  */
 
@@ -44,9 +45,9 @@ public class SRNCreationDialog extends StandardDialog {
 
     /**
      * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
-     * governing desired Neuron type for a given layer*/
-    private HashMap<String, NeuronUpdateRule> boxMap =
-           new HashMap<String, NeuronUpdateRule>();
+     * governing desired Neuron type for a given layer
+     */
+    private HashMap<String, NeuronUpdateRule> boxMap = new HashMap<String, NeuronUpdateRule>();
 
     /**
      * Mapping of Strings to NeuronUpdateRules, currently only Logisitc, Tanh,
@@ -63,7 +64,7 @@ public class SRNCreationDialog extends StandardDialog {
     }
 
     /** String values for combo-boxes (same as key values for boxMap) */
-    private String[] options = { "Linear", "Tanh", "Logistic"};
+    private String[] options = { "Linear", "Tanh", "Logistic" };
 
     /** Combo box for selecting update rule for the hidden layer */
     private JComboBox hiddenNeuronTypes = new JComboBox(options);
@@ -74,8 +75,8 @@ public class SRNCreationDialog extends StandardDialog {
     /**
      * Constructs a labeled item panel dialog for the creation of a simple
      * recurrent network.
-     * @param panel
-     *            the network panel the SRN will be tied to
+     *
+     * @param panel the network panel the SRN will be tied to
      */
     public SRNCreationDialog(final NetworkPanel panel) {
         this.panel = panel;
@@ -110,15 +111,12 @@ public class SRNCreationDialog extends StandardDialog {
 
     /**
      * Creates a new dialog section given a title and using a JSeparator.
-     * @param label
-     *            name of the section
-     * @param gbc
-     *            current GridBagConstraints, to align label and separators
-     * @param cRow
-     *            current row relative to LabeledItemPanel
+     *
+     * @param label name of the section
+     * @param gbc current GridBagConstraints, to align label and separators
+     * @param cRow current row relative to LabeledItemPanel
      */
-    public void sectionSeparator(String label, GridBagConstraints gbc,
-            int cRow) {
+    public void sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
         // Section label
         srnPanel.add(new JLabel(label), gbc);
 
@@ -154,11 +152,12 @@ public class SRNCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(panel.getNetwork(),
-                    Integer.parseInt(tfNumInputs.getText()), Integer
-                            .parseInt(tfNumHidden.getText()), Integer
-                            .parseInt(tfNumOutputs.getText()),
-                            panel.getLastClickedPosition());
+            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(
+                    panel.getNetwork(),
+                    Integer.parseInt(tfNumInputs.getText()),
+                    Integer.parseInt(tfNumHidden.getText()),
+                    Integer.parseInt(tfNumOutputs.getText()),
+                    panel.getLastClickedPosition());
 
             NeuronUpdateRule nur0 = boxMap.get(hiddenNeuronTypes
                     .getSelectedItem());

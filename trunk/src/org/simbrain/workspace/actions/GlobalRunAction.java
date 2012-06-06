@@ -29,7 +29,7 @@ import org.simbrain.workspace.Workspace;
  * Run network action.
  */
 public final class GlobalRunAction extends WorkspaceAction {
-    
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -42,7 +42,6 @@ public final class GlobalRunAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
         putValue(SHORT_DESCRIPTION, "Global iterate network update algorithm");
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

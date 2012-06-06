@@ -81,7 +81,8 @@ public class TextWorldActions {
                 // rich text)
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
-                    //Adapted from http://www.javapractices.com/topic/TopicAction.do?Id=87
+                    // Adapted from
+                    // http://www.javapractices.com/topic/TopicAction.do?Id=87
                     Scanner scanner;
                     try {
                         scanner = new Scanner(new FileReader(theFile));
@@ -93,13 +94,14 @@ public class TextWorldActions {
                                 while (lineScan.hasNext()) {
                                     String word = lineScan.next();
                                     world.addWordToDictionary(word);
-                                    //System.out.println("Entry is : " + word);
+                                    // System.out.println("Entry is : " + word);
                                 }
                             }
                         } finally {
                             // Ensure the underlying stream is always closed
                             // this only has any effect if the item passed to
-                            // the Scanner constructor implements Closeable (which it does
+                            // the Scanner constructor implements Closeable
+                            // (which it does
                             // in this case).
                             scanner.close();
                         }
@@ -145,7 +147,7 @@ public class TextWorldActions {
         };
 
     }
-    
+
     /**
      * Action for displaying a preference dialog
      *

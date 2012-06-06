@@ -41,10 +41,10 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
+ * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
+ * network model.
  */
-public final class SynapseNode
-    extends ScreenElement {
+public final class SynapseNode extends ScreenElement {
 
     /** The logical synapse this screen element represents. */
     private Synapse synapse;
@@ -90,7 +90,7 @@ public final class SynapseNode
      * @param synapse the model synapse this PNode represents
      */
     public SynapseNode(final NetworkPanel net, final NeuronNode source,
-                       final NeuronNode target, final Synapse synapse) {
+            final NeuronNode target, final Synapse synapse) {
 
         super(net);
         this.source = source;
@@ -128,16 +128,18 @@ public final class SynapseNode
 
         // Position the synapse
         if (isSelfConnection()) {
-            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + offset,
-                    target.getCenter().getY() + offset));
+            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter()
+                    .getX() + offset, target.getCenter().getY() + offset));
         } else {
-            synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
+            synapseCenter = globalToLocal(calcCenter(source.getCenter(),
+                    target.getCenter()));
         }
-        this.offset(synapseCenter.getX() - offset, synapseCenter.getY() - offset);
+        this.offset(synapseCenter.getX() - offset, synapseCenter.getY()
+                - offset);
 
         // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse((float) 0, (float) 0,
+            circle = PPath.createEllipse(0, 0,
                     (float) offset * 2, (float) offset * 2);
             ((PPath) circle).setStrokePaint(null);
             setBounds(circle.getFullBounds());
@@ -153,8 +155,8 @@ public final class SynapseNode
             line.reset();
             line.append(new Line2D.Double(globalToLocal(source.getCenter()),
                     synapseCenter), false);
-            publicLine.setLine(source.getCenter(),
-                    localToGlobal(synapseCenter));
+            publicLine
+                    .setLine(source.getCenter(), localToGlobal(synapseCenter));
         }
     }
 
@@ -175,9 +177,11 @@ public final class SynapseNode
      */
     private PPath getLine(final Point2D center) {
         if (isSelfConnection()) {
-            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
+            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1,
+                    355, Arc2D.OPEN));
         } else {
-            return new PPath(new Line2D.Double(globalToLocal(source.getCenter()), center));
+            return new PPath(new Line2D.Double(
+                    globalToLocal(source.getCenter()), center));
         }
     }
 
@@ -196,7 +200,8 @@ public final class SynapseNode
         }
 
         if (source.getNeuron().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) source.getNeuron().getUpdateRule()).hasSpiked()) {
+            if (((SpikingNeuronUpdateRule) source.getNeuron().getUpdateRule())
+                    .hasSpiked()) {
                 line.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 line.setStrokePaint(NetworkGuiSettings.getLineColor());
@@ -205,7 +210,8 @@ public final class SynapseNode
     }
 
     /**
-     * Update the diameter of the drawn weight based on the logical weight's strength.
+     * Update the diameter of the drawn weight based on the logical weight's
+     * strength.
      */
     public void updateDiameter() {
         double diameter;
@@ -214,7 +220,8 @@ public final class SynapseNode
         double lowerBound = synapse.getLowerBound();
         double strength = synapse.getStrength();
 
-        // If upper or lower bound are set to zero use a proxy to prevent division errors
+        // If upper or lower bound are set to zero use a proxy to prevent
+        // division errors
         if (upperBound == 0) {
             upperBound = ZERO_PROXY;
         }
@@ -222,7 +229,8 @@ public final class SynapseNode
             lowerBound = ZERO_PROXY;
         }
 
-        // If strength is out of bounds (which is allowed in the model), set it to those bounds for the
+        // If strength is out of bounds (which is allowed in the model), set it
+        // to those bounds for the
         // sake of the GUI representation
         if (strength < lowerBound) {
             strength = lowerBound;
@@ -234,11 +242,13 @@ public final class SynapseNode
         if (synapse.getStrength() == 0) {
             diameter = NetworkGuiSettings.getMinDiameter();
         } else if (synapse.getStrength() > 0) {
-            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings.getMinDiameter())
-                    * (strength / upperBound) + NetworkGuiSettings.getMinDiameter()));
+            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings
+                    .getMinDiameter()) * (strength / upperBound) + NetworkGuiSettings
+                    .getMinDiameter()));
         } else {
-            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings.getMinDiameter())
-                    * (Math.abs(strength / lowerBound))) + NetworkGuiSettings.getMinDiameter());
+            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings
+                    .getMinDiameter()) * (Math.abs(strength / lowerBound))) + NetworkGuiSettings
+                    .getMinDiameter());
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;
@@ -251,8 +261,8 @@ public final class SynapseNode
     }
 
     /**
-     * Calculates the position of the synapse circle based on the positions of the source and target
-     * NeuronNodes.
+     * Calculates the position of the synapse circle based on the positions of
+     * the source and target NeuronNodes.
      *
      * @param src Source NeuronNode
      * @param tar Target NeuronNode
@@ -335,17 +345,16 @@ public final class SynapseNode
         contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
         contextMenu.addSeparator();
 
-//        Workspace workspace = getNetworkPanel().getWorkspace();
-//        if (workspace.getGaugeList().size() > 0) {
-//            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-//            contextMenu.addSeparator();
-//        }
+        // Workspace workspace = getNetworkPanel().getWorkspace();
+        // if (workspace.getGaugeList().size() > 0) {
+        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+        // contextMenu.addSeparator();
+        // }
 
         contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
 
         return contextMenu;
     }
-
 
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
@@ -354,7 +363,8 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel().getSelectedModelSynapses());
+        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel()
+                .getSelectedModelSynapses());
         return dialog;
     }
 
@@ -365,7 +375,8 @@ public final class SynapseNode
      */
     public String toString() {
         String ret = new String();
-        ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
+        ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")("
+                + getGlobalFullBounds().y + ")\n";
         return ret;
     }
 
@@ -425,15 +436,14 @@ public final class SynapseNode
         return publicLine;
     }
 
-
-//    public void paint(PPaintContext aPaintContext) {
-//        double s = aPaintContext.getScale();
-//        //TODO: Make this settable
-//        if (s < 1) {
-//            this.setVisible(false);
-//        } else {
-//            this.setVisible(true);
-//        }
-//    }
+    // public void paint(PPaintContext aPaintContext) {
+    // double s = aPaintContext.getScale();
+    // //TODO: Make this settable
+    // if (s < 1) {
+    // this.setVisible(false);
+    // } else {
+    // this.setVisible(true);
+    // }
+    // }
 
 }

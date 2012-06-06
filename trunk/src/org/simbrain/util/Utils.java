@@ -76,8 +76,7 @@ public class Utils {
 
         try {
             // # is a comment delimeter in net files
-            theParser = new CSVParser(new FileInputStream(theFile), "", "",
-                    "#");
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n"
@@ -193,7 +192,7 @@ public class Utils {
             retString = retString.concat("" + round(theVec[i], 1) + delimiter);
         }
 
-        retString = retString.concat("" + round(theVec[theVec.length - 1],1));
+        retString = retString.concat("" + round(theVec[theVec.length - 1], 1));
 
         return retString;
     }
@@ -285,7 +284,7 @@ public class Utils {
     /**
      * Launch an .html page using the system's default browser.
      *
-     * @param url the url to display.  Assumes it is in the local file system.
+     * @param url the url to display. Assumes it is in the local file system.
      */
     public static void displayLocalHtmlInBrowser(final String url) {
         try {
@@ -304,7 +303,7 @@ public class Utils {
      * @return Hue, saturation, and brightness
      */
     public static Color floatToHue(final float fclr) {
-        return Color.getHSBColor(fclr, 1, (float) 1);
+        return Color.getHSBColor(fclr, 1, 1);
     }
 
     /**

@@ -24,10 +24,10 @@ package org.simbrain.workspace;
  * @author jyoshimi
  */
 public class PotentialConsumer extends PotentialAttribute {
-    
+
     /**
-     * Construct a potential attribute for the (default) case where the method has one
-     * argument only.
+     * Construct a potential attribute for the (default) case where the method
+     * has one argument only.
      *
      * @param parent parent workspace component
      * @param object base object containing method to call
@@ -43,11 +43,11 @@ public class PotentialConsumer extends PotentialAttribute {
     }
 
     /**
-     * Construct a potential consumer for the case where the method has
-     * multiple arguments. The first is the "main datatype" of the consumer.
-     * 
+     * Construct a potential consumer for the case where the method has multiple
+     * arguments. The first is the "main datatype" of the consumer.
+     *
      * TODO: No support for more than two arguments currently.
-     * 
+     *
      * @param parent parent workspace component
      * @param object base object containing method to call
      * @param methodName name of method to call
@@ -57,10 +57,10 @@ public class PotentialConsumer extends PotentialAttribute {
      * @param description description of the attribute
      */
     public PotentialConsumer(WorkspaceComponent parent, Object object,
-            String methodName, Class<?>[] argDataTypes,
-            Object[] argValues, String description) {
-        super(parent, object, methodName, argDataTypes[0], argDataTypes, argValues,
-                description);
+            String methodName, Class<?>[] argDataTypes, Object[] argValues,
+            String description) {
+        super(parent, object, methodName, argDataTypes[0], argDataTypes,
+                argValues, description);
     }
 
     /**
@@ -71,5 +71,5 @@ public class PotentialConsumer extends PotentialAttribute {
     public Consumer<?> createConsumer() {
         return getParent().getAttributeManager().createConsumer(this);
     }
-    
+
 }

@@ -27,7 +27,8 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the properties of a discrete hopfield network.
+ * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the
+ * properties of a discrete hopfield network.
  */
 public class HopfieldPropertiesDialog extends StandardDialog {
 
@@ -41,7 +42,8 @@ public class HopfieldPropertiesDialog extends StandardDialog {
     public static final int RANDOM = 1;
 
     /** Network type combo box. */
-    private JComboBox cbUpdateOrder = new JComboBox(new String[] {"Sequential", "Random" });
+    private JComboBox cbUpdateOrder = new JComboBox(new String[] {
+            "Sequential", "Random" });
 
     /** The model subnetwork. */
     private Hopfield hop;
@@ -61,8 +63,9 @@ public class HopfieldPropertiesDialog extends StandardDialog {
         this.hop = hop;
         setTitle("Set Discrete Hopfield Properties");
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
-        helpAction = new ShowHelpAction("Pages/Network/network/hopfieldnetwork.html");
+        this.setLocation(500, 0); // Sets location of network dialog
+        helpAction = new ShowHelpAction(
+                "Pages/Network/network/hopfieldnetwork.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);
@@ -97,4 +100,3 @@ public class HopfieldPropertiesDialog extends StandardDialog {
     }
 
 }
-

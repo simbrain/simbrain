@@ -37,8 +37,7 @@ public class LifeCycle {
     }
 
     /**
-     * @param bitesToDie
-     *            Bites to eat an item.
+     * @param bitesToDie Bites to eat an item.
      */
     public void setBitesToDie(final int bitesToDie) {
         this.bitesToDie = bitesToDie;
@@ -52,8 +51,7 @@ public class LifeCycle {
     }
 
     /**
-     * @param resurrectionProb
-     *            Likelihood entity will reappear.
+     * @param resurrectionProb Likelihood entity will reappear.
      */
     public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
@@ -68,9 +66,8 @@ public class LifeCycle {
 
     /**
      * Number of times bitten.
-     * 
-     * @param bites
-     *            Number of bites.
+     *
+     * @param bites Number of bites.
      */
     public void setBites(final int bites) {
         this.bites = bites;
@@ -98,8 +95,7 @@ public class LifeCycle {
     }
 
     /**
-     * @param isDead
-     *            the isDead to set
+     * @param isDead the isDead to set
      */
     public void setDead(boolean isDead) {
         this.isDead = isDead;

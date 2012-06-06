@@ -65,9 +65,8 @@ public class ChartModel {
         settingsListenerList.add(listener);
     }
 
-
     /**
-     * Fire  settings updated event.
+     * Fire settings updated event.
      */
     public void fireSettingsChanged() {
         for (ChartSettingsListener listener : settingsListenerList) {
@@ -116,6 +115,7 @@ public class ChartModel {
 
     /**
      * Creates an xtream object with relevant fields omitted.
+     *
      * @return
      */
     public static XStream getXStream() {

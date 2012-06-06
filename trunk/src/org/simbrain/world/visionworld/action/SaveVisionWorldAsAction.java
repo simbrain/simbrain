@@ -28,28 +28,27 @@ import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 /**
  * Create pixel matrix action.
  */
-public final class SaveVisionWorldAsAction
-    extends AbstractAction {
+public final class SaveVisionWorldAsAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorldDesktopComponent desktopComponent;
-
 
     /**
      * Create a new create pixel matrix action.
      *
      * @param visionWorld vision world, must not be null
      */
-    public SaveVisionWorldAsAction(final VisionWorldDesktopComponent desktopComponent) {
+    public SaveVisionWorldAsAction(
+            final VisionWorldDesktopComponent desktopComponent) {
         super("Save As...");
         if (desktopComponent == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
+            throw new IllegalArgumentException(
+                    "Desktop component must not be null");
         }
         this.desktopComponent = desktopComponent;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
         putValue(SHORT_DESCRIPTION, "Save Vision World As");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

@@ -11,6 +11,5 @@ public class GenericJFrame extends JFrame implements GenericFrame {
 
     public void setIcon(boolean b) throws PropertyVetoException {
         this.setIcon(b);
-    }        
+    }
 }
-

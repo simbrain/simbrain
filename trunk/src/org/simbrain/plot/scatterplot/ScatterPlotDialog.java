@@ -68,7 +68,8 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
      * @param chart Reference to the chart component to be changed
      * @param model Scatter plot model
      */
-    public ScatterPlotDialog(final JFreeChart chart, final ScatterPlotModel model) {
+    public ScatterPlotDialog(final JFreeChart chart,
+            final ScatterPlotModel model) {
         this.model = model;
         theColor = model.getChartSeriesPaint();
         LabelledItemPanel dialogPanel = new LabelledItemPanel();
@@ -107,7 +108,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         colorPanel.add(seriesColorSelector);
         colorPanel.add(colorButton);
         colorPanel.add(colorIndicator);
-        
+
         dialogPanel.addItem("Series Color:", colorPanel);
 
         checkBoundaryFields();
@@ -160,12 +161,16 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         model.setAutoRange(autoRange.isSelected());
         model.setAutoDomain(autoDomain.isSelected());
         if (!autoRange.isSelected()) {
-            model.setUpperRangeBoundary(Double.parseDouble(maxRangeField.getText()));
-            model.setLowerRangeBoundary(Double.parseDouble(minRangeField.getText()));
+            model.setUpperRangeBoundary(Double.parseDouble(maxRangeField
+                    .getText()));
+            model.setLowerRangeBoundary(Double.parseDouble(minRangeField
+                    .getText()));
         }
         if (!autoDomain.isSelected()) {
-            model.setUpperDomainBoundary(Double.parseDouble(maxDomainField.getText()));
-            model.setLowerDomainBoundary(Double.parseDouble(minDomainField.getText()));
+            model.setUpperDomainBoundary(Double.parseDouble(maxDomainField
+                    .getText()));
+            model.setLowerDomainBoundary(Double.parseDouble(minDomainField
+                    .getText()));
         }
 
         model.setDotSize(Integer.parseInt(dotSizeField.getText()));
@@ -183,10 +188,12 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
             maxDomainField.setEnabled(!autoDomain.isSelected());
             minDomainField.setEnabled(!autoDomain.isSelected());
         } else if (arg0.getActionCommand().equalsIgnoreCase("ShowColorDialog")) {
-            theColor.set(seriesColorSelector.getSelectedIndex(), JColorChooser.showDialog(
-                    this, "Series Color", colorIndicator.getBackground()));
+            theColor.set(seriesColorSelector.getSelectedIndex(), JColorChooser
+                    .showDialog(this, "Series Color",
+                            colorIndicator.getBackground()));
             setIndicatorColor();
-        } else if (arg0.getActionCommand().equalsIgnoreCase("SeriesColorSelector")) {
+        } else if (arg0.getActionCommand().equalsIgnoreCase(
+                "SeriesColorSelector")) {
             setIndicatorColor();
         }
     }
@@ -195,6 +202,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
      * Sets the indicator color to the current color of the selected series.
      */
     private void setIndicatorColor() {
-        colorIndicator.setBackground((Color) theColor.get(seriesColorSelector.getSelectedIndex()));
+        colorIndicator.setBackground((Color) theColor.get(seriesColorSelector
+                .getSelectedIndex()));
     }
 }

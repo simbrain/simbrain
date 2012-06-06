@@ -25,12 +25,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Selection edit mode action.
  */
-public final class SelectionEditModeAction
-    extends EditModeAction {
+public final class SelectionEditModeAction extends EditModeAction {
 
     /**
-     * Create a new selection edit mode action with the specified network
-     * panel.
+     * Create a new selection edit mode action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

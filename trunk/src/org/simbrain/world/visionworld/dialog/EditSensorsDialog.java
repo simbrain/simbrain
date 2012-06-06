@@ -53,8 +53,7 @@ import org.simbrain.world.visionworld.filter.editor.FilterEditors;
 /**
  * Edit sensors dialog.
  */
-public final class EditSensorsDialog
-    extends JDialog {
+public final class EditSensorsDialog extends JDialog {
 
     /** Filters. */
     private JComboBox filters;
@@ -86,7 +85,6 @@ public final class EditSensorsDialog
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new edit sensor dialog.
      *
@@ -104,7 +102,6 @@ public final class EditSensorsDialog
         layoutComponents();
     }
 
-
     /**
      * Initialize components.
      */
@@ -113,40 +110,43 @@ public final class EditSensorsDialog
         filters = new JComboBox(new FilterEditorsComboBoxModel());
 
         filters.addActionListener(new ActionListener() {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    filterEditorPlaceholder.remove(filterEditor.getEditorComponent());
-                    filterEditor = (FilterEditor) filters.getModel().getSelectedItem();
-                    filterEditorPlaceholder.add("Center", filterEditor.getEditorComponent());
-                    filterEditorPlaceholder.invalidate();
-                    getContentPane().validate();
-                }
-            });
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                filterEditorPlaceholder.remove(filterEditor
+                        .getEditorComponent());
+                filterEditor = (FilterEditor) filters.getModel()
+                        .getSelectedItem();
+                filterEditorPlaceholder.add("Center",
+                        filterEditor.getEditorComponent());
+                filterEditorPlaceholder.invalidate();
+                getContentPane().validate();
+            }
+        });
 
         filterEditor = FilterEditors.VALUES.get(0);
         filterEditorPlaceholder = new JPanel();
         filterEditorPlaceholder.setLayout(new BorderLayout());
 
         ok = new AbstractAction("OK") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    ok();
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                ok();
+            }
+        };
 
         cancel = new AbstractAction("Cancel") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    setVisible(false);
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                setVisible(false);
+            }
+        };
 
         help = new AbstractAction("Help") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    // empty
-                }
-            };
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                // empty
+            }
+        };
         help.setEnabled(false);
     }
 
@@ -219,7 +219,8 @@ public final class EditSensorsDialog
 
         c.insets = FIELD_INSETS;
         c.gridy++;
-        filterEditorPlaceholder.add("Center", filterEditor.getEditorComponent());
+        filterEditorPlaceholder
+                .add("Center", filterEditor.getEditorComponent());
         panel.add(filterEditorPlaceholder, c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -248,8 +249,9 @@ public final class EditSensorsDialog
         JButton okButton = new JButton(ok);
         JButton cancelButton = new JButton(cancel);
         JButton helpButton = new JButton(help);
-        Dimension d = new Dimension(Math.max(cancelButton.getPreferredSize().width, 70),
-                                    cancelButton.getPreferredSize().height);
+        Dimension d = new Dimension(Math.max(
+                cancelButton.getPreferredSize().width, 70),
+                cancelButton.getPreferredSize().height);
         okButton.setPreferredSize(d);
         cancelButton.setPreferredSize(d);
         helpButton.setPreferredSize(d);
@@ -271,9 +273,9 @@ public final class EditSensorsDialog
         Filter filter = null;
         try {
             filter = filterEditor.createFilter();
-        }
-        catch (FilterEditorException e) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot create filter", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+        } catch (FilterEditorException e) {
+            JOptionPane.showInternalMessageDialog(this, "Cannot create filter",
+                    e.getMessage(), JOptionPane.ERROR_MESSAGE);
             filters.requestFocus();
         }
         for (Sensor sensor : sensors) {
@@ -285,13 +287,11 @@ public final class EditSensorsDialog
     /**
      * Filter editors combo box model.
      */
-    private static class FilterEditorsComboBoxModel
-        extends AbstractListModel
-        implements ComboBoxModel {
+    private static class FilterEditorsComboBoxModel extends AbstractListModel
+            implements ComboBoxModel {
 
         /** Selected filter editor. */
         private FilterEditor selection;
-
 
         /**
          * Create a new filter editors combo box model.
@@ -300,7 +300,6 @@ public final class EditSensorsDialog
             super();
             selection = FilterEditors.VALUES.get(0);
         }
-
 
         /** {@inheritDoc} */
         public int getSize() {

@@ -27,7 +27,6 @@ import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 
-
 /**
  * Add entity action.
  */
@@ -47,16 +46,16 @@ public final class AddEntityAction extends AbstractAction {
     public AddEntityAction(final OdorWorldPanel worldPanel) {
         super("Add Entity");
         this.worldPanel = worldPanel;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
-//        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
+        // putValue(SMALL_ICON,
+        // ResourceManager.getImageIcon("PixelMatrix.png"));
+        // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
         BasicEntity entity = new BasicEntity(worldPanel.getWorld());
-        entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel
-                .getSelectedPoint().y);
+        entity.setLocation(worldPanel.getSelectedPoint().x,
+                worldPanel.getSelectedPoint().y);
         entity.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.0, 0.0, 0.3, 0.7, 0.0, 0.0 }, 100),
                 SmellSource.DecayFunction.GAUSSIAN, entity.getLocation()));

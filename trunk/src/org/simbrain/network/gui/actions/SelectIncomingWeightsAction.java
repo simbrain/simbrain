@@ -20,7 +20,6 @@ package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -33,16 +32,13 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 /**
  * Select incoming weights action weights action.
  */
-public final class SelectIncomingWeightsAction
-    extends AbstractAction {
+public final class SelectIncomingWeightsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create select incoming weights action with the specified
-     * network panel.
+     * Create select incoming weights action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -56,10 +52,11 @@ public final class SelectIncomingWeightsAction
 
         this.networkPanel = networkPanel;
 
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_3, toolkit.getMenuShortcutKeyMask());
-//
-//        putValue(ACCELERATOR_KEY, keyStroke);
+        // Toolkit toolkit = Toolkit.getDefaultToolkit();
+        // KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_3,
+        // toolkit.getMenuShortcutKeyMask());
+        //
+        // putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SHORT_DESCRIPTION, "Select All Incoming Weights");
     }
 

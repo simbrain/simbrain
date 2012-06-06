@@ -19,8 +19,7 @@ import com.jme.renderer.Renderer;
 import com.jme.util.TextureManager;
 
 /**
- * A multiple view element that represents the sky
- * in an environment.
+ * A multiple view element that represents the sky in an environment.
  */
 public class Sky extends MultipleViewElement<SkyDome> {
     /** The number of planes for the dome. */
@@ -29,24 +28,24 @@ public class Sky extends MultipleViewElement<SkyDome> {
     private static final int RADIAL_SAMPLES = 12;
     /** The radius of the dome. */
     private static final float RADIUS = 200;
-    
+
     /** The count of views that have been created. */
     private int count = 0;
-    
+
     /**
      * Returns a new SkyDome instance.
-     * 
+     *
      * @return A new SkyDome instance.
      */
     @Override
     public SkyDome create() {
-//        return new Skybox("sky" + ++count, 200, 200, 200);
+        // return new Skybox("sky" + ++count, 200, 200, 200);
         return new SkyDome("sky" + ++count, PLANES, RADIAL_SAMPLES, RADIUS);
     }
 
     /**
      * Initializes a Skybox.
-     * 
+     *
      * @param renderer the renderer
      * @param skybox the skybox
      */
@@ -55,26 +54,23 @@ public class Sky extends MultipleViewElement<SkyDome> {
         skybox.setRenderer(renderer);
 
         ImageIcon image = ResourceManager.getImageIcon("sky.png");
-        
-        BufferedImage img =
-            new BufferedImage(
-            image.getIconWidth(),
-            image.getIconHeight(),
-            BufferedImage.TYPE_INT_RGB);
+
+        BufferedImage img = new BufferedImage(image.getIconWidth(),
+                image.getIconHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) img.getGraphics();
         g.drawImage(image.getImage(), null, null);
         g.dispose();
-        
+
         image = new ImageIcon(img);
         image.setDescription("sky");
-        
+
         Texture skyTexture = TextureManager.loadTexture(image.getImage(),
                 Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR, true);
-        
+
         skybox.initialize();
-        
+
         skybox.setTexture(skyTexture, 0);
-        
+
         skybox.setModelBound(new BoundingBox());
         skybox.updateModelBound();
 
@@ -118,12 +114,12 @@ public class Sky extends MultipleViewElement<SkyDome> {
 
     public void setTentativeLocation(Point point) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setFloor(float height) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public List<Odor> getOdors() {

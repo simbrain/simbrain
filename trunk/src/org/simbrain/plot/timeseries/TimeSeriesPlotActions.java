@@ -34,14 +34,14 @@ import org.simbrain.resource.ResourceManager;
  */
 public class TimeSeriesPlotActions {
 
-
     /**
      * Shows a properties dialog for the trainer.
      *
      * @param TimeSeriesPlotPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getPropertiesDialogAction(final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getPropertiesDialogAction(
+            final TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -61,12 +61,13 @@ public class TimeSeriesPlotActions {
     }
 
     /**
-     * Clear the  graph.
+     * Clear the graph.
      *
      * @param TimeSeriesPlotPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getClearGraphAction(final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getClearGraphAction(
+            final TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -91,12 +92,14 @@ public class TimeSeriesPlotActions {
      * @param TimeSeriesPlotPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getAddSourceAction(final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getAddSourceAction(
+            final TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Add");
                 putValue(SHORT_DESCRIPTION, "Add a data source");
             }
@@ -117,12 +120,14 @@ public class TimeSeriesPlotActions {
      * @param TimeSeriesPlotPanel reference to time series plot panel
      * @return the action
      */
-    public static Action getRemoveSourceAction(final TimeSeriesPlotPanel timeSeriesPanel) {
+    public static Action getRemoveSourceAction(
+            final TimeSeriesPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Remove");
                 putValue(SHORT_DESCRIPTION, "Remove a data source");
             }

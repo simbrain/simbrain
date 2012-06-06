@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-
-
 /**
  * <b>BlankSpikerPanel</b>.
  */

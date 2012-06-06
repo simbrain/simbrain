@@ -142,7 +142,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
-    
+
     /** Update manager panel. */
     private UpdateManagerPanel updatePanel;
 
@@ -215,10 +215,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         tabbedPane.addTab("Update", updatePanel);
         tabbedPane.addTab("Misc.", tabMisc);
         setContentPane(tabbedPane);
-        
+
         // Add help button
         JButton helpButton = new JButton("Help");
-        ShowHelpAction helpAction = new ShowHelpAction("Network/network_prefs.html");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Network/network_prefs.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
     }
@@ -247,8 +248,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
         if (o == isRoundingBox) {
             checkRounding();
-            networkPanel.getNetwork().setRoundingOff(
-                    isRoundingBox.isSelected());
+            networkPanel.getNetwork()
+                    .setRoundingOff(isRoundingBox.isSelected());
         } else if (o == changeColorButton) {
             Color theColor = getColor();
             if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
@@ -342,8 +343,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getPrecision()));
         nudgeAmountField.setText(Double.toString(NetworkGuiSettings
                 .getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getNetwork()
-                .getRoundingOff());
+        isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
         weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
         weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
     }

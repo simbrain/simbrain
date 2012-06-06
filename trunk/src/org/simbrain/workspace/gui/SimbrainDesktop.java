@@ -581,7 +581,7 @@ public class SimbrainDesktop {
      */
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Scripts");
-        //scriptMenu.add(actionManager.getRunScriptAction());
+        // scriptMenu.add(actionManager.getRunScriptAction());
         scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
@@ -947,7 +947,7 @@ public class SimbrainDesktop {
     @SuppressWarnings("unchecked")
     static GuiComponent<?> createDesktopComponent(
             final GenericFrame parentFrame, final WorkspaceComponent component) {
-        Class<? extends WorkspaceComponent> componentClass = (Class<? extends WorkspaceComponent>) component
+        Class<? extends WorkspaceComponent> componentClass = component
                 .getClass();
         Class<? extends GuiComponent<?>> guiClass = wrappers
                 .get(componentClass);

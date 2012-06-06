@@ -41,7 +41,7 @@ import org.simbrain.util.Utils;
 /**
  * Component for choosing what kind of supervised learning to use. Can be
  * initialized with a set or trainer types.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class IterativeControlsPanel extends JPanel {
@@ -51,35 +51,36 @@ public class IterativeControlsPanel extends JPanel {
 
     /** Current number of iterations. */
     private JLabel iterationsLabel = new JLabel("--- ");
-    
+
     /** Error label. */
     private JLabel rmsError = new JLabel("Error: --- ");
 
     /** Batch iterations field. */
     private JTextField tfIterations = new JTextField("1000");
-    
-    /** Iterations thus far. */ 
-    private int iterations = 0; //TODO: A way to set to 0
+
+    /** Iterations thus far. */
+    private int iterations = 0; // TODO: A way to set to 0
 
     /** Reference to network panel. */
     private final NetworkPanel panel;
-    
+
     /** Flag for showing updates in GUI. */
     private final JCheckBox showUpdates = new JCheckBox("Show updates");
-    
+
     /**
      * Construct a rule chooser panel.
      *
      * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
-    public IterativeControlsPanel(final NetworkPanel networkPanel, final IterableTrainer trainer) {
+    public IterativeControlsPanel(final NetworkPanel networkPanel,
+            final IterableTrainer trainer) {
 
         this.trainer = trainer;
         this.panel = networkPanel;
         setLayout(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
-        
+
         // Run
         JPanel runPanel = new JPanel();
         runPanel.add(new JButton(runAction));
@@ -87,26 +88,27 @@ public class IterativeControlsPanel extends JPanel {
         runPanel.add(showUpdates);
         tabbedPane.addTab("Run", runPanel);
 
-		// Batch train
-		JPanel batchPanel = new JPanel();
-		batchPanel.add(tfIterations);
-		JButton batchButton = new JButton(batchTrain);
-		batchButton.setHideActionText(true);
-		batchPanel.add(batchButton);
-		tabbedPane.addTab("Batch", batchPanel);
+        // Batch train
+        JPanel batchPanel = new JPanel();
+        batchPanel.add(tfIterations);
+        JButton batchButton = new JButton(batchTrain);
+        batchButton.setHideActionText(true);
+        batchPanel.add(batchButton);
+        tabbedPane.addTab("Batch", batchPanel);
 
         // South Panel
-		JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		southPanel.add(new JLabel("Iterations:"));
-		southPanel.add(iterationsLabel);
-		southPanel.add(rmsError);
-    	JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(networkPanel, trainer));
-    	plotButton.setHideActionText(true);
-    	southPanel.add(plotButton);
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        southPanel.add(new JLabel("Iterations:"));
+        southPanel.add(iterationsLabel);
+        southPanel.add(rmsError);
+        JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(
+                networkPanel, trainer));
+        plotButton.setHideActionText(true);
+        southPanel.add(plotButton);
 
         add("Center", tabbedPane);
         add("South", southPanel);
-        
+
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
 
@@ -115,123 +117,115 @@ public class IterativeControlsPanel extends JPanel {
                 iterationsLabel.setText("" + iterations + " ");
                 updateError();
             }
-            
+
         });
 
     }
-    
+
     /**
      * Update the error field.
      */
     private void updateError() {
-        rmsError.setText("Error:"
-                + Utils.round(trainer.getError(), 4));
+        rmsError.setText("Error:" + Utils.round(trainer.getError(), 4));
     }
 
     /**
-     * A "play" action, that can be used to repeatedly iterate iterable
-     * training algorithms.
-     * 
+     * A "play" action, that can be used to repeatedly iterate iterable training
+     * algorithms.
+     *
      */
     Action runAction = new AbstractAction() {
 
-            // Initialize
-            {
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            // putValue(NAME, "Open (.csv)");
+            // putValue(SHORT_DESCRIPTION, "Import table from .csv");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            if (trainer.isUpdateCompleted()) {
+                // Start running
+                trainer.setUpdateCompleted(false);
+                Executors.newSingleThreadExecutor().submit(new Runnable() {
+                    public void run() {
+                        while (!trainer.isUpdateCompleted()) {
+                            trainer.apply();
+                            if (showUpdates.isSelected()) {
+                                panel.getNetwork().setUpdateCompleted(false);
+                                panel.getNetwork().fireNetworkChanged();
+                                while (panel.getNetwork().isUpdateCompleted() == false) {
+                                    try {
+                                        Thread.sleep(1);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                        {
+                            putValue(SMALL_ICON,
+                                    ResourceManager.getImageIcon("Play.png"));
+                        }
+                    }
+                });
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
+            } else {
+                // Stop running
+                trainer.setUpdateCompleted(true);
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
-                // putValue(NAME, "Open (.csv)");
-                // putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                if (trainer.isUpdateCompleted()) {
-                    // Start running
-                    trainer.setUpdateCompleted(false);
-                    Executors.newSingleThreadExecutor().submit(new Runnable() {
-                        public void run() {
-						while (!trainer.isUpdateCompleted()) {
-							trainer.apply();
-							if (showUpdates.isSelected()) {
-								panel.getNetwork()
-										.setUpdateCompleted(false);
-								panel.getNetwork().fireNetworkChanged();
-								while (panel.getNetwork()
-										.isUpdateCompleted() == false) {
-									try {
-										Thread.sleep(1);
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								}
-							}
-						}
-						{
-							putValue(SMALL_ICON,
-									ResourceManager.getImageIcon("Play.png"));
-						}
-					}
-				});
-                    putValue(SMALL_ICON,
-                            ResourceManager.getImageIcon("Stop.png"));
-                } else {
-                    // Stop running
-                    trainer.setUpdateCompleted(true);
-                    putValue(SMALL_ICON,
-                            ResourceManager.getImageIcon("Play.png"));
-                }
+        }
 
-            }
-
-        };
+    };
 
     /**
-     * A step action, for iterating iteratable learning algorithms one
-     * time.
+     * A step action, for iterating iteratable learning algorithms one time.
      */
     Action stepAction = new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-                // putValue(NAME, "Open (.csv)");
-                // putValue(SHORT_DESCRIPTION, "Import table from .csv");
-            }
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+            // putValue(NAME, "Open (.csv)");
+            // putValue(SHORT_DESCRIPTION, "Import table from .csv");
+        }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                trainer.apply();
-                if (showUpdates.isSelected()) {
-                	panel.getNetwork().fireNetworkChanged();
-                }
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            trainer.apply();
+            if (showUpdates.isSelected()) {
+                panel.getNetwork().fireNetworkChanged();
             }
+        }
 
-        };
+    };
 
     /**
      * A batch training action.
      */
     Action batchTrain = new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("BatchPlay.png"));
-                putValue(NAME, "Batch");
-                putValue(SHORT_DESCRIPTION, "Batch train network");
-            }
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("BatchPlay.png"));
+            putValue(NAME, "Batch");
+            putValue(SHORT_DESCRIPTION, "Batch train network");
+        }
 
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                trainer.iterate(Integer.parseInt(tfIterations.getText()));
-            }
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            trainer.iterate(Integer.parseInt(tfIterations.getText()));
+        }
 
-        };
-    
+    };
 
 }

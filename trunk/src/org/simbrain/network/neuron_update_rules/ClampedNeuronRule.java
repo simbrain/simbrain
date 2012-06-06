@@ -47,7 +47,7 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
      */
     public void update(Neuron neuron) {
         neuron.setBuffer(neuron.getActivation());
-     }
+    }
 
     /**
      * {@inheritDoc}
@@ -60,6 +60,5 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
     public String getDescription() {
         return "Clamped";
     }
-
 
 }

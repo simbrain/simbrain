@@ -32,8 +32,7 @@ import org.simbrain.world.visionworld.ReceptiveField;
 /**
  * BufferedImage pixel matrix.
  */
-public final class BufferedImagePixelMatrix
-    implements PixelMatrix {
+public final class BufferedImagePixelMatrix implements PixelMatrix {
 
     /** Image for this pixel matrix. */
     private volatile BufferedImage image;
@@ -47,10 +46,9 @@ public final class BufferedImagePixelMatrix
     /** Default width. */
     public static final int DEFAULT_WIDTH = 100;
 
-
     /**
-     * Create a new BufferedImage pixel matrix with an empty image
-     * the default dimensions.
+     * Create a new BufferedImage pixel matrix with an empty image the default
+     * dimensions.
      *
      * @see #DEFAULT_HEIGHT
      * @see #DEFAULT_WIDTH
@@ -60,20 +58,23 @@ public final class BufferedImagePixelMatrix
     }
 
     /**
-     * Create a new BufferedImage pixel matrix with an empty image
-     * the specified dimensions.
+     * Create a new BufferedImage pixel matrix with an empty image the specified
+     * dimensions.
      *
      * @param width width in pixels, must be &gt; 0
      * @param height height in pixels, must be &gt; 0
      */
     public BufferedImagePixelMatrix(final int width, final int height) {
         if (height <= 0) {
-            throw new IllegalArgumentException("height must be greater than zero");
+            throw new IllegalArgumentException(
+                    "height must be greater than zero");
         }
         if (width <= 0) {
-            throw new IllegalArgumentException("width must be greater than zero");
+            throw new IllegalArgumentException(
+                    "width must be greater than zero");
         }
-        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        this.image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
         this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
@@ -90,28 +91,33 @@ public final class BufferedImagePixelMatrix
         this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
-
     /**
      * Throw an ArrayIndexOutOfBoundsException if either of the specified
      * coordinates are outside the bounds of this pixel matrix.
      *
      * @param x x coordinate to check
      * @param y y coordinate to check
-     * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
-     *    are outside the bounds of this pixel matrix
+     * @throws ArrayIndexOutOfBoundsException if either of the specified
+     *             coordinates are outside the bounds of this pixel matrix
      */
     private void checkCoordinates(final int x, final int y) {
         if (x < 0) {
-            throw new ArrayIndexOutOfBoundsException("x must be greater than 0, was " + x);
+            throw new ArrayIndexOutOfBoundsException(
+                    "x must be greater than 0, was " + x);
         }
         if (y < 0) {
-            throw new ArrayIndexOutOfBoundsException("y must be greater than 0, was " + y);
+            throw new ArrayIndexOutOfBoundsException(
+                    "y must be greater than 0, was " + y);
         }
-        if (x > (int) (getWidth() - 1)) {
-            throw new ArrayIndexOutOfBoundsException("x must be less than or equal to (getWidth() - 1), was " + x);
+        if (x > (getWidth() - 1)) {
+            throw new ArrayIndexOutOfBoundsException(
+                    "x must be less than or equal to (getWidth() - 1), was "
+                            + x);
         }
-        if (y > (int) (getHeight() - 1)) {
-            throw new ArrayIndexOutOfBoundsException("y must be less than or equal to (getHeight() - 1), was " + y);
+        if (y > (getHeight() - 1)) {
+            throw new ArrayIndexOutOfBoundsException(
+                    "y must be less than or equal to (getHeight() - 1), was "
+                            + y);
         }
     }
 
@@ -133,7 +139,9 @@ public final class BufferedImagePixelMatrix
     /**
      * Set the image for this pixel matrix to <code>image</code>.
      *
-     * <p>This is a bound property.</p>
+     * <p>
+     * This is a bound property.
+     * </p>
      *
      * @param image image for this pixel matrix, must not be null
      */
@@ -145,7 +153,7 @@ public final class BufferedImagePixelMatrix
         this.image = image;
         propertyChangeSupport.firePropertyChange("image", oldImage, this.image);
     }
-    
+
     /** {@inheritDoc} */
     public Color getPixel(final int x, final int y) {
         checkCoordinates(x, y);
@@ -163,7 +171,8 @@ public final class BufferedImagePixelMatrix
         if (color == null) {
             throw new IllegalArgumentException("color must not be null");
         }
-        int rgb = (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
+        int rgb = (color.getRed() << 16) | (color.getGreen() << 8)
+                | (color.getBlue());
         int[] a = new int[1];
         a[0] = color.getAlpha();
         image.setRGB(x, y, rgb);
@@ -177,42 +186,47 @@ public final class BufferedImagePixelMatrix
 
     /** {@inheritDoc} */
     public void addPropertyChangeListener(final String propertyName,
-                                          final PropertyChangeListener listener) {
+            final PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
     /** {@inheritDoc} */
-    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+    public void removePropertyChangeListener(
+            final PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     /** {@inheritDoc} */
     public void removePropertyChangeListener(final String propertyName,
-                                             final PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+            final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName,
+                listener);
     }
 
     /** {@inheritDoc} */
     public Image view(final ReceptiveField receptiveField) {
         if (receptiveField == null) {
-            throw new IllegalArgumentException("receptiveField must not be null");
+            throw new IllegalArgumentException(
+                    "receptiveField must not be null");
         }
         return image.getSubimage(receptiveField.getX(), receptiveField.getY(),
-                                 receptiveField.getWidth(), receptiveField.getHeight());
+                receptiveField.getWidth(), receptiveField.getHeight());
     }
 
     /**
-     * Create and return a new BufferedImage of type <code>BufferedImage.TYPE_INT_ARGB</code>
-     * rendered from the specified base image.
+     * Create and return a new BufferedImage of type
+     * <code>BufferedImage.TYPE_INT_ARGB</code> rendered from the specified base
+     * image.
      *
      * @param baseImage base image
-     * @return a new BufferedImage of type <code>BufferedImage.TYPE_INT_ARGB</code> rendered
-     *    from the specified base image
+     * @return a new BufferedImage of type
+     *         <code>BufferedImage.TYPE_INT_ARGB</code> rendered from the
+     *         specified base image
      */
-    private static BufferedImage makeIndexedRGBImage(final BufferedImage baseImage) {
+    private static BufferedImage makeIndexedRGBImage(
+            final BufferedImage baseImage) {
         BufferedImage image = new BufferedImage(baseImage.getWidth(),
-                                                baseImage.getHeight(),
-                                                BufferedImage.TYPE_INT_ARGB);
+                baseImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.drawRenderedImage(baseImage, new AffineTransform());
         g.dispose();

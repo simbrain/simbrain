@@ -39,8 +39,7 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
 /**
  * Sensor selection event handler.
  */
-final class SelectionEventHandler
-    extends PDragSequenceEventHandler {
+final class SelectionEventHandler extends PDragSequenceEventHandler {
 
     /** Selection marquee. */
     private SelectionMarquee marquee;
@@ -58,8 +57,8 @@ final class SelectionEventHandler
     private BoundsFilter boundsFilter = new BoundsFilter();
 
     /** Prior selection, if any. */
-    private Collection<Sensor> priorSelection = Collections.<Sensor>emptyList();
-
+    private Collection<Sensor> priorSelection = Collections
+            .<Sensor> emptyList();
 
     /**
      * Create a new selection event handler for the specified vision world.
@@ -75,10 +74,9 @@ final class SelectionEventHandler
         this.selectionModel = visionWorld.getSensorSelectionModel();
     }
 
-
     /** {@inheritDoc} */
     public void mouseClicked(final PInputEvent event) {
-        //if (!event.isPopupTrigger()) {
+        // if (!event.isPopupTrigger()) {
         if (event.isLeftMouseButton()) {
             super.mouseClicked(event);
         }
@@ -89,7 +87,7 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     public void mousePressed(final PInputEvent event) {
-        //if (!event.isPopupTrigger()) {
+        // if (!event.isPopupTrigger()) {
         if (event.isLeftMouseButton()) {
             super.mousePressed(event);
         }
@@ -97,7 +95,7 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     public void mouseReleased(final PInputEvent event) {
-        //if (!event.isPopupTrigger()) {
+        // if (!event.isPopupTrigger()) {
         if (event.isLeftMouseButton()) {
             super.mouseReleased(event);
         }
@@ -112,12 +110,11 @@ final class SelectionEventHandler
 
         if (event.isShiftDown()) {
             priorSelection = new HashSet<Sensor>(selectionModel.getSelection());
-        }
-        else {
+        } else {
             selectionModel.clear();
         }
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                                       (float) marqueeStartPosition.getY());
+                (float) marqueeStartPosition.getY());
         canvas.getLayer().addChild(marquee);
     }
 
@@ -133,7 +130,7 @@ final class SelectionEventHandler
         marquee.globalToLocal(rect);
 
         marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                                   (float) rect.getWidth(), (float) rect.getHeight());
+                (float) rect.getWidth(), (float) rect.getHeight());
     }
 
     /** {@inheritDoc} */
@@ -144,10 +141,11 @@ final class SelectionEventHandler
         PBounds rect = marquee.getBounds();
         boundsFilter.setBounds(rect);
 
-        Collection highlightedNodes = canvas.getLayer().getRoot().getAllNodes(boundsFilter, null);
+        Collection highlightedNodes = canvas.getLayer().getRoot()
+                .getAllNodes(boundsFilter, null);
 
         Collection<Sensor> highlightedSensors = new HashSet<Sensor>();
-        for (Iterator i = highlightedNodes.iterator(); i.hasNext(); ) {
+        for (Iterator i = highlightedNodes.iterator(); i.hasNext();) {
             Object node = i.next();
             if (node instanceof SensorNode) {
                 SensorNode sensorNode = (SensorNode) node;
@@ -157,10 +155,11 @@ final class SelectionEventHandler
 
         if (event.isShiftDown()) {
             if (highlightedSensors.size() == 1) {
-                selectionModel.toggleSelection(highlightedSensors.iterator().next());
-            }
-            else {
-                Collection<Sensor> selection = union(priorSelection, highlightedSensors);
+                selectionModel.toggleSelection(highlightedSensors.iterator()
+                        .next());
+            } else {
+                Collection<Sensor> selection = union(priorSelection,
+                        highlightedSensors);
                 selectionModel.setSelection(selection);
             }
         } else {
@@ -171,7 +170,7 @@ final class SelectionEventHandler
         marquee = null;
         marqueeStartPosition = null;
 
-        priorSelection = Collections.<Sensor>emptyList();
+        priorSelection = Collections.<Sensor> emptyList();
         canvas.repaint();
     }
 
@@ -184,7 +183,8 @@ final class SelectionEventHandler
      * @param coll2 second collection
      * @return the union of the specified collections
      */
-    private <T> Collection<T> union(final Collection<T> coll1, final Collection<T> coll2) {
+    private <T> Collection<T> union(final Collection<T> coll1,
+            final Collection<T> coll2) {
         Collection<T> union = new HashSet<T>();
         union.addAll(coll1);
         union.addAll(coll2);
@@ -194,12 +194,10 @@ final class SelectionEventHandler
     /**
      * Bounds filter.
      */
-    private class BoundsFilter
-        implements PNodeFilter {
+    private class BoundsFilter implements PNodeFilter {
 
         /** Bounds. */
         private PBounds bounds;
-
 
         /**
          * Set the bounds for this bounds filter to <code>bounds</code>.
@@ -213,7 +211,8 @@ final class SelectionEventHandler
         /** {@inheritDoc} */
         public boolean accept(final PNode node) {
             boolean isSensorNode = (node instanceof SensorNode);
-            boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
+            boolean boundsIntersects = node.getGlobalBounds()
+                    .intersects(bounds);
             return (isSensorNode && boundsIntersects);
         }
 

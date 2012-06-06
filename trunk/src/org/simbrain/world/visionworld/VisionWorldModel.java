@@ -18,49 +18,50 @@
  */
 package org.simbrain.world.visionworld;
 
-
 /**
- * A vision world model has exactly one pixel matrix and exactly
- * one sensor matrix.  Interested classes may receive notification
- * of changes in a VisionWorldModel via the VisionWorldModelListener interface.
+ * A vision world model has exactly one pixel matrix and exactly one sensor
+ * matrix. Interested classes may receive notification of changes in a
+ * VisionWorldModel via the VisionWorldModelListener interface.
  *
  * @see VisionWorldModelListener
  */
 public interface VisionWorldModel {
 
     /**
-     * Return the pixel matrix for this vision world model.
-     * The pixel matrix will not be null.
+     * Return the pixel matrix for this vision world model. The pixel matrix
+     * will not be null.
      *
      * @return the pixel matrix for this vision world model
      */
     PixelMatrix getPixelMatrix();
 
     /**
-     * Set the pixel matrix for this vision world model to <code>pixelMatrix</code>
-     * (optional operation).
+     * Set the pixel matrix for this vision world model to
+     * <code>pixelMatrix</code> (optional operation).
      *
-     * @param pixelMatrix pixel matrix for this vision world model, must not be null
+     * @param pixelMatrix pixel matrix for this vision world model, must not be
+     *            null
      * @throws UnsupportedOperationException if the <code>setPixelMatrix</code>
-     *    operation is not supported by this vision world model
+     *             operation is not supported by this vision world model
      */
     void setPixelMatrix(PixelMatrix pixelMatrix);
 
     /**
-     * Return the sensor matrix for this vision world model.
-     * The sensor matrix will not be null.
+     * Return the sensor matrix for this vision world model. The sensor matrix
+     * will not be null.
      *
      * @return the sensor matrix for this vision world model
      */
     SensorMatrix getSensorMatrix();
 
     /**
-     * Set the sensor matrix for this vision world model to <code>sensorMatrix</code>
-     * (optional operation).
+     * Set the sensor matrix for this vision world model to
+     * <code>sensorMatrix</code> (optional operation).
      *
-     * @param sensorMatrix sensor matrix for this vision world model, must not be null
+     * @param sensorMatrix sensor matrix for this vision world model, must not
+     *            be null
      * @throws UnsupportedOperationException if the <code>setSensorMatrix</code>
-     *    operation is not supported by this vision world model
+     *             operation is not supported by this vision world model
      */
     void setSensorMatrix(SensorMatrix sensorMatrix);
 

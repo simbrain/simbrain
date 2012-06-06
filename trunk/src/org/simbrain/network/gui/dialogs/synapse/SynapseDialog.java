@@ -41,9 +41,8 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * The <b>SynapseDialog</b> is initialized with a list of synapses. When
- * the dialog is closed the synapses are changed based on the state of the
- * dialog.
+ * The <b>SynapseDialog</b> is initialized with a list of synapses. When the
+ * dialog is closed the synapses are changed based on the state of the dialog.
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 
@@ -110,7 +109,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * @param synapseList list of synapses to modify
      */
     public SynapseDialog(final List<Synapse> synapseList) {
-        this.synapseList = (List<Synapse>) synapseList;
+        this.synapseList = synapseList;
         init();
     }
 
@@ -153,7 +152,8 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         // Add tab for setting spike responders, if needed
         ArrayList<Synapse> spikeRespondingSynapses = getSpikeRespondingSynapses();
         if (spikeRespondingSynapses.size() > 0) {
-            spikeResponsePanel = new SpikeResponsePanel(spikeRespondingSynapses, this);
+            spikeResponsePanel = new SpikeResponsePanel(
+                    spikeRespondingSynapses, this);
             tabbedPane.addTab("Synaptic Efficacy", mainPanel);
             tabbedPane.addTab("Spike Response", spikeResponsePanel);
             setContentPane(tabbedPane);
@@ -219,11 +219,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Returns synapse panel corresponding to the given update rule.
-     * Assumes the panel class name = update rule class name + "Panel"
-     * E.g. "HebbianSynapse" > "HebbianSynapsePanel".
+     * Returns synapse panel corresponding to the given update rule. Assumes the
+     * panel class name = update rule class name + "Panel" E.g. "HebbianSynapse"
+     * > "HebbianSynapsePanel".
      *
-     * @param updateRuleClass  the class to match
+     * @param updateRuleClass the class to match
      * @return panel the matching panel
      */
     private AbstractSynapsePanel getSynapsePanel(Class<?> updateRuleClass) {
@@ -263,7 +263,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     public void changeSynapseTypes() {
         Object selected = cbSynapseType.getSelectedItem();
         if (selected != NULL_STRING) {
-            String name = ((ClassDescriptionPair)selected).getSimpleName();
+            String name = ((ClassDescriptionPair) selected).getSimpleName();
             for (int i = 0; i < synapseList.size(); i++) {
                 synapseList.get(i).setLearningRule(name);
             }
@@ -295,7 +295,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * Set the initial values of dialog components.
      */
     private void fillFieldValues() {
-        Synapse synapseRef = (Synapse) synapseList.get(0);
+        Synapse synapseRef = synapseList.get(0);
 
         if (synapseList.size() == 1) {
             idLabel.setText(synapseRef.getId());
@@ -314,20 +314,24 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.fillFieldValues();
         }
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getStrength")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getStrength")) {
             tfStrength.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getIncrement")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getLowerBound")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getUpperBound")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getUpperBound")) {
             tfUpBound.setText(NULL_STRING);
         }
 
@@ -342,22 +346,26 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     public void commitChanges() {
         for (int i = 0; i < synapseList.size(); i++) {
-            Synapse synapseRef = (Synapse) synapseList.get(i);
+            Synapse synapseRef = synapseList.get(i);
 
             if (!tfStrength.getText().equals(NULL_STRING)) {
-                synapseRef.setStrength(Double.parseDouble(tfStrength.getText()));
+                synapseRef
+                        .setStrength(Double.parseDouble(tfStrength.getText()));
             }
 
             if (!tfIncrement.getText().equals(NULL_STRING)) {
-                synapseRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
+                synapseRef.setIncrement(Double.parseDouble(tfIncrement
+                        .getText()));
             }
 
             if (!tfUpBound.getText().equals(NULL_STRING)) {
-                synapseRef.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+                synapseRef
+                        .setUpperBound(Double.parseDouble(tfUpBound.getText()));
             }
 
             if (!tfLowBound.getText().equals(NULL_STRING)) {
-                synapseRef.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+                synapseRef.setLowerBound(Double.parseDouble(tfLowBound
+                        .getText()));
             }
 
             if (!tfDelay.getText().equals(NULL_STRING)) {
@@ -373,7 +381,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.commitChanges();
         }
 
-        // Notify the network that changes have been made 
+        // Notify the network that changes have been made
         Synapse firstSynapse = synapseList.get(0);
         if (firstSynapse.getParentNetwork() != null) {
             firstSynapse.getParentNetwork().fireNetworkChanged();
@@ -384,9 +392,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         synapsePanel.commitChanges();
     }
 
-     /**
-      * Set the help page based on the currently selected synapse type.
-      */
+    /**
+     * Set the help page based on the currently selected synapse type.
+     */
     public void updateHelp() {
         if (cbSynapseType.getSelectedItem() == NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
@@ -395,14 +403,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                     .replace(" ", "");
             spacelessString = spacelessString.substring(0, 1).toLowerCase()
                     .concat(spacelessString.substring(1));
-            helpAction = new ShowHelpAction("Pages/Network/synapse/spikeresponders/"
-                    + spacelessString + ".html");
+            helpAction = new ShowHelpAction(
+                    "Pages/Network/synapse/spikeresponders/" + spacelessString
+                            + ".html");
         } else {
             String name = ((ClassDescriptionPair) cbSynapseType
-                    .getSelectedItem()).getSimpleName()
-                    .replaceAll("Rule", "");
+                    .getSelectedItem()).getSimpleName().replaceAll("Rule", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
-            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
+                    + ".html");
         }
     }
 

@@ -44,7 +44,8 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Display a PieChart.
  */
-public class PieChartGui extends GuiComponent<PieChartComponent> implements ActionListener {
+public class PieChartGui extends GuiComponent<PieChartComponent> implements
+        ActionListener {
 
     /** Plot action manager. */
     private PlotActionManager actionManager;
@@ -57,19 +58,20 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
 
     /** Chart gui. */
     private JFreeChart chart;
-    
+
     /**
      * Construct the GUI Pie Chart.
      *
      * @param frame Generic Frame
      * @param component Pie chart component
      */
-    public PieChartGui(final GenericFrame frame, final PieChartComponent component) {
+    public PieChartGui(final GenericFrame frame,
+            final PieChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
-        
+
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");
         deleteButton.addActionListener(this);
@@ -94,20 +96,18 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
     public void postAddInit() {
 
         // Generate the graph
-        chart = ChartFactory.createPieChart(
-            "Pie Chart",
-            this.getWorkspaceComponent().getModel().getDataset(),
-            true, // include legend
-            true,
-            false
-        );
+        chart = ChartFactory.createPieChart("Pie Chart", this
+                .getWorkspaceComponent().getModel().getDataset(), true, // include
+                                                                        // legend
+                true, false);
         chartPanel.setChart(chart);
 
-        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
-            public void chartSettingsUpdated() {
-                // No implementation
-            }
-        });
+        getWorkspaceComponent().getModel().addChartSettingsListener(
+                new ChartSettingsListener() {
+                    public void chartSettingsUpdated() {
+                        // No implementation
+                    }
+                });
     }
 
     /**

@@ -22,13 +22,12 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
 /**
  * <b>ShortTermPlasticitySynapse</b>.
  */
 public class ShortTermPlasticityRule extends SynapseUpdateRule {
 
-    //TODO: Enum
+    // TODO: Enum
 
     /** STD. */
     private static final int STD = 0;
@@ -99,7 +98,8 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     public void update(Synapse synapse) {
         // Determine whether to activate short term dynamics
         if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule()).hasSpiked()) {
+            if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
+                    .hasSpiked()) {
                 activated = true;
             } else {
                 activated = false;

@@ -20,13 +20,12 @@ package org.simbrain.util;
 
 import java.awt.Point;
 
-
 /**
  * <b>SimbrainMath</b> is the math functions used in simbrain.
  */
 public class SimbrainMath {
     /**
-     * Calculates the Euclidean distance between two points.  Used in World.
+     * Calculates the Euclidean distance between two points. Used in World.
      *
      * @param src source point
      * @param tar target point
@@ -43,7 +42,7 @@ public class SimbrainMath {
     }
 
     /**
-     * Calculates the Euclidean distance between two points.  Used in World.
+     * Calculates the Euclidean distance between two points. Used in World.
      *
      * @param src source point
      * @param tar target point
@@ -60,7 +59,8 @@ public class SimbrainMath {
     }
 
     /**
-     * Set an array of doubles to zero.  TODO: Replace usage in World with library call
+     * Set an array of doubles to zero. TODO: Replace usage in World with
+     * library call
      *
      * @param size size of array
      *
@@ -78,10 +78,11 @@ public class SimbrainMath {
 
     /**
      * Finds the vector multiple.
+     *
      * @param theVec Vecotr
      * @param mult Multiple
-     * @return Multiple of the vector and the multiple
-     *TODO: Replace occurence in world with library call
+     * @return Multiple of the vector and the multiple TODO: Replace occurence
+     *         in world with library call
      */
     public static double[] multVector(final double[] theVec, final double mult) {
         double[] ret = new double[theVec.length];
@@ -111,6 +112,7 @@ public class SimbrainMath {
 
     /**
      * Finds the larger of two numbers.
+     *
      * @param one First number
      * @param two Second number
      * @return the larger number
@@ -124,7 +126,9 @@ public class SimbrainMath {
     }
 
     /**
-     * Add these vectors. If one is larger than the other return a vector with zeros in the difference.
+     * Add these vectors. If one is larger than the other return a vector with
+     * zeros in the difference.
+     *
      * @param base Base number
      * @param add Number to be added to base number
      * @return added vectors
@@ -137,7 +141,8 @@ public class SimbrainMath {
                 ret[i] = base[i] + add[i];
             }
         } else {
-            // if the vectors are not the same length, add zeros in the extra slots
+            // if the vectors are not the same length, add zeros in the extra
+            // slots
             double[] temp = max(base, add);
             int max = max(base.length, add.length);
             int min = max - Math.abs(base.length - add.length);
@@ -173,6 +178,7 @@ public class SimbrainMath {
 
     /**
      * Prints out the vector list.
+     *
      * @param da Vector list
      */
     public static void printVector(final double[] da) {
@@ -184,29 +190,32 @@ public class SimbrainMath {
     }
 
     /**
-     * Calculates the inverse of the error function.  Originally written by S.C. Pohlig, adapted by J.N. Sanders
+     * Calculates the inverse of the error function. Originally written by S.C.
+     * Pohlig, adapted by J.N. Sanders
+     *
      * @param p Parameter to find inverse of the error
      * @return inverse of the error
      */
     public static double inverf(final double p) { // 0 <= p <= 1
-        /* Originally written by S.C. Pohlig, adapted by J.N. Sanders
+        /*
+         * Originally written by S.C. Pohlig, adapted by J.N. Sanders
          *
          * This function returns an approximation to the inverse of the standard
-         * normal probability distribution.  The approximation error is less than
-         * 4.5e-4.  The approximation formula is from M. Abramowitz and I. A. Stegun,
-         * Handbook of Mathematical Functions, eqn. 26.2.23, Dover Publications, Inc.
+         * normal probability distribution. The approximation error is less than
+         * 4.5e-4. The approximation formula is from M. Abramowitz and I. A.
+         * Stegun, Handbook of Mathematical Functions, eqn. 26.2.23, Dover
+         * Publications, Inc.
          *
-         * The C language error function returns erf(x) = (2/sqrt(pi)) * Integral(0,x)
-         *   of exp(-t*t)dt, which gives erf(infinity) = 1. In essence, this gives the
-         *   area under the curve between -x and +x, normalized to 1.
-         * However, this function (inverf), solves for the inverse of (1/sqrt(pi))
-         *   * Integral(-infinity, x) of exp(-t*t)dt.
-         * As a result, the symmetric inverse is:
-         *      x = inverf(erf(x) / 2. + .5)
+         * The C language error function returns erf(x) = (2/sqrt(pi)) *
+         * Integral(0,x) of exp(-t*t)dt, which gives erf(infinity) = 1. In
+         * essence, this gives the area under the curve between -x and +x,
+         * normalized to 1. However, this function (inverf), solves for the
+         * inverse of (1/sqrt(pi)) * Integral(-infinity, x) of exp(-t*t)dt. As a
+         * result, the symmetric inverse is: x = inverf(erf(x) / 2. + .5)
          *
-         *  Given the integral of a unit variance gaussian, from -infinity to x,
-         *   normalized such that the integral to +infinity is 1, multiply this result
-         *   by sqrt(2) to obtain x.
+         * Given the integral of a unit variance gaussian, from -infinity to x,
+         * normalized such that the integral to +infinity is 1, multiply this
+         * result by sqrt(2) to obtain x.
          */
         double c0 = 2.515517;
         double c1 = 0.802853;
@@ -238,7 +247,9 @@ public class SimbrainMath {
         t2 = -2.0 * Math.log(q);
         t1 = Math.sqrt(t2);
 
-        x = t1 - ((c0 + (c1 * t1) + (c2 * t2)) / (1.0 + (d1 * t1) + (d2 * t2) + (d3 * t1 * t2)));
+        x = t1
+                - ((c0 + (c1 * t1) + (c2 * t2)) / (1.0 + (d1 * t1) + (d2 * t2) + (d3
+                        * t1 * t2)));
         x = x / Math.sqrt(2.);
 
         /**
@@ -253,6 +264,7 @@ public class SimbrainMath {
 
     /**
      * Finds the largest value in a vector array.
+     *
      * @param theVec Vector array
      * @return largest value in array
      */
@@ -292,7 +304,8 @@ public class SimbrainMath {
      * @param noiselevel Noise level
      * @return resuling vector
      */
-    public static double[] getNoisyVector(final double[] vector, final double noiselevel) {
+    public static double[] getNoisyVector(final double[] vector,
+            final double noiselevel) {
         double randUniform;
         double sigma = noiselevel * SimbrainMath.getMaximum(vector);
         double sqrt2 = Math.sqrt(2);
@@ -300,7 +313,8 @@ public class SimbrainMath {
 
         for (int i = 0; i < vector.length; i++) {
             randUniform = Math.random();
-            returnVector[i] = vector[i] + (sigma * sqrt2 * SimbrainMath.inverf(randUniform));
+            returnVector[i] = vector[i]
+                    + (sigma * sqrt2 * SimbrainMath.inverf(randUniform));
         }
         return returnVector;
     }
@@ -327,8 +341,9 @@ public class SimbrainMath {
      * @param max maximum value for random values
      * @return the random vector
      */
-    public static double[] randomVector(final int length, final double min, final double max) {
-    	double[] returnVector = new double[length];
+    public static double[] randomVector(final int length, final double min,
+            final double max) {
+        double[] returnVector = new double[length];
         for (int i = 0; i < returnVector.length; i++) {
             returnVector[i] = min + Math.random() * Math.abs(max - min);
         }
@@ -345,8 +360,8 @@ public class SimbrainMath {
      * @return rounded value
      */
     public static final double roundDouble(double d, int places) {
-        return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
-            (double) places);
+        return Math.round(d * Math.pow(10, places))
+                / Math.pow(10, places);
     }
 
     /**

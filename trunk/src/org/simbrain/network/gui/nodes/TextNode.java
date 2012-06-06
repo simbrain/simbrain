@@ -158,8 +158,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
                     textObject.isItalic(), textObject.isBold());
             pStyledText.getDocument().remove(0,
                     pStyledText.getDocument().getLength());
-            pStyledText.getDocument().insertString(0, textObject.getText(),
-                    as);
+            pStyledText.getDocument().insertString(0, textObject.getText(), as);
             pStyledText.syncWithDocument();
             pullViewPositionFromModel();
         } catch (BadLocationException e) {
@@ -203,7 +202,8 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * @param italic italic or not
      * @return the resulting attriube set
      */
-    public static SimpleAttributeSet createAttributeSet(String fontName, int fontSize, boolean italic, boolean bold) {
+    public static SimpleAttributeSet createAttributeSet(String fontName,
+            int fontSize, boolean italic, boolean bold) {
         SimpleAttributeSet as = new SimpleAttributeSet();
         as.addAttribute(StyleConstants.CharacterConstants.FontFamily, fontName);
         as.addAttribute(StyleConstants.CharacterConstants.FontSize, fontSize);
@@ -212,6 +212,5 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         as.addAttribute(StyleConstants.ALIGN_RIGHT, true);
         return as;
     }
-
 
 }

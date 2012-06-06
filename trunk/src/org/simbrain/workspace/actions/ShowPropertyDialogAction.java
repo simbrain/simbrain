@@ -50,11 +50,10 @@ public final class ShowPropertyDialogAction extends AbstractAction {
 
     /**
      * @see AbstractAction
-     * @param event
-     *            Action event
+     * @param event Action event
      */
     public void actionPerformed(final ActionEvent event) {
-    	WorkspaceDialog dialog = new WorkspaceDialog(workspace);
+        WorkspaceDialog dialog = new WorkspaceDialog(workspace);
         dialog.setModal(true);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

@@ -85,13 +85,14 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
         addMenuBar();
         add(panel);
         frame.pack();
-        
+
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 Component component = e.getComponent();
-                panel.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
+                panel.setPreferredSize(new Dimension(component.getWidth(),
+                        component.getHeight()));
                 panel.revalidate();
             }
         });
@@ -122,7 +123,8 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
                 .getLoadDictionaryAction(world));
         showDictionary.setAction(TextWorldActions
                 .getShowDictionaryAction(world));
-        preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
+        preferences.setAction(TextWorldActions
+                .getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);
         edit.add(showDictionary);
         edit.addSeparator();
@@ -134,7 +136,6 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
 
         getParentFrame().setJMenuBar(menuBar);
     }
-
 
     @Override
     public void closing() {

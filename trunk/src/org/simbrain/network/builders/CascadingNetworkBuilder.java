@@ -121,14 +121,15 @@ public final class CascadingNetworkBuilder {
                 network.addNeuron(baseNeuron);
                 double initialXOffset = branchWidth / 2;
                 for (int j = 0; j < numBrachesPerNeuron; j++) {
-                    Neuron targetNeuron = new Neuron(network, new LinearRule()); //TODO;
+                    Neuron targetNeuron = new Neuron(network, new LinearRule()); // TODO;
                     targetNeuron.setLocation(baseNeuron.getX() - initialXOffset
                             + (j * layerSpacing), initialPosition.y
                             - (layerIndex * verticalSpacing));
                     tempList.add(targetNeuron);
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    Synapse synapse = new Synapse(baseNeuron, targetNeuron, new ClampedSynapseRule());
+                    Synapse synapse = new Synapse(baseNeuron, targetNeuron,
+                            new ClampedSynapseRule());
                     network.addSynapse(synapse);
                 }
             }
@@ -145,8 +146,7 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param numLayers
-     *            the numLayers to set
+     * @param numLayers the numLayers to set
      */
     public void setNumLayers(int numLayers) {
         this.numLayers = numLayers;
@@ -160,8 +160,7 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param numBrachesPerNeuron
-     *            the numBrachesPerNeuron to set
+     * @param numBrachesPerNeuron the numBrachesPerNeuron to set
      */
     public void setNumBrachesPerNeuron(int numBrachesPerNeuron) {
         this.numBrachesPerNeuron = numBrachesPerNeuron;
@@ -175,8 +174,7 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param horizontalSpacing
-     *            the horizontalSpacing to set
+     * @param horizontalSpacing the horizontalSpacing to set
      */
     public void setHorizontalSpacing(double horizontalSpacing) {
         this.horizontalSpacing = horizontalSpacing;
@@ -190,8 +188,7 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param verticalSpacing
-     *            the verticalSpacing to set
+     * @param verticalSpacing the verticalSpacing to set
      */
     public void setVerticalSpacing(double verticalSpacing) {
         this.verticalSpacing = verticalSpacing;
@@ -205,8 +202,7 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param initialPosition
-     *            the initialPosition to set
+     * @param initialPosition the initialPosition to set
      */
     public void setInitialPosition(Point initialPosition) {
         this.initialPosition = initialPosition;

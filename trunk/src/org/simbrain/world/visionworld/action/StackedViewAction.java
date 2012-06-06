@@ -28,12 +28,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Stacked view action.
  */
-public final class StackedViewAction
-    extends AbstractAction {
+public final class StackedViewAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new stacked view action.
@@ -48,7 +46,6 @@ public final class StackedViewAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("gridOffset.png"));
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.simbrain.network.neuron_update_rules;
 
@@ -73,7 +73,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule {
     float vClampValue = convertV(0F);
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void update(Neuron neuron) {
         // Advances the model by dt and returns the new voltage
@@ -287,7 +287,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule {
     }
 
     public NeuronUpdateRule deepCopy() {
-        // TODO 
+        // TODO
         return null;
     }
 

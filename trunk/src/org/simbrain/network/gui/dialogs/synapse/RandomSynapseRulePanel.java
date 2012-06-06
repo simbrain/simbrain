@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
 
-
 /**
  * <b>RandomSynapsePanel</b>.
  */
@@ -46,7 +45,8 @@ public class RandomSynapseRulePanel extends AbstractSynapsePanel {
         ArrayList randomPanels = new ArrayList();
 
         for (int i = 0; i < ruleList.size(); i++) {
-            randomPanels.add(((RandomSynapseRule) ruleList.get(i)).getRandomizer());
+            randomPanels.add(((RandomSynapseRule) ruleList.get(i))
+                    .getRandomizer());
         }
 
         rp.fillFieldValues(randomPanels);

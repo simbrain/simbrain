@@ -20,10 +20,10 @@ package org.simbrain.util;
 
 import javax.swing.JComboBox;
 
-
 /**
- * <b>TristateDropDown</b> ceates a combo box that has three states; True, false and null. It is used
- * where it needs to be determined if multiple items have the same value. (e.g. Multiple selected neurons.)
+ * <b>TristateDropDown</b> ceates a combo box that has three states; True, false
+ * and null. It is used where it needs to be determined if multiple items have
+ * the same value. (e.g. Multiple selected neurons.)
  */
 public class TristateDropDown extends JComboBox {
 
@@ -33,7 +33,7 @@ public class TristateDropDown extends JComboBox {
     /** Integer value for false. */
     private static final int FALSE = 1;
 
-    /** Integer value for null.*/
+    /** Integer value for null. */
     private static final int NULL = 2;
 
     /**
@@ -70,6 +70,7 @@ public class TristateDropDown extends JComboBox {
 
     /**
      * Determines if index is selected true.
+     *
      * @return True or false value
      */
     public boolean isSelected() {
@@ -82,6 +83,7 @@ public class TristateDropDown extends JComboBox {
 
     /**
      * Sets the selected item.
+     *
      * @param val Value to be set as
      */
     public void setSelected(final boolean val) {
@@ -94,6 +96,7 @@ public class TristateDropDown extends JComboBox {
 
     /**
      * Determines if value is null.
+     *
      * @return true or false if value is null
      */
     public boolean isNull() {

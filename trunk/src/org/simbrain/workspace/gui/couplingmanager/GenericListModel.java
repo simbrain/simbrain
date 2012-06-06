@@ -31,7 +31,8 @@ import javax.swing.ComboBoxModel;
  *
  * @param <E> The type of the items in the model.
  */
-public class GenericListModel<E> extends AbstractListModel implements ComboBoxModel, Iterable<E> {
+public class GenericListModel<E> extends AbstractListModel implements
+        ComboBoxModel, Iterable<E> {
     /** The default serial version id. */
     private static final long serialVersionUID = 1L;
     /** List of consumers. */
@@ -41,6 +42,7 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
 
     /**
      * Constructs a list of consumers.
+     *
      * @param consumerList List of consumers
      */
     public GenericListModel(final List<? extends E> consumerList) {
@@ -48,9 +50,9 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
     }
 
     /**
-     * Constructs a list of consumers.  If consumers collection is a
-     * List instance, it is used as the backing list, if not a new
-     * List will be created and populated from the collection.
+     * Constructs a list of consumers. If consumers collection is a List
+     * instance, it is used as the backing list, if not a new List will be
+     * created and populated from the collection.
      *
      * @param consumers The list of consumers.
      */
@@ -64,15 +66,17 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
 
     /**
      * Returns a specific consumer.
+     *
      * @param index of consumer.
      * @return consumer at specific location.
      */
     public E getElementAt(final int index) {
-       return list.get(index);
+        return list.get(index);
     }
 
     /**
      * Returns the number of consumers in the list.
+     *
      * @return Number of consumers.
      */
     public int getSize() {
@@ -81,6 +85,7 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
 
     /**
      * Returns the selected item.
+     *
      * @return selected item.
      */
     public E getSelectedItem() {
@@ -89,11 +94,12 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
 
     /**
      * Sets the selected item(s).
+     *
      * @param arg0 items to be set as selected.
      *
-     * //TODO: Check this stuff...
+     *            //TODO: Check this stuff...
      */
-    public void setSelectedItem(final Object arg0) { 
+    public void setSelectedItem(final Object arg0) {
         for (E component : list) {
             if (component == arg0) {
                 selected = component;
@@ -120,7 +126,7 @@ public class GenericListModel<E> extends AbstractListModel implements ComboBoxMo
 
             public void remove() {
                 throw new UnsupportedOperationException(
-                    "cannot remove elements with this iterator");
+                        "cannot remove elements with this iterator");
             }
         };
     }

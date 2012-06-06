@@ -59,8 +59,8 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     /**
-     * Create new BarChart Component from a specified model.
-     * Used in deserializing.
+     * Create new BarChart Component from a specified model. Used in
+     * deserializing.
      *
      * @param name chart name
      * @param model chart model
@@ -141,7 +141,7 @@ public class BarChartComponent extends WorkspaceComponent {
         try {
             int i = Integer.parseInt(objectKey);
             BarChartSetter setter = getSetter(i);
-            return  setter;
+            return setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }

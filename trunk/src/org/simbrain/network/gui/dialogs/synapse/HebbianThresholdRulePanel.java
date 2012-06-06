@@ -24,7 +24,6 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>HebbianThresholdSynapsePanel</b>.
  */
@@ -62,24 +61,31 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         synapseRef = (HebbianThresholdRule) ruleList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        tfOutputThresholdMomentum.setText(Double.toString(synapseRef.getOutputThresholdMomentum()));
-        tfOutputThreshold.setText(Double.toString(synapseRef.getOutputThreshold()));
-        isOutputThreshold.setSelected(synapseRef.getUseSlidingOutputThreshold());
+        tfOutputThresholdMomentum.setText(Double.toString(synapseRef
+                .getOutputThresholdMomentum()));
+        tfOutputThreshold.setText(Double.toString(synapseRef
+                .getOutputThreshold()));
+        isOutputThreshold
+                .setSelected(synapseRef.getUseSlidingOutputThreshold());
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class, "getLearningRate")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class, "getOutputThresholdMomentum")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getOutputThresholdMomentum")) {
             tfOutputThresholdMomentum.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class, "getOutputThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getOutputThreshold")) {
             tfOutputThreshold.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class, "getUseSlidingOutputThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getUseSlidingOutputThreshold")) {
             isOutputThreshold.setNull();
         }
     }
@@ -88,11 +94,16 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-//        HebbianThresholdSynapse synapseRef = new HebbianThresholdSynapse();
-        tfLearningRate.setText(Double.toString(HebbianThresholdRule.DEFAULT_LEARNING_RATE));
-        tfOutputThresholdMomentum.setText(Double.toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD_MOMENTUM));
-        tfOutputThreshold.setText(Double.toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD));
-        isOutputThreshold.setSelected(HebbianThresholdRule.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
+        // HebbianThresholdSynapse synapseRef = new HebbianThresholdSynapse();
+        tfLearningRate.setText(Double
+                .toString(HebbianThresholdRule.DEFAULT_LEARNING_RATE));
+        tfOutputThresholdMomentum
+                .setText(Double
+                        .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD_MOMENTUM));
+        tfOutputThreshold.setText(Double
+                .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD));
+        isOutputThreshold
+                .setSelected(HebbianThresholdRule.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
     }
 
     /**
@@ -100,22 +111,27 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
      */
     public void commitChanges() {
         for (int i = 0; i < ruleList.size(); i++) {
-            HebbianThresholdRule synapseRef = (HebbianThresholdRule) ruleList.get(i);
+            HebbianThresholdRule synapseRef = (HebbianThresholdRule) ruleList
+                    .get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
 
             if (!tfOutputThresholdMomentum.getText().equals(NULL_STRING)) {
-                synapseRef.setOutputThresholdMomentum(Double.parseDouble(tfOutputThresholdMomentum.getText()));
+                synapseRef.setOutputThresholdMomentum(Double
+                        .parseDouble(tfOutputThresholdMomentum.getText()));
             }
 
             if (!tfOutputThreshold.getText().equals(NULL_STRING)) {
-                synapseRef.setOutputThreshold(Double.parseDouble(tfOutputThreshold.getText()));
+                synapseRef.setOutputThreshold(Double
+                        .parseDouble(tfOutputThreshold.getText()));
             }
 
             if (!isOutputThreshold.isNull()) {
-                synapseRef.setUseSlidingOutputThreshold(isOutputThreshold.isSelected());
+                synapseRef.setUseSlidingOutputThreshold(isOutputThreshold
+                        .isSelected());
             }
         }
     }

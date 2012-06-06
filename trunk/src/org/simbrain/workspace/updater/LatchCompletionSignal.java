@@ -4,7 +4,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Signal implementation that wraps a count-down latch.
- * 
+ *
  * @author Matt Watson
  */
 public class LatchCompletionSignal implements CompletionSignal {
@@ -14,7 +14,7 @@ public class LatchCompletionSignal implements CompletionSignal {
 
     /**
      * Creates a new instance with the given latch.
-     * 
+     *
      * @param latch the latch to back this object.
      */
     public LatchCompletionSignal(final CountDownLatch latch) {
@@ -23,7 +23,7 @@ public class LatchCompletionSignal implements CompletionSignal {
 
     /**
      * Creates a new instance which waits for a single done call.
-     * 
+     *
      * @param signals the number of signals to wait for.
      */
     public LatchCompletionSignal(final int signals) {
@@ -48,7 +48,7 @@ public class LatchCompletionSignal implements CompletionSignal {
 
     /**
      * Returns the latch underlying this signal.
-     * 
+     *
      * @return The latch underlying this signal.
      */
     public CountDownLatch getLatch() {

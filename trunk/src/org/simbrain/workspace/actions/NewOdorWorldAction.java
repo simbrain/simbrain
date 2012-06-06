@@ -39,8 +39,7 @@ public final class NewOdorWorldAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a new odor world action with the specified
-     * workspace.
+     * Create a new odor world action with the specified workspace.
      */
     public NewOdorWorldAction(Workspace workspace) {
         super("Odor World", workspace);

@@ -30,30 +30,33 @@ import edu.umd.cs.piccolox.util.PNodeLocator;
 /**
  * Selection handle.
  *
- * <p>Usage:
+ * <p>
+ * Usage:
+ *
  * <pre>
  * PNode node = ...;
  * SelectionHandle.addSelectionHandleTo(node)
  * </pre>
+ *
  * and
+ *
  * <pre>
  * PNode node = ...;
  * SelectionHandle.removeSelectionHandleFrom(node)
  * </pre>
+ *
  * </p>
  *
  * @see #addSelectionHandleTo(PNode)
  * @see #removeSelectionHandleFrom(PNode)
  */
-public final class SourceHandle
-    extends PHandle {
+public final class SourceHandle extends PHandle {
 
     /** Extend factor. */
     private static final double EXTEND_FACTOR = 0.2d;
 
     /** Color of selection boxes. */
     private static Color sourceColor = Color.RED;
-
 
     /**
      * Create a new selection handle.
@@ -85,31 +88,30 @@ public final class SourceHandle
     }
 
     /**
-     * Update the bounds of this selection handle based on the
-     * size of its parent plus an extension factor.
+     * Update the bounds of this selection handle based on the size of its
+     * parent plus an extension factor.
      */
     private void updateBounds() {
         PNode parentNode = ((PNodeLocator) getLocator()).getNode();
 
         double x = 0.0d - (parentNode.getWidth() * EXTEND_FACTOR);
         double y = 0.0d - (parentNode.getHeight() * EXTEND_FACTOR);
-        double width = parentNode.getWidth() + 2 * (parentNode.getWidth() * EXTEND_FACTOR);
-        double height = parentNode.getHeight() + 2 * (parentNode.getHeight() * EXTEND_FACTOR);
+        double width = parentNode.getWidth() + 2
+                * (parentNode.getWidth() * EXTEND_FACTOR);
+        double height = parentNode.getHeight() + 2
+                * (parentNode.getHeight() * EXTEND_FACTOR);
         setPathToRectangle((float) x, (float) y, (float) width, (float) height);
     }
 
-
     /**
-     * Return true if the specified node has a selection handle
-     * as a child.
+     * Return true if the specified node has a selection handle as a child.
      *
      * @param node node
-     * @return true if the specified node has a selection handle
-     *    as a child
+     * @return true if the specified node has a selection handle as a child
      */
     private static boolean hasSelectionHandle(final PNode node) {
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SourceHandle) {
@@ -120,8 +122,8 @@ public final class SourceHandle
     }
 
     /**
-     * Add a selection handle to the specified node, if one does not
-     * exist already.
+     * Add a selection handle to the specified node, if one does not exist
+     * already.
      *
      * @param node node to add the selection handle to, must not be null
      */
@@ -152,7 +154,7 @@ public final class SourceHandle
 
         Collection handlesToRemove = new ArrayList();
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SourceHandle) {
@@ -162,14 +164,12 @@ public final class SourceHandle
         node.removeChildren(handlesToRemove);
     }
 
-
     /**
      * @return Returns the sourceColor.
      */
     public static Color getSourceColor() {
         return sourceColor;
     }
-
 
     /**
      * @param sourceColor The sourceColor to set.

@@ -33,8 +33,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 public class WorkspaceComponentDeserializer {
 
     /** A map of keys to their components. */
-    private final Map<String, WorkspaceComponent> componentKeys
-        = new HashMap<String, WorkspaceComponent>();
+    private final Map<String, WorkspaceComponent> componentKeys = new HashMap<String, WorkspaceComponent>();
 
     /**
      * Returns the workspace component associated with the given uri.
@@ -50,10 +49,8 @@ public class WorkspaceComponentDeserializer {
      * Deserializes a workspace component using the information from the
      * provided component and input stream.
      *
-     * @param archivedComponent
-     *            The component entry from the archive contents.
-     * @param input
-     *            The input stream to read data from.
+     * @param archivedComponent The component entry from the archive contents.
+     * @param input The input stream to read data from.
      * @return The deserialized WorkspaceComponent.
      */
     @SuppressWarnings("unchecked")
@@ -84,11 +81,14 @@ public class WorkspaceComponentDeserializer {
      * @param format the format of the data
      * @return a new component
      */
-    public static WorkspaceComponent deserializeWorkspaceComponent(final Class<?> clazz,
-            final String name, final InputStream input, final String format) {
+    public static WorkspaceComponent deserializeWorkspaceComponent(
+            final Class<?> clazz, final String name, final InputStream input,
+            final String format) {
         try {
-            Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
-            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null, input, name, format);
+            Method method = clazz.getMethod("open", InputStream.class,
+                    String.class, String.class);
+            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null,
+                    input, name, format);
             wc.setChangedSinceLastSave(false);
             return wc;
         } catch (RuntimeException e) {
@@ -109,14 +109,16 @@ public class WorkspaceComponentDeserializer {
      */
     @SuppressWarnings("unchecked")
     GuiComponent<?> deserializeDesktopComponent(final String className,
-            final WorkspaceComponent component, final InputStream input, final String name) {
+            final WorkspaceComponent component, final InputStream input,
+            final String name) {
         try {
-            Class<WorkspaceComponent> clazz
-                = (Class<WorkspaceComponent>) Class.forName(className);
+            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>) Class
+                    .forName(className);
             Method method = clazz.getMethod("open", WorkspaceComponent.class,
-                InputStream.class, String.class);
+                    InputStream.class, String.class);
 
-            return (GuiComponent<?>) method.invoke(null, component, input, name);
+            return (GuiComponent<?>) method
+                    .invoke(null, component, input, name);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

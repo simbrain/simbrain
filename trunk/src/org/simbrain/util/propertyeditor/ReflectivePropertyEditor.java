@@ -40,7 +40,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -50,12 +49,9 @@ import org.simbrain.util.StandardDialog;
  *
  * @author Jeff Yoshimi
  *
- * TODO:
- *  - Generalize array stuff
- *  - Put arrays in scrollers
- *  - Better documenation / readme
- *  - Custom naming, ordering for fields?
- *  - Deal with redundant get and is case (then two fields are added).
+ *         TODO: - Generalize array stuff - Put arrays in scrollers - Better
+ *         documenation / readme - Custom naming, ordering for fields? - Deal
+ *         with redundant get and is case (then two fields are added).
  */
 public class ReflectivePropertyEditor extends JPanel {
 
@@ -78,7 +74,7 @@ public class ReflectivePropertyEditor extends JPanel {
     private HashMap<String, Color> selectedColor = new HashMap<String, Color>();
 
     /** List of methods to exclude from the dialog, listed by name. */
-    private String[] excludeList = new String[]{};
+    private String[] excludeList = new String[] {};
 
     /** If true, use superclass methods. */
     private boolean useSuperclass = true;
@@ -93,8 +89,7 @@ public class ReflectivePropertyEditor extends JPanel {
      * Construct a property editor panel only. It's up to the user to embed it
      * in a dialog or other GUI element
      *
-     * @param toEdit
-     *            the object to edit
+     * @param toEdit the object to edit
      */
     public ReflectivePropertyEditor(final Object toEdit) {
         this.toEdit = toEdit;
@@ -111,12 +106,11 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Returns an action for showing a property dialog for the provided objects.
-     * 
+     *
      * @param Object object the object whose properties should be displayed
      * @return the action
      */
-    public static AbstractAction getPropertiesDialogAction(
-            final Object object) {
+    public static AbstractAction getPropertiesDialogAction(final Object object) {
         return new AbstractAction() {
 
             // Initialize
@@ -142,7 +136,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
         };
     }
-    
+
     /**
      * Set object to edit. For use with no argument constructor.
      *
@@ -180,16 +174,17 @@ public class ReflectivePropertyEditor extends JPanel {
         }
     }
 
-
     /**
      * Set up the main panel.
      */
     private void initPanel() {
         for (final Method method : toEdit.getClass().getMethods()) {
 
-            boolean inSuperClass = (method.getDeclaringClass() != toEdit.getClass());
-            // If useSuperClass is false, then if the method is in the base class,
-            //  this flag should be false.
+            boolean inSuperClass = (method.getDeclaringClass() != toEdit
+                    .getClass());
+            // If useSuperClass is false, then if the method is in the base
+            // class,
+            // this flag should be false.
             boolean skipMethod = !useSuperclass & inSuperClass;
 
             if (!skipMethod && !inExcludeList(method)) {
@@ -204,11 +199,10 @@ public class ReflectivePropertyEditor extends JPanel {
                         // Combo Boxes must be wrapped in a ComboBoxable
                         if (method.getReturnType() == ComboBoxWrapper.class) {
                             ComboBoxWrapper boxable = (ComboBoxWrapper) getGetterValue(method);
-                            JComboBox comboBox = new JComboBox(boxable
-                                    .getObjects());
+                            JComboBox comboBox = new JComboBox(
+                                    boxable.getObjects());
                             componentMap.put(propertyName, comboBox);
-                            comboBox
-                                    .setSelectedItem(boxable.getCurrentObject());
+                            comboBox.setSelectedItem(boxable.getCurrentObject());
                             itemPanel.addItem(formattedPropertyName, comboBox);
                         }
 
@@ -249,25 +243,28 @@ public class ReflectivePropertyEditor extends JPanel {
                             JTable table = new JTable();
                             table.setGridColor(Color.gray);
                             double[] value = (double[]) getGetterValue(method);
-                            DefaultTableModel model = new DefaultTableModel(value.length, 1);
-                            for(int i = 0; i < value.length; i++) {
+                            DefaultTableModel model = new DefaultTableModel(
+                                    value.length, 1);
+                            for (int i = 0; i < value.length; i++) {
                                 model.setValueAt(value[i], i, 0);
                             }
                             table.setModel(model);
-                            table.setBorder(BorderFactory.createLineBorder(Color.black));
+                            table.setBorder(BorderFactory
+                                    .createLineBorder(Color.black));
                             componentMap.put(propertyName, table);
                             itemPanel.addItem(formattedPropertyName, table);
-//                            JList jList = new JList();
-//                            DefaultListModel model = new DefaultListModel();
-//                            double[] value = (double[]) getGetterValue(method);
-//                            model.setSize(value.length);
-//                            for(int i = 0; i < value.length; i++) {
-//                                model.set(i, value[i]);
-//                            }
-//                            jList.setModel(model);
-//                            jList.setBorder(BorderFactory.createLineBorder(Color.black));
-//                            componentMap.put(propertyName, jList);
-//                            itemPanel.addItem(formattedPropertyName, jList);
+                            // JList jList = new JList();
+                            // DefaultListModel model = new DefaultListModel();
+                            // double[] value = (double[])
+                            // getGetterValue(method);
+                            // model.setSize(value.length);
+                            // for(int i = 0; i < value.length; i++) {
+                            // model.set(i, value[i]);
+                            // }
+                            // jList.setModel(model);
+                            // jList.setBorder(BorderFactory.createLineBorder(Color.black));
+                            // componentMap.put(propertyName, jList);
+                            // itemPanel.addItem(formattedPropertyName, jList);
                         }
 
                         // Booleans > Checkboxes
@@ -394,8 +391,9 @@ public class ReflectivePropertyEditor extends JPanel {
                 JTable table = (JTable) componentMap.get(propertyName);
                 double[] data = new double[table.getRowCount()];
                 for (int i = 0; i < table.getRowCount(); i++) {
-                    if(table.getValueAt(i, 0).getClass() == String.class) {
-                        data[i] = Double.parseDouble((String)table.getValueAt(i, 0));                        
+                    if (table.getValueAt(i, 0).getClass() == String.class) {
+                        data[i] = Double.parseDouble((String) table.getValueAt(
+                                i, 0));
                     } else {
                         data[i] = (Double) table.getValueAt(i, 0);
                     }
@@ -475,15 +473,14 @@ public class ReflectivePropertyEditor extends JPanel {
             }
         }
 
-        //System.out.println(toEdit);
+        // System.out.println(toEdit);
     }
 
     /**
      * Return a property name from a Method object, which is here taken to be
      * the substring after "is", "get", or "set".
      *
-     * @param method
-     *            the method to retrieve the property name from.
+     * @param method the method to retrieve the property name from.
      * @return the property name
      */
     private String getPropertyName(Method method) {
@@ -505,7 +502,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Get the return value of getter method.
-     * 
+     *
      * @param theMethod
      * @return
      */
@@ -549,11 +546,10 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Format a string by inserting spaces and capitalizing. This makes the item
      * labels more appealing.
-     * 
+     *
      * Example: convert "heightInPixels" to "Height In Pixels."
-     * 
-     * @param toFormat
-     *            the String to format, retrieved from a getter or setter.
+     *
+     * @param toFormat the String to format, retrieved from a getter or setter.
      * @return the formatted string.
      */
     private String formatString(String toFormat) {
@@ -572,7 +568,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Set the value of a setter method to a specified value
-     * 
+     *
      * @param theMethod
      * @param theVal
      */
@@ -606,9 +602,9 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Set an exclude list.
      *
-     * TODO: Brittle. Only works when the argument-less
-     * constructor + setObject is used. Make it so that if the panel is already
-     * initialized when this is called, relevant items are removed.
+     * TODO: Brittle. Only works when the argument-less constructor + setObject
+     * is used. Make it so that if the panel is already initialized when this is
+     * called, relevant items are removed.
      *
      * @param strings the excludeList to set
      */

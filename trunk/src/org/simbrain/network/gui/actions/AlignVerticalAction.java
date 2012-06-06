@@ -27,16 +27,13 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Aligns vertical.
  */
-public final class AlignVerticalAction
-    extends AbstractAction {
+public final class AlignVerticalAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new align vertical action with the specified
-     * network panel.
+     * Create a new align vertical action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -50,7 +47,6 @@ public final class AlignVerticalAction
 
         this.networkPanel = networkPanel;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

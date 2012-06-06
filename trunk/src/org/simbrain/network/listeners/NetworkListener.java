@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.listeners;
 
-
 /**
  * Listener interface for receiving general network events. Classes interested
- * in responding to such events are registered with a Network, which
- * broadcasts those events to registered observer classes.
+ * in responding to such events are registered with a Network, which broadcasts
+ * those events to registered observer classes.
  */
 public interface NetworkListener {
 
@@ -38,7 +37,7 @@ public interface NetworkListener {
     void neuronClampToggled();
 
     /**
-     *  Notify listeners that all synapses have been clamped or un-clamped.
+     * Notify listeners that all synapses have been clamped or un-clamped.
      */
     void synapseClampToggled();
 

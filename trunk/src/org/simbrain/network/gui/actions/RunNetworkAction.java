@@ -36,9 +36,8 @@ public final class RunNetworkAction extends AbstractAction {
 
     /**
      * Create a new run network action with the specified network panel.
-     * 
-     * @param networkPanel
-     *            network panel, must not be null
+     *
+     * @param networkPanel network panel, must not be null
      */
     public RunNetworkAction(final NetworkPanel networkPanel) {
         super();

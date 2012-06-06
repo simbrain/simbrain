@@ -128,7 +128,6 @@ public class InterceptingEventQueue extends EventQueue implements
         LOGGER.debug("finished runTasks");
     }
 
-
     /**
      * Posts AWTEvents. If the event is an InvocationEvent, it's wrapped in a
      * synchronizingInvocationEvent. If queuing is on, these invocation events

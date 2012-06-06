@@ -18,14 +18,10 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
@@ -37,7 +33,7 @@ import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
  */
 public class Hopfield extends Subnetwork {
 
-    //TODO: Generalize to capture a greater variety of Hopfield type networks.
+    // TODO: Generalize to capture a greater variety of Hopfield type networks.
 
     /** Random update. */
     public static final int RANDOM_UPDATE = 1;
@@ -73,11 +69,12 @@ public class Hopfield extends Subnetwork {
      * @param layout Neuron layout pattern
      * @param root reference to Network.
      */
-    public Hopfield(final Network root, final int numNeurons, final Layout layout) {
+    public Hopfield(final Network root, final int numNeurons,
+            final Layout layout) {
         super(root, 1, 1);
         setLabel("Hopfield network");
 
-        //Create the neurons
+        // Create the neurons
         for (int i = 0; i < numNeurons; i++) {
             BinaryRule binary = new BinaryRule();
             binary.setThreshold(0);
@@ -95,13 +92,14 @@ public class Hopfield extends Subnetwork {
         for (Neuron source : this.getNeuronGroup().getNeuronList()) {
             for (Neuron target : this.getNeuronGroup().getNeuronList()) {
                 if (source != target) {
-                    Synapse newSynapse = new Synapse(source, target, new ClampedSynapseRule()); 
+                    Synapse newSynapse = new Synapse(source, target,
+                            new ClampedSynapseRule());
                     newSynapse.setStrength(0);
                     getSynapseGroup().addSynapse(newSynapse);
                 }
             }
         }
-        
+
     }
 
     /**
@@ -116,8 +114,9 @@ public class Hopfield extends Subnetwork {
                     w.randomize();
                     w.setStrength(Math.round(w.getStrength()));
                 }
-                Synapse w2 = Network.getSynapse(getNeuronGroup().getNeuronList()
-                        .get(j), getNeuronGroup().getNeuronList().get(i));
+                Synapse w2 = Network.getSynapse(getNeuronGroup()
+                        .getNeuronList().get(j), getNeuronGroup()
+                        .getNeuronList().get(i));
                 if (w2 != null) {
                     w2.setStrength(w.getStrength());
                 }
@@ -130,9 +129,9 @@ public class Hopfield extends Subnetwork {
      * Apply Hopfield training rule to current activation pattern.
      */
     public void train() {
-        //Assumes all neurons have the same upper and lower values
+        // Assumes all neurons have the same upper and lower values
         double low = getNeuronGroup().getNeuronList().get(0).getLowerBound();
-        double hi =  getNeuronGroup().getNeuronList().get(0).getUpperBound();
+        double hi = getNeuronGroup().getNeuronList().get(0).getUpperBound();
 
         for (Synapse w : this.getSynapseGroup().getSynapseList()) {
             Neuron src = w.getSource();
@@ -159,7 +158,7 @@ public class Hopfield extends Subnetwork {
         }
 
         for (int i = 0; i < nCount; i++) {
-            n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+            n = getNeuronGroup().getNeuronList().get(i);
             n.update();
             n.setActivation(n.getBuffer());
         }
@@ -195,7 +194,7 @@ public class Hopfield extends Subnetwork {
 
     public void setEnabled(boolean enabled) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

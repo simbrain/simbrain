@@ -19,8 +19,8 @@ package org.simbrain.network.groups;
 
 import java.util.List;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 
 /**
  * Extend neuron group with layer information used in a layered network.

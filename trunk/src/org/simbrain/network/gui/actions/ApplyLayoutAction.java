@@ -43,8 +43,8 @@ public final class ApplyLayoutAction extends AbstractAction {
      * @param layout the layout to apply
      * @param name the name of this action
      */
-    public ApplyLayoutAction(final NetworkPanel networkPanel,
-            Layout layout, String name) {
+    public ApplyLayoutAction(final NetworkPanel networkPanel, Layout layout,
+            String name) {
 
         super(name);
 

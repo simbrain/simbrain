@@ -95,9 +95,9 @@ public class NetworkScriptMenu {
         /** Reference to Network panel */
         private NetworkPanel networkPanel;
 
-
         /**
-         * Construct a network script action. 
+         * Construct a network script action.
+         *
          * @param name name of the action.
          * @param panel reference to parent network panel
          */

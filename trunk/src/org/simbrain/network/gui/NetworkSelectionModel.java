@@ -42,10 +42,9 @@ final class NetworkSelectionModel {
     /** Adjusting. */
     private boolean adjusting;
 
-
     /**
-     * Create a new network selection model for the specified
-     * source of selection events.
+     * Create a new network selection model for the specified source of
+     * selection events.
      *
      * @param networkPanel source of selection events
      */
@@ -56,7 +55,6 @@ final class NetworkSelectionModel {
         this.networkPanel = networkPanel;
         listenerList = new EventListenerList();
     }
-
 
     /**
      * Return the size of the selection.
@@ -215,22 +213,22 @@ final class NetworkSelectionModel {
     }
 
     /**
-     * Return true if this model will be adjusting over a series
-     * of rapid changes.
+     * Return true if this model will be adjusting over a series of rapid
+     * changes.
      *
-     * @return true if ths model will be adjusting over a series
-     *    of rapid changes
+     * @return true if ths model will be adjusting over a series of rapid
+     *         changes
      */
     public boolean isAdjusting() {
         return adjusting;
     }
 
     /**
-     * Set to true if this model will be adjusting over a series
-     * of rapid changes.
+     * Set to true if this model will be adjusting over a series of rapid
+     * changes.
      *
-     * @param adjusting true if this model will be adjusting over
-     *    a series of rapid changes
+     * @param adjusting true if this model will be adjusting over a series of
+     *            rapid changes
      */
     public void setAdjusting(final boolean adjusting) {
         this.adjusting = adjusting;
@@ -254,9 +252,11 @@ final class NetworkSelectionModel {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == NetworkSelectionListener.class) {
                 if (e == null) {
-                    e = new NetworkSelectionEvent(networkPanel, oldSelection, selection);
+                    e = new NetworkSelectionEvent(networkPanel, oldSelection,
+                            selection);
                 }
-                ((NetworkSelectionListener) listeners[i + 1]).selectionChanged(e);
+                ((NetworkSelectionListener) listeners[i + 1])
+                        .selectionChanged(e);
             }
         }
     }

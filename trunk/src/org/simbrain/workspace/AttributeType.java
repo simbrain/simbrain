@@ -85,7 +85,7 @@ public class AttributeType {
      *            component.
      */
     public AttributeType(WorkspaceComponent parent, String typeName,
-             Class<?> dataType, boolean visible) {
+            Class<?> dataType, boolean visible) {
         this(parent, typeName, null, dataType, visible);
     }
 

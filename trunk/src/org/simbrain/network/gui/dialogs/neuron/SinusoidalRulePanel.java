@@ -31,7 +31,6 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>SinusoidalNeuronPanel</b>.
  */
@@ -79,16 +78,19 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
         tfPhase.setText(Double.toString(neuronRef.getPhase()));
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class, "getFrequency")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
+                "getFrequency")) {
             tfFrequency.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class, "getPhase")) {
+        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
+                "getPhase")) {
             tfPhase.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
+                "getAddNoise")) {
             isAddNoise.setNull();
         }
         randPanel.fillFieldValues(getRandomizers());
@@ -106,7 +108,6 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
 
         return ret;
     }
-
 
     /**
      * Populates the fields with default data.
@@ -130,7 +131,8 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
                 neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
             }
             if (!tfFrequency.getText().equals(NULL_STRING)) {
-                neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
+                neuronRef
+                        .setFrequency(Double.parseDouble(tfFrequency.getText()));
             }
             if (!isAddNoise.isNull()) {
                 neuronRef.setAddNoise(isAddNoise.isSelected());

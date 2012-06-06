@@ -45,7 +45,8 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Display a PieChart.
  */
-public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
+public class BarChartGui extends GuiComponent<BarChartComponent> implements
+        ActionListener {
 
     /** Main JFreeChart object. */
     private JFreeChart chart;
@@ -65,7 +66,8 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
      * @param frame Generic frame
      * @param component Bar chart component
      */
-    public BarChartGui(final GenericFrame frame, final BarChartComponent component) {
+    public BarChartGui(final GenericFrame frame,
+            final BarChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
@@ -106,38 +108,52 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
 
                 );
         chartPanel.setChart(chart);
-        chart.getCategoryPlot().getRangeAxis().setAutoRange(
-                getWorkspaceComponent().getModel().isAutoRange());
+        chart.getCategoryPlot().getRangeAxis()
+                .setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
         if (!getWorkspaceComponent().getModel().isAutoRange()) {
-            chart.getCategoryPlot().getRangeAxis().setRange(
-                    getWorkspaceComponent().getModel().getLowerBound(),
-                    getWorkspaceComponent().getModel().getUpperBound());
+            chart.getCategoryPlot()
+                    .getRangeAxis()
+                    .setRange(
+                            getWorkspaceComponent().getModel().getLowerBound(),
+                            getWorkspaceComponent().getModel().getUpperBound());
         }
 
         // Add a chart setting listener
-        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
+        getWorkspaceComponent().getModel().addChartSettingsListener(
+                new ChartSettingsListener() {
 
-            // TODO: Explore parameters in
-            // chart, chart.getCategoryPlot(),
-            // chart.getCategoryPlot().getRenderer(), chartPanel..
-            public void chartSettingsUpdated() {
+                    // TODO: Explore parameters in
+                    // chart, chart.getCategoryPlot(),
+                    // chart.getCategoryPlot().getRenderer(), chartPanel..
+                    public void chartSettingsUpdated() {
 
-                // Update colors
-                chart.getCategoryPlot().getRenderer().setSeriesPaint(0,
-                        getWorkspaceComponent().getModel().getBarColor());
+                        // Update colors
+                        chart.getCategoryPlot()
+                                .getRenderer()
+                                .setSeriesPaint(
+                                        0,
+                                        getWorkspaceComponent().getModel()
+                                                .getBarColor());
 
-                // Update auto-range
-                chart.getCategoryPlot().getRangeAxis().setAutoRange(
-                        getWorkspaceComponent().getModel().isAutoRange());
+                        // Update auto-range
+                        chart.getCategoryPlot()
+                                .getRangeAxis()
+                                .setAutoRange(
+                                        getWorkspaceComponent().getModel()
+                                                .isAutoRange());
 
-                // Update ranges
-                if (!getWorkspaceComponent().getModel().isAutoRange()) {
-                    chart.getCategoryPlot().getRangeAxis().setRange(
-                            getWorkspaceComponent().getModel().getLowerBound(),
-                            getWorkspaceComponent().getModel().getUpperBound());
-                }
-            }
-        });
+                        // Update ranges
+                        if (!getWorkspaceComponent().getModel().isAutoRange()) {
+                            chart.getCategoryPlot()
+                                    .getRangeAxis()
+                                    .setRange(
+                                            getWorkspaceComponent().getModel()
+                                                    .getLowerBound(),
+                                            getWorkspaceComponent().getModel()
+                                                    .getUpperBound());
+                        }
+                    }
+                });
 
         // Fire the chart listener to update settings
         getWorkspaceComponent().getModel().fireSettingsChanged();
@@ -155,7 +171,6 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         }
         fileMenu.addSeparator();
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
-
 
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");

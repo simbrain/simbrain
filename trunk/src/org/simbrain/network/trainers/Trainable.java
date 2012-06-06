@@ -18,36 +18,37 @@ import java.util.List;
 import org.simbrain.network.core.Neuron;
 
 /**
- * Interface that must be implemented by any object that can be trained by a Trainer.
- *  
+ * Interface that must be implemented by any object that can be trained by a
+ * Trainer.
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
  *
  */
 public interface Trainable {
 
-	/**
-	 * Returns the list of input neurons.
-	 *
-	 * @return
-	 */
-	public List<Neuron> getInputNeurons();
+    /**
+     * Returns the list of input neurons.
+     *
+     * @return
+     */
+    public List<Neuron> getInputNeurons();
 
-	/**
-	 * Returns the list of output neurons
-	 *
-	 * @return
-	 */
-	public List<Neuron> getOutputNeurons();
-	
     /**
-     * Return input data.  Must be same number of columns as input neurons. 
+     * Returns the list of output neurons
+     *
+     * @return
      */
-	public double[][] getInputData();
-	
+    public List<Neuron> getOutputNeurons();
+
     /**
-     * Return training data.  Must be same number of columns as output neurons. 
+     * Return input data. Must be same number of columns as input neurons.
      */
-	public double[][] getTrainingData();	
-	
+    public double[][] getInputData();
+
+    /**
+     * Return training data. Must be same number of columns as output neurons.
+     */
+    public double[][] getTrainingData();
+
 }

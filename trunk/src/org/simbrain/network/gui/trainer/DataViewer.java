@@ -50,32 +50,31 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     SimbrainJTable getTable() {
         return table;
     }
-    
+
     /**
      * Create a panel for viewing input or training data in a trainer.
      *
      * @param network the network to be trained
      * @param type whether this is input or training data
      */
-    public DataViewer(final List<Neuron> neurons,
-            final DataHolder data, final String name) {
-    	
-    	// If no data exists, create it!
-    	if (data.getData() == null)  {
+    public DataViewer(final List<Neuron> neurons, final DataHolder data,
+            final String name) {
+
+        // If no data exists, create it!
+        if (data.getData() == null) {
             table = new SimbrainJTable(new DefaultNumericTable(
-                    DEFAULT_NUM_ROWS, neurons.size()));    		
-    	} else {
-    		table = new SimbrainJTable(new DefaultNumericTable(data.getData()));
-    	}
+                    DEFAULT_NUM_ROWS, neurons.size()));
+        } else {
+            table = new SimbrainJTable(new DefaultNumericTable(data.getData()));
+        }
 
-
-        // Set up column headings 
+        // Set up column headings
         List<String> colHeaders = new ArrayList<String>();
         int i = 0;
-		for (Neuron neuron : neurons) {
-			colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
-					+ ")");
-		}
+        for (Neuron neuron : neurons) {
+            colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
+                    + ")");
+        }
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
 
@@ -91,23 +90,23 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             }
 
             public void rowAdded(int row) {
-				data.setData(((NumericTable) table.getData()).asArray());
-           }
+                data.setData(((NumericTable) table.getData()).asArray());
+            }
 
             public void rowRemoved(int row) {
-				data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void cellDataChanged(int row, int column) {
-				data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void tableDataChanged() {
-				data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void tableStructureChanged() {
-				data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asArray());
             }
 
         });
@@ -134,8 +133,8 @@ public class DataViewer extends SimbrainJTableScrollPanel {
 
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
-        fileToolBar
-                .add(TrainerGuiActions.getOpenCSVAction(viewer.getTable(), data));
+        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(viewer.getTable(),
+                data));
         fileToolBar.add(TableActionManager
                 .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
         toolbars.add(fileToolBar);
@@ -154,43 +153,44 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         mainPanel.add("North", toolbars);
         return mainPanel;
     }
-    
+
     /**
-     * Create a combined data viewer panel, which shows two panels in a split pane.
+     * Create a combined data viewer panel, which shows two panels in a split
+     * pane.
      */
-    public static JPanel createCombinedDataViewerPanel(JPanel viewer1,  JPanel viewer2) {
-    	// TODO:  Plenty of enhancements are planned for this.   As it matures it
-    	//	should probably be moved somewhere else.    	
-    	JPanel panel = new JPanel();
-    	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    	//split.setDividerLocation(.5);
-    	split.setLeftComponent(viewer1);
-    	split.setRightComponent(viewer2);
-    	panel.add(split);
+    public static JPanel createCombinedDataViewerPanel(JPanel viewer1,
+            JPanel viewer2) {
+        // TODO: Plenty of enhancements are planned for this. As it matures it
+        // should probably be moved somewhere else.
+        JPanel panel = new JPanel();
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        // split.setDividerLocation(.5);
+        split.setLeftComponent(viewer1);
+        split.setRightComponent(viewer2);
+        panel.add(split);
         return panel;
     }
-    
+
     /**
-     * Interface that indicates where the data is held in a class, and allows it to be used
-     * with the data viewer.
+     * Interface that indicates where the data is held in a class, and allows it
+     * to be used with the data viewer.
      *
      */
     public interface DataHolder {
-    	
-    	/**
-    	 * Set the data
-    	 *
-    	 * @param data the data to set
-    	 */
-    	public void setData(double[][] data);
-    	
-    	/**
-    	 * Get the data
-    	 *
-    	 * @return the data to get
-    	 */
-    	public double[][] getData();
+
+        /**
+         * Set the data
+         *
+         * @param data the data to set
+         */
+        public void setData(double[][] data);
+
+        /**
+         * Get the data
+         *
+         * @return the data to get
+         */
+        public double[][] getData();
     }
-    
-    
+
 }

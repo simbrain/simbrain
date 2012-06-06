@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import java.util.List;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -54,10 +52,10 @@ public class BumpSensor extends Sensor {
      * {@inheritDoc}
      */
     public void update() {
-//        if (wasBumped()) {
-//            return new Double(bumpValue);
-//        } else
-//            return new Double(0);
+        // if (wasBumped()) {
+        // return new Double(bumpValue);
+        // } else
+        // return new Double(0);
     }
 
     /**
@@ -68,8 +66,7 @@ public class BumpSensor extends Sensor {
     }
 
     /**
-     * @param wasBumped
-     *            the wasBumped to set
+     * @param wasBumped the wasBumped to set
      */
     public void setBumped(boolean wasBumped) {
         this.wasBumped = wasBumped;

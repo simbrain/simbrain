@@ -21,14 +21,11 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
@@ -53,32 +50,35 @@ import org.simbrain.network.util.SimnetUtils;
  * @author ztosi
  */
 public class EchoStateNetwork extends Subnetwork {
-	
-	/** Number of input nodes. */
+
+    /** Number of input nodes. */
     private int numInputs;
-    
+
     /** Number of reservoir nodes. */
     private int numResNodes;
-    
+
     /** Number of output nodes. */
     private int numOutputs;
-    
+
     /** Reservoir sparsity. */
     private double resSparsity;
-    
-    /** Sparsity of weights from input. */ 
+
+    /** Sparsity of weights from input. */
     private double inSparsity;
-    
+
     /** Sparsity of back weights from output to reservoir (if they exist). */
     private double backSparsity;
-    
-	/**
-	 * Desired spectral radius (max eigenvalue) of the reservoir's weight
-	 * matrix.  Typical range is .8 -1.
-	 */
+
+    /**
+     * Desired spectral radius (max eigenvalue) of the reservoir's weight
+     * matrix. Typical range is .8 -1.
+     */
     private double spectralRadius;
-    
-    /** Whether the network has weights from the output to the reservoir (not trained.) */
+
+    /**
+     * Whether the network has weights from the output to the reservoir (not
+     * trained.)
+     */
     private boolean backWeights = true;
 
     /** Whether the network has recurrent output weights (trained). */
@@ -99,7 +99,7 @@ public class EchoStateNetwork extends Subnetwork {
     /** Reference to input layer. */
     private NeuronGroup outputLayer;
 
-   /** Default TANH neurons for the reservoir */
+    /** Default TANH neurons for the reservoir */
     {
         ((SigmoidalRule) reservoirNeuronType).setType(SigmoidType.TANH);
     }
@@ -124,20 +124,21 @@ public class EchoStateNetwork extends Subnetwork {
 
     /** Whether to use noise or not. */
     private boolean noise;
-    
+
     /** A noise generator. */
     private RandomSource noiseGenerator = new RandomSource();
-    
-	/**
-	 * Input data. The sequence of inputs to be fed to the ESN's input layer.
-	 */
-	private double[][] inputData;
-	
-	/**
-	 * Training Data.  The desired sequence of inputs from the ESN's output layer.
-	 */
-	private double[][] trainingData;
-	
+
+    /**
+     * Input data. The sequence of inputs to be fed to the ESN's input layer.
+     */
+    private double[][] inputData;
+
+    /**
+     * Training Data. The desired sequence of inputs from the ESN's output
+     * layer.
+     */
+    private double[][] trainingData;
+
     /**
      * Constructor with size of layers specified.
      *
@@ -155,8 +156,8 @@ public class EchoStateNetwork extends Subnetwork {
         this.numOutputs = outputNodes;
         setLabel("Echo State Network");
     }
-    
-	@Override
+
+    @Override
     public void update() {
         inputLayer.update();
         reservoirLayer.update();
@@ -170,31 +171,28 @@ public class EchoStateNetwork extends Subnetwork {
     public void buildNetwork() {
 
         // initialize the Layers
-        List<Neuron> inputLayerNeurons  = new ArrayList<Neuron>();
-        List<Neuron> reservoirLayerNeurons  = new ArrayList<Neuron>();
-        List<Neuron> outputLayerNeurons  = new ArrayList<Neuron>();
-        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(),
-                numInputs);
-        initializeLayer(reservoirLayerNeurons, reservoirNeuronType,
-                numResNodes);
-        initializeLayer(outputLayerNeurons, outputNeuronType,
-                numOutputs);
-        
+        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> reservoirLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
+        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(), numInputs);
+        initializeLayer(reservoirLayerNeurons, reservoirNeuronType, numResNodes);
+        initializeLayer(outputLayerNeurons, outputNeuronType, numOutputs);
+
         Sparse connector = new Sparse();
         connector.setEnableExcitatoryRandomization(true);
         connector.setEnableInhibitoryRandomization(true);
-        
-        //TODO: The user should be able to set these:
+
+        // TODO: The user should be able to set these:
         RandomSource exRand = connector.getExcitatoryRandomizer();
         RandomSource inRand = connector.getInhibitoryRandomizer();
         exRand.setLowerBound(0.01);
         exRand.setUpperBound(0.5);
         inRand.setLowerBound(-0.5);
         inRand.setUpperBound(-0.01);
-                
+
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
-        
+
         // Input Layer
         lineLayout.layoutNeurons(inputLayerNeurons);
         inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
@@ -205,10 +203,12 @@ public class EchoStateNetwork extends Subnetwork {
         GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
                 betweenNeuronInterval, (int) Math.sqrt(numResNodes));
         gridLayout.layoutNeurons(reservoirLayerNeurons);
-        reservoirLayer = new NeuronGroup(getParentNetwork(), reservoirLayerNeurons);
+        reservoirLayer = new NeuronGroup(getParentNetwork(),
+                reservoirLayerNeurons);
         addNeuronGroup(reservoirLayer);
         reservoirLayer.setLabel("Reservoir");
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer, Direction.NORTH, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer,
+                Direction.NORTH, betweenLayerInterval);
 
         // Output Layer
         lineLayout.setInitialLocation(initialPosition);
@@ -216,43 +216,50 @@ public class EchoStateNetwork extends Subnetwork {
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         outputLayer.setLabel("Outputs");
         addNeuronGroup(outputLayer);
-        NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
-        
+        NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,
+                Direction.NORTH, betweenLayerInterval);
+
         // Weights: Input layer to reservoir layer
-        connector.setSparsity(inSparsity);      
-        connectNeuronGroups(inputLayer, reservoirLayer, connector); // This is where the groups are made
+        connector.setSparsity(inSparsity);
+        connectNeuronGroups(inputLayer, reservoirLayer, connector); // This is
+                                                                    // where the
+                                                                    // groups
+                                                                    // are made
 
         // Weights: reservoir layer to itself
         connector.setSparsity(resSparsity);
         connectNeuronGroups(reservoirLayer, reservoirLayer, connector);
 
         // Weights: reservoir layer to output layer
-        //TODO: These only exist for the as yet unimplemented RLMS algorithm
-        AllToAll allToAll  = new AllToAll(getParentNetwork(), reservoirLayerNeurons, outputLayerNeurons);
+        // TODO: These only exist for the as yet unimplemented RLMS algorithm
+        AllToAll allToAll = new AllToAll(getParentNetwork(),
+                reservoirLayerNeurons, outputLayerNeurons);
         connectNeuronGroups(reservoirLayer, outputLayer, allToAll);
 
         // Weights: output to reservoir
         if (backWeights) {
-          connector.setSparsity(backSparsity);
-          connectNeuronGroups(outputLayer, reservoirLayer, connector);
+            connector.setSparsity(backSparsity);
+            connectNeuronGroups(outputLayer, reservoirLayer, connector);
         }
 
-        // If recurrent output weights are on, set up an empty, growing synapse group
-        //	on the output layer
+        // If recurrent output weights are on, set up an empty, growing synapse
+        // group
+        // on the output layer
         if (recurrentOutWeights) {
-        	addEmptySynapseGroup(outputLayer, outputLayer);
+            addEmptySynapseGroup(outputLayer, outputLayer);
         }
 
-        // If direct in-out weights are on, set up an empty, growing synapse group
-        //	connecting the input layer directly to the output layer
+        // If direct in-out weights are on, set up an empty, growing synapse
+        // group
+        // connecting the input layer directly to the output layer
         if (directInOutWeights) {
-        	addEmptySynapseGroup(inputLayer, outputLayer);        	
+            addEmptySynapseGroup(inputLayer, outputLayer);
         }
 
         // Scale the reservoir's weights to have the desired spectral radius
-        SimnetUtils.scaleEigenvalue(reservoirLayerNeurons, reservoirLayerNeurons,
-                spectralRadius);
-        
+        SimnetUtils.scaleEigenvalue(reservoirLayerNeurons,
+                reservoirLayerNeurons, spectralRadius);
+
         // Add the group to the network
         getParentNetwork().addGroup(this);
 
@@ -260,22 +267,21 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Initializes a layer.
-     * @param layer
-     *            the layer to be initialized
-     * @param nodeType
-     *            type of nodes in the layer
+     *
+     * @param layer the layer to be initialized
+     * @param nodeType type of nodes in the layer
      * @param layerType type of layer
      * @param nodes number of nodes in the layer
      */
-    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType, int nodes) {
+    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
+            int nodes) {
 
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);
-            node.setIncrement(1); //TODO: Reasonable?
+            node.setIncrement(1); // TODO: Reasonable?
             layer.add(node);
         }
     }
-
 
     /**
      * Return a trainer object that can be used to train this ESN. The trainer
@@ -285,15 +291,13 @@ public class EchoStateNetwork extends Subnetwork {
      */
     public Trainer getTrainer() {
 
-    
-    	
         // Exception if training data is not set properly at this point
         if (trainingData[0].length != outputLayer.getNeuronList().size()) {
             throw new IllegalArgumentException("Output data length does not "
                     + "match the number of output nodes");
         }
 
-    	// Build the network to be used in state harvesting
+        // Build the network to be used in state harvesting
         final ArrayList<Neuron> full = new ArrayList<Neuron>();
         if (directInOutWeights) {
             for (Neuron node : getInputLayer().getNeuronList()) {
@@ -308,18 +312,17 @@ public class EchoStateNetwork extends Subnetwork {
                 full.add(node);
             }
         }
-        
+
         // Handle non-linearities in the outputs.
         // If output layer neurons are sigmoidal, transform the desired
-        //  output to the inverse of the sigmoidal, so that when it's put
-        //  in to the sigmoidal it will produce the desired output.
+        // output to the inverse of the sigmoidal, so that when it's put
+        // in to the sigmoidal it will produce the desired output.
         for (Neuron n : outputLayer.getNeuronList()) {
             if (n.getUpdateRule() instanceof SigmoidalRule) {
                 for (int i = 0; i < trainingData.length; i++) {
                     int col = outputLayer.getNeuronList().indexOf(n);
-                    trainingData[i][col] = ((SigmoidalRule)
-                            n.getUpdateRule()).getInverse(trainingData[i][col],
-                                    n);
+                    trainingData[i][col] = ((SigmoidalRule) n.getUpdateRule())
+                            .getInverse(trainingData[i][col], n);
                 }
             }
         }
@@ -327,41 +330,42 @@ public class EchoStateNetwork extends Subnetwork {
         // Make Trainable object
         Trainable trainable = new Trainable() {
 
-			@Override
-			public List<Neuron> getInputNeurons() {
-				return full;
-			}
+            @Override
+            public List<Neuron> getInputNeurons() {
+                return full;
+            }
 
-			@Override
-			public List<Neuron> getOutputNeurons() {
-				return getOutputLayer().getNeuronList();
-			}
+            @Override
+            public List<Neuron> getOutputNeurons() {
+                return getOutputLayer().getNeuronList();
+            }
 
-			@Override
-			public double[][] getInputData() {
-		        // Harvest the reservoir states
-				final double[][] harvestedData = harvestData();
-		        if (harvestedData[0].length != full.size()) {
-		            throw new IllegalArgumentException("Input data length does not "
-		                    + "match training node set");
-		        }
-		        //System.out.println("-------");
-		        //System.out.println(Utils.doubleMatrixToString(mainInputData));
-				return harvestedData;
-			}
+            @Override
+            public double[][] getInputData() {
+                // Harvest the reservoir states
+                final double[][] harvestedData = harvestData();
+                if (harvestedData[0].length != full.size()) {
+                    throw new IllegalArgumentException(
+                            "Input data length does not "
+                                    + "match training node set");
+                }
+                // System.out.println("-------");
+                // System.out.println(Utils.doubleMatrixToString(mainInputData));
+                return harvestedData;
+            }
 
-			@Override
-			public double[][] getTrainingData() {
-				return trainingData;
-			}
-        	
+            @Override
+            public double[][] getTrainingData() {
+                return trainingData;
+            }
+
         };
         // Create the offline trainer.
         LMSOffline trainer = new LMSOffline(trainable);
         return trainer;
 
     }
-    
+
     /**
      * A general method for harvesting state data for an arbitrary Echo-State
      * Network. This method iterates through each row of input and teacher data
@@ -369,8 +373,8 @@ public class EchoStateNetwork extends Subnetwork {
      * and updates the reservoir. Depending on the ESN's un-frozen connectivity
      * the resulting return matrix will have rows consisting of concatenated
      * input, reservoir, and (teacher-forced) output states in that order.
-     * 
-     * @return a matrix of data to be used for  training
+     *
+     * @return a matrix of data to be used for training
      */
     private double[][] harvestData() {
 
@@ -378,98 +382,96 @@ public class EchoStateNetwork extends Subnetwork {
         int columnNumber = numResNodes;
 
         if (directInOutWeights) {
-            //Add columns for the input layer states
+            // Add columns for the input layer states
             columnNumber += numInputs;
         }
         if (recurrentOutWeights) {
-            //Add columns for output layer states
+            // Add columns for output layer states
             columnNumber += numOutputs;
         }
-        
-        //State matrix
-        double[][] returnMatrix = new double[inputData.length]
-        		[columnNumber];
+
+        // State matrix
+        double[][] returnMatrix = new double[inputData.length][columnNumber];
 
         boolean harvest = false;
-        
-        //Two full passes over the data, one where states are being harvested
-        //and one where internal dynamics are being allowed to settle.
-        for(int t = 0; t < 2; t++){
-        	
-        	 //Iterate through each row of input data
-	        for (int row = 0; row < inputData.length; row++) {
-	
-	            int col = 0;
-	
-	            //Clamp input neurons based on input data
-	            for (Neuron neuron : getInputLayer().getNeuronList()) {
-	                double clampValue = inputData[row][col];
-	                neuron.setActivation(clampValue);
-	                if (directInOutWeights && harvest) {
-	                    //Add input states to state matrix if direct in to out
-	                    //connections are desired
-	                    returnMatrix[row][col] =
-	                    		neuron.getActivation();
-	                    col++;
-	                }
-	
-	            }
-	            
-	            if (backWeights) {
-	                int count = 0;
-	                double clampValue = 0.5;
-	                for (Neuron neuron : getOutputLayer().getNeuronList()) {
-	                    // Teacher forcing
-	                    if (row > 0) {
-	                        clampValue = trainingData[row - 1][count];
-	                    }
-	                    neuron.setActivation(clampValue);
-	                    count++;
-	                }
-	            }
-	
-	            //Update the reservoir: handles teacher-forced back-weights
-	            for (Neuron n : getReservoirLayer().getNeuronList()) {
-	                n.update();
-	            }
-	            for (Neuron n : getReservoirLayer().getNeuronList()) {
-	                double val = n.getBuffer();
-	                
-	                if (noise) {
-	                    n.setActivation(val + reservoirNoise());
-	                } else {
-	                    n.setActivation(val);
-	                }
-	  
-	                if(harvest) {
-	                	returnMatrix[row][col] = n.getActivation();
-	                }
-	                col++;
-	            }
-	
-	            //Add output states to state matrix if there are recurrent outputs
-	            if (recurrentOutWeights && harvest) {
-	                for (int i = 0; i < trainingData[0].length; i++) {
-	                    //Teacher-forcing
-	                    returnMatrix[row][col] =
-	                    		trainingData[row][i];
-	                    col++;
-	                }
-	            }
-	        }
-	        harvest = true;
+
+        // Two full passes over the data, one where states are being harvested
+        // and one where internal dynamics are being allowed to settle.
+        for (int t = 0; t < 2; t++) {
+
+            // Iterate through each row of input data
+            for (int row = 0; row < inputData.length; row++) {
+
+                int col = 0;
+
+                // Clamp input neurons based on input data
+                for (Neuron neuron : getInputLayer().getNeuronList()) {
+                    double clampValue = inputData[row][col];
+                    neuron.setActivation(clampValue);
+                    if (directInOutWeights && harvest) {
+                        // Add input states to state matrix if direct in to out
+                        // connections are desired
+                        returnMatrix[row][col] = neuron.getActivation();
+                        col++;
+                    }
+
+                }
+
+                if (backWeights) {
+                    int count = 0;
+                    double clampValue = 0.5;
+                    for (Neuron neuron : getOutputLayer().getNeuronList()) {
+                        // Teacher forcing
+                        if (row > 0) {
+                            clampValue = trainingData[row - 1][count];
+                        }
+                        neuron.setActivation(clampValue);
+                        count++;
+                    }
+                }
+
+                // Update the reservoir: handles teacher-forced back-weights
+                for (Neuron n : getReservoirLayer().getNeuronList()) {
+                    n.update();
+                }
+                for (Neuron n : getReservoirLayer().getNeuronList()) {
+                    double val = n.getBuffer();
+
+                    if (noise) {
+                        n.setActivation(val + reservoirNoise());
+                    } else {
+                        n.setActivation(val);
+                    }
+
+                    if (harvest) {
+                        returnMatrix[row][col] = n.getActivation();
+                    }
+                    col++;
+                }
+
+                // Add output states to state matrix if there are recurrent
+                // outputs
+                if (recurrentOutWeights && harvest) {
+                    for (int i = 0; i < trainingData[0].length; i++) {
+                        // Teacher-forcing
+                        returnMatrix[row][col] = trainingData[row][i];
+                        col++;
+                    }
+                }
+            }
+            harvest = true;
         }
-        
+
         return returnMatrix;
     }
-    
+
     /**
      * Compute the reservoir noise.
-     * 
+     *
      * @return noise reservoir noise.
      */
-    private double reservoirNoise(){
-    	return noiseGenerator.getRandom();
+    private double reservoirNoise() {
+        return noiseGenerator.getRandom();
     }
 
     /**
@@ -492,7 +494,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set the back sparsity.
-     * 
+     *
      * @param backSparsity
      */
     public void setBackSparsity(double backSparsity) {
@@ -574,61 +576,60 @@ public class EchoStateNetwork extends Subnetwork {
         return outputLayer;
     }
 
-	/**
-	 * @return the inputData
-	 */
-	public double[][] getInputData() {
-		return inputData;
-	}
+    /**
+     * @return the inputData
+     */
+    public double[][] getInputData() {
+        return inputData;
+    }
 
-	/**
-	 * @param inputData the inputData to set
-	 */
-	public void setInputData(double[][] inputData) {
-		this.inputData = inputData;
-	}
+    /**
+     * @param inputData the inputData to set
+     */
+    public void setInputData(double[][] inputData) {
+        this.inputData = inputData;
+    }
 
-	/**
-	 * @return the trainingData
-	 */
-	public double[][] getTrainingData() {
-		return trainingData;
-	}
+    /**
+     * @return the trainingData
+     */
+    public double[][] getTrainingData() {
+        return trainingData;
+    }
 
-	/**
-	 * @param trainingData the trainingData to set
-	 */
-	public void setTrainingData(double[][] trainingData) {
-		this.trainingData = trainingData;
-	}
+    /**
+     * @param trainingData the trainingData to set
+     */
+    public void setTrainingData(double[][] trainingData) {
+        this.trainingData = trainingData;
+    }
 
-	
-	//TODO: Integrate random panel
-	
-	/**
-	 * @return the noise
-	 */
-	public boolean getUseNoise() {
-		return noise;
-	}
+    // TODO: Integrate random panel
 
-	/**
-	 * @param noise the noise to set
-	 */
-	public void setUseNoise(boolean noise) {
-		this.noise = noise;
-	}
+    /**
+     * @return the noise
+     */
+    public boolean getUseNoise() {
+        return noise;
+    }
 
-	public RandomSource getNoiseGenerator() {
-		return noiseGenerator;
-	}
+    /**
+     * @param noise the noise to set
+     */
+    public void setUseNoise(boolean noise) {
+        this.noise = noise;
+    }
 
-	public void setNoiseGenerator(RandomSource noiseGenerator) {
-		this.noiseGenerator = noiseGenerator;
-	}
+    public RandomSource getNoiseGenerator() {
+        return noiseGenerator;
+    }
 
-	public void setNoise(boolean noise) {
-		this.noise = noise;
-	}
+    public void setNoiseGenerator(RandomSource noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
+
+    public void setNoise(boolean noise) {
+        this.noise = noise;
+    }
 
 }

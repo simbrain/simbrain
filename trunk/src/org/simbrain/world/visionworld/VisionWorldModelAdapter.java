@@ -21,8 +21,7 @@ package org.simbrain.world.visionworld;
 /**
  * Empty implementation of VisionWorldModelListener.
  */
-public class VisionWorldModelAdapter
-    implements VisionWorldModelListener {
+public class VisionWorldModelAdapter implements VisionWorldModelListener {
 
     /** {@inheritDoc} */
     public void pixelMatrixChanged(final VisionWorldModelEvent event) {

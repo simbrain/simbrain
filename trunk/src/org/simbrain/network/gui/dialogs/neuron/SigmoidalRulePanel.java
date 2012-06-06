@@ -33,7 +33,6 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>SigmoidalNeuronPanel</b>.
  */
@@ -41,8 +40,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
     /** Implementation combo box. */
     private JComboBox cbImplementation = new JComboBox(new SigmoidType[] {
-            SigmoidType.ARCTAN, SigmoidType.LOGISTIC,
-            SigmoidType.TANH });
+            SigmoidType.ARCTAN, SigmoidType.LOGISTIC, SigmoidType.TANH });
 
     /** Bias field. */
     private JTextField tfBias = new JTextField();
@@ -88,9 +86,9 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getType")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils
+                .isConsistent(ruleList, SigmoidalRule.class, "getType")) {
             if ((cbImplementation.getItemCount() == SigmoidType.values().length)) {
                 cbImplementation.addItem(NULL_STRING);
             }
@@ -101,11 +99,13 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
             neuronRef.setBias(Double.parseDouble(tfBias.getText()));
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class, "getSlope")) {
+        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
+                "getSlope")) {
             tfSlope.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
+                "getAddNoise")) {
             isAddNoise.setNull();
         }
 

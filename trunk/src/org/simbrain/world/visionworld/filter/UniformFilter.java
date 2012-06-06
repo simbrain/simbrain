@@ -25,15 +25,13 @@ import org.simbrain.world.visionworld.Filter;
 /**
  * Uniform filter.
  */
-public final class UniformFilter
-    implements Filter {
+public final class UniformFilter implements Filter {
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Uniform filter";
 
     /** Value. */
     private final double value;
-
 
     /**
      * Create a new uniform filter with the specified value.
@@ -43,7 +41,6 @@ public final class UniformFilter
     public UniformFilter(final double value) {
         this.value = value;
     }
-
 
     /**
      * Return the value for this uniform filter.

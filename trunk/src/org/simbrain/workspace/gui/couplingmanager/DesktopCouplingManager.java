@@ -56,7 +56,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     private PotentialAttributePanel consumingAttributes;
 
     /** Methods for making couplings. */
-    private String[] tempStrings = {"One to one", "One to many" };
+    private String[] tempStrings = { "One to one", "One to many" };
 
     /** Methods for making couplings. */
     private JComboBox couplingMethodComboBox = new JComboBox(tempStrings);
@@ -73,19 +73,22 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * @param desktop reference to parent desktop
      * @param frame reference to parent frame
      */
-    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericJInternalFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop,
+            final GenericJInternalFrame frame) {
         super(new BorderLayout());
         this.desktop = desktop;
         this.frame = frame;
 
         // Left Panel
         Border leftBorder = BorderFactory.createTitledBorder("Producers");
-        producingAttributes = new PotentialAttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
+        producingAttributes = new PotentialAttributePanel(
+                desktop.getWorkspace(), ProducerOrConsumer.Producing);
         producingAttributes.setBorder(leftBorder);
 
         // Right Panel
         Border rightBorder = BorderFactory.createTitledBorder("Consumers");
-        consumingAttributes = new PotentialAttributePanel(desktop.getWorkspace(),  ProducerOrConsumer.Consuming);
+        consumingAttributes = new PotentialAttributePanel(
+                desktop.getWorkspace(), ProducerOrConsumer.Consuming);
         consumingAttributes.setBorder(rightBorder);
 
         // Bottom Panel
@@ -107,7 +110,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         cancelButton.addActionListener(this);
         bottomPanel.add(cancelButton);
 
-        JComponent couplingList = new CouplingListPanel(desktop,new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
+        JComponent couplingList = new CouplingListPanel(desktop, new Vector(
+                desktop.getWorkspace().getCouplingManager().getCouplings()));
         couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 
         // Main Panel
@@ -123,7 +127,6 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
     }
 
-
     /**
      * @see ActionListener.
      * @param event to listen.
@@ -132,10 +135,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Refresh component lists
         if (event.getSource() instanceof JComboBox) {
-            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
+            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event
+                    .getSource()).getSelectedItem();
         }
 
-       // Handle Button Presses
+        // Handle Button Presses
         if (event.getSource() instanceof JButton) {
             JButton button = (JButton) event.getSource();
             if (button.getActionCommand().equalsIgnoreCase("addCouplings")) {
@@ -158,17 +162,25 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         List<PotentialConsumer> potentialConsumers = (List<PotentialConsumer>) consumingAttributes
                 .getSelectedAttributes();
 
-        if ((potentialProducers.size() == 0) || (potentialConsumers.size() == 0)) {
-          JOptionPane.showMessageDialog(null,
-                  "You must select at least one consuming and producing attribute \n in order to create couplings!",
-                  "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
-                  return;
+        if ((potentialProducers.size() == 0)
+                || (potentialConsumers.size() == 0)) {
+            JOptionPane
+                    .showMessageDialog(
+                            null,
+                            "You must select at least one consuming and producing attribute \n in order to create couplings!",
+                            "No Attributes Selected Warning",
+                            JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
-            desktop.getWorkspace().coupleOneToOne(potentialProducers, potentialConsumers);
-        } else if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
-            desktop.getWorkspace().coupleOneToMany(potentialProducers, potentialConsumers);
+        if (((String) couplingMethodComboBox.getSelectedItem())
+                .equalsIgnoreCase("One to one")) {
+            desktop.getWorkspace().coupleOneToOne(potentialProducers,
+                    potentialConsumers);
+        } else if (((String) couplingMethodComboBox.getSelectedItem())
+                .equalsIgnoreCase("One to many")) {
+            desktop.getWorkspace().coupleOneToMany(potentialProducers,
+                    potentialConsumers);
         }
     }
 

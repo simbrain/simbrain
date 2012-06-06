@@ -27,7 +27,8 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a k-winner take all network.
+ * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a
+ * k-winner take all network.
  */
 public class KwtaPropertiesDialog extends StandardDialog {
 
@@ -55,7 +56,7 @@ public class KwtaPropertiesDialog extends StandardDialog {
         this.wta = wta;
         setTitle("Set KWta Properties");
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
+        this.setLocation(500, 0); // Sets location of network dialog
         helpAction = new ShowHelpAction("Pages/Network/network/kwta.html");
         helpButton.setAction(helpAction);
 
@@ -68,8 +69,8 @@ public class KwtaPropertiesDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      wta.setK(Integer.parseInt(kValue.getText()));
-      super.closeDialogOk();
+        wta.setK(Integer.parseInt(kValue.getText()));
+        super.closeDialogOk();
     }
 
     /**

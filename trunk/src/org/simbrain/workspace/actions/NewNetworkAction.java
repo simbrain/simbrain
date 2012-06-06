@@ -36,20 +36,18 @@ public final class NewNetworkAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create a new network action with the specified
-     * workspace.
+     * Create a new network action with the specified workspace.
      */
     public NewNetworkAction(Workspace workspace) {
         super("New Network", workspace);
         putValue(SHORT_DESCRIPTION, "New network");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

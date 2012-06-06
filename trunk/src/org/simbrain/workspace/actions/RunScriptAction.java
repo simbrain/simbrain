@@ -39,11 +39,11 @@ public final class RunScriptAction extends WorkspaceAction {
 
     /** Reference to Simbrain Desktop. */
     private SimbrainDesktop desktop;
-    
+
     /** Script directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
-        + System.getProperty("file.separator") + "scripts"  + System.getProperty("file.separator") + "scriptmenu" ;
-
+            + System.getProperty("file.separator") + "scripts"
+            + System.getProperty("file.separator") + "scriptmenu";
 
     /**
      * Create a new script action for the workspace.
@@ -54,24 +54,24 @@ public final class RunScriptAction extends WorkspaceAction {
         this.desktop = desktop;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY, "Run Script", "bsh");
+        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY,
+                "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();
         if (scriptFile != null) {
             Interpreter interpreter = new Interpreter();
-            
+
             try {
                 interpreter.set("desktop", desktop);
                 interpreter.set("workspace", workspace);
                 interpreter.source(scriptFile.toString());
             } catch (FileNotFoundException e) {
-               System.out.println("File not found");
-               e.printStackTrace();
+                System.out.println("File not found");
+                e.printStackTrace();
             } catch (IOException e) {
-               System.out.println("IO Exception");
-               e.printStackTrace();
+                System.out.println("IO Exception");
+                e.printStackTrace();
             } catch (EvalError e) {
                 System.out.println("Evaluation error");
                 e.printStackTrace();

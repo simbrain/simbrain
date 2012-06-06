@@ -56,5 +56,4 @@ class WorkspaceKeyAdapter extends KeyAdapter {
         }
     }
 
-
 }

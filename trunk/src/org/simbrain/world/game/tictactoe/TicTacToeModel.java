@@ -7,28 +7,27 @@ import org.simbrain.world.game.GameModel;
 
 /**
  * Holds the state of the game.
- * 
+ *
  * @author Matt Watson
  */
 public class TicTacToeModel extends GameModel {
     /** the size of the board (3). */
     private static final int SIZE = 3;
     /** The state of the board. */
-    State[][] board =
-       {{State.EMPTY, State.EMPTY, State.EMPTY},
-        {State.EMPTY, State.EMPTY, State.EMPTY},
-        {State.EMPTY, State.EMPTY, State.EMPTY}};
-    
+    State[][] board = { { State.EMPTY, State.EMPTY, State.EMPTY },
+            { State.EMPTY, State.EMPTY, State.EMPTY },
+            { State.EMPTY, State.EMPTY, State.EMPTY } };
+
     /**
      * Creates a new tic-tac-toe game.
      */
     public TicTacToeModel() {
         super("tic tac toe", SIZE);
     }
-    
+
     /**
      * Type for the state of a square.
-     * 
+     *
      * @author Matt Watson
      */
     public enum State {
@@ -39,10 +38,10 @@ public class TicTacToeModel extends GameModel {
         /** 'X' state for a square. */
         ECKS
     }
-    
+
     /**
      * Returns the state of a given square.
-     * 
+     *
      * @param x the horizontal position.
      * @param y the vertical position.
      * @return the state for the given square.
@@ -50,10 +49,10 @@ public class TicTacToeModel extends GameModel {
     public State getState(final int x, final int y) {
         return board[x][y];
     }
-    
+
     /**
      * Sets the state of the given square.
-     * 
+     *
      * @param x the horizontal position.
      * @param y the vertical position.
      * @param state the state to set the square.
@@ -78,7 +77,8 @@ public class TicTacToeModel extends GameModel {
         case ECKS:
             return 1;
         default:
-            throw new IllegalStateException("No vaild value set at " + x + ", " + y);
+            throw new IllegalStateException("No vaild value set at " + x + ", "
+                    + y);
         }
     }
 
@@ -98,19 +98,19 @@ public class TicTacToeModel extends GameModel {
             throw new RuntimeException("Illegal value " + value);
         }
     }
-    
+
     List<Listener> listeners = new ArrayList<Listener>();
-    
+
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
-    
+
     private void updated() {
         for (Listener listener : listeners) {
             listener.updated();
         }
     }
-    
+
     public interface Listener {
         void updated();
     }

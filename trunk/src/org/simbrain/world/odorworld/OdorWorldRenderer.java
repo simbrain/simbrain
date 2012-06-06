@@ -21,7 +21,6 @@ package org.simbrain.world.odorworld;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.Iterator;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -71,8 +70,8 @@ public class OdorWorldRenderer {
         }
 
         // For debugging world bounds
-        //g.setColor(Color.black);
-        //g.drawRect(0, 0, world.getWidth(), world.getHeight());
+        // g.setColor(Color.black);
+        // g.drawRect(0, 0, world.getWidth(), world.getHeight());
 
         // Draw entities
         for (OdorWorldEntity entity : world.getObjectList()) {
@@ -86,8 +85,8 @@ public class OdorWorldRenderer {
             // }
 
             // For debugging entity boundary issues
-            //g.drawRect((int) entity.getX(), (int) entity.getY(),
-            //        entity.getWidth(), entity.getHeight());
+            // g.drawRect((int) entity.getX(), (int) entity.getY(),
+            // entity.getWidth(), entity.getHeight());
 
             while (g.drawImage(entity.getImage(), x, y, null) == false) {
                 ; // keep trying to draw the image until you can. Dangerous?
@@ -96,7 +95,7 @@ public class OdorWorldRenderer {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
                         TileSensor tile = (TileSensor) sensor;
-                        g.drawRect((int) tile.getX(), (int) tile.getY(),
+                        g.drawRect(tile.getX(), tile.getY(),
                                 tile.getWidth(), tile.getHeight());
 
                     } else if (sensor instanceof SmellSensor) {
@@ -109,7 +108,7 @@ public class OdorWorldRenderer {
                                     / (1 * world.getTotalSmellVectorLength())));
                         }
                         g.setPaint(Color.getHSBColor(sensorColor, saturation,
-                                (float) 1));
+                                1));
                         // System.out.println(val + "--" +
                         // world.getTotalSmellVectorLength());
                         double[] location = ((SmellSensor) sensor)

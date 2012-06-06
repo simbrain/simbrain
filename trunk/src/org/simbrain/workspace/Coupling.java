@@ -48,8 +48,7 @@ public final class Coupling<E> {
      * Create a coupling between a specified consuming attribute, without yet
      * specifying the corresponding producing attribute.
      *
-     * @param Consumer
-     *            the attribute that consumes.
+     * @param Consumer the attribute that consumes.
      */
     public Coupling(final Consumer<E> Consumer) {
         super();
@@ -60,46 +59,45 @@ public final class Coupling<E> {
      * Create a coupling between a specified producing attribute, without yet
      * specifying the corresponding consuming attribute.
      *
-     * @param Producer
-     *            the attribute that produces.
+     * @param Producer the attribute that produces.
      */
     public Coupling(final Producer<E> Producer) {
         super();
         this.producer = Producer;
     }
 
-
     /**
-     * Create a new coupling between the specified producing attribute
-     * and consuming attribute.
+     * Create a new coupling between the specified producing attribute and
+     * consuming attribute.
      *
      * @param Producer producing attribute for this coupling
      * @param Consumer consuming attribute for this coupling
      */
-    public Coupling(final Producer<E> Producer,
-                    final Consumer<E> Consumer) {
+    public Coupling(final Producer<E> Producer, final Consumer<E> Consumer) {
         LOGGER.debug("new Coupling");
-//        System.out.println("producing " + Producer.getAttributeDescription());
-//        System.out.println("consuming " + Consumer.getAttributeDescription());
+        // System.out.println("producing " +
+        // Producer.getAttributeDescription());
+        // System.out.println("consuming " +
+        // Consumer.getAttributeDescription());
 
         this.producer = Producer;
         this.consumer = Consumer;
     }
 
-
     /**
      * Set value of buffer.
      */
     public void setBuffer() {
-        final WorkspaceComponent producerComponent
-            = producer.getParentComponent();
+        final WorkspaceComponent producerComponent = producer
+                .getParentComponent();
 
         try {
-            buffer = Workspace.syncRest(producerComponent.getLocks().iterator(), new Callable<E>() {
-                public E call() throws Exception {
-                    return producer.getValue();
-                }
-            });
+            buffer = Workspace.syncRest(
+                    producerComponent.getLocks().iterator(), new Callable<E>() {
+                        public E call() throws Exception {
+                            return producer.getValue();
+                        }
+                    });
         } catch (Exception e) {
             // TODO exception service?
             e.printStackTrace();
@@ -113,8 +111,8 @@ public final class Coupling<E> {
      */
     public void update() {
         if ((consumer != null) && (producer != null)) {
-            final WorkspaceComponent consumerComponent
-                = consumer.getParentComponent();
+            final WorkspaceComponent consumerComponent = consumer
+                    .getParentComponent();
             try {
                 Workspace.syncRest(consumerComponent.getLocks().iterator(),
                         new Callable<E>() {
@@ -137,7 +135,6 @@ public final class Coupling<E> {
             }
         }
     }
-
 
     /**
      * @return the Producer
@@ -166,46 +163,49 @@ public final class Coupling<E> {
         if (producer == null) {
             producerString = "Null";
         } else {
-            producerComponent =  "[" + producer.getParentComponent().getName() +"]";
+            producerComponent = "[" + producer.getParentComponent().getName()
+                    + "]";
             producerString = producer.getDescription();
         }
         if (consumer == null) {
             consumerString = "Null";
         } else {
-            consumerComponent = "[" + consumer.getParentComponent().getName() +"]";
+            consumerComponent = "[" + consumer.getParentComponent().getName()
+                    + "]";
             consumerString = consumer.getDescription();
         }
-        return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
-     }
+        return producerComponent + " " + producerString + " --> "
+                + consumerComponent + " " + consumerString;
+    }
 
     /**
      * Returns an id used for persistence.
-     * 
+     *
      * @return id
      */
-	public String getId() {
-		String producerString;
-		String consumerString;
-		if (producer == null) {
-			producerString = "Null";
-		} else {
-			producerString = producer.getParentComponent().getName()
-					+ ":"
-					+ producer.getParentComponent().getKeyFromObject(
-							producer.getBaseObject()) + ":"
-					+ producer.getMethodName();
-		}
-		if (consumer == null) {
-			consumerString = "Null";
-		} else {
-			consumerString = consumer.getParentComponent().getName()
-					+ ":"
-					+ consumer.getParentComponent().getKeyFromObject(
-							consumer.getBaseObject()) + ":"
-					+ consumer.getMethodName();
-		}
-		return producerString + "-" + consumerString;
- 	}
+    public String getId() {
+        String producerString;
+        String consumerString;
+        if (producer == null) {
+            producerString = "Null";
+        } else {
+            producerString = producer.getParentComponent().getName()
+                    + ":"
+                    + producer.getParentComponent().getKeyFromObject(
+                            producer.getBaseObject()) + ":"
+                    + producer.getMethodName();
+        }
+        if (consumer == null) {
+            consumerString = "Null";
+        } else {
+            consumerString = consumer.getParentComponent().getName()
+                    + ":"
+                    + consumer.getParentComponent().getKeyFromObject(
+                            consumer.getBaseObject()) + ":"
+                    + consumer.getMethodName();
+        }
+        return producerString + "-" + consumerString;
+    }
 
     /**
      * {@inheritDoc}
@@ -215,11 +215,12 @@ public final class Coupling<E> {
             Coupling<?> other = (Coupling<?>) o;
 
             return other.producer.equals(producer)
-                && other.consumer.equals(consumer);
+                    && other.consumer.equals(consumer);
         } else {
             return false;
         }
     }
+
     /**
      * {@inheritDoc}
      */

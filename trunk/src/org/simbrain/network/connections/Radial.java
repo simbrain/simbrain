@@ -27,7 +27,7 @@ import org.simbrain.network.core.Synapse;
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them.
- * 
+ *
  * TODO: More complex connection making functions Custom randomization? Ability
  * to connect in a range (e.g, between 109 and 209 units away)
  *
@@ -86,7 +86,7 @@ public class Radial extends ConnectNeurons {
 
     /** @inheritDoc */
     public List<Synapse> connectNeurons() {
-    	ArrayList<Synapse> syns = new ArrayList<Synapse>();
+        ArrayList<Synapse> syns = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
             makeExcitatory(source, syns);
             makeInhibitory(source, syns);
@@ -166,8 +166,7 @@ public class Radial extends ConnectNeurons {
     /**
      * @param allowSelfConnections the allowSelfConnections to set
      */
-    public void setAllowSelfConnections(
-            final boolean allowSelfConnections) {
+    public void setAllowSelfConnections(final boolean allowSelfConnections) {
         this.allowSelfConnections = allowSelfConnections;
     }
 
@@ -181,8 +180,7 @@ public class Radial extends ConnectNeurons {
     /**
      * @param excitatoryProbability the excitatoryProbability to set
      */
-    public void setExcitatoryProbability(
-            final double excitatoryProbability) {
+    public void setExcitatoryProbability(final double excitatoryProbability) {
         this.excitatoryProbability = excitatoryProbability;
     }
 
@@ -224,8 +222,7 @@ public class Radial extends ConnectNeurons {
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public void setInhibitoryProbability(
-            final double inhibitoryProbability) {
+    public void setInhibitoryProbability(final double inhibitoryProbability) {
         this.inhibitoryProbability = inhibitoryProbability;
     }
 

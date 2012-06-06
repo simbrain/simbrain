@@ -21,15 +21,14 @@ package org.simbrain.workspace;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Utility class for creating and maintaining a list of "getterSetters", which
  * are objects which are simple objects that call get or set for some property.
  * Used to create access to objects in lists or arrays for Attributes to use.
  *
- *  @param <E> the data type used in the underlying getterSetter objects.
+ * @param <E> the data type used in the underlying getterSetter objects.
  */
-public class AttributeList<E>{
+public class AttributeList<E> {
 
     /** The main list. */
     private final List<GetterSetter<E>> attributeList;
@@ -99,6 +98,5 @@ public class AttributeList<E>{
             this.value = value;
         }
     }
-
 
 }

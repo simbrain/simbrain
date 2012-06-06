@@ -17,13 +17,12 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.SimpleAttributeSet;
 
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.util.StandardDialog;
 
 /**
- * Font dialog.  Adapted from a post on website from a long time ago...
+ * Font dialog. Adapted from a post on website from a long time ago...
  *
  * @author jyoshimi
  */
@@ -280,7 +279,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
 
             for (int i = 0; i < sizeList.getModel().getSize(); i++) {
                 if (jtfSize.getText().trim()
-                        .equals((String) sizeList.getModel().getElementAt(i))) {
+                        .equals(sizeList.getModel().getElementAt(i))) {
                     sizeList.setSelectedIndex(i);
                     setScrollPos(jspSize, sizeList, i);
                     found = true;
@@ -310,7 +309,6 @@ public class TextDialog extends StandardDialog implements ActionListener,
             jtfTest.setFont(new Font(textType, textStyle, textSize));
         }
     }
-
 
     /**
      * @see AbstractAction.

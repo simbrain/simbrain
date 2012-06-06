@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.simbrain.resource.ResourceManager;
 
-
 /*
  * @(#)Splasher.java  2.0  January 31, 2004
  *
@@ -35,11 +34,13 @@ import org.simbrain.resource.ResourceManager;
  */
 
 /**
- * <b>Splasher</b> displays the simbrain splash screen an initializes the workspace.
+ * <b>Splasher</b> displays the simbrain splash screen an initializes the
+ * workspace.
  */
 public class Splasher {
     /**
-     * Shows the splash screen, launches the application and then disposes the splash screen.
+     * Shows the splash screen, launches the application and then disposes the
+     * splash screen.
      *
      * @param args the command line arguments
      */
@@ -47,9 +48,10 @@ public class Splasher {
         // TODO find a better solution
         Logger.getLogger("com.jme").setLevel(Level.OFF);
         Logger.getLogger("com.jmex").setLevel(Level.OFF);
-        
+
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
-        SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);
+        SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
+                args);
         SplashWindow.disposeSplash();
     }
 }

@@ -30,7 +30,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  * in the workspace Within each component, a menuitem for each Potential
  * Consumer.
  */
-public class CouplingMenuProducer extends JMenu  {
+public class CouplingMenuProducer extends JMenu {
 
     /** Reference to workspace. */
     Workspace workspace;
@@ -41,9 +41,9 @@ public class CouplingMenuProducer extends JMenu  {
     /**
      * Construct the menu.
      *
-     * @param menuName  the name of the menu
-     * @param workspace  the workspace
-     * @param sourceComponent  the target consuming attribute.
+     * @param menuName the name of the menu
+     * @param workspace the workspace
+     * @param sourceComponent the target consuming attribute.
      */
     public CouplingMenuProducer(final String menuName,
             final Workspace workspace, final PotentialAttribute producer) {
@@ -64,13 +64,13 @@ public class CouplingMenuProducer extends JMenu  {
             for (PotentialAttribute potentialConsumer : component
                     .getPotentialConsumers()) {
                 CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
-                        potentialConsumer.getDescription(), producer, potentialConsumer);
+                        potentialConsumer.getDescription(), producer,
+                        potentialConsumer);
                 componentMenu.add(menuItem);
             }
 
             this.add(componentMenu);
         }
     }
-
 
 }

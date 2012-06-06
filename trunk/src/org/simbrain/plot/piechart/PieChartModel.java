@@ -89,7 +89,6 @@ public class PieChartModel extends ChartModel {
         dataset.clear();
     }
 
-
     /**
      * Updates the total value across all data items.
      */

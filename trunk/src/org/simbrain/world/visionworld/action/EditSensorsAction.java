@@ -29,12 +29,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Edit sensors action.
  */
-public final class EditSensorsAction
-    extends AbstractAction {
+public final class EditSensorsAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new edit sensors action.
@@ -47,9 +45,9 @@ public final class EditSensorsAction
             throw new IllegalArgumentException("visionWorld must not be null");
         }
         this.visionWorld = visionWorld;
-        this.visionWorld.getSensorSelectionModel().addSensorSelectionListener(new SelectionListener());
+        this.visionWorld.getSensorSelectionModel().addSensorSelectionListener(
+                new SelectionListener());
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

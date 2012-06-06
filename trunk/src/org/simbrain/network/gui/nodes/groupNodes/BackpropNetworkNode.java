@@ -31,18 +31,17 @@ import org.simbrain.network.gui.trainer.BackpropTrainerPanel;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * PNode representation of a group of a backprop network
- * 
+ *
  * @author jyoshimi
  */
 public class BackpropNetworkNode extends SubnetworkNode {
-    
+
     /**
      * Create a layered network
      *
@@ -54,7 +53,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         setInteractionBox(new BackpropInteractionBox(networkPanel));
         setContextMenu();
     }
-    
+
     /**
      * Custom interaction box for Synapse group node.
      */
@@ -63,19 +62,19 @@ public class BackpropNetworkNode extends SubnetworkNode {
             super(net, BackpropNetworkNode.this);
         }
 
-//        @Override
-//        protected JDialog getPropertyDialog() {
-//            TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-//                    getTrainer());
-//            JDialog dialog = new JDialog();
-//            dialog.setContentPane(panel);
-//            return dialog;
-//        }
-//        
-//      @Override
-//      protected boolean hasPropertyDialog() {
-//          return true;
-//      }
+        // @Override
+        // protected JDialog getPropertyDialog() {
+        // TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
+        // getTrainer());
+        // JDialog dialog = new JDialog();
+        // dialog.setContentPane(panel);
+        // return dialog;
+        // }
+        //
+        // @Override
+        // protected boolean hasPropertyDialog() {
+        // return true;
+        // }
 
         @Override
         protected String getToolTipText() {
@@ -97,66 +96,67 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
         menu.addSeparator();
-        
+
         final BackpropNetwork network = (BackpropNetwork) getGroup();
-        
-		// Reference to the input data
-		DataHolder inputData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				network.setInputData(data);
-			}
 
-			@Override
-			public double[][] getData() {
-				return network.getInputData();
-			}
+        // Reference to the input data
+        DataHolder inputData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                network.setInputData(data);
+            }
 
-		};
-		// Reference to the training data
-		DataHolder trainingData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				network.setTrainingData(data);
-			}
+            @Override
+            public double[][] getData() {
+                return network.getInputData();
+            }
 
-			@Override
-			public double[][] getData() {
-				return network.getTrainingData();
-			}
+        };
+        // Reference to the training data
+        DataHolder trainingData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                network.setTrainingData(data);
+            }
 
-		};
-		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-				network, inputData, trainingData));
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				network.getInputNeurons(), inputData, "Input"));
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				network.getOutputNeurons(), trainingData, "Training"));
-		
-		setContextMenu(menu);
+            @Override
+            public double[][] getData() {
+                return network.getTrainingData();
+            }
+
+        };
+        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+                network, inputData, trainingData));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                network.getInputNeurons(), inputData, "Input"));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                network.getOutputNeurons(), trainingData, "Training"));
+
+        setContextMenu(menu);
     }
-    
+
     /**
      * Action to train Backrop
      */
-	Action trainAction = new AbstractAction() {
+    Action trainAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-			putValue(NAME, "Train backprop net...");
-			putValue(SHORT_DESCRIPTION, "Train backprop net...");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(NAME, "Train backprop net...");
+            putValue(SHORT_DESCRIPTION, "Train backprop net...");
+        }
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			BackpropNetwork network = (BackpropNetwork) getGroup();
-			BackpropTrainerPanel trainingPanel = new BackpropTrainerPanel(
-					getNetworkPanel(), new BackpropTrainer(network, network.getNeuronGroupsAsList()));
-            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel, "Trainer");
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            BackpropNetwork network = (BackpropNetwork) getGroup();
+            BackpropTrainerPanel trainingPanel = new BackpropTrainerPanel(
+                    getNetworkPanel(), new BackpropTrainer(network,
+                            network.getNeuronGroupsAsList()));
+            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
+                    "Trainer");
             trainingPanel.setFrame(frame);
-		}
-	};
-	
+        }
+    };
 
 }

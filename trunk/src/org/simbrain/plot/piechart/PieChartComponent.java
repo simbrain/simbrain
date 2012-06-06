@@ -47,6 +47,7 @@ public class PieChartComponent extends WorkspaceComponent {
 
     /**
      * Create new PieChart Component.
+     *
      * @param name of chart
      */
     public PieChartComponent(final String name) {
@@ -89,9 +90,12 @@ public class PieChartComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (pieChartConsumer.isVisible()) {
             for (PieChartSetter setter : setterList) {
-                String description = pieChartConsumer.getSimpleDescription("Slice " + setter.getIndex());
-                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(setter, pieChartConsumer, description);
-               returnList.add(consumer);
+                String description = pieChartConsumer
+                        .getSimpleDescription("Slice " + setter.getIndex());
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(setter, pieChartConsumer,
+                                description);
+                returnList.add(consumer);
             }
         }
         return returnList;
@@ -125,7 +129,6 @@ public class PieChartComponent extends WorkspaceComponent {
         }
         setterList.add(new PieChartSetter(i));
     }
-
 
     /**
      * Add chart listener to model.
@@ -172,13 +175,12 @@ public class PieChartComponent extends WorkspaceComponent {
         return null;
     }
 
-
     @Override
     public Object getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);
             PieChartSetter setter = new PieChartSetter(i);
-            return  setter;
+            return setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }
@@ -186,6 +188,7 @@ public class PieChartComponent extends WorkspaceComponent {
 
     /**
      * Streams file data for opening saved charts.
+     *
      * @param input stream
      * @param name file name
      * @param format format
@@ -193,7 +196,8 @@ public class PieChartComponent extends WorkspaceComponent {
      */
     public static PieChartComponent open(final InputStream input,
             final String name, final String format) {
-        PieChartModel dataModel = (PieChartModel) PieChartModel.getXStream().fromXML(input);
+        PieChartModel dataModel = (PieChartModel) PieChartModel.getXStream()
+                .fromXML(input);
         return new PieChartComponent(name, dataModel);
     }
 
@@ -261,7 +265,7 @@ public class PieChartComponent extends WorkspaceComponent {
                 return;
             }
             getModel().getDataset().setValue(index, val / total);
-         }
+        }
 
         /**
          * @return the index

@@ -46,8 +46,8 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
      * @param workspace the workspace
      * @param sourceComponent the source component
      */
-    public CouplingMenuComponent(final String menuName, final Workspace workspace,
-            WorkspaceComponent sourceComponent) {
+    public CouplingMenuComponent(final String menuName,
+            final Workspace workspace, WorkspaceComponent sourceComponent) {
         super(menuName);
         this.workspace = workspace;
         this.sourceComponent = sourceComponent;
@@ -58,21 +58,21 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
     /**
      * {@inheritDoc}
      */
-	public boolean clearWorkspace() {
+    public boolean clearWorkspace() {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-	public void componentAdded(WorkspaceComponent component) {
+    public void componentAdded(WorkspaceComponent component) {
         updateMenu();
     }
 
     /**
      * {@inheritDoc}
      */
-	public void componentRemoved(WorkspaceComponent component) {
+    public void componentRemoved(WorkspaceComponent component) {
         updateMenu();
     }
 
@@ -89,21 +89,20 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
     public void newWorkspaceOpened() {
     }
 
-
-	/**
+    /**
      * Update the menu.
      */
     private void updateMenu() {
         this.removeAll();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             final WorkspaceComponent targetComponent = component;
-            JMenuItem componentMenuItem = new JMenuItem(targetComponent
-                    .getName());
+            JMenuItem componentMenuItem = new JMenuItem(
+                    targetComponent.getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    workspace.coupleOneToOne(sourceComponent
-                            .getPotentialProducers(), targetComponent
-                            .getPotentialConsumers());
+                    workspace.coupleOneToOne(
+                            sourceComponent.getPotentialProducers(),
+                            targetComponent.getPotentialConsumers());
                 }
             });
             this.add(componentMenuItem);

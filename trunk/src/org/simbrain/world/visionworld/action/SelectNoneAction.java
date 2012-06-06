@@ -27,12 +27,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Select none action.
  */
-public final class SelectNoneAction
-    extends AbstractAction {
+public final class SelectNoneAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new select none action.
@@ -46,7 +44,6 @@ public final class SelectNoneAction
         }
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

@@ -27,17 +27,17 @@ import org.simbrain.network.gui.nodes.GroupNode;
 
 /**
  * PNode representation of a group of neurons.
- * 
+ *
  * @author jyoshimi
  */
 public class NeuronGroupNode extends GroupNode {
-    
+
     /**
      * Stroke for neuron groups when they are in a subnet. Somewhat lighter than
      * general groups to distinguish these from subnetworks.
      */
     private static final BasicStroke LAYER_OUTLINE_STROKE = new BasicStroke(1f);
-    
+
     /**
      * Create a Neuron Group PNode.
      *
@@ -48,8 +48,8 @@ public class NeuronGroupNode extends GroupNode {
         super(networkPanel, group);
         if (!group.isTopLevelGroup()) {
             setStroke(LAYER_OUTLINE_STROKE);
-            setStrokePaint(Color.gray);            
+            setStrokePaint(Color.gray);
         }
     }
-    
+
 }

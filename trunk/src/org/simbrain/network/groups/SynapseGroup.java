@@ -26,7 +26,7 @@ public class SynapseGroup extends Group {
 
     /** Set of synapses. */
     private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
-    
+
     /**
      * Construct a synapse group from a list of synapses.
      *
@@ -37,7 +37,7 @@ public class SynapseGroup extends Group {
         super(net);
         for (Synapse synapse : list) {
             addSynapse(synapse);
-        }        
+        }
     }
 
     /**
@@ -56,19 +56,20 @@ public class SynapseGroup extends Group {
         } else {
             setMarkedForDeletion(true);
         }
-        for(Synapse synapse : synapseList) {
+        for (Synapse synapse : synapseList) {
             getParentNetwork().removeSynapse(synapse);
         }
         if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
                 ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
-            } 
-            if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
+            }
+            if (getParentGroup().isEmpty()
+                    && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().removeGroup(getParentGroup());
-            }            
+            }
         }
     }
-    
+
     /**
      * @return a list of weights
      */
@@ -78,50 +79,50 @@ public class SynapseGroup extends Group {
 
     /**
      * Add a synapse to this synapse group.
-     * 
+     *
      * @param synapse synapse to add
      * @param fireEvent whether to fire a synapse added event
      */
     public boolean addSynapse(final Synapse synapse, final boolean fireEvent) {
         // Don't add the synapse if it conflicts with an existing synapse.
-    	if (conflictsWithExistingSynapse(synapse)) {
-        	return false;
+        if (conflictsWithExistingSynapse(synapse)) {
+            return false;
         }
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
         if (fireEvent) {
-            getParentNetwork().fireSynapseAdded(synapse);            
+            getParentNetwork().fireSynapseAdded(synapse);
         }
         return true;
     }
 
     /**
      * Add a synapse.
-     * 
+     *
      * @param synapse synapse to add
      */
     public boolean addSynapse(final Synapse synapse) {
         return addSynapse(synapse, true);
     }
-    
+
     /**
-	 * Returns true if a synapse with the same source and parent neurons already
-	 * exists in the synapse group.
-	 * 
-	 * @param toCheck the synapse to check
-	 * @return true if a synapse connecting the same neurons already exists,
-	 *         false otherwise
-	 */
+     * Returns true if a synapse with the same source and parent neurons already
+     * exists in the synapse group.
+     *
+     * @param toCheck the synapse to check
+     * @return true if a synapse connecting the same neurons already exists,
+     *         false otherwise
+     */
     private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
-    	for(Synapse synapse : synapseList) {
-    		if (synapse.getSource() == toCheck.getSource()) {
-    			if (synapse.getTarget() == toCheck.getTarget()) {
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
+        for (Synapse synapse : synapseList) {
+            if (synapse.getSource() == toCheck.getSource()) {
+                if (synapse.getTarget() == toCheck.getTarget()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -161,7 +162,7 @@ public class SynapseGroup extends Group {
                 + this.getSynapseList().size() + " synapse(s)\n");
         return ret;
     }
-    
+
     @Override
     public boolean isEmpty() {
         return synapseList.isEmpty();

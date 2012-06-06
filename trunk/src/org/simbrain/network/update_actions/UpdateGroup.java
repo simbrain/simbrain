@@ -24,14 +24,14 @@ import org.simbrain.network.groups.Group;
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an
  * ordered priority list.
- * 
+ *
  * @author jyoshimi
  */
 public class UpdateGroup implements NetworkUpdateAction {
 
     /** Reference to group. */
     private final Group group;
-    
+
     /**
      * @param group group to update
      */
@@ -39,20 +39,20 @@ public class UpdateGroup implements NetworkUpdateAction {
         this.group = group;
     }
 
-	@Override
+    @Override
     public void invoke() {
         group.update();
     }
 
-	@Override
+    @Override
     public String getDescription() {
         return "Update " + group.getLabel();
     }
 
-	@Override
-	public String getLongDescription() {
+    @Override
+    public String getLongDescription() {
         return "Update " + group.getLabel();
-	}
+    }
 
     /**
      * @return the group

@@ -29,21 +29,21 @@ import org.simbrain.workspace.WorkspaceComponent;
  * matter (read all producer values, write them to a buffer, then read all
  * buffer values and write them to the consumers). Then update all the
  * components.
- * 
+ *
  * In workspace updater, the following happens. Each component update call is
  * fed to an executor service which uses as many threads as it's configured to
  * use (it defaults to the number of available processors which can be changed.)
  * Then the executing thread waits on a countdown latch. Each component update
  * decrements the latch so that after the last update is complete, the thread
  * waiting on the latch wakes up and updates all the couplings.
- * 
+ *
  * @author jyoshimi
  */
 public class UpdateAllBuffered implements UpdateAction {
 
     /** Provides access to workspace updater. */
     private final WorkspaceUpdater updater;
-    
+
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(UpdateAllBuffered.class);
 
@@ -54,12 +54,11 @@ public class UpdateAllBuffered implements UpdateAction {
         this.updater = controls;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public void invoke() {
-        List<? extends WorkspaceComponent> components = updater
-                .getComponents();
+        List<? extends WorkspaceComponent> components = updater.getComponents();
 
         int componentCount = components.size();
 
@@ -71,8 +70,7 @@ public class UpdateAllBuffered implements UpdateAction {
         updater.updateCouplings();
 
         LOGGER.trace("creating latch");
-        LatchCompletionSignal latch = new LatchCompletionSignal(
-                componentCount);
+        LatchCompletionSignal latch = new LatchCompletionSignal(componentCount);
 
         LOGGER.trace("updating components");
         for (WorkspaceComponent component : components) {
@@ -80,18 +78,17 @@ public class UpdateAllBuffered implements UpdateAction {
         }
         LOGGER.trace("waiting");
         latch.await();
-        LOGGER.trace("update complete");    
-     }
-
+        LOGGER.trace("update complete");
+    }
 
     @Override
     public String getDescription() {
         return "Buffered update of all components and couplings.";
     }
 
-	@Override
-	public String getLongDescription() {
-		return getDescription();
-	}
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 
 }

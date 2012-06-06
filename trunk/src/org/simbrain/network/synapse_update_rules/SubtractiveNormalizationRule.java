@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
 /**
  * <b>SubtractiveNormalizationSynapse</b>.
  */

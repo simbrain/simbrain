@@ -32,12 +32,10 @@ import org.simbrain.network.gui.NetworkSelectionListener;
 /**
  * Group selected objects.
  */
-public final class GroupAction
-    extends AbstractAction {
+public final class GroupAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Group selected objects.
@@ -52,7 +50,8 @@ public final class GroupAction
 
         this.networkPanel = networkPanel;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G,
+                toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SHORT_DESCRIPTION, "Group gui objects");
@@ -61,11 +60,11 @@ public final class GroupAction
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**
@@ -79,7 +78,6 @@ public final class GroupAction
             setEnabled(false);
         }
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

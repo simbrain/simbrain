@@ -27,15 +27,13 @@ import edu.umd.cs.piccolo.PNode;
 /**
  * An event object representing a change in network selection.
  */
-public final class NetworkSelectionEvent
-    extends EventObject {
+public final class NetworkSelectionEvent extends EventObject {
 
     /** Old selection. */
     private Set<PNode> oldSelection;
 
     /** Selection. */
     private Set<PNode> selection;
-
 
     /**
      * Create a new network selection event with the specified source.
@@ -45,13 +43,11 @@ public final class NetworkSelectionEvent
      * @param selection selection
      */
     public NetworkSelectionEvent(final NetworkPanel source,
-                                 final Set<PNode> oldSelection,
-                                 final Set<PNode> selection) {
+            final Set<PNode> oldSelection, final Set<PNode> selection) {
         super(source);
         this.oldSelection = Collections.unmodifiableSet(oldSelection);
         this.selection = Collections.unmodifiableSet(selection);
     }
-
 
     /**
      * Return the source of this event as a NetworkPanel.

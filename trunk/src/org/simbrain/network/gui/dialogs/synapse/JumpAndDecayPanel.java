@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 
-
 /**
  * <b>JumpAndDecayPanel</b>.
  */
@@ -58,16 +57,19 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         tfBaseLine.setText(Double.toString(spikeResponder.getBaseLine()));
         tfDecayRate.setText(Double.toString(spikeResponder.getDecayRate()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getJumpHeight")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
+                "getJumpHeight")) {
             tfJumpHeight.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getBaseLine")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
+                "getBaseLine")) {
             tfBaseLine.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class, "getDecayRate")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
+                "getDecayRate")) {
             tfDecayRate.setText(NULL_STRING);
         }
     }
@@ -90,7 +92,8 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
             JumpAndDecay spikerRef = (JumpAndDecay) spikeResponderList.get(i);
 
             if (!tfJumpHeight.getText().equals(NULL_STRING)) {
-                spikerRef.setJumpHeight(Double.parseDouble(tfJumpHeight.getText()));
+                spikerRef.setJumpHeight(Double.parseDouble(tfJumpHeight
+                        .getText()));
             }
 
             if (!tfBaseLine.getText().equals(NULL_STRING)) {
@@ -98,7 +101,8 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
             }
 
             if (!tfDecayRate.getText().equals(NULL_STRING)) {
-                spikerRef.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+                spikerRef
+                        .setDecayRate(Double.parseDouble(tfDecayRate.getText()));
             }
         }
     }

@@ -20,8 +20,10 @@ public class NewtonianBouncer implements Behavior {
     }
 
     public void apply(long elapsedTime) {
-        parentEntity.setX(parentEntity.getX() + parentEntity.getVelocityX() * elapsedTime);
-        parentEntity.setY(parentEntity.getY() + parentEntity.getVelocityY() * elapsedTime);
+        parentEntity.setX(parentEntity.getX() + parentEntity.getVelocityX()
+                * elapsedTime);
+        parentEntity.setY(parentEntity.getY() + parentEntity.getVelocityY()
+                * elapsedTime);
     }
 
     public void collisionX() {
@@ -31,6 +33,5 @@ public class NewtonianBouncer implements Behavior {
     public void collissionY() {
         parentEntity.setVelocityY(-parentEntity.getVelocityY());
     }
-
 
 }

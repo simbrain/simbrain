@@ -184,4 +184,3 @@ public class ThreeValueRule extends NeuronUpdateRule {
         return "Three valued";
     }
 }
-

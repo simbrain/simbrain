@@ -24,8 +24,7 @@ import org.simbrain.world.visionworld.SensorMatrix;
 /**
  * Abstract sensor matrix.
  */
-abstract class AbstractSensorMatrix
-    implements SensorMatrix {
+abstract class AbstractSensorMatrix implements SensorMatrix {
 
     /** Receptive field height. */
     private final int receptiveFieldHeight;
@@ -36,29 +35,30 @@ abstract class AbstractSensorMatrix
     /** Default filter. */
     private final Filter defaultFilter;
 
-
     /**
-     * Create a new abstract sensor matrix with the specified receptive field width and height
-     * and specified filter.
+     * Create a new abstract sensor matrix with the specified receptive field
+     * width and height and specified filter.
      *
-     * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
-     * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
+     * @param receptiveFieldWidth receptive field width, must be
+     *            <code>&gt;= 0</code>
+     * @param receptiveFieldHeight receptive field height, must be
+     *            <code>&gt;= 0</code>
      * @param defaultFilter default filter
      */
     protected AbstractSensorMatrix(final int receptiveFieldWidth,
-                                   final int receptiveFieldHeight,
-                                   final Filter defaultFilter) {
+            final int receptiveFieldHeight, final Filter defaultFilter) {
         if (receptiveFieldWidth < 0) {
-            throw new IllegalArgumentException("receptiveFieldWidth must be >= 0");
+            throw new IllegalArgumentException(
+                    "receptiveFieldWidth must be >= 0");
         }
         if (receptiveFieldWidth < 0) {
-            throw new IllegalArgumentException("receptiveFieldHeight must be >= 0");
+            throw new IllegalArgumentException(
+                    "receptiveFieldHeight must be >= 0");
         }
         this.receptiveFieldHeight = receptiveFieldHeight;
         this.receptiveFieldWidth = receptiveFieldWidth;
         this.defaultFilter = defaultFilter;
     }
-
 
     /** {@inheritDoc} */
     public final int getReceptiveFieldHeight() {

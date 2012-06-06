@@ -22,7 +22,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * A sensor which detects whether the entity is in a given sector or "tile" of
- * the world.  Broadly inspired by "place cells".
+ * the world. Broadly inspired by "place cells".
  *
  * @author jyoshimi
  */
@@ -78,7 +78,7 @@ public class TileSensor extends Sensor {
         boolean yone = entityY > y;
         boolean ytwo = entityY < (y + height);
 
-        //System.out.println(xone + " " + xtwo + " " + yone + " " + ytwo);
+        // System.out.println(xone + " " + xtwo + " " + yone + " " + ytwo);
         if (xone && xtwo && yone && ytwo) {
             value = activationAmount;
         } else {

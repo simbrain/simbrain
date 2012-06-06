@@ -31,13 +31,14 @@ import bsh.util.JConsole;
 /**
  * Component corresponding to a beanshell window.
  */
-public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
+public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public ConsoleDesktopComponent(GenericFrame frame, ConsoleComponent component) {
+    public ConsoleDesktopComponent(GenericFrame frame,
+            ConsoleComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
     }
@@ -59,18 +60,26 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
      * @param workspace workspace references
      * @return simbrain interpreter
      */
-    public static Interpreter getSimbrainInterpreter(final JConsole console, final Workspace workspace) {
+    public static Interpreter getSimbrainInterpreter(final JConsole console,
+            final Workspace workspace) {
         Interpreter interpreter = new Interpreter(console);
-        interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.layouts");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.networks");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.interfaces");
+        interpreter.getNameSpace()
+                .importPackage("org.simbrain.network.neurons");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.connections");
+        interpreter.getNameSpace()
+                .importPackage("org.simbrain.network.layouts");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.networks");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.interfaces");
         interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.synapses");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.synapses");
         interpreter.getNameSpace().importPackage("org.simbrain.workspace");
         interpreter.getNameSpace().importCommands(".");
-        interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
+        interpreter.getNameSpace().importCommands(
+                "org.simbrain.console.commands");
         interpreter.getOut();
         interpreter.getErr();
         try {
@@ -88,7 +97,6 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
     public void closing() {
         // TODO Auto-generated method stub
     }
-
 
     @Override
     protected void update() {

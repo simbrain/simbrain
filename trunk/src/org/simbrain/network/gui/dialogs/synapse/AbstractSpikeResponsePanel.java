@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
  * <b>AbstractSpikeResponsePanel</b>.
  */
@@ -103,7 +102,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     }
 
     /**
-     * Add notes or other text to bottom of panel.  Can be html formatted..
+     * Add notes or other text to bottom of panel. Can be html formatted..
      *
      * @param text Text to be used for bottom of panel
      */

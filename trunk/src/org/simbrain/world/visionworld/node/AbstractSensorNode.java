@@ -45,8 +45,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * Abstract sensor node.
  */
-abstract class AbstractSensorNode
-    extends PNode {
+abstract class AbstractSensorNode extends PNode {
 
     /** Sensor. */
     private final Sensor sensor;
@@ -58,7 +57,8 @@ abstract class AbstractSensorNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(
+            0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default selected paint. */
     private static final Paint DEFAULT_SELECTED_PAINT = Color.GRAY;
@@ -84,14 +84,14 @@ abstract class AbstractSensorNode
     /** Context menu. */
     private JPopupMenu contextMenu;
 
-
     /**
      * Create a new abstract sensor node with the specified sensor.
      *
      * @param visionWorld vision world, must not be null
      * @param sensor sensor, must not be null
      */
-    protected AbstractSensorNode(final VisionWorld visionWorld, final Sensor sensor) {
+    protected AbstractSensorNode(final VisionWorld visionWorld,
+            final Sensor sensor) {
         super();
         if (sensor == null) {
             throw new IllegalArgumentException("sensor must not be null");
@@ -102,7 +102,7 @@ abstract class AbstractSensorNode
 
         contextMenu = new JPopupMenu("Context menu");
         contextMenu.add(new EditSensorAction());
-        
+
         contextMenu.add(visionWorld.getEditSensorsAction());
 
         setPaint(new Color(0, 0, 0, 0));
@@ -113,7 +113,6 @@ abstract class AbstractSensorNode
         addInputEventListener(new ToolTipTextUpdater());
         addInputEventListener(new ContextMenuEventHandler());
     }
-
 
     /**
      * Return the tool tip text for this sensor node.
@@ -149,8 +148,7 @@ abstract class AbstractSensorNode
     }
 
     /**
-     * Return the sensor for this sensor node.
-     * The sensor will not be null.
+     * Return the sensor for this sensor node. The sensor will not be null.
      *
      * @return the sensor for this sensor node
      */
@@ -203,7 +201,7 @@ abstract class AbstractSensorNode
         this.selected = selected;
     }
 
-    // TODO:  add action methods, add coupling, edit properties, etc.
+    // TODO: add action methods, add coupling, edit properties, etc.
 
     /**
      * Return the mouseover paint for this sensor node.
@@ -215,14 +213,16 @@ abstract class AbstractSensorNode
     }
 
     /**
-     * Set the mouseover paint for this sensor node to <code>mouseoverPaint</code>.
+     * Set the mouseover paint for this sensor node to
+     * <code>mouseoverPaint</code>.
      *
      * @param mouseoverPaint mouseover paint for this sensor node
      */
     public final void setMouseoverPaint(final Paint mouseoverPaint) {
         Paint oldMouseoverPaint = this.mouseoverPaint;
         this.mouseoverPaint = mouseoverPaint;
-        firePropertyChange(-1,"mouseoverPaint", oldMouseoverPaint, this.mouseoverPaint);
+        firePropertyChange(-1, "mouseoverPaint", oldMouseoverPaint,
+                this.mouseoverPaint);
     }
 
     /**
@@ -242,12 +242,13 @@ abstract class AbstractSensorNode
     public final void setOutlinePaint(final Paint outlinePaint) {
         Paint oldOutlinePaint = this.outlinePaint;
         this.outlinePaint = outlinePaint;
-        firePropertyChange(-1,"outlinePaint", oldOutlinePaint, this.outlinePaint);
+        firePropertyChange(-1, "outlinePaint", oldOutlinePaint,
+                this.outlinePaint);
     }
 
     /**
-     * Return the outline stroke for this sensor node.
-     * The outline stroke will not be null.
+     * Return the outline stroke for this sensor node. The outline stroke will
+     * not be null.
      *
      * @return the outline stroke for this sensor node
      */
@@ -256,9 +257,11 @@ abstract class AbstractSensorNode
     }
 
     /**
-     * Set the outline stroke for this sensor node to <code>outlineStroke</code>.
+     * Set the outline stroke for this sensor node to <code>outlineStroke</code>
+     * .
      *
-     * @param outlineStroke outline stroke for this sensor node, must not be null
+     * @param outlineStroke outline stroke for this sensor node, must not be
+     *            null
      */
     public final void setOutlineStroke(final Stroke outlineStroke) {
         if (outlineStroke == null) {
@@ -266,7 +269,8 @@ abstract class AbstractSensorNode
         }
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
-        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1, "outlineStroke", oldOutlineStroke,
+                this.outlineStroke);
     }
 
     /**
@@ -279,14 +283,16 @@ abstract class AbstractSensorNode
     }
 
     /**
-     * Set the selected paint for this sensor node to <code>selectedPaint</code>.
+     * Set the selected paint for this sensor node to <code>selectedPaint</code>
+     * .
      *
      * @param selectedPaint selected paint for this sensor node
      */
     public final void setSelectedPaint(final Paint selectedPaint) {
         Paint oldSelectedPaint = this.selectedPaint;
         this.selectedPaint = selectedPaint;
-        firePropertyChange(-1,"selectedPaint", oldSelectedPaint, this.selectedPaint);
+        firePropertyChange(-1, "selectedPaint", oldSelectedPaint,
+                this.selectedPaint);
     }
 
     /** {@inheritDoc} */
@@ -315,8 +321,7 @@ abstract class AbstractSensorNode
     /**
      * Tool tip text updater.
      */
-    private class ToolTipTextUpdater
-        extends PBasicInputEventHandler {
+    private class ToolTipTextUpdater extends PBasicInputEventHandler {
 
         /** {@inheritDoc} */
         public void mouseEntered(final PInputEvent event) {
@@ -329,12 +334,10 @@ abstract class AbstractSensorNode
         }
     }
 
-
     /**
      * Context menu event handler.
      */
-    private class ContextMenuEventHandler
-        extends PBasicInputEventHandler {
+    private class ContextMenuEventHandler extends PBasicInputEventHandler {
 
         /**
          * Show the context menu.
@@ -344,7 +347,8 @@ abstract class AbstractSensorNode
         private void showContextMenu(final PInputEvent event) {
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
-            contextMenu.show((PCanvas) event.getComponent(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
+            contextMenu.show((PCanvas) event.getComponent(),
+                    (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
         /** {@inheritDoc} */
@@ -365,8 +369,7 @@ abstract class AbstractSensorNode
     /**
      * Edit sensor action.
      */
-    private class EditSensorAction
-        extends AbstractAction {
+    private class EditSensorAction extends AbstractAction {
 
         /**
          * Create a new edit sensor action.
@@ -374,7 +377,6 @@ abstract class AbstractSensorNode
         EditSensorAction() {
             super("Edit sensor...");
         }
-
 
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {

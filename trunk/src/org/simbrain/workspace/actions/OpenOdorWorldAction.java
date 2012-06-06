@@ -29,7 +29,6 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldPreferences;
 
 /**
  * Open an odor world in current workspace. //TODO: Use generic!
@@ -39,8 +38,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create an open odor world action with the specified
-     * workspace.
+     * Create an open odor world action with the specified workspace.
      */
     public OpenOdorWorldAction(Workspace workspace) {
         super("Odor World", workspace);

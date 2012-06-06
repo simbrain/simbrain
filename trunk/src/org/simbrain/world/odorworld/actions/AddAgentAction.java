@@ -38,21 +38,22 @@ public final class AddAgentAction extends AbstractAction {
 
     /**
      * Create an add agent action.
-     * 
+     *
      * @param worldPanel parent panel.
      */
     public AddAgentAction(final OdorWorldPanel worldPanel) {
         super("Add Agent");
         this.worldPanel = worldPanel;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
-//        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
+        // putValue(SMALL_ICON,
+        // ResourceManager.getImageIcon("PixelMatrix.png"));
+        // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-    	RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
-    	entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
-    	worldPanel.getWorld().addAgent(entity);
+        RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
+        entity.setLocation(worldPanel.getSelectedPoint().x,
+                worldPanel.getSelectedPoint().y);
+        worldPanel.getWorld().addAgent(entity);
     }
 }

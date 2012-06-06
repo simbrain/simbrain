@@ -33,10 +33,8 @@ public final class ShowPrioritiesAction extends AbstractAction {
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Shows and updates the GUI with the specified
-     * network panel.
+     * Shows and updates the GUI with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -50,7 +48,8 @@ public final class ShowPrioritiesAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION, "Show neuron priorities (for use in priority update)");
+        putValue(SHORT_DESCRIPTION,
+                "Show neuron priorities (for use in priority update)");
     }
 
     /** @see AbstractAction */

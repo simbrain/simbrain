@@ -30,16 +30,13 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Clamps weights action.
  */
-public final class ClampWeightsAction
-    extends AbstractAction {
+public final class ClampWeightsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new clamp weights action with the specified
-     * network panel.
+     * Create a new clamp weights action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -61,7 +58,7 @@ public final class ClampWeightsAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-//        JToggleButton cb = (JToggleButton) event.getSource();
+        // JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
             networkPanel.getNetwork().setClampWeights(cb.isSelected());
@@ -71,7 +68,7 @@ public final class ClampWeightsAction
         }
 
         // Determine status
-//        networkPanel.getNetwork().setClampWeights(cb.isSelected());
+        // networkPanel.getNetwork().setClampWeights(cb.isSelected());
 
     }
 }

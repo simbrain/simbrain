@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace.gui;
 
-
 /*
  * @(#)SplashWindow.java  2.2  2005-04-03
  *
@@ -39,24 +38,27 @@ import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
 /**
  * <b>SplashWindow</b>
  *
  * <p>
- * Usage: MyApplication is your application class. Create a Splasher class which opens the splash window, invokes the
- * main method of your Application class, and disposes the splash window afterwards. Please note that we want to keep
- * the Splasher class and the SplashWindow class as small as possible. The less code and the less classes must be
- * loaded into the JVM to open the splash screen, the faster it will appear.
+ * Usage: MyApplication is your application class. Create a Splasher class which
+ * opens the splash window, invokes the main method of your Application class,
+ * and disposes the splash window afterwards. Please note that we want to keep
+ * the Splasher class and the SplashWindow class as small as possible. The less
+ * code and the less classes must be loaded into the JVM to open the splash
+ * screen, the faster it will appear.
+ *
  * <pre>
  * class Splasher {
- *    public static void main(String[] args) {
- *         SplashWindow.splash(Startup.class.getResource("splash.gif"));
+ *     public static void main(String[] args) {
+ *         SplashWindow.splash(Startup.class.getResource(&quot;splash.gif&quot;));
  *         MyApplication.main(args);
  *         SplashWindow.disposeSplash();
- *    }
+ *     }
  * }
  * </pre>
+ *
  * </p>
  *
  * @author Werner Randelshofer
@@ -72,11 +74,12 @@ public final class SplashWindow extends Window {
     private Image image;
 
     /**
-     * This attribute indicates whether the method paint(Graphics) has been called at least once since the construction
-     * of this window.<br>
-     * This attribute is used to notify method splash(Image) that the window has been drawn at least once by the AWT
-     * event dispatcher thread.<br>
-     * This attribute acts like a latch. Once set to true, it will never be changed back to false again.
+     * This attribute indicates whether the method paint(Graphics) has been
+     * called at least once since the construction of this window.<br>
+     * This attribute is used to notify method splash(Image) that the window has
+     * been drawn at least once by the AWT event dispatcher thread.<br>
+     * This attribute acts like a latch. Once set to true, it will never be
+     * changed back to false again.
      *
      * @see #paint
      * @see #splash
@@ -108,26 +111,27 @@ public final class SplashWindow extends Window {
         setSize(imgWidth, imgHeight);
 
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
+        setLocation((screenDim.width - imgWidth) / 2,
+                (screenDim.height - imgHeight) / 2);
 
         // Users shall be able to close the splash window by
         // clicking on its display area. This mouse listener
         // listens for mouse clicks and disposes the splash window.
         MouseAdapter disposeOnClick = new MouseAdapter() {
-                public void mouseClicked(final MouseEvent evt) {
-                    // Note: To avoid that method splash hangs, we
-                    // must set paintCalled to true and call notifyAll.
-                    // This is necessary because the mouse click may
-                    // occur before the contents of the window
-                    // has been painted.
-                    synchronized (SplashWindow.this) {
-                        SplashWindow.this.paintCalled = true;
-                        SplashWindow.this.notifyAll();
-                    }
-
-                    dispose();
+            public void mouseClicked(final MouseEvent evt) {
+                // Note: To avoid that method splash hangs, we
+                // must set paintCalled to true and call notifyAll.
+                // This is necessary because the mouse click may
+                // occur before the contents of the window
+                // has been painted.
+                synchronized (SplashWindow.this) {
+                    SplashWindow.this.paintCalled = true;
+                    SplashWindow.this.notifyAll();
                 }
-            };
+
+                dispose();
+            }
+        };
 
         addMouseListener(disposeOnClick);
     }
@@ -135,7 +139,7 @@ public final class SplashWindow extends Window {
     /**
      * Updates the display area of the window.
      *
-     *  @param g Graphics to be updated
+     * @param g Graphics to be updated
      */
     public void update(final Graphics g) {
         // Note: Since the paint method is going to draw an
@@ -148,16 +152,16 @@ public final class SplashWindow extends Window {
     /**
      * Paints the image on the window.
      *
-     *  @param g Graphics to be painted
+     * @param g Graphics to be painted
      */
     public void paint(final Graphics g) {
         g.drawImage(image, 0, 0, this);
 
         synchronized (this) {
-        // Notify method splash that the window
-        // has been painted.
-        // Note: To improve performance we do not enter
-        // the synchronized block unless we have to.
+            // Notify method splash that the window
+            // has been painted.
+            // Note: To improve performance we do not enter
+            // the synchronized block unless we have to.
             if (!paintCalled) {
                 paintCalled = true;
                 notifyAll();
@@ -185,7 +189,8 @@ public final class SplashWindow extends Window {
             // called at least once by the AWT event dispatcher thread.
             // If more than one processor is available, we don't wait,
             // and maximize CPU throughput instead.
-            if (!EventQueue.isDispatchThread() && (Runtime.getRuntime().availableProcessors() == 1)) {
+            if (!EventQueue.isDispatchThread()
+                    && (Runtime.getRuntime().availableProcessors() == 1)) {
                 synchronized (instance) {
                     while (!instance.paintCalled) {
                         try {
@@ -216,11 +221,12 @@ public final class SplashWindow extends Window {
      */
     public static void invokeMain(final String className, final String[] args) {
         try {
-            Class.forName(className).getMethod("main", new Class[] {String[].class }).invoke(
-                                                                                              null,
-                                                                                              new Object[] {args });
+            Class.forName(className)
+                    .getMethod("main", new Class[] { String[].class })
+                    .invoke(null, new Object[] { args });
         } catch (Exception e) {
-            InternalError error = new InternalError("Failed to invoke main method");
+            InternalError error = new InternalError(
+                    "Failed to invoke main method");
             error.initCause(e);
             throw error;
         }

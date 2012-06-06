@@ -30,16 +30,14 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Create a new neuron group.
  */
-public final class NewNeuronGroupAction
-    extends AbstractAction {
+public final class NewNeuronGroupAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new new competitive network action with the specified
-     * network panel.
+     * Create a new new competitive network action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -55,13 +53,13 @@ public final class NewNeuronGroupAction
 
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        List<Neuron> neuronList = (List<Neuron>) networkPanel.getSelectedModelNeurons();
+        List<Neuron> neuronList = networkPanel
+                .getSelectedModelNeurons();
         if (neuronList.size() > 0) {
             NeuronGroup group = new NeuronGroup(networkPanel.getNetwork());
-                       networkPanel.getNetwork().transferNeuronsToGroup(neuronList, group);
+            networkPanel.getNetwork().transferNeuronsToGroup(neuronList, group);
             networkPanel.getNetwork().addGroup(group);
         }
     }

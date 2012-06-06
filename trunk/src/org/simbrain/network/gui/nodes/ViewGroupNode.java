@@ -18,7 +18,8 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * A group of screen elements.
  */
-public class ViewGroupNode extends ScreenElement implements PropertyChangeListener {
+public class ViewGroupNode extends ScreenElement implements
+        PropertyChangeListener {
 
     /** Reference to grouped objects. */
     private ArrayList<ScreenElement> groupedObjects = new ArrayList<ScreenElement>();
@@ -38,14 +39,15 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
      * @param netPanel reference to networkPanel
      * @param ptext the styled text
      */
-    public ViewGroupNode(final NetworkPanel netPanel, final ArrayList<ScreenElement> elements) {
+    public ViewGroupNode(final NetworkPanel netPanel,
+            final ArrayList<ScreenElement> elements) {
         super(netPanel);
         PBounds bounds = new PBounds();
-		for (ScreenElement element : elements) {
-			element.setPickable(false);
-			groupedObjects.add(element);
-			bounds.add(element.getGlobalBounds());
-		}
+        for (ScreenElement element : elements) {
+            element.setPickable(false);
+            groupedObjects.add(element);
+            bounds.add(element.getGlobalBounds());
+        }
         this.setBounds(bounds);
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
     }
@@ -54,7 +56,7 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
      * Update synapse node positions.
      */
     private void updateSynapseNodePositions() {
-        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = getChildrenIterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -98,13 +100,12 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
         return true;
     }
 
-    /** @Override. */ 
+    /** @Override. */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
         contextMenu.add(new UngroupAction(getNetworkPanel(), this));
         return contextMenu;
     }
-
 
     /** @Override. */
     protected boolean hasPropertyDialog() {

@@ -21,9 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -33,25 +33,25 @@ public class NeuronGroup extends Group {
 
     /** The neurons in this group. */
     private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
-    
+
     /** @see Group */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
         }
-        //Collections.sort(neuronList, Comparators.X_ORDER);
+        // Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
     /**
      * Create a neuron group without any initial neurons.
-     * 
+     *
      * @param root parent network
      */
     public NeuronGroup(final Network root) {
         super(root);
     }
-    
+
     @Override
     public void delete() {
         if (isMarkedForDeletion()) {
@@ -66,17 +66,18 @@ public class NeuronGroup extends Group {
             if (getParentGroup() instanceof Subnetwork) {
                 ((Subnetwork) getParentGroup()).removeNeuronGroup(this);
             }
-            if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
+            if (getParentGroup().isEmpty()
+                    && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().removeGroup(getParentGroup());
-            }            
+            }
         }
     }
-    
+
     @Override
     public void update() {
         getParentNetwork().updateNeurons(neuronList);
     }
-    
+
     /**
      * @return a list of neurons
      */
@@ -90,7 +91,7 @@ public class NeuronGroup extends Group {
      * @param base the neuron update rule to set.
      */
     public void setNeuronType(NeuronUpdateRule base) {
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             neuron.setUpdateRule(base.deepCopy());
         }
     }
@@ -98,13 +99,13 @@ public class NeuronGroup extends Group {
     /**
      * Returns true if the provided synapse is in the fan-in weight vector of
      * some node in this neuron group.
-     * 
+     *
      * @param synapse the synapse to check
      * @return true if it's attached to a neuron in this group
      */
     public boolean inFanInOfSomeNode(final Synapse synapse) {
         boolean ret = false;
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             if (neuron.getFanIn().contains(synapse)) {
                 ret = true;
             }
@@ -144,7 +145,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Add a neuron to group.
-     * 
+     *
      * @param neuron neuron to add
      * @param fireEvent whether to fire a neuron added event
      */
@@ -153,13 +154,13 @@ public class NeuronGroup extends Group {
         neuronList.add(neuron);
         neuron.setParentGroup(this);
         if (fireEvent) {
-            getParentNetwork().fireNeuronAdded(neuron);            
+            getParentNetwork().fireNeuronAdded(neuron);
         }
     }
 
     /**
      * Add neuron to group.
-     * 
+     *
      * @param neuron neuron to add
      */
     public void addNeuron(Neuron neuron) {
@@ -172,12 +173,12 @@ public class NeuronGroup extends Group {
      * @param toDelete the neuron to delete
      */
     public void removeNeuron(Neuron toDelete) {
-  
+
         neuronList.remove(toDelete);
         if (isEmpty() && isDeleteWhenEmpty()) {
             delete();
         }
-        //getParent().fireGroupChanged(this, this);
+        // getParent().fireGroupChanged(this, this);
     }
 
     @Override
@@ -202,23 +203,24 @@ public class NeuronGroup extends Group {
     public boolean containsNeuron(final Neuron n) {
         return neuronList.contains(n);
     }
-    
-    //TODO: Below don't take account of the actual width of neurons themselves.  Treats them as points.
-    
+
+    // TODO: Below don't take account of the actual width of neurons themselves.
+    // Treats them as points.
+
     /**
-     * Get the central x coordinate of this group, based on the positions of the neurons that
-     * comprise it.
+     * Get the central x coordinate of this group, based on the positions of the
+     * neurons that comprise it.
      *
      * @return the center x coordinate.
      */
     public double getCenterX() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
             }
-            if (neuron.getX() > max ) {
+            if (neuron.getX() > max) {
                 max = neuron.getX();
             }
         }
@@ -226,39 +228,39 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * Get the central y coordinate of this group, based on the positions of the neurons that
-     * comprise it.
+     * Get the central y coordinate of this group, based on the positions of the
+     * neurons that comprise it.
      *
      * @return the center y coordinate.
      */
     public double getCenterY() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             if (neuron.getY() < min) {
                 min = neuron.getY();
             }
-            if (neuron.getY() > max ) {
+            if (neuron.getY() > max) {
                 max = neuron.getY();
             }
         }
         return min + (max - min) / 2;
     }
-    
+
     /**
-     * Return the width of this group, based on the positions of the neurons that
-     * comprise it.
+     * Return the width of this group, based on the positions of the neurons
+     * that comprise it.
      *
      * @return the width of the group
-     */    
+     */
     public double getWidth() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
             }
-            if (neuron.getX() > max ) {
+            if (neuron.getX() > max) {
                 max = neuron.getX();
             }
         }
@@ -266,27 +268,27 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * Return the height of this group, based on the positions of the neurons that
-     * comprise it.
+     * Return the height of this group, based on the positions of the neurons
+     * that comprise it.
      *
      * @return the height of the group
-     */    
+     */
     public double getHeight() {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             if (neuron.getY() < min) {
-                min = neuron.getY();	
+                min = neuron.getY();
             }
-            if (neuron.getY() > max ) {
+            if (neuron.getY() > max) {
                 max = neuron.getY();
             }
         }
         return max - min;
     }
-    
+
     /**
-     * 
+     *
      * Translate all neurons (the only objects with position information).
      *
      * @param offsetX x offset for translation.

@@ -26,8 +26,7 @@ import org.simbrain.world.visionworld.Filter;
 /**
  * Random filter.
  */
-public final class RandomFilter
-    implements Filter {
+public final class RandomFilter implements Filter {
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Random filter";
@@ -44,26 +43,24 @@ public final class RandomFilter
     /** Source of randomness. */
     private final Random random;
 
-
     /**
-     * Create a new random filter with the specified minimum and
-     * maximum values.
+     * Create a new random filter with the specified minimum and maximum values.
      *
      * @param minimumValue minimum value for this random filter
      * @param maximumValue maximum value for this random filter
-     * @throws IllegalArgumentException if <code>minimumValue</code>
-     *    is greater than <code>maximumValue</code>
+     * @throws IllegalArgumentException if <code>minimumValue</code> is greater
+     *             than <code>maximumValue</code>
      */
     public RandomFilter(final double minimumValue, final double maximumValue) {
         if (minimumValue > maximumValue) {
-            throw new IllegalArgumentException("maximumValue must be >= minimumValue");
+            throw new IllegalArgumentException(
+                    "maximumValue must be >= minimumValue");
         }
         this.minimumValue = minimumValue;
         this.maximumValue = maximumValue;
         difference = Math.abs(this.maximumValue - this.minimumValue);
         random = new Random();
     }
-
 
     /**
      * Return the minimum value for this random filter.
@@ -89,7 +86,6 @@ public final class RandomFilter
         double value = minimumValue + (r * difference);
         return value;
     }
-
 
     public String getDescription() {
         return DISPLAY_NAME + ", min=" + minimumValue + ", max=" + maximumValue;

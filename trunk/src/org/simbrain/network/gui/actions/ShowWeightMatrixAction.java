@@ -24,8 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionEvent;
-import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimpleFrame;

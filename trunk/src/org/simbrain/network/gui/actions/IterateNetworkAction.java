@@ -33,14 +33,12 @@ import org.simbrain.resource.ResourceManager;
  */
 public final class IterateNetworkAction extends AbstractAction {
     Logger LOGGER = Logger.getLogger(IterateNetworkAction.class);
-    
+
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new iterate network action with the specified
-     * network panel.
+     * Create a new iterate network action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -53,7 +51,8 @@ public final class IterateNetworkAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-        putValue(SHORT_DESCRIPTION, "Step network update algorithm (\"spacebar\")");
+        putValue(SHORT_DESCRIPTION,
+                "Step network update algorithm (\"spacebar\")");
 
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(' '), this);

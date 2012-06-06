@@ -33,7 +33,7 @@ public class SmellSource {
     /** Vector of base stimulus values associated to object. */
     private double[] stimulusVector;
 
-    /** The vector returned.  Base stimulus vector + noise, if any. */
+    /** The vector returned. Base stimulus vector + noise, if any. */
     private double[] returnVector;
 
     /** Location of the distal stimulus. */
@@ -42,7 +42,7 @@ public class SmellSource {
     /** Decay Functions. */
     public enum DecayFunction {
 
-    	STEP("Step"), LINEAR("Linear"), GAUSSIAN("Gaussian"), QUADRATIC(
+        STEP("Step"), LINEAR("Linear"), GAUSSIAN("Gaussian"), QUADRATIC(
                 "Quadratic");
 
         /** Name of decay function. */
@@ -63,7 +63,10 @@ public class SmellSource {
         }
     };
 
-    /** Method for calculating decay of stimulus as a function of distance from object. */
+    /**
+     * Method for calculating decay of stimulus as a function of distance from
+     * object.
+     */
     private DecayFunction decayFunction = DecayFunction.LINEAR;
 
     /** If outside of this radius the object has no affect on the network. */
@@ -92,7 +95,7 @@ public class SmellSource {
      */
     public SmellSource(final double[] distalstim, final DecayFunction decay,
             final double disp, final boolean addNoise, final double noiseLevel) {
-    	this.stimulusVector = distalstim;
+        this.stimulusVector = distalstim;
         this.decayFunction = decay;
         this.stimulusDispersion = disp;
         this.addNoise = addNoise;
@@ -102,7 +105,7 @@ public class SmellSource {
     /**
      * Construct smell source from specified parameters.
      *
-     * @param distalstim  stimulus vector
+     * @param distalstim stimulus vector
      * @param decay decay function
      * @param dispersion level of dispersion
      * @param location location of smell source
@@ -118,11 +121,12 @@ public class SmellSource {
     /**
      * Construct smell source from specified parameters.
      *
-     * @param distalstim  stimulus vector
+     * @param distalstim stimulus vector
      * @param decay decay function
      * @param location location of smell source
      */
-    public SmellSource(final double[] distalstim, final DecayFunction decay, final double[] location) {
+    public SmellSource(final double[] distalstim, final DecayFunction decay,
+            final double[] location) {
         this.stimulusVector = distalstim;
         this.decayFunction = decay;
         this.location = location;
@@ -142,8 +146,7 @@ public class SmellSource {
      * Construct a smell source with a specified number of dimensions, randomly
      * initialized.
      *
-     * @param numDimensions
-     *            number of dimensions of the stimulus vector.
+     * @param numDimensions number of dimensions of the stimulus vector.
      */
     public SmellSource(final int numDimensions) {
         this.stimulusVector = SimbrainMath.randomVector(numDimensions);
@@ -287,11 +290,12 @@ public class SmellSource {
         if (distance < stimulusDispersion) {
             if (decayFunction == DecayFunction.STEP) {
                 if (distance >= peak) {
-                    ret = (double[]) (returnVector.clone());
+                    ret = (returnVector.clone());
                 }
             } else if (decayFunction == DecayFunction.LINEAR) {
                 if (distance < peak) {
-                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
+                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance)
+                            / (stimulusDispersion - peak);
 
                     if (scalingFactor < 0) {
                         scalingFactor = 0;
@@ -299,17 +303,20 @@ public class SmellSource {
 
                     ret = SimbrainMath.multVector(returnVector, scalingFactor);
                 } else {
-                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
+                    double scalingFactor = (stimulusDispersion - distance)
+                            / (stimulusDispersion - peak);
                     ret = SimbrainMath.multVector(returnVector, scalingFactor);
                 }
             } else if (decayFunction == DecayFunction.GAUSSIAN) {
                 double temp = distance;
                 temp -= peak;
                 double sigma = .5 * (stimulusDispersion - peak);
-                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
+                double scalingFactor = Math.exp(-(temp * temp)
+                        / (2 * sigma * sigma));
                 ret = SimbrainMath.multVector(returnVector, scalingFactor);
             } else if (decayFunction == DecayFunction.QUADRATIC) {
-                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
+                double scalingFactor = 1 - Math.pow((distance - peak)
+                        / (stimulusDispersion - peak), 2);
                 if (scalingFactor < 0) {
                     scalingFactor = 0;
                 }
@@ -324,9 +331,10 @@ public class SmellSource {
      * Update the source.
      */
     public void update() {
-        //Add noise to object vector
+        // Add noise to object vector
         if (addNoise) {
-            returnVector = SimbrainMath.getNoisyVector(stimulusVector, noiseLevel);
+            returnVector = SimbrainMath.getNoisyVector(stimulusVector,
+                    noiseLevel);
         } else {
             returnVector = stimulusVector;
         }
@@ -368,7 +376,8 @@ public class SmellSource {
                 temp -= peak;
 
                 double sigma = .5 * (stimulusDispersion - peak);
-                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
+                double scalingFactor = Math.exp(-(temp * temp)
+                        / (2 * sigma * sigma));
                 ret = val * scalingFactor;
             } else if (decayFunction == DecayFunction.QUADRATIC) {
                 double scalingFactor = 1 - Math.pow((distance - peak)
@@ -397,7 +406,7 @@ public class SmellSource {
         this.peak = peak;
     }
 
-	/**
+    /**
      * @return the decayFunction
      */
     public DecayFunction getDecayFunction() {
@@ -405,8 +414,7 @@ public class SmellSource {
     }
 
     /**
-     * @param decayFunction
-     *            the decayFunction to set
+     * @param decayFunction the decayFunction to set
      */
     public void setDecayFunction(DecayFunction decayFunction) {
         this.decayFunction = decayFunction;

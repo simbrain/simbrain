@@ -56,19 +56,19 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * @param consumer The consumer for the coupling.
      */
     @SuppressWarnings("unchecked")
-    public CouplingMenuItem(final Workspace workspace, final String description,
-            final PotentialAttribute producer,
+    public CouplingMenuItem(final Workspace workspace,
+            final String description, final PotentialAttribute producer,
             final PotentialAttribute consumer) {
-        super(description,
-                workspace.getCouplingManager().containseEquivalentCoupling(
-                        new Coupling(producer.createProducer(), consumer.createConsumer())));
+        super(description, workspace.getCouplingManager()
+                .containseEquivalentCoupling(
+                        new Coupling(producer.createProducer(), consumer
+                                .createConsumer())));
         this.workspace = workspace;
         this.potentialProducer = producer;
         this.potentialConsumer = consumer;
 
         addActionListener(listener);
     }
-
 
     /**
      * Listens for events where this item is clicked. If this item is selected
@@ -83,8 +83,9 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
                         .createProducer(), potentialConsumer.createConsumer()));
                 setSelected(true);
             } else {
-                workspace.getCouplingManager().removeMatchingCoupling(new Coupling(potentialProducer
-                        .createProducer(), potentialConsumer.createConsumer()));
+                workspace.getCouplingManager().removeMatchingCoupling(
+                        new Coupling(potentialProducer.createProducer(),
+                                potentialConsumer.createConsumer()));
                 setSelected(false);
             }
         }

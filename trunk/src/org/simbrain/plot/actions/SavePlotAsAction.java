@@ -27,12 +27,10 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Save plot As Action.
  */
-public final class SavePlotAsAction
-    extends AbstractAction {
+public final class SavePlotAsAction extends AbstractAction {
 
     /** Plot GUI component. */
     private final GuiComponent component;
-
 
     /**
      * Create a new save plot as action.
@@ -42,13 +40,14 @@ public final class SavePlotAsAction
     public SavePlotAsAction(final GuiComponent component) {
         super("Save As...");
         if (component == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
+            throw new IllegalArgumentException(
+                    "Desktop component must not be null");
         }
         this.component = component;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
-//        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
+        // putValue(SMALL_ICON,
+        // ResourceManager.getImageIcon("PixelMatrix.png"));
+        // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

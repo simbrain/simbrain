@@ -27,8 +27,7 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Show connect dialog action.
  */
-public final class ShowConnectDialogAction
-    extends AbstractAction {
+public final class ShowConnectDialogAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;

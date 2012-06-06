@@ -23,10 +23,9 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 
-
 /**
- * <b>ResourceManager</b> provides resources (stored in the same directory)
- *  to the rest of the program.
+ * <b>ResourceManager</b> provides resources (stored in the same directory) to
+ * the rest of the program.
  */
 public class ResourceManager {
 

@@ -506,13 +506,13 @@ public final class NetworkActionManager {
      * @return connection actions
      */
     public List<Action> getConnectionActions() {
-        return Arrays.asList(new Action[] { allToAll, oneToOne,
-                radial, sparse });
+        return Arrays
+                .asList(new Action[] { allToAll, oneToOne, radial, sparse });
     }
 
     /**
      * (Not current used).
-     * 
+     *
      * @return self connect actions
      */
     public List<Action> getSelfConnectionActions() {
@@ -533,25 +533,32 @@ public final class NetworkActionManager {
         }
         return connectionsMenu;
     }
-    
+
     /**
      * @return a list of the network types.
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] { 
-                new AddGroupAction(networkPanel, new BackpropCreationDialog(networkPanel), "Backprop"),
-                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(networkPanel), "Competitive"),
-                new AddGroupAction(networkPanel, new ESNCreationDialog(networkPanel), "Echo State Network"),
-                new AddGroupAction(networkPanel, new HopfieldCreationDialog(networkPanel), "Hopfield"),
-                new AddGroupAction(networkPanel, new LMSCreationDialog(networkPanel),
-                        "LMS (Least Mean Squares)"),
-                new AddGroupAction(networkPanel, new KwtaCreationDialog(networkPanel), "KWTA"),
-                new AddGroupAction(networkPanel, new SOMCreationDialog(networkPanel), "SOM (Self organizing map)"),
-                new AddGroupAction(networkPanel, new SRNCreationDialog(networkPanel), "SRN (Simple Recurrent Network)"),
-                new AddGroupAction(networkPanel, new WTACreationDialog(networkPanel), "WTA (Winner take all)")
-        });
+        return Arrays.asList(new Action[] {
+                new AddGroupAction(networkPanel, new BackpropCreationDialog(
+                        networkPanel), "Backprop"),
+                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
+                        networkPanel), "Competitive"),
+                new AddGroupAction(networkPanel, new ESNCreationDialog(
+                        networkPanel), "Echo State Network"),
+                new AddGroupAction(networkPanel, new HopfieldCreationDialog(
+                        networkPanel), "Hopfield"),
+                new AddGroupAction(networkPanel, new LMSCreationDialog(
+                        networkPanel), "LMS (Least Mean Squares)"),
+                new AddGroupAction(networkPanel, new KwtaCreationDialog(
+                        networkPanel), "KWTA"),
+                new AddGroupAction(networkPanel, new SOMCreationDialog(
+                        networkPanel), "SOM (Self organizing map)"),
+                new AddGroupAction(networkPanel, new SRNCreationDialog(
+                        networkPanel), "SRN (Simple Recurrent Network)"),
+                new AddGroupAction(networkPanel, new WTACreationDialog(
+                        networkPanel), "WTA (Winner take all)") });
     }
-    
+
     /**
      * Return a JManue for creating new networks.
      *
@@ -559,12 +566,12 @@ public final class NetworkActionManager {
      */
     public JMenu getNewNetworkMenu() {
         JMenu ret = new JMenu("Insert Network");
-        for(Action action : getNewNetworkActions()) {
+        for (Action action : getNewNetworkActions()) {
             ret.add(action);
         }
         return ret;
     }
-        
+
     // public List<JToggleButton> getClampBarActions() {
     // return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(),
     // getClampWeightsBarItem()});

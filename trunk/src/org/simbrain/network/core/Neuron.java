@@ -46,11 +46,11 @@ import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.ClassDescriptionPair;
 
 /**
- * <b>Neuron</b> represents a node in the neural network.  Most of the "logic"
- * of the neural network occurs here, in the update function.  Subclasses must
+ * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
+ * the neural network occurs here, in the update function. Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
  */
-public class Neuron  {
+public class Neuron {
 
     /**
      * The update method of this neuron, which corresponds to what kind of
@@ -64,13 +64,13 @@ public class Neuron  {
     /** An optional String description associated with this neuron. */
     private String label = "";
 
-    /** Activation value of the neuron.  The main state variable. */
+    /** Activation value of the neuron. The main state variable. */
     private double activation = 0;
 
     /** Minimum value this neuron can take. */
     private double lowerBound = -1;
 
-    /** Maximum value  this neuron can take. */
+    /** Maximum value this neuron can take. */
     private double upperBound = 1;
 
     /** Amount by which to increment or decrement neuron. */
@@ -107,32 +107,48 @@ public class Neuron  {
     private Group parentGroup;
 
     /**
-     *  Sequence in which the update function should be called
-     *  for this neuron. By default, this is set to 0 for all
-     *  the neurons. If you want a subset of neurons to fire
-     *  before other neurons, assign it a smaller priority value.
+     * Sequence in which the update function should be called for this neuron.
+     * By default, this is set to 0 for all the neurons. If you want a subset of
+     * neurons to fire before other neurons, assign it a smaller priority value.
      */
     private int updatePriority = 0;
 
     /** List of Neuron update rules; used in Gui Combo boxes. */
     private static final ClassDescriptionPair[] RULE_LIST = {
-        new ClassDescriptionPair(AdditiveRule.class, new AdditiveRule().getDescription()),
-        new ClassDescriptionPair(BinaryRule.class, new BinaryRule().getDescription()),
-        new ClassDescriptionPair(ClampedNeuronRule.class, new ClampedNeuronRule().getDescription()),
-        new ClassDescriptionPair(DecayRule.class, new DecayRule().getDescription()),
-        new ClassDescriptionPair(IACRule.class, new IACRule().getDescription()),
-        new ClassDescriptionPair(IntegrateAndFireRule.class, new IntegrateAndFireRule().getDescription()),
-        new ClassDescriptionPair(IzhikevichRule.class, new IzhikevichRule().getDescription()),
-        new ClassDescriptionPair(LinearRule.class, new LinearRule().getDescription()),
-        new ClassDescriptionPair(LogisticRule.class, new LogisticRule().getDescription()),
-        new ClassDescriptionPair(NakaRushtonRule.class, new NakaRushtonRule().getDescription()),
-        new ClassDescriptionPair(PointNeuronRule.class, new PointNeuronRule().getDescription()),
-        new ClassDescriptionPair(RandomNeuronRule.class, new RandomNeuronRule().getDescription()),
-        new ClassDescriptionPair(SigmoidalRule.class, new SigmoidalRule().getDescription()),
-        new ClassDescriptionPair(SinusoidalRule.class, new SinusoidalRule().getDescription()),
-        new ClassDescriptionPair(SpikingThresholdRule.class, new SpikingThresholdRule().getDescription()),
-        new ClassDescriptionPair(StochasticRule.class, new StochasticRule().getDescription()),
-        new ClassDescriptionPair(ThreeValueRule.class, new ThreeValueRule().getDescription())};
+            new ClassDescriptionPair(AdditiveRule.class,
+                    new AdditiveRule().getDescription()),
+            new ClassDescriptionPair(BinaryRule.class,
+                    new BinaryRule().getDescription()),
+            new ClassDescriptionPair(ClampedNeuronRule.class,
+                    new ClampedNeuronRule().getDescription()),
+            new ClassDescriptionPair(DecayRule.class,
+                    new DecayRule().getDescription()),
+            new ClassDescriptionPair(IACRule.class,
+                    new IACRule().getDescription()),
+            new ClassDescriptionPair(IntegrateAndFireRule.class,
+                    new IntegrateAndFireRule().getDescription()),
+            new ClassDescriptionPair(IzhikevichRule.class,
+                    new IzhikevichRule().getDescription()),
+            new ClassDescriptionPair(LinearRule.class,
+                    new LinearRule().getDescription()),
+            new ClassDescriptionPair(LogisticRule.class,
+                    new LogisticRule().getDescription()),
+            new ClassDescriptionPair(NakaRushtonRule.class,
+                    new NakaRushtonRule().getDescription()),
+            new ClassDescriptionPair(PointNeuronRule.class,
+                    new PointNeuronRule().getDescription()),
+            new ClassDescriptionPair(RandomNeuronRule.class,
+                    new RandomNeuronRule().getDescription()),
+            new ClassDescriptionPair(SigmoidalRule.class,
+                    new SigmoidalRule().getDescription()),
+            new ClassDescriptionPair(SinusoidalRule.class,
+                    new SinusoidalRule().getDescription()),
+            new ClassDescriptionPair(SpikingThresholdRule.class,
+                    new SpikingThresholdRule().getDescription()),
+            new ClassDescriptionPair(StochasticRule.class,
+                    new StochasticRule().getDescription()),
+            new ClassDescriptionPair(ThreeValueRule.class,
+                    new ThreeValueRule().getDescription()) };
 
     /**
      * Construct a specific type of neuron from a string description.
@@ -206,7 +222,7 @@ public class Neuron  {
      */
     public void setUpdateRule(String name) {
         try {
-            NeuronUpdateRule newRule  = (NeuronUpdateRule) Class.forName(
+            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName(
                     "org.simbrain.network.neuron_update_rules." + name)
                     .newInstance();
             setUpdateRule(newRule);
@@ -253,17 +269,18 @@ public class Neuron  {
     }
 
     /**
-     * Perform any initialization required when creating a neuron, but after
-     * the parent network has been added.
+     * Perform any initialization required when creating a neuron, but after the
+     * parent network has been added.
      */
     public void postUnmarshallingInit() {
-        //TODO: Add checks?
+        // TODO: Add checks?
         fanOut = new ArrayList<Synapse>();
         fanIn = new ArrayList<Synapse>();
     }
 
     /**
      * Sets the activation of the neuron.
+     *
      * @param act Activation
      */
     public void setActivation(final double act) {
@@ -288,6 +305,7 @@ public class Neuron  {
 
     /**
      * Sets the id of the neuron.
+     *
      * @param theName Neuron id
      */
     public void setId(final String theName) {
@@ -303,6 +321,7 @@ public class Neuron  {
 
     /**
      * Sets the upper bound of the neuron.
+     *
      * @param d Value to set upper bound
      */
     public void setUpperBound(final double d) {
@@ -318,6 +337,7 @@ public class Neuron  {
 
     /**
      * Sets the lower bound of the neuron.
+     *
      * @param d Value to set lower bound
      */
     public void setLowerBound(final double d) {
@@ -333,6 +353,7 @@ public class Neuron  {
 
     /**
      * Sets the neuron increment.
+     *
      * @param d Value to set increment
      */
     public void setIncrement(final double d) {
@@ -426,7 +447,7 @@ public class Neuron  {
         double wtdSum = inputValue;
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
-                Synapse w = (Synapse) fanIn.get(j);
+                Synapse w = fanIn.get(j);
                 if (w.isSendWeightedInput()) {
                     wtdSum += w.getValue();
                 }
@@ -449,6 +470,7 @@ public class Neuron  {
 
     /**
      * Returns a random value between the upper and lower bounds of this neuron.
+     *
      * @return the random value.
      */
     public double getRandomValue() {
@@ -480,6 +502,7 @@ public class Neuron  {
 
     /**
      * If value is above or below its bounds set it to those bounds.
+     *
      * @param value Value to check
      * @return clip
      */
@@ -504,14 +527,14 @@ public class Neuron  {
         System.out.println("fan in");
 
         for (int i = 0; i < fanIn.size(); i++) {
-            Synapse tempRef = (Synapse) fanIn.get(i);
+            Synapse tempRef = fanIn.get(i);
             System.out.println("fanIn [" + i + "]:" + tempRef);
         }
 
         System.out.println("fan out");
 
         for (int i = 0; i < fanOut.size(); i++) {
-            Synapse tempRef = (Synapse) fanOut.get(i);
+            Synapse tempRef = fanOut.get(i);
             System.out.println("fanOut [" + i + "]:" + tempRef);
         }
     }
@@ -583,7 +606,7 @@ public class Neuron  {
         double ret = 0;
 
         for (int i = 0; i < fanIn.size(); i++) {
-            Synapse tempRef = (Synapse) fanIn.get(i);
+            Synapse tempRef = fanIn.get(i);
             ret += tempRef.getStrength();
         }
 
@@ -594,7 +617,7 @@ public class Neuron  {
      * Returns the number of neurons attaching to this one which have activity
      * above a specified threshold.
      *
-     * @param threshold  value above which neurons are considered "active."
+     * @param threshold value above which neurons are considered "active."
      * @return number of "active" neurons
      */
     public int getNumberOfActiveInputs(final int threshold) {
@@ -622,7 +645,7 @@ public class Neuron  {
         double ret = 0;
 
         for (int i = 0; i < fanIn.size(); i++) {
-            ret += ((Synapse) fanIn.get(i)).getSource().getActivation();
+            ret += fanIn.get(i).getSource().getActivation();
         }
 
         return ret;
@@ -648,6 +671,7 @@ public class Neuron  {
 
     /**
      * True if the synapse is connected to this neuron, false otherwise.
+     *
      * @param s the synapse to check.
      * @return true if synapse is connected, false otherwise.
      */
@@ -661,7 +685,6 @@ public class Neuron  {
     public double getX() {
         return x;
     }
-
 
     /**
      * @return Returns the y coordinate.
@@ -859,6 +882,7 @@ public class Neuron  {
             synapse.randomize();
         }
     }
+
     /**
      * @return the rulelist
      */
@@ -874,7 +898,7 @@ public class Neuron  {
     }
 
     /**
-     * TODO: Possibly make this be a NeuronGroup.  See design notes. 
+     * TODO: Possibly make this be a NeuronGroup. See design notes.
      *
      * @return the parentGroup
      */

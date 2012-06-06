@@ -40,9 +40,8 @@ import org.simbrain.world.visionworld.sensormatrix.DenseSensorMatrix;
 /**
  * Dense sensor matrix editor.
  */
-public final class DenseSensorMatrixEditor
-    extends JPanel
-    implements SensorMatrixEditor {
+public final class DenseSensorMatrixEditor extends JPanel implements
+        SensorMatrixEditor {
 
     /** Rows. */
     private JTextField rows;
@@ -86,7 +85,6 @@ public final class DenseSensorMatrixEditor
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new dense sensor matrix editor.
      */
@@ -96,7 +94,6 @@ public final class DenseSensorMatrixEditor
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.
@@ -108,26 +105,28 @@ public final class DenseSensorMatrixEditor
         receptiveFieldWidth = new JTextField();
         effectiveSize = new JLabel();
         DocumentListener updateEffectiveSize = new DocumentListener() {
-                /** {@inheritDoc} */
-                public void changedUpdate(final DocumentEvent event) {
-                    updateEffectiveSize();
-                }
+            /** {@inheritDoc} */
+            public void changedUpdate(final DocumentEvent event) {
+                updateEffectiveSize();
+            }
 
-                /** {@inheritDoc} */
-                public void insertUpdate(final DocumentEvent event) {
-                    updateEffectiveSize();
-                }
+            /** {@inheritDoc} */
+            public void insertUpdate(final DocumentEvent event) {
+                updateEffectiveSize();
+            }
 
-                /** {@inheritDoc} */
-                public void removeUpdate(final DocumentEvent event) {
-                    updateEffectiveSize();
-                }
-            };
+            /** {@inheritDoc} */
+            public void removeUpdate(final DocumentEvent event) {
+                updateEffectiveSize();
+            }
+        };
 
         rows.getDocument().addDocumentListener(updateEffectiveSize);
         columns.getDocument().addDocumentListener(updateEffectiveSize);
-        receptiveFieldHeight.getDocument().addDocumentListener(updateEffectiveSize);
-        receptiveFieldWidth.getDocument().addDocumentListener(updateEffectiveSize);
+        receptiveFieldHeight.getDocument().addDocumentListener(
+                updateEffectiveSize);
+        receptiveFieldWidth.getDocument().addDocumentListener(
+                updateEffectiveSize);
     }
 
     /**
@@ -135,7 +134,8 @@ public final class DenseSensorMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME),
+                new EmptyBorder(6, 6, 6, 6)));
         setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
@@ -169,7 +169,7 @@ public final class DenseSensorMatrixEditor
         c.insets = LABEL_INSETS;
         c.gridx = 0;
         c.gridy++;
-        c.weightx = 0.33f ;
+        c.weightx = 0.33f;
         add(new JLabel("Receptive field height"), c);
 
         c.insets = FIELD_INSETS;
@@ -220,8 +220,7 @@ public final class DenseSensorMatrixEditor
             int h = Integer.valueOf(receptiveFieldHeight.getText());
             int w = Integer.valueOf(receptiveFieldWidth.getText());
             effectiveSize.setText((c * w) + "x" + (r * h));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             effectiveSize.setText("...");
         }
     }
@@ -230,24 +229,25 @@ public final class DenseSensorMatrixEditor
     public Component getEditorComponent() {
         rows.setText(String.valueOf(DEFAULT_ROWS));
         columns.setText(String.valueOf(DEFAULT_COLUMNS));
-        receptiveFieldHeight.setText(String.valueOf(DEFAULT_RECEPTIVE_FIELD_HEIGHT));
-        receptiveFieldWidth.setText(String.valueOf(DEFAULT_RECEPTIVE_FIELD_WIDTH));
+        receptiveFieldHeight.setText(String
+                .valueOf(DEFAULT_RECEPTIVE_FIELD_HEIGHT));
+        receptiveFieldWidth.setText(String
+                .valueOf(DEFAULT_RECEPTIVE_FIELD_WIDTH));
         return this;
     }
 
     /** {@inheritDoc} */
-    public SensorMatrix createSensorMatrix(final Filter defaultFilter) throws SensorMatrixEditorException {
+    public SensorMatrix createSensorMatrix(final Filter defaultFilter)
+            throws SensorMatrixEditorException {
         try {
             int r = Integer.valueOf(rows.getText());
             int c = Integer.valueOf(columns.getText());
             int h = Integer.valueOf(receptiveFieldHeight.getText());
             int w = Integer.valueOf(receptiveFieldWidth.getText());
             return new DenseSensorMatrix(r, c, w, h, defaultFilter);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new SensorMatrixEditorException(e);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new SensorMatrixEditorException(e);
         }
     }
@@ -257,4 +257,3 @@ public final class DenseSensorMatrixEditor
         return DISPLAY_NAME;
     }
 }
-

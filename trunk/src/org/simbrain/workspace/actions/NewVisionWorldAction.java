@@ -34,14 +34,12 @@ public final class NewVisionWorldAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a new vision world action with the specified
-     * workspace.
+     * Create a new vision world action with the specified workspace.
      */
     public NewVisionWorldAction(Workspace workspace) {
         super("Vision World (Beta)", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Glasses.png"));
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

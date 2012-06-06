@@ -13,7 +13,6 @@
  */
 package org.simbrain.network.connections;
 
-
 /**
  * Properties for quick connect, where a connection is applied using a key
  * command, without a dialog. In this way many connections can be quickly

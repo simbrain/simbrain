@@ -29,15 +29,14 @@ import org.simbrain.network.gui.NetworkSelectionListener;
 /**
  * Set synapse properties.
  */
-public final class SetSynapsePropertiesAction
-    extends AbstractAction {
+public final class SetSynapsePropertiesAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new set synapse properties action with the specified network panel.
+     * Create a new set synapse properties action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -55,11 +54,11 @@ public final class SetSynapsePropertiesAction
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**
@@ -79,7 +78,6 @@ public final class SetSynapsePropertiesAction
             setEnabled(false);
         }
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

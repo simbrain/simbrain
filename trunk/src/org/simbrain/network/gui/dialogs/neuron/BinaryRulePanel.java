@@ -25,9 +25,9 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
- * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary neurons.
+ * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
+ * neurons.
  */
 public class BinaryRulePanel extends AbstractNeuronPanel {
 
@@ -59,8 +59,9 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getThreshold")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
+                "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
         }
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias")) {
@@ -85,7 +86,8 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
             BinaryRule neuronRef = (BinaryRule) ruleList.get(i);
 
             if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+                neuronRef
+                        .setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
             if (!tfBias.getText().equals(NULL_STRING)) {
                 neuronRef.setBias(Double.parseDouble(tfBias.getText()));

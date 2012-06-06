@@ -32,12 +32,12 @@ public abstract class Group {
     /** Name of this group. */
     private String id;
 
-	/** Name of this group. Null strings lead to default labeling conventions. */
-	private String label;
+    /** Name of this group. Null strings lead to default labeling conventions. */
+    private String label;
 
-	/**
-	 * Whether this group should be deleted when all its components are deleted.
-	 */
+    /**
+     * Whether this group should be deleted when all its components are deleted.
+     */
     private boolean deleteWhenEmpty = true;
 
     /** Flag which prevents infinite loops when deleting composite groups. */
@@ -79,7 +79,7 @@ public abstract class Group {
     public String toString() {
         if (label != null) {
             return label;
-        } else if (id != null){
+        } else if (id != null) {
             return id;
         } else {
             return super.toString();

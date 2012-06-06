@@ -77,8 +77,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
-        chooser = new SFileChooser(WorkspacePreferences.getCurrentDirectory(workspaceComponent.getClass()),
-               null);
+        chooser = new SFileChooser(
+                WorkspacePreferences.getCurrentDirectory(workspaceComponent
+                        .getClass()), null);
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
@@ -213,8 +214,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                 throw new RuntimeException(e);
             }
 
-//            workspaceComponent.setCurrentDirectory(theFile.getParentFile()
-//                    .getAbsolutePath());
+            // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
+            // .getAbsolutePath());
             WorkspacePreferences.setCurrentDirectory(workspaceComponent
                     .getClass(), theFile.getParentFile().getAbsolutePath());
             workspaceComponent.setName(theFile.getName());

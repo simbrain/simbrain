@@ -15,7 +15,7 @@ import org.simbrain.world.threedee.Moveable.Action;
 /**
  * Binds key events to Moveable actions and provides a Input instance that can
  * be set on a Moveable instance.
- * 
+ *
  * @author Matt Watson
  */
 public class KeyHandler implements KeyListener {
@@ -26,15 +26,15 @@ public class KeyHandler implements KeyListener {
     private final Map<Integer, Moveable.Action> bindings = new HashMap<Integer, Moveable.Action>();
 
     /** An input that can be set on a Moveable instance. */
-    private final Collection<Action> input = Collections.synchronizedCollection(
-        new HashSet<Action>());
-    
+    private final Collection<Action> input = Collections
+            .synchronizedCollection(new HashSet<Action>());
+
     /**
      * Adds an new binding in this handler.
-     * 
+     *
      * @param key the key to bind
      * @param action the Moveable action to bind the key to
-     * 
+     *
      * @see java.awt.event.KeyEvent
      */
     public void addBinding(final int key, final Moveable.Action action) {
@@ -43,13 +43,13 @@ public class KeyHandler implements KeyListener {
 
     /**
      * Returns the input collection.
-     * 
+     *
      * @return The input collection.
      */
     public Collection<Action> getInput() {
         return input;
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -24,8 +24,7 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Sensor node.
  */
-public final class SensorNode
-    extends AbstractSensorNode {
+public final class SensorNode extends AbstractSensorNode {
 
     /**
      * Create a new sensor node for the specified sensor.

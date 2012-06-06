@@ -32,19 +32,19 @@ import javax.swing.JMenuBar;
 public interface GenericFrame {
 
     public void dispose();
-    
+
     public void pack();
-    
+
     public void setTitle(String title);
-    
+
     public String getTitle();
-    
+
     public void setIcon(boolean b) throws PropertyVetoException;
-    
+
     public void setJMenuBar(JMenuBar menuBar);
-    
+
     public JMenuBar getJMenuBar();
-    
+
     public void setBounds(int x, int y, int width, int height);
 
     public Rectangle getBounds();
@@ -54,7 +54,7 @@ public interface GenericFrame {
     public void setBounds(Rectangle bounds);
 
     public void setLocation(int xposition, int yposition);
-    
+
     public void setContentPane(Container container);
 
 }

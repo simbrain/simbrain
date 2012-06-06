@@ -21,8 +21,8 @@ package org.simbrain.world.visionworld;
 import javax.swing.event.EventListenerList;
 
 /**
- * Support class that can be used via subclassing or delegation to
- * provide VisionWorldModelListener management.
+ * Support class that can be used via subclassing or delegation to provide
+ * VisionWorldModelListener management.
  */
 class VisionWorldModelListenerSupport {
 
@@ -32,19 +32,18 @@ class VisionWorldModelListenerSupport {
     /** Listener list. */
     private final EventListenerList listenerList;
 
-
     /**
-     * Create a new vision world model listener support class meant
-     * to be subclassed.  The subclass should call <code>setSource(this)</code>
-     * before calling any of the <code>fireX</code> methods.
+     * Create a new vision world model listener support class meant to be
+     * subclassed. The subclass should call <code>setSource(this)</code> before
+     * calling any of the <code>fireX</code> methods.
      */
     protected VisionWorldModelListenerSupport() {
         listenerList = new EventListenerList();
     }
 
     /**
-     * Create a new vision world model listener support class with the
-     * specified VisionWorldModel as the source of events.
+     * Create a new vision world model listener support class with the specified
+     * VisionWorldModel as the source of events.
      *
      * @param source the event source, must not be null
      */
@@ -52,7 +51,6 @@ class VisionWorldModelListenerSupport {
         this();
         setSource(source);
     }
-
 
     /**
      * Set the source of vision world model events to <code>source</code>.
@@ -67,11 +65,11 @@ class VisionWorldModelListenerSupport {
     }
 
     /**
-     * Return the <code>EventListenerList</code> backing this vision world
-     * model listener support class.
+     * Return the <code>EventListenerList</code> backing this vision world model
+     * listener support class.
      *
      * @return the <code>EventListenerList</code> backing this vision world
-     *    model listener support class
+     *         model listener support class
      */
     protected final EventListenerList getEventListenerList() {
         return listenerList;
@@ -91,7 +89,8 @@ class VisionWorldModelListenerSupport {
      *
      * @param listener vision world model listener to remove
      */
-    public final void removeModelListener(final VisionWorldModelListener listener) {
+    public final void removeModelListener(
+            final VisionWorldModelListener listener) {
         listenerList.remove(VisionWorldModelListener.class, listener);
     }
 
@@ -103,9 +102,10 @@ class VisionWorldModelListenerSupport {
      * @param pixelMatrix new pixel matrix, must not be null
      */
     public final void firePixelMatrixChanged(final PixelMatrix oldPixelMatrix,
-                                             final PixelMatrix pixelMatrix) {
+            final PixelMatrix pixelMatrix) {
         if (oldPixelMatrix == null) {
-            throw new IllegalArgumentException("oldPixelMatrix must not be null");
+            throw new IllegalArgumentException(
+                    "oldPixelMatrix must not be null");
         }
         if (pixelMatrix == null) {
             throw new IllegalArgumentException("pixelMatrix must not be null");
@@ -115,9 +115,11 @@ class VisionWorldModelListenerSupport {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == VisionWorldModelListener.class) {
                 if (event == null) {
-                    event = new VisionWorldModelEvent(source, oldPixelMatrix, pixelMatrix);
+                    event = new VisionWorldModelEvent(source, oldPixelMatrix,
+                            pixelMatrix);
                 }
-                ((VisionWorldModelListener) listeners[i + 1]).pixelMatrixChanged(event);
+                ((VisionWorldModelListener) listeners[i + 1])
+                        .pixelMatrixChanged(event);
             }
         }
     }
@@ -129,10 +131,11 @@ class VisionWorldModelListenerSupport {
      * @param oldSensorMatrix old sensor matrix, must not be null
      * @param sensorMatrix new sensor matrix, must not be null
      */
-    public final void fireSensorMatrixChanged(final SensorMatrix oldSensorMatrix,
-                                             final SensorMatrix sensorMatrix) {
+    public final void fireSensorMatrixChanged(
+            final SensorMatrix oldSensorMatrix, final SensorMatrix sensorMatrix) {
         if (oldSensorMatrix == null) {
-            throw new IllegalArgumentException("oldSensorMatrix must not be null");
+            throw new IllegalArgumentException(
+                    "oldSensorMatrix must not be null");
         }
         if (sensorMatrix == null) {
             throw new IllegalArgumentException("sensorMatrix must not be null");
@@ -142,9 +145,11 @@ class VisionWorldModelListenerSupport {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == VisionWorldModelListener.class) {
                 if (event == null) {
-                    event = new VisionWorldModelEvent(source, oldSensorMatrix, sensorMatrix);
+                    event = new VisionWorldModelEvent(source, oldSensorMatrix,
+                            sensorMatrix);
                 }
-                ((VisionWorldModelListener) listeners[i + 1]).sensorMatrixChanged(event);
+                ((VisionWorldModelListener) listeners[i + 1])
+                        .sensorMatrixChanged(event);
             }
         }
     }

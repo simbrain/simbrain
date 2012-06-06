@@ -34,14 +34,14 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * Selection marquee node.
  */
-public final class SelectionMarquee
-    extends PPath {
+public final class SelectionMarquee extends PPath {
 
     /** Default paint. */
     private static final Paint DEFAULT_PAINT = Color.WHITE;
 
     /** Default stroke. */
-    private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
+    private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(
+            1.0f) : new PFixedWidthStroke(1.0f);
 
     /** Color of selection marquee. */
     private static Color marqueeColor = Color.yellow;
@@ -49,10 +49,9 @@ public final class SelectionMarquee
     /** Default interior transparency. */
     private static final float DEFAULT_TRANSPARENCY = 0.6f;
 
-
     /**
-     * Create a new selection marquee at the specified point
-     * (<code>x</code>, <code>y</code>).
+     * Create a new selection marquee at the specified point (<code>x</code>,
+     * <code>y</code>).
      *
      * @param x x
      * @param y y
@@ -67,7 +66,6 @@ public final class SelectionMarquee
         setStrokePaint(marqueeColor);
         setTransparency(DEFAULT_TRANSPARENCY);
     }
-
 
     /** {@inheritDoc} */
     protected void paint(final PPaintContext paintContext) {
@@ -95,7 +93,6 @@ public final class SelectionMarquee
     public static Color getMarqueeColor() {
         return marqueeColor;
     }
-
 
     /**
      * @param marqueeColor The marqueeColor to set.

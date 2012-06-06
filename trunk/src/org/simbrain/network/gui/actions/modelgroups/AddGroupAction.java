@@ -29,8 +29,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * Create a new group using the specified dialog.
  */
-public final class AddGroupAction
-    extends AbstractAction {
+public final class AddGroupAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -39,22 +38,22 @@ public final class AddGroupAction
     private JDialog dialog;
 
     /**
-     * Create a new set synapse properties action with the specified network panel.
+     * Create a new set synapse properties action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public AddGroupAction(final NetworkPanel networkPanel, StandardDialog dialog, String name) {
+    public AddGroupAction(final NetworkPanel networkPanel,
+            StandardDialog dialog, String name) {
 
         super(name);
         this.dialog = dialog;
         this.networkPanel = networkPanel;
-        
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        
-        
+
     }
 
     /**

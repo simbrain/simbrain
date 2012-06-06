@@ -26,22 +26,20 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.subnetworks.Hopfield;
 
 /**
  * PNode representation of Hopfield Network.
- * 
- * TODO:
- *   - Location of top interaction box
- *   - Dialog
- * 
+ *
+ * TODO: - Location of top interaction box - Dialog
+ *
  * @author jyoshimi
  */
 public class HopfieldNode extends SubnetworkNode {
-    
+
     /**
      * Create a Hopfield Network PNode.
      *
@@ -50,12 +48,12 @@ public class HopfieldNode extends SubnetworkNode {
      */
     public HopfieldNode(NetworkPanel networkPanel, Hopfield group) {
         super(networkPanel, group);
-        //setStrokePaint(Color.green);
+        // setStrokePaint(Color.green);
         setInteractionBox(new HopfieldInteractionBox(networkPanel));
         setContextMenu();
         setOutlinePadding(15f);
     }
-    
+
     /**
      * Custom interaction box for Hopfield group node.
      */
@@ -105,6 +103,5 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(new JMenuItem(randWeights));
         setContextMenu(menu);
     }
-    
 
 }

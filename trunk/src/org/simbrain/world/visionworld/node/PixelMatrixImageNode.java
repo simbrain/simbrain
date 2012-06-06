@@ -35,8 +35,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Pixel matrix image node.
  */
-public final class PixelMatrixImageNode
-    extends AbstractPixelMatrixNode {
+public final class PixelMatrixImageNode extends AbstractPixelMatrixNode {
 
     /** Image node. */
     private final NonAntialiasingImageNode imageNode;
@@ -59,10 +58,8 @@ public final class PixelMatrixImageNode
     /** Pen. */
     private final Pen pen = new Pen();
 
-
     /**
-     * Create a new pixel matrix image node with the
-     * specified pixel matrix.
+     * Create a new pixel matrix image node with the specified pixel matrix.
      *
      * @param pixelMatrix pixel matrix, must not be null
      */
@@ -71,7 +68,6 @@ public final class PixelMatrixImageNode
         imageNode = new NonAntialiasingImageNode(pixelMatrix.getImage());
         addChild(imageNode);
     }
-
 
     /**
      * Return the pen foreground color for this pixel matrix image node.
@@ -83,11 +79,15 @@ public final class PixelMatrixImageNode
     }
 
     /**
-     * Set the pen foreground color for this pixel matrix image node to <code>penForeground</code>.
+     * Set the pen foreground color for this pixel matrix image node to
+     * <code>penForeground</code>.
      *
-     * <p>This is a bound property.</p>
+     * <p>
+     * This is a bound property.
+     * </p>
      *
-     * @param penForeground pen foreground color for this pixel matrix image node, must not be null
+     * @param penForeground pen foreground color for this pixel matrix image
+     *            node, must not be null
      */
     public void setPenForeground(final Color penForeground) {
         if (penForeground == null) {
@@ -95,7 +95,8 @@ public final class PixelMatrixImageNode
         }
         Color oldPenForeground = this.penForeground;
         this.penForeground = penForeground;
-        firePropertyChange(-1,"penForeground", oldPenForeground, this.penForeground);
+        firePropertyChange(-1, "penForeground", oldPenForeground,
+                this.penForeground);
     }
 
     /**
@@ -108,11 +109,15 @@ public final class PixelMatrixImageNode
     }
 
     /**
-     * Set the pen background color for this pixel matrix image node to <code>penBackground</code>.
+     * Set the pen background color for this pixel matrix image node to
+     * <code>penBackground</code>.
      *
-     * <p>This is a bound property.</p>
+     * <p>
+     * This is a bound property.
+     * </p>
      *
-     * @param penBackground pen background color for this pixel matrix image node, must not be null
+     * @param penBackground pen background color for this pixel matrix image
+     *            node, must not be null
      */
     public void setPenBackground(final Color penBackground) {
         if (penBackground == null) {
@@ -120,7 +125,8 @@ public final class PixelMatrixImageNode
         }
         Color oldPenBackground = this.penBackground;
         this.penBackground = penBackground;
-        firePropertyChange(-1,"penBackground", oldPenBackground, this.penBackground);
+        firePropertyChange(-1, "penBackground", oldPenBackground,
+                this.penBackground);
     }
 
     /**
@@ -133,8 +139,8 @@ public final class PixelMatrixImageNode
     }
 
     /**
-     * Set to true to indicate this pixel matrix image node has focus
-     * and should enabled drawing via mouse clicks.
+     * Set to true to indicate this pixel matrix image node has focus and should
+     * enabled drawing via mouse clicks.
      *
      * @param hasFocus true to indicate this pixel matrix image node has focus
      */
@@ -161,12 +167,10 @@ public final class PixelMatrixImageNode
     /**
      * Image node that paints images without antialiasing.
      */
-    private static class NonAntialiasingImageNode
-        extends PNode {
+    private static class NonAntialiasingImageNode extends PNode {
 
         /** Image for this non-antialiasing image node. */
         private Image image;
-
 
         /**
          * Create a new non-antialiasing image node for the specifed image.
@@ -178,9 +182,9 @@ public final class PixelMatrixImageNode
             setImage(image);
         }
 
-
         /**
-         * Set the image for this non-antialiasing image node to <code>image</code>.
+         * Set the image for this non-antialiasing image node to
+         * <code>image</code>.
          *
          * @param image image
          */
@@ -198,10 +202,14 @@ public final class PixelMatrixImageNode
             Graphics2D g = paintContext.getGraphics();
 
             // explicitly prevent antialiasing
-            Object oldAntialiasingHint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-            Object oldInterpolationHint = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            Object oldAntialiasingHint = g
+                    .getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_OFF);
+            Object oldInterpolationHint = g
+                    .getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
             if (b.x != 0 || b.y != 0 || b.width != iw || b.height != ih) {
                 g.translate(b.x, b.y);
@@ -209,17 +217,18 @@ public final class PixelMatrixImageNode
                 g.drawImage(image, 0, 0, null);
                 g.scale(iw / b.width, ih / b.height);
                 g.translate(-b.x, -b.y);
-            }
-            else {
+            } else {
                 g.drawImage(image, 0, 0, null);
             }
 
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasingHint);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    oldAntialiasingHint);
             if (oldInterpolationHint != null) {
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, oldInterpolationHint);
-            }
-            else {
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                        oldInterpolationHint);
+            } else {
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             }
         }
     }
@@ -227,28 +236,28 @@ public final class PixelMatrixImageNode
     /**
      * Pen.
      */
-    private class Pen
-        extends PDragSequenceEventHandler {
+    private class Pen extends PDragSequenceEventHandler {
 
         /** Temporary drag color, may be null. */
         private Color dragColor;
 
-
         /** {@inheritDoc} */
         protected void drag(final PInputEvent event) {
             super.drag(event);
-            Point2D position = event.getPositionRelativeTo(PixelMatrixImageNode.this);
+            Point2D position = event
+                    .getPositionRelativeTo(PixelMatrixImageNode.this);
             // border conditions are off-by-one
-            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
-            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
+            int x = Math.min(getPixelMatrix().getWidth() - 1,
+                    (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1,
+                    (int) position.getY());
             try {
                 Color oldColor = getPixelMatrix().getPixel(x, y);
                 if (!oldColor.equals(dragColor)) {
                     getPixelMatrix().setPixel(x, y, dragColor);
                     refreshImage();
                 }
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 // ignore
             }
         }
@@ -261,21 +270,22 @@ public final class PixelMatrixImageNode
 
         /** {@inheritDoc} */
         public void mouseClicked(final PInputEvent event) {
-            Point2D position = event.getPositionRelativeTo(PixelMatrixImageNode.this);
+            Point2D position = event
+                    .getPositionRelativeTo(PixelMatrixImageNode.this);
             // border conditions are off-by-one
-            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
-            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
+            int x = Math.min(getPixelMatrix().getWidth() - 1,
+                    (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1,
+                    (int) position.getY());
             try {
                 Color oldColor = getPixelMatrix().getPixel(x, y);
                 if (penForeground.equals(oldColor)) {
                     getPixelMatrix().setPixel(x, y, penBackground);
-                }
-                else {
+                } else {
                     getPixelMatrix().setPixel(x, y, penForeground);
                 }
                 refreshImage();
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 // ignore
             }
         }
@@ -283,20 +293,21 @@ public final class PixelMatrixImageNode
         /** {@inheritDoc} */
         protected void startDrag(final PInputEvent event) {
             super.startDrag(event);
-            Point2D position = event.getPositionRelativeTo(PixelMatrixImageNode.this);
+            Point2D position = event
+                    .getPositionRelativeTo(PixelMatrixImageNode.this);
             // border conditions are off-by-one
-            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
-            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
+            int x = Math.min(getPixelMatrix().getWidth() - 1,
+                    (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1,
+                    (int) position.getY());
             try {
                 Color oldColor = getPixelMatrix().getPixel(x, y);
                 if (penForeground.equals(oldColor)) {
                     dragColor = penBackground;
-                }
-                else {
+                } else {
                     dragColor = penForeground;
                 }
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 // ignore
             }
         }

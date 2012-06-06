@@ -36,8 +36,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * Abstract sensor matrix node.
  */
-abstract class AbstractSensorMatrixNode
-    extends PNode {
+abstract class AbstractSensorMatrixNode extends PNode {
 
     /** Sensor matrix. */
     private final SensorMatrix sensorMatrix;
@@ -46,13 +45,15 @@ abstract class AbstractSensorMatrixNode
     private static final Paint DEFAULT_GRID_PAINT = Color.BLACK;
 
     /** Default grid stroke. */
-    private static final Stroke DEFAULT_GRID_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_GRID_STROKE = Utils.isMacOSX() ? new BasicStroke(
+            0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default outline paint. */
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(
+            0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Grid paint. */
     private Paint gridPaint = DEFAULT_GRID_PAINT;
@@ -66,9 +67,9 @@ abstract class AbstractSensorMatrixNode
     /** Outline stroke. */
     private Stroke outlineStroke = DEFAULT_OUTLINE_STROKE;
 
-
     /**
-     * Create a new abstract sensor matrix node with the specified sensor matrix.
+     * Create a new abstract sensor matrix node with the specified sensor
+     * matrix.
      *
      * @param sensorMatrix sensor matrix, must not be null
      */
@@ -82,10 +83,9 @@ abstract class AbstractSensorMatrixNode
         setHeight(sensorMatrix.rows() * sensorMatrix.getReceptiveFieldHeight());
     }
 
-
     /**
-     * Return the sensor matrix for this sensor matrix node.
-     * The sensor matrix will not be null.
+     * Return the sensor matrix for this sensor matrix node. The sensor matrix
+     * will not be null.
      *
      * @return the sensor matrix for this sensor matrix node
      */
@@ -93,8 +93,9 @@ abstract class AbstractSensorMatrixNode
         return sensorMatrix;
     }
 
-    // todo:  add context menu, tooltip text
-    // todo:  add action methods, add sensor, remove sensor, edit properties, etc.
+    // todo: add context menu, tooltip text
+    // todo: add action methods, add sensor, remove sensor, edit properties,
+    // etc.
 
     /**
      * Return the grid paint for this sensor matrix node.
@@ -113,12 +114,12 @@ abstract class AbstractSensorMatrixNode
     public final void setGridPaint(final Paint gridPaint) {
         Paint oldGridPaint = this.gridPaint;
         this.gridPaint = gridPaint;
-        firePropertyChange(-1,"gridPaint", oldGridPaint, this.gridPaint);
+        firePropertyChange(-1, "gridPaint", oldGridPaint, this.gridPaint);
     }
 
     /**
-     * Return the grid stroke for this sensor matrix node.
-     * The grid stroke will not be null.
+     * Return the grid stroke for this sensor matrix node. The grid stroke will
+     * not be null.
      *
      * @return the grid stroke for this sensor matrix node
      */
@@ -127,9 +128,11 @@ abstract class AbstractSensorMatrixNode
     }
 
     /**
-     * Set the grid stroke for this sensor matrix node to <code>gridStroke</code>.
+     * Set the grid stroke for this sensor matrix node to
+     * <code>gridStroke</code>.
      *
-     * @param gridStroke grid stroke for this sensor matrix node, must not be null
+     * @param gridStroke grid stroke for this sensor matrix node, must not be
+     *            null
      */
     public final void setGridStroke(final Stroke gridStroke) {
         if (gridStroke == null) {
@@ -137,7 +140,7 @@ abstract class AbstractSensorMatrixNode
         }
         Stroke oldGridStroke = this.gridStroke;
         this.gridStroke = gridStroke;
-        firePropertyChange(-1,"gridStroke", oldGridStroke, this.gridStroke);
+        firePropertyChange(-1, "gridStroke", oldGridStroke, this.gridStroke);
     }
 
     /**
@@ -150,19 +153,21 @@ abstract class AbstractSensorMatrixNode
     }
 
     /**
-     * Set the outline paint for this sensor matrix node to <code>outlinePaint</code>.
+     * Set the outline paint for this sensor matrix node to
+     * <code>outlinePaint</code>.
      *
      * @param outlinePaint outline paint for this sensor matrix node
      */
     public final void setOutlinePaint(final Paint outlinePaint) {
         Paint oldOutlinePaint = this.outlinePaint;
         this.outlinePaint = outlinePaint;
-        firePropertyChange(-1,"outlinePaint", oldOutlinePaint, this.outlinePaint);
+        firePropertyChange(-1, "outlinePaint", oldOutlinePaint,
+                this.outlinePaint);
     }
 
     /**
-     * Return the outline stroke for this sensor matrix node.
-     * The outline stroke will not be null.
+     * Return the outline stroke for this sensor matrix node. The outline stroke
+     * will not be null.
      *
      * @return the outline stroke for this sensor matrix node
      */
@@ -171,9 +176,11 @@ abstract class AbstractSensorMatrixNode
     }
 
     /**
-     * Set the outline stroke for this sensor matrix node to <code>outlineStroke</code>.
+     * Set the outline stroke for this sensor matrix node to
+     * <code>outlineStroke</code>.
      *
-     * @param outlineStroke outline stroke for this sensor matrix node, must not be null
+     * @param outlineStroke outline stroke for this sensor matrix node, must not
+     *            be null
      */
     public final void setOutlineStroke(final Stroke outlineStroke) {
         if (outlineStroke == null) {
@@ -181,7 +188,8 @@ abstract class AbstractSensorMatrixNode
         }
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
-        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1, "outlineStroke", oldOutlineStroke,
+                this.outlineStroke);
     }
 
     /** {@inheritDoc} */
@@ -203,10 +211,12 @@ abstract class AbstractSensorMatrixNode
             double w = rect.getWidth() / sensorMatrix.columns();
 
             for (double x = rect.getX(); x < rect.getWidth(); x += w) {
-                g.draw(new Line2D.Double(x, rect.getY(), x, rect.getY() + rect.getHeight()));
+                g.draw(new Line2D.Double(x, rect.getY(), x, rect.getY()
+                        + rect.getHeight()));
             }
             for (double y = rect.getY(); y < rect.getHeight(); y += h) {
-                g.draw(new Line2D.Double(rect.getX(), y, rect.getX() + rect.getWidth(), y));
+                g.draw(new Line2D.Double(rect.getX(), y, rect.getX()
+                        + rect.getWidth(), y));
             }
         }
 

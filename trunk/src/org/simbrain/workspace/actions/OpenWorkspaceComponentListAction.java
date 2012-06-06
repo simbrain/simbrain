@@ -36,18 +36,16 @@ public final class OpenWorkspaceComponentListAction extends AbstractAction {
 
     /** Reference to Simbrain desktop. */
     private SimbrainDesktop desktop;
-    
 
     /**
-     * Create a workspace component list of the specified
-     * workspace.
+     * Create a workspace component list of the specified workspace.
      *
      * @param desktop reference to simbrain desktop.
      */
     public OpenWorkspaceComponentListAction(final SimbrainDesktop desktop) {
         super("Open component list");
         this.desktop = desktop;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
         putValue(SHORT_DESCRIPTION, "Open component list");
     }
 

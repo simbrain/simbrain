@@ -33,14 +33,15 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>DecayNeuronPanel</b>.
  */
-public class DecayRulePanel extends AbstractNeuronPanel implements ActionListener {
+public class DecayRulePanel extends AbstractNeuronPanel implements
+        ActionListener {
 
     /** Relative absolute combo box. */
-    private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");
+    private TristateDropDown cbRelAbs = new TristateDropDown("Relative",
+            "Absolute");
 
     /** Decay amount field. */
     private JTextField tfDecayAmount = new JTextField();
@@ -88,6 +89,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements ActionListene
 
     /**
      * Responds to actions performed.
+     *
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
@@ -122,28 +124,33 @@ public class DecayRulePanel extends AbstractNeuronPanel implements ActionListene
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
+        // Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getRelAbs")) {
             cbRelAbs.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getBaseLine")) {
+        if (!NetworkUtils
+                .isConsistent(ruleList, DecayRule.class, "getBaseLine")) {
             tfBaseLine.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getDecayFraction")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
+                "getDecayFraction")) {
             tfDecayFraction.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getDecayAmount")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
+                "getDecayAmount")) {
             tfDecayAmount.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getClipping")) {
+        if (!NetworkUtils
+                .isConsistent(ruleList, DecayRule.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getAddNoise")) {
+        if (!NetworkUtils
+                .isConsistent(ruleList, DecayRule.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -188,7 +195,8 @@ public class DecayRulePanel extends AbstractNeuronPanel implements ActionListene
             }
 
             if (!tfDecayAmount.getText().equals(NULL_STRING)) {
-                neuronRef.setDecayAmount(Double.parseDouble(tfDecayAmount.getText()));
+                neuronRef.setDecayAmount(Double.parseDouble(tfDecayAmount
+                        .getText()));
             }
 
             if (!tfBaseLine.getText().equals(NULL_STRING)) {
@@ -196,7 +204,8 @@ public class DecayRulePanel extends AbstractNeuronPanel implements ActionListene
             }
 
             if (!tfDecayFraction.getText().equals(NULL_STRING)) {
-                neuronRef.setDecayFraction(Double.parseDouble(tfDecayFraction.getText()));
+                neuronRef.setDecayFraction(Double.parseDouble(tfDecayFraction
+                        .getText()));
             }
 
             if (!isClipping.isNull()) {

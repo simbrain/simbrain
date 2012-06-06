@@ -15,8 +15,7 @@ public class WorkspaceComponentSerializer {
     private int lastComponent = 0;
 
     /** Map of components to their ids. */
-    private final Map<WorkspaceComponent, Integer> componentIds
-        = new IdentityHashMap<WorkspaceComponent, Integer>();
+    private final Map<WorkspaceComponent, Integer> componentIds = new IdentityHashMap<WorkspaceComponent, Integer>();
 
     /** Output stream. */
     private final OutputStream stream;

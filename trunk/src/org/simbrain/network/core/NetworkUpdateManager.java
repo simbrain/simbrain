@@ -30,7 +30,6 @@ import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
-import org.simbrain.workspace.updater.UpdateAction;
 
 /**
  * Manage network updates. Maintain a list of actions. When the network is

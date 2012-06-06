@@ -43,7 +43,6 @@ public final class NewProjectionPlotAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Projection Plot");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         ProjectionComponent plot = new ProjectionComponent("");

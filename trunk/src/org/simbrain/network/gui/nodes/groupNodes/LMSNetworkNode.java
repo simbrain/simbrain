@@ -40,7 +40,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * PNode representation of a group of a LMS network
- * 
+ *
  * @author jyoshimi
  */
 public class LMSNetworkNode extends SubnetworkNode {
@@ -56,7 +56,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         setInteractionBox(new LMSInteractionBox(networkPanel));
         setContextMenu();
     }
-    
+
     /**
      * Custom interaction box for LMS group node.
      */
@@ -64,7 +64,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         public LMSInteractionBox(NetworkPanel net) {
             super(net, LMSNetworkNode.this);
         }
-        
+
         @Override
         protected String getToolTipText() {
             return "LMS...";
@@ -86,85 +86,86 @@ public class LMSNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainIterativelyAction));
         menu.add(new JMenuItem(trainOfflineAction));
         menu.addSeparator();
-        
+
         final LMSNetwork lms = (LMSNetwork) getGroup();
-        
-		// Reference to the input data in the LMS
-		DataHolder inputData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				lms.setInputData(data);
-			}
 
-			@Override
-			public double[][] getData() {
-				return lms.getInputData();
-			}
+        // Reference to the input data in the LMS
+        DataHolder inputData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                lms.setInputData(data);
+            }
 
-		};
-		// Reference to the training data in the LMS
-		DataHolder trainingData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				lms.setTrainingData(data);
-			}
+            @Override
+            public double[][] getData() {
+                return lms.getInputData();
+            }
 
-			@Override
-			public double[][] getData() {
-				return lms.getTrainingData();
-			}
+        };
+        // Reference to the training data in the LMS
+        DataHolder trainingData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                lms.setTrainingData(data);
+            }
 
-		};
-		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-				(Trainable) getGroup(), inputData, trainingData));
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				lms.getInputNeurons(), inputData, "Input"));
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				lms.getOutputNeurons(), trainingData, "Training"));
+            @Override
+            public double[][] getData() {
+                return lms.getTrainingData();
+            }
+
+        };
+        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+                (Trainable) getGroup(), inputData, trainingData));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                lms.getInputNeurons(), inputData, "Input"));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                lms.getOutputNeurons(), trainingData, "Training"));
         setContextMenu(menu);
     }
 
     /**
      * Action to train LMS Iteratively
      */
-	Action trainIterativelyAction = new AbstractAction() {
+    Action trainIterativelyAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-			putValue(NAME, "Train iteratively...");
-			putValue(SHORT_DESCRIPTION, "Train iteratively...");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(NAME, "Train iteratively...");
+            putValue(SHORT_DESCRIPTION, "Train iteratively...");
+        }
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			LMSNetwork network = (LMSNetwork) getGroup();
-			LMSIterativePanel trainingPanel = new LMSIterativePanel(
-					getNetworkPanel(), new LMSIterative(network));
-            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel, "Trainer");
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            LMSNetwork network = (LMSNetwork) getGroup();
+            LMSIterativePanel trainingPanel = new LMSIterativePanel(
+                    getNetworkPanel(), new LMSIterative(network));
+            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
+                    "Trainer");
             trainingPanel.setFrame(frame);
-		}
-	};
-	
+        }
+    };
+
     /**
      * Action to train LMS Offline
      */
-	Action trainOfflineAction = new AbstractAction() {
+    Action trainOfflineAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-			putValue(NAME, "Train offline...");
-			putValue(SHORT_DESCRIPTION, "Train offline...");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(NAME, "Train offline...");
+            putValue(SHORT_DESCRIPTION, "Train offline...");
+        }
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			LMSNetwork network = (LMSNetwork) getGroup();
-        	LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(network));
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            LMSNetwork network = (LMSNetwork) getGroup();
+            LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(
+                    network));
             getNetworkPanel().displayPanel(trainingPanel, "Trainer");
-		}
-	};
-    
+        }
+    };
 
 }

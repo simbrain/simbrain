@@ -22,34 +22,34 @@ package org.simbrain.util;
  * A (hackish?) way to remove remove dependency on log4j in jar files. The ant
  * build file replaces "import org.apache.log4j.Logger" with
  * "import org.simbrain.util.Logger"
- * 
+ *
  * @author jyoshimi
  */
 public class Logger {
-    
+
     public Logger() {
     }
 
     public static Logger getLogger(Class clazz) {
         return new Logger();
     }
-    
+
     public static Logger getLogger(String string) {
         return new Logger();
     }
-    
+
     public void debug(Object object) {
-    //        if (object != null) {
-    //            System.out.println(object.toString());
-    //        }
+        // if (object != null) {
+        // System.out.println(object.toString());
+        // }
     }
 
     public void trace(Object object) {
-    //        if (object != null) {
-    //            System.out.println(object.toString());
-    //        }
+        // if (object != null) {
+        // System.out.println(object.toString());
+        // }
     }
-    
+
     public boolean isDebugEnabled() {
         return false;
     }

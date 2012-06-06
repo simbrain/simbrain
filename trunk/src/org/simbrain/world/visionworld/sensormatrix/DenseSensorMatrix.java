@@ -28,25 +28,25 @@ import cern.colt.matrix.impl.DenseObjectMatrix2D;
 /**
  * Dense sensor matrix.
  */
-public final class DenseSensorMatrix
-    extends AbstractSensorMatrix {
+public final class DenseSensorMatrix extends AbstractSensorMatrix {
 
     /** 2D object matrix of sensors. */
     private final ObjectMatrix2D sensors;
-
 
     /**
      * Create a new dense sensor matrix with the specified filter.
      *
      * @param rows number of rows, must be <code>&gt;= 1</code>
      * @param columns number of columns, must be <code>&gt;= 1</code>
-     * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
-     * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
+     * @param receptiveFieldWidth receptive field width, must be
+     *            <code>&gt;= 0</code>
+     * @param receptiveFieldHeight receptive field height, must be
+     *            <code>&gt;= 0</code>
      * @param defaultFilter default filter
      */
     public DenseSensorMatrix(final int rows, final int columns,
-                             final int receptiveFieldWidth, final int receptiveFieldHeight,
-                             final Filter defaultFilter) {
+            final int receptiveFieldWidth, final int receptiveFieldHeight,
+            final Filter defaultFilter) {
 
         super(receptiveFieldWidth, receptiveFieldHeight, defaultFilter);
         if (rows < 1) {
@@ -59,7 +59,6 @@ public final class DenseSensorMatrix
         createSensors();
     }
 
-
     /**
      * Create sensors.
      */
@@ -71,12 +70,14 @@ public final class DenseSensorMatrix
             for (int column = 0, columns = columns(); column < columns; column++) {
                 int x = column * receptiveFieldWidth;
                 int y = row * receptiveFieldHeight;
-                ReceptiveField receptiveField = new ReceptiveField(x, y, receptiveFieldWidth, receptiveFieldHeight);
+                ReceptiveField receptiveField = new ReceptiveField(x, y,
+                        receptiveFieldWidth, receptiveFieldHeight);
                 Sensor sensor;
                 if (defaultFilter == null) {
                     sensor = new Sensor(row, column, receptiveField);
                 } else {
-                    sensor = new Sensor(row, column, defaultFilter, receptiveField);
+                    sensor = new Sensor(row, column, defaultFilter,
+                            receptiveField);
                 }
                 sensors.set(row, column, sensor);
             }

@@ -36,7 +36,8 @@ import org.simbrain.world.visionworld.sensormatrix.DenseSensorMatrix;
 /**
  * Vision world frame.
  */
-public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldComponent> {
+public final class VisionWorldDesktopComponent extends
+        GuiComponent<VisionWorldComponent> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -46,9 +47,10 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
      *
      * @param component component, must not be null
      */
-    public VisionWorldDesktopComponent(GenericFrame frame, final VisionWorldComponent component) {
+    public VisionWorldDesktopComponent(GenericFrame frame,
+            final VisionWorldComponent component) {
         super(frame, component);
-        this.setPreferredSize(new Dimension(400,400));
+        this.setPreferredSize(new Dimension(400, 400));
 
         // Sets a reference within vision world for use by actions.
         component.getVisionWorld().setVisionWorldDesktopComponent(this);
@@ -67,10 +69,10 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         JMenu edit = new JMenu("Edit");
         for (Action action : component.getVisionWorld().getEditMenuActions()) {
             edit.add(action);
-            //toolBar.add(action);
+            // toolBar.add(action);
         }
 
-        //toolBar.addSeparator();
+        // toolBar.addSeparator();
 
         JMenu view = new JMenu("View");
         for (Action action : component.getVisionWorld().getViewMenuActions()) {
@@ -82,8 +84,9 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         menuBar.add(edit);
         menuBar.add(view);
 
-        menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
-                .getWorkspace(), this.getWorkspaceComponent()));
+        menuBar.add(new CouplingMenuComponent("Couple", this
+                .getWorkspaceComponent().getWorkspace(), this
+                .getWorkspaceComponent()));
 
         getParentFrame().setJMenuBar(menuBar);
 
@@ -99,13 +102,13 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
 
         // Open with a default pixel matrix
         PixelMatrix pixelMatrix = new BufferedImagePixelMatrix(100, 100);
-        getWorkspaceComponent().getVisionWorld().getModel().setPixelMatrix(
-                pixelMatrix);
+        getWorkspaceComponent().getVisionWorld().getModel()
+                .setPixelMatrix(pixelMatrix);
         Filter defaultFilter = new PixelAccumulator();
         SensorMatrix sensorMatrix = new DenseSensorMatrix(10, 10, 10, 10,
                 defaultFilter);
-        getWorkspaceComponent().getVisionWorld().getModel().setSensorMatrix(
-                sensorMatrix);
+        getWorkspaceComponent().getVisionWorld().getModel()
+                .setSensorMatrix(sensorMatrix);
         setVisible(true);
     }
 

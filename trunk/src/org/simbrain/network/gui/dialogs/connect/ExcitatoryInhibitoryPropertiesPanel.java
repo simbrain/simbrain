@@ -53,9 +53,10 @@ import org.simbrain.util.StandardDialog;
  * @author ztosi
  * @author jyoshimi
  *
- */public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
+ */
+public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
 
-     /** The connection object. */
+    /** The connection object. */
     private final ConnectNeurons connection;
 
     /** Max ratio of excitatory/inhibitory connections. */
@@ -347,7 +348,8 @@ import org.simbrain.util.StandardDialog;
                     @Override
                     protected void closeDialogOk() {
                         super.closeDialogOk();
-                        exRandPanel.commitRandom(connection.getExcitatoryRandomizer());
+                        exRandPanel.commitRandom(connection
+                                .getExcitatoryRandomizer());
                     }
                 };
                 exRSD.setContentPane(exRandPanel);
@@ -366,7 +368,8 @@ import org.simbrain.util.StandardDialog;
                     @Override
                     protected void closeDialogOk() {
                         super.closeDialogOk();
-                        inRandPanel.commitRandom(connection.getInhibitoryRandomizer());
+                        inRandPanel.commitRandom(connection
+                                .getInhibitoryRandomizer());
                     }
                 };
                 inRSD.setContentPane(inRandPanel);

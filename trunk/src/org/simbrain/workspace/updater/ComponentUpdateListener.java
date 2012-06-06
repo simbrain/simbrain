@@ -28,14 +28,15 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public interface ComponentUpdateListener {
 
-	/**
+    /**
      * Called when a component update begins.
      *
      * @param component The component being updated.
      * @param update The number of the update.
      * @param thread The thread doing the update.
      */
-    void startingComponentUpdate(WorkspaceComponent component, int update, int thread);
+    void startingComponentUpdate(WorkspaceComponent component, int update,
+            int thread);
 
     /**
      * Called when a component update ends.
@@ -44,6 +45,7 @@ public interface ComponentUpdateListener {
      * @param update The number of the update.
      * @param thread The thread doing the update.
      */
-    void finishedComponentUpdate(WorkspaceComponent component, int update, int thread);
+    void finishedComponentUpdate(WorkspaceComponent component, int update,
+            int thread);
 
 }

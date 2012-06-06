@@ -36,7 +36,8 @@ import org.apache.log4j.Logger;
 public class CouplingManager {
 
     /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
+    private static final Logger LOGGER = Logger
+            .getLogger(CouplingManager.class);
 
     /** Parent workspace. */
     private final Workspace workspace;
@@ -52,7 +53,7 @@ public class CouplingManager {
 
     /** The couplings indexed by target component. */
     private Map<WorkspaceComponent, List<Coupling<?>>> targetComponentCouplings = newMap();
-    
+
     /** Associates workspace components with attribute listeners. */
     private Map<WorkspaceComponent, AttributeListener> listenerMap = newMap();
 
@@ -82,7 +83,7 @@ public class CouplingManager {
         // When workspace components are added, add listeners to them,
         // so that when relevant objects are removed the corresponding couplings
         // can be cleaned up
-        workspace.addListener(new WorkspaceListener(){
+        workspace.addListener(new WorkspaceListener() {
 
             /**
              * {@ineritDoc}
@@ -101,7 +102,8 @@ public class CouplingManager {
                     /**
                      * {@ineritDoc}
                      */
-                    public void attributeTypeVisibilityChanged(AttributeType type) {
+                    public void attributeTypeVisibilityChanged(
+                            AttributeType type) {
                     }
 
                     /**
@@ -179,8 +181,8 @@ public class CouplingManager {
             final WorkspaceComponent sourceComponent,
             final WorkspaceComponent targetComponent) {
 
-        Collection<Coupling<?>> couplings = sourceTargetCouplings.get(
-                new SourceTarget(sourceComponent, targetComponent));
+        Collection<Coupling<?>> couplings = sourceTargetCouplings
+                .get(new SourceTarget(sourceComponent, targetComponent));
 
         if (couplings == null) {
             return Collections.emptySet();
@@ -250,8 +252,7 @@ public class CouplingManager {
      * @param attribute2 second attribute to compare
      * @return whether they match
      */
-    private boolean attributesMatch(Attribute attribute1,
-            Attribute attribute2) {
+    private boolean attributesMatch(Attribute attribute1, Attribute attribute2) {
         boolean baseObjectMatches = (attribute1.getBaseObject() == attribute2
                 .getBaseObject());
         boolean methodNameMatches = (attribute1.getMethodName()
@@ -265,7 +266,7 @@ public class CouplingManager {
      * Remove coupling (if any) that is essentially a copy of the supplied
      * coupling.
      *
-     * @param toRemove  the coupling type to remove
+     * @param toRemove the coupling type to remove
      */
     public void removeMatchingCoupling(Coupling<?> toRemove) {
         for (Coupling<?> coupling : getCouplings()) {
@@ -283,12 +284,11 @@ public class CouplingManager {
      * Adds a coupling to this instance.
      *
      * @param coupling The coupling to add.
-     * @throws UmatchedAttributesException
-     *             thrown if the attributes in this coupling have mismatched
-     *             data types
+     * @throws UmatchedAttributesException thrown if the attributes in this
+     *             coupling have mismatched data types
      */
     public void addCoupling(final Coupling<?> coupling)
-        throws UmatchedAttributesException {
+            throws UmatchedAttributesException {
 
         // If there is already a coupling with the same consumer, remove it,
         // because it does not make sense for one attribute to have multiple
@@ -317,12 +317,18 @@ public class CouplingManager {
         WorkspaceComponent source = coupling.getProducer().getParentComponent();
         WorkspaceComponent target = coupling.getConsumer().getParentComponent();
         SourceTarget sourceTarget = new SourceTarget(source, target);
-        sourceTargetCouplings.put(sourceTarget, addCouplingToList(
-            sourceTargetCouplings.get(sourceTarget), coupling));
-        sourceComponentCouplings.put(source, addCouplingToList(
-            sourceComponentCouplings.get(source), coupling));
-        targetComponentCouplings.put(target, addCouplingToList(
-            targetComponentCouplings.get(source), coupling));
+        sourceTargetCouplings.put(
+                sourceTarget,
+                addCouplingToList(sourceTargetCouplings.get(sourceTarget),
+                        coupling));
+        sourceComponentCouplings.put(
+                source,
+                addCouplingToList(sourceComponentCouplings.get(source),
+                        coupling));
+        targetComponentCouplings.put(
+                target,
+                addCouplingToList(targetComponentCouplings.get(source),
+                        coupling));
 
         // Fire coupling added event
         fireCouplingAdded(coupling);
@@ -349,15 +355,15 @@ public class CouplingManager {
     }
 
     /**
-     * Replaces any couplings where the old attribute is the source or
-     * target with a new coupling with the new attribute in the source
-     * and/or target.
+     * Replaces any couplings where the old attribute is the source or target
+     * with a new coupling with the new attribute in the source and/or target.
      *
      * @param oldAttr the attribute to be replaced.
      * @param newAttr the attribute to replace it with.
      */
     @SuppressWarnings("unchecked")
-    public void replaceCouplings(final Attribute oldAttr, final Attribute newAttr) {
+    public void replaceCouplings(final Attribute oldAttr,
+            final Attribute newAttr) {
 
         for (Coupling<?> coupling : new ArrayList<Coupling<?>>(couplingList)) {
             boolean replace = false;
@@ -386,8 +392,8 @@ public class CouplingManager {
     }
 
     /**
-     * Adds a coupling to the provided list.  If the list is null, a new list
-     * is created.  The list that the coupling is added to is returned.
+     * Adds a coupling to the provided list. If the list is null, a new list is
+     * created. The list that the coupling is added to is returned.
      *
      * @param list The list to add to.
      * @param coupling The coupling to add.
@@ -447,17 +453,20 @@ public class CouplingManager {
 
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
-        //consumingAttributes.remove(coupling.getConsumingAttribute());
+        // consumingAttributes.remove(coupling.getConsumingAttribute());
 
         couplingList.remove(coupling);
 
-        removeCouplingFromList(sourceTargetCouplings.get(sourceTarget), coupling);
+        removeCouplingFromList(sourceTargetCouplings.get(sourceTarget),
+                coupling);
         removeCouplingFromList(sourceComponentCouplings.get(source), coupling);
         removeCouplingFromList(targetComponentCouplings.get(target), coupling);
 
         source.couplingRemoved(coupling);
 
-        if (target != source) { target.couplingRemoved(coupling); }
+        if (target != source) {
+            target.couplingRemoved(coupling);
+        }
 
         fireCouplingRemoved(coupling);
     }
@@ -467,7 +476,7 @@ public class CouplingManager {
      * done.
      *
      * @param list The list to remove from.
-     * @param coupling  The coupling to remove.
+     * @param coupling The coupling to remove.
      */
     private void removeCouplingFromList(final List<Coupling<?>> list,
             final Coupling<?> coupling) {
@@ -496,7 +505,8 @@ public class CouplingManager {
          * @param source The source.
          * @param target The target.
          */
-        SourceTarget(final WorkspaceComponent source, final WorkspaceComponent target) {
+        SourceTarget(final WorkspaceComponent source,
+                final WorkspaceComponent target) {
             if (source == null) {
                 throw new IllegalArgumentException("source cannot be null");
             }
@@ -550,7 +560,6 @@ public class CouplingManager {
         priority = value;
     }
 
-
     /**
      * Coupling added.
      *
@@ -577,6 +586,7 @@ public class CouplingManager {
 
     /**
      * Adds a new listener to be updated when changes are made.
+     *
      * @param listener to be updated of changes
      */
     public void addCouplingListener(final CouplingListener listener) {
@@ -585,6 +595,7 @@ public class CouplingManager {
 
     /**
      * Removes the listener from the list.
+     *
      * @param listener to be removed
      */
     public void removeCouplingListener(final CouplingListener listener) {

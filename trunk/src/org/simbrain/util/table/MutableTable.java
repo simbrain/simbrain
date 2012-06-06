@@ -20,15 +20,15 @@ package org.simbrain.util.table;
 
 /**
  * Interface for tables (subclasses of SimbrainJTable) that have concept of
- * "current row" implemented which allows the table to iterated from row to
- * row when updated.
+ * "current row" implemented which allows the table to iterated from row to row
+ * when updated.
  *
  * @author jyoshimi
  *
  */
 public interface MutableTable {
 
-    //TODO: Assumes numeric data.  Generalize to all forms of data.
+    // TODO: Assumes numeric data. Generalize to all forms of data.
 
     /**
      * Add a new row.

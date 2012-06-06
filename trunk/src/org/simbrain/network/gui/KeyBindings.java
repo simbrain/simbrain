@@ -66,8 +66,9 @@ public class KeyBindings {
         });
 
         // Nudge objects
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP,
-                ActionEvent.SHIFT_MASK), "up");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.SHIFT_MASK),
+                "up");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
                 ActionEvent.SHIFT_MASK), "right");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
@@ -96,8 +97,9 @@ public class KeyBindings {
         });
 
         // Print debug info
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
-                ActionEvent.SHIFT_MASK), "debug");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.SHIFT_MASK),
+                "debug");
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(panel.getNetwork().toString());
@@ -120,9 +122,7 @@ public class KeyBindings {
                 panel.getActionManager().getTextEditModeAction());
 
         // Zoom mode
-        inputMap.put(
-                KeyStroke.getKeyStroke("Z"),
-                "altPress");
+        inputMap.put(KeyStroke.getKeyStroke("Z"), "altPress");
         panel.getActionMap().put("altPress", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (panel.getEditMode().isZoomIn()) {
@@ -139,8 +139,9 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");
         panel.getActionMap().put("setSource", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.setSourceNeurons(); 
-               //TODO: This does not work when I use the action manager's action.  Not sure why not.
+                panel.setSourceNeurons();
+                // TODO: This does not work when I use the action manager's
+                // action. Not sure why not.
             }
         });
 

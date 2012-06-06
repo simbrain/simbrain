@@ -27,12 +27,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Space horizontal.
  */
-public final class SpaceHorizontalAction
-    extends AbstractAction {
+public final class SpaceHorizontalAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new space horizontal action with the specified network panel.
@@ -49,7 +47,6 @@ public final class SpaceHorizontalAction
 
         this.networkPanel = networkPanel;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

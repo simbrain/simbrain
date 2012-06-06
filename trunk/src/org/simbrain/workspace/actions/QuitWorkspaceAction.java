@@ -36,16 +36,15 @@ public final class QuitWorkspaceAction extends DesktopAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a clear workspace action with the specified
-     * workspace.
+     * Create a clear workspace action with the specified workspace.
      */
     public QuitWorkspaceAction(SimbrainDesktop desktop) {
         super("Quit", desktop);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+                toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

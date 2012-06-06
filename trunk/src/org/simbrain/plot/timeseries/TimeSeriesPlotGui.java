@@ -35,7 +35,6 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
 
-
     /** Plot action manager. */
     private PlotActionManager actionManager;
 
@@ -48,7 +47,8 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
      * @param frame parent frame
      * @param component the underlying component
      */
-    public TimeSeriesPlotGui(final GenericFrame frame, final TimeSeriesPlotComponent component) {
+    public TimeSeriesPlotGui(final GenericFrame frame,
+            final TimeSeriesPlotComponent component) {
         super(frame, component);
 
         actionManager = new PlotActionManager(this);
@@ -81,7 +81,8 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(new JMenuItem(TimeSeriesPlotActions.getPropertiesDialogAction(timeSeriesPanel)));
+        editMenu.add(new JMenuItem(TimeSeriesPlotActions
+                .getPropertiesDialogAction(timeSeriesPanel)));
 
         bar.add(fileMenu);
         bar.add(editMenu);

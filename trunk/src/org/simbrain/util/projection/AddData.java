@@ -22,7 +22,7 @@ package org.simbrain.util.projection;
 public class AddData {
     /**
      * Coordinate project new points.
-     * 
+     *
      * @param i first low-d coordinate for projection
      * @param j second low-d coordinate for projection
      * @param hiPoint new point upstairs
@@ -37,7 +37,7 @@ public class AddData {
 
     /**
      * Adds a new datapoint which preserves distances to nearest neighbors.
-     * 
+     *
      * @param upstairs reference to upstairs dataset
      * @param downstairs reference to downstairs dataset
      * @param hiPoint new hi-d point to be added
@@ -191,7 +191,7 @@ public class AddData {
 
     /**
      * Adds new datapoint to subspace spanned by nearest-neighbors.
-     * 
+     *
      * @param upstairs reference to upstairs dataset
      * @param downstairs reference to downstairs dataset
      * @param hiPoint new hi-d point to be added

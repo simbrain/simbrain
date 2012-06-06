@@ -62,7 +62,8 @@ public final class VisionWorldComponent extends WorkspaceComponent {
      */
     private void initAttributes() {
         if (getProducerTypes().size() == 0) {
-            addProducerType(new AttributeType(this, "Sensor", "getValue", double.class, true));
+            addProducerType(new AttributeType(this, "Sensor", "getValue",
+                    double.class, true));
         }
         visionWorld.getModel().addModelListener(new VisionWorldModelListener() {
 
@@ -70,7 +71,7 @@ public final class VisionWorldComponent extends WorkspaceComponent {
             }
 
             public void sensorMatrixChanged(VisionWorldModelEvent event) {
-               VisionWorldComponent.this.firePotentialAttributesChanged();
+                VisionWorldComponent.this.firePotentialAttributesChanged();
             }
 
         });
@@ -81,14 +82,18 @@ public final class VisionWorldComponent extends WorkspaceComponent {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Sensor")) {
-              SensorMatrix sensorMatrix = getVisionWorld().getModel().getSensorMatrix();
-              for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                  for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-                      Sensor sensor = sensorMatrix.getSensor(row, column);
-                      String description = type.getDescription(sensor.getKey());
-                      returnList.add(getAttributeManager().createPotentialProducer(sensor, type, description));
-                  }
-              }
+                SensorMatrix sensorMatrix = getVisionWorld().getModel()
+                        .getSensorMatrix();
+                for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                    for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+                        Sensor sensor = sensorMatrix.getSensor(row, column);
+                        String description = type.getDescription(sensor
+                                .getKey());
+                        returnList.add(getAttributeManager()
+                                .createPotentialProducer(sensor, type,
+                                        description));
+                    }
+                }
             }
         }
         return returnList;
@@ -96,16 +101,18 @@ public final class VisionWorldComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        String[] rowCol = objectKey.split(","); //todo check that string is valid
+        String[] rowCol = objectKey.split(","); // todo check that string is
+                                                // valid
         int row = Integer.parseInt(rowCol[0]);
         int col = Integer.parseInt(rowCol[1]);
-        return getVisionWorld().getModel().getSensorMatrix().getSensor(row, col);
+        return getVisionWorld().getModel().getSensorMatrix()
+                .getSensor(row, col);
     }
 
     @Override
     public String getKeyFromObject(Object object) {
         if (object instanceof Sensor) {
-            return ((Sensor)object).getKey();
+            return ((Sensor) object).getKey();
         }
         return null;
     }
@@ -113,14 +120,17 @@ public final class VisionWorldComponent extends WorkspaceComponent {
     /**
      * {@inheritDoc}
      */
-    public static VisionWorldComponent open(InputStream input, String name, String format) {
-        MutableVisionWorldModel model = (MutableVisionWorldModel) AbstractVisionWorldModel.getXStream().fromXML(input);
+    public static VisionWorldComponent open(InputStream input, String name,
+            String format) {
+        MutableVisionWorldModel model = (MutableVisionWorldModel) AbstractVisionWorldModel
+                .getXStream().fromXML(input);
         return new VisionWorldComponent(name, model);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-         MutableVisionWorldModel.getXStream().toXML(visionWorld.getModel(), output);
+        MutableVisionWorldModel.getXStream().toXML(visionWorld.getModel(),
+                output);
     }
 
     @Override
@@ -131,7 +141,8 @@ public final class VisionWorldComponent extends WorkspaceComponent {
     /** {@inheritDoc} */
     @Override
     public void update() {
-        // Possibly change this later so only sensors with couplings are updated.
+        // Possibly change this later so only sensors with couplings are
+        // updated.
         VisionWorldModel model = visionWorld.getModel();
         PixelMatrix pixelMatrix = model.getPixelMatrix();
         SensorMatrix sensorMatrix = model.getSensorMatrix();

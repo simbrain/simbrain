@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.actions;
 
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -27,12 +25,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Zoom in edit mode action.
  */
-public final class ZoomEditModeAction
-    extends EditModeAction {
+public final class ZoomEditModeAction extends EditModeAction {
 
     /**
-     * Create a new zoom in edit mode action with the specified network
-     * panel.
+     * Create a new zoom in edit mode action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

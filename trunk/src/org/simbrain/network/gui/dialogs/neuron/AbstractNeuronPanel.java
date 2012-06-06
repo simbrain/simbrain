@@ -25,8 +25,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -58,6 +58,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 
     /**
      * Adds a new item.
+     *
      * @param text Text to add
      * @param comp SimbrainComponent to add
      */

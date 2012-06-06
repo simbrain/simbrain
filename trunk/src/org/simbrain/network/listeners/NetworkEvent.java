@@ -24,31 +24,27 @@ import org.simbrain.network.core.Network;
 
 /**
  * Network event which holds an old and new version of some type of object.
- * 
+ *
  *
  * @param <T> The type of the object involved in the event.
  */
-public final class NetworkEvent<T>
-    extends EventObject {
+public final class NetworkEvent<T> extends EventObject {
 
     /** New version of object */
     private T theObject;
 
     /** Previous version of object. */
     private T oldObject;
-    
+
     /** An auxiliarity object. */
     private Object auxiliaryObject;
 
-	/**
+    /**
      * Create a network event with a new and old object.
      *
-     * @param net
-     *            reference to parent network.
-     * @param oldThing
-     *            old version of object.
-     * @param theThing
-     *            reference to relevant object.
+     * @param net reference to parent network.
+     * @param oldThing old version of object.
+     * @param theThing reference to relevant object.
      */
     public NetworkEvent(Network net, final T oldThing, final T theThing) {
         super(net);
@@ -66,7 +62,6 @@ public final class NetworkEvent<T>
         super(net);
         this.theObject = theThing;
     }
-
 
     /**
      * @return the newObject
@@ -97,8 +92,8 @@ public final class NetworkEvent<T>
     }
 
     /**
-     * Event's default getSource() just returns the same object
-     * as this class's getObject() method.
+     * Event's default getSource() just returns the same object as this class's
+     * getObject() method.
      */
     @Override
     public Object getSource() {

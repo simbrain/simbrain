@@ -21,8 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
-
 /**
  * <b>Hebbian</b> implements a standard Hebbian learning rule.
  */
@@ -33,7 +31,6 @@ public class HebbianRule extends SynapseUpdateRule {
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
-
 
     @Override
     public void init(Synapse synapse) {

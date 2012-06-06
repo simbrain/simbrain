@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+
 /**
  * Sensor.
  */
@@ -54,18 +55,17 @@ public final class Sensor {
     private int col;
 
     /** No filter. */
-    private static final Filter NO_FILTER = new Filter()
-        {
-            /** {@inheritDoc} */
-            public double filter(final BufferedImage image) {
-                return 0.0d;
-            }
+    private static final Filter NO_FILTER = new Filter() {
+        /** {@inheritDoc} */
+        public double filter(final BufferedImage image) {
+            return 0.0d;
+        }
 
-            /** {@inheritDoc} */
-            public String getDescription() {
-                return "None";
-            }
-        };
+        /** {@inheritDoc} */
+        public String getDescription() {
+            return "None";
+        }
+    };
 
     /**
      * Create a new sensor with the specified receptive field and no filter.
@@ -93,7 +93,8 @@ public final class Sensor {
             throw new IllegalArgumentException("filter must not be null");
         }
         if (receptiveField == null) {
-            throw new IllegalArgumentException("receptiveField must not be null");
+            throw new IllegalArgumentException(
+                    "receptiveField must not be null");
         }
         this.row = row;
         this.col = col;
@@ -102,7 +103,6 @@ public final class Sensor {
         updateProducerDescription();
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
-
 
     /**
      * Sample the specified pixel matrix, reducing a view of the pixel matrix
@@ -113,7 +113,7 @@ public final class Sensor {
      * @see #getReceptiveField
      * @param pixelMatrix pixel matrix, must not be null
      * @return a view of the specified pixel matrix through the receptive field
-     *    of this sensor reduced to a single numerical value
+     *         of this sensor reduced to a single numerical value
      */
     public double sample(final PixelMatrix pixelMatrix) {
         if (pixelMatrix == null) {
@@ -135,8 +135,7 @@ public final class Sensor {
     }
 
     /**
-     * Return the filter for this sensor.
-     * The filter will not be null.
+     * Return the filter for this sensor. The filter will not be null.
      *
      * @return the filter for this sensor
      */
@@ -147,7 +146,9 @@ public final class Sensor {
     /**
      * Set the filter for this sensor to <code>filter</code>.
      *
-     * <p>This is a bound property.</p>
+     * <p>
+     * This is a bound property.
+     * </p>
      *
      * @param filter filter for this sensor, must not be null
      */
@@ -158,12 +159,13 @@ public final class Sensor {
         Filter oldFilter = this.filter;
         this.filter = filter;
         updateProducerDescription();
-        propertyChangeSupport.firePropertyChange("filter", oldFilter, this.filter);
+        propertyChangeSupport.firePropertyChange("filter", oldFilter,
+                this.filter);
     }
 
     /**
-     * Return the receptive field for this sensor.
-     * The receptive field will not be null.
+     * Return the receptive field for this sensor. The receptive field will not
+     * be null.
      *
      * @return the receptive field for this sensor
      */
@@ -185,11 +187,15 @@ public final class Sensor {
             VolatileImage volatileImage = (VolatileImage) image;
             return volatileImage.getSnapshot();
         }
-        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
-        GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
-        BufferedImage bufferedImage = graphicsConfiguration.createCompatibleImage(image.getWidth(null),
-                                                                                  image.getHeight(null));
+        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
+                .getLocalGraphicsEnvironment();
+        GraphicsDevice graphicsDevice = graphicsEnvironment
+                .getDefaultScreenDevice();
+        GraphicsConfiguration graphicsConfiguration = graphicsDevice
+                .getDefaultConfiguration();
+        BufferedImage bufferedImage = graphicsConfiguration
+                .createCompatibleImage(image.getWidth(null),
+                        image.getHeight(null));
         Graphics2D g = bufferedImage.createGraphics();
         g.drawImage(image, 0, 0, null);
         g.dispose();
@@ -212,7 +218,7 @@ public final class Sensor {
      * @param listener listener to add
      */
     public void addPropertyChangeListener(final String propertyName,
-                                          final PropertyChangeListener listener) {
+            final PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -221,7 +227,8 @@ public final class Sensor {
      *
      * @param listener listener to remove
      */
-    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+    public void removePropertyChangeListener(
+            final PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
@@ -232,8 +239,9 @@ public final class Sensor {
      * @param listener listener to remove
      */
     public void removePropertyChangeListener(final String propertyName,
-                                             final PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+            final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName,
+                listener);
     }
 
     /**

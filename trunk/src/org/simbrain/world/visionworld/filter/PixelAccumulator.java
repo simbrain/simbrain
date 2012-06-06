@@ -25,8 +25,7 @@ import org.simbrain.world.visionworld.Filter;
 /**
  * Pixel accumulator.
  */
-public final class PixelAccumulator
-    implements Filter {
+public final class PixelAccumulator implements Filter {
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Pixel accumulator";
@@ -43,13 +42,10 @@ public final class PixelAccumulator
                 }
                 // ...because this isn't giving the right value
                 /*
-                int r = (rgb >> 16) & 255;
-                int g = (rgb >> 8) & 255;
-                int b = rgb & 255;
-                if ((r == 0) && (g == 0) && (b == 0)) {
-                    pixels++;
-                }
-                */
+                 * int r = (rgb >> 16) & 255; int g = (rgb >> 8) & 255; int b =
+                 * rgb & 255; if ((r == 0) && (g == 0) && (b == 0)) { pixels++;
+                 * }
+                 */
             }
         }
         return pixels;
@@ -58,5 +54,5 @@ public final class PixelAccumulator
     public String getDescription() {
         return DISPLAY_NAME;
     }
-    
+
 }

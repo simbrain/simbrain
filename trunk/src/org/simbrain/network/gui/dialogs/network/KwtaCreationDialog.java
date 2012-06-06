@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -30,6 +29,7 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -39,7 +39,7 @@ import org.simbrain.util.StandardDialog;
  */
 public class KwtaCreationDialog extends StandardDialog {
 
-     /** Tabbed pane. */
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Logic tab panel. */
@@ -54,7 +54,7 @@ public class KwtaCreationDialog extends StandardDialog {
     /** Layout panel. */
     private LayoutPanel layoutPanel;
 
-    //TODO: Separate this from number of neurons!  Add a second field.
+    // TODO: Separate this from number of neurons! Add a second field.
     /** K field. */
     private JTextField tfK = new JTextField("5");
 
@@ -68,8 +68,9 @@ public class KwtaCreationDialog extends StandardDialog {
      */
     public KwtaCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(),
-                           new HexagonalGridLayoutPanel(), new GridLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
+                new LineLayoutPanel(), new HexagonalGridLayoutPanel(),
+                new GridLayoutPanel() });
         init();
     }
 
@@ -79,7 +80,8 @@ public class KwtaCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()), layout);
+        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK
+                .getText()), layout);
         networkPanel.getNetwork().addGroup(kWTA);
         networkPanel.repaint();
         super.closeDialogOk();
@@ -107,13 +109,11 @@ public class KwtaCreationDialog extends StandardDialog {
         setContentPane(tabbedPane);
     }
 
-
-
     /**
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        //KWTA kw = new KWTA();
+        // KWTA kw = new KWTA();
         tfK.setText("5");
 
     }

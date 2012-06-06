@@ -24,7 +24,6 @@ package org.simbrain.workspace;
  */
 public interface CouplingListener {
 
-
     /**
      * Called when a coupling is added.
      *

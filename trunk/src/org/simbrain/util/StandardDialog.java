@@ -20,7 +20,6 @@ package org.simbrain.util;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -48,7 +47,7 @@ import org.simbrain.util.genericframe.GenericJDialog;
  * By default, the dialog is modal, and has a JPanel with a BorderLayout for its
  * content pane.
  * </p>
- * 
+ *
  * @author David Fraser
  * @author Michael Harris
  */
@@ -89,14 +88,14 @@ public class StandardDialog extends GenericJDialog {
      * This method is the default constructor.
      */
     public StandardDialog() {
-    	super();
+        super();
         init();
     }
 
     /**
      * This method creates a StandardDialog with the given parent frame and
      * title.
-     * 
+     *
      * @param parent The parent frame for the dialog.
      * @param title The title to display in the dialog.
      */
@@ -135,8 +134,8 @@ public class StandardDialog extends GenericJDialog {
                     .showMessageDialog(
                             null,
                             "WARNING: You are modifying system parameters while a simulation is running. \n "
-                                    + "It is reccomended that you first stop the simulation using the stop button.\n" +
-                                        " Some functions may not behave as they are supposed to.",
+                                    + "It is reccomended that you first stop the simulation using the stop button.\n"
+                                    + " Some functions may not behave as they are supposed to.",
                             "Warning!", JOptionPane.WARNING_MESSAGE);
         }
 
@@ -228,7 +227,7 @@ public class StandardDialog extends GenericJDialog {
     /**
      * This method gets the content pane for adding components. Components
      * should not be added directly to the dialog.
-     * 
+     *
      * @return the content pane for the dialog.
      */
     public Container getContentPane() {
@@ -238,7 +237,7 @@ public class StandardDialog extends GenericJDialog {
     /**
      * This method sets the content pane for adding components. Components
      * should not be added directly to the dialog.
-     * 
+     *
      * @param contentPane The content pane for the dialog.
      */
     public void setContentPane(final Container contentPane) {
@@ -263,7 +262,7 @@ public class StandardDialog extends GenericJDialog {
      * This method is used to validate the current dialog box. This method
      * provides a default response of <code>true</code>. This method should be
      * implemented by each dialog that extends this class.
-     * 
+     *
      * @return a boolean indicating if the data is valid. <code>true</code>
      *         indicates that all of the fields were validated correctly and
      *         <code>false</code> indicates the validation failed
@@ -274,7 +273,7 @@ public class StandardDialog extends GenericJDialog {
 
     /**
      * Adds a new button to the panel.
-     * 
+     *
      * @param theButton button to be added
      */
     public void addButton(final JButton theButton) {

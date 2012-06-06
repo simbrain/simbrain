@@ -17,8 +17,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -35,7 +35,7 @@ public class LMSCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param np Network panel
      */
     public LMSCreationDialog(final NetworkPanel np) {

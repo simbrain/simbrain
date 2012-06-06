@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 
-
 /**
  * <b>SubtractiveNormalizationSynapsePanel</b>.
  */
@@ -50,8 +49,9 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, SubtractiveNormalizationRule.class, "getMomentum")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(ruleList,
+                SubtractiveNormalizationRule.class, "getMomentum")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -60,8 +60,10 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-//        SubtractiveNormalizationSynapse synapseRef = new SubtractiveNormalizationSynapse();
-        tfLearningRate.setText(Double.toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
+        // SubtractiveNormalizationSynapse synapseRef = new
+        // SubtractiveNormalizationSynapse();
+        tfLearningRate.setText(Double
+                .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
@@ -69,10 +71,12 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
      */
     public void commitChanges() {
         for (int i = 0; i < ruleList.size(); i++) {
-            SubtractiveNormalizationRule synapseRef = (SubtractiveNormalizationRule) ruleList.get(i);
+            SubtractiveNormalizationRule synapseRef = (SubtractiveNormalizationRule) ruleList
+                    .get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
         }
     }

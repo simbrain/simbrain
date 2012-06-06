@@ -10,10 +10,10 @@ public class ThreeDeeModel {
     final Environment environment = new Environment();
     /** The set of agents in the environment. */
     final Set<Agent> agents = new HashSet<Agent>();
-    
+
     /**
-     * The bindings that allow agents to be be wrapped as producers
-     * and consumers.
+     * The bindings that allow agents to be be wrapped as producers and
+     * consumers.
      */
-    //final List<Bindings> bindings = new ArrayList<Bindings>();
+    // final List<Bindings> bindings = new ArrayList<Bindings>();
 }

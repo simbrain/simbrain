@@ -2,8 +2,8 @@ package org.simbrain.network.subnetworks;
 
 import java.io.File;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
@@ -13,8 +13,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  * <b>SOM</b> implements a Self-Organizing Map network.
  *
  * @author William B. St. Clair
- * 
- * TODO: Move all "training" functions over to trainer
+ *
+ *         TODO: Move all "training" functions over to trainer
  */
 public class SOM extends Subnetwork {
 
@@ -115,28 +115,29 @@ public class SOM extends Subnetwork {
     public SOM(final Network root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearRule()));
+            getNeuronGroup().addNeuron(
+                    new Neuron(getParentNetwork(), new LinearRule()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
         getSynapseGroup().setDeleteWhenEmpty(false);
-		root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-				getNeuronGroup(), getSynapseGroup());
+        root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
+                getNeuronGroup(), getSynapseGroup());
         setLabel("SOM");
     }
 
-//    /**
-//     * Copy constructor.
-//     *
-//     * @param newRoot new root net
-//     * @param oldNet old network
-//     */
-//    public SOM(Network newRoot, SOM oldNet) {
-//        super(newRoot, oldNet);
-//        this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
-//        this.setInitAlpha(oldNet.getInitAlpha());
-//        this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
-//        this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
-//    }
+    // /**
+    // * Copy constructor.
+    // *
+    // * @param newRoot new root net
+    // * @param oldNet old network
+    // */
+    // public SOM(Network newRoot, SOM oldNet) {
+    // super(newRoot, oldNet);
+    // this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
+    // this.setInitAlpha(oldNet.getInitAlpha());
+    // this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
+    // this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
+    // }
 
     /**
      * Discovers the current index of the SOM neuron which is closest to the
@@ -146,7 +147,7 @@ public class SOM extends Subnetwork {
      */
     private int calculateWinnerIndex() {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+            Neuron n = getNeuronGroup().getNeuronList().get(i);
             distance = findDistance(n);
             if (distance < winDistance) {
                 winDistance = distance;
@@ -189,7 +190,7 @@ public class SOM extends Subnetwork {
     /**
      * Iterates the network based on training inputs. Does not respect superior
      * networks.
-     * 
+     *
      * TODO: Integrate this code with train and update.
      */
     public void iterate() {
@@ -203,7 +204,7 @@ public class SOM extends Subnetwork {
             // Determine Winner: The SOM Neuron with the lowest distance between
             // it's weight vector and the input neurons's weight vector.
             for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+                Neuron n = getNeuronGroup().getNeuronList().get(i);
                 distance = 0;
                 counter = 0;
                 for (Synapse incoming : n.getFanIn()) {
@@ -216,12 +217,14 @@ public class SOM extends Subnetwork {
                     winner = i;
                 }
             }
-            Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
+            Neuron winningNeuron = getNeuronGroup().getNeuronList()
+                    .get(winner);
 
             // Update Weights of the neurons within the radius of the winning
             // neuron.
             for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) getNeuronGroup().getNeuronList().get(i));
+                Neuron neuron = getNeuronGroup().getNeuronList().get(
+                        i);
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
 
                 // The center of the neuron is within the update region.
@@ -266,13 +269,14 @@ public class SOM extends Subnetwork {
     public void recall() {
         winDistance = 0;
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+            Neuron n = getNeuronGroup().getNeuronList().get(i);
             if (n.getActivation() > winDistance) {
                 winDistance = n.getActivation();
                 winner = i;
             }
         }
-        Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
+        Neuron winningNeuron = getNeuronGroup().getNeuronList().get(
+                winner);
         for (Synapse incoming : winningNeuron.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
@@ -292,7 +296,7 @@ public class SOM extends Subnetwork {
     /**
      * Trains the network in batches based on trainingInputs. Does not respect
      * superior networks.
-     * 
+     *
      * TODO: Integrate this code with train and update
      */
     public void train() {
@@ -309,7 +313,7 @@ public class SOM extends Subnetwork {
                 // between
                 // it's weight vector and the input neurons's weight vector.
                 for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+                    Neuron n = getNeuronGroup().getNeuronList().get(i);
                     distance = 0;
                     counter = 0;
                     for (Synapse incoming : n.getFanIn()) {
@@ -322,11 +326,12 @@ public class SOM extends Subnetwork {
                         winner = i;
                     }
                 }
-                Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
+                Neuron winningNeuron = getNeuronGroup()
+                        .getNeuronList().get(winner);
 
                 // Update Weights of the neurons within the radius of the
                 // winning neuron.
-                for(Neuron neuron: getNeuronGroup().getNeuronList()) {
+                for (Neuron neuron : getNeuronGroup().getNeuronList()) {
                     physicalDistance = findPhysicalDistance(neuron,
                             winningNeuron);
 
@@ -380,7 +385,8 @@ public class SOM extends Subnetwork {
         // its weight vector and the input neurons's weight vector.
 
         winner = calculateWinnerIndex();
-        Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
+        Neuron winningNeuron = getNeuronGroup().getNeuronList().get(
+                winner);
 
         // Neuron update
         if (!getParentNetwork().getClampNeurons()) {
@@ -388,7 +394,7 @@ public class SOM extends Subnetwork {
                 getNeuronGroup().update();
             } else {
                 for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
+                    Neuron n = getNeuronGroup().getNeuronList().get(i);
                     if (n == winningNeuron) {
                         n.setActivation(1);
                     } else {
@@ -402,7 +408,8 @@ public class SOM extends Subnetwork {
         // neuron.
         if (!getParentNetwork().getClampWeights()) {
             for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) getNeuronGroup().getNeuronList().get(i));
+                Neuron neuron = getNeuronGroup().getNeuronList().get(
+                        i);
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {

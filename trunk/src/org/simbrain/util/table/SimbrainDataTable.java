@@ -20,7 +20,6 @@ package org.simbrain.util.table;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
@@ -34,7 +33,6 @@ public abstract class SimbrainDataTable<T> {
 
     /** Listeners. */
     private List<SimbrainTableListener> listeners;
-
 
     // Initialize listener list
     {
@@ -88,13 +86,13 @@ public abstract class SimbrainDataTable<T> {
     public abstract int getColumnCount();
 
     /**
-     * Returns the number of row in the dataset. Note the same as columns in
-     * the simbrainjtable, which has an extra row and column for headers.
+     * Returns the number of row in the dataset. Note the same as columns in the
+     * simbrainjtable, which has an extra row and column for headers.
      *
      * @return the columns in the dataset.
      */
     public abstract int getRowCount();
-    
+
     /**
      * Returns a string array representation of the table, useful in csv
      * parsing.
@@ -105,7 +103,7 @@ public abstract class SimbrainDataTable<T> {
         String stringArray[][] = new String[getRowCount()][getColumnCount()];
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                stringArray[i][j] = "" + getValue(i,j);
+                stringArray[i][j] = "" + getValue(i, j);
             }
         }
         return stringArray;
@@ -185,7 +183,6 @@ public abstract class SimbrainDataTable<T> {
             listener.tableDataChanged();
         }
     }
-
 
     /**
      * Fire cell data changed event.

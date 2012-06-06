@@ -27,8 +27,7 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Set source neurons.
  */
-public final class SetSourceNeurons
-    extends AbstractAction {
+public final class SetSourceNeurons extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;

@@ -37,9 +37,7 @@ import org.simbrain.world.visionworld.filter.RandomFilter;
 /**
  * Random filter editor.
  */
-public final class RandomFilterEditor
-    extends JPanel
-    implements FilterEditor {
+public final class RandomFilterEditor extends JPanel implements FilterEditor {
 
     /** Minimum value. */
     private JTextField minimumValue;
@@ -68,7 +66,6 @@ public final class RandomFilterEditor
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new random filter editor.
      */
@@ -77,7 +74,6 @@ public final class RandomFilterEditor
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.
@@ -92,7 +88,8 @@ public final class RandomFilterEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME),
+                new EmptyBorder(6, 6, 6, 6)));
         setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
@@ -147,11 +144,9 @@ public final class RandomFilterEditor
             double min = Double.valueOf(minimumValue.getText());
             double max = Double.valueOf(maximumValue.getText());
             return new RandomFilter(min, max);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new FilterEditorException(e);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new FilterEditorException(e);
         }
     }

@@ -35,11 +35,11 @@ import org.simbrain.util.Utils;
 
 /**
  * PNode representation of Self-Organizing Map.
- * 
+ *
  * @author jyoshimi
  */
 public class SOMNode extends SubnetworkNode {
-    
+
     /**
      * Create a SOM Network PNode.
      *
@@ -48,7 +48,7 @@ public class SOMNode extends SubnetworkNode {
      */
     public SOMNode(final NetworkPanel networkPanel, final SOM group) {
         super(networkPanel, group);
-        //setStrokePaint(Color.green);
+        // setStrokePaint(Color.green);
         setInteractionBox(new SOMInteractionBox(networkPanel));
         setContextMenu();
         setOutlinePadding(15f);
@@ -71,7 +71,7 @@ public class SOMNode extends SubnetworkNode {
 
         });
     }
-    
+
     /**
      * Custom interaction box for SOM group node.
      */
@@ -83,9 +83,9 @@ public class SOMNode extends SubnetworkNode {
         @Override
         protected String getToolTipText() {
             return "Current learning rate: "
-                    + Utils.round(((SOM)getGroup()).getAlpha(), 2)
+                    + Utils.round(((SOM) getGroup()).getAlpha(), 2)
                     + "  Current neighborhood size: "
-                    + Utils.round(((SOM)getGroup()).getNeighborhoodSize(), 2);
+                    + Utils.round(((SOM) getGroup()).getNeighborhoodSize(), 2);
         }
 
         @Override
@@ -95,16 +95,14 @@ public class SOMNode extends SubnetworkNode {
 
         @Override
         protected JDialog getPropertyDialog() {
-            return new SOMPropertiesDialog((SOM) getGroup()); 
+            return new SOMPropertiesDialog((SOM) getGroup());
         }
-
 
         @Override
         protected boolean hasToolTipText() {
             return true;
         }
     };
-    
 
     /**
      * Sets custom menu for SOM node.
@@ -114,36 +112,34 @@ public class SOMNode extends SubnetworkNode {
         menu.addSeparator();
         menu.add(new JMenuItem(new AbstractAction("Reset Network") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM)getGroup()).reset();
-                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOM) getGroup()).reset();
+                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         menu.add(new JMenuItem(new AbstractAction("Recall") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM)getGroup()).recall();
-                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOM) getGroup()).recall();
+                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         menu.add(new JMenuItem(new AbstractAction("Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM)getGroup()).randomizeIncomingWeights();
-                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOM) getGroup()).randomizeIncomingWeights();
+                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         menu.add(new JMenuItem(new AbstractAction("Train SOM Network") {
-        	//TODO: Integrate below in to training framework?
+            // TODO: Integrate below in to training framework?
             public void actionPerformed(final ActionEvent event) {
                 JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
                 propertyDialog.pack();
                 propertyDialog.setLocationRelativeTo(null);
                 propertyDialog.setVisible(true);
-                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
 
-
         setContextMenu(menu);
     }
-    
 
 }

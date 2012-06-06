@@ -24,16 +24,16 @@ import org.simbrain.network.core.SynapseUpdateRule;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
- * 
+ *
  * Only works if source and target neurons are spiking neurons.
- * 
+ *
  * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
  * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
  * Spiking Neurons. Also drew on the Scholarpedia article.
- * 
+ *
  */
 public class STDPRule extends SynapseUpdateRule {
-    
+
     /** Default tau plus. */
     private static final double TAU_PLUS_DEFAULT = 30;
 
@@ -49,7 +49,7 @@ public class STDPRule extends SynapseUpdateRule {
     /** Default Learning rate. */
     private static final double LEARNING_RATE_DEFAULT = .01;
 
-    /** Time constant for LTP.*/
+    /** Time constant for LTP. */
     private double tau_plus = TAU_PLUS_DEFAULT;
 
     /** Time constant for LTD. */
@@ -101,24 +101,24 @@ public class STDPRule extends SynapseUpdateRule {
                     .getSource().getUpdateRule();
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
-            if (tar.hasSpiked() ) {
-				delta_t = synapse.getNetwork().getTime()
-						- src.getLastSpikeTime();
-				delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
-				//System.out.println("LTP: " + delta_t + "/" + delta_w);
-				synapse.setStrength(synapse.clip(synapse.getStrength()
-						+ delta_w));
-            	
+            if (tar.hasSpiked()) {
+                delta_t = synapse.getNetwork().getTime()
+                        - src.getLastSpikeTime();
+                delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
+                // System.out.println("LTP: " + delta_t + "/" + delta_w);
+                synapse.setStrength(synapse.clip(synapse.getStrength()
+                        + delta_w));
+
             }
             if (src.hasSpiked()) {
-				delta_t = tar.getLastSpikeTime()
-						- synapse.getNetwork().getTime();
-				delta_w = -W_minus * Math.exp(delta_t / tau_minus)
-						* learningRate;
-				//System.out.println("LTD: " + delta_t + "/" + delta_w);
-				synapse.setStrength(synapse.clip(synapse.getStrength()
-						+ delta_w));
-            
+                delta_t = tar.getLastSpikeTime()
+                        - synapse.getNetwork().getTime();
+                delta_w = -W_minus * Math.exp(delta_t / tau_minus)
+                        * learningRate;
+                // System.out.println("LTD: " + delta_t + "/" + delta_w);
+                synapse.setStrength(synapse.clip(synapse.getStrength()
+                        + delta_w));
+
             }
         }
 

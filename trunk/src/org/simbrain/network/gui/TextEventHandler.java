@@ -71,8 +71,8 @@ public class TextEventHandler extends PStyledTextEventHandler implements
 
             // Make a new text object and then edit it
             NetworkTextObject text = new NetworkTextObject(
-                    networkPanel.getNetwork(), inputEvent.getPosition()
-                            .getX(), inputEvent.getPosition().getY());
+                    networkPanel.getNetwork(), inputEvent.getPosition().getX(),
+                    inputEvent.getPosition().getY());
             networkPanel.getNetwork().addText(text);
             TextNode node = (TextNode) networkPanel.getObjectNodeMap()
                     .get(text);

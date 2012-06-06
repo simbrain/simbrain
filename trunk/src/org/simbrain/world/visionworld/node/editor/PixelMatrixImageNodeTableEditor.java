@@ -41,9 +41,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * Pixel matrix node table editor.
  */
-public final class PixelMatrixImageNodeTableEditor
-    extends JPanel
-    implements PixelMatrixImageNodeEditor {
+public final class PixelMatrixImageNodeTableEditor extends JPanel implements
+        PixelMatrixImageNodeEditor {
 
     /** Editor table. */
     private JTable editorTable;
@@ -53,7 +52,6 @@ public final class PixelMatrixImageNodeTableEditor
 
     /** Zero width stroke. */
     private static final Stroke ZERO_WIDTH_STROKE = new BasicStroke(0.0f);
-
 
     /**
      * Create a new pixel matrix image node table editor.
@@ -68,12 +66,10 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Paint cell renderer.
      */
-    private static class PaintCellRenderer
-        implements TableCellRenderer {
+    private static class PaintCellRenderer implements TableCellRenderer {
 
         /** Paint cell renderer component. */
         private JPanel panel;
-
 
         /**
          * Create a new paint cell renderer.
@@ -83,14 +79,10 @@ public final class PixelMatrixImageNodeTableEditor
             panel.setOpaque(true);
         }
 
-
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,
-                                                       final Object value,
-                                                       final boolean isSelected,
-                                                       final boolean hasFocus,
-                                                       final int row,
-                                                       final int column) {
+                final Object value, final boolean isSelected,
+                final boolean hasFocus, final int row, final int column) {
             Paint paint = (Paint) value;
             panel.setBackground((Color) paint);
             return panel;
@@ -100,12 +92,10 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Color cell renderer.
      */
-    private static class ColorCellRenderer
-        implements TableCellRenderer {
+    private static class ColorCellRenderer implements TableCellRenderer {
 
         /** Color cell renderer component. */
         private JPanel panel;
-
 
         /**
          * Create a new color cell renderer.
@@ -115,14 +105,10 @@ public final class PixelMatrixImageNodeTableEditor
             panel.setOpaque(true);
         }
 
-
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,
-                                                       final Object value,
-                                                       final boolean isSelected,
-                                                       final boolean hasFocus,
-                                                       final int row,
-                                                       final int column) {
+                final Object value, final boolean isSelected,
+                final boolean hasFocus, final int row, final int column) {
             Color color = (Color) value;
             panel.setBackground(color);
             return panel;
@@ -132,8 +118,7 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Stroke cell renderer.
      */
-    private static class StrokeCellRenderer
-        implements TableCellRenderer {
+    private static class StrokeCellRenderer implements TableCellRenderer {
 
         /** Stroke cell renderer component. */
         private JPanel panel;
@@ -146,14 +131,10 @@ public final class PixelMatrixImageNodeTableEditor
             panel.setOpaque(true);
         }
 
-
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,
-                                                       final Object value,
-                                                       final boolean isSelected,
-                                                       final boolean hasFocus,
-                                                       final int row,
-                                                       final int column) {
+                final Object value, final boolean isSelected,
+                final boolean hasFocus, final int row, final int column) {
             Paint paint = (Paint) value;
             panel.setBackground((Color) paint);
             return panel;
@@ -167,7 +148,8 @@ public final class PixelMatrixImageNodeTableEditor
         editorTable = new JTable(new EditorTableModel());
         int rowHeight = editorTable.getRowHeight();
         int rowMargin = editorTable.getRowMargin();
-        editorTable.setPreferredScrollableViewportSize(new Dimension(0, 2 * (rowHeight + (2 * rowMargin))));
+        editorTable.setPreferredScrollableViewportSize(new Dimension(0,
+                2 * (rowHeight + (2 * rowMargin))));
         editorTable.setDefaultRenderer(Paint.class, new PaintCellRenderer());
         editorTable.setDefaultRenderer(Color.class, new ColorCellRenderer());
         editorTable.setDefaultRenderer(Stroke.class, new StrokeCellRenderer());
@@ -187,10 +169,12 @@ public final class PixelMatrixImageNodeTableEditor
     }
 
     /** {@inheritDoc} */
-    public void setPixelMatrixImageNode(final PixelMatrixImageNode pixelMatrixImageNode) {
+    public void setPixelMatrixImageNode(
+            final PixelMatrixImageNode pixelMatrixImageNode) {
         PixelMatrixImageNode oldPixelMatrixImageNode = this.pixelMatrixImageNode;
         this.pixelMatrixImageNode = pixelMatrixImageNode;
-        firePropertyChange("pixelMatrixImageNode", oldPixelMatrixImageNode, this.pixelMatrixImageNode);
+        firePropertyChange("pixelMatrixImageNode", oldPixelMatrixImageNode,
+                this.pixelMatrixImageNode);
         updateEditor();
     }
 
@@ -198,7 +182,8 @@ public final class PixelMatrixImageNodeTableEditor
      * Update editor.
      */
     private void updateEditor() {
-        EditorTableModel editorTableModel = (EditorTableModel) editorTable.getModel();
+        EditorTableModel editorTableModel = (EditorTableModel) editorTable
+                .getModel();
         editorTableModel.fireTableDataChanged();
         editorTable.setEnabled(pixelMatrixImageNode != null);
     }
@@ -206,8 +191,7 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Editor table model.
      */
-    private class EditorTableModel
-        extends AbstractTableModel {
+    private class EditorTableModel extends AbstractTableModel {
 
         /** {@inheritDoc} */
         public int getRowCount() {
@@ -221,8 +205,7 @@ public final class PixelMatrixImageNodeTableEditor
 
         /** {@inheritDoc} */
         public String getColumnName(final int column) {
-            switch (column)
-            {
+            switch (column) {
             case 0:
                 return "Pixel matrix";
             case 1:
@@ -246,8 +229,7 @@ public final class PixelMatrixImageNodeTableEditor
 
         /** {@inheritDoc} */
         public Class getColumnClass(final int column) {
-            switch (column)
-            {
+            switch (column) {
             case 0:
                 return String.class;
             case 1:
@@ -297,7 +279,8 @@ public final class PixelMatrixImageNodeTableEditor
         }
 
         /** {@inheritDoc} */
-        public void setValueAt(final Object value, final int row, final int column) {
+        public void setValueAt(final Object value, final int row,
+                final int column) {
             if (pixelMatrixImageNode != null) {
                 switch (column) {
                 case 0:
@@ -315,8 +298,8 @@ public final class PixelMatrixImageNodeTableEditor
                     break;
                 case 5:
                     float strokeWidth = ((Float) value).floatValue();
-                    Stroke outlineStroke = Utils.isMacOSX() ?
-                        new BasicStroke(strokeWidth) : new PFixedWidthStroke(strokeWidth);
+                    Stroke outlineStroke = Utils.isMacOSX() ? new BasicStroke(
+                            strokeWidth) : new PFixedWidthStroke(strokeWidth);
                     pixelMatrixImageNode.setOutlineStroke(outlineStroke);
                     break;
                 case 6:
@@ -336,21 +319,29 @@ public final class PixelMatrixImageNodeTableEditor
             PixelMatrix pixelMatrix = pixelMatrixImageNode.getPixelMatrix();
             switch (column) {
             case 0:
-                return (pixelMatrixImageNode == null) ? " (none)" : "Pixel matrix";
+                return (pixelMatrixImageNode == null) ? " (none)"
+                        : "Pixel matrix";
             case 1:
-                return (pixelMatrixImageNode == null) ? "" : pixelMatrix.getWidth() + " x " + pixelMatrix.getHeight();
+                return (pixelMatrixImageNode == null) ? "" : pixelMatrix
+                        .getWidth() + " x " + pixelMatrix.getHeight();
             case 2:
-                return (pixelMatrixImageNode == null) ? Boolean.FALSE : pixelMatrixImageNode.getVisible();
+                return (pixelMatrixImageNode == null) ? Boolean.FALSE
+                        : pixelMatrixImageNode.getVisible();
             case 3:
-                return (pixelMatrixImageNode == null) ? Float.valueOf(0.0f) : pixelMatrixImageNode.getTransparency();
+                return (pixelMatrixImageNode == null) ? Float.valueOf(0.0f)
+                        : pixelMatrixImageNode.getTransparency();
             case 4:
-                return (pixelMatrixImageNode == null) ? Color.BLACK : pixelMatrixImageNode.getOutlinePaint();
+                return (pixelMatrixImageNode == null) ? Color.BLACK
+                        : pixelMatrixImageNode.getOutlinePaint();
             case 5:
-                return (pixelMatrixImageNode == null) ? ZERO_WIDTH_STROKE : pixelMatrixImageNode.getOutlineStroke();
+                return (pixelMatrixImageNode == null) ? ZERO_WIDTH_STROKE
+                        : pixelMatrixImageNode.getOutlineStroke();
             case 6:
-                return (pixelMatrixImageNode == null) ? Color.BLACK : pixelMatrixImageNode.getPenForeground();
+                return (pixelMatrixImageNode == null) ? Color.BLACK
+                        : pixelMatrixImageNode.getPenForeground();
             case 7:
-                return (pixelMatrixImageNode == null) ? Color.BLACK : pixelMatrixImageNode.getPenBackground();
+                return (pixelMatrixImageNode == null) ? Color.BLACK
+                        : pixelMatrixImageNode.getPenBackground();
             default:
                 return null;
             }

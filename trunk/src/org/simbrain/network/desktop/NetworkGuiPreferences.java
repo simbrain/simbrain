@@ -14,11 +14,11 @@
 package org.simbrain.network.desktop;
 
 import java.awt.Color;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import org.simbrain.util.Utils;
 
 /**
  * <b>NetworkGuiPreferences</b> stores Gui related preferences using the, e.g.
@@ -380,18 +380,13 @@ public class NetworkGuiPreferences {
      * @return Default maximum node radius
      */
     public static int getDefaultMaxDiameter() {
-        Properties prop = new Properties();
-        int retVal = 20;
-        try {
-            prop.load(new FileInputStream("." + FS + "etc" + FS + "config.properties"));
-            if (prop.containsKey("maxWeightDiameter")) {
-                retVal = Integer
-                        .parseInt(prop.getProperty("maxWeightDiameter"));
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("maxWeightDiameter")) {
+            return Integer
+                    .parseInt(properties.getProperty("maxWeightDiameter"));
+        } else {
+            return 20;
         }
-        return retVal;
     }
 
     /**
@@ -419,18 +414,13 @@ public class NetworkGuiPreferences {
      * @return Default minimum node radius
      */
     public static int getDefaultMinDiameter() {
-        Properties prop = new Properties();
-        int retVal = 7;
-        try {
-            prop.load(new FileInputStream("." + FS + "etc" + FS + "config.properties"));
-            if (prop.containsKey("minWeightDiameter")) {
-                retVal = Integer
-                        .parseInt(prop.getProperty("minWeightDiameter"));
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("minWeightDiameter")) {
+            return Integer
+                    .parseInt(properties.getProperty("minWeightDiameter"));
+        } else {
+            return 7;
         }
-        return retVal;
     }
 
     /**

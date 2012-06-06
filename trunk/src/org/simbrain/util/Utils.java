@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -410,6 +411,24 @@ public class Utils {
             }
         }
         return ret;
+    }
+
+    /**
+     * Return the Simbrain properties file, or null if it is not found.
+     *
+     * @return the Simbrain properties file
+     */
+    public static Properties getSimbrainProperties() {
+        try {
+            Properties properties = new Properties();
+            String fs = System.getProperty("file.separator");
+            properties.load(new FileInputStream("." + fs + "etc" + fs
+                    + "config.properties"));
+            return properties;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
 }

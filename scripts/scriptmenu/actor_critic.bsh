@@ -30,23 +30,26 @@ import java.util.concurrent.*;
 {
 
     //TODOS:
-    // Put sim params in control panel (yes!  lambda in part.)
+    // Put all sim params in control panel (yes!  lambda in part.)
     // Ability to step through sim
-    // Distribution of good and bad entities.
+    // Set distribution of good and bad entities.
+	// Button to reset weights
 
     // Simulation parameters
     int numTrials = 5;
-    double alpha = .25; // learning rate
-    double gamma = 1; // Discount factor 
-    double lambda = 0; // 0 for no trace; 1 for permanent trace.  .9 default 
-    double epsilon = .1; // Prob. of taking a random action
+    double alpha = .25; // Learning rate
+    double gamma = .7; // Discount factor .  0-1.  0 predict next value only.   .5 predict future values.
+    				// ncreases toward one, values of y in the more distant future become more significant.}
+    double lambda = .6; // 0 for no trace; 1 for permanent trace.  .9 default 
+    double epsilon = .3; // Prob. of taking a random action
+    double rewardDispersionFactor = 3; // Number of tiles for reward to disperse
 
     // World Parameters
     int worldWidth = 250; 
     int worldHeight = 250; // just one var?
-    int numTiles = 4; // Number of rows / cols in each tileset
-    int tileSets = 1; // Number of tilesets
-    boolean worldWrap = false; // Currently can't get good performance if set to true
+    int numTiles = 7; // Number of rows / cols in each tileset
+    int tileSets = 2; // Number of tilesets
+    boolean worldWrap = false; // Currently hard to get good performance if set to true
 
     // Other variables
     double previousValue = 0;
@@ -54,7 +57,7 @@ import java.util.concurrent.*;
     double stdev = .01 * worldHeight;
     int tileSize = worldHeight / numTiles;
     double tileIncrement = (worldHeight / numTiles) / tileSets;
-    double hitRadius = (tileSize/2);
+    double hitRadius = rewardDispersionFactor * (tileSize/2);
 
     // Init workspace
     workspace.clearWorkspace();
@@ -77,11 +80,12 @@ import java.util.concurrent.*;
     mouse.setCenterLocation(location,location);
     world.addAgent(mouse);
     BasicEntity cheese = new BasicEntity("Swiss.gif", world);
+    double dispersion = rewardDispersionFactor * (tileSize/2);
     cheese.setCenterLocation(tileSize/2, tileSize/2);
     cheese.setSmellSource(
             new SmellSource(new double[]{1,0},
                     SmellSource.DecayFunction.STEP, 
-                    tileSize/2,
+                    dispersion,
                     cheese.getCenterLocation()));
     world.addEntity(cheese);
 
@@ -243,7 +247,7 @@ import java.util.concurrent.*;
                 if (lambda == 0) {
                     tileNeuron = new NeuronWithMemory(network, "LinearRule");                    
                 } else {
-                    tileNeuron = new NeuronWithMemory(network, "DecayNeuronRule");
+                    tileNeuron = new NeuronWithMemory(network, "DecayRule");
                 }
                 tileNeurons.add(tileNeuron);
                 tileNeuron.setX(initTilesX + (double)x);
@@ -306,8 +310,8 @@ import java.util.concurrent.*;
     // Initialize decay using lambda
     for (Neuron neuron : network.getFlatNeuronList()) {
         if (lambda != 0) {
-            if (neuron.getUpdateRule() instanceof DecayNeuron) {
-                ((DecayNeuron)neuron.getUpdateRule()).setDecayFraction(1-lambda);
+            if (neuron.getUpdateRule() instanceof DecayRule) {
+                ((DecayRule)neuron.getUpdateRule()).setDecayFraction(1-lambda);
             }            
         }
     }

@@ -1,11 +1,11 @@
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.*;
-import org.simbrain.network.interfaces.*;
+import org.simbrain.network.core.*;
 import org.simbrain.network.desktop.*;
 import org.simbrain.network.layouts.*;
 import org.simbrain.network.networks.*;
-import org.simbrain.network.neurons.*;
-import org.simbrain.network.synapses.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.workspace.*;
 import javax.swing.JInternalFrame;
 import java.util.*;
@@ -13,6 +13,9 @@ import org.jgap.*;
 import org.jgap.impl.*;
 
 {
+	// TODO: Move num iterations of time window to top, and make a more clear set of example params
+	// TODO: Show progress in progress bar after invoking
+	
     /** Sample size. */
     private final static int SAMPLE_SIZE = 10;
 
@@ -79,20 +82,18 @@ import org.jgap.impl.*;
             + fittest.getFitnessValue() + "  number of neurons: "
             + ((IntegerGene) fittest.getGene(0)).intValue());
 
-    RootNetwork network = (RootNetwork) fittest.getApplicationData();
+    Network network = (Network) fittest.getApplicationData();
 
     // Initialize network component
     NetworkComponent networkComponent = new NetworkComponent("Evolved network", network );
     workspace.addWorkspaceComponent(networkComponent);
-    desktop.getDesktopComponent(networkComponent).postAddInit();
-
 
     private class NetworkEvaluationFunction extends FitnessFunction {
         // TODO: Base Synapse Types for inhib and excit...
 
         protected double evaluate(IChromosome chromosome) {
 
-            RootNetwork network = new RootNetwork();
+            Network network = new Network();
             chromosome.setApplicationData(network);
 
             // The basic description of the network using a chromosome
@@ -112,7 +113,7 @@ import org.jgap.impl.*;
             }
             GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
                     .sqrt(numNeurons));
-            layout.layoutNeurons(network);
+            layout.layoutNeurons(network.getNeuronList());
             Radial connection = new Radial(network, network.getFlatNeuronList(),
                     network.getFlatNeuronList());
             connection.setExcitatoryProbability(excitProb);
@@ -125,7 +126,7 @@ import org.jgap.impl.*;
             // network and update it for a set number of iterations.
             network.randomizeNeurons();
             for (int i = 0; i < 50; i++) {
-                network.updateRootNetwork();
+                network.update();
             }
 
             // ---------------------------------------------------------------
@@ -133,10 +134,9 @@ import org.jgap.impl.*;
             // fitness function implemented.
             // ---------------------------------------------------------------
 
-            // return howCloseToValue(network, 150);
-            // return percentActive(network);
+             return howCloseToValue(network, 150);
              //return getAverageValue(network);
-            return percentActive(network, .50);
+            //return percentActive(network, .50);
         }
 
         /**
@@ -151,15 +151,15 @@ import org.jgap.impl.*;
 
             switch (neuronType) {
             case 0:
-                return "BinaryNeuron";
+                return "BinaryRule";
             case 1:
-                return "LinearNeuron";
+                return "LinearRule";
             case 2:
-                return "SigmoidalNeuron";
+                return "SigmoidalRule";
             case 3:
-                return "DecayNeuron";
+                return "DecayRule";
             default:
-                return "NakaRushtonNeuron";
+                return "NakaRushtonRule";
             }
         }
 
@@ -173,7 +173,7 @@ import org.jgap.impl.*;
          *            target percentage
          * @return how close the given network is to the specified percentage
          */
-        private double percentActive(RootNetwork network, double target) {
+        private double percentActive(Network network, double target) {
             return 1 - Math.abs(percentActive(network) - target);
         }
 
@@ -188,7 +188,7 @@ import org.jgap.impl.*;
          *            reference
          * @return percent active
          */
-        private double percentActive(RootNetwork network) {
+        private double percentActive(Network network) {
 
             int numNeurons = network.getFlatNeuronList().size();
             int numActive = 0;
@@ -220,7 +220,7 @@ import org.jgap.impl.*;
          *            target average activity
          * @return how close the network's average value is to the target value.
          */
-        private double howCloseToValue(RootNetwork network, double value) {
+        private double howCloseToValue(Network network, double value) {
 
             // A value between 0 and something..
             double distanceToValue = Math.abs(getAverageValue(network) - value);
@@ -237,7 +237,7 @@ import org.jgap.impl.*;
          *            reference to network
          * @return average value over specified window.
          */
-        private double getAverageValue(RootNetwork network) {
+        private double getAverageValue(Network network) {
             double total = 0;
             int numIterations = 2;
 

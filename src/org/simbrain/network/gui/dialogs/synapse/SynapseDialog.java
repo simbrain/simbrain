@@ -413,6 +413,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
                     + ".html");
         }
+        helpButton.setAction(helpAction);
     }
 
     /**

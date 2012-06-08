@@ -276,6 +276,7 @@ public class NeuronDialog extends StandardDialog {
             helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
                     + ".html");
         }
+        helpButton.setAction(helpAction);
     }
 
     /**

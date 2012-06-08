@@ -181,6 +181,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     public void actionPerformed(final ActionEvent e) {
         spikeRespondersHaveChanged = true;
 
+        ((SynapseDialog)parentDialog).updateHelp();
         SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList
                 .get(0);
 

@@ -30,7 +30,6 @@ import java.util.concurrent.*;
 {
 
     //TODOS:
-    // Put all sim params in control panel (yes!  lambda in part.)
     // Ability to step through sim
     // Set distribution of good and bad entities.
 	// Button to reset weights
@@ -58,7 +57,9 @@ import java.util.concurrent.*;
     int tileSize = worldHeight / numTiles;
     double tileIncrement = (worldHeight / numTiles) / tileSets;
     double hitRadius = rewardDispersionFactor * (tileSize/2);
-
+    boolean stop  = false;
+    boolean goalAchieved = false;
+    
     // Init workspace
     workspace.clearWorkspace();
 
@@ -100,7 +101,7 @@ import java.util.concurrent.*;
                     SmellSource.DecayFunction.STEP, 
                     tileSize/2,
                     entity.getCenterLocation()));
-    //world.addEntity(entity);
+    world.addEntity(entity);
 
     // Neuron position variables
     double initTilesX = 100;
@@ -330,6 +331,9 @@ import java.util.concurrent.*;
     JTextField lambdaField = new JTextField();
     lambdaField.setText("" + lambda);
     panel.addItem("Lambda", lambdaField);
+    JTextField epsilonField = new JTextField();
+    epsilonField.setText("" + epsilon);
+    panel.addItem("Epsilon", epsilonField);
 
     // Run Button
     JButton runButton = new JButton("Run");
@@ -342,12 +346,18 @@ import java.util.concurrent.*;
                     numTrials = Integer.parseInt(trialField.getText());
                     gamma = Double.parseDouble(discountField.getText());
                     lambda = Double.parseDouble(lambdaField.getText());
-
+                    epsilon = Double.parseDouble(epsilonField.getText());
+                    
+                    stop = false;
                     for (int i = 1; i < numTrials+1; i++) {
 
+                    	if (stop) {
+                    		return;
+                    	}
+                    	
                         // Set up the trial
                         trialField.setText("" + ((numTrials + 1)- i));
-                        boolean goalAchieved = false;
+                        goalAchieved = false;
 
                         // Clear network activations between trials
                         network.clearActivations();
@@ -384,6 +394,17 @@ import java.util.concurrent.*;
 
         }});
     panel.addItem("Simulation", runButton);
+    
+    // Stop Button
+    JButton stopButton = new JButton("Stop");
+    panel.addItem("Stop simulation", stopButton);
+    stopButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            goalAchieved = true;
+        	stop = true;
+        }
+    });
+
 
     // Set up Frame
     internalFrame.setLocation(20,38);

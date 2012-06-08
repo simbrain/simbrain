@@ -22,9 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -49,6 +46,7 @@ import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 /**
  * Panel for display and ordering of network update actions.
@@ -297,23 +295,10 @@ public class UpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            Scanner scanner = null;
             File defaultScript = new File(System.getProperty("user.dir")
                     + "/etc/customNetworkUpdateTemplate.bsh");
-            StringBuilder scriptText = new StringBuilder();
-            String NL = System.getProperty("line.separator");
-            try {
-                scanner = new Scanner(new FileInputStream(defaultScript));
-                while (scanner.hasNextLine()) {
-                    scriptText.append(scanner.nextLine() + NL);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                scanner.close();
-            }
-
-            ScriptEditor panel = new ScriptEditor(scriptText.toString());
+            ScriptEditor panel = new ScriptEditor(
+                    Utils.readFileContents(defaultScript));
             panel.setScriptFile(defaultScript);
             StandardDialog dialog = ScriptEditor.getDialog(panel);
             // Setting script file to null prevents the template script from

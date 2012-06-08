@@ -45,6 +45,7 @@ import javax.swing.TransferHandler;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;
@@ -347,23 +348,10 @@ public class UpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            Scanner scanner = null;
             File defaultScript = new File(System.getProperty("user.dir")
                     + "/etc/customWorkspaceUpdateTemplate.bsh");
-            StringBuilder scriptText = new StringBuilder();
-            String NL = System.getProperty("line.separator");
-            try {
-                scanner = new Scanner(new FileInputStream(defaultScript));
-                while (scanner.hasNextLine()) {
-                    scriptText.append(scanner.nextLine() + NL);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                scanner.close();
-            }
-
-            ScriptEditor panel = new ScriptEditor(scriptText.toString());
+            ScriptEditor panel = new ScriptEditor(
+                    Utils.readFileContents(defaultScript));
             panel.setScriptFile(defaultScript);
             StandardDialog dialog = ScriptEditor.getDialog(panel);
             // Setting script file to null prevents the template script from

@@ -52,7 +52,6 @@ import org.simbrain.workspace.actions.OpenWorkspaceAction;
 import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
 import org.simbrain.workspace.actions.PropertyTabAction;
 import org.simbrain.workspace.actions.QuitWorkspaceAction;
-import org.simbrain.workspace.actions.RunScriptAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.ScriptEditorAction;
@@ -169,9 +168,6 @@ public class WorkspaceActionManager {
     /** Opens the list of workspace components. */
     private final Action openWorkspaceComponentListAction;
 
-    /** Run script action. */
-    private final Action runScriptAction;
-
     /** Show hide property tab. */
     private final Action propertyTabAction;
 
@@ -224,8 +220,6 @@ public class WorkspaceActionManager {
         globalStopAction = new GlobalStopAction(workspace);
 
         showScriptEditorAction = new ScriptEditorAction(desktop);
-
-        runScriptAction = new RunScriptAction(desktop);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
@@ -519,13 +513,6 @@ public class WorkspaceActionManager {
      */
     public Action getNewScatterPlotAction() {
         return newScatterPlotAction;
-    }
-
-    /**
-     * @return the runScriptAction
-     */
-    public Action getRunScriptAction() {
-        return runScriptAction;
     }
 
     /**

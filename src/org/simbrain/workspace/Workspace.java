@@ -346,7 +346,7 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        ArrayList<WorkspaceComponent> toRemove = new ArrayList<WorkspaceComponent>();
+        List<WorkspaceComponent> toRemove = new ArrayList<WorkspaceComponent>();
         synchronized (componentList) {
             for (WorkspaceComponent component : componentList) {
                 toRemove.add(component);

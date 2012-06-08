@@ -21,12 +21,14 @@ package org.simbrain.util;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -428,6 +430,29 @@ public class Utils {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Returns the contents of a file as a String.
+     *
+     * @param file the file to read
+     * @return the string contents of the file
+     */
+    public static String readFileContents(File file) {
+        StringBuilder scriptText = new StringBuilder();
+        String newLine = System.getProperty("line.separator");
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new FileInputStream(file));
+            while (scanner.hasNextLine()) {
+                scriptText.append(scanner.nextLine() + newLine);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+        return scriptText.toString();
     }
 
 }

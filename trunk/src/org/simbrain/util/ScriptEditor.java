@@ -77,7 +77,8 @@ public class ScriptEditor extends JPanel {
     public ScriptEditor(String initialText) {
         textArea = new RSyntaxTextArea(DEFAULT_HEIGHT, DEFAULT_WIDTH);
         initPanel();
-        textArea.setText(initialText);
+        setText(initialText);
+        textArea.setCaretPosition(0);
     }
 
     /**
@@ -112,6 +113,24 @@ public class ScriptEditor extends JPanel {
     }
 
     /**
+     * Sets text of the underlying text area.
+     *
+     * @param text text to set.
+     */
+    public void setText(final String text) {
+        textArea.setText(text);
+    }
+
+    /**
+     * Returns the main text (in the underlying text area).
+     *
+     * @return the displayed in the text area
+     */
+    public String getText() {
+        return textArea.getText();
+    }
+
+    /**
      * @return the scriptFile
      */
     public File getScriptFile() {
@@ -125,8 +144,7 @@ public class ScriptEditor extends JPanel {
         this.scriptFile = scriptFile;
     }
 
-    // //// Methods for obtaining frames which contain a Script Editor panel.
-    // /////
+    // Methods for obtaining frames which contain a Script Editor panel.
 
     /**
      * Returns an internal frame for editing a script.
@@ -205,7 +223,7 @@ public class ScriptEditor extends JPanel {
      *
      * @return the toolbar
      */
-    private static JToolBar getToolbarOpenClose(final GenericFrame frame,
+    protected static JToolBar getToolbarOpenClose(final GenericFrame frame,
             final ScriptEditor editor) {
         JToolBar toolbar = new JToolBar();
         toolbar.add(getOpenScriptAction(frame, editor));

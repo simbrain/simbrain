@@ -19,13 +19,15 @@
 package org.simbrain.workspace.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ScriptEditor;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.gui.SimbrainScriptEditor;
 
 /**
  * Open a script editor.
@@ -34,6 +36,11 @@ public final class ScriptEditorAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
+    /** Script directory. */
+    private static final String SCRIPT_MENU_DIRECTORY = "."
+            + System.getProperty("file.separator") + "scripts"
+            + System.getProperty("file.separator") + "scriptmenu";
+
     /** Reference to Simbrain desktop. */
     private SimbrainDesktop desktop;
 
@@ -41,15 +48,21 @@ public final class ScriptEditorAction extends AbstractAction {
      * Open a script editor.
      */
     public ScriptEditorAction(final SimbrainDesktop desktop) {
-        super("Script Editor");
+        super("Edit / Run Script...");
         this.desktop = desktop;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("ScriptEditor.png"));
-        putValue(SHORT_DESCRIPTION, "Script Editor");
+        putValue(SHORT_DESCRIPTION, "Edit / Run Script...");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GenericJInternalFrame frame = ScriptEditor.getInternalFrame();
+
+        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY,
+                "Run Script", "bsh");
+        File scriptFile = fileChooser.showOpenDialog();
+
+        GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(
+                desktop, scriptFile);
         desktop.addInternalFrame(frame);
         frame.setResizable(true);
         frame.setClosable(true);
@@ -58,4 +71,7 @@ public final class ScriptEditorAction extends AbstractAction {
         frame.setVisible(true);
         frame.pack();
     }
+
+
+
 }

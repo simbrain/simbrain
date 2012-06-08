@@ -11,9 +11,9 @@ import org.simbrain.workspace.*;
     // Parameters 
     int NUM_NEURONS = 25;
     double GRID_SPACE = 50;
-    double INHIBITORY_PROB = .2;
-    double INHIBITORY_RADIUS = 100;
-    double EXCITATORY_PROB = .1;
+    double INHIBITORY_PROB = .1;
+    double INHIBITORY_RADIUS = 200;
+    double EXCITATORY_PROB = .05;
     double EXCITATORY_RADIUS = 200;
 
     // Build Network

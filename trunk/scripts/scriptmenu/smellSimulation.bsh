@@ -24,6 +24,9 @@ import org.simbrain.plot.projection.*;
     int worldHeight = 500;
     int worldWidth = 400;
 
+    // Init workspace
+    workspace.clearWorkspace();
+
     // Make a 2-d environment
     OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
     OdorWorld world = odorWorld.getWorld();

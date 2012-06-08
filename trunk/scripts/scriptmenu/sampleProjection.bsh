@@ -13,7 +13,7 @@ import org.simbrain.workspace.*;
 {
 
 	// PARAMETERS
-    int numNeurons = 25;
+    int numNeurons = 55;
     double sparsity = .4;
     double excitatoryRatio = .6;
 

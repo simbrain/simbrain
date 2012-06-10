@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Update</p>
+  </div>
+  <p>
+  </p><h1>Update</h1><br>
+<p><span class="heading">Running a simulation</span><br>
+<br>
+To run a simulation use the iterate <img style="width: 18px; height: 18px;" alt="step" src="../../Images/Step.png"> and play <img style="width: 18px; height: 18px;" alt="play" src="../../Images/Play.png">&nbsp; buttons in the main desktop toolbar.<br>
+<br>An alternative method is to use a&nbsp; terminal component&nbsp; or
+in the terminal tab at the bottom of the desktop.&nbsp; The command
+workspace.iterate(<span style="font-style: italic;">n</span>) can be use to iterate the workspace <span style="font-style: italic;">n</span> times. <br>
+</p>
+<p><span class="heading2">Update Types</span><br>
+</p><p>On each iteration an update occurs.&nbsp; There are various
+types of update, and you have some control over how the update happens
+(in future versions there will be more control).&nbsp;&nbsp; Updates
+occur via an "updater".&nbsp; The default updater is a buffered
+update&nbsp; Here are the currently available updaters: <br>
+</p>
+
+<p style="margin-left: 40px;"><span class="heading2">Buffered:</span> Update order does not matter. The default sequence of events is: <br>
+&nbsp;&nbsp;&nbsp; - Update component 1 <br>
+
+&nbsp;&nbsp;&nbsp; - Update component 2, ...<br>
+&nbsp;&nbsp;&nbsp; - Update component <span style="font-style: italic;">n</span><br>
+&nbsp;&nbsp;&nbsp; - Update couplings (uses a buffer so that update order does not matter)<br>
+
+
+</p>
+
+
+<p style="margin-left: 40px;"><span class="heading2">Priority:</span> Update order does matter.&nbsp; When you need things updated in a particular sequence.</p>
+
+<p>Custom update</p>
+<p>Update can be customized by running a script which installs a
+custom updater. &nbsp;&nbsp; An example which shows
+how this is done is in the&nbsp; scriptmenu.&nbsp;&nbsp; If you run the
+script "customUpdateExample.bsh", you will notice that the network's
+synapses are randomized every time the workspace is updated. <br>
+</p>
+
+
+<p><br>
+<span style="text-decoration: underline;">Updator tab</span>: Can specify one or more threads.&nbsp; The default value is the number of available processors.<br>
+<br>
+<span style="text-decoration: underline;">Custom update</span>: Users
+can create their own updators.&nbsp; In a script, just create an instance of
+the workspace and call workspace.setUpdator.&nbsp; See <a href="../Scripting.html">scripting</a>.</p>
+</div>
+</body></html>

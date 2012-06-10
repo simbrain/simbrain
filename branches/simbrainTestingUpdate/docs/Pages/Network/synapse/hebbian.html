@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Hebbian</p>
+  </div>
+  <p><h1>Hebbian</h1></p>
+  <p span>This type of synapse implements Hebbian learning, where the change of the synapse is proportional to the product of the activation of the source neuron <em>a<sub>s</sub></em> and target neuron <em>a<sub>t</sub></em>:   
+  <p span><img src="../equations/Hebbian.png" width="129" height="52">
+<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. 
+<p span>In effect, neurons that &quot;fire together, wire together.&quot; 
+<p span>Note that in most cases synapses of this type will rapidly achieve their maximum or minimum value. To prevent this a very small learning rate can be used, or after sufficient training the weights can be <a href="../menu.html#MenuEdit">clamped</a>.  Other learning rules and networks attempt to overcome this limitation of Hebbian learning. 
+<p class="heading" span><a name="HebbLearning"></a>Learning rate 
+<blockquote>
+  <p span="span">This value changes the rate of the change of the synapse, denoted by epsilon in the equation above. </p>
+</blockquote>
+</div>
+</body>
+</html>

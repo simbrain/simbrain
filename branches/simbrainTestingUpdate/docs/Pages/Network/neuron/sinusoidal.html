@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Sinusoidal</p>
+  </div>
+  <p><h1>Sinusoidal Neuron</h1></p>
+  <p>The activation of this type of neuron varies sinusoidally over time between the <a href="../neuron.html#UpBound">upper bound</a> and <a href="../neuron.html#LowBound">lower bound</a> of the neuron. </p>
+<p>Note that this type of neuron functions autonomously; it does not  use sensory inputs or inputs from other neurons. It can be thought of as a signal generation device. </p>
+<br>
+<p class="heading">Phase</p>
+<blockquote>
+  <p>The phase tells us where we start  in a period of the sinusoidal oscillation. This number should be between 0 and 2&pi;. </p>
+</blockquote>
+<p class="heading">Frequency</p>
+<blockquote>
+  <p>The frequency tells us how frequently the acitvation oscillates.  For example, a low value (e.g. .001) will make the activation slowly vary over time.</p>
+</blockquote>
+<p class="heading">Add Noise </p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. The random values are added after the sinusoidal  function is applied.</p>
+</blockquote>
+</div>
+</body>
+</html>

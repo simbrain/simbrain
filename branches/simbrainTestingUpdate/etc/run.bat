@@ -1,0 +1,3 @@
+cd..
+"C:\Program Files\Java\jre1.5.0_11\bin\java" -XX:+UseConcMarkSweepGC -Xmx1024M -cp bin;etc;lib/Jama-1.0.1.jar;lib/bsh-2.0b4.jar;lib/colt-1.2.0.jar;lib/commons-collections-3.2.jar;lib/commons-lang-2.3.jar;lib/dsh-disclosure-triangle-1.0-SNAPSHOT.jar;lib/jcommon-1.0.10.jar;lib/jfreechart-1.0.6.jar;lib/jgame.jar;lib/jlinalg.jar;lib/log4j-1.2.14.jar;lib/piccolo.jar;lib/piccolox.jar;lib/servlet.jar;lib/snarli.jar;lib/swinglabs-0.8.0.jar;lib/utils.jar;lib/xstream-1.2.2.jar;lib;simulations;lib/lwjgl.jar;lib/jme-awt.jar;lib/jme-terrain.jar;lib/jme.jar org.simbrain.workspace.gui.Splasher
+cd etc

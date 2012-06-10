@@ -1,0 +1,10 @@
+<body> The <b>simbrain.util.environment</b> package contains a simple 2-d environment model with
+smell sensors, simple motion, and very simple touch.  The main thing this package current supplies is 
+a model of smell, where a set of chemicals disperses in an environment and an agent's receptors
+pick these chemicals up.
+
+There are two interfaces, TwoDEnvironment and TwoDEntity, which users of this package must
+implement.   Agents (which can be loaded with various sensors and effectors), and smell sources
+are classes which can be added to objects which use this package.
+
+The package depends on workspace currently.  Perhaps the two could be decoupled.

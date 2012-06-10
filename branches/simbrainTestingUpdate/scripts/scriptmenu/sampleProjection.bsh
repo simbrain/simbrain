@@ -1,0 +1,50 @@
+package org.simbrain;
+
+import java.awt.Point;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.*;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.plot.projection.*;
+import org.simbrain.workspace.*;
+
+{
+
+	// PARAMETERS
+    int numNeurons = 25;
+    double sparsity = .4;
+    double excitatoryRatio = .6;
+
+    // Make Network
+    NetworkComponent networkComponent = new NetworkComponent("Attractor Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    Network network = networkComponent.getNetwork();
+    GridLayout layout = new GridLayout(50.0, 50.0, 5);
+    layout.setInitialLocation(new Point(10, 10));
+    for (int i = 0; i < numNeurons; i++) {
+        Neuron neuron = new Neuron(network, "NakaRushtonRule");
+        network.addNeuron(neuron);
+    }
+    layout.layoutNeurons(network.getNeuronList());
+    Sparse connection = new Sparse(network, network.getFlatNeuronList(),
+            network.getFlatNeuronList());
+    connection.setSparsity(sparsity);
+    connection.setExcitatoryRatio(excitatoryRatio);
+    connection.connectNeurons();    
+    network.randomizeNeurons();
+
+    //Make a projection component
+    ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network");
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
+
+    // Make Couplings
+    for (int i = 1; i <= numNeurons; i++) {
+        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class, "Neuron " + i); 
+        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+    }
+
+}

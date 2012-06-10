@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Workspace</p>
+</div>
+<div id="menu">
+<p class="menubold">Contents</p>
+<blockquote>
+  <p><a href="Workspace/Components.html">Components</a><br>
+  <a href="Workspace/Couplings.html">Couplings</a><br>
+  <a href="Workspace/Examples.html">Examples</a><br>
+  <a href="Workspace/Menus.html">Menus</a><br>
+  <a href="Workspace/Preferences.html">Preferences</a><br>
+  <a href="Workspace/PropertyTabs.html">Property Tabs</a><br>
+  <a href="Scripting.html">Scripts<br>
+  </a><a href="Workspace/Toolbar.html">Toolbar</a><br>
+  <a href="Workspace/Update.html">Update</a><br>
+&nbsp;</p>
+</blockquote>
+</div>
+<p> </p>
+<h1>Workspace</h1>
+<p>The Simbrain <span style="font-weight: bold;">workspace</span>
+is the framework within which a simulation is run. It contains
+components which are coupled to one another, and tools for managing
+these interactions.&nbsp;&nbsp; More specifically, the
+workspace&nbsp; is responsible for:<br>
+</p>
+<p style="margin-left: 40px;">(1) Maintaining a list of
+<a href="Workspace/Components.html">components</a> (neural networks, virtual worlds, data tables, plots, etc.)<br>
+(2) Maintaining a list of <a href="Workspace/Couplings.html">couplings</a>,
+which are links between components (e.g. from a neural network to
+a time-series plot of the activation of some nodes in that network).<br>
+(3) Managing simulation <a href="Workspace/Update.html">updates</a>.&nbsp; All updates are iteration
+based.&nbsp;&nbsp; The network is updated using the press or play
+buttons in the <a href="Workspace/Toolbar.html">toolbar</a>, and the current iteration number is also visible in the toolbar. Custom forms of update are also available.<br>
+</p>
+<p>The workspace is visible in the GUI as the
+Simbrain <span style="font-weight: bold;">desktop</span> (see below). The desktop contains menus, a toolbar,
+and a main space in which all components are shown. &nbsp; There is
+also a set of tabs at the bottom of the network which allow the user to
+view couplings, set certain properties of components, and monitor a
+simulation in other ways.
+</p>
+<p>Workspaces are stored as .zip files.&nbsp; These files contain .xml
+representations of all components and couplings in a simulation (and
+some other information as well)&nbsp; They can be unzipped, and
+individual saved
+component and coupling descriptions can be inspected (Note that
+you cannot currently change the files, rezip, and re-open).<br>
+</p>
+
+<br>
+<p style="text-align: center;"><img src="../Images/WorkspaceLarge.png" height="370" width="600"></p>
+<br>
+<br>
+<p><br>
+<br>
+</p>
+<span style="font-weight: bold;">
+</span>
+<p><span style="font-weight: bold;"><br>
+</span></p>
+</div>
+
+</body></html>

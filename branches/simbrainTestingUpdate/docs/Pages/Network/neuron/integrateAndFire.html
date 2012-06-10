@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>`
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Integrate and Fire</p>
+  </div>
+  <p><h1>Integrate and and Fire</h1></p> 
+  <p>The (leaky) integrate and fire  model is perhaps the most prevalent biologically realistic model neuron currently in use.   It simulates all the basic aspects of neural conduction in a relatively simple framework.</p>
+  <p> Simbrain's Integrate and Fire neuron is a <a href="../spikingnetworks.html">spiking neuron</a>. As a result,  when it spikes, a ring of yellow flashes around it and the axon protruding from it turns yellow as well. </p>
+  <p> Activation of the neuron is interpreted as voltage potential.  When that voltage potential passes a threshold value, the neuron spikes (resulting in the flash of yellow), and then the voltage is reset to a reset value, typically below the threshold potential.  Below threshold, the neuron behaves like the <a href="additive.html">additive neuron</a>.  It decays to a steady state value at a rate proporitional to its time constant. </p>
+  <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
+  <p><img src="../equations/intFire.png" width="190" height="65"></p>
+  <p>&nbsp;</p>
+  <p>where <em>r</em> is resting potential,<em> R</em> is resistance, &tau; is a time constant, and  <em>W</em> is the weighted inputs.</p>
+  <p>&nbsp;</p>
+  <p class="heading">Time step</p>
+  <blockquote>
+    <p>See <a href="../timing.html">time-step</a>. </p>
+  </blockquote>
+  <p>Resting potential</p>
+  <blockquote>
+    <p>The activation value which the neuron decays to over time.</p>
+  </blockquote>
+  <p>Reset potential</p>
+  <blockquote>
+    <p>The activation value which the neuron is reset to after a spiking event. </p>
+  </blockquote>
+  <p>Threshold</p>
+  <blockquote>
+    <p>The value beyond which the neuron spikes. </p>
+  </blockquote>
+  <p>Time constant</p>
+  <blockquote>
+    <p>Controls the rate at which the neuron attains its resting potential. As one increases this value, things become relatively slower; conversely, as one decreases this value, things become relatively faster.</p>
+  </blockquote>
+  <p></p>
+  <p>Resistance</p>
+  <blockquote>
+    <p>A constant factor multiplied by weighted inputs. </p>
+  </blockquote>
+  <p>Use Clipping</p>
+  <blockquote>
+    <p> See <a href="../common.html#clipping">clipping</a>. </p>
+  </blockquote>
+  <p>Add Noise</p>
+  <blockquote>
+    <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. </p>
+  </blockquote>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+</div>
+</body>
+</html>

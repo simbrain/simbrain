@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Additive</p>
+  </div> 
+  <p><h1>Additive</h1></p>
+  <p>These neurons were developed for use in the continuous version of Hopfield networks. They were intended to be broadly biologically plausible. Their dynamics are similar to several other neurons, including the <a href="naka-rushton.html">Naka Rushton</a>, <a href="iac.html">IAC</a>, and <a href="decay.html">decay</a> neurons, in that the activation value will decay towards a steady state determined by the <em> <a href="../common.html#wtdinput">weighted inputs</a> W</em> to the neuron.</p>
+  <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
+  <p>&nbsp;</p>
+  <p><img src="../equations/additive.png" width="242" height="68"></p>
+  <p>The resistance <em>R</em> functions essentially a time-constant. <em>I</em> is the external input to the neuron. <em>W</em> is the weighted inputs <em>without </em>external input (which is added separately). &quot;sgm&quot; is the sigmoidal function described by Hopfield in his original article: sgm(x) = 2/ &pi; * arctan(&pi; * &lambda; * x) / 2 .</p>
+  <p>See Simon Haykin (2002), <em>Neural Networks</em>, section 14.5. </p>
+  <p>&nbsp;</p>
+  <p class="heading2">Time step</p>
+  <blockquote>
+    <p>See <a href="../timing.html">time-step</a>. </p>
+  </blockquote>
+  <p class="heading2">Lambda</p>
+<blockquote>
+  <p>This controls the slope of the sigmoidal. Bigger &lambda; = steeper slope, approaching a step function as &lambda; increases.</p>
+</blockquote>
+<p class="heading2">Resistance</p>
+<blockquote>
+  <p>Like a time constant. Make it larger and things slow down; make it lower and things speed up. </p>
+</blockquote>
+<p class="heading2">Use Clipping</p>
+<blockquote>
+  <p> See <a href="../common.html#clipping">clipping</a>. </p>
+</blockquote>
+<p class="heading2">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. </p>
+</blockquote>
+</div>
+</body>
+</html>

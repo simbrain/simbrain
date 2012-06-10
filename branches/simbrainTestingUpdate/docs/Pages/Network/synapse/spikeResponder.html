@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Spike Responder</p>
+  </div>
+  <div id="menu">
+    <p class="menubold">Response Functions</p>
+	  <blockquote>
+	    <p>   <a href="./spikeresponders/jumpAndDecay.html">Jump and Decay</a><br />
+		    <a href="./spikeresponders/riseAndDecay.html">Rise and Decay</a><br />
+		    <a href="./spikeresponders/step.html">Step</a>
+	    </p>
+    </blockquote>
+  </div>
+    <p><h1>Spike Responders</h1></p>
+    <p>Synapses whose source neuron is a <a href="../spikingnetworks.html">spiking neuron</a> are called spike responders.</p>
+  <p>In general, when a spike arrives at a post-synaptic cell (the target neuron of the spiking neuron), a &quot;wave&quot; of activation is created. This is modeled using a &quot;response function&quot; which characterizes a synaptic current, the influx of chemicals into a target cell which occurs when vesicles are released from a source neuron. </p>
+  <p>Formally, while the <a href="common.html#wtdinput">weighted inputs</a> to a target neuron are usually computed by taking the sum of the source activation times weights at time <em>t</em>, if the source neuron is a spiking cell that term is replaced by:</p>
+  <blockquote>
+    <p>weight(<em>t</em>) x response function(<em>t</em>)</p>
+  </blockquote>
+  <p>This is to say, what is passed on to the post-synaptic neuron is the value of the response function scaled by the strength of the weight. That being said, there are a number of unique response functions that dramatically change the utility of the spike interaction. The response function can be thought of as the wave form of the response to a spike.</p>
+  </blockquote>
+  </p>
+  
+</div>
+</body>
+</html>

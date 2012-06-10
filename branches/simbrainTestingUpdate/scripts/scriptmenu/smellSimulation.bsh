@@ -1,0 +1,145 @@
+import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.util.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.workspace.*;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.util.*;
+import org.simbrain.util.environment.SmellSource;
+import org.simbrain.plot.projection.*;
+
+{
+
+    // Variables
+    int worldHeight = 500;
+    int worldWidth = 400;
+
+    // Init workspace
+    workspace.clearWorkspace();
+
+    // Make a 2-d environment
+    OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
+    OdorWorld world = odorWorld.getWorld();
+    workspace.addWorkspaceComponent(odorWorld);
+    desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(470, 38, worldWidth, worldHeight);
+
+    // Add agent to environment
+    RotatingEntity mouse = new RotatingEntity(world);
+    mouse.setLocation(162,200);
+    world.addAgent(mouse);
+
+    // Add objects
+    BasicEntity object1 = new BasicEntity("Swiss.gif", world);
+    object1.setLocation(36,107);
+    object1.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.3,0.0,0.0,0.0,0.0,0.0,0.0}
+            , 100),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));
+    world.addEntity(object1);	
+
+    BasicEntity object2 = new BasicEntity("Gouda.gif", world);
+    object2.setLocation(169,32);
+    object2.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.3,0.0,0.0,0.0,0.0,0.0}
+            , 100),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));
+    world.addEntity(object2);	
+
+    BasicEntity object3 = new BasicEntity("Bluecheese.gif", world);
+    object3.setLocation(304,87);
+    object3.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.0,0.0,0.3,0.0,0.0,0.0}
+            , 100),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));
+    world.addEntity(object3);
+
+    BasicEntity object4 = new BasicEntity("Tulip.gif", world);
+    object4.setLocation(80,351);
+    object4.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.3,0.0,0.7,0.0,0.0,0.0,0.0}
+            , 100),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));
+    world.addEntity(object4);
+
+    BasicEntity object5 = new BasicEntity("Pansy.gif", world);
+    object5.setLocation(251,370);
+    object5.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.0,0.3,0.7,0.0,0.0,0.0,0.0}
+            , 100),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));
+    world.addEntity(object5);	
+
+
+    // Add Recurrent network
+    source("./scripts/scriptmenu/sparseNetwork.bsh");
+    NetworkComponent networkComponent = workspace.getComponent("Sparse Network");
+    Network network = networkComponent.getNetwork();
+    List targetNeurons = network.getFlatNeuronList();
+    List sourceNeurons = new ArrayList();
+
+    // Add input layer to recurrent network
+    LineLayout layout = new LineLayout(-20,350,70, LineOrientation.HORIZONTAL);
+    for (int i = 0; i < 5; i++) {
+        Neuron neuron = new Neuron(network, "LinearRule");
+        neuron.setLowerBound(0);
+        neuron.setUpperBound(100);
+        network.addNeuron(neuron);
+        sourceNeurons.add(neuron);
+    }
+    layout.layoutNeurons(sourceNeurons);
+    //((NetworkDesktopComponent)desktop.getDesktopComponent(networkComponent)).getNetworkPanel().centerCamera();
+
+    // Connect input layer to main network
+    Sparse sparseConnect = new Sparse(network, sourceNeurons, targetNeurons);
+    //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
+    sparseConnect.setSparsity(.4);
+    sparseConnect.setExcitatoryRatio(1);
+    sparseConnect.connectNeurons();
+
+    // Couple odor world to network
+    String mouseId = mouse.getId();
+    Producer smell1 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 0, "Sensor 1"); 
+    Producer smell2 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 1, "Sensor 2"); 
+    Producer smell3 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 2, "Sensor 3"); 
+    Producer smell4 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 3, "Sensor 4"); 
+    Producer smell5 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 4, "Sensor 5");   
+    Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_26"), "setInputValue", double.class, "Output neuron 1"); 
+    Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_27"), "setInputValue", double.class, "Output neuron 2"); 
+    Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_28"), "setInputValue", double.class, "Output neuron 3"); 
+    Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_29"), "setInputValue", double.class, "Output neuron 4"); 
+    Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_30"), "setInputValue", double.class, "Output neuron 5"); 
+    workspace.getCouplingManager().addCoupling(new Coupling(smell1, inputNeuron1));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell2, inputNeuron2));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell3, inputNeuron3));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell4, inputNeuron4));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell5, inputNeuron5));
+
+    // Create projection plot
+    ProjectionComponent chart = new ProjectionComponent("Network Projection");
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(890, 38, 400, worldHeight);
+
+    // Couple network to projection chart
+    for (int i = 1; i < 25; i++) {
+        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class, "Neuron " + i); 
+        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+    }
+
+
+}

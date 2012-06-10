@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<br>
+
+<a href="../../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../connections.html">Connections</a></p>
+</div>
+
+<h1>Sparse Connection<br>
+</h1><br>
+<p>Sparse connectivity gets its name from the concept of a sparse
+matrix i.e. a matrix primarily populated by zeros. Likewise, since a
+given set of connections is generally represented as a "weight matrix"
+this corresponds to there being a relatively small number of
+connections between two sets of neurons. Specifically, the sparse
+connection panel allows users to specify how well connected two sets of
+neurons are in terms of a percentage of the total possible connections
+(0% being no connections and 100% being the same as <a href="./alltoall.html">connecting every source neuron to every target neuron</a>).
+Technically, this means that sparse is capable of creating so called
+"dense" connectivity, since any percent is possible (so long as there
+are enough neurons). It should be noted that sparse connects sets of
+neurons randomly (i.e. if one has 4 source neurons and 4 target neurons
+and desires 50% connectivity 8 synapses will be generated connecting
+random source neurons to random target neurons), and futhermore it is
+impossible to designate or guarantee than any particular connection
+will be generated. In the aforementioned example there is no guarantee
+that there will be a connection between say source neuron 2 and target
+neuron 3, unless the percent connectivity is set to 100%. Sparse
+connection does guarantee that the number of synapses generated will be
+the closest possible approximation of the percent connectivity
+specified (since any percentage of possible connections must be an
+integer value). Parameters relating to inhibitory and excitatory
+attributes of these connections can be adjusted from the sparse panel
+via the <a href="./excitatoryinhibitoryproperties.html">excitatory/inhibitory properties sub-panel.</a></p>
+<br>
+
+
+</div>
+
+</body></html>

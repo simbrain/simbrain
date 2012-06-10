@@ -1,0 +1,15 @@
+iterate() {
+	network.updateInputs();
+	network.getNeuron("n_2").update();
+	network.getNeuron("n_3").update();
+	network.getNeuron("n_4").update();
+	network.getNeuron("n_5").update();
+	network.getNeuron("n_1").update();
+	network.getNeuron("n_1").setActivation(network.getNeuron("n_1").getBuffer());
+	network.updateAllWeights();
+	network.updateTime();
+	network.updateWorlds();
+	network.fireNetworkChanged();
+	network.clearInputs();
+	network.setUpdateCompleted(true);
+}

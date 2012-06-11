@@ -1265,4 +1265,23 @@ public class SimbrainDesktop {
     private int getDividerLocation() {
         return (int) (3 * (workspaceBounds.getHeight() / 4));
     }
+
+    /**
+     * Returns the width of the visible portion of the desktop.
+     *
+     * @return visible width.
+     */
+    public double getWidth() {
+        return desktop.getVisibleRect().getWidth();
+    }
+
+    /**
+     * Returns the height of the visible portion of the desktop.
+     *
+     * @return the visible height
+     */
+    public double getHeight() {
+        return desktop.getVisibleRect().getHeight();
+    }
+
 }

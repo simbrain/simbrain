@@ -1,0 +1,350 @@
+<org.simbrain.network.core.Network>
+  <neuronList>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>0.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>true</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>252949826054089</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_1</id>
+      <label>Left sensor</label>
+      <activation>0.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>0.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>132.57830536562656</x>
+      <y>110.0</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>0.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>true</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>252949643684176</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_2</id>
+      <label>Right sensor</label>
+      <activation>0.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>0.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>248.93420029378723</x>
+      <y>110.73744923528903</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>2.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>true</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>252948314823483</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_3</id>
+      <label>Forward</label>
+      <activation>1.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>1.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>191.4476185986111</x>
+      <y>33.10723179617574</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>0.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>true</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>252948114071690</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_4</id>
+      <label>Left</label>
+      <activation>0.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>0.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>132.57830536562656</x>
+      <y>39.34165730579794</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>0.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>true</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>252947874622437</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_5</id>
+      <label>Right</label>
+      <activation>0.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>0.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>248.93420029378723</x>
+      <y>39.34165730579794</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+  </neuronList>
+  <synapseList>
+    <org.simbrain.network.core.Synapse>
+      <parentNetwork reference="../../.."/>
+      <source reference="../../../neuronList/org.simbrain.network.core.Neuron[2]"/>
+      <target reference="../../../neuronList/org.simbrain.network.core.Neuron[5]"/>
+      <learningRule class="org.simbrain.network.synapse_update_rules.ClampedSynapseRule">
+        <clipped>false</clipped>
+      </learningRule>
+      <id>Synapse_2</id>
+      <strength>1.0</strength>
+      <increment>1.0</increment>
+      <upperBound>10.0</upperBound>
+      <lowerBound>-10.0</lowerBound>
+      <delay>0</delay>
+      <sendWeightedInput>true</sendWeightedInput>
+    </org.simbrain.network.core.Synapse>
+    <org.simbrain.network.core.Synapse>
+      <parentNetwork reference="../../.."/>
+      <source reference="../../../neuronList/org.simbrain.network.core.Neuron[2]"/>
+      <target reference="../../../neuronList/org.simbrain.network.core.Neuron[4]"/>
+      <learningRule class="org.simbrain.network.synapse_update_rules.ClampedSynapseRule">
+        <clipped>false</clipped>
+      </learningRule>
+      <id>Synapse_3</id>
+      <strength>-1.0</strength>
+      <increment>1.0</increment>
+      <upperBound>10.0</upperBound>
+      <lowerBound>-10.0</lowerBound>
+      <delay>0</delay>
+      <sendWeightedInput>true</sendWeightedInput>
+    </org.simbrain.network.core.Synapse>
+    <org.simbrain.network.core.Synapse>
+      <parentNetwork reference="../../.."/>
+      <source reference="../../../neuronList/org.simbrain.network.core.Neuron"/>
+      <target reference="../../../neuronList/org.simbrain.network.core.Neuron[5]"/>
+      <learningRule class="org.simbrain.network.synapse_update_rules.ClampedSynapseRule">
+        <clipped>false</clipped>
+      </learningRule>
+      <id>Synapse_5</id>
+      <strength>-1.0</strength>
+      <increment>1.0</increment>
+      <upperBound>10.0</upperBound>
+      <lowerBound>-10.0</lowerBound>
+      <delay>0</delay>
+      <sendWeightedInput>true</sendWeightedInput>
+    </org.simbrain.network.core.Synapse>
+    <org.simbrain.network.core.Synapse>
+      <parentNetwork reference="../../.."/>
+      <source reference="../../../neuronList/org.simbrain.network.core.Neuron"/>
+      <target reference="../../../neuronList/org.simbrain.network.core.Neuron[4]"/>
+      <learningRule class="org.simbrain.network.synapse_update_rules.ClampedSynapseRule">
+        <clipped>false</clipped>
+      </learningRule>
+      <id>Synapse_6</id>
+      <strength>1.0</strength>
+      <increment>1.0</increment>
+      <upperBound>10.0</upperBound>
+      <lowerBound>-10.0</lowerBound>
+      <delay>0</delay>
+      <sendWeightedInput>true</sendWeightedInput>
+    </org.simbrain.network.core.Synapse>
+  </synapseList>
+  <groupList/>
+  <textList/>
+  <updateManager>
+    <actionList>
+      <org.simbrain.network.update__actions.BufferedUpdate>
+        <network reference="../../../.."/>
+      </org.simbrain.network.update__actions.BufferedUpdate>
+    </actionList>
+    <availableActionList>
+      <org.simbrain.network.update__actions.PriorityUpdate>
+        <network reference="../../../.."/>
+      </org.simbrain.network.update__actions.PriorityUpdate>
+    </availableActionList>
+    <network reference="../.."/>
+  </updateManager>
+  <synapseRouter>
+    <routingMap/>
+    <incomingUnified/>
+    <outgoingUnified/>
+    <autoRouting>false</autoRouting>
+  </synapseRouter>
+  <time>0.0</time>
+  <timeStep>0.01</timeStep>
+  <timeType>DISCRETE</timeType>
+  <clampWeights>false</clampWeights>
+  <clampNeurons>false</clampNeurons>
+  <prioritySortedNeuronList>
+    <org.simbrain.network.core.Neuron reference="../../neuronList/org.simbrain.network.core.Neuron"/>
+    <org.simbrain.network.core.Neuron reference="../../neuronList/org.simbrain.network.core.Neuron[2]"/>
+    <org.simbrain.network.core.Neuron reference="../../neuronList/org.simbrain.network.core.Neuron[3]"/>
+    <org.simbrain.network.core.Neuron reference="../../neuronList/org.simbrain.network.core.Neuron[4]"/>
+    <org.simbrain.network.core.Neuron reference="../../neuronList/org.simbrain.network.core.Neuron[5]"/>
+    <org.simbrain.network.core.Neuron>
+      <updateRule class="org.simbrain.network.neuron_update_rules.LinearRule">
+        <slope>1.0</slope>
+        <bias>0.0</bias>
+        <noiseGenerator>
+          <distributionIndex>0</distributionIndex>
+          <upperBound>1.0</upperBound>
+          <lowerBound>-1.0</lowerBound>
+          <mean>0.5</mean>
+          <standardDeviation>0.5</standardDeviation>
+          <clipping>false</clipping>
+          <randomGenerator serialization="custom">
+            <java.util.Random>
+              <default>
+                <seed>130356018508567</seed>
+                <nextNextGaussian>0.0</nextNextGaussian>
+                <haveNextNextGaussian>false</haveNextNextGaussian>
+              </default>
+            </java.util.Random>
+          </randomGenerator>
+        </noiseGenerator>
+        <addNoise>false</addNoise>
+        <clipping>true</clipping>
+      </updateRule>
+      <id>Neuron_7</id>
+      <label></label>
+      <activation>0.0</activation>
+      <lowerBound>-1.0</lowerBound>
+      <upperBound>1.0</upperBound>
+      <increment>0.1</increment>
+      <buffer>0.0</buffer>
+      <inputValue>0.0</inputValue>
+      <parent reference="../../.."/>
+      <x>204.0</x>
+      <y>14.0</y>
+      <clamped>false</clamped>
+      <targetValue>0.0</targetValue>
+      <updatePriority>0</updatePriority>
+    </org.simbrain.network.core.Neuron>
+  </prioritySortedNeuronList>
+  <priorityComparator>
+    <outer-class reference="../.."/>
+  </priorityComparator>
+  <neuronIdGenerator>
+    <rootName>Neuron</rootName>
+    <index>8</index>
+  </neuronIdGenerator>
+  <synapseIdGenerator>
+    <rootName>Synapse</rootName>
+    <index>7</index>
+  </synapseIdGenerator>
+  <groupIdGenerator>
+    <rootName>Group</rootName>
+    <index>1</index>
+  </groupIdGenerator>
+  <roundOffActivationValues>false</roundOffActivationValues>
+  <precision>0</precision>
+</org.simbrain.network.core.Network>

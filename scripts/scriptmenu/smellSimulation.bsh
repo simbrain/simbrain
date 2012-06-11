@@ -1,6 +1,7 @@
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.*;
+import javax.swing.JInternalFrame;
 import org.simbrain.network.neurons.*;
 import org.simbrain.network.*;
 import org.simbrain.network.connections.*;
@@ -20,9 +21,12 @@ import org.simbrain.plot.projection.*;
 
 {
 
-    // Variables
-    int worldHeight = 500;
-    int worldWidth = 400;
+    // Layout variables
+    int distance_from_top = 10;  
+    int distance_from_left = 10;
+    int buffer = 10;
+    int componentWidth = desktop.getWidth()/3 - buffer;
+    int componentHeight = desktop.getHeight() - buffer;
 
     // Init workspace
     workspace.clearWorkspace();
@@ -31,7 +35,6 @@ import org.simbrain.plot.projection.*;
     OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
     OdorWorld world = odorWorld.getWorld();
     workspace.addWorkspaceComponent(odorWorld);
-    desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(470, 38, worldWidth, worldHeight);
 
     // Add agent to environment
     RotatingEntity mouse = new RotatingEntity(world);
@@ -132,7 +135,7 @@ import org.simbrain.plot.projection.*;
     // Create projection plot
     ProjectionComponent chart = new ProjectionComponent("Network Projection");
     workspace.addWorkspaceComponent(chart);
-    desktop.getDesktopComponent(chart).getParentFrame().setBounds(890, 38, 400, worldHeight);
+
 
     // Couple network to projection chart
     for (int i = 1; i < 25; i++) {
@@ -140,6 +143,17 @@ import org.simbrain.plot.projection.*;
         Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
+    
+    // Position components
+	JInternalFrame networkFrame = desktop.getDesktopComponent(networkComponent).getParentFrame(); 
+	networkFrame.setBounds(distance_from_left, distance_from_top, componentWidth, componentHeight);
+    
+	JInternalFrame chartFrame = desktop.getDesktopComponent(chart).getParentFrame();
+	chartFrame.setBounds(networkFrame.getX() + networkFrame.getWidth() + buffer, distance_from_top, componentWidth, componentHeight);
+    
+	desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(chartFrame.getX() + chartFrame.getWidth() + buffer, distance_from_top, componentWidth, componentHeight);
+
+
 
 
 }

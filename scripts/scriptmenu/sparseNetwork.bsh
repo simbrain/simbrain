@@ -7,6 +7,7 @@ import org.simbrain.network.neurons.*;
 import org.simbrain.workspace.*;
 
 {
+	// NOTE: Other scripts call this script, so changes here will affect those (e.g. smell simulation).
 
     // Parameters 
     int NUM_NEURONS = 25;

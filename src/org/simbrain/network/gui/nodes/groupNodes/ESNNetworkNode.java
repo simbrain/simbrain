@@ -28,7 +28,7 @@ import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 public class ESNNetworkNode extends SubnetworkNode {
 
     /**
-     * Create an ESN network
+     * Create an ESN network.
      *
      * @param networkPanel parent panel
      * @param group the ESN

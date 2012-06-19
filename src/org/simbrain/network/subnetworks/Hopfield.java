@@ -187,14 +187,4 @@ public class Hopfield extends Subnetwork {
         this.updateOrder = updateOrder;
     }
 
-    public boolean getEnabled() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void setEnabled(boolean enabled) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

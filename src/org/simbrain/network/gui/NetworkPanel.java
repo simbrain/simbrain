@@ -1566,11 +1566,13 @@ public class NetworkPanel extends JPanel {
         for (Neuron neuron : network.getNeuronList()) {
             addNeuron(neuron);
         }
-        for (Synapse synapse : network.getSynapseList()) {
-            addSynapse(synapse);
-        }
         for (Group group : network.getGroupList()) {
             addGroup(group);
+        }
+        // Synapses must be added _after_ groups are added so that all neurons in groups are
+        // in place.
+        for (Synapse synapse : network.getSynapseList()) {
+            addSynapse(synapse);
         }
         for (NetworkTextObject text : network.getTextList()) {
             addTextObject(text);

@@ -173,7 +173,7 @@ public class ScriptEditor extends JPanel {
      * Initialize the frame with the provided panel.
      *
      * @param frame frame to initialize
-     * @param editor the panel to dispaly in the frame
+     * @param editor the panel to display in the frame
      */
     private static void initFrame(final GenericFrame frame,
             final ScriptEditor editor) {
@@ -254,8 +254,11 @@ public class ScriptEditor extends JPanel {
                 SFileChooser fileChooser = new SFileChooser(
                         SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
                 final File scriptFile = fileChooser.showOpenDialog();
-                frame.setTitle(scriptFile.getName());
+                if (scriptFile == null) {
+                    return;
+                }
 
+                frame.setTitle(scriptFile.getName());
                 try {
                     BufferedReader r = new BufferedReader(new FileReader(
                             scriptFile));

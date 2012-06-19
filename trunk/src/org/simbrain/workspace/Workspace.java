@@ -67,6 +67,9 @@ public class Workspace {
 
     /** Current workspace file. */
     private File currentFile = null;
+    
+    /** A persistence representation of the time (the updater's state is not persisted).*/
+    private int savedTime;
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
@@ -609,8 +612,19 @@ public class Workspace {
      *
      * @return the time
      */
-    public Number getTime() {
-        return updater.getTime();
+    public int getTime() {
+        if (updater == null) {
+            return 0;
+        } else {
+            return updater.getTime();
+        }
+    }
+
+    /**
+     * @return the savedTime
+     */
+    protected int getSavedTime() {
+        return savedTime;
     }
 
     /**
@@ -644,17 +658,21 @@ public class Workspace {
     }
 
     /**
-     * Actions required prior to proper serialization. TODO: A bit of a hack.
-     * Currently just moves trainer components to the back of the list, so they
-     * are serialized last, and hence deserialized last.
+     * Actions required prior to proper serialization.
      */
     void preSerializationInit() {
+        /**
+         * TODO: A bit of a hack. Currently just moves trainer components to the
+         * back of the list, so they are serialized last, and hence deserialized
+         * last.
+         */
         Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
             public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
                 return Integer.valueOf(c1.getSerializePriority()).compareTo(
                         Integer.valueOf(c2.getSerializePriority()));
             }
         });
+        savedTime = getTime();
     }
 
     /**
@@ -687,5 +705,6 @@ public class Workspace {
         updater.getUpdateManager().clearCurrentActions();
         updater.getUpdateManager().addAction(action);
     }
+
 
 }

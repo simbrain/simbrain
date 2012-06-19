@@ -78,8 +78,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
-        model = new TimeSeriesModel();
-        model.addDataSources(numDataSources);
+        model = new TimeSeriesModel(numDataSources);
         initializeAttributes();
         addListener();
     }
@@ -284,7 +283,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
          */
         public void setValue(final double val) {
             model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
-                    .getTime().doubleValue(), val);
+                    .getTime(), val);
         }
 
         /**

@@ -79,7 +79,7 @@ public class WorkspaceUpdater {
     private volatile boolean run = false;
 
     /** The number of times the update has run. */
-    private volatile int time = 0;
+    private volatile int time;
 
     /** Number of threads used in the update service. */
     private int numThreads;
@@ -148,6 +148,16 @@ public class WorkspaceUpdater {
     public int getTime() {
         return time;
     }
+
+    /**
+     * Sets the time.
+     *
+     * @param time time to set
+     */
+    public void setTime(final int time) {
+        this.time = time;
+    }
+
 
     /**
      * Reset time to 0.

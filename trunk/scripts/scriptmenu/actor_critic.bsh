@@ -17,6 +17,7 @@ import org.simbrain.workspace.updater.*;
 import org.simbrain.world.odorworld.*;
 import org.simbrain.world.odorworld.entities.*;
 import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.plot.timeseries.*;
 import javax.swing.*;
 import java.swing.*;
 import java.util.*;
@@ -42,12 +43,13 @@ import java.util.concurrent.*;
     double lambda = .6; // 0 for no trace; 1 for permanent trace.  .9 default 
     double epsilon = .3; // Prob. of taking a random action
     double rewardDispersionFactor = 3; // Number of tiles for reward to disperse
+    double movementFactor = 1; // Number of tiles to move
 
     // World Parameters
     int worldWidth = 250; 
     int worldHeight = 250; // just one var?
     int numTiles = 7; // Number of rows / cols in each tileset
-    int tileSets = 2; // Number of tilesets
+    int tileSets = 1; // Number of tilesets
     boolean worldWrap = false; // Currently hard to get good performance if set to true
 
     // Other variables
@@ -189,7 +191,7 @@ import java.util.concurrent.*;
             }            
             for(NeuronWithMemory neuron : actionNeurons) {
                 if (neuron == winningNeuron) {
-                    neuron.setActivation(tileSize);
+                    neuron.setActivation(tileSize * movementFactor);
 
                 } else {
                     neuron.setActivation(0);
@@ -282,26 +284,26 @@ import java.util.concurrent.*;
 
     // Absolute movement couplings
     List effectorCouplings = new ArrayList();
-    Producer northProducer = worldComponent.getAttributeManager().createProducer(northNeuron, "getActivation", double.class); 
-    Consumer northMovement = networkComponent.getAttributeManager().createConsumer(mouse, "moveNorth", double.class, "North"); 
+    Producer northProducer = networkComponent.getAttributeManager().createProducer(northNeuron, "getActivation", double.class); 
+    Consumer northMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveNorth", double.class, "North"); 
     Coupling northCoupling = new Coupling(northProducer, northMovement);
     effectorCouplings.add(northCoupling);
     workspace.getCouplingManager().addCoupling(northCoupling);
     
-    Producer southProducer = worldComponent.getAttributeManager().createProducer(southNeuron, "getActivation", double.class); 
-    Consumer southMovement = networkComponent.getAttributeManager().createConsumer(mouse, "moveSouth", double.class, "South"); 
+    Producer southProducer = networkComponent.getAttributeManager().createProducer(southNeuron, "getActivation", double.class); 
+    Consumer southMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveSouth", double.class, "South"); 
     Coupling southCoupling = new Coupling(southProducer, southMovement);
     effectorCouplings.add(southCoupling);
     workspace.getCouplingManager().addCoupling(southCoupling);
     
-    Producer eastProducer = worldComponent.getAttributeManager().createProducer(eastNeuron, "getActivation", double.class); 
-    Consumer eastMovement = networkComponent.getAttributeManager().createConsumer(mouse, "moveEast", double.class, "East"); 
+    Producer eastProducer = networkComponent.getAttributeManager().createProducer(eastNeuron, "getActivation", double.class); 
+    Consumer eastMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveEast", double.class, "East"); 
     Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
     effectorCouplings.add(eastCoupling);
     workspace.getCouplingManager().addCoupling(eastCoupling);
     
-    Producer westProducer = worldComponent.getAttributeManager().createProducer(westNeuron, "getActivation", double.class); 
-    Consumer westMovement = networkComponent.getAttributeManager().createConsumer(mouse, "moveWest", double.class, "West"); 
+    Producer westProducer = networkComponent.getAttributeManager().createProducer(westNeuron, "getActivation", double.class); 
+    Consumer westMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveWest", double.class, "West"); 
     Coupling westCoupling = new Coupling(westProducer, westMovement);
     effectorCouplings.add(westCoupling);
     workspace.getCouplingManager().addCoupling(westCoupling);
@@ -316,6 +318,34 @@ import java.util.concurrent.*;
             }            
         }
     }
+    
+    // Make time series chart
+    TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("TD, Value, Reward", 1);
+    chart.getModel().setAutoRange(false);
+    chart.getModel().setRangeUpperBound(1);
+    chart.getModel().setRangeLowerBound(-1);
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(700, 340, 300, 300);
+
+
+    // Couple network to chart
+    Producer valueProducer = networkComponent.getAttributeManager().createProducer(valueNeuron, "getActivation", double.class); 
+    Consumer timeSeriesConsumer1 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(0));
+    valueCoupling = new Coupling(valueProducer, timeSeriesConsumer1);
+    workspace.getCouplingManager().addCoupling(valueCoupling);
+    sensorCouplings.add(valueCoupling);
+    
+//    Producer rewardProducer = networkComponent.getAttributeManager().createProducer(rewardNeuron, "getActivation", double.class); 
+//    Consumer timeSeriesConsumer2 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(1));
+//    rewardCoupling = new Coupling(rewardProducer, timeSeriesConsumer2);
+//    workspace.getCouplingManager().addCoupling(rewardCoupling);
+//    sensorCouplings.add(rewardCoupling);
+//    
+//    Producer tdProducer = networkComponent.getAttributeManager().createProducer(tdErrorNeuron, "getActivation", double.class); 
+//    Consumer timeSeriesConsumer3 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(3));
+//    tdCoupling = new Coupling(tdProducer, timeSeriesConsumer3);
+//    workspace.getCouplingManager().addCoupling(tdCoupling);
+//    sensorCouplings.add(tdCoupling);
 
     // Set up button panel
     JInternalFrame internalFrame = new JInternalFrame("Simulation", true, true);
@@ -334,6 +364,10 @@ import java.util.concurrent.*;
     JTextField epsilonField = new JTextField();
     epsilonField.setText("" + epsilon);
     panel.addItem("Epsilon", epsilonField);
+    JTextField movementField = new JTextField();
+    movementField.setText("" + movementFactor);
+    movementField.setToolTipText("Percentage of a tile, by which to move on each iteration.");
+    panel.addItem("Movement Factor", movementField);
 
     // Run Button
     JButton runButton = new JButton("Run");
@@ -347,6 +381,7 @@ import java.util.concurrent.*;
                     gamma = Double.parseDouble(discountField.getText());
                     lambda = Double.parseDouble(lambdaField.getText());
                     epsilon = Double.parseDouble(epsilonField.getText());
+                    movementFactor = Double.parseDouble(movementField.getText());
                     
                     stop = false;
                     for (int i = 1; i < numTrials+1; i++) {
@@ -394,7 +429,7 @@ import java.util.concurrent.*;
 
         }});
     panel.addItem("Simulation", runButton);
-    
+
     // Stop Button
     JButton stopButton = new JButton("Stop");
     panel.addItem("Stop simulation", stopButton);

@@ -215,14 +215,4 @@ public class WinnerTakeAll extends NeuronGroup {
     public void setRandomProb(double randomProb) {
         this.randomProb = randomProb;
     }
-
-    public boolean getEnabled() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void setEnabled(boolean enabled) {
-        // TODO Auto-generated method stub
-
-    }
 }

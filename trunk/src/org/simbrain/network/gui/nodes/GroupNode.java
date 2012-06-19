@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
@@ -35,6 +36,7 @@ import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -125,18 +127,33 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected JPopupMenu getDefaultContextMenu() {
         JPopupMenu ret = new JPopupMenu();
+        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+        editor.setUseSuperclass(false);
+        editor.setObject(getGroup());
+        // Only add edit properties action if there are properties to edit
+        if (editor.getFieldCount() > 0) {
+            Action editGroup = new AbstractAction("Group properties...") {
+                public void actionPerformed(final ActionEvent event) {
+                    JDialog dialog = editor.getDialog();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            };
+            ret.add(editGroup);
+        }
         Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {
                 String newName = JOptionPane.showInputDialog("Name:");
                 group.setLabel(newName);
             }
         };
+        ret.add(editGroupName);
         Action removeGroup = new AbstractAction("Remove group") {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().getNetwork().removeGroup(group);
             }
         };
-        ret.add(editGroupName);
         ret.add(removeGroup);
         return ret;
     }

@@ -78,7 +78,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /** If true, use superclass methods. */
     private boolean useSuperclass = true;
-
+    
     /**
      * Associate property names with JComponents that are used to set those
      * values.
@@ -610,6 +610,15 @@ public class ReflectivePropertyEditor extends JPanel {
      */
     public void setExcludeList(String[] strings) {
         this.excludeList = strings;
+    }
+
+    /**
+     * Returns the number of items contained in the panel.
+     *
+     * @return number of items in panel.
+     */
+    public int getFieldCount() {
+        return itemPanel.getMyNextItemRow();
     }
 
 }

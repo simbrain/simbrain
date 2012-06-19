@@ -321,6 +321,8 @@ public class WorkspaceSerializer {
         if (contents.getWorkspaceParameters() != null) {
             workspace.setUpdateDelay(contents.getWorkspaceParameters()
                     .getUpdateDelay());
+            workspace.getUpdater().setTime(
+                    contents.getWorkspaceParameters().getSavedTime());
         }
     }
 

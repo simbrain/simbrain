@@ -232,6 +232,7 @@ public class SimbrainDesktop {
          */
         public void newWorkspaceOpened() {
             frame.setTitle(workspace.getCurrentFile().getName());
+            updateTimeLabel();
         }
 
     };
@@ -983,6 +984,7 @@ public class SimbrainDesktop {
             workspace.openWorkspace(simFile);
             workspace.setCurrentDirectory(simulationChooser
                     .getCurrentLocation());
+            workspace.setCurrentFile(simFile);
         }
     }
 

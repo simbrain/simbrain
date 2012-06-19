@@ -42,7 +42,9 @@ import javax.swing.TransferHandler;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
+import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
@@ -279,6 +281,17 @@ public class UpdateManagerPanel extends JPanel {
                 network.getUpdateManager().moveActionToAvailableList(
                         (NetworkUpdateAction) action);
             }
+            for (Object action : availableActionJList.getSelectedValues()) {
+                // Don't allow built in actions to be removed
+                if ((action instanceof BufferedUpdate)
+                        || (action instanceof PriorityUpdate)) {
+                    continue;
+                } else {
+                    network.getUpdateManager().removeAvailableAction(
+                            (NetworkUpdateAction) action);
+                }
+            }
+
         }
     };
 

@@ -22,9 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -50,6 +47,7 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
+import org.simbrain.workspace.updater.UpdateAllBuffered;
 
 /**
  * Panel for display and ordering of workspace update actions.
@@ -309,8 +307,13 @@ public class UpdateManagerPanel extends JPanel {
                         .moveActionToAvailableList((UpdateAction) action);
             }
             for (Object action : availableActionJList.getSelectedValues()) {
-                workspace.getUpdater().getUpdateManager()
-                        .removeAction((UpdateAction) action);
+                // Don't allow built in actions to be removed
+                if (action instanceof UpdateAllBuffered) {
+                    continue;
+                } else {
+                    workspace.getUpdater().getUpdateManager()
+                    .removeAction((UpdateAction) action);
+                }
             }
         }
     };

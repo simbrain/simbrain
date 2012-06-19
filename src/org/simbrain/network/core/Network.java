@@ -332,7 +332,7 @@ public class Network {
     }
 
     /**
-     * Find groups with a given label.
+     * Find groups with a given label, or null if none found.
      *
      * @param label label to search for.
      * @return list of groups with that label found, null otherwise
@@ -344,7 +344,26 @@ public class Network {
                 returnList.add(group);
             }
         }
-        return returnList;
+        if (returnList.isEmpty()) {
+            return null;
+        } else {
+            return returnList;
+        }
+    }
+
+    /**
+     * Find group with a given label, or null if none found.
+     *
+     * @param label label to search for.
+     * @return list of groups with that label found, null otherwise
+     */
+    public Group getGroupByLabel(final String label) {
+        List<Group> returnList = getGroupsByLabel(label);
+        if (returnList == null) {
+            return null;
+        } else {
+            return returnList.get(0);
+        }
     }
 
     /**

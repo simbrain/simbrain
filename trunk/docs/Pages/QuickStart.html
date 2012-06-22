@@ -2,6 +2,7 @@
 <html><head><title>Simbrain Documentation</title>
 
 
+
   
 
   
@@ -23,30 +24,35 @@
 <h1>Simbrain Quick Start<br>
 </h1>
 <p class="heading">Some quick things you can do to see things happen... </p>
+<p>1: Open different workspaces using <span class="command">File &gt; Open Workspace</span> (open the .zip files) and press play <img src="../Images/Play.gif" height="18" width="18"> in the in the workspace toolbar to see what happens.</p>
+<p> 2: Run different scripts using the  the <span class="command">Scripts</span> menu and either press the buttons in the button panel that appears, or press play <img src="../Images/Play.gif" height="18" width="18"> in the in the workspace toolbar to see what happens.</p>
 
-      
-<p> 1: Run different scripts using the  the <span class="command">Scripts</span> menu and press play <img src="../Images/Play.gif" height="18" width="18"> in the in the workspace toolbar to see what happens.</p>
-
-  
-<p>2: Open different workspaces using <span class="command">File &gt; Open Workspace</span> (open the .zip files) and press play <img src="../Images/Play.gif" height="18" width="18"> in the in the workspace toolbar to see what happens.</p>
 
   
-<p>To get rid of everything in the workspace,  use <span class="command">File &gt; Clear Workspace</span>. </p>
+
+
+  
+<p>To get rid of everything in the workspace,  use <span class="command">File &gt; Clear Workspace</span>. <span style="font-weight: bold;"><br>
+</span></p>
 
   
 <p class="heading">Add networks to the workspace
   </p>
+
 <p>Click the network button <img src="../Images/Network.png" height="18" width="18">
 in the main toolbar a few times. You should see a few networks show up.
-You can move them around however you like, maximize and minimize them. </p>
+You can move them around however you like and resize them.<br>
+ </p>
 
   
 <p class="heading">Add neurons to a network </p>
 
   
-<p>Click in one of the networks you created. Now create some neurons, by presing the <img src="../Images/AddNeuron.png" height="18" width="18">
-button or using the "P" key (shown here as upper-case; however to use
-it, use lower case). Do this a few times to create a line of neurons. </p>
+<p>Click in one of the networks you created. Now create some neurons, by presing the <img src="../Images/AddNeuron.png" height="18" width="18">button
+or using the "p" key. Do this a few times to create a line of neurons.
+(For all network key commands, the network window must be selected for
+the command to work)<br>
+ </p>
 
   
 <p class="heading">Select  those neurons </p>
@@ -56,7 +62,7 @@ it, use lower case). Do this a few times to create a line of neurons. </p>
   </p>
 <p>Use
 the mouse the draw a lasso around the neurons so that they are
-selected. You can also press the "N" button to select all neurons.
+selected. You can also press the "n" button to select all neurons.
 Green halos will show up around these neurons signifying that you have
 selected them. </p>
 
@@ -76,7 +82,7 @@ selected them. </p>
 <p><span class="heading">Delete neurons </span></p>
 
   
-<p>Select all your neurons, and press the delete button <img src="../Images/DeleteNeuron.png" height="18" width="18"> or the "backspace" or "delete" key. </p>
+<p>Select all your neurons using "n", and press the delete button <img src="../Images/DeleteNeuron.png" height="18" width="18"> or the "backspace" or "delete" key. </p>
 
   
 <p><span class="heading">Connect one  neuron to another </span></p>
@@ -94,13 +100,15 @@ selected them. </p>
 <p>4) Connect the source to the target neuron using <span class="command">Edit &gt; Connect &gt; Connect Source-Target &gt; All to all</span> or by pressing the "2" key. (After a while you can get quick at selecting, and using the "1" and "2" keys to connect neurons).</p>
 
   
-<p>5) If you like, clear the "source neuron" halo by going to <span class="command">Edit &gt; Connect &gt; Clear source neuron(s)</span></p>
+<p>5) If you like, clear the "source neuron" halo by going to  <span class="command">Edit &gt; Connect &gt; Clear source neuron(s) </span>or by clicking outside any neurons or weights and pressing "1". <span class="command"><br>
+</span></p>
+
 
   
 <p><span class="heading">Add activation to  one neuron </span></p>
 
   
-<p>Select the source neuron from above. Press the "up" arrow button, and observe the value of the neuron change upwards.</p>
+<p>Select the source neuron you just created. Press the "up" arrow button, and observe the value of the neuron change upwards.</p>
 
   
 <p><span class="heading">Iterate a network </span></p>
@@ -141,7 +149,8 @@ the activation propagates differently. </p>
 <p><span class="heading">Make a layered network </span></p>
 
   
-<p>Let's make a new network. Delete everything you've done up until now.</p>
+<p>Let's make a new network. Delete everything you've done up until now (press "a" to select all and delete to delete).<br>
+</p>
 
   
 <p>1. Make a row of neurons by pressing "P" a few times.</p>
@@ -185,13 +194,16 @@ OK.</p>
 <p>2. Select all the neurons with "N"</p>
 
   
-<p>3. Connect them all to themselves using <span class="command">Edit &gt; Connect &gt; Connect Self &gt; All to all.</span></p>
+<p>3. Connect them all to themselves by pressing "1" then "2".&nbsp;&nbsp;
+(This works because in step 2 they were designated as target neurons,
+and by pressing "1" they were designated as source neurons, and&nbsp;
+pressing "2" connected all source to all target neurons).<span style="font-style: italic;"></span><span class="command"></span></p>
 
   
-<p>4. Randomize the weights by first pressing "W" to select all weights, and then pressing "R" to randomize them.</p>
+<p>4. Randomize the weights by first pressing "w" to select all weights, and then pressing "r" to randomize them.</p>
 
   
-<p>5. Randomize the neurons by first pressing "N" to select all neurons, and then pressing "R" to randomize them.</p>
+<p>5. Randomize the neurons by first pressing "n" to select all neurons, and then pressing "r" to randomize them.</p>
 
   
 <p>6.
@@ -202,7 +214,7 @@ Periodically re-randomize the neurons using "N" followed by "R". </p>
 <p><span class="heading">Edit a few neurons </span></p>
 
   
-<p>1. Select all the weights in your network by pressing "W" or using <span class="command">Select &gt; Edit Selected Neurons</span></p>
+<p>1. Select all the weights in your network by pressing "w" or using <span class="command">Select &gt; Edit Selected Neurons</span></p>
 
   
 <p>2. Double click one of the neurons, or use <span class="command">Edit &gt; Edit Selected Neurons</span>. A neuron dialog will show up allowing you to edit these neurons. Change the update rule to <span class="command">Clamped</span>. </p>
@@ -220,11 +232,11 @@ Periodically re-randomize the neurons using "N" followed by "R". </p>
 <p>2. Double click one of the synapses, or use <span class="command">Edit &gt; Edit Selected Synapse(s)</span>. A synapse dialog will show up allowing you to edit these weights. Change the learning rule to <span class="command">Hebbian</span>. </p>
 
   
-<p>3. Randomize everything by using<span class="command"> Select &gt; Select All </span>or pressing "A" or command-A, and then pressing "R" (this randomizes weights and neurons).</p>
+<p>3. Randomize everything by using<span class="command"> Select &gt; Select All </span>or pressing "a" and then pressing "r" (this randomizes weights <span style="font-style: italic;">and</span> neurons).</p>
 
   
 <p>4. Press the play button <img src="../Images/Play.gif" height="18" width="18">.
-Periodicaly press "A" then "R" to re-randomize the network. Notice that
+Periodically press "a" then "r" to re-randomize the network. Notice that
 the weights slowly change their size, becuse they are learning using
 the Hebb rule. </p>
 
@@ -235,7 +247,8 @@ the Hebb rule. </p>
 <p>Don't delete the network you just created. We will now graph its activity using a bar chart. </p>
 
   
-<p>1. Add a bar chart to the workspace using <span class="command">Desktop Menu: Insert &gt; New Plot &gt; Bar Chart</span>.</p>
+<p>1. Add a bar chart to the workspace using <span class="command">Desktop Menu: Insert &gt; New Plot &gt; Bar Chart</span> or by clicking on the plot menu button&nbsp;<img style="width: 18px; height: 18px;" alt="bar chart icon" src="../Images/BarChart.png"> in the desktop toolbar and selecting "Bar Chart"<br>
+</p>
 
   
 <p>2. Connect the network to the bar-chart <span class="command">Network Menu: Couple &gt; BarChart1</span>. </p>
@@ -245,7 +258,7 @@ the Hebb rule. </p>
 <p>3. Iterate the workspace a few times the step button <img src="../Images/Step.gif" height="18" width="18"> , or run the workspace using the play button <img src="../Images/Play.gif" height="18" width="18">.
 While it's running periodically reset the network using select all and
 randomize ("A" then "R" while the network component is in focus), and
-observe the changing pattern in the bar graph.<br>
+observe the changing pattern in the bar chart.<br>
 <br>
 <br>
 &nbsp; 

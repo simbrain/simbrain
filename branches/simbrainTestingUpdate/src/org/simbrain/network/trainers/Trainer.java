@@ -54,7 +54,7 @@ public abstract class Trainer {
     /**
      * Add a trainer listener.
      *
-     * @param trainerListener the listener to add
+     * @param eventListener the listener to add
      */
     public void addListener(final TrainerListener eventListener) {
         if (listeners == null) {

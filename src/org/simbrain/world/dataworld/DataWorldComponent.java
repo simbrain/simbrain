@@ -115,15 +115,22 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        getProducerTypes().add(producingColumnType);
-        getConsumerTypes().add(consumingColumnType);
+        addProducerType(producingColumnType);
+        addConsumerType(consumingColumnType);
+        initProducerConsumerLists();
+        dataModel.addListener(listener);
+    }
 
+    /**
+     * Initialize the producer and consumer lists.
+     */
+    private void initProducerConsumerLists() {
+        consumerList.clear();
+        producerList.clear();
         for (int i = 0; i < dataModel.getColumnCount(); i++) {
             addColumnAttribute(i, consumerList);
             addColumnAttribute(i, producerList);
         }
-
-        dataModel.addListener(listener);
     }
 
     @Override
@@ -163,6 +170,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private final SimbrainTableListener listener = new SimbrainTableListener() {
 
         public void columnAdded(int column) {
+            //System.out.println("In column added");
             int index = dataModel.getColumnCount() - 1;
             addColumnAttribute(index, consumerList);
             addColumnAttribute(index, producerList);
@@ -171,6 +179,7 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
         public void columnRemoved(int index) {
+            //System.out.println("In column removed");
             ColumnAttribute producer = getColumnAttribute(index, producerList);
             ColumnAttribute consumer = getColumnAttribute(index, consumerList);
             DataWorldComponent.this.fireAttributeObjectRemoved(producer);
@@ -182,22 +191,28 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
         public void tableDataChanged() {
+            //System.out.println("In table data changed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void cellDataChanged(int row, int column) {
+            //System.out.println("In cell data changed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowAdded(int row) {
+            //System.out.println("In row added");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowRemoved(int row) {
+            //System.out.println("In row removed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void tableStructureChanged() {
+            //System.out.println("In table structure changed");
+            initProducerConsumerLists();
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 

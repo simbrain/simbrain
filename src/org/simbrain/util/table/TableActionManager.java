@@ -60,8 +60,8 @@ public class TableActionManager {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                putValue(NAME, "Open (.csv)");
-                putValue(SHORT_DESCRIPTION, "Open table from .csv");
+                putValue(NAME, "Import (.csv)");
+                putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
 
             /**

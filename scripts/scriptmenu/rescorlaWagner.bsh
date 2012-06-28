@@ -1,0 +1,213 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.util.*;
+import org.simbrain.util.environment.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.world.odorworld.sensors.*;
+import javax.swing.*;
+import java.swing.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+//
+// Rescorla-Wagner Simulation
+//
+{
+
+	// Clear workspace
+	workspace.clearWorkspace();
+
+	// Initial parameter values  
+	double alpha = .6; // Salience of CS (Candle)
+	double beta = .6; // Salience of US (Swiss / Poison)
+	int xpos = 200;
+	int ypos = 160;
+	double hitRadius = 50;
+	double synapseMagnitude = .5;
+
+	// Variables
+	double deltaV = 0;
+	double unconditioned = 0;
+	double conditioned = 0;
+	boolean goalAchieved = false;
+
+	// Load simulation and get references to main objects
+	String FS = System.getProperty("file.separator");
+	workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "rescorla_wagner.zip"));
+	OdorWorldComponent worldComponent = (OdorWorldComponent) workspace.getComponent("CandleWorld.xml");
+	OdorWorld world =  worldComponent.getWorld();
+	RotatingEntity mouse = (RotatingEntity) world.getEntity("Agent_1");
+	SmellSensor sensor = mouse.getSensors().get(0);    
+	NetworkComponent networkComponent = (NetworkComponent) workspace.getComponent("RescorlaWagner.xml");
+	Network network = networkComponent.getNetwork();
+	Neuron valueNeuron = network.getNeuron("Neuron_9");
+	Neuron rewardNeuron = network.getNeuronByLabel("Reward");
+	Neuron forwardNeuron = network.getNeuronByLabel("Forward");
+	Synapse synapseLeftLeft = network.getSynapse("Synapse_6");
+	Synapse synapseLeftRight = network.getSynapse("Synapse_5");
+	Synapse synapseRightLeft = network.getSynapse("Synapse_3");
+	Synapse synapseRightRight = network.getSynapse("Synapse_2");
+	Synapse associationSynapse = network.getSynapse("Synapse_7");
+
+	// Initialize Synapses
+	synapseLeftLeft.setStrength(synapseMagnitude);
+	synapseLeftRight.setStrength(0);
+	synapseRightLeft.setStrength(0);
+	synapseRightRight.setStrength(synapseMagnitude);
+	associationSynapse.setStrength(0);
+
+	// Entitites
+	BasicEntity candle = world.getEntity("Candle");
+
+	// Set up button panel
+	JInternalFrame internalFrame = new JInternalFrame("Simulation", true, true);
+	LabelledItemPanel panel = new LabelledItemPanel();    
+
+	// Parameter Fields
+	JTextField alphaField = new JTextField();
+	alphaField.setText("" + alpha);
+	panel.addItem("Salience of CS (Alpha)", alphaField);
+	JTextField betaField = new JTextField();
+	betaField.setText("" + beta);
+	panel.addItem("Salience of UCS (Beta)", betaField);
+	JTextField slowDownField = new JTextField();
+	slowDownField.setText("" + workspace.getUpdateDelay());
+	panel.addItem("Delay per iteration (msec)", slowDownField);
+
+	// Run Button
+	JButton runButton = new JButton("Run");
+	runButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+
+			Executors.newSingleThreadExecutor().execute(new Runnable() {
+				public void run() {
+
+					workspace.setUpdateDelay(Integer.parseInt(slowDownField.getText()));
+					alpha = Double.parseDouble(alphaField.getText());
+					beta = Double.parseDouble(betaField.getText());
+					double heading;
+
+					// Randomize position of mouse on a circle, pointing
+					//      towards main objects
+					heading = 360 * Math.random();
+					mouse.setHeading(180 + heading + ((Math.random() * 45)-6));
+					heading = Math.toRadians(heading);
+					mouse.setLocation((int)(xpos + (200 * Math.cos(heading))), 
+							((int)(ypos + (-200 * Math.sin(heading)))));
+
+					goalAchieved = false;
+					int distance = Integer.MAX_VALUE; 
+
+					while(!goalAchieved) {
+						if(world.containsEntity(candle)) {
+							distance = (int) SimbrainMath.distance(
+									mouse.getCenterLocation(), 
+									candle.getCenterLocation()); 
+						}
+						if (distance < hitRadius) {
+							goalAchieved = true;
+						}
+						CountDownLatch latch = new CountDownLatch(1);
+						workspace.iterate(latch);
+						try {
+							latch.await();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+
+		}});
+	panel.addItem("Start simulation", runButton);
+
+	// Stop Button
+	JButton stopButton = new JButton("Stop");
+	panel.addItem("Stop simulation", stopButton);
+	stopButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			goalAchieved = true;
+			rp = false;
+		}
+	});
+
+	// Reward-Punish Button
+	JButton rpButton = new JButton("Reward/Punish...");
+	panel.addItem("", rpButton);
+	rpButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			goalAchieved = true;
+			// Reward / Punish dialog
+			Object[] options = {"Reward", "Punish"};
+			int clickedPunish = JOptionPane.showOptionDialog(null,
+					"Reward or punish the creature?",
+					"Reward/Punish",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.PLAIN_MESSAGE, //For some reason QUESTION_MESSAGE DOES NOT WORK
+					null,
+					options,
+					null);
+
+			// Get conditioned and unconditioned values
+			if (clickedPunish == 0) {
+				unconditioned = synapseMagnitude;
+			} else {
+				unconditioned = -synapseMagnitude;
+			}
+			conditioned = associationSynapse.getStrength();
+
+			// Compute change in value and update value Neuron
+			deltaV = alpha * beta * (unconditioned - conditioned);
+			associationSynapse.setStrength(associationSynapse.getStrength() + deltaV);
+
+			// Diagonostics
+			//System.out.println(conditioned + "  " + unconditioned);
+			//System.out.println("-->" + deltaV);
+
+			// Update value neuron based on deltaV
+			//synapse.setStrength(synapse.getStrength() + deltaV);
+
+			// Set vehicle to approach or repulse based on current value
+			if (associationSynapse.getStrength() > 0) {
+				// Pursue object
+				synapseLeftLeft.setStrength(synapseMagnitude);
+				synapseLeftRight.setStrength(0);
+				synapseRightLeft.setStrength(0);
+				synapseRightRight.setStrength(synapseMagnitude);
+			} else {
+				// Avoid object
+				synapseLeftLeft.setStrength(0);
+				synapseLeftRight.setStrength(synapseMagnitude);
+				synapseRightLeft.setStrength(synapseMagnitude);
+				synapseRightRight.setStrength(0);
+			}
+
+			// Make speed proportional to current conditioned response
+			BiasedUpdateRule forward = (BiasedUpdateRule)forwardNeuron.getUpdateRule();
+			forward.setBias(1 + Math.abs(associationSynapse.getStrength()));
+
+			// Update the reward neuron appropriately
+			rewardNeuron.setActivation(1);
+			valueNeuron.update();
+			valueNeuron.setActivation(valueNeuron.getBuffer());
+			network.fireNetworkChanged();        
+		}
+	});
+
+	// Set up Frame
+	internalFrame.setLocation(10,38);
+	internalFrame.getContentPane().add(panel);
+	internalFrame.setVisible(true);
+	internalFrame.pack();
+	desktop.addInternalFrame(internalFrame);
+
+}

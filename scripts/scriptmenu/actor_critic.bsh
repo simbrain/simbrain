@@ -103,7 +103,7 @@ import java.util.concurrent.*;
                     SmellSource.DecayFunction.STEP, 
                     tileSize/2,
                     entity.getCenterLocation()));
-    world.addEntity(entity);
+    //world.addEntity(entity);
 
     // Neuron position variables
     double initTilesX = 100;

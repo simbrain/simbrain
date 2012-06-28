@@ -134,9 +134,9 @@ import org.jgap.impl.*;
             // fitness function implemented.
             // ---------------------------------------------------------------
 
-             return howCloseToValue(network, 150);
-             //return getAverageValue(network);
-            //return percentActive(network, .50);
+            //return howCloseToValue(network, 150);
+            //return getAverageValue(network);
+            return percentActive(network, .50);
         }
 
         /**

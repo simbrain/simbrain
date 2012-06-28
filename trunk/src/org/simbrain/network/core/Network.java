@@ -1279,11 +1279,22 @@ public class Network {
     /**
      * Fire a neuron changed event to all registered model listeners.
      *
-     * @param changed new, changed neuron
+     * @param changed neuron
      */
     public void fireNeuronChanged(final Neuron changed) {
         for (NeuronListener listener : neuronListeners) {
             listener.neuronChanged(new NetworkEvent<Neuron>(this, changed));
+        }
+    }
+
+    /**
+     * Fire a label changed event to all registered model listeners.
+     *
+     * @param changed neuron
+     */
+    public void fireNeuronLabelChanged(final Neuron changed) {
+        for (NeuronListener listener : neuronListeners) {
+            listener.labelChanged(new NetworkEvent<Neuron>(this, changed));
         }
     }
 
@@ -1728,4 +1739,5 @@ public class Network {
             neuron.setY(neuron.getY() + offsetY);
         }
     }
+
 }

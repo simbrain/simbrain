@@ -122,7 +122,13 @@ public final class NetworkComponent extends WorkspaceComponent {
                 fireAttributeObjectRemoved(e.getObject());
             }
 
+            @Override
             public void neuronChanged(NetworkEvent<Neuron> e) {
+                setChangedSinceLastSave(true);
+            }
+
+            @Override
+            public void labelChanged(NetworkEvent<Neuron> e) {
                 setChangedSinceLastSave(true);
             }
         });

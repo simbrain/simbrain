@@ -51,7 +51,7 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
 
         // Handle consistency of multiply selections
         if (!NetworkUtils.isConsistent(ruleList,
-                SubtractiveNormalizationRule.class, "getMomentum")) {
+                SubtractiveNormalizationRule.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }

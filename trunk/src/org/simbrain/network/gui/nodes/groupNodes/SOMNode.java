@@ -128,7 +128,7 @@ public class SOMNode extends SubnetworkNode {
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
-        menu.add(new JMenuItem(new AbstractAction("Train SOM Network") {
+        menu.add(new JMenuItem(new AbstractAction("Train SOM Network...") {
             // TODO: Integrate below in to training framework?
             public void actionPerformed(final ActionEvent event) {
                 JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());

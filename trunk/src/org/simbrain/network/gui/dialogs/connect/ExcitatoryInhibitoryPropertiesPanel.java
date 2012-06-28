@@ -385,8 +385,8 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
      * Commit changes on closing.
      */
     public void commitChanges() {
-        connection.setExcitatoryRatio(((Number) tRatio.getValue())
-                .doubleValue() / 100);
+        connection.setPercentExcitatory(((Number) tRatio.getValue())
+                .doubleValue());
         connection.setEnableInhibitoryRandomization(randInhib.isSelected());
         connection.setEnableExcitatoryRandomization(randExcite.isSelected());
     }

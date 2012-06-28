@@ -839,6 +839,7 @@ public class Neuron {
      */
     public void setLabel(final String label) {
         this.label = label;
+        this.getParentNetwork().fireNeuronLabelChanged(this);
     }
 
     /**

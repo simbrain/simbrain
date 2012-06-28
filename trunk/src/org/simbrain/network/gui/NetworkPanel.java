@@ -74,6 +74,7 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNode;
 import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
@@ -89,6 +90,7 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.LMSNetwork;
@@ -417,6 +419,12 @@ public class NetworkPanel extends JPanel {
                 }
             }
 
+            @Override
+            public void labelChanged(NetworkEvent<Neuron> e) {
+                NeuronNode node = (NeuronNode) objectNodeMap.get(e.getObject());
+                node.updateTextLabel();
+            }
+
         });
 
         // Handle Synapse Events
@@ -578,6 +586,8 @@ public class NetworkPanel extends JPanel {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
             } else if (group instanceof SOM) {
                 ret = new SOMNode(NetworkPanel.this, (SOM) group);
+            } else if (group instanceof Competitive) {
+                ret = new CompetitiveNode(NetworkPanel.this, (Competitive) group);
             } else if (group instanceof FeedForward) {
                 if (group instanceof BackpropNetwork) {
                     ret = new BackpropNetworkNode(NetworkPanel.this,

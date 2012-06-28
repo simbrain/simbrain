@@ -45,7 +45,7 @@ public class AllToAll extends ConnectNeurons {
     }
 
     /**
-     * Construct all to all connection object specifying only the parent network
+     * Construct all to all connection object specifying only the parent network.
      *
      * @param network parent network
      */

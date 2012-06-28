@@ -224,7 +224,9 @@ public abstract class WorkspaceComponent {
      * @param type type to add
      */
     public void addProducerType(AttributeType type) {
-        producerTypes.add(type);
+        if (!producerTypes.contains(type)) {
+            producerTypes.add(type);
+        }
     }
 
     /**
@@ -233,7 +235,9 @@ public abstract class WorkspaceComponent {
      * @param type type to add
      */
     public void addConsumerType(AttributeType type) {
-        consumerTypes.add(type);
+        if (!consumerTypes.contains(type)) {
+            consumerTypes.add(type);
+        }
     }
 
     /**
@@ -532,14 +536,14 @@ public abstract class WorkspaceComponent {
      * @return the producerTypes
      */
     public List<AttributeType> getProducerTypes() {
-        return producerTypes;
+        return Collections.unmodifiableList(producerTypes);
     }
 
     /**
      * @return the consumerTypes
      */
     public List<AttributeType> getConsumerTypes() {
-        return consumerTypes;
+        return Collections.unmodifiableList(consumerTypes);
     }
 
     /**

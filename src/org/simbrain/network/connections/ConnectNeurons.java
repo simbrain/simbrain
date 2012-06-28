@@ -48,7 +48,7 @@ public abstract class ConnectNeurons {
     protected List<? extends Neuron> targetNeurons;
 
     /** The default ratio of excitatory to inhibitory weights. */
-    protected static double DEFAULT_EXCITATORY_RATIO = 0.5;
+    protected static double DEFAULT_EXCITATORY_RATIO = 1;
 
     /** The default excitatory strength. */
     protected static double DEFAULT_EXCITATORY_STRENGTH = 1;
@@ -173,6 +173,27 @@ public abstract class ConnectNeurons {
             throw new IllegalArgumentException("Invalid excitatory ratio value");
         }
         this.excitatoryRatio = excitatoryRatio;
+    }
+
+
+    /**
+     * Helper method for setting excitatory ratio using an excitatory
+     * percentage.
+     *
+     * @param percentExcitatory percentage of excitatory neurons to use.
+     */
+    public void setPercentExcitatory(double percentExcitatory) {
+        setExcitatoryRatio(percentExcitatory / 100);
+    }
+
+    /**
+     * Helper method for setting inhibitory ratio using an inhibitory
+     * percentage.
+     *
+     * @param percentInhibitory percentage of inhibitory neurons to use.
+     */
+    public void setPercentInhibitory(double percentInhibitory) {
+        setExcitatoryRatio((100 - percentInhibitory) / 100);
     }
 
     public static double getDefaultRatio() {

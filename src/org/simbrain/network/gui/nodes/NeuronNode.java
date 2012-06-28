@@ -48,6 +48,7 @@ import org.simbrain.util.Utils;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -185,7 +186,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         // The main circle is what users select
-        setBounds(circle.getBounds());
+        PBounds bounds = circle.getBounds();
+        setBounds(bounds);
+
+        updateTextLabel();
     }
 
     /**
@@ -378,6 +382,29 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
+     * Update the text label.
+     */
+    public void updateTextLabel() {
+        // Set label text
+        if ((!neuron.getLabel().equalsIgnoreCase(""))
+                || (!neuron.getLabel().equalsIgnoreCase(
+                        NeuronDialog.NULL_STRING))) {
+            labelText.setFont(NEURON_FONT);
+            labelText.setText("" + neuron.getLabel());
+            labelText.setOffset(circle.getX() - labelText.getWidth() / 2 + DIAMETER
+                    / 2, circle.getY() - DIAMETER / 2 - 1);
+            labelBackground.setBounds(labelText.getFullBounds());
+
+            // update bounds to include text
+            PBounds bounds = circle.getBounds();
+            bounds.add(labelText.localToParent(labelText.getBounds()));
+            setBounds(bounds);
+
+            // TODO: Make background bigger than label text
+        }
+    }
+
+    /**
      * Sets the color of this neuron based on its activation level.
      */
     private void updateColor() {
@@ -534,18 +561,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         priorityText.setText("" + neuron.getUpdatePriority()); // todo: respond
                                                                // to listener
 
-        // Set label text
-        if ((!neuron.getLabel().equalsIgnoreCase(""))
-                || (!neuron.getLabel().equalsIgnoreCase(
-                        NeuronDialog.NULL_STRING))) {
-            labelText.setFont(NEURON_FONT);
-            labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(getX() - labelText.getWidth() / 2 + DIAMETER
-                    / 2, getY() - DIAMETER / 2 - 1);
-            labelBackground.setBounds(labelText.getFullBounds());
-            // TODO: Make background bigger than label text
-        }
-
         if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and 1
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
@@ -585,11 +600,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * on the size of the text.
      */
     private void setActivationTextPosition() {
-        if (activationText == null) {
-            return;
+        if (activationText != null) {
+            activationText.setOffset(circle.getX() + DIAMETER / 4 + 2,
+                    circle.getY() + DIAMETER / 4 + 1);
         }
-        activationText.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER
-                / 4 + 1);
     }
 
     // /**

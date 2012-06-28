@@ -43,6 +43,13 @@ public interface NeuronListener {
     void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> networkEvent);
 
     /**
+     * Notify this listener of a text labelchanged event.
+     *
+     * @param networkEvent holds reference to changed Neuron
+     */
+    void labelChanged(NetworkEvent<Neuron> networkEvent);
+
+    /**
      * Notify this listener of a Neuron added event.
      *
      * @param networkEvent reference to new neuron

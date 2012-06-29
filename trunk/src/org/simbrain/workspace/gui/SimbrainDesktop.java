@@ -675,9 +675,11 @@ public class SimbrainDesktop {
      */
     private JMenu createHelpMenu() {
         JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(new ShowHelpAction("Credits", "SimbrainCredits.html"));
-        helpMenu.add(new ShowHelpAction("Help contents", "SimbrainDocs.html"));
+        helpMenu.add(new ShowHelpAction("Main Help", "SimbrainDocs.html"));
+        helpMenu.addSeparator();
         helpMenu.add(new ShowHelpAction("Quick start", "Pages/QuickStart.html"));
+        helpMenu.add(new ShowHelpAction("Keyboard Shortcuts", "KeyboardShortcuts.html"));
+        helpMenu.add(new ShowHelpAction("Credits", "SimbrainCredits.html"));
         return helpMenu;
     }
 

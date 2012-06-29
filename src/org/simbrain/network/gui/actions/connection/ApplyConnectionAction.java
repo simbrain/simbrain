@@ -99,7 +99,7 @@ public final class ApplyConnectionAction extends AbstractAction {
             }
             ConnectionDialog dialog = new ConnectionDialog();
             ShowHelpAction helpAction = new ShowHelpAction(
-                    "Network/connections.html");
+                    "Pages/Network/connections.html");
             dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
             dialog.setLocationRelativeTo(null);

@@ -219,7 +219,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         // Add help button
         JButton helpButton = new JButton("Help");
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Network/network_prefs.html");
+                "Pages/Network/network_prefs.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
     }

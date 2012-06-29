@@ -107,7 +107,7 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
         // Add help button
         JButton helpButton = new JButton("Help");
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Workspace/Preferences.html");
+                "Pages/Workspace/Preferences.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
     }

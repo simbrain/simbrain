@@ -1,15 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-  <title>Simbrain Documentation</title>
+<html><head><title>Simbrain Documentation</title>
+
+  
 
   
   
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../Styles.css" rel="stylesheet" type="text/css">
-
-</head><body>
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -19,26 +18,13 @@
 <div class="navi">
 <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
 </div>
-<h1>Network Operation</h1>
+<h1>Network Update</h1>
 <p>Each time the step button is pressed in the network panel--the
 network moves forward in time by one iteration; that is, it takes on a
-new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. However, as
-one might imagine, there are multiple ways to go about this given a
-construct as complex as an artificial neural network. To this end,
-Simbrain includes two built in update types: buffered (default) and
-priority-based. For more advanced users Simbrain also includes the
-option of creating custom update methods. At the network level update
-rules can be changed by going to File &gt; Network Preferences (or
-"ctrl + ,"), and selecting the "logic" tab. From there the desired
-update method for the network can be selected from a combo-box (see
-below). <br>
+new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. On each update, the "time" label
+is updated as well.
 </p>
-<img style="border: 1px solid ; width: 300px; height: 240px;" alt="example" src="../../Images/UpdateDialog.png">
-<br>
-The differences in these update methods can sometimes be subtle and
-requires an understaning of how artificial neural networks are
-simulated on a serial machine (and specifically in simbrain). To this
-end: Artificial neural networks are essentially graphs, a collection of
+<p>There are multiple ways to go about updating a a construct as complex as an artificial neural network. Artificial neural networks are essentially graphs, a collection of
 nodes connected by vertices (the vertices are neurons and the
 connections are synapses). The whole network has three lists: a list of
 nodes, a list
@@ -50,9 +36,20 @@ list of synapses. Before these values are actually changed they are
 stored as a buffer within each network component. In this way, an
 update method can be thought of as the specific way or order in which
 buffered values are transformed into actual values. <br>
+</p>
+<p>To allow for custom updating includes two built in update types: buffered (default) and
+priority-based. For more advanced users Simbrain also includes the
+option of creating custom update method, and a dialog for creating custom updates.<br>
+</p>
+<p> At the network level update
+rules can be changed by going to File &gt; Network Preferences (or
+"ctrl + ,"), and selecting the "update" tab. From there the update method can be customized.<br>
+</p>
+
+<div style="text-align: center;"><img style="width: 370px; height: 303px;" alt="Update Network" src="../../Images/UpdateNetwork.png">&nbsp;<br>
+</div>
 <br>
-To reflect the fact that the network has been updated the "time" label
-is updated as well.
+The general operation of this panel is identical to the <a href="../Workspace/Update.html">workspace updater.</a>&nbsp;&nbsp; Refer to that page for more on how to use it.<br>
 <br>
 <br>
 <p><span class="heading"><span class="heading2">Buffered Update</span></span><br>
@@ -63,7 +60,7 @@ from the attribute values at <i>t - 1</i> and stored in the buffer. No
 activation values are changed until every buffer as been calculated.
 Then all activations are updated simultaneously based on their buffer
 values.</p>
-<p><span class="heading"><span class="heading2">Priority-Based Update</span></span><br>
+<p><span class="heading"><span class="heading2">Priority Update</span></span><br>
 </p>
 <p>When using a priority based update, each node is assigned a priority
 value. The lower this value, the higher the node's priority. Based on
@@ -75,10 +72,7 @@ Components with the same priority are ordered arbitrarily in this queue.</p>
 <p><span class="heading"><span class="heading2"><a name="CustomUpdate"></a>Custom
 Update </span></span><br>
 </p>
-<p>For more advanced users the option exists to create a custom update
-rule. Specifying a custom update rule is not availble in the GUI and
-must be instantiated and defined either within a script (see <a href="../Scripting.html"> scripting</a>) or by editing the Simbrain
-source code. </p>
+<p>Create a custom update action.&nbsp; Users have access to the underlying <span style="text-decoration: underline;">network</span> object and the gui <span style="text-decoration: underline;">networkpanel.</span> </p>
 <p>&nbsp;</p>
 </div>
 

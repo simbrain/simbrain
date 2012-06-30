@@ -8,6 +8,10 @@
 
 
 
+
+
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
@@ -18,49 +22,113 @@
     <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Update</p>
   </div>
   <p>
-  </p><h1>Update</h1><br>
+  </p><h1>Workspace Updating</h1><br>
 <p><span class="heading">Running a simulation</span><br>
 <br>
-To run a simulation use the iterate <img style="width: 18px; height: 18px;" alt="step" src="../../Images/Step.png"> and play <img style="width: 18px; height: 18px;" alt="play" src="../../Images/Play.png">&nbsp; buttons in the main desktop toolbar.<br>
-<br>An alternative method is to use a&nbsp; terminal component&nbsp; or
+To run a simulation use the iterate <img style="width: 18px; height: 18px;" alt="step" src="../../Images/Step.png"> and play <img style="width: 18px; height: 18px;" alt="play" src="../../Images/Play.png">&nbsp; buttons in the main desktop toolbar.</p>
+<p>On each iteration an update occurs, which essentially means all the
+components and couplings are updated. &nbsp; The workspace time is
+iterated, the components are all updated, and the couplings are
+updated. &nbsp; There are various
+types of update, and you have some control over how the update happens<br>
+</p>
+
+
+
+<span class="heading2"></span>
+<p>
+</p>
+<p><span class="heading2">Time:</span>&nbsp;When a simulation is run iterations or "simulation time" are
+tracked.&nbsp;&nbsp; This time is represented in the toolbar, and can
+be reset to 0 by double clicking on the text label.</p>
+<p><span class="heading2">Updating From Terminal</span><br>
+
+
+
+An alternative method is to use a&nbsp; terminal component&nbsp; or
 in the terminal tab at the bottom of the desktop.&nbsp; The command
-workspace.iterate(<span style="font-style: italic;">n</span>) can be use to iterate the workspace <span style="font-style: italic;">n</span> times. <br>
-</p>
-<p><span class="heading2">Update Types</span><br>
-</p><p>On each iteration an update occurs.&nbsp; There are various
-types of update, and you have some control over how the update happens
-(in future versions there will be more control).&nbsp;&nbsp; Updates
-occur via an "updater".&nbsp; The default updater is a buffered
-update&nbsp; Here are the currently available updaters: <br>
-</p>
-
-<p style="margin-left: 40px;"><span class="heading2">Buffered:</span> Update order does not matter. The default sequence of events is: <br>
-&nbsp;&nbsp;&nbsp; - Update component 1 <br>
-
-&nbsp;&nbsp;&nbsp; - Update component 2, ...<br>
-&nbsp;&nbsp;&nbsp; - Update component <span style="font-style: italic;">n</span><br>
-&nbsp;&nbsp;&nbsp; - Update couplings (uses a buffer so that update order does not matter)<br>
-
-
+workspace.iterate(<span style="font-style: italic;">n</span>) can be use to iterate the workspace <span style="font-style: italic;">n</span> times.&nbsp;</p>
+<p><span class="heading">Managing and Customizing Workspace Update</span><br>
 </p>
 
 
-<p style="margin-left: 40px;"><span class="heading2">Priority:</span> Update order does matter.&nbsp; When you need things updated in a particular sequence.</p>
-
-<p>Custom update</p>
-<p>Update can be customized by running a script which installs a
-custom updater. &nbsp;&nbsp; An example which shows
-how this is done is in the&nbsp; scriptmenu.&nbsp;&nbsp; If you run the
-script "customUpdateExample.bsh", you will notice that the network's
-synapses are randomized every time the workspace is updated. <br>
+<p>Workspace updates occur according to a default buffered update
+strategy, but this can be customized in various ways.&nbsp; Sometimes
+it is important that components and couplings be updated in a very
+specific way over time.</p><p>On
+any update the actions listed in the current update sequence panel will
+be instantiated in the order shown.&nbsp;&nbsp; To customize the way
+update happens, open the workspace dialog and click on the update
+tab.&nbsp; This is what you will see:<br>
 </p>
+<div style="text-align: center;"><img style="width: 607px; height: 302px;" alt="Update Panel" src="../../Images/UpdaterPanel.png"><br>
 
-
+</div>
 <p><br>
-<span style="text-decoration: underline;">Updator tab</span>: Can specify one or more threads.&nbsp; The default value is the number of available processors.<br>
-<br>
-<span style="text-decoration: underline;">Custom update</span>: Users
-can create their own updators.&nbsp; In a script, just create an instance of
-the workspace and call workspace.setUpdator.&nbsp; See <a href="../Scripting.html">scripting</a>.</p>
+</p>
+<p><br>
+</p>
+<p><span class="heading2">Current Update Sequence</span>: The current
+list of update actions.&nbsp; On a given iteration of the workspace the
+actions in this list will be fired in the order they are
+listed.&nbsp;&nbsp; The order can be changed by dragging the actions
+around in the subpanel.<br>
+</p>
+<p><span class="heading2">Unused update actions</span>:&nbsp; Actions you can add to the update sequence.You
+can move actions between the current and unused panels by selecting
+actions in the unused panel and clicking "add selected actions"</p>
+<p><span class="heading2">Add selected action(s): </span>&nbsp;Adds any selected actions in the unused update actions to the&nbsp; current update sequence.</p>
+<p><span class="heading2">Remove selected actions(s):  </span>For
+selected actions in the current update sequence, move them to unused
+update actions.&nbsp; For actions in the unused update actions, remove
+them altogether.</p>
+<p><span class="heading2">Add Custom action: </span>&nbsp;Create&nbsp; a custom update action.&nbsp;&nbsp; A script editor opens up, with comments that indicate
+how to go about creating the custom updater.&nbsp; Users have access to the underlying <span style="text-decoration: underline;">workspace</span> object and the gui <span style="text-decoration: underline;">desktop</span>.&nbsp; See  <a href="../Scripting.html">scripting</a> for more on how to create these scripts.&nbsp; To edit a custom action just double click on it.<br>
+</p>
+
+<p><span class="heading2">Changing update order. </span>&nbsp;To change the order of update actions, drag them around in the update sequence panel.<br>
+</p>
+<p><span class="heading">Types of Update Action</span><br>
+</p>
+
+
+
+
+<p>There are four kinds of action currently.</p>
+<p><span class="heading2">Buffered Update of all components and couplings</span></p>
+<p>Update order does not matter. The default sequence of events is: <br></p>
+
+<ul>
+  <li>
+&nbsp;&nbsp;&nbsp; Update all workspace components</li>
+  <li>&nbsp;&nbsp;&nbsp; Update all couplings (uses a buffer so that update order does not matter.)</li>
+</ul>
+<p></p>
+<p>In this scheme, the impact of a coupling is "felt" after an
+iteration of the workspace, since coupling's producer value must first
+update to a buffer, then the consumer is updated on the next iteration.</p>
+<p><span class="heading2">Update Component</span></p>
+<p>This action updates a single component.<br>
+</p>
+<p><span class="heading2">Update Coupling</span></p>
+<p>This action updates a coupling, pulling the producer value and
+applying it to the consumer.&nbsp; By combining component and coupling
+updates in specific orders sequences of actions can be created that are
+not asynchronous and do not have a time lag in the way buffered update
+does.&nbsp;&nbsp; But care must be taken since when new componentss and
+couplings are added they will not automatically be put in the current
+update sequence.<br>
+</p>
+<p><span class="heading2">Custom Update Action</span><br>
+</p>
+<p>See add custom update action above.<br>
+</p>
+<p>
+</p>
+<span class="heading2"></span>
+<p><br>
+<span style="text-decoration: underline;"><br>
+</span></p>
+
 </div>
 </body></html>

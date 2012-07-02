@@ -2,14 +2,15 @@
 
 = Basics =
 
-Installing Simbrain is pretty simple: just download, unzip, and double-click on the jar file. However, there are various issues you can run in to depending on what system you are using.
+Installing Simbrain is pretty simple: just download, unzip, and double-click on the jar file. However, there are various issues you can run in to depending on your experience with .zip files, and what system you are using.
 
 In steps:
 
   # Download the simbrain .zip file (e.g. [http://code.google.com/p/simbrain/downloads/list here])
   # Uncompress the .zip file.   
     * On Macs just double click on the .zip file.  A regular Simbrain folder will appear.  
-    * On PC's right click on the file and select "extract".   Do not double-click because that will  often just "view" what's in the zipped file. 
+    * On PC's right click on the file and select "extract".   Do not double-click because that will  often just "view" what's in the zipped file, and can  mislead people when they thin, they are broswing a regular folder.
+    * [http://netforbeginners.about.com/od/downloadingfiles/f/how-zip-files-work.htm Here] is more information on zip files.
   # Open up the Simbrain folder.  
   # Double click on the Simbrain.jar file.  The Simbrain Desktop should appear and you are ready to go.
 
@@ -21,7 +22,7 @@ In steps:
 
 = Running from the command line =
 
-Sometimes you can't run by double clicking.  In some cases you can still run by opening up a terminal window or command line, going to the folder where Simbrain.jar is, and entering the command:
+Sometimes you can't run by double clicking, but  must open up a terminal window or dos window, "cd" to the folder where Simbrain.jar is, and enter the command:
 
 {{{
 java -jar simbrain.jar

@@ -16,7 +16,7 @@ In steps:
 
 = Gotchas =
 
-  * If nothing happens, [http://javatester.org/version.html check to make sure you have java installed].   
+  * If nothing happens, [http://javatester.org/version.html check to make sure you have java installed].   Simbrain requires that you have at least java 1.6 installed.
   * If you are using Linux, you may have to run from the command line (see below)
   * Be sure you have actually extracted the simbrain folder from the .zip file, and are not just "viewing" what's in a zip file.   If the thing you double clicked is in a "win zip" or "win rar" folder then you have not actually exracted the Simbrain folder.
 

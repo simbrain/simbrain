@@ -422,7 +422,9 @@ public class NetworkPanel extends JPanel {
             @Override
             public void labelChanged(NetworkEvent<Neuron> e) {
                 NeuronNode node = (NeuronNode) objectNodeMap.get(e.getObject());
-                node.updateTextLabel();
+                if (node != null) {
+                    node.updateTextLabel();
+                }
             }
 
         });

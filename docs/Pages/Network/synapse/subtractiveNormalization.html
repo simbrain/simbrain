@@ -1,13 +1,10 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
 
-<body>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div>
@@ -16,23 +13,35 @@
   <div class="navi">
    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Subtractive Normalization</p>
   </div>
-  <p><h1>Subtractive Normalization</h1>
-  <p span><a href="hebbian.html#HebbLearning">Hebbian learning</a> rules suffer from the fact that weights tend to achieve maximum or minimum values. Several variants of Hebbian learning have been introduced to address this issue;
-  <p span> Subtractive Normalization is one of them. 
-<p span>Subtractive normalization is a form of Hebbian learning where the sum of the weights attaching to a given neuron is kept relatively constant. This is achieved by subtracting the product of the target neuron activation <em>a<sub>t</sub></em> and the average activation of source neurons <em>a<sub>i</sub></em> attaching to <em>a<sub>t</sub></em>:
+  <p></p><h1>Subtractive Normalization</h1>
+  <p span=""><a href="hebbian.html#HebbLearning">Hebbian learning</a>
+rules suffer from the fact that weights tend to achieve maximum or
+minimum values. Several variants of Hebbian learning have been
+introduced to address this issue; </p><p span=""> Subtractive Normalization is one of them. 
+</p><p span="">Subtractive normalization is a form of Hebbian learning
+where the sum of the weights attaching to a given neuron is kept
+relatively constant. This is achieved by subtracting the product of the
+target neuron activation <em>a<sub>t</sub></em> and the average activation of source neurons <em>a<sub>i</sub></em> attaching to <em>a<sub>t</sub></em>:
 
-<blockquote>
-  <p span="span"><img src="../equations/SubtractiveNormalization.png" width="241" height="85">
+</p><blockquote>
+  <p span="span"><img src="../equations/SubtractiveNormalization.png" height="85" width="241">
   </p>
 </blockquote>
-<p span>In order for the effect of keeping the sum of the weights attached to a neuron constant, those weights must all use this rule. 
-<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. Note that clipping the values of this type of synapse could interfere with its intended effect of keeping the sum of weights attaching to a neuron constant. 
-<p span>Note that although this method constrains the sum of the weights to some fixed number, it allows for some weights to go off to positive infinity while others are going off simultaneously to negative infinity. 
-<p span>See  Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, p. 290. 
-<p span><span class="heading">Momentum</span>
-<blockquote>
-  <p span="span">This value changes the rate of the change of the synapse, denoted by &epsilon; above. </p>
+<p span="">In order for the effect of keeping the sum of the weights attached to a neuron constant, those weights must all use this rule. 
+</p><p span="">The strength of this synapse is <a href="../common.html#clipping">clipped</a>
+so as to remain between the lower and upper bounds specified for this
+synapse. Note that clipping the values of this type of synapse could
+interfere with its intended effect of keeping the sum of weights
+attaching to a neuron constant. </p><p span="">Note that although this method constrains the sum of
+the weights to some fixed number, it allows for some weights to go off
+to positive infinity while others are going off simultaneously to
+negative infinity. </p><p span="">See  Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, p. 290.&nbsp; <br>
+</p>
+<p span="">Also see K. Miller&nbsp; and&nbsp; D. MacKay, "The Role of Constraints in Hebbian Learning", <span style="font-style: italic;">Neural Computation</span> 6, 120-126 (1994). 
+</p>
+<p span=""><span class="heading">Momentum</span>
+</p><blockquote>
+  <p span="span">This value changes the rate of the change of the synapse, denoted by &#949; above. </p>
 </blockquote>
 </div>
-</body>
-</html>
+</body></html>

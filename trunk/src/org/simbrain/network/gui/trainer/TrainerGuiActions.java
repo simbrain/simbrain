@@ -77,7 +77,7 @@ public class TrainerGuiActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, name);
+                putValue(NAME, "Edit " + name + " data..");
                 putValue(SHORT_DESCRIPTION, "Edit data...");
             }
 
@@ -183,7 +183,7 @@ public class TrainerGuiActions {
                     try {
                         ((NumericTable) table.getData()).readData(theFile);
                         dataHolder.setData(((NumericTable) table.getData())
-                                .asArray());
+                                .asDoubleArray());
                         ((JFrame) table.getTopLevelAncestor()).setTitle(theFile
                                 .getName());
                     } catch (InvalidDataException exception) {

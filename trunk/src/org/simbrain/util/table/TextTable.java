@@ -23,21 +23,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A simple text table.
+ * A default mutable text table.
  *
  * @author jyoshimi
  */
-public class DefaultTextTable extends SimbrainDataTable<String> {
-
-    /** The data. */
-    private List<List<String>> rowData = new ArrayList<List<String>>();
-
-    // TODO: Add more constructors
+public class TextTable extends MutableTable<String> {
 
     /**
-     * Construct from list of strings.
+     * Construct A text table.
      */
-    public DefaultTextTable(Set<String> dictionary) {
+    public TextTable(final int rows, final int cols) {
+        init(rows, cols);
+        for (int i = 0; i < rows; i++) {
+            rowData.add(getNewRow(""));
+        }
+    }
+
+    /**
+     * Construct table from a set of strings.
+     */
+    public TextTable(final Set<String> dictionary) {
         init(dictionary.size(), 1);
         int i = 0;
         for (String string : dictionary) {
@@ -47,58 +52,28 @@ public class DefaultTextTable extends SimbrainDataTable<String> {
     }
 
     /**
-     * Initialize the table the table.
+     * Initialize the table.
      *
      * @param rows num rows
      * @param cols num cols
      */
-    private void init(int rows, int cols) {
+    protected void init(int rows, int cols) {
         rowData.clear();
         for (int i = 0; i < rows; i++) {
             rowData.add(getNewRow(" ", cols));
         }
-
         fireTableStructureChanged();
     }
 
-    /**
-     * Create a new row for the table, with a specified value.
-     *
-     * @param value value for columns of new row
-     * @return the new row
-     */
-    private List<String> getNewRow(final String value, int cols) {
-        ArrayList<String> row = new ArrayList<String>();
-
-        for (int i = 0; i < cols; i++) {
-            row.add(value);
-        }
-        return row;
+    @Override
+    String getDefaultValue() {
+        return "";
     }
 
     @Override
-    public void setValue(int row, int col, String value) {
-        rowData.get(row).set(col, value);
-        fireTableDataChanged();
+    public Class getDataType() {
+        return String.class;
     }
 
-    @Override
-    public String getValue(int row, int col) {
-        return rowData.get(row).get(col);
-    }
-
-    @Override
-    public int getColumnCount() {
-        if (rowData.size() > 0) {
-            return rowData.get(0).size();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getRowCount() {
-        return rowData.size();
-    }
 
 }

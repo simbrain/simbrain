@@ -89,6 +89,17 @@ public class SimbrainJTable extends JXTable {
      */
     private boolean hasChangedSinceLastSave = false;
 
+    /** Flags for popup menus. */
+    private boolean showInsertRowPopupMenu = true;
+    private boolean showInsertColumnPopupMenu = true;
+    private boolean showDeleteRowPopupMenu = true;
+    private boolean showDeleteColumnPopupMenu = true;
+    private boolean showEditInPopupMenu = true;
+    private boolean showRandomizeInPopupMenu = true;
+    private boolean showNormalizeInPopupMenu = true;
+    private boolean showFillInPopupMenu = true;
+    private boolean showCSVInPopupMenu = true;
+
     /**
      * Construct the table with specified number of rows and columns.
      *
@@ -96,7 +107,7 @@ public class SimbrainJTable extends JXTable {
      * @param cols number of columns of data
      */
     public SimbrainJTable(int rows, int cols) {
-        data = new DefaultNumericTable(rows, cols);
+        data = new NumericTable(rows, cols);
         initJTable();
     }
 
@@ -107,6 +118,7 @@ public class SimbrainJTable extends JXTable {
      */
     public SimbrainJTable(SimbrainDataTable dataModel) {
         data = dataModel;
+        // get data values and use to set?
         initJTable();
     }
 
@@ -136,7 +148,26 @@ public class SimbrainJTable extends JXTable {
         getColumnModel().getColumn(0).setPreferredWidth(30);
         // TODO: Make preferred width for first column settable
 
+        // Disable specific popupmenus for text tables
+        if (data instanceof TextTable) {
+            showRandomizeInPopupMenu = false;
+            showNormalizeInPopupMenu = false;
+            showFillInPopupMenu = false;
+            showCSVInPopupMenu = false;
+        }
+
         hasChangedSinceLastSave = false;
+    }
+
+    /**
+     * Disable popup menus that allow table structure to changed.
+     */
+    public void disableTableModificationMenus() {
+        showInsertRowPopupMenu = false;
+        showInsertColumnPopupMenu = false;
+        showDeleteRowPopupMenu = false;
+        showDeleteColumnPopupMenu = false;
+        showEditInPopupMenu = false;
     }
 
     /**
@@ -205,25 +236,54 @@ public class SimbrainJTable extends JXTable {
 
         JPopupMenu ret = new JPopupMenu();
         if (getData() instanceof MutableTable) {
-            ret.add(TableActionManager.getInsertRowAction(this));
-            if (getSelectedColumn() >= 0) {
-                ret.add(TableActionManager.getInsertColumnAction(this));
+
+            if (showInsertRowPopupMenu) {
+                ret.add(TableActionManager.getInsertRowAction(this));
             }
-            ret.add(TableActionManager.getDeleteRowAction(this));
-            if (getSelectedColumn() != 0) {
-                ret.add(TableActionManager.getDeleteColumnAction(this));
+            if (showInsertColumnPopupMenu) {
+                if (getSelectedColumn() >= 0) {
+                    ret.add(TableActionManager.getInsertColumnAction(this));
+                }
+            }
+            if (showDeleteRowPopupMenu) {
+                ret.add(TableActionManager.getDeleteRowAction(this));
+            }
+            if (showDeleteColumnPopupMenu) {
+                if (getSelectedColumn() != 0) {
+                    ret.add(TableActionManager.getDeleteColumnAction(this));
+                }
             }
         }
-        ret.addSeparator();
-        ret.add(getMenuEdit());
-        ret.addSeparator();
-        ret.add(getMenuRandomize());
-        ret.addSeparator();
-        ret.add(getMenuNormalize());
-        ret.addSeparator();
-        ret.add(getMenuFill());
-        ret.addSeparator();
-        ret.add(getMenuCSV());
+        if (showEditInPopupMenu) {
+            JMenuItem editItem = getMenuEdit();
+            if (editItem != null) {
+                ret.add(editItem);
+            }
+        }
+        if (showRandomizeInPopupMenu) {
+            JMenuItem randomizeItem = getMenuRandomize();
+            if (randomizeItem != null) {
+                ret.add(randomizeItem);
+            }
+        }
+        if (showNormalizeInPopupMenu) {
+            JMenuItem normalizeItem = getMenuNormalize();
+            if (normalizeItem != null) {
+                ret.add(normalizeItem);
+            }
+        }
+        if (showFillInPopupMenu) {
+            JMenuItem fillItem = getMenuFill();
+            if (fillItem != null) {
+                ret.add(fillItem);
+            }
+        }
+        if (showCSVInPopupMenu) {
+            JMenuItem csvItem = getMenuCSV();
+            if (csvItem != null) {
+                ret.add(csvItem);
+            }
+        }
         return ret;
     }
 
@@ -260,6 +320,21 @@ public class SimbrainJTable extends JXTable {
             if (getSelectedColumn() != 0) {
                 toolbar.add(TableActionManager.getDeleteColumnAction(this));
             }
+            return toolbar;
+        }
+        return null;
+    }
+
+    /**
+     * Return a toolbar with buttons for editing the rows of a table.
+     *
+     * @return the edit toolbar
+     */
+    public JToolBar getToolbarEditRows() {
+        if (getData() instanceof MutableTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager.getInsertRowAction(this));
+            toolbar.add(TableActionManager.getDeleteRowAction(this));
             return toolbar;
         }
         return null;
@@ -357,8 +432,9 @@ public class SimbrainJTable extends JXTable {
         JMenu menu = new JMenu("Edit");
         if (getData() instanceof MutableTable) {
             menu.add(new JMenuItem(TableActionManager.changeRowsColumns(this)));
+            return menu;
         }
-        return menu;
+        return null;
     }
 
     /**
@@ -409,9 +485,10 @@ public class SimbrainJTable extends JXTable {
      *
      * @return the tableModel
      */
-    public TableModel getTableModel() {
+    TableModel getTableModel() {
         return tableModel;
     }
+
 
     /**
      * Renderer for table. If custom row headings are used, treats first column
@@ -529,6 +606,15 @@ public class SimbrainJTable extends JXTable {
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
+            if (data instanceof NumericTable) {
+                return Double.class;
+            } else if (data instanceof TextTable) {
+                if (columnIndex > 0) {
+                    return String.class;
+                } else {
+                    return Double.class;
+                }
+            }
             return Double.class;
         }
 
@@ -665,6 +751,69 @@ public class SimbrainJTable extends JXTable {
      */
     public void setHasChangedSinceLastSave(boolean hasChanged) {
         this.hasChangedSinceLastSave = hasChanged;
+    }
+
+    /**
+     * @param showInsertRowPopupMenu the showInsertRowPopupMenu to set
+     */
+    public void setShowInsertRowPopupMenu(boolean showInsertRowPopupMenu) {
+        this.showInsertRowPopupMenu = showInsertRowPopupMenu;
+    }
+
+    /**
+     * @param showInsertColumnPopupMenu the showInsertColumnPopupMenu to set
+     */
+    public void setShowInsertColumnPopupMenu(boolean showInsertColumnPopupMenu) {
+        this.showInsertColumnPopupMenu = showInsertColumnPopupMenu;
+    }
+
+    /**
+     * @param showDeleteRowPopupMenu the showDeleteRowPopupMenu to set
+     */
+    public void setShowDeleteRowPopupMenu(boolean showDeleteRowPopupMenu) {
+        this.showDeleteRowPopupMenu = showDeleteRowPopupMenu;
+    }
+
+    /**
+     * @param showDeleteColumnPopupMenu the showDeleteColumnPopupMenu to set
+     */
+    public void setShowDeleteColumnPopupMenu(boolean showDeleteColumnPopupMenu) {
+        this.showDeleteColumnPopupMenu = showDeleteColumnPopupMenu;
+    }
+
+    /**
+     * @param showEditInPopupMenu the showEditInPopupMenu to set
+     */
+    public void setShowEditInPopupMenu(boolean showEditInPopupMenu) {
+        this.showEditInPopupMenu = showEditInPopupMenu;
+    }
+
+    /**
+     * @param showRandomizeInPopupMenu the showRandomizeInPopupMenu to set
+     */
+    public void setShowRandomizeInPopupMenu(boolean showRandomizeInPopupMenu) {
+        this.showRandomizeInPopupMenu = showRandomizeInPopupMenu;
+    }
+
+    /**
+     * @param showNormalizeInPopupMenu the showNormalizeInPopupMenu to set
+     */
+    public void setShowNormalizeInPopupMenu(boolean showNormalizeInPopupMenu) {
+        this.showNormalizeInPopupMenu = showNormalizeInPopupMenu;
+    }
+
+    /**
+     * @param showFillInPopupMenu the showFillInPopupMenu to set
+     */
+    public void setShowFillInPopupMenu(boolean showFillInPopupMenu) {
+        this.showFillInPopupMenu = showFillInPopupMenu;
+    }
+
+    /**
+     * @param showCSVInPopupMenu the showCSVInPopupMenu to set
+     */
+    public void setShowCSVInPopupMenu(boolean showCSVInPopupMenu) {
+        this.showCSVInPopupMenu = showCSVInPopupMenu;
     }
 
 }

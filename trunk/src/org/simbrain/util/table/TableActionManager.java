@@ -22,6 +22,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -43,7 +46,7 @@ import org.simbrain.util.Utils;
  */
 public class TableActionManager {
 
-    /** Ddefault directory where tables are stored. */
+    /** Default directory where tables are stored. */
     private static String CSV_DIRECTORY = "."
             + System.getProperty("file.separator") + "simulations"
             + System.getProperty("file.separator") + "tables";
@@ -142,7 +145,8 @@ public class TableActionManager {
     /**
      * Action for normalizing the currently selected column in a table.
      *
-     * @param jtable table to normalize
+     * @param table table to normalize
+     * @param columnIndex column to normalize
      * @return the action
      */
     public static Action getNormalizeColumnAction(final NumericTable table,
@@ -320,9 +324,9 @@ public class TableActionManager {
                 JPanel pane = new JPanel();
                 JTextField rows = new JTextField();
                 JTextField columns = new JTextField();
-                rows.setText(Integer.toString(table.getRowCount()));
+                rows.setText(Integer.toString(table.getData().getRowCount()));
                 rows.setColumns(3);
-                columns.setText(Integer.toString(table.getColumnCount()));
+                columns.setText(Integer.toString(table.getData().getColumnCount()));
                 columns.setColumns(3);
                 pane.add(new JLabel("Rows"));
                 pane.add(rows);
@@ -346,7 +350,7 @@ public class TableActionManager {
     /**
      * Action for inserting a row in to a jtable.
      *
-     * @param jtable table to insert row into
+     * @param table jtable to insert row into.
      * @return the action
      */
     public static Action getInsertRowAction(final SimbrainJTable table) {
@@ -366,8 +370,10 @@ public class TableActionManager {
              */
             public void actionPerformed(ActionEvent arg0) {
                 if (table.getSelectedRow() != -1) {
-                    ((MutableTable) table.getData()).insertRow(
-                            table.getSelectedRow(), new Double(0));
+                    if (table.getData() instanceof MutableTable) {
+                        ((MutableTable<?>) table.getData()).insertRow(table
+                                .getSelectedRow());
+                    }
                 }
             }
 
@@ -399,7 +405,7 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
                     ((MutableTable) jtable.getData()).insertColumn(
-                            jtable.getSelectedColumn(), new Double(0));
+                            jtable.getSelectedColumn());
                 }
             }
 
@@ -428,15 +434,26 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                // TODO: For this and others, if not use a sensible value (for
-                // not selected case)
-                // selection = getSelectedRow or else it =
-                if (jtable.getSelectedRow() != -1) {
-                    ((MutableTable) jtable.getData()).removeRow(jtable
-                            .getSelectedRow());
+                // TODO: Also allow multiple column selection using this method?
+                List<Integer> selection = new ArrayList<Integer>(0);
+                for (int i = 0; i < jtable.getSelectedRows().length; i++) {
+                    selection.add(jtable.getSelectedRows()[i]);
+                }
+                Collections.sort(selection, Collections.reverseOrder());
+                if (selection.size() > 0) {
+                    for (Integer i : selection) {
+                        ((MutableTable) jtable.getData()).removeRow(i);
+                    }
+                }
+                // Rule for selecting row after deleting a row.  Needs work.
+                //  Should work well when button is repeatedly pressed
+                if (selection.size() > 0) {
+                    int newSelection = selection.get(selection.size() - 1) - 1;
+                    if (newSelection >= 0) {
+                        jtable.setRowSelectionInterval(newSelection, newSelection);
+                    }
                 }
             }
-
         };
     }
 
@@ -494,7 +511,7 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 String numRows = JOptionPane.showInputDialog(null,
                         "Number of rows to add:", "5");
-                table.addRows(Integer.parseInt(numRows), 0);
+                table.addRows(Integer.parseInt(numRows));
             }
 
         };
@@ -523,7 +540,7 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 String numCols = JOptionPane.showInputDialog(null,
                         "Number of columns to add:", "5");
-                table.addColumns(Integer.parseInt(numCols), 0);
+                table.addColumns(Integer.parseInt(numCols));
             }
 
         };
@@ -553,7 +570,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                table.fill(0);
+                table.fill(new Double(0));
             }
 
         };

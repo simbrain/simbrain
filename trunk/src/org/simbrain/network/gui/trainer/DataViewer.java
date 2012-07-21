@@ -23,7 +23,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -62,10 +61,10 @@ public class DataViewer extends SimbrainJTableScrollPanel {
 
         // If no data exists, create it!
         if (data.getData() == null) {
-            table = new SimbrainJTable(new DefaultNumericTable(
+            table = new SimbrainJTable(new NumericTable(
                     DEFAULT_NUM_ROWS, neurons.size()));
         } else {
-            table = new SimbrainJTable(new DefaultNumericTable(data.getData()));
+            table = new SimbrainJTable(new NumericTable(data.getData()));
         }
 
         // Set up column headings
@@ -90,23 +89,23 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             }
 
             public void rowAdded(int row) {
-                data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asDoubleArray());
             }
 
             public void rowRemoved(int row) {
-                data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asDoubleArray());
             }
 
             public void cellDataChanged(int row, int column) {
-                data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asDoubleArray());
             }
 
             public void tableDataChanged() {
-                data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asDoubleArray());
             }
 
             public void tableStructureChanged() {
-                data.setData(((NumericTable) table.getData()).asArray());
+                data.setData(((NumericTable) table.getData()).asDoubleArray());
             }
 
         });

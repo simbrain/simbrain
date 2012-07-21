@@ -31,13 +31,31 @@ import java.util.List;
  */
 public abstract class SimbrainDataTable<T> {
 
+    /** The data. */
+    protected final List<List<T>> rowData;
+
     /** Listeners. */
     private List<SimbrainTableListener> listeners;
 
-    // Initialize listener list
+    // Initialize fields
     {
         listeners = new ArrayList<SimbrainTableListener>();
+        rowData = new ArrayList<List<T>>();
     }
+
+    /**
+     * Returns the default cell value for a given table type.
+     *
+     * @return the default value.
+     */
+    abstract T getDefaultValue();
+
+    /**
+     * Returns the datatype (T) for a given table type.
+     *
+     * @return the data type.
+     */
+    abstract Class<?> getDataType();
 
     /**
      * Set the value at specific position in the table.
@@ -46,7 +64,13 @@ public abstract class SimbrainDataTable<T> {
      * @param col column index
      * @param value value to add
      */
-    public abstract void setValue(int row, int col, T value);
+    public void setValue(int row, int col, T value) {
+        rowData.get(row).set(col, value);
+        // TODO: fireTableDataChanged() used to be called but it was a
+        // performance problem. May be cases where update does not
+        // happen properly. If so add amethod for setValue with a boolean
+        // fireEvent flag here.
+    }
 
     /**
      * Get the value of a specific cell in the table.
@@ -55,7 +79,9 @@ public abstract class SimbrainDataTable<T> {
      * @param col the column index
      * @return the value at that cell
      */
-    public abstract T getValue(int row, int col);
+    public T getValue(int row, int col) {
+        return rowData.get(row).get(col);
+    }
 
     /**
      * Set the value at specific position in the table, and specify whether to
@@ -83,15 +109,66 @@ public abstract class SimbrainDataTable<T> {
      *
      * @return the columns in the dataset.
      */
-    public abstract int getColumnCount();
+    public int getColumnCount() {
+        if (rowData.size() > 0) {
+            return rowData.get(0).size();
+        } else {
+            return 0;
+        }
+    }
 
     /**
-     * Returns the number of row in the dataset. Note the same as columns in the
-     * simbrainjtable, which has an extra row and column for headers.
+     * Returns the number of rows in the dataset.
      *
-     * @return the columns in the dataset.
+     * @return the rows in the dataset.
      */
-    public abstract int getRowCount();
+    public int getRowCount() {
+        return rowData.size();
+    }
+
+    /**
+     * Create a new row for the table, with a specified value.
+     *
+     * @param value value for columns of new row
+     * @return the new row
+     */
+    protected List<T> getNewRow(final T value) {
+        ArrayList<T> row = new ArrayList<T>();
+        for (int i = 0; i < getColumnCount(); i++) {
+            row.add(value);
+        }
+        return row;
+    }
+
+    /**
+     * Create a new row for the table, with a specified value.
+     *
+     * @param value value for columns of new row
+     * @param cols number of columns in a row for this table
+     * @return the new row
+     */
+    protected List<T> getNewRow(final T value, final int cols) {
+        ArrayList<T> row = new ArrayList<T>();
+
+        for (int i = 0; i < cols; i++) {
+            row.add(value);
+        }
+        return row;
+    }
+
+    /**
+     * Fills the table with the given value.
+     *
+     * @param value value to fill the table with.
+     */
+    public void fill(final T value) {
+        for (int i = 0; i < this.getRowCount(); i++) {
+            for (int j = 0; j < this.getColumnCount(); j++) {
+                setValue(i, j, value, false);
+            }
+        }
+        this.fireTableDataChanged();
+    }
 
     /**
      * Returns a string array representation of the table, useful in csv
@@ -107,6 +184,21 @@ public abstract class SimbrainDataTable<T> {
             }
         }
         return stringArray;
+    }
+
+    /**
+     * Returns the contents of the table as a flat list.
+     *
+     * @return contents as a list.
+     */
+    public List<T> asFlatList() {
+        List<T> list = new ArrayList<T>();
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                list.add(getValue(i, j));
+            }
+        }
+        return list;
     }
 
     /**

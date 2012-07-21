@@ -219,6 +219,19 @@ public abstract class TextWorld {
     }
 
     /**
+     * Reset the dictionary.
+     *
+     * @param newDictionary new words for the dictionary.
+     */
+    public void resetDictionary(List<String> newDictionary) {
+        dictionary.clear();
+        for (String word : newDictionary) {
+            dictionary.add(word);
+        }
+        fireDictionaryChangedEvent();
+    }
+
+    /**
      * Check to see if the dictionary contains the provided word. Used for
      * localist representations of words at component level.
      *

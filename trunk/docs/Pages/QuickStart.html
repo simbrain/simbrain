@@ -3,6 +3,7 @@
 
 
 
+
   
 
   
@@ -32,8 +33,9 @@
 
 
   
-<p>To get rid of everything in the workspace,  use <span class="command">File &gt; Clear Workspace</span>. <span style="font-weight: bold;"><br>
-</span></p>
+<p>To get rid of everything in the workspace,  use <span class="command">File &gt; Clear Workspace</span>. <br>
+</p>
+
 
   
 <p class="heading">Add networks to the workspace
@@ -41,14 +43,16 @@
 
 <p>Click the network button <img src="../Images/Network.png" height="18" width="18">
 in the main toolbar a few times. You should see a few networks show up.
-You can move them around however you like and resize them.<br>
+You can move them around however you like and resize them.</p>
+<p>For a guide to what the symbols in a network mean, see the image and description <a href="Network.html">here</a>.<br>
  </p>
+
 
   
 <p class="heading">Add neurons to a network </p>
 
   
-<p>Click in one of the networks you created. Now create some neurons, by presing the <img src="../Images/AddNeuron.png" height="18" width="18">button
+<p>Click in one of the networks you created (<span style="text-decoration: underline;">most of the next steps assume you have created a network and it is in focus</span>).&nbsp; Now create some neurons, by presing the <img src="../Images/AddNeuron.png" height="18" width="18">button
 or using the "p" key. Do this a few times to create a line of neurons.
 (For all network key commands, the network window must be selected for
 the command to work)<br>
@@ -61,7 +65,7 @@ the command to work)<br>
 <p>
   </p>
 <p>Use
-the mouse the draw a lasso around the neurons so that they are
+the mouse to draw a lasso around the neurons so that they are
 selected. You can also press the "n" button to select all neurons.
 Green halos will show up around these neurons signifying that you have
 selected them. </p>
@@ -76,7 +80,7 @@ selected them. </p>
 <p><span class="heading">Copy and paste some   neurons </span></p>
 
   
-<p>Select some neurons, copy them using <span class="command">Edit &gt; Copy</span> (or control/command-C), click where you want to put a copy of those neurons, and then paste them there using <span class="command">Edit &gt; Paste</span> (or control/command-V). Press paste repeatedly to see multiple copies of these neurons appear. </p>
+<p>Select some neurons, copy them using <span class="command">Edit &gt; Copy</span> (or <a href="../KeyboardShortcuts.html">command</a>-c), click where you want to put a copy of those neurons, and then paste them there using <span class="command">Edit &gt; Paste</span> (or command-v). Press paste repeatedly to see multiple copies of these neurons appear. </p>
 
   
 <p><span class="heading">Delete neurons </span></p>
@@ -88,19 +92,29 @@ selected them. </p>
 <p><span class="heading">Connect one  neuron to another </span></p>
 
   
-<p>1) Create two neurons. You will make a connection from a "source" to a "target" neuron. </p>
+<p>1) Create two neurons. You will make a <a href="Network/connections.html">connection from a "source" to a "target" neuron</a>. </p>
 
   
-<p>2) Select the source neuron. Designate it a source neuron by selecting <span class="command">Edit &gt; Connect &gt; Set source neuron(s)</span> or pressing the "1" key, which is a shortcut for selecting source neurons. Observe the red halo that appears around the neuron.</p>
+<p>2) Designate one neuron as a "source neuron",&nbsp; by selecting <span class="command">Edit &gt; Connect &gt; Set source neuron(s)</span>
+or pressing the "1" key, which is a keyboard shortcut for selecting
+source neurons. Observe the red halo that appears around the neuron.</p>
 
   
-<p>3) Select the target neuron.</p>
+<p>3) Select the target neuron just by lassong it using your mouse.<br>
+</p>
 
   
-<p>4) Connect the source to the target neuron using <span class="command">Edit &gt; Connect &gt; Connect Source-Target &gt; All to all</span> or by pressing the "2" key. (After a while you can get quick at selecting, and using the "1" and "2" keys to connect neurons).</p>
+<p>4) Connect the source to the target neuron using <span class="command">Edit &gt; Connect &gt; All to all</span>
+or by pressing the "2" key.&nbsp;&nbsp; If a dialog appears just click
+"OK".&nbsp; This dialog will not appear if you click "2".<br>
+</p>
+<div style="margin-left: 40px;">(After a while you can get quick at selecting, and using this sequence: <br>
+&nbsp; select source neurons &gt; "1" &gt; select target neurons &gt; "2"<br>
+</div>
+
 
   
-<p>5) If you like, clear the "source neuron" halo by going to  <span class="command">Edit &gt; Connect &gt; Clear source neuron(s) </span>or by clicking outside any neurons or weights and pressing "1". <span class="command"><br>
+<p>5) If you like, clear the "source neuron" halo by going to  <span class="command">Edit&nbsp; &gt; Clear source neuron(s) </span>or by clicking outside any neurons or weights and pressing "1". <span class="command"><br>
 </span></p>
 
 
@@ -129,7 +143,7 @@ distinction for now). </p>
 <p>
   </p>
 <p>Select
-the weight you created by clicking on it. If that is tricky, lasso over
+the weight you created by clicking on it (the weight or synapse is the red disk connecting one node to another; see the picture <a href="Network.html">here</a>) . If that is tricky, lasso over
 the connection line. You can also press "w", which selects all weights.
 A green halo will show up around the weight.</p>
 
@@ -149,8 +163,15 @@ the activation propagates differently. </p>
 <p><span class="heading">Make a layered network </span></p>
 
   
+<p>(A layered network or "feedforward" network is one in which the
+nodes are organized in to a sequence layers, where each node in one
+layer connects to all the nodes in the next layer.&nbsp; Activation
+flows from an input layer to an output layer.&nbsp; There are no loops
+so these networks tend to "dissipate" activation.)<br>
+</p>
 <p>Let's make a new network. Delete everything you've done up until now (press "a" to select all and delete to delete).<br>
 </p>
+
 
   
 <p>1. Make a row of neurons by pressing "P" a few times.</p>
@@ -162,10 +183,10 @@ the activation propagates differently. </p>
 <p>3. Repeat. You should now have three rows or "layers" of neurons.</p>
 
   
-<p>4. Select the bottom row and make them source neurons using <span class="command">Edit &gt; Connect &gt; Set source neuron(s)</span> or by pressing the "1" key.</p>
+<p>4. Select the bottom row and make them source neurons using <span class="command">Edit&nbsp; &gt; Set source neuron(s)</span> or by pressing the "1" key.</p>
 
   
-<p>5. Select the middle row and connect   using <span class="command">Edit &gt; Connect &gt; Connect Source-Target &gt; All to all</span> or by pressing the "2" key. </p>
+<p>5. Select the middle row and connect   using <span class="command">Edit &gt; Connect&nbsp; &gt; All to all</span> or by pressing the "2" key. </p>
 
   
 <p>6. Now immediately make the middle row the new source neurons by pressing "1" while they are still selected</p>
@@ -180,15 +201,24 @@ the activation propagates differently. </p>
 <p>9.Iterate the network a few times pressing the space-bar, to see activation propoagate through the network</p>
 
   
-<p><span class="heading">Make a recurrent network </span></p>
+<p><span class="heading">Make a recurrent network&nbsp;<br>
+ </span></p>
+
 
   
 <p>
   </p>
+<p>(A recurrent network is a network which contains "loops" or
+"cycles", in the sense that one can begin at some nodes, follow
+connections, and end up back at the same node.&nbsp;&nbsp; Because
+activation can repeatly flow through the loops in recurrent networks,
+they can display interesting dynamics.)<br>
+</p>
 <p>1.
 Make a grid of neurons using Insert &gt; Add Neurons... A dialog will
 show up asking you how many neurons you want to create. Say 9 and press
 OK.</p>
+
 
   
 <p>2. Select all the neurons with "N"</p>
@@ -226,10 +256,10 @@ Periodically re-randomize the neurons using "N" followed by "R". </p>
 <p><span class="heading">Edit  weights</span></p>
 
   
-<p>1. Select all the weights in your network by pressing "W" or using <span class="command">Select &gt; Select All Weights. </span></p>
+<p>1. Select all the weights in your network by pressing "w" or using <span class="command">Select &gt; Select All Weights. </span></p>
 
   
-<p>2. Double click one of the synapses, or use <span class="command">Edit &gt; Edit Selected Synapse(s)</span>. A synapse dialog will show up allowing you to edit these weights. Change the learning rule to <span class="command">Hebbian</span>. </p>
+<p>2. Edit the weights using <span class="command">Edit &gt; Edit Selected Synapse(s)</span>. A synapse dialog will show up allowing you to edit these weights. Change the learning rule to <span class="command">Hebbian</span>. </p>
 
   
 <p>3. Randomize everything by using<span class="command"> Select &gt; Select All </span>or pressing "a" and then pressing "r" (this randomizes weights <span style="font-style: italic;">and</span> neurons).</p>

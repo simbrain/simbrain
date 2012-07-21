@@ -1,48 +1,51 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
 
-<body>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div>
 </a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Hebbian Threshold</a></p>
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Hebbian Threshold</p>
   </div>
-  <p><h1>Hebbian Threshold</h1></p>
-  <p span>This is a variant of <a href="hebbian.html#HebbLearning">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &theta;, where &theta; can be fixed or sliding. <p span><img src="../equations/BCM.png" width="236" height="69">
-<p span>If &theta; is set to be sliding, then it changes at each time step by its own learning rate times the difference between the square of the post-synaptic activation and its current value. If &theta; is fixed, it will not change according to the proceding function, and will remain as it was left.
-<blockquote>
-  <p span="span"><img src="../equations/BCM_Theta.png" width="182" height="66"></p>
+  <p></p><h1>Hebbian Threshold</h1>
+  <p span="">This is a variant of <a href="hebbian.html#HebbLearning">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &#952;, where &#952; can be fixed or sliding. </p><p span=""><img src="../equations/BCM.png" height="69" width="236">
+</p><p span="">If &#952; is set to be sliding, then it changes at each time
+step by its own learning rate times the difference between the square
+of the post-synaptic activation and its current value. If &#952; is fixed,
+it will not change according to the proceding function, and will remain
+as it was left.
+</p><blockquote>
+  <p span="span"><img src="../equations/BCM_Theta.png" height="66" width="182"></p>
 </blockquote>
 <p span="span">The rule seems to work best for small activation and weight values (between 0 and 1). </p>
-<p span="span">This rule is known as the BCM rule (Bienenstock, Cooper, and Munro).</p>
-<p span="span">See Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, pp. 290-291. </p>
-<p span>
-<p span><span class="heading">Momentum</span>
-<blockquote>
-  <p span="span">The value that scales the rate of the change of this synapse, denoted by &epsilon; above. </p>
+<p span="span">This rule is also known as the BCM rule (Bienenstock, Cooper, and Munro).</p>
+<p span="span">See Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, pp. 290-291.</p>
+<p span="span">Also see the Scholarpedia article on <a href="http://www.scholarpedia.org/article/BCM_theory">BCM Theory</a>.<br>
+ </p>
+
+<p span="">
+</p><p span=""><span class="heading">Momentum</span>
+</p><blockquote>
+  <p span="span">The value that scales the rate of the change of this synapse, denoted by &#949; above. </p>
 </blockquote>
-<p class="heading" span>Output threshold momentum
-<blockquote>
-  <p span="span">This controls the rate at which the threshold  &theta; changes &epsilon;<sub>&theta;</sub>, above. </p>
+<p class="heading" span="">Output threshold momentum
+</p><blockquote>
+  <p span="span">This controls the rate at which the threshold  &#952; changes &#949;<sub>&#952;</sub>, above. </p>
 </blockquote>
-<p class="heading" span>Output Threshold
-<blockquote>
+<p class="heading" span="">Output Threshold
+</p><blockquote>
   <p span="span">The value the output activation <em>a</em><sub>t</sub> has to be above in order for the weight to increase. </p>
 </blockquote>
-<p class="heading" span>Use Sliding Output Threshold 
-<blockquote>
+<p class="heading" span="">Use Sliding Output Threshold 
+</p><blockquote>
   <p span="span">If
-this is set to yes, then the threshold &theta; will change according to the equation above; otherwise it stays fixed. </p>
+this is set to yes, then the threshold &#952; will change according to the equation above; otherwise it stays fixed. </p>
 </blockquote>
 </div>
-</body>
-</html>
+</body></html>

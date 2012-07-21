@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.XStream;
 public class DisplayWorld extends TextWorld {
 
     /** Threshold for displaying text. */
-    private double threshold = .5;
+    private double displayThreshold = .5;
 
     /**
      * Constructs an instance of TextWorld.
@@ -65,7 +65,7 @@ public class DisplayWorld extends TextWorld {
      * @param value value to check against threshold
      */
     public void addTextIfAboveThreshold(final double value, final String string) {
-        if (value > threshold) {
+        if (value > displayThreshold) {
             addText(string + " "); // TODO: Replace space with user-specified
                                    // "buffer" string
         }
@@ -79,6 +79,20 @@ public class DisplayWorld extends TextWorld {
     static XStream getXStream() {
         XStream xstream = TextWorld.getXStream();
         return xstream;
+    }
+
+    /**
+     * @return the displayThreshold
+     */
+    public double getDisplayThreshold() {
+        return displayThreshold;
+    }
+
+    /**
+     * @param displayThreshold the displayThreshold to set
+     */
+    public void setDisplayThreshold(double displayThreshold) {
+        this.displayThreshold = displayThreshold;
     }
 
 }

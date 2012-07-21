@@ -18,47 +18,57 @@
  */
 package org.simbrain.util.table;
 
+import java.util.List;
+
 /**
- * Interface for tables (subclasses of SimbrainJTable) that have concept of
- * "current row" implemented which allows the table to iterated from row to row
- * when updated.
+ * Superclass for tables which can be modified.
  *
  * @author jyoshimi
  *
  */
-public interface MutableTable {
+public abstract class MutableTable<T> extends SimbrainDataTable<T> {
 
-    // TODO: Assumes numeric data. Generalize to all forms of data.
+    /**
+     * Add a new row.
+     *
+     * @param value value for cells of new row
+     * @param fireEvent whether to fire an update event or not
+     */
+    private void addRow(T value, boolean fireEvent) {
+        rowData.add(getNewRow(value));
+        if (fireEvent) {
+            this.fireRowAdded(getRowCount() - 1);
+        }
+    }
 
     /**
      * Add a new row.
      *
      * @param value value for cells of new row
      */
-    public void addRow(final double value);
-
-    /**
-     * Add a new column at the far right of the table.
-     *
-     * @param value value to add
-     */
-    public void addColumn(final double value);
+    public void addRow(T value) {
+        addRow(value, true);
+    }
 
     /**
      * Add a specified number of rows to the bottom of the table.
      *
      * @param rowsToAdd number of rows to add
-     * @param number value for cells of new rows
+     * @param value value for cells of new rows
      */
-    public void addRows(final int rowsToAdd, final double number);
+    public void addRows(int rowsToAdd, T value) {
+        modifyRowsColumns(rowsToAdd, 0, value);
+    }
 
     /**
-     * Adds a specified number of columns to the right of the table.
+     * Add a specified number of rows to the bottom of the table.
      *
-     * @param colsToAdd number of columns to add.
-     * @param defaultValue value for cells of new columns
+     * @param rowsToAdd number of rows to add
      */
-    public void addColumns(final int colsToAdd, final double defaultValue);
+    public void addRows(final int rowsToAdd) {
+        addRows(rowsToAdd, getDefaultValue());
+    }
+
 
     /**
      * Insert a new row at the specified position.
@@ -66,7 +76,90 @@ public interface MutableTable {
      * @param at row index for where to put the new row
      * @param value value for new row cells
      */
-    public void insertRow(final int at, final double value);
+    public void insertRow(int at, T value) {
+        rowData.add(at, getNewRow(value));
+        this.fireRowAdded(at);
+    }
+
+    /**
+     * Insert a new row at the specified position,
+     * using the default data.
+     *
+     * @param at row index for where to put the new row
+     */
+    public void insertRow(int at) {
+        insertRow(at, getDefaultValue());
+    }
+    
+    /**
+     * Remove row with choice whether to fire an event or not.
+     *
+     * @param rowToRemoveIndex index of row to remove
+     * @param fireEvent whether to fire an event or not
+     */
+    public void removeRow(final int rowToRemoveIndex, boolean fireEvent) {
+        // Don't allow getRowCount() to go to 0
+        if (getRowCount() <= 1) {
+            return;
+        }
+        rowData.remove(rowToRemoveIndex);
+        if (fireEvent) {
+            this.fireRowRemoved(rowToRemoveIndex);
+        }
+    }
+
+    /**
+     * Remove a specified row.
+     *
+     * @param rowToRemoveIndex index of row to remove.
+     */
+    public void removeRow(int rowToRemoveIndex) {
+        removeRow(rowToRemoveIndex, true);
+    }
+
+    /**
+     * Add a new column.
+     *
+     * @param value value for cells of new column
+     * @param fireEvent whether to fire an update event or not
+     */
+    private void addColumn(T value, boolean fireEvent) {
+        for (List<T> row : rowData) {
+            row.add(value);
+        }
+        if (fireEvent) {
+            this.fireColumnAdded(getColumnCount() - 1);
+        }
+    }
+
+    /**
+     * Add a new column at the far right of the table.
+     *
+     * @param value value to add
+     */
+    public void addColumn(T value) {
+        addColumn(value, true);
+    }
+
+    /**
+     * Adds a specified number of columns to the right of the table.
+     *
+     * @param colsToAdd number of columns to add.
+     * @param defaultValue value for cells of new columns
+     */
+    public void addColumns(int colsToAdd, T value) {
+        modifyRowsColumns(0, colsToAdd, value);
+    }
+
+    /**
+     * Adds a specified number of columns to the right of the table.
+     *
+     * @param colsToAdd number of columns to add.
+     */
+    public void addColumns(int colsToAdd) {
+        addColumns(colsToAdd, getDefaultValue());
+    }
+
 
     /**
      * Insert a new column at the specified position.
@@ -74,38 +167,50 @@ public interface MutableTable {
      * @param at column index where column should be added
      * @param value value for cells of new column
      */
-    public void insertColumn(final int at, final double value);
+    public void insertColumn(int at, T value) {
+        for (List<T> row : rowData) {
+            row.add(at, value);
+        }
+        this.fireColumnAdded(at);
+    }
 
     /**
-     * Remove a specified row.
+     * Insert a new column at the specified position,
+     * using the default data.
      *
-     * @param rowToRemoveIndex index of row to remove.
+     * @param at column index for where to put the new row
      */
-    public void removeRow(final int rowToRemoveIndex);
+    public void insertColumn(int at) {
+        insertColumn(at, getDefaultValue());
+    }
+
+    /**
+     * Remove column with choice whether to fire an event or not.
+     *
+     * @param columnToRemoveIndex index of row to remove
+     * @param fireEvent whether to fire an event or not
+     */
+    public void removeColumn(final int columnToRemoveIndex, boolean fireEvent) {
+        // Don't allow no columns
+        if (getColumnCount() <= 1) {
+            return;
+        }
+        for (List<T> row : rowData) {
+            row.remove(columnToRemoveIndex);
+        }
+        if (fireEvent) {
+            this.fireColumnRemoved(columnToRemoveIndex);
+        }
+    }
 
     /**
      * Remove column at specified index.
      *
      * @param columnToRemoveIndex index of column to remove
      */
-    public void removeColumn(final int columnToRemoveIndex);
-
-    /**
-     * Reset the table structure.
-     *
-     * @param rows number of rows
-     * @param cols number of columns
-     */
-    public void reset(int rows, int cols);
-
-    /**
-     * Adds rows or columns.
-     *
-     * @param row number of rows to add.
-     * @param col number of columns to add.
-     * @param value to be added to the table.
-     */
-    public void addRowsColumns(final int row, final int col, final double value);
+    public void removeColumn(int columnToRemoveIndex) {
+        removeColumn(columnToRemoveIndex, true);
+    }
 
     /**
      * Adds or removes rows and columns. Does not change value of existing
@@ -115,7 +220,57 @@ public interface MutableTable {
      * @param col Number of columns in table.
      * @param value to be used for any new columns or rows added to the table.
      */
-    public void modifyRowsColumns(final int row, final int col,
-            final double value);
+    public void modifyRowsColumns(int row, int col, T value) {
+        int currentColNum = getColumnCount();
+        int currentRowNum = getRowCount();
+        if (col > currentColNum) {
+            for (int i = 0; i < col - currentColNum; ++i) {
+                addColumn(value, false);
+            }
+        } else if (col < currentColNum) {
+            for (int i = 0; i < currentColNum - col; ++i) {
+                removeColumn(getColumnCount() - 1, false);
+            }
+        }
+
+        if (row > currentRowNum) {
+            for (int i = 0; i < row - currentRowNum; ++i) {
+                addRow(value, false);
+            }
+        } else if (row < currentRowNum) {
+            for (int i = 0; i < currentRowNum - row; ++i) {
+                removeRow(getRowCount() - 1, false);
+            }
+        }
+        fireTableStructureChanged();
+    }
+
+    /**
+     * Reset the table structure.
+     *
+     * @param rows number of rows
+     * @param cols number of columns
+     */
+    public void reset(int rows, int cols) {
+        rowData.clear();
+
+        for (int i = 0; i < rows; i++) {
+            rowData.add(getNewRow(getDefaultValue(), cols));
+        }
+
+        fireTableStructureChanged();
+    }
+
+    /**
+     * Adds rows or columns.
+     *
+     * @param rows number of rows to add.
+     * @param cols number of columns to add.
+     * @param val value to be added to the table.
+     */
+    public void reset(final int rows, final int cols, final T val) {
+        reset(rows, cols);
+        fill(val);
+    }
 
 }

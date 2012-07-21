@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.table.DefaultNumericTable;
+import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
@@ -42,7 +42,7 @@ public class DataWorldComponent extends WorkspaceComponent {
             .getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private DefaultNumericTable dataModel;
+    private NumericTable dataModel;
 
     /**
      * Objects which can be used to get or set column values in the current row.
@@ -67,7 +67,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name) {
         super(name);
-        dataModel = new DefaultNumericTable();
+        dataModel = new NumericTable();
         init();
     }
 
@@ -80,7 +80,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name, int rows, int columns) {
         super(name);
-        dataModel = new DefaultNumericTable(rows, columns);
+        dataModel = new NumericTable(rows, columns);
         init();
     }
 
@@ -88,7 +88,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      * Construct a data world component from data.
      *
      * @param name name of component
-     * @param inputData data data to use to initialize the model
+     * @param data data to use to initialize the model
      */
     public DataWorldComponent(String name, double[][] data) {
         this(name);
@@ -104,7 +104,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     @SuppressWarnings("unchecked")
     public DataWorldComponent(final String name,
-            final DefaultNumericTable dataModel) {
+            final NumericTable dataModel) {
         super(name);
         this.dataModel = dataModel;
         init();
@@ -286,7 +286,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     public static DataWorldComponent open(InputStream input, String name,
             String format) {
         // TODO: Use format to determine how to open this.
-        DefaultNumericTable model = (DefaultNumericTable) DefaultNumericTable
+        NumericTable model = (NumericTable) NumericTable
                 .getXStream().fromXML(input);
         return new DataWorldComponent(name, model);
     }
@@ -296,7 +296,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      *
      * @return The data model for this component.
      */
-    public DefaultNumericTable getDataModel() {
+    public NumericTable getDataModel() {
         return dataModel;
     }
 
@@ -305,7 +305,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        DefaultNumericTable.getXStream().toXML(dataModel, output);
+        NumericTable.getXStream().toXML(dataModel, output);
     }
 
     @Override
@@ -350,7 +350,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return DefaultNumericTable.getXStream().toXML(dataModel);
+        return NumericTable.getXStream().toXML(dataModel);
     }
 
     /**

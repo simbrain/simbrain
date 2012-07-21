@@ -86,6 +86,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                 targetList);
         WeightMatrix weightMatrix = new WeightMatrix(weights);
         table = new SimbrainJTable(weightMatrix);
+        table.disableTableModificationMenus();
 
         // Create names for row headings
         List<String> rowHeaders = new ArrayList<String>();
@@ -143,7 +144,13 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
          * @param weights the weights to set
          */
         public WeightMatrix(Synapse[][] weights) {
+            super(weights.length, weights[0].length);
             this.weights = weights;
+            for (int i = 0; i < weights.length; i++) {
+                for (int j = 0; j < weights[0].length; j++) {
+                    setValue(i, j, weights[i][j].getStrength());
+                }
+            }
         }
 
         @Override
@@ -171,16 +178,6 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             } else {
                 return new Double(0);
             }
-        }
-
-        @Override
-        public int getRowCount() {
-            return weights.length;
-        }
-
-        @Override
-        public int getColumnCount() {
-            return weights[0].length;
         }
 
     }

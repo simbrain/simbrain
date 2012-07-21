@@ -54,7 +54,8 @@ public class SubtractiveNormalizationRule extends SynapseUpdateRule {
         double output = synapse.getTarget().getActivation();
         double averageInput = synapse.getTarget().getAverageInput();
         double strength = synapse.getStrength()
-                + (learningRate * ((output * (input - averageInput))));
+		+ ((learningRate * output * input) -
+                (learningRate * output * averageInput));
         synapse.setStrength(synapse.clip(strength));
 
     }

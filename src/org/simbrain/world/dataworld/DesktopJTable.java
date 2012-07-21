@@ -21,7 +21,7 @@ package org.simbrain.world.dataworld;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.util.table.DefaultNumericTable;
+import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
@@ -44,7 +44,7 @@ public class DesktopJTable extends SimbrainJTable {
      * @param dataModel base table
      * @param component parent component
      */
-    public DesktopJTable(DefaultNumericTable dataModel,
+    public DesktopJTable(NumericTable dataModel,
             DataWorldComponent component) {
         super(dataModel);
         this.component = component;

@@ -18,13 +18,17 @@
  */
 package org.simbrain.world.textworld;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.List;
 import java.util.Scanner;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,9 +38,9 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.SimpleFrame;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.util.table.DefaultTextTable;
+import org.simbrain.util.table.TextTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
@@ -49,6 +53,10 @@ public class TextWorldActions {
 
     /** Directory where text files for dictionaries are stored. */
     private static String DICTIONARY_DIR = ".";
+
+    /** User preference object. */
+    private static final Preferences THE_PREFS = Preferences.userRoot().node(
+            "org/simbrain/network/textworld");
 
     /**
      * Action for loading a dictionary, by finding every distinct word and
@@ -64,8 +72,9 @@ public class TextWorldActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                putValue(NAME, "Load dictionary");
-                putValue(SHORT_DESCRIPTION, "Load dictionary from text file");
+                putValue(NAME, "Load dictionary...");
+                putValue(SHORT_DESCRIPTION,
+                        "Extract dictionary from text file...");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
@@ -75,9 +84,9 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(DICTIONARY_DIR,
-                        "text file", "txt");
-                // chooser.addExtension("rtf"); (Must do other stuff to support
+                SFileChooser chooser = new SFileChooser(
+                        getDictionaryDirectory(), "text file", "txt");
+                chooser.addExtension("rtf"); //(Must do other stuff to support
                 // rich text)
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
@@ -104,13 +113,13 @@ public class TextWorldActions {
                             // (which it does
                             // in this case).
                             scanner.close();
+                            setDictionaryDirectory(chooser.getCurrentLocation());
                         }
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
             }
-
         };
     }
 
@@ -134,22 +143,46 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                JPanel mainPanel = new JPanel();
-                SimbrainJTable table = new SimbrainJTable(new DefaultTextTable(
+
+                // Should really enable / disable the action depending
+                // on if the dictionary is empty or not, but time is limited...
+                if (world.getDictionary().size() == 0) {
+                    return;
+                }
+                StandardDialog dialog = new StandardDialog();
+                dialog.setTitle("View / Edit Dictionary");
+                JPanel mainPanel = new JPanel(new BorderLayout());
+                SimbrainJTable table = new SimbrainJTable(new TextTable(
                         world.getDictionary()));
+                table.setShowCSVInPopupMenu(false);
+                table.setShowDeleteColumnPopupMenu(false);
+                table.setShowInsertColumnPopupMenu(false);
+                table.setShowEditInPopupMenu(false);
                 SimbrainJTableScrollPanel scroller = new SimbrainJTableScrollPanel(
                         table);
+                JPanel toolbarPanel = new JPanel();
+                toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                toolbarPanel.add(table.getToolbarEditRows());
+                mainPanel.add(toolbarPanel, BorderLayout.NORTH);
                 scroller.setMaxVisibleRows(10);
                 table.setDisplayColumnHeadings(false);
-                mainPanel.add(scroller);
-                SimpleFrame.displayPanel(mainPanel, "Dictionary");
+                mainPanel.add(scroller, BorderLayout.CENTER);
+
+                // Display dialog
+                dialog.setContentPane(mainPanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                if (!dialog.hasUserCancelled()) {
+                    world.resetDictionary(table.getData().asFlatList());
+                }
             }
         };
 
     }
 
     /**
-     * Action for displaying a preference dialog
+     * Action for displaying a preference dialog.
      *
      * @param world the world for which a dialog should be shown
      * @return the action
@@ -179,6 +212,25 @@ public class TextWorldActions {
             }
         };
 
+    }
+
+    /**
+     * Sets the current dictionaryDirectory directory in user preferences
+     * (memory for file chooser).
+     *
+     * @param dir directory to set
+     */
+    public static void setDictionaryDirectory(final String dir) {
+        THE_PREFS.put("dictionaryDirectory", dir);
+    }
+
+    /**
+     * Return the current dictionary directory.
+     *
+     * @return return the dictionaryDirectory directory
+     */
+    public static String getDictionaryDirectory() {
+        return THE_PREFS.get("dictionaryDirectory", DICTIONARY_DIR);
     }
 
 }

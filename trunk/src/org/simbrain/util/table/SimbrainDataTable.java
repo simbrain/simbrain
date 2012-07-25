@@ -65,22 +65,7 @@ public abstract class SimbrainDataTable<T> {
      * @param value value to add
      */
     public void setValue(int row, int col, T value) {
-        rowData.get(row).set(col, value);
-        // TODO: fireTableDataChanged() used to be called but it was a
-        // performance problem. May be cases where update does not
-        // happen properly. If so add amethod for setValue with a boolean
-        // fireEvent flag here.
-    }
-
-    /**
-     * Get the value of a specific cell in the table.
-     *
-     * @param row the row index
-     * @param col the column index
-     * @return the value at that cell
-     */
-    public T getValue(int row, int col) {
-        return rowData.get(row).get(col);
+        setValue(row, col, value, true);
     }
 
     /**
@@ -97,10 +82,21 @@ public abstract class SimbrainDataTable<T> {
     public void setValue(final int row, final int column, final T value,
             final boolean fireEvent) {
 
-        setValue(row, column, value);
+        rowData.get(row).set(column, value);
         if (fireEvent) {
             fireCellDataChanged(row, column);
         }
+    }
+
+    /**
+     * Get the value of a specific cell in the table.
+     *
+     * @param row the row index
+     * @param col the column index
+     * @return the value at that cell
+     */
+    public T getValue(int row, int col) {
+        return rowData.get(row).get(col);
     }
 
     /**

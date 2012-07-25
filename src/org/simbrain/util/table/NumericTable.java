@@ -112,9 +112,10 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         reset(data.length, data[0].length);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[0].length; j++) {
-                this.setValue(i, j, data[i][j]);
+                this.setValue(i, j, data[i][j], false);
             }
         }
+        fireTableDataChanged();
     }
 
     /**

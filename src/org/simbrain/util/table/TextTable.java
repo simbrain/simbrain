@@ -46,9 +46,10 @@ public class TextTable extends MutableTable<String> {
         init(dictionary.size(), 1);
         int i = 0;
         for (String string : dictionary) {
-            setValue(i, 0, string);
+            setValue(i, 0, string, false);
             i++;
         }
+        fireTableDataChanged();
     }
 
     /**

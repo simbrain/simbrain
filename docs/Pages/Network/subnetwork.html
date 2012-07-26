@@ -2,67 +2,61 @@
 <html><head><title>Simbrain Documentation</title>
 
 
-  
 
   
-  
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-  
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
   <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../SimbrainDocs.html">
+
 <div class="logo">
-<p><span></span></p>
+<p><a href="../../SimbrainDocs.html"><span></span></a></p>
 </div>
-</a>
+ 
+
 <div id="main_docs">
+
 <div class="navi">
 <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Subnetwork</p>
 </div>
+
 <div id="menu">
 <p class="menubold">Contents<br>
 </p>
+
 <blockquote>
-  
-  <p> <a href="network/backpropnetwork.html">Backprop</a><br>
-<a href="network/competitivenetwork.html">Competitive<br>
-</a>Echo state machine<br>
+  <p><a href="network/backpropnetwork.html">Backprop</a><br>
+  <a href="network/competitivenetwork.html">Competitive<br>
+  </a>Echo state machine<br>
   <a href="network/hopfieldnetwork.html">Hopfield</a><br>
-  <a href="network/KwinnerTakeAllNetwork.html">K Winner Take All</a><br><a href="network/lmsnetwork.html">
-Least mean Square</a><br>
+  <a href="network/KwinnerTakeAllNetwork.html">K Winner Take All</a><br>
+  <a href="network/lmsnetwork.html">Least mean Square</a><br>
   <a href="network/som.html">Self-Organizing Map</a><br>
-Simple Recurrent Network<br>
+  Simple Recurrent Network<br>
   <a href="network/winnerTakeAll.html">Winner Take All</a> </p>
 
-  <p> <br>
-</p></blockquote>
+  <p><br>
+  </p>
+</blockquote>
 </div>
-<p> </p>
+
+<p></p>
+
 <h1>Subnetworks</h1>
 
-<p>Subnetworks are a special kid of <a href="groups.html">group</a> used when special rules are required that go beyond
-what is available using the <a href="network_op.html">standard update</a>method,
-and when special types of learning, e.g. <a href="supervisedLearning.html">supervised learning</a>, are
-required.&nbsp;&nbsp; The subnetwork holds special data structures
-(e.g. input data) that are required when training a network using
-supervised learning.</p>
-<p>For more information on specific types of subnetwork click on the items in the menu on the right.<br>
-</p>
-<p>Here is an example of a subnetwork, a backprop network. <br>
-</p>
-<p style="text-align: center;"><img style="width: 240px; height: 320px;" alt="example subnetwork" src="../../Images/bp_net_4-3-2.png"><br>
-</p>
-<p><br>
-
+<p>Subnetworks are a special kind of <a href="groups.html">group</a> used when
+special update rules are required that go beyond what is available using the <a href="network_op.html">standard update</a> method for "loose" collections of
+neurons and synapses,&nbsp; and to facilitate special types of weight update, e.g. via <a href="supervisedLearning.html">supervised learning</a>.&nbsp;  <br>
 </p>
 
-<p>Subnetworks are created either by using the <span class="command">insert
-menu</span> in the network window, or right clicking and using the <span class="command">new network</span>
-submenu. Neurons and synapses cannot currently be added inside
-subnetworks, though subnets can be connected to anything outside of
-themselves. </p>
-<br>
+<p>For more information on specific types of subnetwork click on the items in
+the menu on the right.</p>
+<p><span class="heading">Creating Subnetworks</span><br>
+</p>
+
+
+<p>To create a subnetwork use <span class="command">Insert &gt;  Insert network &gt; ...</span>
+either from the network menu or by right clicking inside the network panel.</p><p><br>
+</p>
+
 <p>&nbsp;</p>
 </div>
-
 </body></html>

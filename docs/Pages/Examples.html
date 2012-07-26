@@ -10,6 +10,9 @@
 
 
 
+
+
+
   
 
   
@@ -29,16 +32,18 @@
 </div>
 <p> </p>
 <h1>Examples</h1>
-<br>
 
 <p>Here are some quick tutorials on how to do specific things in
 Simbrain.&nbsp;&nbsp;&nbsp; The basics of building a network and other
 simple examples are covered in the <a href="QuickStart.html">quick-start</a>.<br>
 </p>
 
+
 <p><span class="heading">Plot the activation of a node over time with a time-series plot.<br>
 </span></p>
-<p>Create a <a href="Network.html">neural network</a> and a <a href="Plot/time_series.html">time series plot</a>.&nbsp;&nbsp; You will now creating&nbsp; a <a href="Workspace/Couplings.html">coupling</a>
+<p>1) Create a <a href="Network.html">neural network</a> and a <a href="Plot/time_series.html">time series plot</a>.&nbsp; <br>
+</p>
+<p>2) Create&nbsp; a <a href="Workspace/Couplings.html">coupling</a>
 from a node in the neural network to a time series in the
 plot.&nbsp;&nbsp; The easiest way to do this is as follows.&nbsp; Right
 click on the node whose activation you want to plot, and in the context
@@ -49,11 +54,12 @@ particular time series in the plot.) &nbsp; By repeating this for
 different nodes you can plot the activation of multiple neurons at
 once. &nbsp;If you want to add more time series beyond the default 5, click "add" in the time series component.&nbsp;  <br>
 </p>
-<p>Now run your simulation and you should see a plot of the changing
+
+<p>3) Now run your simulation and you should see a plot of the changing
 activation of the neuron.&nbsp; For some purposes it helps to turn
 "auto range" off in the time series preferences, and manually set&nbsp;
 upper and lower bounds.</p><br>
-<p><span class="heading">Plot the activation of a set of nodes using a project plot and the coupling manager<br>
+<p><span class="heading">Plot the activation of a set of nodes using a projection plot and the coupling manager<br>
 </span></p>
 <p>(There are other ways to do this, some of them simpler in some cases, but this technique also shows you how to use the <a href="Workspace/Couplings.html">coupling manager</a>).&nbsp; This assumes a network component is open in the desktop.<br>
 <br>
@@ -89,81 +95,52 @@ projection plot, or the menu&nbsp;<span class="command">Edit &gt; Set dimensions
 
 <p><span class="heading">Train a backprop network on a pattern association task<br>
 </span></p>
-<p>To create a <a href="Network/network/backpropnetwork.html">backprop network</a>, go to the menu&nbsp;<span class="command">Insert &gt; Insert Network &gt; Backprop</span></p>
+<p>1) Create a <a href="Network/network/backpropnetwork.html">backprop network</a>, using the menu&nbsp;<span class="command">Insert &gt; Insert Network &gt; Backprop</span></p>
 
-<p>Then you specify a topology, which means how many layers, and how
-many
-neurons per layer (from bottom to top layer).&nbsp; Example: 4,3,2
-means 4
-neurons in the first layer, 3 neurons in the second layer, and 2
-neurons in the output layer.</p>
 
-<p style="text-align: center;"><img style="width: 240px; height: 320px;" alt="backprop net" src="../Images/bp_net_4-3-2.png"><br>
-</p>
 
-<br>
-
-<p><br>
-</p>
-
-<p>Now you have to create some training data, which encompasses a set
-of input vectors and a set of target vectors.&nbsp;&nbsp; To edit this
-data, right click on the backprop tab and select "Edit combined
+<p>2) Enter a topology (a layout for the network) in the dialog that
+appears.&nbsp;&nbsp; For example, enter "4,5,4" for a backprop network
+with 4 input nodes, 5 hidden layer
+nodes, and 4 output nodes.<br>
+</p><p style="text-align: left;">3) Now you have to create some a
+training set: set
+of input vectors and a set of target vectors which you want the network
+to associate.&nbsp; &nbsp; To do this right-click on the backprop tab
+and select "Edit combined
 data..."&nbsp;&nbsp; A pair of tables will open up, which you can use
-to edit the training data.&nbsp;&nbsp; Here is an example:<br>
+to edit the training data.&nbsp; <br>
+</p>
+<p style="text-align: left;">4) Edit the cells of the tables to create a pattern assocation task.<br>
 </p>
 
-<br>
 
-<p style="text-align: center;"><img style="width: 496px; height: 108px;" alt="Training Data Example" src="../Images/TrainingDataExample.png"></p>
 
-<p style="text-align: left;"><br>
-</p>
-
-<p style="text-align: left;">You can edit this data directly by hand,
-or can load stored data from a file. (See tale docs / TODO)<br>
-</p>
-
-<p style="text-align: left;">Of course the input data and target data
-must have the same number of rows.<br>
-</p>
-
-<p style="text-align: left;">This is what we want the network to learn.</p>
-
-<p style="text-align: left;">Now all that's left to do is to actually
+<p style="text-align: left;">5) Now all that's left to do is to actually
 train the network.&nbsp; To do this, open up the trainer dialog, by
 right clicking on the backprop tab and selecting "Train backprop
-net...".&nbsp; This
-action has this chalk / chalkboard icon, <img style="width: 18px; height: 18px;" alt="trainer icon" src="../Images/Trainer.png"></p>
-
-<p style="text-align: left;">A dialog will appear that looks like this</p>
-
-<div style="text-align: center;"><img style="width: 226px; height: 200px;" alt="Trainer Dialog" src="../Images/TrainerDialog.png"><br>
-</div>
-
-<p style="text-align: left;"><br>
+net...". <br>
 </p>
 
-Now just press run.&nbsp;&nbsp; This runs the algorithm, which adjusts
+<p style="text-align: left;">6) Press run in the training dialog &nbsp;
+This runs the algorithm, which adjusts
 the weights to try to achieve the desired input output
 mapping.&nbsp;&nbsp; As the trainer runs, the error should go
 down.&nbsp; Once the error gets to an acceptable level (often something
-below .1), stop the algorithm.&nbsp;&nbsp; Note that you cannot always
-get the error value low.<br>
+below .1), press the stop button.&nbsp; If you have trouble getting a low
+value you can press the randomize button and try again. Note: Depending on the associate task
+you set up in step 4 you may not be able to achieve a sufficiently low error value.<br>
+</p>
+<p style="text-align: left;">7) Now you can test your network to see
+how well it did.&nbsp; At this point it helps to have the "edit
+combined data" dialog open to see what patterns your network was
+trained to associate.&nbsp; Hand input one of the input patterns into
+the input nodes of the network, iterate the workspace, and see if you
+the correct output results.<br>
+</p>
 
-<br>
 
-Now you can test your network to see how well it did.&nbsp; Close the
-trainer dialog and just hand input one of your inputs into the input
-nodes, iterate the network, and see if you get the correct output (it
-helps to have the edit data dialog open as you do this)<br>
-
-<br>
-
-When you are done training, the source neurons should produce the
-correct target values.&nbsp; To test, you can open up a <a href="Worlds/DataWorld/DataWorld.html">data world</a>, load the
-input data in to that data world, and <a href="Workspace/Couplings.html">couple</a> it to the source
-neurons, to see if it worked.<p>  </p>
+<p>  </p>
 <span style="font-weight: bold;"></span>
 </div>
 

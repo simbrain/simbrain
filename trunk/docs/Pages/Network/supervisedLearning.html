@@ -2,6 +2,11 @@
 <html><head><title>Simbrain Documentation</title>
 
 
+
+
+
+
+
   
 
   
@@ -17,32 +22,223 @@
 </a>
 <div id="main_docs">
 <div class="navi">
-<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Trainers</p>
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Supervised Learning<br>
+</p>
 </div>
 <h1>Supervised Learning<br>
 </h1>
 <br>
-<p>Trainers are used to implement <a href="http://en.wikipedia.org/wiki/Supervised_learning">supervised
-learning</a> in Simbrain.&nbsp; They are like teachers. &nbsp; You can
-use trainers to "teach" a network to associate associate input patterns
-with output patterns. You are basically telling the network, when you
-get this input, produce this output, for a whole bunch of inputs and
-outputs.</p>
-<p>(TODO: Pull in some stuff from pattern associator, backprop docs)
-</p>
 
-<p>To use a trainer in simbrain you first create a network that has a
-trainer associated with it.&nbsp; Currently there are two <br>
-<span style="font-style: italic;"></span>such networks:Backprop and
-Least Mean Squared (LMS).&nbsp; <br>
-</p>
 
-<p style="margin-left: 40px;"><span class="heading2"></span><a href="network/backpropnetwork.html">Backprop</a> : work with arbitrarily many layers.</p>
-<p style="margin-left: 40px;"><a href="network/lmsnetwork.html">Least mean square (LMS)</a><span class="heading2"></span>: works with 2 layer networks.&nbsp; Useful
+
+<p>This page describes supervised learning in Simbrain (for more detail see <a href="http://en.wikipedia.org/wiki/Supervised_learning">here</a>).&nbsp; With
+a supervised learning scheme you train a network to perform a
+collection of input-output associations.&nbsp; It is "supervised" in
+the sense that for each of a collection of inputs, you "tell" the
+network what the desired output is.&nbsp; Several components exist in
+Simbrain to help with Supervised learning, which are used in multiple
+types of <a href="subnetwork.html">subnetworks</a>.&nbsp; Currently there are two subnetworks that use these components:<br>
+</p><p style="margin-left: 40px;"><a href="network/backpropnetwork.html">Backprop</a> : work with arbitrarily many layers.<br>
+<a href="network/lmsnetwork.html">Least mean square (LMS)</a><span class="heading2"></span>: works with 2 layer networks.&nbsp; Useful
 becaues it can be much faster than backprop.<br>
 </p>
+
+<p>An example which steps through the process of&nbsp; creating and
+trainining a network using supervised learning (backprop) is in the <a href="../Examples.html">examples page.</a>
+</p>
+<br>
+<p><span class="heading">Editing Data</span><br>
+</p>
+<p>A training dataset for a supervised learning algorithm essentially
+consists of two tables: (1) Input data and (2) Training data. <br>
+</p>
+<p>For networks that use supervised learning schemes, desired values must be specified for each input value.
+These are specified using tables, rows of data where
+each row corresponds to an activation for one neuron.&nbsp;&nbsp; The
+input data has input data for the input layer of a network.&nbsp; The
+training data has desired values that we want the output nodes to
+produce.</p>
+<p>&nbsp;For example, suppose we want to train a network to compute these associations:<br>
+</p>
+<blockquote><blockquote>
+    <p>(0,0) &gt; (0)<br>
+      (1,0) &gt; (1)<br>
+      (0,1) &gt; (1)<br>
+      (1,1) &gt; (0)</p>
+</blockquote></blockquote>
+<p>To do this we need two datasets (two tables),&nbsp; <br>
+</p>
+<blockquote>
+  <blockquote>
+  </blockquote>
+
+  
+  <blockquote>
+    <p><b>Input Dataset<br>
+</b></p>
+    <p>0,0<br>
+      1,0<br>
+      0,1<br>
+    1,1</p>
+    <p><b>Training Dataset<br>
+</b></p>
+    <p>0<br>
+      1<br>
+      1<br>
+      0</p></blockquote></blockquote>
+<br>
+<p>Columns of the input data correpspond to input neurons.&nbsp;
+Columns of the training data correspond to output neurons.&nbsp; Each
+row corresponds to one association.&nbsp; The two tables should have
+the same nubmer of rows.<br>
+</p>
+<p>To edit the data there are three commands.&nbsp;&nbsp; <br>
+</p>
+<p style="margin-left: 40px;"><span class="heading2">Edit Input Data</span>: Edit the input data only.<br>
+</p>
+
+<p style="margin-left: 40px;"><span class="heading2">Edit Training Data</span>: Edit the training data only.<br>
+</p>
+<p style="margin-left: 40px;"><span class="heading2">Edit Combined Data</span>:
+Edit both at once.&nbsp; This is useful because you can directly see
+the individual patterns to be associated by looking at the rows. <br>
+</p>
+<p>All three of these commands create a simple spreadsheet type interface, whose basic commands are documented in&nbsp; the <a href="../Worlds/DataWorld/DataWorld.html">data world documentation.</a>&nbsp; Most of the functions nad buttons are the same.&nbsp; Below is an example of the edit combined data dialog.<br>
+</p>
+
+
+<p style="margin-left: 40px;">
+</p>
+
+<blockquote>
+  <blockquote>
+  </blockquote>
+</blockquote>
+<br>
+<p style="text-align: center;"><img style="width: 597px; height: 130px;" alt="Training Data Example" src="../../Images/TrainingDataExample.png"></p>
+<p style="text-align: center;"><br>
+</p>
+The data can be edited or modified directly, by clicking in the
+cells,&nbsp; by using buttons (e.g randomize or normalize), or be
+importing data from stored .csv files.<span class="heading"><br>
+<br>
+Trainer Dialog</span><br>
+<br>
+This dialog is used to&nbsp; train a network, after a training set has been specified. &nbsp; You
+use this to manage a supervised&nbsp; algorithm, and track error, which should
+decrease.&nbsp; You can also randomize a&nbsp; network from this dialog to try to
+find better initial conditions&nbsp; for the algorithm and hopefully
+better results.<br>
+<br>
+
+
+<p><br>
+
+
+
+
+
+
+
+
+</p>
+
+
+<p style="text-align: center;"><img style="width: 226px; height: 200px;" alt="Trainer Dialog" src="../../Images/TrainerDialog.png"></p>
+
+<p class="heading2">Run <br>
+</p>
+
+
+
+<blockquote>
+  <p>This repeatedly applies learning algorithm<br>
+</p>
+</blockquote>
+
+
+<p class="heading2">Step <br>
+</p>
+
+
+
+
+<blockquote>
+  <p>Apply the backpropagation learning algorithm once.<br>
+</p>
+</blockquote>
+
+
+
+<p class="heading2">Show Updates<br>
+</p>
+
+
+
+<blockquote>
+  <p>If this is selected then you will see the weights
+change in Simbrain while the algorithm is run.&nbsp; This slows things
+down but can help illustrate what is happening.<br>
+</p>
+</blockquote>
+
+
+<p class="heading2">Batch</p>
+
+
+
+<blockquote>
+  <p>This tab provides controls for iterating the
+algorithm a set number of times. In batch mode you specify a specific
+number of epochs for the algorithm to perform. An epoch is one
+iteration through the entire dataset. The number of epochs is the
+number of such complete iterations to perform.<br>
+</p>
+</blockquote>
+
+
+<p class="heading2">Iterations</p>
+
+
+  
+<blockquote>
+    <p>Current iteration number </p>
+  </blockquote>
+
+
+  
+<p class="heading2">Error</p>
+
+
+<blockquote>
+  <p>Current error. Typically root mean squared error.<br>
+</p>
+</blockquote>
+
+
+<p class="heading2">Randomize</p>
+
+
+<blockquote>
+  <br>
+  <p>Randomize the network.&nbsp; Usually this randomizes
+the weights and biases, but the details of randomizaation depend on the
+network type.</p>
+
+</blockquote>
+<p class="heading2">Properties</p>
+
+
+
+<blockquote>
+  <p>Set specific properties of the current learning algorithm
+</p>
+</blockquote>
+
+
 <br>
 <br>
+
 <span class="heading"></span><br>
 <br>
 </div>

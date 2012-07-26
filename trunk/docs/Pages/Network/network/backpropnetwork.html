@@ -1,13 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css">
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
 
-<body>
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div>
@@ -16,40 +16,51 @@
   <div class="navi">
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
   </div>
-  <p><h1>Backprop Network</h1></p>
-  <p>This is a three layer feed-forward network that uses a well-known variant of the  Least Mean Squares rule for learning (the least mean squares rule is used directly by the <a href="lmsnetwork.html">LMS Network</a>). When iterated normally, the backprop network behaves like a <a href="standardnetwork.html">standard network</a>. Unlike a standard network, though, the backprop network can be trained based on the backpropagation algorithm by right-clicking on the <a href="../subnetwork_tab.html">subnetwork tab</a> and selecting "Train Backprop Network."</p>
-  <p>Currently Simbrain only uess three-layer networks. By default,  the hidden layer and the output layer are made up  of <a href="../neuron/sigmoidal.html">sigmoidal neurons</a>, and the input layer is entire made up of <a href="../neuron/clamped.html">clamped neurons</a>. 
-  <p>Backprop is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values. See <a href="trainingFile.html">training files.</a> </p>
-  <p>Since the backprop algorithm has been described in detail <a href="http://en.wikipedia.org/wiki/Backpropagation">elsewhere</a>, details of the algorithm are not given here. The engine which runs backprop in Simbrain is <a href="http://snarli.sourceforge.net/">SNARLI</a>, a software package created by Simon Levy. </p>
-  <p class="heading">Initialization</p>
+  <p></p><h1>Backprop Network</h1>
+  
+
+
+  
+<p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a>
+is a standard form of <a href="../supervisedLearning.html">supervised learning</a>. &nbsp; It is perhaps the best known
+and most popular means of training neural networks. <a href="http://en.wikipedia.org/wiki/Backpropagation"><span style="font-weight: bold;"><br>
+</span></a></p>
+
+  
+<p>An example which steps through the process of&nbsp; creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a><br>
+</p>
+<p><span class="heading">Creating a&nbsp; network</span></p>
+<p>After
+selecting&nbsp;<span class="command">Insert &gt; Insert Network &gt; Backrpop</span>, a dialog will appear asking that you
+specify a topology, which means how many layers, and how
+many
+neurons per layer (from bottom to top layer).&nbsp; <br>
+</p>
+<p style="margin-left: 40px;">Example: 4,3,2
+means 4
+neurons in the first layer, 3 neurons in the second layer, and 2
+neurons in the output layer.&nbsp; This will create the following network<br>
+</p>
+
+
+
+  <p style="text-align: center;" class="heading"><img style="width: 146px; height: 195px;" alt="backprop net" src="../../../Images/bp_net_4-3-2.png"></p>
+<p class="heading">Training</p>
+
   <blockquote>
-    <p>Since these are three layer networks, they are initialized with a set number of input and output units. The resulting network comprises three layers of the specified number of neurons with feed-forward connections. </p>
+    <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>. <br>
+ </p>
   </blockquote>
   <p class="heading">Parameters</p>
   <blockquote>
     <p><span class="heading2">Learning Rate: </span>A standard learning rate.  This determines how quickly synapses change. </p>
-    <p><span class="heading2">Momentum: </span> This scales the rate of weight change by the amount a given weight changed on the previous time step. This speeds up learning and prevents oscillations. Momentum should be between 0 and 1; 0.9 is a common value. </p>
-    <p></p>
-  </blockquote>
-  <p class="heading">Randomize</p>
-  <blockquote>
-    <p>The randomize option in the subnetwork tab context menu not only randomizes all synapses but the biases of all neurons as well. </p>
-  </blockquote>
-  <p class="heading">Training</p>
-  <blockquote>
-    <p>To train the backprop network select &quot;Train&quot; in the tab-context menu. (Right click on the subnetwork tab and select &quot;train&quot;). You must set an input and output file. </p>
-    <p><span class="heading2">Input File</span>: Use this button to select an input file for training (See <a href="trainingFile.html">training files)</a>. </p>
-    <p><span class="heading2">Output File</span>: Use this button to select an output file for training.</p>
-    <p><span class="heading2">Randomize Network:</span> Randomize weights and biases of the entire network. </p>
-    <p><span class="heading2">User / Play</span>: This repeatedly applies the backpropagation learning algorithm</p>
-    <p><span class="heading2">User / Step</span>: This applies the backpropagation learning  algorithm once.</p>
-    <p><span class="heading2">Batch / Epochs</span>: In batch mode you specify a specific number of epochs for the algorithm to perform. An epoch is one iteration through the entire dataset. The number of epochs is the number of such complete iterations to perform.</p>
-    <p><span class="heading2">Batch / Error Interval </span>: How often error should be displayed. E.g. if this is set to 100 then every 100 epochs the current error will be displayed. </p>
-    <p><span class="heading2">Batch / Train</span>: Begin iterating for the number of iterations specified in the epochs field.</p>
-    <p><span class="heading2">Props</span>: Set parameters for this network: momentum and learning rate, described above.</p>
-    <p><span class="heading2">RMS Error</span>: Displays the current root mean squared error.</p>
-    <p><span class="heading2"></span></p>
+    <p><span class="heading2">Momentum: </span>
+This scales the rate of weight change by the amount a given weight
+changed on the previous time step. This speeds up learning and prevents
+oscillations. Momentum should be between 0 and 1; 0.9 is a common
+value. </p>
+    
+  </blockquote><blockquote><p><span class="heading2"></span></p>
   </blockquote>
 </div>
-</body>
-</html>
+</body></html>

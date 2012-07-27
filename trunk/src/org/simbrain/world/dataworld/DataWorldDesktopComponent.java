@@ -34,6 +34,7 @@ import javax.swing.event.MenuListener;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.TableActionManager;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -135,6 +136,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         editMenu.add(table.getMenuFill());
         editMenu.add(table.getMenuRandomize());
         editMenu.add(table.getMenuNormalize());
+        editMenu.add(TableActionManager.getShuffleAction(table.getData()));
         editMenu.addSeparator();
         editMenu.add(iterationMode);
 

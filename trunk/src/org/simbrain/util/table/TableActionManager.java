@@ -605,4 +605,32 @@ public class TableActionManager {
         };
     }
 
+    /**
+     * Action for shuffling the rows of a table.
+     *
+     * @param table table whose rows should be shuffled
+     * @return the action
+     */
+    public static Action getShuffleAction(final SimbrainDataTable<?> table) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("Shuffle.png"));
+                putValue(NAME, "Shuffle rows");
+                putValue(SHORT_DESCRIPTION,
+                        "Randomize the positions of the rows");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                table.shuffle();
+            }
+
+        };
+    }
+
 }

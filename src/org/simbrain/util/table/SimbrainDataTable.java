@@ -19,6 +19,7 @@
 package org.simbrain.util.table;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -291,6 +292,14 @@ public abstract class SimbrainDataTable<T> {
         for (SimbrainTableListener listener : listeners) {
             listener.tableStructureChanged();
         }
+    }
+
+    /**
+     * Shuffle the rows of the dataset.
+     */
+    public void shuffle() {
+        Collections.shuffle(rowData);
+        fireTableDataChanged();
     }
 
 }

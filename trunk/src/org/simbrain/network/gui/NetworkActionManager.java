@@ -90,6 +90,7 @@ import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
+import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
 import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
 import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
@@ -545,6 +546,8 @@ public final class NetworkActionManager {
                         networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new ESNCreationDialog(
                         networkPanel), "Echo State Network"),
+                new AddGroupAction(networkPanel, new FeedForwardCreationDialog(
+                        networkPanel), "Feed Forward Network"),
                 new AddGroupAction(networkPanel, new HopfieldCreationDialog(
                         networkPanel), "Hopfield"),
                 new AddGroupAction(networkPanel, new LMSCreationDialog(

@@ -90,16 +90,23 @@ public class ReaderComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("Letters")) {
                 char letter;
                 for (letter = 'a'; letter <= 'z'; letter++) {
-                    returnList.add(new PotentialProducer(this, world,
-                            "matchCurrentLetter", double.class, char.class,
-                            letter, "Letter " + letter));
+                    PotentialProducer producer = getAttributeManager()
+                            .createPotentialProducer(world,
+                                    "matchCurrentLetter", double.class,
+                                    new Class[] { char.class },
+                                    new Object[] { letter });
+                    producer.setCustomDescription("Letter " + letter);
+                    returnList.add(producer);
                 }
             }
             if (type.getTypeName().equalsIgnoreCase("Words")) {
                 for (String word : world.getDictionary()) {
-                    returnList.add(new PotentialProducer(this, world,
-                            "matchCurrentItem", double.class, String.class,
-                            word, word));
+                    PotentialProducer producer = getAttributeManager()
+                            .createPotentialProducer(world, "matchCurrentItem",
+                                    double.class, new Class[] { String.class },
+                                    new Object[] { word });
+                    producer.setCustomDescription(word);
+                    returnList.add(producer);
                 }
 
             }

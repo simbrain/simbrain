@@ -256,8 +256,10 @@ import java.util.concurrent.*;
                 tileNeuron.setX(initTilesX + (double)x);
                 tileNeuron.setY(initTilesY + (double)y);
                 network.addNeuron(tileNeuron);
-                Producer tileProducer = worldComponent.getAttributeManager().createProducer(sensor, "getValue", double.class, sensor.getLabel()); 
-                Consumer neuronConsumer = networkComponent.getAttributeManager().createConsumer(tileNeuron, "setInputValue", double.class, tileNeuron.getId());
+                PotentialProducer tileProducer = worldComponent.getAttributeManager().createPotentialProducer(sensor, "getValue", double.class);
+                tileProducer.setCustomDescription(sensor.getLabel());
+                PotentialConsumer neuronConsumer = networkComponent.getAttributeManager().createPotentialConsumer(tileNeuron, "setInputValue", double.class);
+                neuronConsumer.setCustomDescription(tileNeuron.getId());
                 Coupling tileCoupling = new Coupling(tileProducer, neuronConsumer);
                 sensorCouplings.add(tileCoupling);
                 workspace.getCouplingManager().addCoupling(tileCoupling);
@@ -276,34 +278,40 @@ import java.util.concurrent.*;
     }
     
     // Add one smell coupling
-    Producer smell = worldComponent.getAttributeManager().createProducer(world.getSensor(mouse.getId(),"Sensor_2"), "getCurrentValue", double.class, int.class, 0, "Reward Sensor"); 
-    Consumer reward = networkComponent.getAttributeManager().createConsumer(rewardNeuron, "setInputValue", double.class, "Reward neuron"); 
+    PotentialProducer smell = worldComponent.getAttributeManager().createPotentialProducer(world.getSensor(mouse.getId(),"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{0}); 
+    smell.setCustomDescription("Reward");
+    PotentialConsumer reward = networkComponent.getAttributeManager().createPotentialConsumer(rewardNeuron, "setInputValue", double.class); 
+    reward.setCustomDescription("Reward neuron");
     Coupling rewardCoupling = new Coupling(smell, reward);
     sensorCouplings.add(rewardCoupling);
     workspace.getCouplingManager().addCoupling(rewardCoupling);
 
     // Absolute movement couplings
     List effectorCouplings = new ArrayList();
-    Producer northProducer = networkComponent.getAttributeManager().createProducer(northNeuron, "getActivation", double.class); 
-    Consumer northMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveNorth", double.class, "North"); 
+    PotentialProducer northProducer = networkComponent.getAttributeManager().createPotentialProducer(northNeuron, "getActivation", double.class); 
+    PotentialConsumer northMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveNorth", double.class); 
+    northMovement.setCustomDescription("North");
     Coupling northCoupling = new Coupling(northProducer, northMovement);
     effectorCouplings.add(northCoupling);
     workspace.getCouplingManager().addCoupling(northCoupling);
     
-    Producer southProducer = networkComponent.getAttributeManager().createProducer(southNeuron, "getActivation", double.class); 
-    Consumer southMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveSouth", double.class, "South"); 
+    PotentialProducer southProducer = networkComponent.getAttributeManager().createPotentialProducer(southNeuron, "getActivation", double.class); 
+    PotentialConsumer southMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveSouth", double.class); 
+    southMovement.setCustomDescription("South");
     Coupling southCoupling = new Coupling(southProducer, southMovement);
     effectorCouplings.add(southCoupling);
     workspace.getCouplingManager().addCoupling(southCoupling);
     
-    Producer eastProducer = networkComponent.getAttributeManager().createProducer(eastNeuron, "getActivation", double.class); 
-    Consumer eastMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveEast", double.class, "East"); 
+    PotentialProducer eastProducer = networkComponent.getAttributeManager().createPotentialProducer(eastNeuron, "getActivation", double.class); 
+    PotentialConsumer eastMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveEast", double.class); 
+    eastMovement.setCustomDescription("East");
     Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
     effectorCouplings.add(eastCoupling);
     workspace.getCouplingManager().addCoupling(eastCoupling);
     
-    Producer westProducer = networkComponent.getAttributeManager().createProducer(westNeuron, "getActivation", double.class); 
-    Consumer westMovement = worldComponent.getAttributeManager().createConsumer(mouse, "moveWest", double.class, "West"); 
+    PotentialProducer westProducer = networkComponent.getAttributeManager().createPotentialProducer(westNeuron, "getActivation", double.class); 
+    PotentialConsumer westMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveWest", double.class); 
+    westMovement.setCustomDescription("West");
     Coupling westCoupling = new Coupling(westProducer, westMovement);
     effectorCouplings.add(westCoupling);
     workspace.getCouplingManager().addCoupling(westCoupling);
@@ -329,20 +337,20 @@ import java.util.concurrent.*;
 
 
     // Couple network to chart
-    Producer valueProducer = networkComponent.getAttributeManager().createProducer(valueNeuron, "getActivation", double.class); 
-    Consumer timeSeriesConsumer1 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(0));
+    PotentialProducer valueProducer = networkComponent.getAttributeManager().createPotentialProducer(valueNeuron, "getActivation", double.class); 
+    PotentialConsumer timeSeriesConsumer1 = chart.getPotentialConsumers().get(0);
     valueCoupling = new Coupling(valueProducer, timeSeriesConsumer1);
     workspace.getCouplingManager().addCoupling(valueCoupling);
     sensorCouplings.add(valueCoupling);
     
-//    Producer rewardProducer = networkComponent.getAttributeManager().createProducer(rewardNeuron, "getActivation", double.class); 
-//    Consumer timeSeriesConsumer2 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(1));
+//    PotentialProducer rewardProducer = networkComponent.getAttributeManager().createProducer(rewardNeuron, "getActivation", double.class); 
+//    PotentialConsumer timeSeriesConsumer2 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(1));
 //    rewardCoupling = new Coupling(rewardProducer, timeSeriesConsumer2);
 //    workspace.getCouplingManager().addCoupling(rewardCoupling);
 //    sensorCouplings.add(rewardCoupling);
 //    
-//    Producer tdProducer = networkComponent.getAttributeManager().createProducer(tdErrorNeuron, "getActivation", double.class); 
-//    Consumer timeSeriesConsumer3 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(3));
+//    PotentialProducer tdProducer = networkComponent.getAttributeManager().createProducer(tdErrorNeuron, "getActivation", double.class); 
+//    PotentialConsumer timeSeriesConsumer3 = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(3));
 //    tdCoupling = new Coupling(tdProducer, timeSeriesConsumer3);
 //    workspace.getCouplingManager().addCoupling(tdCoupling);
 //    sensorCouplings.add(tdCoupling);

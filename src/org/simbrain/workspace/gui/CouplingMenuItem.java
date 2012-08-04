@@ -24,7 +24,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -39,10 +40,10 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private final PotentialAttribute potentialProducer;
+    private final PotentialProducer potentialProducer;
 
     /** Reference to consuming attribute. */
-    private final PotentialAttribute potentialConsumer;
+    private final PotentialConsumer potentialConsumer;
 
     /** The workspace this object belongs to. */
     private final Workspace workspace;
@@ -57,8 +58,8 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      */
     @SuppressWarnings("unchecked")
     public CouplingMenuItem(final Workspace workspace,
-            final String description, final PotentialAttribute producer,
-            final PotentialAttribute consumer) {
+            final String description, final PotentialProducer producer,
+            final PotentialConsumer consumer) {
         super(description, workspace.getCouplingManager()
                 .containseEquivalentCoupling(
                         new Coupling(producer.createProducer(), consumer

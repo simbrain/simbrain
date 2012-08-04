@@ -38,10 +38,11 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Instances of this class are used for building and reading the TOC of an
  * archive.
- *
+ * <p>
  * This is the class that XStream serializes.
  *
  * @author Matt Watson
+ * @author Jeff Yoshimi
  */
 class ArchiveContents {
 

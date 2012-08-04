@@ -127,11 +127,12 @@ public class PieChartModel extends ChartModel {
         return this;
     }
 
-    /**
-     * @return the total
-     */
-    public double getTotal() {
-        return total;
+    public void setValue(double value, Integer index) {
+        if ((total == 0) || (index > dataset.getItemCount())) {
+            return;
+        }
+        //System.out.println(index + "," + Math.abs(value) / total);
+        this.getDataset().setValue(index, Math.abs(value) / total);
     }
 
 }

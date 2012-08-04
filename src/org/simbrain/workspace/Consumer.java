@@ -21,9 +21,16 @@ package org.simbrain.workspace;
 /**
  * A wrapper for a public setter in a Simbrain object. The second component of a
  * coupling, which "consumes" values of type E from a corresponding producer
- * object.
+ * object.  Consumers are created in the <code>AttributeManager</code> class, by
+ * way of a <code>PotentailConsumer</code> object.
+ *
+ * @author Jeff Yoshimi
  *
  * @param <E> the type of data taken by the setter.
+ *
+ * @see Attribute
+ * @see AttributeManaager
+ * @see PotentialConsumer
  */
 public interface Consumer<E> extends Attribute {
 

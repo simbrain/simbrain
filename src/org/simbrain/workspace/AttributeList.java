@@ -25,6 +25,8 @@ import java.util.List;
  * Utility class for creating and maintaining a list of "getterSetters", which
  * are objects which are simple objects that call get or set for some property.
  * Used to create access to objects in lists or arrays for Attributes to use.
+ * <p>
+ * TODO: No longer being used in favor of auxiliary arguments.  Possibly remove.
  *
  * @param <E> the data type used in the underlying getterSetter objects.
  */

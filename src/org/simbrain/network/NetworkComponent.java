@@ -166,16 +166,18 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
-                    returnList
-                            .add(getAttributeManager().createPotentialConsumer(
-                                    neuron, type, description));
+                    PotentialConsumer consumer = getAttributeManager()
+                            .createPotentialConsumer(neuron, type);
+                    consumer.setCustomDescription(description);
+                    returnList.add(consumer);
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
-                    returnList
-                            .add(getAttributeManager().createPotentialConsumer(
-                                    synapse, type, description));
+                    PotentialConsumer consumer = getAttributeManager()
+                            .createPotentialConsumer(synapse, type);
+                    consumer.setCustomDescription(description);
+                    returnList.add(consumer);
                 }
             }
 
@@ -190,16 +192,18 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
-                    returnList
-                            .add(getAttributeManager().createPotentialProducer(
-                                    neuron, type, description));
+                    PotentialProducer producer = getAttributeManager().createPotentialProducer(
+                            neuron, type);
+                    producer.setCustomDescription(description);
+                    returnList.add(producer);
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
-                    returnList
-                            .add(getAttributeManager().createPotentialProducer(
-                                    synapse, type, description));
+                    PotentialProducer producer = getAttributeManager().createPotentialProducer(
+                            synapse, type);
+                    producer.setCustomDescription(description);
+                    returnList.add(producer);
                 }
             }
         }

@@ -54,8 +54,8 @@ import org.simbrain.plot.timeseries.*;
 
 
     // Couple network to chart
-    Producer neuronProducer =networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_2"), "getActivation", double.class); 
-    Consumer timeSeriesConsumer = chart.getAttributeManager().createConsumer(chart.getPotentialConsumers().get(0));
+    PotentialProducer neuronProducer = networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_2"), "getActivation", double.class); 
+    PotentialConsumer timeSeriesConsumer = chart.getPotentialConsumers().get(0);
     workspace.getCouplingManager().addCoupling(new Coupling(neuronProducer, timeSeriesConsumer));
 
 }

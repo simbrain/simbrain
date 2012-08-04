@@ -40,12 +40,6 @@ public class BarChartComponent extends WorkspaceComponent {
     private AttributeType barChartConsumer;
 
     /**
-     * Objects which can be used to set bar chart. Component level interface to
-     * plot.
-     */
-    private List<BarChartSetter> setterList = new ArrayList<BarChartSetter>();
-
-    /**
      * Create new BarChart Component.
      *
      * @param name chart name
@@ -95,9 +89,6 @@ public class BarChartComponent extends WorkspaceComponent {
                 double.class, true);
         addConsumerType(barChartConsumer);
 
-        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            addSetter(i);
-        }
     }
 
     /**
@@ -111,19 +102,13 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                if (getSetter(index) == null) {
-                    addSetter(index);
-                    firePotentialAttributesChanged();
-                }
+                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                BarChartSetter setter = getSetter(index);
-                fireAttributeObjectRemoved(setter);
-                setterList.remove(setter);
                 firePotentialAttributesChanged();
             }
 
@@ -138,50 +123,7 @@ public class BarChartComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        try {
-            int i = Integer.parseInt(objectKey);
-            BarChartSetter setter = getSetter(i);
-            return setter;
-        } catch (NumberFormatException e) {
-            return null; // the supplied string was not an integer
-        }
-    }
-
-    @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof BarChartSetter) {
-            return "" + ((BarChartSetter) object).getIndex();
-        }
-        return null;
-    }
-
-    /**
-     * Return the setter with specified index, or null if none found.
-     *
-     * @param i index of setter
-     * @return the setter object
-     */
-    public BarChartSetter getSetter(int i) {
-        for (BarChartSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return setter;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Add a setter with the specified index.
-     *
-     * @param i index of setter
-     */
-    public void addSetter(int i) {
-        for (BarChartSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return;
-            }
-        }
-        setterList.add(new BarChartSetter(i));
+        return model;
     }
 
     /**
@@ -231,12 +173,14 @@ public class BarChartComponent extends WorkspaceComponent {
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (barChartConsumer.isVisible()) {
-            for (BarChartSetter setter : setterList) {
+            for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
                 String description = barChartConsumer
-                        .getSimpleDescription("Bar " + setter.getIndex());
+                        .getSimpleDescription("Bar" + i);
                 PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(setter, barChartConsumer,
-                                description);
+                        .createPotentialConsumer(model, "setValue",
+                                new Class[] { double.class, Integer.class },
+                                new Object[] { i });
+                consumer.setCustomDescription(description);
                 returnList.add(consumer);
             }
         }

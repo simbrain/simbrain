@@ -42,8 +42,11 @@ import org.simbrain.workspace.*;
 
     // Make Couplings
     for (int i = 1; i <= numNeurons; i++) {
-        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class, "Neuron " + i); 
-        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
+        PotentialProducer neuronAttribute = 
+        		networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class);
+        neuronAttribute.setCustomDescription("Neuron_" + i);
+        PotentialConsumer chartAttribute = chart.getAttributeManager().createPotentialConsumer(chart.getDimension(i-1), "setValue", double.class);
+        chartAttribute.setCustomDescription("Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
 

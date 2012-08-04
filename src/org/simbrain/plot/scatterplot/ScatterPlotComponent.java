@@ -112,14 +112,16 @@ public class ScatterPlotComponent extends WorkspaceComponent {
                 String xDesc = xAttributeType.getSimpleDescription("Point "
                         + setter.getIndex() + "[X]");
                 PotentialConsumer xConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, xAttributeType, xDesc);
+                        .createPotentialConsumer(setter, xAttributeType);
+                xConsumer.setCustomDescription(xDesc);
                 returnList.add(xConsumer);
             }
             if (yAttributeType.isVisible()) {
                 String yDesc = yAttributeType.getSimpleDescription("Point "
                         + setter.getIndex() + "[Y]");
                 PotentialConsumer yConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, yAttributeType, yDesc);
+                        .createPotentialConsumer(setter, yAttributeType);
+                yConsumer.setCustomDescription(yDesc);
                 returnList.add(yConsumer);
             }
         }

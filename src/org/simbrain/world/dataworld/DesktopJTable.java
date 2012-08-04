@@ -66,7 +66,8 @@ public class DesktopJTable extends SimbrainJTable {
                 .createPotentialProducer(
                         component.getObjectFromKey("producerList:"
                                 + getSelectedColumn()),
-                        component.getProducingColumnType(), producerDescription);
+                        component.getProducingColumnType());
+        producer.setCustomDescription(producerDescription);
         JMenu producerMenu = new CouplingMenuProducer("Send coupling to",
                 component.getWorkspace(), producer);
         ret.add(producerMenu);
@@ -77,7 +78,8 @@ public class DesktopJTable extends SimbrainJTable {
                 .createPotentialConsumer(
                         component.getObjectFromKey("consumerList:"
                                 + getSelectedColumn()),
-                        component.getConsumingColumnType(), consumerDescription);
+                        component.getConsumingColumnType());
+        consumer.setCustomDescription(consumerDescription);
         JMenu consumerMenu = new CouplingMenuConsumer("Receive coupling from",
                 component.getWorkspace(), consumer);
         ret.add(consumerMenu);

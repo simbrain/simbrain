@@ -143,7 +143,8 @@ public class DataWorldComponent extends WorkspaceComponent {
                                 + (attribute.getIndex() + 1));
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(attribute,
-                                consumingColumnType, description);
+                                consumingColumnType);
+                consumer.setCustomDescription(description);
                 returnList.add(consumer);
             }
         }
@@ -159,7 +160,8 @@ public class DataWorldComponent extends WorkspaceComponent {
                         .getDescription("Column_" + (attribute.getIndex() + 1));
                 PotentialProducer producer = getAttributeManager()
                         .createPotentialProducer(attribute,
-                                producingColumnType, description);
+                                producingColumnType);
+                producer.setCustomDescription(description);
                 returnList.add(producer);
             }
         }

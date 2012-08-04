@@ -19,49 +19,36 @@
 package org.simbrain.workspace;
 
 /**
- * Class which can be used to create a consumer.
+ * A <code>PotentialAttribute</code> corresponding to a <code>Consumer</code>.
  *
  * @author jyoshimi
+ *
+ * @see PotentialAttribute
+ * @see Attribute
  */
 public class PotentialConsumer extends PotentialAttribute {
 
-    /**
-     * Construct a potential attribute for the (default) case where the method
-     * has one argument only.
-     *
-     * @param parent parent workspace component
-     * @param object base object containing method to call
-     * @param methodName name of method to call
-     * @param dataType return type of method
-     * @param argDataType datatype of argument to method
-     * @param argValue value of argument to method
-     * @param description description of the attribute
-     */
-    public PotentialConsumer(WorkspaceComponent parent, Object baseObject,
-            String methodName, Class<?> dataType, String description) {
-        super(parent, baseObject, methodName, dataType, description);
-    }
 
     /**
      * Construct a potential consumer for the case where the method has multiple
-     * arguments. The first is the "main datatype" of the consumer.
-     *
-     * TODO: No support for more than two arguments currently.
+     * arguments. For more on what these fields mean see the javadocs for
+     * <code>Attribute</code>.
      *
      * @param parent parent workspace component
      * @param object base object containing method to call
      * @param methodName name of method to call
-     * @param dataType return type of method
-     * @param argDataTypes datatypes of argument to method
-     * @param argValues values of argument to method
+     * @param argDataTypes first member is main data type. Others for auxiliary
+     *            methods.
+     * @param argValues for auxiliary methods
      * @param description description of the attribute
      */
-    public PotentialConsumer(WorkspaceComponent parent, Object object,
+    protected PotentialConsumer(WorkspaceComponent parent, Object object,
             String methodName, Class<?>[] argDataTypes, Object[] argValues,
             String description) {
         super(parent, object, methodName, argDataTypes[0], argDataTypes,
                 argValues, description);
     }
+
 
     /**
      * Actualize this potential attribute into a consumer.

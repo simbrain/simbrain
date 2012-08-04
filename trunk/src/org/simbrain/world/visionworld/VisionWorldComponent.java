@@ -89,9 +89,10 @@ public final class VisionWorldComponent extends WorkspaceComponent {
                         Sensor sensor = sensorMatrix.getSensor(row, column);
                         String description = type.getDescription(sensor
                                 .getKey());
-                        returnList.add(getAttributeManager()
-                                .createPotentialProducer(sensor, type,
-                                        description));
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(sensor, type);
+                        producer.setCustomDescription(description);
+                        returnList.add(producer);
                     }
                 }
             }

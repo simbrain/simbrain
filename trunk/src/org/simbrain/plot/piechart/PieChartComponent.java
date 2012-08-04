@@ -30,6 +30,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Data for a JFreeChart pie chart.
+ * 
  */
 public class PieChartComponent extends WorkspaceComponent {
 
@@ -38,12 +39,6 @@ public class PieChartComponent extends WorkspaceComponent {
 
     /** Pie chart consumer type. */
     private AttributeType pieChartConsumer;
-
-    /**
-     * Objects which can be used to set the pie chart. Component level interface
-     * to plot.
-     */
-    private List<PieChartSetter> setterList = new ArrayList<PieChartSetter>();
 
     /**
      * Create new PieChart Component.
@@ -80,54 +75,24 @@ public class PieChartComponent extends WorkspaceComponent {
         pieChartConsumer = new AttributeType(this, "Slice", "setValue",
                 double.class, true);
         addConsumerType(pieChartConsumer);
-        for (int i = 0; i < model.getDataset().getItemCount(); i++) {
-            addSetter(i);
-        }
     }
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (pieChartConsumer.isVisible()) {
-            for (PieChartSetter setter : setterList) {
+            for (int i = 0; i < model.getDataset().getItemCount(); i++) {
                 String description = pieChartConsumer
-                        .getSimpleDescription("Slice " + setter.getIndex());
+                        .getSimpleDescription("Slice " + i);
                 PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(setter, pieChartConsumer,
-                                description);
+                        .createPotentialConsumer(model, "setValue",
+                                new Class[] { double.class, Integer.class },
+                                new Object[] { i });
+                consumer.setCustomDescription(description);
                 returnList.add(consumer);
             }
         }
         return returnList;
-    }
-
-    /**
-     * Return the setter with specified index, or null if none found.
-     *
-     * @param i index of setter
-     * @return the setter object
-     */
-    public PieChartSetter getSetter(int i) {
-        for (PieChartSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return setter;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Add a setter with the specified index.
-     *
-     * @param i index of setter
-     */
-    public void addSetter(int i) {
-        for (PieChartSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return;
-            }
-        }
-        setterList.add(new PieChartSetter(i));
     }
 
     /**
@@ -141,19 +106,13 @@ public class PieChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                if (getSetter(index) == null) {
-                    addSetter(index);
-                    firePotentialAttributesChanged();
-                }
+                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                PieChartSetter setter = getSetter(index);
-                fireAttributeObjectRemoved(setter);
-                setterList.remove(setter);
                 firePotentialAttributesChanged();
             }
 
@@ -168,22 +127,8 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof PieChartSetter) {
-            return "" + ((PieChartSetter) object).getIndex();
-        }
-        return null;
-    }
-
-    @Override
     public Object getObjectFromKey(String objectKey) {
-        try {
-            int i = Integer.parseInt(objectKey);
-            PieChartSetter setter = new PieChartSetter(i);
-            return setter;
-        } catch (NumberFormatException e) {
-            return null; // the supplied string was not an integer
-        }
+        return model;
     }
 
     /**
@@ -235,44 +180,6 @@ public class PieChartComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return PieChartModel.getXStream().toXML(model);
-    }
-
-    /**
-     * Object which sets a value of one slice of a pie chart.
-     */
-    public class PieChartSetter {
-
-        /** Index. */
-        private Integer index;
-
-        /**
-         * Construct a setter object.
-         *
-         * @param index index of the "slice" to set
-         */
-        public PieChartSetter(final Integer index) {
-            this.index = index;
-        }
-
-        /**
-         * Set the value.
-         *
-         * @param val value for the slice
-         */
-        public void setValue(final double val) {
-            double total = getModel().getTotal();
-            if (total == 0) {
-                return;
-            }
-            getModel().getDataset().setValue(index, val / total);
-        }
-
-        /**
-         * @return the index
-         */
-        public int getIndex() {
-            return index;
-        }
     }
 
 }

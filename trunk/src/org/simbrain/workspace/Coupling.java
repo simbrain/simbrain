@@ -23,9 +23,27 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 /**
- * Coupling between a producing attribute and a consuming attribute.
+ * A coupling is an object that allows different objects in the Simbrain
+ * workspace to communicate with each other. A coupling is essentially a pair
+ * consisting of a <code>Producer</code> and a <code>Consumer</code>, where the
+ * producer passes a value of type E to the consumer:
+ * <p>
+ * Producer --> E --> Consumer
+ * <p>
+ * Producers and Consumers are types of <code>Attribute</code>. They are usually
+ * not created directly but are created from a <code>PotentialAttribute</code>.
+ * When creating couplings, a lot of the work is in creating these
+ * PotentialAttributes. Most users of the API will create Potential Attributes
+ * using the <code>AttributeManager</code>.
+ *
+ * @author Matthew Watson
+ * @author Jeff Yoshimi
  *
  * @param <E> coupling attribute value type
+ *
+ * @see Attribute
+ * @see PotentialAttribute
+ * @see AttributeManager
  */
 public final class Coupling<E> {
 
@@ -83,6 +101,20 @@ public final class Coupling<E> {
         this.producer = Producer;
         this.consumer = Consumer;
     }
+
+    /**
+     * Create a new coupling by actualizing a potential producer and a potential
+     * consumer.
+     *
+     * @param producer producing attribute for this coupling
+     * @param consumer consuming attribute for this coupling
+     */
+    public Coupling(final PotentialProducer producer, final PotentialConsumer consumer) {
+        LOGGER.debug("new Coupling");
+        this.producer = (Producer<E>) producer.createProducer();
+        this.consumer = (Consumer<E>) consumer.createConsumer();
+    }
+
 
     /**
      * Set value of buffer.

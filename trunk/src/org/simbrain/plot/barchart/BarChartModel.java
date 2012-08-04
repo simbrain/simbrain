@@ -135,7 +135,7 @@ public class BarChartModel extends ChartModel {
      * @param value value of bar
      * @param index which bar value to set
      */
-    public void setValue(final Double value, final Integer index) {
+    public void setValue(final double value, final Integer index) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 getDataset().setValue(value, new Integer(1), index);

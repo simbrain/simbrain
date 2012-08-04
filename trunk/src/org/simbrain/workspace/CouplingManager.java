@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,8 @@ import org.apache.log4j.Logger;
  * Manages all the couplings for a Workspace instance.
  *
  * @author Matt Watson
+ *
+ * @see Coupling
  */
 public class CouplingManager {
 
@@ -259,7 +262,12 @@ public class CouplingManager {
                 .equalsIgnoreCase(attribute2.getMethodName()));
         boolean typeMatches = (attribute1.getDataType() == attribute2
                 .getDataType());
-        return (baseObjectMatches && methodNameMatches && typeMatches);
+        boolean argTypesMatch = Arrays.deepEquals(
+                attribute1.getArgumentDataTypes(), attribute2.getArgumentDataTypes());
+        boolean argValuesMatch = Arrays.deepEquals(
+                attribute1.getArgumentValues(), attribute2.getArgumentValues());
+        return (baseObjectMatches && methodNameMatches && typeMatches
+                && argValuesMatch && argTypesMatch);
     }
 
     /**

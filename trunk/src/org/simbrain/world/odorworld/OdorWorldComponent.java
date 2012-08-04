@@ -111,53 +111,74 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             // X, Y Locations
             if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":"
-                        + xLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, xLocationType, description));
+                String description = entity.getName() + ":X";
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(entity, "setX", double.class);
+                consumer.setCustomDescription(description);
+                returnList.add(consumer);
             }
             if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":"
-                        + yLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, yLocationType, description));
+                String description = entity.getName() + ":Y";
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(entity, "setY", double.class);
+                consumer.setCustomDescription(description);
+                returnList.add(consumer);
             }
 
             // Absolute movement
             if (absoluteMovementType.isVisible()) {
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, "moveNorth", double.class,
-                        entity.getName() + ":goNorth"));
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, "moveSouth", double.class,
-                        entity.getName() + ":goSouth"));
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, "moveEast", double.class,
-                        entity.getName() + ":goEast"));
-                returnList.add(getAttributeManager().createPotentialConsumer(
-                        entity, "moveWest", double.class,
-                        entity.getName() + ":goWest"));
+
+                String description = entity.getName() + ":goNorth";
+                PotentialConsumer goNorth = getAttributeManager()
+                        .createPotentialConsumer(entity, "moveNorth",
+                                double.class);
+                goNorth.setCustomDescription(description);
+                returnList.add(goNorth);
+
+                description = entity.getName() + ":goSouth";
+                PotentialConsumer goSouth = getAttributeManager()
+                        .createPotentialConsumer(entity, "moveSouth",
+                                double.class);
+                goSouth.setCustomDescription(description);
+                returnList.add(goSouth);
+
+                description = entity.getName() + ":goEast";
+                PotentialConsumer goEast = getAttributeManager()
+                        .createPotentialConsumer(entity, "moveEast",
+                                double.class);
+                goEast.setCustomDescription(description);
+                returnList.add(goEast);
+
+                description = entity.getName() + ":goWest";
+                PotentialConsumer goWest = getAttributeManager()
+                        .createPotentialConsumer(entity, "moveWest",
+                                double.class);
+                goWest.setCustomDescription(description);
+                returnList.add(goWest);
             }
 
             // Turning and Going Straight
             if (entity instanceof RotatingEntity) {
                 if (leftRotationType.isVisible()) {
-                    returnList.add(getAttributeManager()
+                    String description =  entity.getName() + ":turnLeft";
+                    PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "turnLeft",
-                                    double.class,
-                                    entity.getName() + ":turnLeft"));
+                                    double.class);
+                    returnList.add(consumer);
                 }
                 if (rightRotationType.isVisible()) {
-                    returnList.add(getAttributeManager()
+                    String description =  entity.getName() + ":turnRight";
+                    PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "turnRight",
-                                    double.class,
-                                    entity.getName() + ":turnRight"));
+                                    double.class);
+                    returnList.add(consumer);
                 }
                 if (straightMovementType.isVisible()) {
-                    returnList.add(getAttributeManager()
+                    String description =  entity.getName() + ":goStraight";
+                    PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "goStraight",
-                                    double.class,
-                                    entity.getName() + ":goStraight"));
+                                    double.class);
+                    returnList.add(consumer);
                 }
 
             }
@@ -174,16 +195,20 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             // X, Y Location of entities
             if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":"
-                        + xLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(
-                        entity, "DoubleX", double.class, description));
+                String description = entity.getName() + ":X";
+                PotentialProducer producer = getAttributeManager()
+                        .createPotentialProducer(entity, "getX",
+                                double.class);
+                producer.setCustomDescription(description);
+                returnList.add(producer);
             }
             if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":"
-                        + yLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(
-                        entity, "DoubleY", double.class, description));
+                String description = entity.getName() + ":Y";
+                PotentialProducer producer = getAttributeManager()
+                        .createPotentialProducer(entity, "getY",
+                                double.class);
+                producer.setCustomDescription(description);
+                returnList.add(producer);
             }
 
             // Smell sensor
@@ -192,12 +217,15 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
-                            returnList
-                                    .add(new PotentialProducer(this, smell,
+                            String description = entity.getName() + ":"
+                                    + sensor.getLabel() + "-" + (i + 1);
+                            PotentialProducer producer = getAttributeManager()
+                                    .createPotentialProducer(smell,
                                             "getCurrentValue", double.class,
-                                            int.class, i, entity.getName()
-                                                    + ":" + sensor.getLabel()
-                                                    + "-" + (i + 1)));
+                                            new Class[] { int.class },
+                                            new Object[] { i });
+                            producer.setCustomDescription(description);
+                            returnList.add(producer);
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
@@ -209,15 +237,15 @@ public class OdorWorldComponent extends WorkspaceComponent {
             if (tileSensorType.isVisible()) {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
-                        returnList.add(getAttributeManager()
-                                .createPotentialProducer(
-                                        sensor,
-                                        "isActivated",
-                                        double.class,
-                                        entity.getName()
-                                                + ":"
-                                                + ((TileSensor) sensor)
-                                                        .getLabel()));
+                        String description = entity.getName()
+                                + ":"
+                                + ((TileSensor) sensor)
+                                        .getLabel();
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(sensor, "isActivated",
+                                        double.class);
+                        producer.setCustomDescription(description);
+                        returnList.add(producer);
                     }
                 }
             }

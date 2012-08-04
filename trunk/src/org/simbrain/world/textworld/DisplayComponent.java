@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.workspace.AttributeManager;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -91,15 +92,23 @@ public class DisplayComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("StringReader")) {
-                returnList.add(new PotentialConsumer(this, world, "addText",
-                        String.class, "StringReader"));
+                String description = "String reader";
+                PotentialConsumer consumer = this
+                        .getAttributeManager()
+                        .createPotentialConsumer(world, "addText", String.class);
+                consumer.setCustomDescription(description);
+                returnList.add(consumer);
             }
             if (type.getTypeName().equalsIgnoreCase("WordReader")) {
                 for (String word : world.getDictionary()) {
-                    returnList.add(new PotentialConsumer(this, world,
-                            "addTextIfAboveThreshold", new Class<?>[] {
-                                    double.class, String.class },
-                            new Object[] { word }, word));
+                    PotentialConsumer consumer = getAttributeManager()
+                            .createPotentialConsumer(
+                                    world,
+                                    "addTextIfAboveThreshold",
+                                    new Class<?>[] { double.class, String.class },
+                                    new Object[] { word });
+                    consumer.setCustomDescription(word);
+                    returnList.add(consumer);
                 }
             }
         }

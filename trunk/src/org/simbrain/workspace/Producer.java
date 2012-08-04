@@ -21,9 +21,16 @@ package org.simbrain.workspace;
 /**
  * A wrapper for a public getter in a Simbrain object. The first component of a
  * coupling, which "produces" values of type E for a corresponding consumer
- * object which wraps a setter method on another object.
+ * object which wraps a setter method on another object. Producers are created
+ * in the <code>AttributeManager</code> class, by way of a
+ * <code>PotentialConsumer</code>.
+ *
+ * @author Jeff Yoshimi
  *
  * @param <E> the type of data returned by the getter.
+ *
+ * @see Attribute
+ * @see AttributeManaager
  */
 public interface Producer<E> extends Attribute {
 

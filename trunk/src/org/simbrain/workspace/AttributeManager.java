@@ -19,36 +19,32 @@ package org.simbrain.workspace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
- * A raft of methods for creating attributes and potential attributes. For
- * attributes (Producer and Consumer) the main creation method, using reflection
- * is here.
- *
- * You can create an attribute without specifying a description, in which case a
- * standard description is created. For potential attributes (PotentialProducer
- * and PotentialConsumer), there are two choices, so that there are four
- * creation methods. As with attributes, you can specify a custom description or
- * not. You can also use an attribute type when creating the potential
- * attribute.
- *
- * Main type. The type used when passing info from producer to consumer. These
- * must match.
- *
- * Auxiliary arguments. Used when calling the method (using reflection)
- * associated with a producer or consumer. In these cases both the argument
- * types and an unchanging argument value must be specified.
- *
- * For producers (getters): the return type is the main type, and all args are
- * additional. Example: double getValue(int bar-index). double is the main type
- * int is auxiliary
- *
- * For consumers (setters): the _first_ argument is the main type, and all other
- * arguments are auxiliary.
- *
- * TODO: Refer other classes here for info
+ * The main usage of this class by API users is to create potential attributes
+ * (PotentialConsumer and PotentialProducer), which are in turn used to create
+ * couplings.
+ * <p>
+ * Most coupling creation should occur by way of the createPotential... methods
+ * in this class. The preferred method is to create a potential attribute
+ * (potential consumer or producer) which is then used to make a coupling.
+ * <p>
+ * A potential consumer or producer can be created in one of three ways
+ * <ol>
+ * <li>Using an <code>AttributeType</code> object.</li>
+ * <li>Using a parent object, a method name, and a data type.</li>
+ * <li>Using auxiliary arguments.</li>
+ * </ol>
+ * <p>
+ * These concepts are discussed in the javadocs for <code>Attribute</code>.
  *
  * @author jyoshimi
+ *
+ * @see Attribute
+ * @see AttributeType
+ * @see PotentialAttribute
+ * @see Coupling
  */
 public class AttributeManager {
 
@@ -74,7 +70,7 @@ public class AttributeManager {
      * @param description description of the producer
      * @return the resulting producer
      */
-    public Producer<?> createProducer(final Object parentObject,
+    protected Producer<?> createProducer(final Object parentObject,
             final String methodName, final Class<?> dataType,
             final Class<?>[] argumentDataTypes, final Object[] argumentValues,
             final String description) {
@@ -86,8 +82,13 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(methodName,
-                            argumentDataTypes);
+                    if (argumentDataTypes == null) {
+                        theMethod = parentObject.getClass().getMethod(
+                                methodName);
+                    } else {
+                        theMethod = parentObject.getClass().getMethod(
+                                methodName, argumentDataTypes);
+                    }
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
@@ -173,63 +174,12 @@ public class AttributeManager {
     }
 
     /**
-     * Create a producer based on a method with no arguments.
-     *
-     * @param parentObject base object
-     * @param methodName name of method
-     * @param dataType type of data
-     * @param description description
-     * @return the resulting producer
-     */
-    public Producer<?> createProducer(final Object parentObject,
-            final String methodName, final Class<?> dataType,
-            final String description) {
-
-        return createProducer(parentObject, methodName, dataType,
-                (Class[]) null, (Object[]) null, description);
-    }
-
-    /**
-     * Create a producer based on a method with no arguments.
-     *
-     * @param parentObject base object
-     * @param methodName name of method
-     * @param dataType type of data
-     * @param description description
-     * @return the resulting producer
-     */
-    public Producer<?> createProducer(final Object parentObject,
-            final String methodName, final Class<?> dataType,
-            final Class<?> argument, final Object value,
-            final String description) {
-
-        return createProducer(parentObject, methodName, dataType,
-                new Class[] { argument }, new Object[] { value }, description);
-    }
-
-    /**
-     * Create a producer without specifying a custom description (the
-     * description is created automatically).
-     *
-     * @param baseObject base object
-     * @param methodName method name
-     * @param dataType data type
-     * @return created producer
-     */
-    public Producer<?> createProducer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodName,
-                dataType);
-        return createProducer(baseObject, methodName, dataType, description);
-    }
-
-    /**
      * Create an actual producer from a potential producer.
      *
      * @param potentialAttribute the potential attribute to actualize
      * @return the resulting producer
      */
-    public Producer<?> createProducer(
+    protected Producer<?> createProducer(
             final PotentialAttribute potentialAttribute) {
 
         return createProducer(potentialAttribute.getBaseObject(),
@@ -244,28 +194,28 @@ public class AttributeManager {
      * Create a consumer. This version of the method does the real work; others
      * forward to it. Note that, unlike createProducer, this does not have a
      * main datatype argument, because that is implicitly the first element of
-     * argument dataTypes.
-     *
-     * TODO: Currently only works for one or two arguments only.
+     * argument dataTypes. For more information on these fields see the
+     * documentation for <code>Attribute</code>.
      *
      * @param parentObject parent object
      * @param methodName name of method
      * @param argumentDataTypes type of all arguments, where the first is the
      *            main data type
-     * @param argumentValues values for arguments _after_ the first argument
+     * @param argumentValues values for auxiliary arguments
      * @param description description
      * @return the resulting consumer
      */
-    public Consumer<?> createConsumer(final Object parentObject,
+    protected Consumer<?> createConsumer(final Object parentObject,
             final String methodName, final Class<?>[] argumentDataTypes,
             final Object[] argumentValues, final String description) {
 
         Consumer<?> consumer = new Consumer() {
 
-            Method theMethod;
+            private Method theMethod;
 
             // Static initializer
             {
+                // System.out.println(Arrays.asList(argumentDataTypes));
                 try {
                     theMethod = parentObject.getClass().getMethod(methodName,
                             argumentDataTypes);
@@ -290,12 +240,15 @@ public class AttributeManager {
              */
             public void setValue(Object value) {
                 try {
-                    // Currently only works for case of one or two arguments.
+
                     if (argumentDataTypes.length == 1) {
                         theMethod.invoke(parentObject, new Object[] { value });
                     } else {
-                        theMethod.invoke(parentObject, new Object[] { value,
-                                argumentValues[0] });
+                        Object[] concatArray = new Object[argumentValues.length + 1];
+                        concatArray[0] = value;
+                        System.arraycopy(argumentValues, 0, concatArray, 1,
+                                argumentValues.length);
+                        theMethod.invoke(parentObject, concatArray);
                     }
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
@@ -364,37 +317,12 @@ public class AttributeManager {
     }
 
     /**
-     * Create a consumer using: 1) Parent Object 2) Method name 3) Data type (so
-     * no auxiliary args: one value in argument list and null value list)
-     * Description is automatically created.
-     */
-    public Consumer<?> createConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodName,
-                dataType);
-        return createConsumer(baseObject, methodName,
-                new Class<?>[] { dataType }, null, description);
-    }
-
-    /**
-     * Create a consumer using: 1) Parent Object 2) Method name 3) Data type (so
-     * no auxiliary args: one value in argument list and null value list) 4)
-     * Description
-     */
-    public Consumer<?> createConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType,
-            final String description) {
-        return createConsumer(baseObject, methodName,
-                new Class<?>[] { dataType }, null, description);
-    }
-
-    /**
      * Create an actual consumer from a potential consumer.
      *
      * @param potentialAttribute the potential attribute to actualize
      * @return the resulting consumer
      */
-    public Consumer<?> createConsumer(
+    protected Consumer<?> createConsumer(
             final PotentialAttribute potentialAttribute) {
         return createConsumer(potentialAttribute.getBaseObject(),
                 potentialAttribute.getMethodName(),
@@ -408,38 +336,47 @@ public class AttributeManager {
     // ////////////////////////////////////////
 
     /**
-     * Create a potential producer. All information is provided.
+     * Create a potential producer using auxiliary arguments. For more
+     * information on these fields see the javadocs for <code>Attribute</code>.
      *
-     * @param parentObject base object
-     * @param methodName name of method
-     * @param dataType type of data
-     * @param description custom description
+     *
+     * @param baseObject base object
+     * @param methodName name of method on base object
+     * @param dataType main data type. Type of data returned by the base object.
+     * @param argDataTypes signature of method (new Class[] {Class1,
+     *            Class2,...})
+     * @param argValues values to pass to method (new Object[] {Object1,
+     *            Object2,...})
      * @return the resulting producer
      */
-    public PotentialProducer createPotentialProducer(final Object parentObject,
-            final String methodName, final Class<?> dataType,
-            final String description) {
-        return new PotentialProducer(parentComponent, parentObject, methodName,
-                dataType, description);
+    public PotentialProducer createPotentialProducer(Object baseObject,
+            String methodName, Class<?> dataType, Class<?>[] argDataTypes,
+            Object[] argValues) {
+        String description = getDescriptionString(baseObject, methodName,
+                dataType);
+        return new PotentialProducer(parentComponent, baseObject, methodName,
+                dataType, argDataTypes, argValues, description);
     }
 
     /**
-     * Create a potential producer. The description is automatically generated.
+     * Create a potential producer (without auxiliary arguments). This is
+     * probably the main method to use in a script.
      *
      * @param baseObject base object
-     * @param methodName name of method
-     * @param dataType type of data
+     * @param methodName name of method on base object
+     * @param dataType main data type. Type of data returned by the base object.
      * @return the resulting producer
      */
     public PotentialProducer createPotentialProducer(final Object baseObject,
             final String methodName, final Class<?> dataType) {
-        return createPotentialProducer(baseObject, methodName, dataType,
-                getDescriptionString(baseObject, methodName, dataType));
+        String description = getDescriptionString(baseObject, methodName,
+                dataType);
+        return new PotentialProducer(parentComponent, baseObject, methodName,
+                dataType, null, null, description);
     }
 
     /**
-     * Returns a potential producer with a base object and attribute type. The
-     * description string is automatically generated.
+     * Create a potential producer using an attribute type.
      *
      * @param baseObject the base object
      * @param type the attribute type
@@ -447,63 +384,56 @@ public class AttributeManager {
      */
     public PotentialProducer createPotentialProducer(final Object baseObject,
             final AttributeType type) {
-        return createPotentialProducer(baseObject, type,
-                type.getBaseDescription());
-    }
-
-    /**
-     * Returns a potential producer with a base object and attribute type. A
-     * custom description is provided
-     *
-     * @param baseObject the base object
-     * @param type the attribute type
-     * @param description the custom description
-     * @return the potential producer
-     */
-    public PotentialProducer createPotentialProducer(final Object baseObject,
-            final AttributeType type, final String description) {
         String methodName = type.getMethodName();
         Class<?> dataType = type.getDataType();
-        return createPotentialProducer(baseObject, methodName, dataType,
-                description);
+        PotentialProducer producer = createPotentialProducer(baseObject,
+                methodName, dataType);
+        String description = type.getBaseDescription();
+        producer.setCustomDescription(description);
+        return producer;
     }
 
-    // Potential Consumers
-
     /**
-     * Create a potential consumer. All information is provided.
+     * Create a potential consumer using auxiliary arguments. For more
+     * information on these fields see the javadocs for <code>Attribute</code>.
      *
-     * @param parentObject base object
-     * @param methodName name of method
-     * @param dataType type of data (so no auxiliary args: one value in argument
-     *            list and null value list)
-     * @param description custom description
+     * @param baseObject base object
+     * @param methodName name of method on base object
+     * @param argDataTypes signature of method (new Class[] {datatype, Class1,
+     *            Class2,...})
+     * @param argValues values to pass to method (new Object[] {Class1,
+     *            Class2,...})
      * @return the resulting consumer
      */
-    public PotentialConsumer createPotentialConsumer(final Object parentObject,
-            final String methodName, final Class<?> dataType,
-            final String description) {
-        return new PotentialConsumer(parentComponent, parentObject, methodName,
+    public PotentialConsumer createPotentialConsumer(final Object baseObject,
+            final String methodName, final Class<?>[] argDataTypes,
+            final Object[] argValues) {
+        Class<?> dataType = argDataTypes[0];
+        String description = getDescriptionString(baseObject, methodName,
+                dataType);
+        return new PotentialConsumer(parentComponent, baseObject, methodName,
+                argDataTypes, argValues, description);
+    }
+
+    /**
+     * Create a potential consumer without auxiliary arguments. This is probably
+     * the main method to use in a script.
+     *
+     * @param baseObject base object
+     * @param methodName name of method on base object
+     * @param dataType main data type. Type of data returned by the base object.
+     * @return the resulting consumer
+     */
+    public PotentialConsumer createPotentialConsumer(final Object baseObject,
+            final String methodName, final Class<?> dataType) {
+        String description = getDescriptionString(baseObject, methodName,
+                dataType);
+        return new PotentialConsumer(parentComponent, baseObject, methodName,
                 new Class<?>[] { dataType }, null, description);
     }
 
     /**
-     * Create a potential consumer. The description is automatically generated.
-     *
-     * @param baseObject base object
-     * @param methodName name of method
-     * @param dataType type of data
-     * @return the resulting consumer
-     */
-    public PotentialConsumer createPotentialConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType) {
-        return createPotentialConsumer(baseObject, methodName, dataType,
-                getDescriptionString(baseObject, methodName, dataType));
-    }
-
-    /**
-     * Returns a potential consumer with a base object and attribute type. The
-     * description string is automatically generated.
+     * Create a potential consumer using an attribute type.
      *
      * @param baseObject the base object
      * @param type the attribute type
@@ -511,25 +441,13 @@ public class AttributeManager {
      */
     public PotentialConsumer createPotentialConsumer(final Object baseObject,
             final AttributeType type) {
-        return createPotentialConsumer(baseObject, type,
-                type.getBaseDescription());
-    }
-
-    /**
-     * Returns a potential consumer with a base object and attribute type. A
-     * custom description is provided
-     *
-     * @param baseObject the base object
-     * @param type the attribute type
-     * @param description the custom description
-     * @return the potential consumer
-     */
-    public PotentialConsumer createPotentialConsumer(final Object baseObject,
-            final AttributeType type, final String description) {
         String methodName = type.getMethodName();
         Class<?> dataType = type.getDataType();
-        return createPotentialConsumer(baseObject, methodName, dataType,
-                description);
+        PotentialConsumer consumer = createPotentialConsumer(baseObject,
+                methodName, dataType);
+        String description = type.getBaseDescription();
+        consumer.setCustomDescription(description);
+        return consumer;
     }
 
     /**

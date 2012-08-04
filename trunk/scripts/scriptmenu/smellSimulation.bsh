@@ -116,16 +116,26 @@ import org.simbrain.plot.projection.*;
 
     // Couple odor world to network
     String mouseId = mouse.getId();
-    Producer smell1 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 0, "Sensor 1"); 
-    Producer smell2 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 1, "Sensor 2"); 
-    Producer smell3 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 2, "Sensor 3"); 
-    Producer smell4 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 3, "Sensor 4"); 
-    Producer smell5 = odorWorld.getAttributeManager().createProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, int.class, 4, "Sensor 5");   
-    Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_26"), "setInputValue", double.class, "Output neuron 1"); 
-    Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_27"), "setInputValue", double.class, "Output neuron 2"); 
-    Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_28"), "setInputValue", double.class, "Output neuron 3"); 
-    Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_29"), "setInputValue", double.class, "Output neuron 4"); 
-    Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_30"), "setInputValue", double.class, "Output neuron 5"); 
+    PotentialProducer smell1 = odorWorld.getAttributeManager().createPotentialProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{0}); 
+    smell1.setCustomDescription("Sensor 1");
+    PotentialProducer smell2 = odorWorld.getAttributeManager().createPotentialProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{1}); 
+    smell2.setCustomDescription("Sensor 2");
+    PotentialProducer smell3 = odorWorld.getAttributeManager().createPotentialProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{2}); 
+    smell3.setCustomDescription("Sensor 3");
+    PotentialProducer smell4 = odorWorld.getAttributeManager().createPotentialProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{3}); 
+    smell4.setCustomDescription("Sensor 4");
+    PotentialProducer smell5 = odorWorld.getAttributeManager().createPotentialProducer(world.getSensor(mouseId,"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{4}); 
+    smell5.setCustomDescription("Sensor 5");
+    PotentialConsumer inputNeuron1 = networkComponent.getAttributeManager().createPotentialConsumer(network.getNeuron("Neuron_26"), "setInputValue", double.class);
+    inputNeuron1.setCustomDescription("Output neuron 1");
+    PotentialConsumer inputNeuron2 = networkComponent.getAttributeManager().createPotentialConsumer(network.getNeuron("Neuron_27"), "setInputValue", double.class); 
+    inputNeuron2.setCustomDescription("Output neuron 2");
+    PotentialConsumer inputNeuron3 = networkComponent.getAttributeManager().createPotentialConsumer(network.getNeuron("Neuron_28"), "setInputValue", double.class); 
+    inputNeuron3.setCustomDescription("Output neuron 3");
+    PotentialConsumer inputNeuron4 = networkComponent.getAttributeManager().createPotentialConsumer(network.getNeuron("Neuron_29"), "setInputValue", double.class); 
+    inputNeuron4.setCustomDescription("Output neuron 4");
+    PotentialConsumer inputNeuron5 = networkComponent.getAttributeManager().createPotentialConsumer(network.getNeuron("Neuron_30"), "setInputValue", double.class); 
+    inputNeuron5.setCustomDescription("Output neuron 5");
     workspace.getCouplingManager().addCoupling(new Coupling(smell1, inputNeuron1));
     workspace.getCouplingManager().addCoupling(new Coupling(smell2, inputNeuron2));
     workspace.getCouplingManager().addCoupling(new Coupling(smell3, inputNeuron3));
@@ -139,8 +149,10 @@ import org.simbrain.plot.projection.*;
 
     // Couple network to projection chart
     for (int i = 1; i < 25; i++) {
-        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class, "Neuron " + i); 
-        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
+        PotentialProducer neuronAttribute = networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class); 
+        neuronAttribute.setCustomDescription("Neuron " + i);
+        PotentialConsumer chartAttribute = chart.getAttributeManager().createPotentialConsumer(chart.getDimension(i-1), "setValue", double.class);
+        chartAttribute.setCustomDescription( "Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
     

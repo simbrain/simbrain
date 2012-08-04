@@ -39,9 +39,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /** Time Series consumer type. */
     private AttributeType timeSeriesConsumerType;
 
-    /** Objects which can be used to add data to time series plot. */
-    private List<TimeSeriesSetter> setterList = new ArrayList<TimeSeriesSetter>();
-
     /**
      * Create new time series plot component.
      *
@@ -90,52 +87,22 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
                 double.class, true);
         addConsumerType(timeSeriesConsumerType);
-        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addTimeSeriesSetter(i);
-        }
-    }
-
-    /**
-     * Return the setter with specified index, or null if none found.
-     *
-     * @param i index of setter
-     * @return the setter object
-     */
-    public TimeSeriesSetter getTimeSeriesSetter(int i) {
-        for (TimeSeriesSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return setter;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Add a time series setter with the specified index.
-     *
-     * @param i index of setter
-     */
-    public void addTimeSeriesSetter(int i) {
-        for (TimeSeriesSetter setter : setterList) {
-            if (setter.getIndex() == i) {
-                return;
-            }
-        }
-        setterList.add(new TimeSeriesSetter(i));
     }
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (timeSeriesConsumerType.isVisible()) {
-            for (TimeSeriesSetter setter : setterList) {
+            for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
                 String description = timeSeriesConsumerType
                         .getSimpleDescription("Time Series "
-                                + setter.getIndex());
-                PotentialConsumer consumerID = getAttributeManager()
-                        .createPotentialConsumer(setter,
-                                timeSeriesConsumerType, description);
-                returnList.add(consumerID);
+                                + i);
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(this, "setValue",
+                                new Class[] { double.class, Integer.class },
+                                new Object[] { i });
+                consumer.setCustomDescription(description);
+                returnList.add(consumer);
             }
         }
         return returnList;
@@ -152,19 +119,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                if (getTimeSeriesSetter(index) == null) {
-                    addTimeSeriesSetter(index);
-                    firePotentialAttributesChanged();
-                }
+                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                TimeSeriesSetter setter = getTimeSeriesSetter(index);
-                fireAttributeObjectRemoved(setter);
-                setterList.remove(setter);
                 firePotentialAttributesChanged();
             }
 
@@ -187,21 +148,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        try {
-            int i = Integer.parseInt(objectKey);
-            TimeSeriesSetter setter = new TimeSeriesSetter(i);
-            return setter;
-        } catch (NumberFormatException e) {
-            return null; // the supplied string was not an integer
-        }
-    }
-
-    @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof TimeSeriesSetter) {
-            return "" + ((TimeSeriesSetter) object).getIndex();
-        }
-        return null;
+        return this;
     }
 
     /**
@@ -260,37 +207,17 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Object which adds data to a time series plot.
+     * Set the value of a specified data source (one curve in the time series
+     * plot). This is the main method for updating the data in a time series
+     * chart.
+     *
+     * @param value the current "y-axis" value for the time series
+     * @param index which time series curve to set.
      */
-    public class TimeSeriesSetter {
-
-        /** Index. */
-        private int index;
-
-        /**
-         * Construct a setter object.
-         *
-         * @param index index of the bar to set
-         */
-        public TimeSeriesSetter(final int index) {
-            this.index = index;
-        }
-
-        /**
-         * Set the value.
-         *
-         * @param val value for the bar
-         */
-        public void setValue(final double val) {
-            model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
-                    .getTime(), val);
-        }
-
-        /**
-         * @return the index
-         */
-        public int getIndex() {
-            return index;
-        }
+    public void setValue(final double value, final Integer index) {
+        //TODO: Throw exception if index out of current bounds
+        model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
+                .getTime(), value);
     }
+
 }

@@ -20,6 +20,7 @@ package org.simbrain.util;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -285,5 +286,16 @@ public class StandardDialog extends GenericJDialog {
      */
     public static void setSimulationRunning(boolean isRunning) {
         StandardDialog.isRunning = isRunning;
+    }
+
+    /**
+     * Center the dialog on the screen.
+     */
+    public void centerDialog() {
+        final Toolkit toolkit = Toolkit.getDefaultToolkit();
+        final Dimension screenSize = toolkit.getScreenSize();
+        final int x = (screenSize.width - getWidth()) / 2;
+        final int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
     }
 }

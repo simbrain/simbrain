@@ -27,6 +27,8 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -63,6 +65,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /** Synapse panel. */
     private AbstractSynapsePanel synapsePanel = new ClampedSynapseRulePanel();
+
+    /** Scrollpane for synapse panel. */
+    private JScrollPane scrollPane;
 
     /** Id Label. */
     private JLabel idLabel = new JLabel();
@@ -147,7 +152,8 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         topPanel.addItem("Learning rule", cbSynapseType);
 
         mainPanel.add(topPanel);
-        mainPanel.add(synapsePanel);
+        initScrollPane(synapsePanel);
+        mainPanel.add(scrollPane);
 
         // Add tab for setting spike responders, if needed
         ArrayList<Synapse> spikeRespondingSynapses = getSpikeRespondingSynapses();
@@ -161,6 +167,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else {
             setContentPane(mainPanel);
         }
+
     }
 
     /**
@@ -281,12 +288,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         updateHelp();
         Object selected = cbSynapseType.getSelectedItem();
         if (selected != NULL_STRING) {
-            mainPanel.remove(synapsePanel);
+            mainPanel.remove(scrollPane);
             synapsePanel = getSynapsePanel(((ClassDescriptionPair) selected)
                     .getTheClass());
             synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
+            initScrollPane(synapsePanel);
+            mainPanel.add(scrollPane);
+            scrollPane.revalidate();
             pack();
+            centerDialog();
         }
 
     }
@@ -428,5 +438,17 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     public void setSynapseList(List<Synapse> synapseList) {
         this.synapseList = synapseList;
+    }
+    /**
+     * Initialize the scroll panel: set its properties and re-init the scrollbar
+     * policy. This is called every time a new neuron type is selected, so that
+     * the panel can be laid out again.
+     *
+     * @param npanel
+     */
+    private void initScrollPane(JPanel panel) {
+        scrollPane = new JScrollPane(panel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     }
 }

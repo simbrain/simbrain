@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Constructor;
@@ -28,6 +30,8 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
@@ -59,6 +63,9 @@ public class NeuronDialog extends StandardDialog {
 
     /** Neuron panel. */
     private AbstractNeuronPanel neuronPanel;
+
+    /** Scrollpane for neuron panel. */
+    private JScrollPane scrollPane;
 
     /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(Neuron.getRulelist());
@@ -160,10 +167,26 @@ public class NeuronDialog extends StandardDialog {
         topPanel.addItem("Update rule", cbNeuronType);
 
         mainPanel.add(topPanel);
-        mainPanel.add(neuronPanel);
+
+        initScrollPane(neuronPanel);
+        mainPanel.add(scrollPane);
         setContentPane(mainPanel);
 
     }
+
+    /**
+     * Initialize the scroll panel: set its properties and re-init the scrollbar
+     * policy. This is called every time a new neuron type is selected, so that
+     * the panel can be laid out again.
+     *
+     * @param npanel
+     */
+    private void initScrollPane(JPanel npanel) {
+        scrollPane = new JScrollPane(npanel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    }
+
 
     @Override
     protected void closeDialogOk() {
@@ -296,12 +319,15 @@ public class NeuronDialog extends StandardDialog {
                 return;
             }
 
-            mainPanel.remove(neuronPanel);
+            mainPanel.remove(scrollPane);
             neuronPanel = getNeuronPanel(network,
                     ((ClassDescriptionPair) selected).getTheClass());
             neuronPanel.fillDefaultValues();
-            mainPanel.add(neuronPanel);
+            initScrollPane(neuronPanel);
+            mainPanel.add(scrollPane);
+            scrollPane.revalidate();
             pack();
+            centerDialog();
         }
     };
 

@@ -58,6 +58,7 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesDialog;
@@ -146,6 +147,9 @@ public class NetworkPanel extends JPanel {
 
     /** Action manager. */
     protected NetworkActionManager actionManager;
+
+    /** Undo manager. */
+    protected final UndoManager undoManager;
 
     /** Cached context menu. */
     private JPopupMenu contextMenu;
@@ -263,6 +267,7 @@ public class NetworkPanel extends JPanel {
         editMode = DEFAULT_BUILD_MODE;
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
+        undoManager = new UndoManager();
 
         createContextMenu();
         // createContextMenuAlt();
@@ -390,17 +395,19 @@ public class NetworkPanel extends JPanel {
             public void neuronRemoved(final NetworkEvent<Neuron> e) {
                 Neuron neuron = e.getObject();
                 NeuronNode node = (NeuronNode) objectNodeMap.get(neuron);
-                node.removeFromParent();
-                objectNodeMap.remove(neuron);
-                if (neuron.getParentGroup() != null) {
-                    GroupNode groupNode = (GroupNode) objectNodeMap.get(neuron
-                            .getParentGroup());
-                    if (groupNode != null) {
-                        groupNode.removePNode(node);
-                        groupNode.updateBounds();
+                if (node != null) {
+                    node.removeFromParent();
+                    objectNodeMap.remove(neuron);
+                    if (neuron.getParentGroup() != null) {
+                        GroupNode groupNode = (GroupNode) objectNodeMap
+                                .get(neuron.getParentGroup());
+                        if (groupNode != null) {
+                            groupNode.removePNode(node);
+                            groupNode.updateBounds();
+                        }
                     }
+                    centerCamera();
                 }
-                centerCamera();
             }
 
             public void neuronChanged(final NetworkEvent<Neuron> e) {
@@ -451,7 +458,7 @@ public class NetworkPanel extends JPanel {
 
             public void synapseAdded(final NetworkEvent<Synapse> e) {
                 NetworkPanel.this.addSynapse(e.getObject());
-                Synapse synapse = e.getObject();
+                final Synapse synapse = e.getObject();
                 if (synapse.getParentGroup() != null) {
                     GroupNode parentGroupNode = (GroupNode) objectNodeMap
                             .get(synapse.getParentGroup());
@@ -460,10 +467,11 @@ public class NetworkPanel extends JPanel {
                         parentGroupNode.setVisible(true);
                     }
                 }
+ 
             }
 
             public void synapseRemoved(final NetworkEvent<Synapse> e) {
-                Synapse synapse = e.getObject();
+                final Synapse synapse = e.getObject();
                 SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
                         .getObject());
                 if (synapseNode != null) {
@@ -646,16 +654,33 @@ public class NetworkPanel extends JPanel {
             }
         }
 
-        Neuron neuron = new Neuron(getNetwork(), new LinearRule());
+        final Neuron neuron = new Neuron(getNetwork(), new LinearRule());
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);
         getNetwork().addNeuron(neuron);
+        undoManager.addUndoableAction(new UndoableAction() {
+
+            @Override
+            public void undo() {
+                getNetwork().removeNeuron(neuron);
+                //System.out.println("AddNeuron:undo.  Remove "
+                //        + neuron.getId());
+            }
+
+            @Override
+            public void redo() {
+                getNetwork().addNeuron(neuron);
+                //System.out.println("AddNeuron:redo. Add" + neuron.getId());
+            }
+
+        });
         repaint();
     }
 
     /**
-     * Add representation of specified neuron to network panel.
+     * Add representation of specified neuron to network panel. Invoked when
+     * linking to a neuron that exists in the model.
      */
     private void addNeuron(final Neuron neuron) {
         if (objectNodeMap.get(neuron) != null) {
@@ -680,6 +705,22 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(node);
         objectNodeMap.put(text, node);
         // node.update();
+        undoManager.addUndoableAction(new UndoableAction() {
+
+            @Override
+            public void undo() {
+                getNetwork().deleteText(text);
+                //System.out.println("AddText:undo.  Remove "
+                //        + text);
+            }
+
+            @Override
+            public void redo() {
+                //getNetwork().addText(text);
+                //System.out.println("AddText:redo. Add" + text);
+            }
+
+        });
     }
 
     /**
@@ -1005,18 +1046,51 @@ public class NetworkPanel extends JPanel {
      */
     public void deleteSelectedObjects() {
 
+        final List<Object> deletedObjects= new ArrayList<Object>();
         for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
-                network.removeNeuron(selectedNeuronNode.getNeuron());
+                final Neuron neuron = selectedNeuronNode.getNeuron();
+                network.removeNeuron(neuron);
+                deletedObjects.add(neuron);
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.removeSynapse(selectedSynapseNode.getSynapse());
+                deletedObjects.add(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());
+                deletedObjects.add(selectedTextNode.getTextObject());
             }
         }
+        undoManager.addUndoableAction(new UndoableAction() {
+
+            @Override
+            public void undo() {
+                for (Object object : deletedObjects) {
+                    if (object instanceof Neuron) {
+                        network.addNeuron((Neuron) object);
+                    } else if (object instanceof NetworkTextObject) {
+                        network.addText((NetworkTextObject) object);
+                    }
+                }
+                //System.out.println("Delete Selected Objects:undo - Add those objects");
+            }
+
+            @Override
+            public void redo() {
+                for (Object object : deletedObjects) {
+                    if (object instanceof Neuron) {
+                        network.removeNeuron((Neuron) object);
+                    } else if (object instanceof NetworkTextObject) {
+                        network.deleteText((NetworkTextObject) object);
+                    }
+                }
+                //System.out.println("Delete Selected Objects:redo - Re-Remove those objects");
+            }
+
+        });
+
     }
 
     /**
@@ -2256,5 +2330,13 @@ public class NetworkPanel extends JPanel {
     public HashMap<Object, PNode> getObjectNodeMap() {
         return objectNodeMap;
     }
+
+    /**
+     * @return the undoManager
+     */
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
+
 
 }

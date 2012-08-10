@@ -17,6 +17,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -24,6 +25,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -153,16 +155,38 @@ public class AddNeuronsDialog extends StandardDialog {
      * Adds the neurons to the panel.
      */
     private void addNeuronsToPanel() {
+        // TODO: Move to networkPanel?
         int number = Integer.parseInt(numNeurons.getText());
+        final List<Neuron> addedNeurons = new ArrayList<Neuron>();
         for (int i = 0; i < number; i++) {
             Neuron neuron = new Neuron(networkPanel.getNetwork(), baseNeuron);
             nodes.add(new NeuronNode(networkPanel, neuron));
             networkPanel.getNetwork().addNeuron(neuron);
+            addedNeurons.add(neuron);
         }
         networkPanel.setSelection(nodes);
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
+        networkPanel.getUndoManager().addUndoableAction(new UndoableAction() {
+
+            @Override
+            public void undo() {
+                for (Neuron neuron : addedNeurons) {
+                    networkPanel.getNetwork().removeNeuron(neuron);
+                }
+                //System.out.println("AddNeurons:undo. - Remove List");
+            }
+
+            @Override
+            public void redo() {
+                for (Neuron neuron : addedNeurons) {
+                    networkPanel.getNetwork().addNeuron(neuron);
+                }
+                //System.out.println("AddNeurons:red. - Re-add List");
+            }
+
+        });
     }
 
     /**

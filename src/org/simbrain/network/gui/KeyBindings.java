@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -96,6 +97,28 @@ public class KeyBindings {
             }
         });
 
+        // Undo
+        inputMap.put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+                            .getDefaultToolkit().getMenuShortcutKeyMask()), "undo");
+        panel.getActionMap().put("undo", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.getUndoManager().undo();
+            }
+        });
+        // Redo
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+                        .getDefaultToolkit().getMenuShortcutKeyMask() + 
+                        ActionEvent.SHIFT_MASK), "redo");
+        panel.getActionMap().put("redo", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.getUndoManager().redo();
+                panel.repaint();
+            }
+        });
+
+
         // Print debug info
         inputMap.put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.SHIFT_MASK),
@@ -105,6 +128,7 @@ public class KeyBindings {
                 System.out.println(panel.getNetwork().toString());
             }
         });
+
 
         // Selection Mode
         inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");

@@ -2,7 +2,7 @@
   <neuronList>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -29,19 +29,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>73.62611487831975</x>
-      <y>139.45325751507292</y>
+      <x>114.02007090597961</x>
+      <y>152.12510723087073</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -68,19 +68,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>117.63832538852007</x>
-      <y>134.399758056598</y>
+      <x>52.90592408875036</x>
+      <y>102.48191811391374</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -107,19 +107,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>71.23949042526802</x>
-      <y>183.7219768839334</y>
+      <x>55.02398701443938</x>
+      <y>152.86722062079295</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -146,19 +146,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
-      <buffer>-0.2729553155350076</buffer>
+      <increment>1.0</increment>
+      <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>120.22015149005665</x>
-      <y>184.7559787138751</y>
+      <x>109.32785465196301</x>
+      <y>101.23001872030109</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -185,19 +185,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>176.66141690313404</x>
-      <y>34.78904782278019</y>
+      <x>219.79700828246803</x>
+      <y>-38.705682163802756</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -224,19 +224,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>187.7087422401596</x>
-      <y>85.15464855608093</y>
+      <x>236.82475880436556</x>
+      <y>11.484863986488069</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -263,19 +263,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>217.53305484468942</x>
-      <y>35.82304965272189</y>
+      <x>260.66864622402346</x>
+      <y>-37.67168033386106</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -302,19 +302,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
       <x>267.85801771106475</x>
-      <y>229.6424858883804</y>
+      <y>228.97514365278604</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -341,19 +341,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
       <x>242.87216481956702</x>
-      <y>281.1017087364347</y>
+      <y>280.4343665008403</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -380,19 +380,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
       <x>287.87216481956705</x>
-      <y>281.1017087364347</y>
+      <y>280.4343665008403</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -419,19 +419,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>34.00144045841342</x>
-      <y>268.60210862935924</y>
+      <x>0.9077193954970189</x>
+      <y>279.7005724489942</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -458,19 +458,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
+      <increment>1.0</increment>
       <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>-35.37198692298966</x>
-      <y>265.99849294924445</y>
+      <x>-56.538467109508844</x>
+      <y>259.4932473588176</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -497,19 +497,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
-      <buffer>-0.8620847747011174</buffer>
+      <increment>1.0</increment>
+      <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>-40.45535415248152</x>
-      <y>68.05838497576754</y>
+      <x>-87.84799586327924</x>
+      <y>14.540424730671365</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -536,19 +536,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
-      <buffer>0.05469783020444337</buffer>
+      <increment>1.0</increment>
+      <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>-80.84147643147013</x>
-      <y>17.663327754745907</y>
+      <x>-88.34491554425244</x>
+      <y>-36.23088518951884</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -575,19 +575,19 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
-      <buffer>-0.2729553155350076</buffer>
+      <increment>1.0</increment>
+      <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>-40.99800065052189</x>
-      <y>18.69732958468761</y>
+      <x>-36.36267070779073</x>
+      <y>-35.45957526932866</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
-        <decay>0.01</decay>
+        <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
           <distributionIndex>0</distributionIndex>
@@ -614,12 +614,12 @@
       <activation>0.0</activation>
       <lowerBound>-1.0</lowerBound>
       <upperBound>1.0</upperBound>
-      <increment>0.1</increment>
-      <buffer>-0.2729553155350076</buffer>
+      <increment>1.0</increment>
+      <buffer>0.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>-81.41846824019329</x>
-      <y>71.04388077435907</y>
+      <x>-36.36267070779073</x>
+      <y>14.540424730671361</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
@@ -634,7 +634,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_17</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -649,7 +649,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_18</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -664,7 +664,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_19</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -679,7 +679,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_20</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -694,7 +694,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_21</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -724,7 +724,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_23</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -739,7 +739,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_24</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -769,7 +769,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_26</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -799,7 +799,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_28</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -814,7 +814,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_30</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -829,7 +829,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_31</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -844,7 +844,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_34</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -859,7 +859,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_37</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -874,7 +874,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_38</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -889,7 +889,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_39</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -904,7 +904,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_40</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -934,7 +934,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_44</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -949,7 +949,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_46</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -964,7 +964,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_47</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -979,7 +979,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_49</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -994,7 +994,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_107</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1009,7 +1009,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_138</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1024,7 +1024,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_139</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1039,7 +1039,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_140</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1069,7 +1069,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_142</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1084,7 +1084,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_143</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1114,7 +1114,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_145</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1144,7 +1144,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_147</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1174,7 +1174,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_149</id>
-      <strength>-0.05</strength>
+      <strength>-1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1339,7 +1339,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_160</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1354,7 +1354,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_161</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1429,7 +1429,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_166</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1444,7 +1444,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_167</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1489,7 +1489,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_170</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1504,7 +1504,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_171</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1609,7 +1609,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_178</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1624,7 +1624,7 @@
         <clipped>false</clipped>
       </learningRule>
       <id>Synapse_179</id>
-      <strength>-0.05</strength>
+      <strength>1.0</strength>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
@@ -1683,7 +1683,7 @@
     <outgoingUnified/>
     <autoRouting>false</autoRouting>
   </synapseRouter>
-  <time>304.0</time>
+  <time>0.0</time>
   <timeStep>0.2</timeStep>
   <timeType>DISCRETE</timeType>
   <clampWeights>false</clampWeights>

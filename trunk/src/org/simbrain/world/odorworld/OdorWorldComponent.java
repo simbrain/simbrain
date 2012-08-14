@@ -164,6 +164,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "turnLeft",
                                     double.class);
+                    consumer.setCustomDescription(description);
                     returnList.add(consumer);
                 }
                 if (rightRotationType.isVisible()) {
@@ -171,6 +172,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "turnRight",
                                     double.class);
+                    consumer.setCustomDescription(description);
                     returnList.add(consumer);
                 }
                 if (straightMovementType.isVisible()) {
@@ -178,6 +180,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(entity, "goStraight",
                                     double.class);
+                    consumer.setCustomDescription(description);
                     returnList.add(consumer);
                 }
 

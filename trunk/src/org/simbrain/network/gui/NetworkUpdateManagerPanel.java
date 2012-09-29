@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.workspace.gui;
+package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,23 +39,24 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
+import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.UpdateAction;
-import org.simbrain.workspace.updater.UpdateActionCustom;
-import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
-import org.simbrain.workspace.updater.UpdateAllBuffered;
 
 /**
- * Panel for display and ordering of workspace update actions.
+ * Panel for display and ordering of network update actions.
  *
  * @author jeff yoshimi
  *
  */
-public class UpdateManagerPanel extends JPanel {
+public class NetworkUpdateManagerPanel extends JPanel {
 
     /** The JList which represents current actions. */
     private final JList currentActionJList = new JList();
@@ -69,16 +70,22 @@ public class UpdateManagerPanel extends JPanel {
     /** The model object for current actions. */
     private final DefaultListModel availableActionListModel = new DefaultListModel();
 
-    /** Reference to workspace. */
-    private final Workspace workspace;
+    /** Reference to root network. */
+    private final Network network;
+
+    /** Script directory for custom workspace updates. */
+    private static final String SCRIPT_DIR = "." + System.getProperty("file.separator")
+            + "scripts" + System.getProperty("file.separator")
+            + "updateScripts" + System.getProperty("file.separator")
+            + "networkUpdate";
 
     /**
      * Creates a new action list panel.
      */
-    public UpdateManagerPanel(final Workspace workspace) {
+    public NetworkUpdateManagerPanel(final Network network) {
 
         super(new BorderLayout());
-        this.workspace = workspace;
+        this.network = network;
 
         // Set up Current Action list
         currentActionJList.setModel(currentActionListModel);
@@ -128,7 +135,8 @@ public class UpdateManagerPanel extends JPanel {
         updateAvailableActionsList();
         add(buttonPanel, BorderLayout.SOUTH);
 
-        workspace.getUpdater().getUpdateManager().addListener(listener);
+        // Listen for network updates
+        network.getUpdateManager().addListener(listener);
 
         // TODO: Handle closing event
         // Should remove listener from update manager when this is closed
@@ -136,87 +144,55 @@ public class UpdateManagerPanel extends JPanel {
     }
 
     /**
-     * Listener for update manager changes.
+     * Renderer for lists in this panel
      */
-    private UpdateManagerListener listener = new UpdateManagerListener() {
+    private ListCellRenderer listRenderer = new ListCellRenderer() {
+        public Component getListCellRendererComponent(JList list,
+                Object updateAction, int index, boolean isSelected,
+                boolean cellHasFocus) {
 
-        public void actionAdded(UpdateAction action) {
-            updateCurrentActionsList();
-        }
-
-        public void actionRemoved(UpdateAction action) {
-            updateCurrentActionsList();
-        }
-
-        public void actionOrderChanged() {
-            updateCurrentActionsList();
-        }
-
-        public void availableActionAdded(UpdateAction action) {
-            updateAvailableActionsList();
-        }
-
-        public void availableActionRemoved(UpdateAction action) {
-            updateAvailableActionsList();
-        }
-
+            JLabel label = new JLabel((index + 1) + ": "
+                    + ((NetworkUpdateAction) updateAction).getDescription());
+            label.setToolTipText(((NetworkUpdateAction) updateAction)
+                    .getLongDescription());
+            if (index == 0) {
+                label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
+                        Color.LIGHT_GRAY));
+            } else {
+                label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                        Color.LIGHT_GRAY));
+            }
+            label.setBackground(null);
+            if (isSelected) {
+                label.setForeground(list.getSelectionForeground());
+                label.setBackground(list.getSelectionBackground());
+            } else {
+                label.setForeground(list.getForeground());
+                label.setBackground(list.getBackground());
+            }
+            label.setEnabled(list.isEnabled());
+            label.setFont(list.getFont());
+            label.setOpaque(true);
+            return label;
+        };
     };
 
     /**
      * Configure the JList.
      */
     private void configureCurrentJList() {
-        currentActionJList.setCellRenderer(new ListCellRenderer() {
-            public Component getListCellRendererComponent(JList list,
-                    Object updateAction, int index, boolean isSelected,
-                    boolean cellHasFocus) {
-
-                JLabel label = new JLabel((index + 1) + ": "
-                        + ((UpdateAction) updateAction).getDescription());
-                label.setToolTipText(((UpdateAction) updateAction)
-                        .getLongDescription());
-                if (index == 0) {
-                    label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
-                            Color.LIGHT_GRAY));
-                } else {
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                            Color.LIGHT_GRAY));
-                }
-                label.setBackground(null);
-                if (isSelected) {
-                    label.setForeground(list.getSelectionForeground());
-                    label.setBackground(list.getSelectionBackground());
-                } else {
-                    label.setForeground(list.getForeground());
-                    label.setBackground(list.getBackground());
-                }
-                label.setEnabled(list.isEnabled());
-                label.setFont(list.getFont());
-                label.setOpaque(true);
-                return label;
-            }
-        });
+        currentActionJList.setCellRenderer(listRenderer);
         currentActionJList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
 
                     // When double clicking on custom actions open an editor
-                    UpdateAction action = (UpdateAction) currentActionJList
+                    NetworkUpdateAction action = (NetworkUpdateAction) currentActionJList
                             .getModel().getElementAt(
                                     currentActionJList.locationToIndex(e
                                             .getPoint()));
-                    if (action instanceof UpdateActionCustom) {
-                        ScriptEditor panel = new ScriptEditor(
-                                ((UpdateActionCustom) action).getScriptString());
-                        StandardDialog dialog = ScriptEditor.getDialog(panel);
-                        dialog.pack();
-                        dialog.setLocationRelativeTo(null);
-                        dialog.setVisible(true);
-                        if (!dialog.hasUserCancelled()) {
-                            ((UpdateActionCustom) action).setScriptString(panel
-                                    .getTextArea().getText());
-                            ((UpdateActionCustom) action).init();
-                        }
+                    if (action instanceof CustomUpdate) {
+                        openScriptEditorPanel((CustomUpdate) action);
                     }
                 }
 
@@ -228,58 +204,40 @@ public class UpdateManagerPanel extends JPanel {
      * Configure the JList.
      */
     private void configureAvailableJList() {
-        availableActionJList.setCellRenderer(new ListCellRenderer() {
-            public Component getListCellRendererComponent(JList list,
-                    Object updateAction, int index, boolean isSelected,
-                    boolean cellHasFocus) {
-                JLabel label = new JLabel(((UpdateAction) updateAction)
-                        .getDescription());
-                label.setToolTipText(((UpdateAction) updateAction)
-                        .getLongDescription());
-                if (index == 0) {
-                    label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
-                            Color.LIGHT_GRAY));
-                } else {
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                            Color.LIGHT_GRAY));
-                }
-                if (isSelected) {
-                    label.setBackground(list.getSelectionBackground());
-                    label.setForeground(list.getSelectionForeground());
-                } else {
-                    label.setForeground(list.getForeground());
-                    label.setBackground(null);
-                }
-                label.setEnabled(list.isEnabled());
-                label.setFont(list.getFont());
-                label.setOpaque(true);
-                return label;
-            }
-        });
+        availableActionJList.setCellRenderer(listRenderer);
         availableActionJList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    UpdateAction action = (UpdateAction) availableActionJList
+                    NetworkUpdateAction action = (NetworkUpdateAction) availableActionJList
                             .getModel().getElementAt(
                                     availableActionJList.locationToIndex(e
                                             .getPoint()));
-                    if (action instanceof UpdateActionCustom) {
-                        ScriptEditor panel = new ScriptEditor(
-                                ((UpdateActionCustom) action).getScriptString());
-                        StandardDialog dialog = ScriptEditor.getDialog(panel);
-                        dialog.pack();
-                        dialog.setLocationRelativeTo(null);
-                        dialog.setVisible(true);
-                        if (!dialog.hasUserCancelled()) {
-                            ((UpdateActionCustom) action).setScriptString(panel
-                                    .getTextArea().getText());
-                            ((UpdateActionCustom) action).init();
-                        }
+                    if (action instanceof CustomUpdate) {
+                        openScriptEditorPanel((CustomUpdate) action);
                     }
                 }
 
             }
         });
+    }
+
+    /**
+     * Open the script editor panel with appropriate defaults.
+     *
+     * @param action the action
+     */
+    private void openScriptEditorPanel(CustomUpdate action) {
+        ScriptEditor panel = new ScriptEditor(
+                ((CustomUpdate) action).getScriptString(), SCRIPT_DIR);
+        StandardDialog dialog = panel.getDialog(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+        if (!dialog.hasUserCancelled()) {
+            ((CustomUpdate) action).setScriptString(panel
+                    .getTextArea().getText());
+            ((CustomUpdate) action).init();
+        }
     }
 
     /** Action which deletes selected actions. */
@@ -289,13 +247,13 @@ public class UpdateManagerPanel extends JPanel {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
             putValue(NAME, "Remove selected action(s)");
             putValue(SHORT_DESCRIPTION, "Delete selected actions");
-            UpdateManagerPanel.this.getInputMap(
+            NetworkUpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("BACK_SPACE"), this);
-            UpdateManagerPanel.this.getInputMap(
+            NetworkUpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("DELETE"), this);
-            UpdateManagerPanel.this.getActionMap().put(this, this);
+            NetworkUpdateManagerPanel.this.getActionMap().put(this, this);
         }
 
         /**
@@ -303,38 +261,20 @@ public class UpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             for (Object action : currentActionJList.getSelectedValues()) {
-                workspace.getUpdater().getUpdateManager()
-                        .moveActionToAvailableList((UpdateAction) action);
+                network.getUpdateManager().moveActionToAvailableList(
+                        (NetworkUpdateAction) action);
             }
             for (Object action : availableActionJList.getSelectedValues()) {
                 // Don't allow built in actions to be removed
-                if (action instanceof UpdateAllBuffered) {
+                if ((action instanceof BufferedUpdate)
+                        || (action instanceof PriorityUpdate)) {
                     continue;
                 } else {
-                    workspace.getUpdater().getUpdateManager()
-                    .removeAction((UpdateAction) action);
+                    network.getUpdateManager().removeAvailableAction(
+                            (NetworkUpdateAction) action);
                 }
             }
-        }
-    };
 
-    /** Action which deletes selected actions. */
-    Action addActionsAction = new AbstractAction() {
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Add selected action(s)");
-            putValue(SHORT_DESCRIPTION, "Add selected actions");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            for (Object action : availableActionJList.getSelectedValues()) {
-                workspace.getUpdater().getUpdateManager()
-                        .addAction((UpdateAction) action);
-            }
         }
     };
 
@@ -352,11 +292,11 @@ public class UpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             File defaultScript = new File(System.getProperty("user.dir")
-                    + "/etc/customWorkspaceUpdateTemplate.bsh");
+                    + "/etc/customNetworkUpdateTemplate.bsh");
             ScriptEditor panel = new ScriptEditor(
-                    Utils.readFileContents(defaultScript));
+                    Utils.readFileContents(defaultScript), SCRIPT_DIR);
             panel.setScriptFile(defaultScript);
-            StandardDialog dialog = ScriptEditor.getDialog(panel);
+            StandardDialog dialog = panel.getDialog(panel);
             // Setting script file to null prevents the template script from
             // being saved. Forces "save as"
             // if save button pressed.
@@ -365,12 +305,32 @@ public class UpdateManagerPanel extends JPanel {
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
             if (!dialog.hasUserCancelled()) {
-                UpdateActionCustom updateAction = new UpdateActionCustom(
-                        workspace.getUpdater(), panel.getTextArea().getText());
-                workspace.getUpdater().getUpdateManager()
-                        .addAction(updateAction);
+                CustomUpdate updateAction = new CustomUpdate(network, panel
+                        .getTextArea().getText());
+                network.getUpdateManager().addAction(
+                        updateAction);
             }
 
+        }
+    };
+
+    /** Action which deletes selected actions. */
+    Action addActionsAction = new AbstractAction() {
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(NAME, "Add selected action(s)");
+            putValue(SHORT_DESCRIPTION, "Add selected actions");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            for (Object action : availableActionJList.getSelectedValues()) {
+                network.getUpdateManager().addAction(
+                        (NetworkUpdateAction) action);
+            }
         }
     };
 
@@ -379,7 +339,7 @@ public class UpdateManagerPanel extends JPanel {
      */
     private void updateCurrentActionsList() {
         currentActionListModel.clear();
-        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
+        for (NetworkUpdateAction action : network.getUpdateManager()
                 .getActionList()) {
             currentActionListModel.addElement(action);
         }
@@ -391,7 +351,7 @@ public class UpdateManagerPanel extends JPanel {
      */
     private void updateAvailableActionsList() {
         availableActionListModel.clear();
-        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
+        for (NetworkUpdateAction action : network.getUpdateManager()
                 .getAvailableActionList()) {
             availableActionListModel.addElement(action);
         }
@@ -399,9 +359,36 @@ public class UpdateManagerPanel extends JPanel {
     }
 
     /**
+     * Listener for update manager changes.
+     */
+    private UpdateManagerListener listener = new UpdateManagerListener() {
+
+        public void actionAdded(NetworkUpdateAction action) {
+            updateCurrentActionsList();
+        }
+
+        public void actionRemoved(NetworkUpdateAction action) {
+            updateCurrentActionsList();
+        }
+
+        public void actionOrderChanged() {
+            updateCurrentActionsList();
+        }
+
+        public void availableActionAdded(NetworkUpdateAction action) {
+            updateAvailableActionsList();
+        }
+
+        public void availableActionRemoved(NetworkUpdateAction action) {
+            updateAvailableActionsList();
+        }
+
+    };
+
+    /**
      * Handle drag and drop events
      *
-     * @return the transfer handler
+     * @return
      */
     private TransferHandler createTransferHandler() {
         return new TransferHandler() {
@@ -428,16 +415,16 @@ public class UpdateManagerPanel extends JPanel {
                         .getDropLocation();
                 int targetIndex = dl.getIndex();
                 int sourceIndex = currentActionJList.getSelectedIndex();
-                int listSize = workspace.getUpdater().getUpdateManager()
-                        .getActionList().size();
+                int listSize = network.getUpdateManager().getActionList()
+                        .size();
                 if (targetIndex == listSize) {
                     targetIndex--;
                 }
                 if (sourceIndex == listSize) {
                     sourceIndex--;
                 }
-                workspace.getUpdater().getUpdateManager()
-                        .swapElements(sourceIndex, targetIndex);
+                network.getUpdateManager().swapElements(sourceIndex,
+                        targetIndex);
                 return true;
             }
 
@@ -451,5 +438,21 @@ public class UpdateManagerPanel extends JPanel {
 
         };
     }
+
+    // /**
+    // * Test panel.
+    // */
+    // public static void main(String[] args) {
+    // JFrame frame = new JFrame();
+    // List<String> actions = new ArrayList<String>();
+    // actions.add("Buffered Update");
+    // actions.add("Group 1");
+    // actions.add("Group 2");
+    // actions.add("Neuron 1");
+    // UpdateManagerPanel panel = new UpdateManagerPanel(frame, actions);
+    // frame.setContentPane(panel);
+    // frame.setVisible(true);
+    // frame.pack();
+    // }
 
 }

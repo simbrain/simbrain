@@ -42,12 +42,13 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
  */
 public class ScriptEditor extends JPanel {
 
-    // TODO: Separate directory just for update templates?
-
-    /** Script directory. */
-    private static final String SCRIPT_MENU_DIRECTORY = "."
+    /** Default script directory. */
+    private static final String DEFAULT_SCRIPT_DIRECTORY = "."
             + System.getProperty("file.separator") + "scripts"
             + System.getProperty("file.separator") + "scriptmenu";
+
+    /** Script directory. */
+    private String scriptDirectory = DEFAULT_SCRIPT_DIRECTORY;
 
     /** Reference to file (for saving). */
     private File scriptFile;
@@ -79,6 +80,17 @@ public class ScriptEditor extends JPanel {
         initPanel();
         setText(initialText);
         textArea.setCaretPosition(0);
+    }
+
+    /**
+     * Initialize with initial text and a default directory.
+     *
+     * @param initialText initial text
+     * @param fileDirectory initial file directory
+     */
+    public ScriptEditor(String initialText, String fileDirectory) {
+        this(initialText);
+        scriptDirectory = fileDirectory;
     }
 
     /**
@@ -151,7 +163,7 @@ public class ScriptEditor extends JPanel {
      *
      * @return internal frame
      */
-    public static GenericJInternalFrame getInternalFrame() {
+    public GenericJInternalFrame getInternalFrame() {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         initFrame(frame, new ScriptEditor());
         return frame;
@@ -163,7 +175,7 @@ public class ScriptEditor extends JPanel {
      * @param editor the panel to display in the dialog
      * @return the dialog
      */
-    public static StandardDialog getDialog(final ScriptEditor editor) {
+    public StandardDialog getDialog(final ScriptEditor editor) {
         StandardDialog dialog = new StandardDialog();
         initFrame(dialog, editor);
         return dialog;
@@ -175,7 +187,7 @@ public class ScriptEditor extends JPanel {
      * @param frame frame to initialize
      * @param editor the panel to display in the frame
      */
-    private static void initFrame(final GenericFrame frame,
+    private void initFrame(final GenericFrame frame,
             final ScriptEditor editor) {
         final JPanel mainPanel = new JPanel(new BorderLayout());
         createAttachMenuBar(frame, editor);
@@ -190,7 +202,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Creates the menu bar.
      */
-    protected static void createAttachMenuBar(final GenericFrame frame,
+    protected void createAttachMenuBar(final GenericFrame frame,
             final ScriptEditor editor) {
         JMenuBar bar = new JMenuBar();
 
@@ -223,7 +235,7 @@ public class ScriptEditor extends JPanel {
      *
      * @return the toolbar
      */
-    protected static JToolBar getToolbarOpenClose(final GenericFrame frame,
+    protected JToolBar getToolbarOpenClose(final GenericFrame frame,
             final ScriptEditor editor) {
         JToolBar toolbar = new JToolBar();
         toolbar.add(getOpenScriptAction(frame, editor));
@@ -234,7 +246,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for opening script files.
      */
-    private static Action getOpenScriptAction(final GenericFrame frame,
+    private Action getOpenScriptAction(final GenericFrame frame,
             final ScriptEditor editor) {
         return new AbstractAction() {
 
@@ -252,7 +264,7 @@ public class ScriptEditor extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 SFileChooser fileChooser = new SFileChooser(
-                        SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
+                        scriptDirectory, "Edit Script", "bsh");
                 final File scriptFile = fileChooser.showOpenDialog();
                 if (scriptFile == null) {
                     return;
@@ -278,7 +290,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for saving script files.
      */
-    private static Action getSaveScriptAction(final GenericFrame frame,
+    private Action getSaveScriptAction(final GenericFrame frame,
             final ScriptEditor editor) {
         return new AbstractAction() {
 
@@ -297,7 +309,7 @@ public class ScriptEditor extends JPanel {
                 File scriptFile = editor.getScriptFile();
                 if (scriptFile == null) {
                     SFileChooser fileChooser = new SFileChooser(
-                            SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
+                            scriptDirectory, "Edit Script", "bsh");
                     scriptFile = fileChooser.showSaveDialog();
                     if (scriptFile == null) {
                         return;
@@ -323,7 +335,7 @@ public class ScriptEditor extends JPanel {
     /**
      * Returns the action for saving script files.
      */
-    private static Action getSaveScriptAsAction(final GenericFrame frame,
+    private Action getSaveScriptAsAction(final GenericFrame frame,
             final ScriptEditor editor) {
         return new AbstractAction() {
 
@@ -337,7 +349,7 @@ public class ScriptEditor extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SFileChooser fileChooser = new SFileChooser(
-                        SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
+                        scriptDirectory, "Edit Script", "bsh");
                 File scriptFile = fileChooser.showSaveDialog();
                 if (scriptFile == null) {
                     return;

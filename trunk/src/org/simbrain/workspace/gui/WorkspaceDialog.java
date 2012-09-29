@@ -48,7 +48,7 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
     private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Update manager panel. */
-    private UpdateManagerPanel updatePanel;
+    private WorkspaceUpdateManagerPanel updatePanel;
 
     /**
      * This method is the default constructor.
@@ -69,7 +69,7 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
         fillFieldValues();
 
         // UpdatePanel
-        updatePanel = new UpdateManagerPanel(workspace);
+        updatePanel = new WorkspaceUpdateManagerPanel(workspace);
 
         // Set up tab panels
         tabbedPane.addTab("Update", updatePanel);

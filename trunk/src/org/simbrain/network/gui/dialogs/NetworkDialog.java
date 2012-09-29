@@ -36,7 +36,7 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.UpdateManagerPanel;
+import org.simbrain.network.gui.NetworkUpdateManagerPanel;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.util.LabelledItemPanel;
@@ -144,7 +144,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     private JCheckBox showTimeBox = new JCheckBox();
 
     /** Update manager panel. */
-    private UpdateManagerPanel updatePanel;
+    private NetworkUpdateManagerPanel updatePanel;
 
     /**
      * This method is the default constructor.
@@ -206,7 +206,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
         // UpdatePanel
-        updatePanel = new UpdateManagerPanel(networkPanel.getNetwork());
+        updatePanel = new NetworkUpdateManagerPanel(networkPanel.getNetwork());
 
         // Set up tab panels
         tabGraphics.add(graphicsPanel);

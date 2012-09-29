@@ -97,26 +97,26 @@ public class KeyBindings {
             }
         });
 
-        // Undo
-        inputMap.put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
-                            .getDefaultToolkit().getMenuShortcutKeyMask()), "undo");
-        panel.getActionMap().put("undo", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                panel.getUndoManager().undo();
-            }
-        });
-        // Redo
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
-                        .getDefaultToolkit().getMenuShortcutKeyMask() + 
-                        ActionEvent.SHIFT_MASK), "redo");
-        panel.getActionMap().put("redo", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                panel.getUndoManager().redo();
-                panel.repaint();
-            }
-        });
+//        // Undo
+//        inputMap.put(
+//            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+//                            .getDefaultToolkit().getMenuShortcutKeyMask()), "undo");
+//        panel.getActionMap().put("undo", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                panel.getUndoManager().undo();
+//            }
+//        });
+//        // Redo
+//        inputMap.put(
+//                KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+//                        .getDefaultToolkit().getMenuShortcutKeyMask() + 
+//                        ActionEvent.SHIFT_MASK), "redo");
+//        panel.getActionMap().put("redo", new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                panel.getUndoManager().redo();
+//                panel.repaint();
+//            }
+//        });
 
 
         // Print debug info

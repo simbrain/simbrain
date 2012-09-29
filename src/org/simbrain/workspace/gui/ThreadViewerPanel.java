@@ -102,7 +102,7 @@ public class ThreadViewerPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 JDialog dialog = new JDialog();
-                dialog.setContentPane(new UpdateManagerPanel(workspace));
+                dialog.setContentPane(new WorkspaceUpdateManagerPanel(workspace));
                 dialog.setModal(true);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);

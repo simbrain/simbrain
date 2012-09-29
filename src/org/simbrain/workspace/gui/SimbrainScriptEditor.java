@@ -147,7 +147,7 @@ public class SimbrainScriptEditor extends ScriptEditor {
         SimbrainScriptEditor editor = new SimbrainScriptEditor(desktop,
                 Utils.readFileContents(scriptFile));
         editor.setScriptFile(scriptFile);
-        initFrame(frame, editor);
+        editor.initFrame(frame, editor);
         return frame;
     }
 
@@ -157,11 +157,11 @@ public class SimbrainScriptEditor extends ScriptEditor {
      * @param frame frame to initialize
      * @param editor the panel to dispaly in the frame
      */
-    private static void initFrame(final GenericFrame frame,
+    private void initFrame(final GenericFrame frame,
             final SimbrainScriptEditor editor) {
         final JPanel mainPanel = new JPanel(new BorderLayout());
         createAttachMenuBar(frame, editor);
-        JToolBar toolbar = ScriptEditor.getToolbarOpenClose(frame, editor);
+        JToolBar toolbar = editor.getToolbarOpenClose(frame, editor);
         toolbar.addSeparator();
         toolbar.add(getRunScriptAction(frame, editor));
         mainPanel.add("North", toolbar);

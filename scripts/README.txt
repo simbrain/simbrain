@@ -1,7 +1,5 @@
 SIMBRAIN SCRIPTING
 
-(If you are downloading from svn then some of these folders will be incomplete.   More sample scripts can be obtained by downloading Simbrain_2_AlphaX.zip).
-
 This directory and its subdirectories hold beanshell scripts.  You are encouraged to add your own scripts.  This is your entry point for customizing Simbrain.
 
 The syntax for these scripts is java (with some modifications).  In each case some base object is made available that you can modify using java commands. The best way to learn how to write these scripts is probably to just look (and modify)  existing scripts.  Also see http://www.beanshell.org/docs.html
@@ -12,4 +10,4 @@ Scripts in ./network  automatically appear in the "scripts" menu of Simbrain net
 
 Scripts in ./console are available from the Simbrain console (from which command line arguments can be issued) or terminal components. The objects available here are the same as with scriptmenu.
 
-Workspace is there as a place to put workspace that are called from scripts.  Workspaces from /simbrain/simulations/workspaces can be called, but those are more likely to be edited independently of the script, thereby breaking the script.
+Scripts in ./updateScripts correspond to custom updating for the whole workspace or for an individual network.  These are custom tailored for specific applications and then  saved as part of a workspace.zip file.   These folders are a location such custom scripts can be stored.   Template update scripts are in the {Simbrain_Home}/etc directory.

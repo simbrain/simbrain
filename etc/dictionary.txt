@@ -18,3 +18,5 @@ csv
 uncomment
 sparsity
 sigmoidal
+scrollpane
+scrollbar

@@ -13,6 +13,8 @@
 
 
 
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
@@ -24,11 +26,10 @@
   </div>
   <p>
   </p><h1>Couplings</h1><br>
-<p>An individual coupling represents a one way informational link
-between two attributes in Simbrain. These links can occur between
-attributes of different components or even within the same component.
+<p>A&nbsp; coupling represents a one-way informational link
+between two objects in a Simbrain simulation.&nbsp;
 In this way information can be made to flow from one component to
-another. When using the couplings manager, the attribute which sends
+another (e.g. from a network to a bar chart). When using the couplings manager, the attribute which sends
 information to another attribute is known as a <b><i>producer</i></b>, and the attribute receiving that information is known as a <b><i>consumer</i></b> (see <a href="#Creation">coupling creation</a>).</p>
 
 <p>A list of all current couplings can be found in the <span style="font-weight: bold;">couplings tab</span> of the <a href="PropertyTabs.html">property tab</a> at the bottom of the desktop.</p>
@@ -41,9 +42,25 @@ points" that make up couplings, and couplings represent the
 uni-directional data flow between these hooks. For
 example, a simulation might involve coupling neurons whose neurons are
 producers to a bar chart whose bars are consumers (to see this, try bar
-chart test in the script menu).</p>
+chart test in the script menu).</p><br>
+<p>An example is shown below.&nbsp; One network controls the man, the
+other network controls the mouse.&nbsp;&nbsp; The man network has motor
+neurons that use couplings from, e.g., the straight neuron (producer)
+to the man's "go straight" motor (a consumer).&nbsp;&nbsp; The man's
+left and right sensors (producers) are also attached to the left and
+right neurons (consumers).&nbsp; Similarly for the mouse network.<br>
+</p>
+
+
 <p><br>
 </p>
+<div style="text-align: center;"><img style="width: 827px; height: 409px;" alt="Couplings Diagram" src="../../Images/CouplingsDiagram.png">
+</div>
+<p><br>
+</p>
+<p><br>
+</p>
+
 
 <p><span class="heading"><a name="Attributes"></a>Attributes</span></p>
 
@@ -71,7 +88,9 @@ manager
 button&nbsp;<img style="width: 18px; height: 18px;" alt="coupling icon" src="../../Images/Coupling.png"> on the Simbrain <a href="Toolbar.html">toolbar</a> or use the menu&nbsp;<span class="command">Couplings &gt; Coupling Manager</span>.&nbsp;
 The coupling manager allows you to create and delete couplings , set
 attribute visibility, and view workspace attributes.&nbsp; The coupling
-manager is organized in to three columns.&nbsp; Multiple items in each column can be selected by holding the shift key while selecting items or ranges of items.<br>
+manager is organized in to three columns.&nbsp; Multiple items in each
+column can be selected by holding the shift key while selecting items
+or ranges of items.<br>
 </p>
 <p style="margin-left: 40px;"><span class="heading2">Producer / Consumer lists</span>:
 these are the columns on the left and right side of the coupling

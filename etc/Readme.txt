@@ -1,6 +1,6 @@
 SIMBRAIN 3
 
-This is a second alpha version of Simbrain 3, a major refactoring and revision of Simbrain 2, with hundreds of new features.   
+This is a beta release of Simbrain 3, a major refactoring and revision of Simbrain 2, with hundreds of new features. This release is not compatible with previous alpha versions.  However, all simulations created with this beta release should be compatible with future beta releases and the final Simbrain 3 release.   
 
 RUNNING SIMBRAIN
 

@@ -8,13 +8,13 @@ This page is for those who want to contribute to Simbrain development. Notes for
 
 === Install eclipse checkstyle ===
 
-From eclipse click on Help > Software Updates
+From eclipse click on Help > Install New Software...
 
-Next click on Available Software and then Add Site and enter "http://eclipse-cs.sourceforge.net/update" in the Location: text field.
+Next click on the  Add button and enter "http://eclipse-cs.sourceforge.net/update" in the "Location" text field.  Enter a name for the configuration such as "Checkstyle"
 
 Click OK and then put a check mark next to the entry http://eclipse-cs.sourceforge.net/update in the list and click Install. 
 
-After the eclipse has finished checking the program for requirements and dependancies, click Next, accept the license agreement and click Finish.
+After Eclipse has finished checking the program for requirements and dependancies, click Next, accept the license agreement and click Finish.
 
 Finally, restart eclipse when prompted to do so by clicking Yes in the dialog box.
 
@@ -22,7 +22,7 @@ Finally, restart eclipse when prompted to do so by clicking Yes in the dialog bo
 
 Right click on the Simbrain project in the package explorer and select Properties and click on Checkstyle in the left frame.
 
-Select Local Check Configurations and click on New.
+Select the "Local Check Configurations" tab, and click on New.
 
 Select External Configuration File from the Type:  drop down menu. 
 
@@ -36,7 +36,7 @@ Finally click the check box labeled Checkstyle active for this project to activa
 
 === Eclipse Tabs to Spaces ===
 
-Since our checkstyle requires spaces, this has to be changed on Eclipse.  Here's an entry on how to do it:
+Since our checkstyle requires spaces, this may have to be changed in older versions of  Eclipse.  Here's an entry on how to do it:
 
 http://blog.dotkam.com/2007/03/21/changing-tabs-to-spaces-in-eclipse/
 
@@ -53,9 +53,9 @@ Make sure that the log4j jar file is listed. If it is not listed, add it to the 
 
 === Configure log4j ===
 
-Click on "Run" menu then go to "Run Configurations"   From here there are two cases:
+Click on the "Run" menu then go to "Run Configurations"   From here there are two cases:
 
-(If Running Simbrain for the first time, you must create a run configuraiton.  Double click on "Java Application" in the left frame. Change the name to something like "Simbrain" or some other descriptive term. Next under "Project:" heading click "Browse" and select the Simbrain project folder. Then under the "Main class:" heading type "org.simbrain.workspace.gui.Splasher")
+(If Running Simbrain for the first time, you must create a run configuration.  Double click on "Java Application" in the left frame. Change the name to something like "Simbrain" or some other descriptive term. Next under "Project:" heading click "Browse" and select the Simbrain project folder. Then under the "Main class:" heading type "org.simbrain.workspace.gui.Splasher")
 
 === Import log4j properties file ===
 
@@ -65,3 +65,7 @@ Assuming the Simbrain run configuration is selected from the left frame:
   # Click on the "Advanced" button on the right
   # Select "Add Folders" in the dialog and click "OK,"
   # Select the "etc" folder within the project directory. Click "OK" then "Apply" and run the project.
+
+=== Configure log4j file ===
+
+The log4j file  ({Simbrain}/etc/log4j.properties) can now be configured to show as much debug information as you like.  For more on log4j property file configuration see http://logging.apache.org/log4j/1.2/manual.html and http://jessehu.wordpress.com/2009/11/17/log4j-levels-all-trace-debug-info-warn-error-fatal-off/

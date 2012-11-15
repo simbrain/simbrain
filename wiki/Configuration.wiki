@@ -69,3 +69,15 @@ Assuming the Simbrain run configuration is selected from the left frame:
 === Configure log4j file ===
 
 The log4j file  ({Simbrain}/etc/log4j.properties) can now be configured to show as much debug information as you like.  For more on log4j property file configuration see http://logging.apache.org/log4j/1.2/manual.html and http://jessehu.wordpress.com/2009/11/17/log4j-levels-all-trace-debug-info-warn-error-fatal-off/
+
+By default logging is turned off in the properties file.  To see a bunch of debug information you can, for example, change this line
+
+{{{
+log4j.logger.org.simbrain=INFO
+}}}
+
+to
+
+{{{
+log4j.logger.org.simbrain=DEBUG
+}}}

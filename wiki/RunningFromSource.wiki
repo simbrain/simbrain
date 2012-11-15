@@ -57,3 +57,7 @@ For Windows users, the JAVA_HOME system variable must be set in order for ant to
   # Select the advanced tab (for Vista click the advanced system properties menu and click the advanced tab).
   # Under the system variables check to see if there is a JAVA_HOME variable.  If not, click the new button and enter JAVA_HOME for the variable name.
   # Enter the path the jdk folder (ex C:\Program Files\jdk) for the variable value.
+
+== Further Configuration ==
+
+For more on setting up your development environment see [Configuration] and [RunningSimbrainFromEclipse].

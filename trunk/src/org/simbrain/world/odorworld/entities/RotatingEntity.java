@@ -79,14 +79,22 @@ public class RotatingEntity extends OdorWorldEntity {
         }
         if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
-        } else if (entityType.equalsIgnoreCase("Cow")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("cow", 15);
-        } else if (entityType.equalsIgnoreCase("Arnold")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("arno", 55);
-        } else if (entityType.equalsIgnoreCase("Susi")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("susi", 55);
         } else if (entityType.equalsIgnoreCase("Amy")) {
             imageMap = RotatingEntityManager.getRotatingTileset("amy", 55);
+        } else if (entityType.equalsIgnoreCase("Arnold")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("arno", 55);
+        } else if (entityType.equalsIgnoreCase("Boy")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("boy", 25);
+        } else if (entityType.equalsIgnoreCase("Cow")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("cow", 15);
+        } else if (entityType.equalsIgnoreCase("Girl")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("girl", 25);
+        } else if (entityType.equalsIgnoreCase("Lion")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("lion", 25);
+        } else if (entityType.equalsIgnoreCase("Susi")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("susi", 55);
+        } else if (entityType.equalsIgnoreCase("Steve")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("steve", 25);
         }
         update(0);
     }
@@ -225,7 +233,7 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Amy", "Arnold", "Cow", "Mouse", "Susi" };
+                return new Object[] { "Amy", "Arnold", "Boy" ,"Cow",  "Girl" ,"Lion", "Mouse", "Susi",  "Steve"};
             }
         };
     }

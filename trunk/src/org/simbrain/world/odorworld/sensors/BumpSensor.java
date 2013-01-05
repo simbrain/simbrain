@@ -22,7 +22,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * Very simple bump sensor. Holding off on more sophisticated "touch" sensors in
- * case an existing¯ library can provide it.
+ * case an existing library can provide it.
  *
  * TODO: - Not tested yet Possible extensions: - location of bump sensor -
  * return vector represent impact on agent

@@ -892,13 +892,6 @@ public class Neuron {
     }
 
     /**
-     * @return the ruleList
-     */
-    public static ClassDescriptionPair[] getRuleList() {
-        return RULE_LIST;
-    }
-
-    /**
      * TODO: Possibly make this be a NeuronGroup. See design notes.
      *
      * @return the parentGroup

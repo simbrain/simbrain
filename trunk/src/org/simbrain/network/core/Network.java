@@ -666,7 +666,6 @@ public class Network {
 
     /**
      * Returns the "state" of the network--the activation level of its neurons.
-     * Used by the gauge component.
      *
      * @return an array representing the activation levels of all the neurons in
      *         this network

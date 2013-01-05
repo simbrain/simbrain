@@ -21,9 +21,12 @@ package org.simbrain.util.propertyeditor;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,7 +81,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /** If true, use superclass methods. */
     private boolean useSuperclass = true;
-    
+
     /**
      * Associate property names with JComponents that are used to set those
      * values.
@@ -178,8 +181,29 @@ public class ReflectivePropertyEditor extends JPanel {
      * Set up the main panel.
      */
     private void initPanel() {
-        for (final Method method : toEdit.getClass().getMethods()) {
 
+        // Sort methods by any display order annotations that might have been used
+        Method[] methods = toEdit.getClass().getMethods();
+        Arrays.sort(methods, new Comparator<Method>() {
+            @Override
+            public int compare(Method method1, Method method2) {
+                int int1 = 0;
+                int int2 = 0;
+                for (Annotation annotation : method1.getDeclaredAnnotations()) {
+                    if (annotation instanceof DisplayOrder) {
+                        int1 = ((DisplayOrder) annotation).val();
+                    }
+                }
+                for (Annotation annotation : method2.getDeclaredAnnotations()) {
+                    if (annotation instanceof DisplayOrder) {
+                        int2 = ((DisplayOrder) annotation).val();
+                    }
+                }
+                return Integer.compare(int1, int2);
+            }
+        });
+
+        for (final Method method : methods) {
             boolean inSuperClass = (method.getDeclaringClass() != toEdit
                     .getClass());
             // If useSuperClass is false, then if the method is in the base

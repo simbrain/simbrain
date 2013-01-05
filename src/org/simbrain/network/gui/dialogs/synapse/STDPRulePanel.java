@@ -37,7 +37,7 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     /** W minus. */
     private JTextField tfWMinus = new JTextField();
 
-    /** WÊplus. */
+    /** W plus. */
     private JTextField tfWPlus = new JTextField();
 
     /** Learning rate. */

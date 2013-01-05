@@ -25,53 +25,48 @@ package org.simbrain.util.projection;
  * it just takes a 2-dimensional subspace of the high-dimensional space.
  */
 public class ProjectCoordinate extends ProjectionMethod {
+
+  /** Coordinate Projection Settings. */
+  private int hiD1 = ProjectorPreferences.getHiDim1();
+
+  /** Coordinate Projection Settings. */
+  private int hiD2 = ProjectorPreferences.getHiDim2();
+
+  /** Automatically use most variant dimensions. */
+  private boolean autoFind = ProjectorPreferences.getAutoFind();
+
     /**
      * Default projector coordinate constructor.
      */
-    public ProjectCoordinate() {
+    public ProjectCoordinate(Projector projector) {
+        super(projector);
     }
 
-    /**
-     * ProjectionMethod coordinate constructor.
-     *
-     * @param set ProjectionMethod setting
-     */
-    public ProjectCoordinate(final Settings set) {
-        theSettings = set;
-    }
+    @Override
+    public void init() {
+        //super.init(up, down);
 
-    /**
-     * Initializes the coordinage dataset.
-     *
-     * @param up Upper data set
-     * @param down Lower data set
-     */
-    public void init(final Dataset up, final Dataset down) {
-        super.init(up, down);
-
-        if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind())) {
-            theSettings.setHiD1(upstairs.getKthVariantDimension(1));
-            theSettings.setHiD2(upstairs.getKthVariantDimension(2));
+        if ((projector.getUpstairs().getNumPoints() > 1) && (autoFind)) {
+            hiD1 = projector.getUpstairs().getKthVariantDimension(1);
+            hiD2 = projector.getUpstairs().getKthVariantDimension(2);
         }
 
         checkCoordinates();
     }
 
-    /**
-     * Project data points.
-     */
+    @Override
     public void project() {
-        if (upstairs.getNumPoints() < 1) {
+        if (projector.getUpstairs().getNumPoints() < 1) {
             return;
         }
 
         checkCoordinates();
 
-        for (int i = 0; i < upstairs.getNumPoints(); i++) {
+        for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
             double[] newLowDPoint = {
-                    upstairs.getComponent(i, theSettings.getHiD1()),
-                    upstairs.getComponent(i, theSettings.getHiD2()) };
-            downstairs.setPoint(i, newLowDPoint);
+                    projector.getUpstairs().getComponent(i, hiD1),
+                    projector.getUpstairs().getComponent(i, hiD2) };
+            projector.getDownstairs().getPoint(i).setData(newLowDPoint);
         }
 
         // System.out.println("-->" + hi_d1);
@@ -83,90 +78,55 @@ public class ProjectCoordinate extends ProjectionMethod {
      * acceptable values (currently 0 and 1).
      */
     public void checkCoordinates() {
-        if (theSettings.getHiD1() >= upstairs.getDimensions()) {
-            theSettings.setHiD1(0);
+        if (hiD1 >= projector.getUpstairs().getDimensions()) {
+            hiD1 = 0;
         }
 
-        if (theSettings.getHiD2() >= upstairs.getDimensions()) {
-            theSettings.setHiD2(1);
+        if (hiD2 >= projector.getUpstairs().getDimensions()) {
+            hiD2 = 1;
         }
     }
 
-    /**
-     * @return Return project is extendable.
-     */
-    public boolean isExtendable() {
-        return true;
-    }
 
     /**
-     * @return Returns project is iterable
-     */
-    public boolean isIterable() {
-        return false;
-    }
-
-    /**
-     * @return default times to iterate.
-     */
-    public double iterate() {
-        return 0;
-    }
-
-    /**
-     * @return the first coordinate projected onto
+     * @return the hiD1
      */
     public int getHiD1() {
-        return theSettings.getHiD1();
+        return hiD1;
     }
 
     /**
-     * @return the second coordinate projected onto
+     * @param hiD1 the hiD1 to set
+     */
+    public void setHiD1(int hiD1) {
+        this.hiD1 = hiD1;
+    }
+
+    /**
+     * @return the hiD2
      */
     public int getHiD2() {
-        return theSettings.getHiD2();
+        return hiD2;
     }
 
     /**
-     * @param i the first coordinate to project onto
+     * @param hiD2 the hiD2 to set
      */
-    public void setHiD1(final int i) {
-        checkCoordinates();
-        theSettings.setHiD1(i);
+    public void setHiD2(int hiD2) {
+        this.hiD2 = hiD2;
     }
 
     /**
-     * @param i the second coordinate to project onto
-     */
-    public void setHiD2(final int i) {
-        checkCoordinates();
-        theSettings.setHiD2(i);
-    }
-
-    /**
-     * In auto-find the projection automatically uses the most variant
-     * dimensions.
-     *
-     * @return true if in auto-find mode, false otherwise
+     * @return the autoFind
      */
     public boolean isAutoFind() {
-        return theSettings.isAutoFind();
+        return autoFind;
     }
 
     /**
-     * In auto-find the projection automatically uses the most variant
-     * dimensions.
-     *
-     * @param b whether to use auto-find mode
+     * @param autoFind the autoFind to set
      */
-    public void setAutoFind(final boolean b) {
-        theSettings.setAutoFind(b);
-    }
-
-    /**
-     * @see ProjectionMethod
-     */
-    public boolean hasDialog() {
-        return true;
+    public void setAutoFind(boolean autoFind) {
+        this.autoFind = autoFind;
     }
 }

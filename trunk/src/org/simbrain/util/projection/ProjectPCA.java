@@ -30,33 +30,26 @@ import Jama.Matrix;
 public class ProjectPCA extends ProjectionMethod {
 
     /**
-     * Defalut PCA project.
+     * Default PCA project.
      */
-    public ProjectPCA() {
+    public ProjectPCA(Projector projector) {
+        super(projector);
     }
 
-    /**
-     * PCA project.
-     *
-     * @param set Project Settings
-     */
-    public ProjectPCA(final Settings set) {
-        theSettings = set;
-    }
-
-    /**
-     * Projects data points.
-     */
+    @Override
     public void project() {
-        if (upstairs.getNumPoints() < 1) {
+        if (projector.getUpstairs() == null) {
+            return;
+        }
+        if (projector.getUpstairs().getNumPoints() < 1) {
             return;
         }
 
-        int lowdim = downstairs.getDimensions();
-        int updim = upstairs.getDimensions();
+        int lowdim = projector.getDownstairs().getDimensions();
+        int updim = projector.getUpstairs().getDimensions();
 
         // Get e-vals and e-vectors of covariance matrix
-        Matrix m = upstairs.getCovarianceMatrix();
+        Matrix m = projector.getUpstairs().getCovarianceMatrix();
         EigenvalueDecomposition ed = m.eig();
         Matrix eVecs = ed.getV().transpose();
         double[] evalsArray = ed.getRealEigenvalues();
@@ -92,49 +85,27 @@ public class ProjectPCA extends ProjectionMethod {
             }
         }
 
-        downstairs.clear();
+        projector.getDownstairs().clear();
 
         // printMatrix(matrix_projector);
         // project the points along the principal components
-        for (int i = 0; i < upstairs.getNumPoints(); i++) {
+        for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
             Matrix uppoint = new Matrix(updim, 1);
 
             for (int j = 0; j < updim; ++j) {
-                uppoint.set(j, 0, upstairs.getComponent(i, j));
+                uppoint.set(j, 0, projector.getUpstairs().getComponent(i, j));
             }
 
             Matrix lowpoint = matrixProjector.times(uppoint);
             double[] columnPackedCopy = lowpoint.getColumnPackedCopy();
 
-            downstairs.addPoint(columnPackedCopy);
+            projector.getDownstairs().addPoint(new DataPoint(columnPackedCopy));
         }
     }
 
-    /**
-     * @return is projector extendable.
-     */
-    public boolean isExtendable() {
-        return true;
+    @Override
+    public void init() {
+        // TODO Auto-generated method stub
     }
 
-    /**
-     * @return is project iterable.
-     */
-    public boolean isIterable() {
-        return false;
-    }
-
-    /**
-     * @return default times to iterate.
-     */
-    public double iterate() {
-        return 0;
-    }
-
-    /**
-     * @see ProjectionMethod
-     */
-    public boolean hasDialog() {
-        return false;
-    }
 }

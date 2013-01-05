@@ -23,30 +23,26 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * <b>GaugePreferences</b> handles storage and retrieval of user preferences,
- * e.g. background color for the GaugePanel, point size, etc.
+ * <b>ProjectionPreferences</b> handles storage and retrieval of user preferences for
+ * projections.
  */
-public final class GaugePreferences {
-
-    /**
-     * Private constructor prevents instantiation.
-     */
-    private GaugePreferences() {
-        /* no implementation */
-    }
+public final class ProjectorPreferences {
 
     /** The default tolerance. */
-    private static final double DEFAULT_TOLERANCE = .5;
+    private static final double DEFAULT_TOLERANCE = 5;
+
     /** The default perturbation. */
     private static final double DEFAULT_PERTURBATION = .1;
+
     /** The default iterations between updates. */
     private static final int DEFAULT_ITERATIONS_BETWEEN_UPDATES = 10;
+
     /** The default epsilon. */
     private static final int DEFAULT_EPSILON = 3;
 
     /** User preferences. */
-    private static final Preferences GAUGE_PREFERENCES = Preferences.userRoot()
-            .node("/org/simbrain/gauge");
+    private static final Preferences PROJECTION_PREFERENCES = Preferences.userRoot()
+            .node("/org/simbrain/util/projection");
 
     /** File system separator. */
     public static final String FS = System.getProperty("file.separator");
@@ -56,7 +52,7 @@ public final class GaugePreferences {
      */
     public static void saveAll() {
         try {
-            GAUGE_PREFERENCES.flush();
+            PROJECTION_PREFERENCES.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
@@ -69,7 +65,7 @@ public final class GaugePreferences {
         setPerturbationAmount(getDefaultPerturbationAmount());
         setTolerance(getDefaultTolerance());
         setAddMethod(getDefaultAddMethod());
-        setDefaultProjector(getDefaultDefaultProjector());
+        setDefaultProjectionMethod(getDefaultDefaultProjector());
         setCurrentDirectory(getDefaultCurrentDirectory());
     }
 
@@ -113,14 +109,14 @@ public final class GaugePreferences {
      * @param rgbColor Sets Background color.
      */
     public static void setBackgroundColor(final int rgbColor) {
-        GAUGE_PREFERENCES.putInt("BackgroundColor", rgbColor);
+        PROJECTION_PREFERENCES.putInt("BackgroundColor", rgbColor);
     }
 
     /**
      * @return Current background color.
      */
     public static int getBackgroundColor() {
-        return GAUGE_PREFERENCES.getInt("BackgroundColor",
+        return PROJECTION_PREFERENCES.getInt("BackgroundColor",
                 getDefaultBackgroundColor());
     }
 
@@ -135,14 +131,14 @@ public final class GaugePreferences {
      * @param rgbColor Sets hot color.
      */
     public static void setHotColor(final int rgbColor) {
-        GAUGE_PREFERENCES.putInt("HotColor", rgbColor);
+        PROJECTION_PREFERENCES.putInt("HotColor", rgbColor);
     }
 
     /**
      * @return Current hot color.
      */
     public static int getHotColor() {
-        return GAUGE_PREFERENCES.getInt("HotColor", getDefaultHotColor());
+        return PROJECTION_PREFERENCES.getInt("HotColor", getDefaultHotColor());
     }
 
     /**
@@ -156,14 +152,14 @@ public final class GaugePreferences {
      * @param rgbColor Sets default color.
      */
     public static void setDefaultColor(final int rgbColor) {
-        GAUGE_PREFERENCES.putInt("DefaultColor", rgbColor);
+        PROJECTION_PREFERENCES.putInt("DefaultColor", rgbColor);
     }
 
     /**
      * @return Default color.
      */
     public static int getDefaultColor() {
-        return GAUGE_PREFERENCES.getInt("DefaultColor",
+        return PROJECTION_PREFERENCES.getInt("DefaultColor",
                 getDefaultDefaultColor());
     }
 
@@ -178,14 +174,14 @@ public final class GaugePreferences {
      * @param tolerance Sets tolerance.
      */
     public static void setTolerance(final double tolerance) {
-        GAUGE_PREFERENCES.putDouble("Tolerance", tolerance);
+        PROJECTION_PREFERENCES.putDouble("Tolerance", tolerance);
     }
 
     /**
      * @return Tolerance.
      */
     public static double getTolerance() {
-        return GAUGE_PREFERENCES.getDouble("Tolerance", getDefaultTolerance());
+        return PROJECTION_PREFERENCES.getDouble("Tolerance", getDefaultTolerance());
     }
 
     /**
@@ -199,14 +195,14 @@ public final class GaugePreferences {
      * @param amount Sets pertubation amount.
      */
     public static void setPerturbationAmount(final double amount) {
-        GAUGE_PREFERENCES.putDouble("PerturbationAmount", amount);
+        PROJECTION_PREFERENCES.putDouble("PerturbationAmount", amount);
     }
 
     /**
      * @return Current perturbation amount.
      */
     public static double getPerturbationAmount() {
-        return GAUGE_PREFERENCES.getDouble("PerturbationAmount",
+        return PROJECTION_PREFERENCES.getDouble("PerturbationAmount",
                 getDefaultPerturbationAmount());
     }
 
@@ -221,14 +217,14 @@ public final class GaugePreferences {
      * @param error Sets show error.
      */
     public static void setShowError(final boolean error) {
-        GAUGE_PREFERENCES.putBoolean("ShowError", error);
+        PROJECTION_PREFERENCES.putBoolean("ShowError", error);
     }
 
     /**
      * @return Current show error value.
      */
     public static boolean getShowError() {
-        return GAUGE_PREFERENCES.getBoolean("ShowError", getDefaultShowError());
+        return PROJECTION_PREFERENCES.getBoolean("ShowError", getDefaultShowError());
     }
 
     /**
@@ -242,14 +238,14 @@ public final class GaugePreferences {
      * @param statusBar Sets show status bar.
      */
     public static void setShowStatusBar(final boolean statusBar) {
-        GAUGE_PREFERENCES.putBoolean("ShowStatusBar", statusBar);
+        PROJECTION_PREFERENCES.putBoolean("ShowStatusBar", statusBar);
     }
 
     /**
      * @return Current set status bar value.
      */
     public static boolean getShowStatusBar() {
-        return GAUGE_PREFERENCES.getBoolean("ShowStatusBar",
+        return PROJECTION_PREFERENCES.getBoolean("ShowStatusBar",
                 getDefaultShowStatusBar());
     }
 
@@ -264,14 +260,14 @@ public final class GaugePreferences {
      * @param dataPoints Sets color data points.
      */
     public static void setColorDataPoints(final boolean dataPoints) {
-        GAUGE_PREFERENCES.putBoolean("ColorDataPoints", dataPoints);
+        PROJECTION_PREFERENCES.putBoolean("ColorDataPoints", dataPoints);
     }
 
     /**
      * @return Current color data points value.
      */
     public static boolean getColorDataPoints() {
-        return GAUGE_PREFERENCES.getBoolean("ColorDataPoints",
+        return PROJECTION_PREFERENCES.getBoolean("ColorDataPoints",
                 getDefaultColorDataPoints());
     }
 
@@ -286,14 +282,14 @@ public final class GaugePreferences {
      * @param size Sets the size of data points.
      */
     public static void setPointSize(final double size) {
-        GAUGE_PREFERENCES.putDouble("PointSize", size);
+        PROJECTION_PREFERENCES.putDouble("PointSize", size);
     }
 
     /**
      * @return Current point size.
      */
     public static double getPointSize() {
-        return GAUGE_PREFERENCES.getDouble("PointSize", getDefaultPointSize());
+        return PROJECTION_PREFERENCES.getDouble("PointSize", getDefaultPointSize());
     }
 
     /**
@@ -307,14 +303,14 @@ public final class GaugePreferences {
      * @param iterations Sets number of iterations between updates.
      */
     public static void setIterationsBetweenUpdates(final int iterations) {
-        GAUGE_PREFERENCES.putInt("IterationsBetweenUpdates", iterations);
+        PROJECTION_PREFERENCES.putInt("IterationsBetweenUpdates", iterations);
     }
 
     /**
      * @return Current number of iterations between updates.
      */
     public static int getIterationsBetweenUpdates() {
-        return GAUGE_PREFERENCES.getInt("IterationsBetweenUptates",
+        return PROJECTION_PREFERENCES.getInt("IterationsBetweenUptates",
                 getDefaultIterationsBetweenUpdates());
     }
 
@@ -329,14 +325,14 @@ public final class GaugePreferences {
      * @param epsilon Sets epsilon value.
      */
     public static void setEpsilon(final double epsilon) {
-        GAUGE_PREFERENCES.putDouble("Epsilon", epsilon);
+        PROJECTION_PREFERENCES.putDouble("Epsilon", epsilon);
     }
 
     /**
      * @return Current epsilon value.
      */
     public static double getEpsilon() {
-        return GAUGE_PREFERENCES.getDouble("Epsilon", getDefaultEpsilon());
+        return PROJECTION_PREFERENCES.getDouble("Epsilon", getDefaultEpsilon());
     }
 
     /**
@@ -350,14 +346,14 @@ public final class GaugePreferences {
      * @param dim Sets high dimension 1 value.
      */
     public static void setHiDim1(final int dim) {
-        GAUGE_PREFERENCES.putInt("HiDim1", dim);
+        PROJECTION_PREFERENCES.putInt("HiDim1", dim);
     }
 
     /**
      * @return Current high dimension 1 value.
      */
     public static int getHiDim1() {
-        return GAUGE_PREFERENCES.getInt("HiDim1", getDefaultHiDim1());
+        return PROJECTION_PREFERENCES.getInt("HiDim1", getDefaultHiDim1());
     }
 
     /**
@@ -371,14 +367,14 @@ public final class GaugePreferences {
      * @param dim Sets high dimension 2 value.
      */
     public static void setHiDim2(final int dim) {
-        GAUGE_PREFERENCES.putInt("HiDim2", dim);
+        PROJECTION_PREFERENCES.putInt("HiDim2", dim);
     }
 
     /**
      * @return Current high dimension 2 value.
      */
     public static int getHiDim2() {
-        return GAUGE_PREFERENCES.getInt("HiDim2", getDefaultHiDim2());
+        return PROJECTION_PREFERENCES.getInt("HiDim2", getDefaultHiDim2());
     }
 
     /**
@@ -392,14 +388,14 @@ public final class GaugePreferences {
      * @param autoFind Sets auto find value.
      */
     public static void setAutoFind(final boolean autoFind) {
-        GAUGE_PREFERENCES.putBoolean("AutoFind", autoFind);
+        PROJECTION_PREFERENCES.putBoolean("AutoFind", autoFind);
     }
 
     /**
      * @return Current auto find value.
      */
     public static boolean getAutoFind() {
-        return GAUGE_PREFERENCES.getBoolean("AutoFind", getDefaultAutoFind());
+        return PROJECTION_PREFERENCES.getBoolean("AutoFind", getDefaultAutoFind());
     }
 
     /**
@@ -413,14 +409,14 @@ public final class GaugePreferences {
      * @param addMethod Sets current add method value.
      */
     public static void setAddMethod(final String addMethod) {
-        GAUGE_PREFERENCES.put("AddMethod", addMethod);
+        PROJECTION_PREFERENCES.put("AddMethod", addMethod);
     }
 
     /**
      * @return Current add method value.
      */
     public static String getAddMethod() {
-        return GAUGE_PREFERENCES.get("AddMethod", getDefaultAddMethod());
+        return PROJECTION_PREFERENCES.get("AddMethod", getDefaultAddMethod());
     }
 
     /**
@@ -433,15 +429,15 @@ public final class GaugePreferences {
     /**
      * @param defaultProjector Sets default projector value.
      */
-    public static void setDefaultProjector(final String defaultProjector) {
-        GAUGE_PREFERENCES.put("DefaultProjector", defaultProjector);
+    public static void setDefaultProjectionMethod(final String defaultProjector) {
+        PROJECTION_PREFERENCES.put("DefaultProjector", defaultProjector);
     }
 
     /**
      * @return Current default projector value.
      */
-    public static String getDefaultProjector() {
-        return GAUGE_PREFERENCES.get("DefaultProjector",
+    public static String getDefaultProjectionMethod() {
+        return PROJECTION_PREFERENCES.get("DefaultProjector",
                 getDefaultDefaultProjector());
     }
 
@@ -456,14 +452,14 @@ public final class GaugePreferences {
      * @param dir Sets current directory value.
      */
     public static void setCurrentDirectory(final String dir) {
-        GAUGE_PREFERENCES.put("CurrentDirectory", dir);
+        PROJECTION_PREFERENCES.put("CurrentDirectory", dir);
     }
 
     /**
      * @return Current directory value.
      */
     public static String getCurrentDirectory() {
-        return GAUGE_PREFERENCES.get("CurrentDirectory",
+        return PROJECTION_PREFERENCES.get("CurrentDirectory",
                 getDefaultCurrentDirectory());
     }
 
@@ -472,6 +468,6 @@ public final class GaugePreferences {
      *
      */
     public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "gauges";
+        return "." + FS + "simulations";
     }
 }

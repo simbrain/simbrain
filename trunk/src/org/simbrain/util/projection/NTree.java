@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.util.projection;
 
 import java.util.ArrayList;
@@ -11,7 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * An n-dimensional generalization of a simple QuadTree structure This is a
+ * An n-dimensional generalization of a simple QuadTree structure. This is a
  * binary tree that splits elements based on successive dimensions, repeating as
  * necessary. There are two types of nodes in the structure, branches and
  * leaves. The leaf nodes are a n-dimensional 'space' that contains a number of
@@ -33,36 +51,36 @@ import org.apache.log4j.Logger;
  *
  * @author James Matthew Watson - July 2, 2007
  */
-public class NTree implements Iterable<double[]> {
+public class NTree implements Iterable<DataPoint> {
 
-    /** the number of elements to allow in a leaf before splitting */
+    /** The number of elements to allow in a leaf before splitting */
     static final int MAX = 50; /*
                                 * determined ad hoc testing and hand-waving
                                 * optimization theories
                                 */
 
-    /** the static logger for this class */
+    /** The static logger for this class */
     private static final Logger LOGGER = Logger.getLogger(NTree.class);
 
-    /** an instance specific logger */
+    /** An instance specific logger */
     private Logger logger = LOGGER;
 
-    /** an enumeration for quick switching on the node type */
+    /** An enumeration for quick switching on the node type */
     private enum Type {
         branch, leaf
     };
 
-    /** the root node, initialized to a leaf */
+    /** The root node, initialized to a leaf */
     private Node root = new Leaf();
 
-    /** the number of dimensions this structure supports */
+    /** The number of dimensions this structure supports */
     public final int dimensions;
 
-    /** indexed list of all elements */
-    private List<double[]> list = new ArrayList<double[]>();
+    /** Indexed list of all elements */
+    private List<DataPoint> list = new ArrayList<DataPoint>();
 
-    /** map of all elements mapped to their leafs */
-    private Map<double[], Leaf> all = new LinkedHashMap<double[], Leaf>();
+    /** Map of all elements mapped to their leafs */
+    private Map<DataPoint, Leaf> all = new LinkedHashMap<DataPoint, Leaf>();
 
     /**
      * Constructs an NTree with the given number of dimensions
@@ -76,7 +94,7 @@ public class NTree implements Iterable<double[]> {
     }
 
     /**
-     * returns the number of points in the tree
+     * Returns the number of points in the tree.
      *
      * @return the number of points in the tree
      */
@@ -85,20 +103,24 @@ public class NTree implements Iterable<double[]> {
     }
 
     /**
-     * Adds a point to the set
+     * Adds a point to the set.
      *
      * @param point the point to add
+     * @return
      */
-    public boolean add(double[] point) {
-        if (logger.isDebugEnabled())
-            logger.debug("adding point " + toString(point));
-        /* keeps track of the most recent parent branch, if any */
+    public DataPoint add(DataPoint point) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("adding point " + point);
+        }
+
+        /* Keeps track of the most recent parent branch, if any */
         Branch parent = null;
-        /* the current node in the search, initialized to the root */
+
+        /* The current node in the search, initialized to the root */
         Node current = root;
         /*
-         * keeps track of whether the current node is on the left or right of
-         * it's parent
+         * Keeps track of whether the current node is on the left or right of
+         * it's parent.
          */
         boolean onLeft = true;
 
@@ -107,32 +129,32 @@ public class NTree implements Iterable<double[]> {
          * left or right based on the midpoint of the branches split dimension.
          */
         while (current.type == Type.branch) {
-            /* cast current to Branch and set the parent */
+            /* Cast current to Branch and set the parent */
             Branch branch = (Branch) current;
             parent = branch;
 
-            if (point[branch.splitDimension] < branch.midPoint) {
+            if (point.get(branch.splitDimension) < branch.midPoint) {
                 if (logger.isDebugEnabled())
                     logger.debug("at branch : " + branch + " - going left");
-                /* to the left */
+                /* To the left */
                 current = branch.left;
                 onLeft = true;
             } else {
                 if (logger.isDebugEnabled())
                     logger.debug("at branch : " + branch + " - going right");
-                /* to the right */
+                /* To the right */
                 current = branch.right;
                 onLeft = false;
             }
         }
 
-        /* cast the current node to a leaf */
+        /* Cast the current node to a leaf */
         Leaf leaf = (Leaf) current;
 
         if (logger.isDebugEnabled())
             logger.debug("adding point to leaf : " + leaf);
 
-        /* add the point to the leaf and the list and map */
+        /* Add the point to the leaf and the list and map */
         leaf.points.add(point);
         list.add(point);
         all.put(point, leaf);
@@ -153,31 +175,31 @@ public class NTree implements Iterable<double[]> {
             if (logger.isDebugEnabled())
                 logger.debug("splitting leaf on dimension: " + splitOn);
 
-            /* get the middle point index */
+            /* Get the middle point index */
             int middle = size / 2;
             if (logger.isTraceEnabled())
                 logger.trace("middle: " + middle);
 
-            /* sort the points based on the split dimension */
+            /* Sort the points based on the split dimension */
             Collections.sort(leaf.points, new PointComparator(splitOn));
 
             /*
-             * take the right most point on the left the left most point on the
+             * Take the right most point on the left the left most point on the
              * right
              */
-            double[] leftPoint = leaf.points.get(middle);
+            DataPoint leftPoint = leaf.points.get(middle);
             if (logger.isTraceEnabled())
-                logger.trace("leftPoint: " + toString(leftPoint));
+                logger.trace("leftPoint: " + leftPoint);
 
-            double[] rightPoint = leaf.points.get(middle + 1);
+            DataPoint rightPoint = leaf.points.get(middle + 1);
             if (logger.isTraceEnabled())
-                logger.trace("rightPoint: " + toString(rightPoint));
+                logger.trace("rightPoint: " + rightPoint);
 
             /*
-             * get the average between the points on the split dimension. this
+             * Get the average between the points on the split dimension. this
              * is the midpoint
              */
-            double midPoint = (leftPoint[splitOn] + rightPoint[splitOn]) / 2;
+            double midPoint = (leftPoint.get(splitOn) + rightPoint.get(splitOn)) / 2;
             if (logger.isTraceEnabled())
                 logger.trace("midPoint: " + midPoint);
 
@@ -190,28 +212,28 @@ public class NTree implements Iterable<double[]> {
 
             /* loop through all the points and add to the appropriate leaf */
             for (int i = 0; i < size; i++) {
-                double[] p = leaf.points.get(i);
+                DataPoint p = leaf.points.get(i);
 
-                if (p[splitOn] < midPoint) {
+                if (p.get(splitOn) < midPoint) {
                     if (logger.isTraceEnabled())
-                        logger.trace("adding to left: " + toString(p));
+                        logger.trace("adding to left: " + p);
                     left.points.add(p);
                     all.put(p, left);
                 } else {
                     if (logger.isTraceEnabled())
-                        logger.trace("adding to right: " + toString(p));
+                        logger.trace("adding to right: " + p);
                     right.points.add(p);
                     all.put(p, right);
                 }
             }
 
-            /* set the new braches */
+            /* set the new branches */
             newBranch.left = left;
             newBranch.right = right;
 
             /*
-             * set the brach on it's parent, unless there is none: then it's the
-             * new root
+             * Set the branch on it's parent, unless there is none: then it's
+             * the new root
              */
             if (parent == null) {
                 if (logger.isTraceEnabled())
@@ -228,30 +250,15 @@ public class NTree implements Iterable<double[]> {
             }
         }
 
-        /* this method should always return true unless an exception is thrown */
-        return true;
-    }
-
-    /**
-     * pretty prints the point
-     */
-    private String toString(double[] point) {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < point.length; i++) {
-            builder.append(point[i]);
-            if (i < point.length - 1)
-                builder.append(", ");
-        }
-
-        return builder.toString();
+        return null;
     }
 
     /**
      * Comparator used to compare two points on a single dimension
      */
-    private static final class PointComparator implements Comparator<double[]> {
-        /** the dimension to compare on */
+    private static final class PointComparator implements Comparator<DataPoint> {
+
+        /** The dimension to compare on */
         final int dimension;
 
         /**
@@ -266,8 +273,8 @@ public class NTree implements Iterable<double[]> {
         /**
          * compares two points on one dimension
          */
-        public int compare(double[] o1, double[] o2) {
-            double difference = o1[dimension] - o2[dimension];
+        public int compare(DataPoint o1, DataPoint o2) {
+            double difference = o1.get(dimension) - o2.get(dimension);
             if (difference < 0) {
                 return -1;
             } else if (difference > 0) {
@@ -283,19 +290,19 @@ public class NTree implements Iterable<double[]> {
      * @param index of element to return.
      * @return Array of element at index location
      */
-    public double[] get(final int index) {
+    public DataPoint get(final int index) {
         return list.get(index);
     }
 
     /**
-     * checks whether the given point already exists in the tree with the
+     * Checks whether the given point already exists in the tree with the
      * specified tolerance.
      *
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
      * @return whether the point is unique
      */
-    public boolean isUnique(final double[] point, final double tolerance) {
+    public DataPoint isUnique(final DataPoint point, final double tolerance) {
         return isUnique(root, point, tolerance);
     }
 
@@ -308,11 +315,10 @@ public class NTree implements Iterable<double[]> {
      * @param tolerance the tolerance for determining uniqueness
      * @return whether the point is unique
      */
-    private boolean isUnique(Node from, double[] point, double tolerance) {
+    private DataPoint isUnique(Node from, DataPoint point, double tolerance) {
 
         if (logger.isDebugEnabled())
-            logger.debug("is unique? tolerance " + tolerance + " - "
-                    + toString(point));
+            logger.debug("is unique? tolerance " + tolerance + " - " + point);
 
         /* loop over the from node while it's a branch */
         while (from.type == Type.branch) {
@@ -320,19 +326,28 @@ public class NTree implements Iterable<double[]> {
             /* cast to a branch */
             Branch branch = (Branch) from;
             /* get the split dimension */
-            double d = point[branch.splitDimension];
+            double d = point.get(branch.splitDimension);
 
             /*
-             * if the point is within tolerance of the split, recurse both paths
-             * otherwise continue braching
+             * If the point is within tolerance of the split, recurse both paths
+             * otherwise continue branching
              */
             if (Math.abs(d - branch.midPoint) < tolerance) {
                 if (logger.isDebugEnabled())
                     logger.debug("at branch : " + branch
                             + " - recursing both paths");
-                return isUnique(branch.left, point, tolerance)
-                        && isUnique(branch.right, point, tolerance);
-            } else if (point[branch.splitDimension] < branch.midPoint) {
+                DataPoint leftCheck = isUnique(branch.left, point, tolerance);
+                DataPoint rightCheck = isUnique(branch.right, point, tolerance);
+                if ((leftCheck == null) && (rightCheck == null)) {
+                    return null;
+                } else {
+                    if (leftCheck != null) {
+                        return leftCheck;
+                    } else {
+                        return rightCheck;
+                    }
+                }
+            } else if (point.getVector()[branch.splitDimension] < branch.midPoint) {
                 if (logger.isDebugEnabled())
                     logger.debug("at branch : " + branch + " - going left");
                 from = branch.left;
@@ -351,45 +366,45 @@ public class NTree implements Iterable<double[]> {
          * a tolerance of the given point, check the distance. otherwise, the
          * point cannot be within a tolerance distance of the given point.
          */
-        for (double[] p : leaf.points) {
-            for (int i = 0; i < p.length; i++) {
-                if (Math.abs(p[i] - point[i]) >= tolerance) {
+        for (DataPoint p : leaf.points) {
+            for (int i = 0; i < p.getDimension(); i++) {
+                if (Math.abs(p.get(i) - point.get(i)) >= tolerance) {
                     break;
                 }
             }
 
-            /* if the distance is less than tolerance, this point is not unique */
+            /* If the distance is less than tolerance, this point is not unique */
             if (getDistance(p, point) < tolerance) {
-                return false;
+                return p;
             }
         }
 
         /*
-         * All possiblities in the current path have been exhausted and no dupes
-         * were found.
+         * All possibilities in the current path have been exhausted and no
+         * duplicates were found.
          */
-        return true;
+        return null;
     }
 
     /**
-     * determines the euclidean distance between two points.
+     * Determines the Euclidean distance between two points.
      *
      * @param a First point of distance
      * @param b Second point of distance
      *
      * @return the Euclidean distance between points 1 and 2
      */
-    public static double getDistance(final double[] a, final double[] b) {
-        if (a.length != b.length) {
+    public static double getDistance(final DataPoint a, final DataPoint b) {
+        if (a.getDimension() != b.getDimension()) {
             throw new IllegalArgumentException(
                     "points of different dimensions cannot be compared: "
-                            + a.length + ", " + b.length);
+                            + a.getDimension() + ", " + b.getDimension());
         }
 
         double sum = 0;
 
-        for (int i = 0; i < a.length; i++) {
-            double difference = a[i] - b[i];
+        for (int i = 0; i < a.getDimension(); i++) {
+            double difference = a.getVector()[i] - b.getVector()[i];
             sum += (difference * difference);
         }
 
@@ -397,15 +412,15 @@ public class NTree implements Iterable<double[]> {
     }
 
     /**
-     * gets the closest points to the passed in point. The amount of points to
+     * Gets the closest points to the passed in point. The amount of points to
      * determine is specified by the number argument
      *
      * @param number the number of points to collect
      * @param point the point to find points close to
      * @return the closest points
      */
-    public List<double[]> getClosestPoints(int number, double[] point) {
-        List<double[]> points = new ArrayList<double[]>();
+    public List<DataPoint> getClosestPoints(int number, DataPoint point) {
+        List<DataPoint> points = new ArrayList<DataPoint>();
         for (DistancePoint dp : getClosestPoints(root, number, point)) {
             points.add(dp.point);
         }
@@ -414,7 +429,7 @@ public class NTree implements Iterable<double[]> {
     }
 
     /**
-     * gets the closest points to the passed in point. The amount of points to
+     * Gets the closest points to the passed in point. The amount of points to
      * determine is specified by the number argument
      *
      * @param from then node to start from
@@ -423,7 +438,7 @@ public class NTree implements Iterable<double[]> {
      * @return the closest points
      */
     private List<DistancePoint> getClosestPoints(Node from, int number,
-            double[] point) {
+            DataPoint point) {
         List<DistancePoint> points;
 
         /*
@@ -434,11 +449,11 @@ public class NTree implements Iterable<double[]> {
             /* cast to Branch */
             Branch branch = (Branch) from;
             /* the point's value on the splitDimension */
-            double d = point[branch.splitDimension];
+            double d = point.get(branch.splitDimension);
             /* determine whether the normal path is left or right */
             boolean left = d < branch.midPoint;
 
-            /* recurse on brach determined above */
+            /* recurse on branch determined above */
             points = getClosestPoints(left ? branch.left : branch.right,
                     number, point);
 
@@ -474,7 +489,7 @@ public class NTree implements Iterable<double[]> {
              * loop over the points in the leaf adding any that are less than
              * the current or adding if there are less than n
              */
-            for (double[] d : leaf.points) {
+            for (DataPoint d : leaf.points) {
                 double distance = getDistance(d, point);
 
                 for (int i = 0; i < number; i++) {
@@ -496,13 +511,13 @@ public class NTree implements Iterable<double[]> {
      */
     private static class DistancePoint {
         double distance;
-        double[] point;
+        DataPoint point;
 
         /**
          * @param distance the distance to the given point
          * @param point a point
          */
-        DistancePoint(final double distance, final double[] point) {
+        DistancePoint(final double distance, final DataPoint point) {
             this.distance = distance;
             this.point = point;
         }
@@ -514,17 +529,17 @@ public class NTree implements Iterable<double[]> {
      * @param point
      * @return the point closest to the given point
      */
-    public double[] getClosestPoint(final double[] point) {
+    public DataPoint getClosestPoint(final DataPoint point) {
         return getClosestPoints(1, point).get(0);
     }
 
     /**
-     * Returns the insdex for the given point.
+     * Returns the index for the given point.
      *
      * @param point the point to lookup
      * @return the index of that point
      */
-    public int getIndex(double[] point) {
+    public int getIndex(DataPoint point) {
         return list.indexOf(point);
     }
 
@@ -533,8 +548,8 @@ public class NTree implements Iterable<double[]> {
      *
      * @return the tree as an arraylist
      */
-    public ArrayList<double[]> asArrayList() {
-        return new ArrayList<double[]>(list);
+    public ArrayList<DataPoint> asArrayList() {
+        return new ArrayList<DataPoint>(list);
     }
 
     /**
@@ -543,15 +558,15 @@ public class NTree implements Iterable<double[]> {
      * @param other the other tree
      */
     public void addAll(NTree other) {
-        for (double[] d : other) {
+        for (DataPoint d : other) {
             add(d);
         }
     }
 
     /**
-     * returns an iterator over this tree
+     * Returns an iterator over this tree
      */
-    public Iterator<double[]> iterator() {
+    public Iterator<DataPoint> iterator() {
         return list.iterator();
     }
 
@@ -561,8 +576,8 @@ public class NTree implements Iterable<double[]> {
      * @param index the index to set the point at
      * @param point the point to set
      */
-    public void set(int index, double[] point) {
-        double[] old = list.get(index);
+    public void set(int index, DataPoint point) {
+        DataPoint old = list.get(index);
         Leaf leaf = all.get(old); // leaf can be null sometimes..
         if (leaf == null) {
             System.out.println(index);
@@ -577,14 +592,14 @@ public class NTree implements Iterable<double[]> {
     /*----------------------------------------------*/
 
     /**
-     * base class for nodes
+     * Base class for nodes.
      */
     private abstract static class Node {
         Type type;
     }
 
     /**
-     * class for braches
+     * Class for branches.
      */
     private static class Branch extends Node {
         Node left;
@@ -604,14 +619,14 @@ public class NTree implements Iterable<double[]> {
     }
 
     /**
-     * class for leaves
+     * Class for leaves.
      */
     private static class Leaf extends Node {
         {
             type = Type.leaf;
         }
 
-        List<double[]> points = new ArrayList<double[]>();
+        List<DataPoint> points = new ArrayList<DataPoint>();
 
         public String toString() {
             return "size: " + points.size();

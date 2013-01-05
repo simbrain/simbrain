@@ -45,8 +45,7 @@ public class ProjectionUpdater implements Runnable {
                 component.getProjectionModel().setUpdateCompleted(false);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        component.getGauge().iterate(1);
-                        component.resetChartDataset();
+                        component.getProjector().iterate();
                         component.fireUpdateEvent();
                     }
                 });

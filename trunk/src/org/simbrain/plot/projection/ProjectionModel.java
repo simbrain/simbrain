@@ -23,9 +23,12 @@ import java.awt.EventQueue;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.Dataset;
+import org.simbrain.util.projection.NTree;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
+import org.simbrain.util.projection.ProjectorListener;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -34,7 +37,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class ProjectionModel extends ChartModel {
 
-    /** High Dimensional Projection. */
+    /** The underlying projector object. */
     private Projector projector = new Projector();
 
     /** Scatter Plot Data. */
@@ -47,14 +50,22 @@ public class ProjectionModel extends ChartModel {
     private volatile boolean isRunning = true;
 
     /** Flag for checking that GUI update is completed. */
-    private volatile boolean setUpdateCompleted;
+    private volatile boolean isUpdateCompleted;
 
     /**
      * Default constructor.
-     *
-     * @param numDataSources dimension of the data.
      */
     public ProjectionModel() {
+        init(-1);
+    }
+
+    /**
+     * Construct a projection model with a specified number of dimensions.
+     *
+     * @param dimensions dimension of the projector
+     */
+    public ProjectionModel(int dimensions) {
+        init(dimensions);
     }
 
     /**
@@ -62,14 +73,52 @@ public class ProjectionModel extends ChartModel {
      *
      * @param numDataSources number of sources to initialize model with.
      */
-    public void init(final int numDataSources) {
+    private void init(int numDataSources) {
         if (dataset == null) {
             dataset = new XYSeriesCollection();
             dataset.addSeries(new XYSeries("Data", false, true));
         }
-        projector.init(numDataSources);
-        fireChartInitialized(numDataSources);
+        if (numDataSources == -1){
+            projector = new Projector();
+        } else {
+            projector = new Projector(numDataSources);
+        }
+        fireChartInitialized(projector.getDimensions());
         resetData();
+        addListeners();
+    }
+
+    /**
+     * Add listener to model projection component. For the most part the purpose
+     * here is to update the chart data points to sync them with the projector
+     * object when a change happens in the projector object.
+     */
+    private void addListeners() {
+        projector.addListener(new ProjectorListener() {
+
+            @Override
+            public void projectionMethodChanged() {
+                resetData();
+            }
+
+            @Override
+            public void projectorDataChanged() {
+                setRunning(false);
+                resetData();
+            }
+
+            @Override
+            public void datapointAdded() {
+                resetData();
+            }
+
+            @Override
+            public void projectorColorsChanged() {
+                resetData();
+            }
+
+        });
+
     }
 
     /**
@@ -112,13 +161,16 @@ public class ProjectionModel extends ChartModel {
      */
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
-        // xstream.omitField(ProjectionModel.class, "dataset");
+        xstream.omitField(ProjectionModel.class, "dataset");
+        xstream.omitField(ProjectionModel.class, "isUpdateCompleted");
+        xstream.omitField(ProjectionModel.class, "isRunning");
         xstream.omitField(Projector.class, "logger");
-        xstream.omitField(Projector.class, "currentState");
+        xstream.omitField(Projector.class, "listeners");
         xstream.omitField(ProjectionMethod.class, "logger");
-        xstream.omitField(Dataset.class, "logger");
+        xstream.omitField(Dataset.class, "ntree");
         xstream.omitField(Dataset.class, "distances");
-        xstream.omitField(Dataset.class, "dataset");
+        xstream.omitField(Dataset.class, "logger");
+        xstream.omitField(NTree.class, "logger");
         return xstream;
     }
 
@@ -130,8 +182,10 @@ public class ProjectionModel extends ChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
-        projector.getUpstairs().postOpenInit();
-        projector.getDownstairs().postOpenInit();
+        dataset = new XYSeriesCollection();
+        dataset.addSeries(new XYSeries("Data", false, true));
+        projector.postOpenInit();
+        addListeners();
         return this;
     }
 
@@ -153,37 +207,17 @@ public class ProjectionModel extends ChartModel {
     }
 
     /**
-     * Resets the JFreeChart data and re-adds all the datapoint. Invoked when
+     * Resets the JFreeChart data and re-adds all the datapoints. Invoked when
      * the projector must be applied to an entire dataset.
      */
     public void resetData() {
-        // TODO: Add a check to see whether the current projection algorithm
-        // resets all the data or simply involves adding a single new datapoint.
-        // Add a property to projectionMethods like
-        // newPointsAffectWholeDataset(). If true, then this should be called;
-        // otherwise it should not have to be.
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                // Add the data
                 dataset.getSeries(0).clear();
                 int size = projector.getNumPoints();
                 for (int i = 0; i < size; i++) {
-                    double[] point = projector.getProjectedPoint(i);
-                    if (point == null) {
-                        // System.out.println(i + ":" + point);
-                    } else {
-                        // System.out.println(i + ":" + point[0] + "," +
-                        // point[1]);
-                        if (i != (size - 1)) {
-                            // No need to update the chart yet (hence the
-                            // "false"
-                            // parameter)
-                            dataset.getSeries(0).add(point[0], point[1], false);
-                        } else {
-                            // Notify chart when last datapoint is updated
-                            dataset.getSeries(0).add(point[0], point[1], true);
-                        }
-                    }
+                    DataPoint point = projector.getDownstairs().getPoint(i);
+                    dataset.getSeries(0).add(point.get(0), point.get(1));
                 }
                 setUpdateCompleted(true);
             }
@@ -214,7 +248,7 @@ public class ProjectionModel extends ChartModel {
      * @param b whether updated is completed
      */
     public void setUpdateCompleted(final boolean b) {
-        setUpdateCompleted = b;
+        isUpdateCompleted = b;
     }
 
     /**
@@ -223,7 +257,7 @@ public class ProjectionModel extends ChartModel {
      * @return whether update is completed or not
      */
     public boolean isUpdateCompleted() {
-        return setUpdateCompleted;
+        return isUpdateCompleted;
     }
 
 }

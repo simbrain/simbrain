@@ -18,6 +18,7 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenuItem;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -58,7 +59,7 @@ public class ProjectionPlotActions {
                         "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
-                    model.getProjector().getUpstairs().saveData(theFile);
+                    model.getProjector().getUpstairs().exportToCSV(theFile);
                 }
 
             }
@@ -89,7 +90,38 @@ public class ProjectionPlotActions {
                         "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
-                    model.getProjector().getDownstairs().saveData(theFile);
+                    model.getProjector().getDownstairs().exportToCSV(theFile);
+                }
+
+            }
+        };
+    }
+
+    /**
+     * Import high dimensional data from .csv.
+     *
+     * @param model parent model
+     * @return the action the action
+     */
+    public static Action getImportData(final ProjectionModel model) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(NAME, "Import data (.csv)");
+                putValue(SHORT_DESCRIPTION, "Import data (.csv)");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
+                        "comma-separated-values (csv)", "csv");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    model.getProjector().importData(theFile);
                 }
 
             }

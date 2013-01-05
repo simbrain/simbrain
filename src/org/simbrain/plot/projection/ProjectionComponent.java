@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
+import org.simbrain.util.projection.DataPoint;
+import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
@@ -31,19 +33,11 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Component for a projection plot.
- *
- * TODO: Color "hot point" Tool-tips Option of connecting data-points with lines
  */
 public class ProjectionComponent extends WorkspaceComponent {
 
     /** Data model. */
     private ProjectionModel projectionModel;
-
-    /**
-     * Default number of sources. This is the dimensionality of the hi D
-     * projectionModel
-     */
-    private final int DEFAULT_NUMBER_OF_DIMENSIONS = 25;
 
     /** Time Series consumer type. */
     private AttributeType projectionConsumerType;
@@ -57,7 +51,6 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final String name) {
         super(name);
         projectionModel = new ProjectionModel();
-        projectionModel.init(DEFAULT_NUMBER_OF_DIMENSIONS);
         initializeConsumers();
         addListener();
     }
@@ -70,8 +63,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public ProjectionComponent(final String name, final int numDataSources) {
         super(name);
-        projectionModel = new ProjectionModel();
-        projectionModel.init(numDataSources);
+        projectionModel = new ProjectionModel(numDataSources);
         initializeConsumers();
         addListener();
     }
@@ -90,10 +82,10 @@ public class ProjectionComponent extends WorkspaceComponent {
         // Add the data to the chart.
         int numPoints = projectionModel.getProjector().getNumPoints();
         for (int i = 0; i < numPoints; i++) {
-            double[] point = projectionModel.getProjector().getDownstairs()
+            DataPoint point = projectionModel.getProjector().getDownstairs()
                     .getPoint(i);
             if (point != null) {
-                projectionModel.addPoint(point[0], point[1]);
+                projectionModel.addPoint(point.get(0), point.get(1));
             }
         }
 
@@ -265,13 +257,11 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
     }
 
     /**
@@ -283,8 +273,8 @@ public class ProjectionComponent extends WorkspaceComponent {
         // System.out.println(setterList.size() + "  " +
         // projectionModel.getProjector().getDimensions());
 
-        // Create a new double array to be sent as a new "point" to the
-        // projection dataset
+        // Create a new double array from the dimension objects to be sent as a
+        // new point to the projector
         double[] point = new double[dimensionList.size()];
         int i = 0;
         for (Dimension dimension : dimensionList) {
@@ -292,11 +282,8 @@ public class ProjectionComponent extends WorkspaceComponent {
             i++;
         }
         // System.out.println(Arrays.toString(temp));
-        boolean newDatapointWasAdded = projectionModel.getProjector()
-                .addDatapoint(point);
-        if (newDatapointWasAdded) {
-            resetChartDataset();
-        }
+        projectionModel.getProjector()
+                .addDatapoint(new DataPointColored(point));
 
         // Notify Gui that this component was updated.
         fireUpdateEvent();
@@ -307,7 +294,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      *
      * @return projector object.
      */
-    public Projector getGauge() {
+    public Projector getProjector() {
         return projectionModel.getProjector();
     }
 
@@ -316,28 +303,6 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public void clearData() {
         projectionModel.getProjector().reset();
-        resetChartDataset();
-        fireUpdateEvent();
-    }
-
-    /**
-     * Change projection.
-     */
-    public void changeProjection() {
-        projectionModel.getProjector().getCurrentProjectionMethod().project(); // Should
-                                                                               // this
-                                                                               // have
-                                                                               // happened
-                                                                               // already?
-        resetChartDataset();
-    }
-
-    /**
-     * Update the entire dataset. Called when the entire chart dataset is
-     * changed.
-     */
-    public void resetChartDataset() {
-        projectionModel.resetData();
     }
 
     /**
@@ -348,9 +313,9 @@ public class ProjectionComponent extends WorkspaceComponent {
                 .println("------------ Print contents of dataset ------------");
         Projector projector = projectionModel.getProjector();
         for (int i = 0; i < projector.getNumPoints(); i++) {
-            System.out.println("<" + i + "> "
-                    + projector.getProjectedPoint(i)[0] + ","
-                    + projector.getProjectedPoint(i)[1]);
+//            System.out.println("<" + i + "> "
+//                    + projector.getProjectedPoint(i).get(0) + ","
+//                    + projector.getProjectedPoint(i).get(1));
         }
         System.out.println("--------------------------------------");
     }
@@ -382,6 +347,11 @@ public class ProjectionComponent extends WorkspaceComponent {
             this.dimension = index;
         }
 
+        /**
+         * Returns current value.
+         *
+         * @return value for this dimension.
+         */
         public double getValue() {
             return value;
         }

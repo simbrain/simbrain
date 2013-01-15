@@ -199,7 +199,7 @@ public class ReflectivePropertyEditor extends JPanel {
                         int2 = ((DisplayOrder) annotation).val();
                     }
                 }
-                return Integer.compare(int1, int2);
+                return Integer.signum(int1-int2);
             }
         });
 

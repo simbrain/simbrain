@@ -185,10 +185,11 @@ public class EchoStateNetwork extends Subnetwork {
         // TODO: The user should be able to set these:
         RandomSource exRand = connector.getExcitatoryRandomizer();
         RandomSource inRand = connector.getInhibitoryRandomizer();
-        exRand.setLowerBound(0.01);
-        exRand.setUpperBound(0.5);
-        inRand.setLowerBound(-0.5);
-        inRand.setUpperBound(-0.01);
+        connector.setPercentExcitatory(50);
+        exRand.setLowerBound(0.1);
+        exRand.setUpperBound(1.0);
+        inRand.setLowerBound(-1.0);
+        inRand.setUpperBound(-0.1);
 
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);

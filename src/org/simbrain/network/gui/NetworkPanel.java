@@ -1995,6 +1995,7 @@ public class NetworkPanel extends JPanel {
             SourceHandle.removeSourceHandleFrom(node);
         }
         sourceNeurons.clear();
+        selectionModel.fireSelectionChanged();
     }
 
     /**
@@ -2006,6 +2007,7 @@ public class NetworkPanel extends JPanel {
         for (NeuronNode node : sourceNeurons) {
             SourceHandle.addSourceHandleTo(node);
         }
+        selectionModel.fireSelectionChanged();
     }
 
     /**

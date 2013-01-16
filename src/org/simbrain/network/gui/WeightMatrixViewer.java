@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Network;
@@ -39,6 +40,9 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 /**
  * Widget to display the synaptic connections between two layers of neurons as a
  * matrix, in a jtable.
+ *
+ * TODO: Better display of non-existent connections (perhaps by disabling those
+ * cells for now).
  *
  * @author jyoshimi
  */
@@ -84,6 +88,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Populate data in simbrain table
         Synapse[][] weights = SimnetUtils.getWeightMatrix(sourceList,
                 targetList);
+        displayWarningIfEmptyCells(weights);
         WeightMatrix weightMatrix = new WeightMatrix(weights);
         table = new SimbrainJTable(weightMatrix);
         table.disableTableModificationMenus();
@@ -117,9 +122,6 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                 repaint();
             }
 
-            public void networkUpdateMethodChanged() {
-            }
-
             public void neuronClampToggled() {
             }
 
@@ -127,6 +129,27 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             }
 
         });
+    }
+
+    /**
+     * Display a warning message if there are empty weights.
+     *
+     * @param weights weight matrix to check
+     */
+    private void displayWarningIfEmptyCells(Synapse[][] weights) {
+        String warningMessage = "Only fully connected source-target pairs \n" +
+                "are supported.  Some zeros in the matrix \n" +
+                "correspond to non-existent weights and \n" +
+                "cannot be modified in the viewer.";
+        for (int i = 0; i < weights.length; i++) {
+            for (int j = 0; j < weights[0].length; j++) {
+                if (weights[i][j] == null) {
+                    JOptionPane.showMessageDialog(null, warningMessage,
+                            "Weight Matrix Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -148,13 +171,16 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             this.weights = weights;
             for (int i = 0; i < weights.length; i++) {
                 for (int j = 0; j < weights[0].length; j++) {
-                    setValue(i, j, weights[i][j].getStrength());
+                    if (weights[i][j] != null) {
+                        setValue(i, j, weights[i][j].getStrength());
+                    }
                 }
             }
         }
 
         @Override
-        public void setValue(int row, int col, Double value) {
+        public void setValue(final int row, final int col, final Double value,
+                final boolean fireEvent) {
             if (weights[row][col] != null) {
                 weights[row][col].setStrength(value);
                 /**
@@ -163,10 +189,14 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                  */
                 parentNetwork = weights[row][col].getNetwork();
             }
-            // TODO: Below ok with large changes?
-            if (parentNetwork != null) {
-                parentNetwork.fireNetworkChanged();
+            if (fireEvent) {
+                fireTableDataChanged();
             }
+        }
+
+        @Override
+        public void setValue(int row, int col, Double value) {
+            setValue(row, col, value, true);
         }
 
         @Override
@@ -177,6 +207,14 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                 return weights[row][col].getStrength();
             } else {
                 return new Double(0);
+            }
+        }
+
+        @Override
+        public void fireTableDataChanged() {
+            super.fireTableDataChanged();
+            if (parentNetwork != null) {
+                parentNetwork.fireNetworkChanged();
             }
         }
 

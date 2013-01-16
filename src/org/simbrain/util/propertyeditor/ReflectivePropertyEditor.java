@@ -51,12 +51,13 @@ import org.simbrain.util.StandardDialog;
  * ReflectivePropertyEditor.
  *
  * @author Jeff Yoshimi
- *
- *         TODO: - Generalize array stuff - Put arrays in scrollers - Better
- *         documenation / readme - Custom naming, ordering for fields? - Deal
- *         with redundant get and is case (then two fields are added).
  */
 public class ReflectivePropertyEditor extends JPanel {
+
+    // TODO: Generalize array stuff
+    // - Put arrays in scrollers
+    // - Better documenation / readme
+    // - Deal with redundant get and is case (then two fields are added)
 
     /** Getting rid of warning. */
     private static final long serialVersionUID = 1L;
@@ -179,10 +180,14 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Set up the main panel.
+     *
+     * The items in the underlying java class can be ordered using an annotation
+     * @DisplayOrder(val = 1) For an example see
+     * org.simbrain.util.projection.DataColoringManager
      */
     private void initPanel() {
 
-        // Sort methods by any display order annotations that might have been used
+        // Sort methods using display order annotations
         Method[] methods = toEdit.getClass().getMethods();
         Arrays.sort(methods, new Comparator<Method>() {
             @Override
@@ -199,7 +204,8 @@ public class ReflectivePropertyEditor extends JPanel {
                         int2 = ((DisplayOrder) annotation).val();
                     }
                 }
-                return Integer.signum(int1-int2);
+                // Integer.compare(int1, int2) was introduced in java 7
+                return Integer.signum(int1 - int2);
             }
         });
 

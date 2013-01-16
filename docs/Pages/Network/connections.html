@@ -6,6 +6,7 @@
 
 
 
+
   
 
   
@@ -129,21 +130,19 @@ Connections can be selected in 3 different ways via the selection methods laid o
 <br><br>
 <div style="text-align: center;"><img style="border: 1px solid ; width: 340px; height: 244px;" src="../../Images/selectWeights.png"></div>
 </blockquote><br><br>
-<p class="heading">View Connections as a Weight Matrix<br><br>
+<p class="heading"><a name="WeightMatrixViewer"></a>View Connections as a Weight Matrix<br><br>
 </p>
 
 <p>
 <img style="width: 406px; height: 232px;" src="../../Images/weightmatrixviewer.png" align="right"></p><p align="left">The <span class="command">Show Weight Matrix</span>
 option can be selected after right clicking any neuron or group of
-neurons. The window itself represents the selected neurons as columns
-and all source neurons to these neurons as rows. This equates all
-selected neurons to target neurons as far as the weight matrix viewer
-is concerned. All non-zero entries in the viewer represent the strength
-of the connection between the neuron in the cell's row and the neuron
-represented in its column. Likewise a zero entry represents that no
-connection exists between the neurons designated by the row and coulumn
-of the cell (though there can be a GUI connection with a value of zero
-in rare cases).</p> <br><br>
+neurons.&nbsp; <a href="#sourceTarget">Source and target neurons</a>
+must be set.&nbsp;&nbsp; The window that appears represents the&nbsp;
+source (red) neurons and target (green) neurons as columns.&nbsp;
+Entries represent the strength of connections.&nbsp; (Non-existing
+connections are not fully supported: they are represented by a zero
+that cannot change).<br>
+</p><br><br>
 
 <blockquote>
 <span class="heading2">Weight Matrix Viewer Toolbar<br>

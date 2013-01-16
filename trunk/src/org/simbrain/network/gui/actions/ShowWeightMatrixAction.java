@@ -24,6 +24,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimpleFrame;
@@ -51,6 +53,15 @@ public final class ShowWeightMatrixAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
+        updateAction();
+
+        // add a selection listener to update state based on selection
+        networkPanel.addSelectionListener(new NetworkSelectionListener() {
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**

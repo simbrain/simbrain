@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -48,6 +50,15 @@ public final class ShowTrainerAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+        updateAction();
+
+        // add a selection listener to update state based on selection
+        networkPanel.addSelectionListener(new NetworkSelectionListener() {
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**

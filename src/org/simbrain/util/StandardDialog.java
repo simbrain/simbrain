@@ -75,6 +75,9 @@ public class StandardDialog extends GenericJDialog {
             setVisible(false);
         }
     };
+    
+    /** A global okay button for accessibility. */
+    private JButton okButton;
 
     /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
@@ -154,7 +157,7 @@ public class StandardDialog extends GenericJDialog {
                 COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING,
                 COMPONENT_SPACING));
 
-        // Create the standard button panel with "Ok" and "Cancel"
+        // Create the standard "Ok" Button
         Action okAction = new AbstractAction("OK") {
             public void actionPerformed(final ActionEvent actionEvent) {
                 if (isValidData()) {
@@ -164,6 +167,7 @@ public class StandardDialog extends GenericJDialog {
             }
         };
 
+        //Create the standard "Cancel" Button
         Action cancelAction = new AbstractAction("Cancel") {
             public void actionPerformed(final ActionEvent actionEvent) {
                 myIsDialogCancelled = true;
@@ -176,7 +180,7 @@ public class StandardDialog extends GenericJDialog {
 
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        JButton okButton = new JButton(okAction);
+        okButton = new JButton(okAction);
         buttonPanel.add(customButtonPanel);
         buttonPanel.add(okButton);
         buttonPanel.add(new JButton(cancelAction));
@@ -297,5 +301,27 @@ public class StandardDialog extends GenericJDialog {
         final int x = (screenSize.width - getWidth()) / 2;
         final int y = (screenSize.height - getHeight()) / 2;
         setLocation(x, y);
+    }
+    
+    /**
+     * Disables the Ok button if certain constraints of the dialog have not be fulfilled.
+     */
+    public void disableOkButton(){
+    	okButton.setEnabled(false);
+    }
+    
+    /**
+     * Enables the Ok button.
+     */
+    public void enableOkButton(){
+    	okButton.setEnabled(true);
+    }
+    
+    /**
+     * Give other classes access to the Ok button
+     * @return the ok JButton
+     */
+    public JButton getOkButton(){
+    	return okButton;
     }
 }

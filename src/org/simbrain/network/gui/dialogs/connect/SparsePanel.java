@@ -322,10 +322,19 @@ public class SparsePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        sparsity.setValue(new Double(Sparse.getDEFAULT_SPARSITY()));
-        synsPerSource.setValue(new Integer((int) (numTargs * ((Number) sparsity
-                .getValue()).doubleValue())));
+    	if (connection == null || !(connection instanceof Sparse)) {
+    		sparsity.setValue(new Double(Sparse.getDEFAULT_SPARSITY()));
+        	
+    	} else {
+    		sparsity.setValue(((Sparse) connection).getSparsity());
+    	}
+    	synsPerSource.setValue(new Integer((int) (numTargs * ((Number) sparsity
+        	.getValue()).doubleValue())));
         synsPerSource.setEnabled(false);
+    }
+    
+    public Sparse getConnection(){
+    	return (Sparse) connection;
     }
 
 }

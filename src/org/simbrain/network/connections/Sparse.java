@@ -18,6 +18,7 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -74,30 +75,72 @@ public class Sparse extends ConnectNeurons {
 
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
 
-        // TODO: percent excititory currently not guaranteed for recurrent
-        // connections (source list == target list) when self connection is
-        // not allowed
-
-        int numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons
-                .size());
-        int numExcite = (int) (excitatoryRatio * numSyns);
+        int numSyns;
+        if(!allowSelfConnection && sourceNeurons == targetNeurons){
+        	numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons.size() - 1));
+        } else {
+        	numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size() );
+        }          
         Neuron source;
         Neuron target;
         Synapse synapse;
-        Random randGen = new Random();
-
-        if (!sparseSpecific) {
-
-            for (int i = 0; i < numSyns; i++) {
-                do {
-                    source = sourceNeurons.get(randGen.nextInt(sourceNeurons
-                            .size()));
-                    target = targetNeurons.get(randGen.nextInt(targetNeurons
-                            .size()));
-                } while (Network.getSynapse(source, target) != null
-                        || (!allowSelfConnection && (source == target)));
-
-                if (i < numExcite) {
+        
+        if(sparseSpecific){
+            ArrayList<Integer> targetList = new ArrayList<Integer>(); 
+            for(int i = 0; i < targetNeurons.size(); i++){
+            	targetList.add(i);
+            }
+            Collections.shuffle(targetList);
+        	int synsPerSource = numSyns / sourceNeurons.size();
+        	for(int i = 0; i < sourceNeurons.size(); i++){
+        		source = sourceNeurons.get(i);   	
+        		for(int j = 0; j < synsPerSource; j++){
+        			if(!allowSelfConnection && sourceNeurons == targetNeurons &&
+        					targetList.get(j) == i) {
+        				targetList.add(targetList.remove(j));
+        			}
+        			target = targetNeurons.get(targetList.get(j));
+        			if (Math.random() < excitatoryRatio) {
+                        synapse = baseExcitatorySynapse.instantiateTemplateSynapse(
+                                source, target, network);
+                        if (enableExcitatoryRandomization) {
+                            synapse.setStrength(excitatoryRandomizer.getRandom());
+                        } else {
+                            synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+                        }
+                    } else {
+                        synapse = baseInhibitorySynapse.instantiateTemplateSynapse(
+                                source, target, network);
+                        if (enableInhibitoryRandomization) {
+                            synapse.setStrength(inhibitoryRandomizer.getRandom());
+                        } else {
+                            synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+                        }
+                    }
+        			network.addSynapse(synapse);
+                    syns.add(synapse);
+        		}
+        		Collections.shuffle(targetList);
+        	}
+        } else {
+        	ArrayList<Integer> indices = new ArrayList<Integer>();
+        	for(int i = 0; i < (sourceNeurons.size() * targetNeurons.size());
+        			i++){
+        		int dum = 0;
+        		if(!allowSelfConnection && sourceNeurons == targetNeurons && i == dum){
+        			dum = dum + targetNeurons.size() + 1;
+        		} else {
+        			indices.add(i);
+        		}
+        	}
+        	Collections.shuffle(indices);
+        	
+        	for(int i = 0; i < numSyns; i++){
+        		int s = indices.get(i) / targetNeurons.size();
+        		int t = indices.get(i) % targetNeurons.size();
+        		source = sourceNeurons.get(s);
+        		target = targetNeurons.get(t);
+        		if (Math.random() < excitatoryRatio) {
                     synapse = baseExcitatorySynapse.instantiateTemplateSynapse(
                             source, target, network);
                     if (enableExcitatoryRandomization) {
@@ -114,56 +157,11 @@ public class Sparse extends ConnectNeurons {
                         synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                     }
                 }
-
-                network.addSynapse(synapse);
+    			network.addSynapse(synapse);
                 syns.add(synapse);
-            }
-        } else {
-            int synsPerSource = numSyns / sourceNeurons.size();
-            Random rGen = new Random();
-            int numEx = (int) (excitatoryRatio * numSyns);
-            int numIn = numSyns - numEx;
-
-            for (int i = 0; i < sourceNeurons.size(); i++) {
-                source = sourceNeurons.get(i);
-                for (int j = 0; j < synsPerSource; j++) {
-
-                    do {
-                        target = targetNeurons.get(randGen
-                                .nextInt(targetNeurons.size()));
-                    } while (Network.getSynapse(source, target) != null
-                            || (!allowSelfConnection && (source == target)));
-                    int ex = rGen.nextInt(numEx + numIn);
-                    if (ex < numEx) {
-                        numEx--;
-                        synapse = baseExcitatorySynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        if (enableExcitatoryRandomization) {
-                            synapse.setStrength(excitatoryRandomizer
-                                    .getRandom());
-                        } else {
-                            synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
-                        }
-
-                    } else {
-                        numIn--;
-                        synapse = baseInhibitorySynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        if (enableInhibitoryRandomization) {
-                            synapse.setStrength(inhibitoryRandomizer
-                                    .getRandom());
-                        } else {
-                            synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
-                        }
-                    }
-                    network.addSynapse(synapse);
-                    syns.add(synapse);
-                }
-
-            }
-        }
+        	}
+        	
+        }                   
         return syns;
     }
 

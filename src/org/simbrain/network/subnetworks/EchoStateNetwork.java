@@ -60,15 +60,6 @@ public class EchoStateNetwork extends Subnetwork {
     /** Number of output nodes. */
     private int numOutputs;
 
-    /** Reservoir sparsity. */
-    private double resSparsity;
-
-    /** Sparsity of weights from input. */
-    private double inSparsity;
-
-    /** Sparsity of back weights from output to reservoir (if they exist). */
-    private double backSparsity;
-
     /**
      * Desired spectral radius (max eigenvalue) of the reservoir's weight
      * matrix. Typical range is .8 -1.
@@ -171,26 +162,13 @@ public class EchoStateNetwork extends Subnetwork {
     public void buildNetwork() {
 
         // initialize the Layers
-        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
-        List<Neuron> reservoirLayerNeurons = new ArrayList<Neuron>();
-        List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
-        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(), numInputs);
-        initializeLayer(reservoirLayerNeurons, reservoirNeuronType, numResNodes);
-        initializeLayer(outputLayerNeurons, outputNeuronType, numOutputs);
-
-        Sparse connector = new Sparse();
-        connector.setEnableExcitatoryRandomization(true);
-        connector.setEnableInhibitoryRandomization(true);
-
-        // TODO: The user should be able to set these:
-        RandomSource exRand = connector.getExcitatoryRandomizer();
-        RandomSource inRand = connector.getInhibitoryRandomizer();
-        connector.setPercentExcitatory(50);
-        exRand.setLowerBound(0.1);
-        exRand.setUpperBound(1.0);
-        inRand.setLowerBound(-1.0);
-        inRand.setUpperBound(-0.1);
-
+        List<Neuron> inputLayerNeurons = 
+        		initializeLayer(new ClampedNeuronRule(), numInputs);
+        List<Neuron> reservoirLayerNeurons = 
+        		initializeLayer(reservoirNeuronType, numResNodes);
+        List<Neuron> outputLayerNeurons = 
+        		initializeLayer(outputNeuronType, numOutputs);
+        
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
 
@@ -220,68 +198,83 @@ public class EchoStateNetwork extends Subnetwork {
         NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,
                 Direction.NORTH, betweenLayerInterval);
 
-        // Weights: Input layer to reservoir layer
-        connector.setSparsity(inSparsity);
-        connectNeuronGroups(inputLayer, reservoirLayer, connector); // This is
-                                                                    // where the
-                                                                    // groups
-                                                                    // are made
 
-        // Weights: reservoir layer to itself
-        connector.setSparsity(resSparsity);
-        connectNeuronGroups(reservoirLayer, reservoirLayer, connector);
 
+    }
+
+    /**
+     * Connects all the layers of the network based on 3 connection objects
+     * each with their own connection parameters. Also scales the spectral
+     * radius of the recurrent connections in the reservoir.
+     * @param inToRes the connection object governing how the input connects to
+     * the reservoir.
+     * @param resRecurrent the connection object governing how the reservoir
+     * connects to itself.
+     * @param outToRes the connection object governing how the output connects
+     * to the reservoir. If these connections do not exist, pass null. If 
+     * backWeights is false these connections will not be made regardless of
+     * whether or not outToRes is null.
+     */
+    public void connectLayers(Sparse inToRes, Sparse resRecurrent,
+    		Sparse outToRes){	
+    	
+    	inToRes.setParameters(parentNetwork, inputLayer, reservoirLayer);
+    	resRecurrent.setParameters(parentNetwork, reservoirLayer,
+    			reservoirLayer);	
+    	addSynapseGroup(connectNeuronGroups(inputLayer, reservoirLayer, inToRes));
+    	addSynapseGroup(connectNeuronGroups(reservoirLayer, reservoirLayer, resRecurrent));
+    	
+    	if(backWeights) {
+    		outToRes.setParameters(parentNetwork, outputLayer, reservoirLayer);
+    		addSynapseGroup(connectNeuronGroups(outputLayer, reservoirLayer, outToRes));
+    	}
+    	
         // Weights: reservoir layer to output layer
-        // TODO: These only exist for the as yet unimplemented RLMS algorithm
-        AllToAll allToAll = new AllToAll(getParentNetwork(),
-                reservoirLayerNeurons, outputLayerNeurons);
+        AllToAll allToAll = new AllToAll(parentNetwork,
+                reservoirLayer.getNeuronList(), outputLayer.getNeuronList());
         connectNeuronGroups(reservoirLayer, outputLayer, allToAll);
 
-        // Weights: output to reservoir
-        if (backWeights) {
-            connector.setSparsity(backSparsity);
-            connectNeuronGroups(outputLayer, reservoirLayer, connector);
-        }
-
         // If recurrent output weights are on, set up an empty, growing synapse
-        // group
-        // on the output layer
+        // group on the output layer
         if (recurrentOutWeights) {
             addEmptySynapseGroup(outputLayer, outputLayer);
         }
 
         // If direct in-out weights are on, set up an empty, growing synapse
-        // group
-        // connecting the input layer directly to the output layer
+        // group connecting the input layer directly to the output layer
         if (directInOutWeights) {
             addEmptySynapseGroup(inputLayer, outputLayer);
         }
-
+        
         // Scale the reservoir's weights to have the desired spectral radius
-        SimnetUtils.scaleEigenvalue(reservoirLayerNeurons,
-                reservoirLayerNeurons, spectralRadius);
-
+        SimnetUtils.scaleEigenvalue(reservoirLayer.getNeuronList(),
+        		reservoirLayer.getNeuronList(), spectralRadius);
+        
+    }
+    
+    public void addToParentNetwork(){
         // Add the group to the network
         getParentNetwork().addGroup(this);
-
     }
-
+    
     /**
-     * Initializes a layer.
-     *
-     * @param layer the layer to be initialized
-     * @param nodeType type of nodes in the layer
-     * @param layerType type of layer
-     * @param nodes number of nodes in the layer
+     * Fills and returns an ArrayList with neurons governed by the specified
+     * node type.
+     * @param nodeType the desired update rule governing all the neurons in the
+     * layer.
+     * @param nodes the number of nodes in the layer.
+     * @return an ArrayList of nodes number of neurons all governed by the 
+     * NeuronUpdateRule nodeType. 
      */
-    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
+    private ArrayList<Neuron> initializeLayer(NeuronUpdateRule nodeType,
             int nodes) {
-
+    	ArrayList<Neuron> layer = new ArrayList<Neuron>();
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);
             node.setIncrement(1); // TODO: Reasonable?
             layer.add(node);
         }
+        return layer;
     }
 
     /**
@@ -476,33 +469,6 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Set the reservoir sparsity.
-     *
-     * @param resSparsity reservoir sparsity.
-     */
-    public void setResSparsity(double resSparsity) {
-        this.resSparsity = resSparsity;
-    }
-
-    /**
-     * Set the input sparsity.
-     *
-     * @param inSparsity the input sparsity
-     */
-    public void setInSparsity(double inSparsity) {
-        this.inSparsity = inSparsity;
-    }
-
-    /**
-     * Set the back sparsity.
-     *
-     * @param backSparsity
-     */
-    public void setBackSparsity(double backSparsity) {
-        this.backSparsity = backSparsity;
-    }
-
-    /**
      * Set spectral radius
      *
      * @param spectralRadius the spectral radius
@@ -539,7 +505,8 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Set to true for (TODO).
+     * Set to true for the output to receive input from itself from the 
+     * previous time-step.
      *
      * @param recurrentWeights
      */
@@ -604,8 +571,6 @@ public class EchoStateNetwork extends Subnetwork {
     public void setTrainingData(double[][] trainingData) {
         this.trainingData = trainingData;
     }
-
-    // TODO: Integrate random panel
 
     /**
      * @return the noise

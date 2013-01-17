@@ -84,4 +84,18 @@ public abstract class AbstractConnectionPanel extends JPanel {
         labelPanel.add(theLabel);
         this.add(labelPanel, BorderLayout.SOUTH);
     }
+
+    /**
+     * @return the ConnectNeurons object
+     */
+	public ConnectNeurons getConnection() {
+		return connection;
+	}
+
+	/**
+	 * @param connection the desired ConnectNeurons object
+	 */
+	public void setConnection(ConnectNeurons connection) {
+		this.connection = connection;
+	}
 }

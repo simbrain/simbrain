@@ -18,26 +18,40 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.connection.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.connect.SparsePanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.StopLight;
 
 /**
  * Creates a GUI dialog for the creation of an arbitrary echo-state network.
@@ -45,7 +59,7 @@ import org.simbrain.util.StandardDialog;
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class ESNCreationDialog extends StandardDialog {
+public class ESNCreationDialog extends StandardDialog implements PropertyChangeListener{
 
     /** Underlying network panel */
     private final NetworkPanel panel;
@@ -65,17 +79,23 @@ public class ESNCreationDialog extends StandardDialog {
     /** Text field: reads in desired max eigenvalue */
     private JTextField maxEigenValue = new JTextField();
 
-    /** Text field: reads in desired reservoir sparsity */
-    private JTextField resSparsity = new JTextField();
-
-    /** Text field: reads in desired sparsity between the input and reservoir */
-    private JTextField inResSparsity = new JTextField();
+    /** 
+     * Opens a dialog for setting the parameters of the recurrent connections
+     * in the reservoir.
+     */
+    private JButton resSparsity = new JButton("Reservoir");
 
     /**
-     * Text field: reads in the desired sparsity between the output and
-     * reservoir
+     * Opens a dialog for setting the parameters of the connections between
+     * the input layer and the reservoir layer.
      */
-    private JTextField backSparsity = new JTextField();
+    private JButton inResSparsity = new JButton("In to Res");
+
+    /**
+     * Opens a dialog to set the parameters of the connection between the
+     * output layer and the reservoir layer if they exist.
+     */
+    private JButton backSparsity = new JButton("Out to Res");
 
     /**
      * A check-box which determines whether or not this ESN will have recurrent
@@ -94,8 +114,6 @@ public class ESNCreationDialog extends StandardDialog {
      * directly from input to output
      */
     private JCheckBox directInOutWeights = new JCheckBox();
-
-    private JCheckBox noise = new JCheckBox();
 
     /**
      * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
@@ -124,12 +142,19 @@ public class ESNCreationDialog extends StandardDialog {
     /** Combo-box governing the desired neuron type of the output layer */
     private JComboBox outputNeuronTypes = new JComboBox(nTypeOptions);
 
-    /** Possible methods of linear regression for training */
-    private String[] regressionOptions = { "Weiner-Hopf", "Moore-Penrose" };
-
-    /** Combo-box governing desired linear regression solution for training */
-    private JComboBox linearRegressionSol = new JComboBox(regressionOptions);
-
+    private SparsePanel inToRes;
+    
+    private SparsePanel resRecurrent;
+    
+    private SparsePanel outToRes;
+    
+    private StopLight outToResReady = new StopLight();
+    
+    private StopLight resRecurrentReady = new StopLight();
+    
+    private StopLight inToResReady = new StopLight();
+    
+    
     /**
      * Creation dialog constructor.
      *
@@ -137,7 +162,15 @@ public class ESNCreationDialog extends StandardDialog {
      */
     public ESNCreationDialog(final NetworkPanel panel) {
         this.panel = panel;
+        
 
+        
+        // Create panels to set individual properties of each user-defined
+        // connection
+        inToRes = new SparsePanel(new Sparse(), panel);
+        resRecurrent = new SparsePanel(new Sparse(), panel);
+        outToRes = new SparsePanel(new Sparse(), panel);
+             
         // For customized values
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -154,9 +187,11 @@ public class ESNCreationDialog extends StandardDialog {
 
         // Add text-fields
         esnPanel.addItem("Input Nodes:", tfNumInputs);
-        esnPanel.addItem("Reservoir Neuron Type:", reservoirNeuronTypes, 2);
+        esnPanel.addItem(new JLabel("Reservoir Neuron Type:"),
+        		reservoirNeuronTypes, 2);
         esnPanel.addItem("Reservoir Nodes:", tfNumReservoir);
-        esnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
+        esnPanel.addItem(new JLabel("Output Neuron Type:"),
+        		outputNeuronTypes, 2);
         esnPanel.addItem("Output Nodes:", tfNumOutputs);
 
         // GridBagConstraints for next section
@@ -170,37 +205,109 @@ public class ESNCreationDialog extends StandardDialog {
         // Adds section for connectivity parameters
         sectionSeparator("Connectivity Parameters", gbc, row);
 
-        // Add connectivity parameter check-boxes and text fields
-        esnPanel.addItem("Input- reservoir connectivity:", inResSparsity, 2);
+        // Add connectivity parameter check-boxes and buttons
+        JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        tempPanel.add(inToResReady);
+        esnPanel.addItem(tempPanel, 2);
+        esnPanel.addItem(inResSparsity, 3);
         esnPanel.addItem("Recurrent output weights:", recurrentOutputWeights);
-        esnPanel.addItem("Reservoir connectivity: ", resSparsity, 2);
+        
+        JPanel tempPanel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        tempPanel1.add(resRecurrentReady);
+        esnPanel.addItem(tempPanel1, 2);
+        esnPanel.addItem(resSparsity, 3);
         esnPanel.addItem("Direct input to output weights:", directInOutWeights);
-        esnPanel.addItem("Back weight connectivity: ", backSparsity, 2);
+        JPanel tempPanel2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        tempPanel2.add(outToResReady);
+        esnPanel.addItem(tempPanel2, 2);
+        esnPanel.addItem(backSparsity, 3);
         // Default is disabled
         backSparsity.setEnabled(false);
+        outToResReady.setVisible(false);
         esnPanel.addItem("Back weights:", backWeights);
         row = esnPanel.getMyNextItemRow();
         esnPanel.setMyNextItemRow(row++);
-        esnPanel.addItem("Spectral radius:", maxEigenValue, 2);
+        esnPanel.addItem(new JLabel("Spectral radius:"), maxEigenValue, 2);
 
-        // Creates action listener which enables the text field for back weight
+        addActionListeners();
+
+        setContentPane(esnPanel);
+        fillFieldValues();
+
+    }
+    
+    private void addActionListeners(){
+    	
+    	// Creates action listener which enables the text field for back weight
         // sparsity based on if back weights are desired given the state of
         // its check-box
         backWeights.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (backWeights.isSelected()) {
                     backSparsity.setEnabled(true);
+                    outToResReady.setVisible(true);       
                 } else {
                     backSparsity.setEnabled(false);
+                    outToResReady.setVisible(false); 
                 }
             }
         });
-
-        setContentPane(esnPanel);
-        fillFieldValues();
-
+        
+        resSparsity.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		ConnectionDialog dialog = new ConnectionDialog(panel,
+        				resRecurrent);
+        		dialog.getOkButton().addActionListener(resRecurrentReady);
+        		dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+        	}
+        });
+        
+        inResSparsity.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		ConnectionDialog dialog = new ConnectionDialog(panel,
+        				inToRes);
+        		dialog.getOkButton().addActionListener(inToResReady);
+        		dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+        	}
+        });
+        
+        backSparsity.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		ConnectionDialog dialog = new ConnectionDialog(panel,
+        				outToRes);
+        		dialog.getOkButton().addActionListener(outToResReady);
+        		dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+        	}
+        });
+        
+        outToResReady.addPropertyChangeListener(this);
+        resRecurrentReady.addPropertyChangeListener(this);
+        inToResReady.addPropertyChangeListener(this);
+        
     }
-
+    
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+	
+		boolean check1 = inToResReady.getState();
+		boolean check2 = resRecurrentReady.getState();
+		boolean check3 = outToResReady.getState() ||
+				!backSparsity.isSelected();
+		
+		if(check1 && check2 && check3){
+			enableOkButton();
+		} else {
+			disableOkButton();
+		}
+		
+	}
+    
     // TODO: put this in a more public class?
     /**
      * Creates a new dialog section given a title and using a JSeparator.
@@ -236,15 +343,14 @@ public class ESNCreationDialog extends StandardDialog {
      * Populate fields with default data.
      */
     public void fillFieldValues() {
+        // Connection parameters have not been set...
+        disableOkButton();
         tfNumInputs.setText("" + 1);
-        tfNumReservoir.setText("" + 25);
+        tfNumReservoir.setText("" + 64);
         tfNumOutputs.setText("" + 1);
         recurrentOutputWeights.setSelected(false);
         directInOutWeights.setSelected(false);
         backWeights.setSelected(false);
-        resSparsity.setText("" + 0.1);
-        inResSparsity.setText("" + 1.0);
-        backSparsity.setText(" " + .5);
         maxEigenValue.setText("" + 0.98);
     }
 
@@ -274,34 +380,34 @@ public class ESNCreationDialog extends StandardDialog {
                     Integer.parseInt(tfNumOutputs.getText()),
                     panel.getLastClickedPosition());
 
-            // Get connection parameters from fields
-            esn.setInSparsity(Double.parseDouble(inResSparsity.getText()));
-            esn.setResSparsity(Double.parseDouble(resSparsity.getText()));
-            esn.setBackWeights(backWeights.isSelected());
-            if (backWeights.isSelected()) {
-                esn.setBackSparsity(Double.parseDouble(backSparsity.getText()));
-            }
             esn.setSpectralRadius(Double.parseDouble(maxEigenValue.getText()));
             esn.setRecurrentOutWeights(recurrentOutputWeights.isSelected());
             esn.setDirectInOutWeights(directInOutWeights.isSelected());
+            esn.setBackWeights(backWeights.isSelected());
             NeuronUpdateRule resUp = boxMap.get(reservoirNeuronTypes
                     .getSelectedItem());
             esn.setReservoirNeuronType(resUp);
             NeuronUpdateRule outUp = boxMap.get(outputNeuronTypes
                     .getSelectedItem());
             esn.setOutputNeuronType(outUp);
-
+            
             // Build network
-            esn.buildNetwork();
 
+            esn.buildNetwork();
+            esn.connectLayers(inToRes.getConnection(),
+            		resRecurrent.getConnection(), outToRes.getConnection());
+            esn.addToParentNetwork();
             dispose();
 
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"
                     + "\nNetwork construction failed.", "Error",
                     JOptionPane.ERROR_MESSAGE);
+           nfe.printStackTrace();
         }
 
     }
 
+
+    
 }

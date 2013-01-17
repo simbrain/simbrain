@@ -23,6 +23,7 @@ import java.util.List;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.RandomSource;
 
 /**
@@ -216,4 +217,46 @@ public abstract class ConnectNeurons {
         this.enableInhibitoryRandomization = enableInRand;
     }
 
+	public List<? extends Neuron> getSourceNeurons() {
+		return sourceNeurons;
+	}
+
+	public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
+		this.sourceNeurons = sourceNeurons;
+	}
+
+	public List<? extends Neuron> getTargetNeurons() {
+		return targetNeurons;
+	}
+
+	public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
+		this.targetNeurons = targetNeurons;
+	}
+	
+	/**
+	 * Sets all the major parameters for the connection: source, target, and
+	 * network. This is used in place of a constructor for when other variables
+	 * of the connection are being set before a specific network is defined.
+	 * @param network the network where the connections are being made
+	 * @param source the source neurons
+	 * @param target the target neurons
+	 */
+	public void setParameters(final Network network, NeuronGroup source, NeuronGroup target){
+		setParameters(network, source.getNeuronList(), target.getNeuronList());
+	}
+
+	/**
+	 * Sets all the major parameters for the connection: source, target, and
+	 * network. This is used in place of a constructor for when other variables
+	 * of the connection are being set before a specific network is defined.
+	 * @param network the network where the connections are being made
+	 * @param source the source neurons
+	 * @param target the target neurons
+	 */
+	public void setParameters(final Network network, List<Neuron> source, List<Neuron> target){
+		this.network = network;
+		this.sourceNeurons = source;
+		this.targetNeurons = target;
+	}
+	
 }

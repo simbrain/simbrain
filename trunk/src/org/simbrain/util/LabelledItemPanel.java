@@ -18,10 +18,12 @@
  */
 package org.simbrain.util;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,6 +34,7 @@ import javax.swing.JPanel;
  *
  * @author David Fraser
  * @author Michael Harris
+ * @author ztosi
  */
 public class LabelledItemPanel extends JPanel {
     /** The row to add the next labelled item to. */
@@ -110,9 +113,7 @@ public class LabelledItemPanel extends JPanel {
      * @param item The item to be added.
      * @param col desired grid bag layor column
      */
-    public void addItem(final String labelText, final JComponent item, int col) {
-        // Create the label and its constraints
-        JLabel label = new JLabel(labelText);
+    public void addItem(final JLabel label, final JComponent item, int col) {
 
         GridBagConstraints labelConstraints = new GridBagConstraints();
 
@@ -138,13 +139,7 @@ public class LabelledItemPanel extends JPanel {
 
     }
 
-    public int getMyNextItemRow() {
-        return myNextItemRow;
-    }
 
-    public void setMyNextItemRow(int myNextItemRow) {
-        this.myNextItemRow = myNextItemRow;
-    }
 
     /**
      * Modification of addItem which takes a label, rather than text, as an
@@ -177,5 +172,41 @@ public class LabelledItemPanel extends JPanel {
         add(item, itemConstraints);
 
         myNextItemRow++;
+    }
+    
+    /**
+     * A function which adds an item without a label. This function works with
+     * the already established constraints and coordinates of the
+     * LabelledItemPanel class to keep the code clean.
+     * @param item the desired item
+     * @param col the column in which it is to be deposited
+     */
+    public void addItem(final JComponent item, int col) {
+    	 GridBagConstraints itemConstraints = new GridBagConstraints();
+
+         itemConstraints.gridx = col;
+         itemConstraints.gridy = myNextItemRow;
+         itemConstraints.insets = new Insets(10, 10, 0, 10);
+         itemConstraints.weightx = 1.0;
+         itemConstraints.anchor = GridBagConstraints.EAST;
+         itemConstraints.fill = GridBagConstraints.HORIZONTAL;
+         
+         add(item, itemConstraints);
+    }
+    
+    /**
+     * Returns the current row
+     * @return the next row where an item will be deposited
+     */
+    public int getMyNextItemRow() {
+        return myNextItemRow;
+    }
+
+    /**
+     * Sets the current row where the next item will be deposited
+     * @param myNextItemRow the desired row
+     */
+    public void setMyNextItemRow(int myNextItemRow) {
+        this.myNextItemRow = myNextItemRow;
     }
 }

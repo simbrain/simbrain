@@ -27,7 +27,7 @@ import org.simbrain.network.core.Network;
 public abstract class Group {
 
     /** Reference to the network this group is a part of. */
-    private final Network parentNetwork;
+    protected final Network parentNetwork;
 
     /** Name of this group. */
     private String id;

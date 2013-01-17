@@ -98,9 +98,9 @@ public class SRNCreationDialog extends StandardDialog {
 
         // Add fields
         srnPanel.addItem("Number of input nodes:", tfNumInputs);
-        srnPanel.addItem("Hidden Neuron Type:", hiddenNeuronTypes, 2);
+      //  srnPanel.addItem("Hidden Neuron Type:", hiddenNeuronTypes, 2);
         srnPanel.addItem("Number of Hidden nodes:", tfNumHidden);
-        srnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
+      //  srnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
         srnPanel.addItem("Number of output nodes:", tfNumOutputs);
 
         // Fill fields with default values

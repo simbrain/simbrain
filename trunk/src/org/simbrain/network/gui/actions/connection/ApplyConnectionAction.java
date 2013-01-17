@@ -16,7 +16,6 @@ package org.simbrain.network.gui.actions.connection;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -29,8 +28,6 @@ import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.RadialPanel;
 import org.simbrain.network.gui.dialogs.connect.SparsePanel;
-import org.simbrain.util.ShowHelpAction;
-import org.simbrain.util.StandardDialog;
 
 /**
  * Apply specified connection either from selected neurons to themselves
@@ -97,11 +94,8 @@ public final class ApplyConnectionAction extends AbstractAction {
                         networkPanel);
                 optionsPanel.fillFieldValues();
             }
-            ConnectionDialog dialog = new ConnectionDialog();
-            ShowHelpAction helpAction = new ShowHelpAction(
-                    "Pages/Network/connections.html");
-            dialog.addButton(new JButton(helpAction));
-            dialog.setContentPane(optionsPanel);
+            ConnectionDialog dialog = new ConnectionDialog(networkPanel,
+            		optionsPanel, connection);   
             dialog.setLocationRelativeTo(null);
             dialog.pack();
             dialog.setVisible(true);
@@ -109,18 +103,4 @@ public final class ApplyConnectionAction extends AbstractAction {
         }
     }
 
-    /**
-     * Dialog for displaying connection panel.
-     */
-    private class ConnectionDialog extends StandardDialog {
-
-        @Override
-        protected void closeDialogOk() {
-            super.closeDialogOk();
-            optionsPanel.commitChanges();
-            connection.connectNeurons(networkPanel.getNetwork(),
-                    networkPanel.getSourceModelNeurons(),
-                    networkPanel.getSelectedModelNeurons());
-        }
-    }
 }

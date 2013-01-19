@@ -26,6 +26,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -84,8 +85,16 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
         editMenu.add(new JMenuItem(TimeSeriesPlotActions
                 .getPropertiesDialogAction(timeSeriesPanel)));
 
+        JMenu helpMenu = new JMenu("Help");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Plot/time_series.html");
+        JMenuItem helpItem = new JMenuItem(helpAction);
+        helpMenu.add(helpItem);
+
         bar.add(fileMenu);
         bar.add(editMenu);
+        bar.add(helpMenu);
+
         getParentFrame().setJMenuBar(bar);
     }
 

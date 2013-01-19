@@ -25,6 +25,7 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
+import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.connect.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.RadialPanel;
 import org.simbrain.network.gui.dialogs.connect.SparsePanel;
@@ -33,7 +34,6 @@ import org.simbrain.network.gui.dialogs.connect.SparsePanel;
  * Apply specified connection either from selected neurons to themselves
  * ("self connect") or form source to target.
  */
-@SuppressWarnings("serial")
 public final class ApplyConnectionAction extends AbstractAction {
 
     /** Network panel. */

@@ -35,32 +35,32 @@ import org.simbrain.resource.ResourceManager;
  * to some other component and can be used to indicate to the user whether or
  * whatever that component represents is ready. Can also be used for internal
  * checks.
- * 
+ *
  * TODO: implement null and/or yellow warning status. Change name to status
  * light and rename greenlight?
- * 
+ *
  * @author ztosi
  */
-@SuppressWarnings("serial")
 public class StopLight extends JPanel implements ActionListener {
-	
-	/** A List of images, designed to be a singleton list containing the status
-	 *  image.
+
+    /**
+     * A List of images, designed to be a singleton list containing the status
+     * image.
      */
 	private ArrayList<Image> imgs = new ArrayList<Image>();
-	
+
 	/** Default greenlight image. */
 	private ImageIcon go = ResourceManager.getImageIcon("GreenCheck.png");
-	
+
 	/** Default redlight image. */
 	private ImageIcon stop = ResourceManager.getImageIcon("RedX.png");
-	
+
 	/** The current image. */
 	private Image img;
-	
+
 	/** A boolean tied to the current status. */
 	private boolean greenlight;
-	
+
 	/**
 	 * Default Constructor, by default current status is redlight: image is
 	 * RedX and greenlight is false. Also fully paints and prepares stoplight
@@ -78,7 +78,7 @@ public class StopLight extends JPanel implements ActionListener {
 		setLayout(null);
 		repaint();
 	}
-	
+
 	/**
 	 * Constructor which fully paints and prepares stoplight
 	 * as a JPanel for integration into another panel/dialog/etc.
@@ -103,7 +103,7 @@ public class StopLight extends JPanel implements ActionListener {
 		setLayout(null);
 		repaint();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -112,34 +112,35 @@ public class StopLight extends JPanel implements ActionListener {
 		super.paintComponent(g);
 		g.drawImage(img,  0, 0, null);
 	}
-	
+
 	/**
-	 * Quick method which flips the state of the stoplight to green if the 
-	 * current state is red and red if the current state is green. Again 
+	 * Quick method which flips the state of the stoplight to green if the
+	 * current state is red and red if the current state is green. Again
 	 * the image is always coupled to the greenlight boolean.
 	 */
 	public void flip(){
 		if(greenlight) {
 			img = null;
 			repaint();
-			img = stop.getImage();   			
+			img = stop.getImage();
 		} else {
 			img = null;
 			repaint();
-			img = go.getImage();			
+			img = go.getImage();
 		}
 		greenlight = !greenlight;
 		firePropertyChange("State", !greenlight, greenlight);
 	}
 
 	/**
-	 * Set the current state of the stoplight
+	 * Set the current state of the stoplight.
+	 *
 	 * @param greenlight the desired state of the stop light: green -> true
 	 * false -> red
 	 */
 	public void setState(boolean greenlight) {
 		this.greenlight = greenlight;
-		if(greenlight) {
+        if (greenlight) {
 			img = null;
 			repaint();
 			img = go.getImage();
@@ -150,17 +151,17 @@ public class StopLight extends JPanel implements ActionListener {
 		}
 		firePropertyChange("State", !greenlight, greenlight);
 	}
-	
+
 	/**
 	 * @return the current state.
 	 */
 	public boolean getState(){
 		return greenlight;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		setState(true);
-		repaint();		
+		repaint();
 	}
 }

@@ -52,7 +52,6 @@ import org.simbrain.util.genericframe.GenericJDialog;
  * @author David Fraser
  * @author Michael Harris
  */
-@SuppressWarnings("serial")
 public class StandardDialog extends GenericJDialog {
 
     /**
@@ -76,7 +75,7 @@ public class StandardDialog extends GenericJDialog {
             setVisible(false);
         }
     };
-    
+
     /** A global okay button for accessibility. */
     private JButton okButton;
 
@@ -168,7 +167,7 @@ public class StandardDialog extends GenericJDialog {
             }
         };
 
-        //Create the standard "Cancel" Button
+        // Create the standard "Cancel" Button
 		Action cancelAction = new AbstractAction("Cancel") {
             public void actionPerformed(final ActionEvent actionEvent) {
                 myIsDialogCancelled = true;
@@ -303,26 +302,28 @@ public class StandardDialog extends GenericJDialog {
         final int y = (screenSize.height - getHeight()) / 2;
         setLocation(x, y);
     }
-    
+
     /**
-     * Disables the Ok button if certain constraints of the dialog have not be fulfilled.
+     * Disables the Ok button if certain constraints of the dialog have not be
+     * fulfilled.
      */
-    public void disableOkButton(){
-    	okButton.setEnabled(false);
+    public void disableOkButton() {
+        okButton.setEnabled(false);
     }
-    
+
     /**
      * Enables the Ok button.
      */
-    public void enableOkButton(){
-    	okButton.setEnabled(true);
+    public void enableOkButton() {
+        okButton.setEnabled(true);
     }
-    
+
     /**
-     * Give other classes access to the Ok button
+     * Give other classes access to the Ok button.
+     *
      * @return the ok JButton
      */
-    public JButton getOkButton(){
-    	return okButton;
+    public JButton getOkButton() {
+        return okButton;
     }
 }

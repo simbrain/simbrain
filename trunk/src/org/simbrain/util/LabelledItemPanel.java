@@ -33,10 +33,11 @@ import javax.swing.JPanel;
  * @author David Fraser
  * @author Michael Harris
  * @author ztosi
+ *
  */
-@SuppressWarnings("serial")
 public class LabelledItemPanel extends JPanel {
-    /** The row to add the next labelled item to. */
+
+    /** The row to add the next labeled item to. */
     private int myNextItemRow = 0;
 
     /**
@@ -47,7 +48,7 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * This method initialises the panel and layout manager.
+     * Initializes the panel and layout manager.
      */
     private void init() {
         setLayout(new GridBagLayout());
@@ -69,7 +70,7 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * This method adds a labelled item to the panel. The item is added to the
+     * Add a labeled item to the panel. The item is added to the
      * row below the last item added.
      *
      * @param labelText The label text for the item.
@@ -105,12 +106,12 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * Adds a labeled item to the panel on the current myNextItemRow, at the
-     * specified column
+     * Provides support for multi-column labeled item panels. Adds a label and
+     * item to the panel on the current row, at the specified column.
      *
-     * @param labelText The label text for the item.
+     * @param label The label text for the item.
      * @param item The item to be added.
-     * @param col desired grid bag layor column
+     * @param col desired grid bag layer column
      */
     public void addItem(final JLabel label, final JComponent item, int col) {
 
@@ -137,19 +138,19 @@ public class LabelledItemPanel extends JPanel {
         add(item, itemConstraints);
 
     }
-    
+
     /**
      * Adds a labeled item to the panel on the current myNextItemRow, at the
-     * specified column
+     * specified column.
      *
      * @param labelText The label text for the item.
      * @param item The item to be added.
      * @param col desired grid bag layor column
      */
     public void addItem(final String name, final JComponent item, int col) {
-    	
+
     	JLabel label = new JLabel(name);
-    	
+
         GridBagConstraints labelConstraints = new GridBagConstraints();
 
         labelConstraints.gridx = col;
@@ -206,37 +207,40 @@ public class LabelledItemPanel extends JPanel {
 
         myNextItemRow++;
     }
-    
+
     /**
      * A function which adds an item without a label. This function works with
      * the already established constraints and coordinates of the
      * LabelledItemPanel class to keep the code clean.
+     *
      * @param item the desired item
      * @param col the column in which it is to be deposited
      */
     public void addItem(final JComponent item, int col) {
-    	 GridBagConstraints itemConstraints = new GridBagConstraints();
+        GridBagConstraints itemConstraints = new GridBagConstraints();
 
-         itemConstraints.gridx = col;
-         itemConstraints.gridy = myNextItemRow;
-         itemConstraints.insets = new Insets(10, 10, 0, 10);
-         itemConstraints.weightx = 1.0;
-         itemConstraints.anchor = GridBagConstraints.EAST;
-         itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-         
-         add(item, itemConstraints);
+        itemConstraints.gridx = col;
+        itemConstraints.gridy = myNextItemRow;
+        itemConstraints.insets = new Insets(10, 10, 0, 10);
+        itemConstraints.weightx = 1.0;
+        itemConstraints.anchor = GridBagConstraints.EAST;
+        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+        add(item, itemConstraints);
     }
-    
+
     /**
-     * Returns the current row
-     * @return the next row where an item will be deposited
+     * Returns the current row.
+     *
+     * @return the next row where an item will be placed.
      */
     public int getMyNextItemRow() {
         return myNextItemRow;
     }
 
     /**
-     * Sets the current row where the next item will be deposited
+     * Sets the current row where the next item will be placed.
+     *
      * @param myNextItemRow the desired row
      */
     public void setMyNextItemRow(int myNextItemRow) {

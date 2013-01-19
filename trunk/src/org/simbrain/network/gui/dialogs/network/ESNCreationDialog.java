@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -39,7 +38,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.connection.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.connect.SparsePanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
@@ -54,8 +53,8 @@ import org.simbrain.util.StopLight;
  *
  * @author ztosi
  */
-@SuppressWarnings("serial")
-public class ESNCreationDialog extends StandardDialog implements PropertyChangeListener{
+public class ESNCreationDialog extends StandardDialog implements
+        PropertyChangeListener {
 
     /** Underlying network panel */
     private final NetworkPanel panel;
@@ -75,21 +74,21 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
     /** Text field: reads in desired max eigenvalue */
     private JTextField maxEigenValue = new JTextField();
 
-    /** 
-     * Opens a dialog for setting the parameters of the recurrent connections
-     * in the reservoir.
+    /**
+     * Opens a dialog for setting the parameters of the recurrent connections in
+     * the reservoir.
      */
     private JButton resSparsity = new JButton("Reservoir");
 
     /**
-     * Opens a dialog for setting the parameters of the connections between
-     * the input layer and the reservoir layer.
+     * Opens a dialog for setting the parameters of the connections between the
+     * input layer and the reservoir layer.
      */
     private JButton inResSparsity = new JButton("In to Res");
 
     /**
-     * Opens a dialog to set the parameters of the connection between the
-     * output layer and the reservoir layer if they exist.
+     * Opens a dialog to set the parameters of the connection between the output
+     * layer and the reservoir layer if they exist.
      */
     private JButton backSparsity = new JButton("Out to Res");
 
@@ -106,7 +105,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
     private JCheckBox backWeights = new JCheckBox();
 
     /**
-     * A check-box which destermines whether or not this ESN will have weights
+     * A check-box which determines whether or not this ESN will have weights
      * directly from input to output
      */
     private JCheckBox directInOutWeights = new JCheckBox();
@@ -138,51 +137,52 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
     /** Combo-box governing the desired neuron type of the output layer */
     private JComboBox outputNeuronTypes = new JComboBox(nTypeOptions);
 
-    /** A sparse panel for setting the connections between input and 
-     * reservoir. */
+    /**
+     * A sparse panel for setting the connections between input and reservoir.
+     */
     private SparsePanel inToRes;
-    
+
     /** A sparse panel for setting the recurrent reservoir connections. */
     private SparsePanel resRecurrent;
-    
-    /** A sparse panel for setting the connections between output and 
-     * reservoir if they exist. */
+
+    /**
+     * A sparse panel for setting the connections between output and reservoir
+     * if they exist.
+     */
     private SparsePanel outToRes;
-    
+
     /**
      * A status light indicating whether or not the parameters of the
      * connections between input and reservoir have been properly set.
      */
     private StopLight inToResReady = new StopLight();
-    
+
     /**
      * A status light indicating whether or not the parameters of the recurrent
      * reservoir connections have been properly set.
      */
     private StopLight resRecurrentReady = new StopLight();
-    
 
-    /** A status light indicating whether or not the parameters of the 
+    /**
+     * A status light indicating whether or not the parameters of the
      * connections between the output and the reservoir have been properly set.
      * Is not visible if backWeights is not selected.
      */
     private StopLight outToResReady = new StopLight();
-    
+
     /**
      * Creation dialog constructor.
      *
      * @param panel Underlying network panel
      */
     public ESNCreationDialog(final NetworkPanel panel) {
-        
-    	this.panel = panel;
-        
+        this.panel = panel;
         // Create panels to set individual properties of each user-defined
         // connection
         inToRes = new SparsePanel(new Sparse(), panel);
         resRecurrent = new SparsePanel(new Sparse(), panel);
         outToRes = new SparsePanel(new Sparse(), panel);
-             
+
         // For customized values
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -200,10 +200,10 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         // Add text-fields
         esnPanel.addItem("Input Nodes:", tfNumInputs);
         esnPanel.addItem(new JLabel("Reservoir Neuron Type:"),
-        		reservoirNeuronTypes, 2);
+                reservoirNeuronTypes, 2);
         esnPanel.addItem("Reservoir Nodes:", tfNumReservoir);
-        esnPanel.addItem(new JLabel("Output Neuron Type:"),
-        		outputNeuronTypes, 2);
+        esnPanel.addItem(new JLabel("Output Neuron Type:"), outputNeuronTypes,
+                2);
         esnPanel.addItem("Output Nodes:", tfNumOutputs);
 
         // GridBagConstraints for next section
@@ -223,7 +223,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         esnPanel.addItem(tempPanel, 2);
         esnPanel.addItem(inResSparsity, 3);
         esnPanel.addItem("Recurrent output weights:", recurrentOutputWeights);
-        
+
         JPanel tempPanel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         tempPanel1.add(resRecurrentReady);
         esnPanel.addItem(tempPanel1, 2);
@@ -233,7 +233,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         tempPanel2.add(outToResReady);
         esnPanel.addItem(tempPanel2, 2);
         esnPanel.addItem(backSparsity, 3);
-        
+
         // Default is disabled
         backSparsity.setEnabled(false);
         outToResReady.setVisible(false);
@@ -249,109 +249,105 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         fillFieldValues();
 
     }
-    
+
     /**
      * Adds all appropriate action listeners to each button and/or checkbox.
      */
-    private void addActionListeners(){
-    	
-    	//Enables/Disables the button for setting parameters from outputs to
-    	//inputs.
+    private void addActionListeners() {
+
+        // Enables/Disables the button for setting parameters from outputs to
+        // inputs.
         backWeights.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (backWeights.isSelected()) {
                     backSparsity.setEnabled(true);
-                    outToResReady.setVisible(true);       
+                    outToResReady.setVisible(true);
                 } else {
                     backSparsity.setEnabled(false);
-                    outToResReady.setVisible(false); 
+                    outToResReady.setVisible(false);
                 }
             }
         });
-        
-        //Opens the sparse panels for each of the user defined connections
+
+        // Opens the sparse panels for each of the user defined connections
         resSparsity.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		ConnectionDialog dialog = new ConnectionDialog(panel,
-        				resRecurrent);
-        		dialog.getOkButton().addActionListener(resRecurrentReady);
-        		dialog.setLocationRelativeTo(null);
+            public void actionPerformed(ActionEvent arg0) {
+                ConnectionDialog dialog = new ConnectionDialog(panel,
+                        resRecurrent);
+                dialog.getOkButton().addActionListener(resRecurrentReady);
+                dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
-        	}
+            }
         });
         inResSparsity.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		ConnectionDialog dialog = new ConnectionDialog(panel,
-        				inToRes);
-        		dialog.getOkButton().addActionListener(inToResReady);
-        		dialog.setLocationRelativeTo(null);
+            public void actionPerformed(ActionEvent arg0) {
+                ConnectionDialog dialog = new ConnectionDialog(panel, inToRes);
+                dialog.getOkButton().addActionListener(inToResReady);
+                dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
-        	}
-        });     
-        backSparsity.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		ConnectionDialog dialog = new ConnectionDialog(panel,
-        				outToRes);
-        		dialog.getOkButton().addActionListener(outToResReady);
-        		dialog.setLocationRelativeTo(null);
-                dialog.pack();
-                dialog.setVisible(true);
-        	}
+            }
         });
-        
+        backSparsity.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                ConnectionDialog dialog = new ConnectionDialog(panel, outToRes);
+                dialog.getOkButton().addActionListener(outToResReady);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
+
     }
-    
+
     /**
-     * Adds ESNCreationDialog as a proptery change listener to each of the 
-     * StopLights. This allows ESNCreationDialog to perform a check to
-     * determine whether or not enough parameters have been set to create
-     * an ESN. 
+     * Adds ESNCreationDialog as a proptery change listener to each of the
+     * StopLights. This allows ESNCreationDialog to perform a check to determine
+     * whether or not enough parameters have been set to create an ESN.
      */
-    private void addPropertyChangeListeners(){
+    private void addPropertyChangeListeners() {
 
         outToResReady.addPropertyChangeListener(this);
         resRecurrentReady.addPropertyChangeListener(this);
         inToResReady.addPropertyChangeListener(this);
-        
+
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * Checks if each of the used connections has been properly set and either
      * enables or disables the Ok button accordingly.
-     * 
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     *
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
+     * PropertyChangeEvent)
      */
-	@Override
-	public void propertyChange(PropertyChangeEvent arg0) {
-		
-		boolean check1 = inToResReady.getState();
-		boolean check2 = resRecurrentReady.getState();
-		boolean check3 = outToResReady.getState() ||
-				!backSparsity.isSelected();
-		
-		if(check1 && check2 && check3){
-			enableOkButton();
-		} else {
-			disableOkButton();
-		}
-		
-	}
-    
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+
+        boolean check1 = inToResReady.getState();
+        boolean check2 = resRecurrentReady.getState();
+        boolean check3 = outToResReady.getState() || !backSparsity.isSelected();
+
+        if (check1 && check2 && check3) {
+            enableOkButton();
+        } else {
+            disableOkButton();
+        }
+
+    }
+
     /**
-     * Creates a new dialog section given a title and using a JSeparator.
-     * TODO: This should really be in utils somewhere. Perhaps added to
+     * Creates a new dialog section given a title and using a JSeparator. TODO:
+     * This should really be in utils somewhere. Perhaps added to
      * LabelledItemPanel or made into its own class?
      *
      * @param label name of the section
      * @param gbc current GridBagConstraints, to align label and separators
      * @param cRow current row relative to LabeledItemPanel
      */
-    public void sectionSeparator(String label, GridBagConstraints gbc,
-    		int cRow) {
+    public void sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
         // Section label
         esnPanel.add(new JLabel(label), gbc);
 
@@ -378,7 +374,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
      * Populate fields with default data.
      */
     public void fillFieldValues() {
-      
+
         disableOkButton(); // Connection parameters have not been set...
         tfNumInputs.setText("" + 1);
         tfNumReservoir.setText("" + 64);
@@ -426,20 +422,21 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
             NeuronUpdateRule outUp = boxMap.get(outputNeuronTypes
                     .getSelectedItem());
             esn.setOutputNeuronType(outUp);
-            
+
             // Build network
 
             esn.buildNetwork();
             esn.connectLayers(inToRes.getConnection(),
-            		resRecurrent.getConnection(), outToRes.getConnection());
-            esn.addToParentNetwork();
+                    resRecurrent.getConnection(), outToRes.getConnection());
+            panel.getNetwork().addGroup(esn);
+
             dispose();
 
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"
                     + "\nNetwork construction failed.", "Error",
                     JOptionPane.ERROR_MESSAGE);
-           nfe.printStackTrace();
+            nfe.printStackTrace();
         }
 
     }

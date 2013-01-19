@@ -26,7 +26,6 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>AbstractConnectionPanel</b> is the abstract panel for all specific panels
  * for setting connection properties.
  */
-@SuppressWarnings("serial")
 public abstract class AbstractConnectionPanel extends JPanel {
 
     /** Main panel. */

@@ -162,13 +162,13 @@ public class EchoStateNetwork extends Subnetwork {
     public void buildNetwork() {
 
         // initialize the Layers
-        List<Neuron> inputLayerNeurons = 
-        		initializeLayer(new ClampedNeuronRule(), numInputs);
-        List<Neuron> reservoirLayerNeurons = 
-        		initializeLayer(reservoirNeuronType, numResNodes);
-        List<Neuron> outputLayerNeurons = 
-        		initializeLayer(outputNeuronType, numOutputs);
-        
+        List<Neuron> inputLayerNeurons = initializeLayer(
+                new ClampedNeuronRule(), numInputs);
+        List<Neuron> reservoirLayerNeurons = initializeLayer(
+                reservoirNeuronType, numResNodes);
+        List<Neuron> outputLayerNeurons = initializeLayer(outputNeuronType,
+                numOutputs);
+
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
 
@@ -198,39 +198,41 @@ public class EchoStateNetwork extends Subnetwork {
         NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,
                 Direction.NORTH, betweenLayerInterval);
 
-
-
     }
 
     /**
-     * Connects all the layers of the network based on 3 connection objects
-     * each with their own connection parameters. Also scales the spectral
-     * radius of the recurrent connections in the reservoir.
+     * Connects all the layers of the network based on 3 connection objects each
+     * with their own connection parameters. Also scales the spectral radius of
+     * the recurrent connections in the reservoir.
+     *
      * @param inToRes the connection object governing how the input connects to
-     * the reservoir.
+     *            the reservoir.
      * @param resRecurrent the connection object governing how the reservoir
-     * connects to itself.
+     *            connects to itself.
      * @param outToRes the connection object governing how the output connects
-     * to the reservoir. If these connections do not exist, pass null. If 
-     * backWeights is false these connections will not be made regardless of
-     * whether or not outToRes is null.
+     *            to the reservoir. If these connections do not exist, pass
+     *            null. If backWeights is false these connections will not be
+     *            made regardless of whether or not outToRes is null.
      */
     public void connectLayers(Sparse inToRes, Sparse resRecurrent,
-    		Sparse outToRes){	
-    	
-    	inToRes.setParameters(parentNetwork, inputLayer, reservoirLayer);
-    	resRecurrent.setParameters(parentNetwork, reservoirLayer,
-    			reservoirLayer);	
-    	addSynapseGroup(connectNeuronGroups(inputLayer, reservoirLayer, inToRes));
-    	addSynapseGroup(connectNeuronGroups(reservoirLayer, reservoirLayer, resRecurrent));
-    	
-    	if(backWeights) {
-    		outToRes.setParameters(parentNetwork, outputLayer, reservoirLayer);
-    		addSynapseGroup(connectNeuronGroups(outputLayer, reservoirLayer, outToRes));
-    	}
-    	
+            Sparse outToRes) {
+
+        inToRes.setParameters(getParentNetwork(), inputLayer, reservoirLayer);
+        resRecurrent.setParameters(getParentNetwork(), reservoirLayer,
+                reservoirLayer);
+        addSynapseGroup(connectNeuronGroups(inputLayer, reservoirLayer, inToRes));
+        addSynapseGroup(connectNeuronGroups(reservoirLayer, reservoirLayer,
+                resRecurrent));
+
+        if (backWeights) {
+            outToRes.setParameters(getParentNetwork(), outputLayer,
+                    reservoirLayer);
+            addSynapseGroup(connectNeuronGroups(outputLayer, reservoirLayer,
+                    outToRes));
+        }
+
         // Weights: reservoir layer to output layer
-        AllToAll allToAll = new AllToAll(parentNetwork,
+        AllToAll allToAll = new AllToAll(getParentNetwork(),
                 reservoirLayer.getNeuronList(), outputLayer.getNeuronList());
         connectNeuronGroups(reservoirLayer, outputLayer, allToAll);
 
@@ -245,30 +247,26 @@ public class EchoStateNetwork extends Subnetwork {
         if (directInOutWeights) {
             addEmptySynapseGroup(inputLayer, outputLayer);
         }
-        
+
         // Scale the reservoir's weights to have the desired spectral radius
         SimnetUtils.scaleEigenvalue(reservoirLayer.getNeuronList(),
-        		reservoirLayer.getNeuronList(), spectralRadius);
-        
+                reservoirLayer.getNeuronList(), spectralRadius);
+
     }
-    
-    public void addToParentNetwork(){
-        // Add the group to the network
-        getParentNetwork().addGroup(this);
-    }
-    
+
     /**
      * Fills and returns an ArrayList with neurons governed by the specified
      * node type.
+     *
      * @param nodeType the desired update rule governing all the neurons in the
-     * layer.
+     *            layer.
      * @param nodes the number of nodes in the layer.
-     * @return an ArrayList of nodes number of neurons all governed by the 
-     * NeuronUpdateRule nodeType. 
+     * @return an ArrayList of nodes number of neurons all governed by the
+     *         NeuronUpdateRule nodeType.
      */
     private ArrayList<Neuron> initializeLayer(NeuronUpdateRule nodeType,
             int nodes) {
-    	ArrayList<Neuron> layer = new ArrayList<Neuron>();
+        ArrayList<Neuron> layer = new ArrayList<Neuron>();
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);
             node.setIncrement(1); // TODO: Reasonable?
@@ -505,8 +503,8 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Set to true for the output to receive input from itself from the 
-     * previous time-step.
+     * Set to true for the output to receive input from itself from the previous
+     * time-step.
      *
      * @param recurrentWeights
      */

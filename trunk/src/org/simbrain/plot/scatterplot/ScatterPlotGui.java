@@ -37,6 +37,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -202,8 +203,17 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
+
+        JMenu helpMenu = new JMenu("Help");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Plot/scatter_plot.html");
+        JMenuItem helpItem = new JMenuItem(helpAction);
+        helpMenu.add(helpItem);
+
         bar.add(fileMenu);
         bar.add(editMenu);
+        bar.add(helpMenu);
+
         getParentFrame().setJMenuBar(bar);
     }
 

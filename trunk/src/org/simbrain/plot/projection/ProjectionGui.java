@@ -51,6 +51,7 @@ import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.DataPointColored;
@@ -437,8 +438,17 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
 
         });
         //editMenu.add(dims);
+
+        JMenu helpMenu = new JMenu("Help");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Plot/projection.html");
+        JMenuItem helpItem = new JMenuItem(helpAction);
+        helpMenu.add(helpItem);
+
         bar.add(fileMenu);
         bar.add(editMenu);
+        bar.add(helpMenu);
+
         getParentFrame().setJMenuBar(bar);
     }
 

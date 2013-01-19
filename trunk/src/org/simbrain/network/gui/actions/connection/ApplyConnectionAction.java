@@ -33,6 +33,7 @@ import org.simbrain.network.gui.dialogs.connect.SparsePanel;
  * Apply specified connection either from selected neurons to themselves
  * ("self connect") or form source to target.
  */
+@SuppressWarnings("serial")
 public final class ApplyConnectionAction extends AbstractAction {
 
     /** Network panel. */

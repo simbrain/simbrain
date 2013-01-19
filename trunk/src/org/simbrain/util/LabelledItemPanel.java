@@ -18,12 +18,10 @@
  */
 package org.simbrain.util;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,6 +34,7 @@ import javax.swing.JPanel;
  * @author Michael Harris
  * @author ztosi
  */
+@SuppressWarnings("serial")
 public class LabelledItemPanel extends JPanel {
     /** The row to add the next labelled item to. */
     private int myNextItemRow = 0;
@@ -138,8 +137,42 @@ public class LabelledItemPanel extends JPanel {
         add(item, itemConstraints);
 
     }
+    
+    /**
+     * Adds a labeled item to the panel on the current myNextItemRow, at the
+     * specified column
+     *
+     * @param labelText The label text for the item.
+     * @param item The item to be added.
+     * @param col desired grid bag layor column
+     */
+    public void addItem(final String name, final JComponent item, int col) {
+    	
+    	JLabel label = new JLabel(name);
+    	
+        GridBagConstraints labelConstraints = new GridBagConstraints();
 
+        labelConstraints.gridx = col;
+        labelConstraints.gridy = myNextItemRow;
+        labelConstraints.insets = new Insets(10, 10, 0, 0);
+        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
+        labelConstraints.fill = GridBagConstraints.NONE;
 
+        add(label, labelConstraints);
+
+        // Add the component with its constraints
+        GridBagConstraints itemConstraints = new GridBagConstraints();
+
+        itemConstraints.gridx = col + 1;
+        itemConstraints.gridy = myNextItemRow;
+        itemConstraints.insets = new Insets(10, 10, 0, 10);
+        itemConstraints.weightx = 1.0;
+        itemConstraints.anchor = GridBagConstraints.WEST;
+        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+        add(item, itemConstraints);
+
+    }
 
     /**
      * Modification of addItem which takes a label, rather than text, as an

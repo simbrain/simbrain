@@ -33,6 +33,7 @@ import javax.swing.JPanel;
  * @author David Fraser
  * @author Michael Harris
  */
+@SuppressWarnings("serial")
 public class LabelledItemPanel extends JPanel {
 
     /** The row to add the next labelled item to. */

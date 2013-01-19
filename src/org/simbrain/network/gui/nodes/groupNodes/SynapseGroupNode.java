@@ -44,7 +44,7 @@ public class SynapseGroupNode extends GroupNode {
      */
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
-        setStroke(null); // Comment this out to see outline
+        //setStroke(null); // Comment this out to see outline
         // getInteractionBox().setPaint(Color.white);
         // setOutlinePadding(-30);
         setPickable(false);
@@ -76,7 +76,7 @@ public class SynapseGroupNode extends GroupNode {
                             + (2 * inset));
 
             // Can also use setPathToEllipse
-            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+            setPathToEllipse((float) bounds.getX(), (float) bounds.getY(),
                     (float) bounds.getWidth(), (float) bounds.getHeight());
 
         } else {

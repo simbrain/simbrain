@@ -18,18 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.Dimension;
+
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -48,7 +45,6 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.StopLight;
@@ -142,18 +138,35 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
     /** Combo-box governing the desired neuron type of the output layer */
     private JComboBox outputNeuronTypes = new JComboBox(nTypeOptions);
 
+    /** A sparse panel for setting the connections between input and 
+     * reservoir. */
     private SparsePanel inToRes;
     
+    /** A sparse panel for setting the recurrent reservoir connections. */
     private SparsePanel resRecurrent;
     
+    /** A sparse panel for setting the connections between output and 
+     * reservoir if they exist. */
     private SparsePanel outToRes;
     
-    private StopLight outToResReady = new StopLight();
-    
-    private StopLight resRecurrentReady = new StopLight();
-    
+    /**
+     * A status light indicating whether or not the parameters of the
+     * connections between input and reservoir have been properly set.
+     */
     private StopLight inToResReady = new StopLight();
     
+    /**
+     * A status light indicating whether or not the parameters of the recurrent
+     * reservoir connections have been properly set.
+     */
+    private StopLight resRecurrentReady = new StopLight();
+    
+
+    /** A status light indicating whether or not the parameters of the 
+     * connections between the output and the reservoir have been properly set.
+     * Is not visible if backWeights is not selected.
+     */
+    private StopLight outToResReady = new StopLight();
     
     /**
      * Creation dialog constructor.
@@ -161,9 +174,8 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
      * @param panel Underlying network panel
      */
     public ESNCreationDialog(final NetworkPanel panel) {
-        this.panel = panel;
         
-
+    	this.panel = panel;
         
         // Create panels to set individual properties of each user-defined
         // connection
@@ -221,6 +233,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         tempPanel2.add(outToResReady);
         esnPanel.addItem(tempPanel2, 2);
         esnPanel.addItem(backSparsity, 3);
+        
         // Default is disabled
         backSparsity.setEnabled(false);
         outToResReady.setVisible(false);
@@ -230,17 +243,20 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         esnPanel.addItem(new JLabel("Spectral radius:"), maxEigenValue, 2);
 
         addActionListeners();
+        addPropertyChangeListeners();
 
         setContentPane(esnPanel);
         fillFieldValues();
 
     }
     
+    /**
+     * Adds all appropriate action listeners to each button and/or checkbox.
+     */
     private void addActionListeners(){
     	
-    	// Creates action listener which enables the text field for back weight
-        // sparsity based on if back weights are desired given the state of
-        // its check-box
+    	//Enables/Disables the button for setting parameters from outputs to
+    	//inputs.
         backWeights.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (backWeights.isSelected()) {
@@ -253,6 +269,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
             }
         });
         
+        //Opens the sparse panels for each of the user defined connections
         resSparsity.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		ConnectionDialog dialog = new ConnectionDialog(panel,
@@ -263,7 +280,6 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
                 dialog.setVisible(true);
         	}
         });
-        
         inResSparsity.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		ConnectionDialog dialog = new ConnectionDialog(panel,
@@ -273,8 +289,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
                 dialog.pack();
                 dialog.setVisible(true);
         	}
-        });
-        
+        });     
         backSparsity.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		ConnectionDialog dialog = new ConnectionDialog(panel,
@@ -286,15 +301,33 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         	}
         });
         
+    }
+    
+    /**
+     * Adds ESNCreationDialog as a proptery change listener to each of the 
+     * StopLights. This allows ESNCreationDialog to perform a check to
+     * determine whether or not enough parameters have been set to create
+     * an ESN. 
+     */
+    private void addPropertyChangeListeners(){
+
         outToResReady.addPropertyChangeListener(this);
         resRecurrentReady.addPropertyChangeListener(this);
         inToResReady.addPropertyChangeListener(this);
         
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * Checks if each of the used connections has been properly set and either
+     * enables or disables the Ok button accordingly.
+     * 
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
-	
+		
 		boolean check1 = inToResReady.getState();
 		boolean check2 = resRecurrentReady.getState();
 		boolean check3 = outToResReady.getState() ||
@@ -308,15 +341,17 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
 		
 	}
     
-    // TODO: put this in a more public class?
     /**
      * Creates a new dialog section given a title and using a JSeparator.
+     * TODO: This should really be in utils somewhere. Perhaps added to
+     * LabelledItemPanel or made into its own class?
      *
      * @param label name of the section
      * @param gbc current GridBagConstraints, to align label and separators
      * @param cRow current row relative to LabeledItemPanel
      */
-    public void sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
+    public void sectionSeparator(String label, GridBagConstraints gbc,
+    		int cRow) {
         // Section label
         esnPanel.add(new JLabel(label), gbc);
 
@@ -343,8 +378,8 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
      * Populate fields with default data.
      */
     public void fillFieldValues() {
-        // Connection parameters have not been set...
-        disableOkButton();
+      
+        disableOkButton(); // Connection parameters have not been set...
         tfNumInputs.setText("" + 1);
         tfNumReservoir.setText("" + 64);
         tfNumOutputs.setText("" + 1);
@@ -352,6 +387,7 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
         directInOutWeights.setSelected(false);
         backWeights.setSelected(false);
         maxEigenValue.setText("" + 0.98);
+
     }
 
     /*
@@ -408,6 +444,4 @@ public class ESNCreationDialog extends StandardDialog implements PropertyChangeL
 
     }
 
-
-    
 }

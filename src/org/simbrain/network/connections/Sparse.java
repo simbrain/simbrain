@@ -20,7 +20,6 @@ package org.simbrain.network.connections;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;

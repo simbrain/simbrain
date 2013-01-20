@@ -19,12 +19,24 @@
 package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SimpleFrame;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -48,6 +60,7 @@ public class SynapseGroupNode extends GroupNode {
         // getInteractionBox().setPaint(Color.white);
         // setOutlinePadding(-30);
         setPickable(false);
+        setContextMenu();
     }
 
     @Override
@@ -87,6 +100,44 @@ public class SynapseGroupNode extends GroupNode {
 
         updateInteractionBox();
     }
+
+    /**
+     * Sets custom menu for SynapseGroup nodes.  To add new menu items
+     * to context menu add them here.
+     */
+    private void setContextMenu() {
+        JPopupMenu menu = super.getDefaultContextMenu();
+        menu.addSeparator();
+        ((SynapseGroup) this.getGroup()).getSynapseList();
+        menu.add(new JMenuItem(showWeightMatrixAction));
+        setContextMenu(menu);
+    }
+
+    /**
+     * Action for showing the weight matrix for this neuron group.
+     */
+    Action showWeightMatrixAction = new AbstractAction() {
+
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Grid.png"));
+            putValue(NAME, "Show weight matrix");
+            putValue(SHORT_DESCRIPTION, "Show weight matrix");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            List<Neuron> sourceNeurons = ((SynapseGroup) SynapseGroupNode.this
+                    .getGroup()).getSourceNeurons();
+            List<Neuron> targetNeurons = ((SynapseGroup) SynapseGroupNode.this
+                    .getGroup()).getTargetNeurons();
+            JPanel panel = WeightMatrixViewer
+                    .getWeightMatrixPanel(new WeightMatrixViewer(
+                            sourceNeurons, targetNeurons,
+                            SynapseGroupNode.this.getNetworkPanel()));
+            SimpleFrame.displayPanel(panel);
+        }
+    };
 
     @Override
     protected void updateInteractionBox() {

@@ -12,11 +12,15 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -137,6 +141,36 @@ public class SynapseGroup extends Group {
         if (isEmpty() && isDeleteWhenEmpty()) {
             delete();
         }
+    }
+
+    /**
+     * Return a list of source neurons associated with the synapses in this
+     * group.
+     *
+     * @return the source neuron list.
+     */
+    public List<Neuron> getSourceNeurons() {
+        // Use a set to remove repeat source neurons
+        Set<Neuron> retList = new HashSet<Neuron>();
+        for (Synapse synpase : synapseList) {
+            retList.add(synpase.getSource());
+        }
+        return new ArrayList<Neuron>(retList);
+    }
+
+    /**
+     * Return a list of target neurons associated with the synapses in this
+     * group.
+     *
+     * @return the target neuron list.
+     */
+    public List<Neuron> getTargetNeurons() {
+        // Use a set to remove repeat source neurons
+        Set<Neuron> retList = new HashSet<Neuron>();
+        for (Synapse synpase : synapseList) {
+            retList.add(synpase.getTarget());
+        }
+        return new ArrayList<Neuron>(retList);
     }
 
     /**

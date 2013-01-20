@@ -68,6 +68,19 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     }
 
     /**
+     * Construct a weight matrix viewer using a specified list of source and
+     * target neurons.
+     *
+     * @param sourceList the source neurons
+     * @param targetList the target neurons
+     * @param panel the parent network panel
+     */
+    public WeightMatrixViewer(List<Neuron> sourceList, List<Neuron> targetList,
+            NetworkPanel panel) {
+        init(sourceList, targetList, panel);
+    }
+
+    /**
      * Create a panel for viewing the matrices connecting a set of source and
      * target neuron lists.
      *
@@ -78,6 +91,21 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Get source and target lists
         ArrayList<Neuron> sourceList = panel.getSourceModelNeurons();
         ArrayList<Neuron> targetList = panel.getSelectedModelNeurons();
+        init(sourceList, targetList, panel);
+    }
+
+    /**
+     * Initialize the weight matrix viewer.
+     *
+     * @param sourceList the source neurons
+     * @param targetList the target neurons
+     * @param panel the network panel
+     */
+    private void init(List<Neuron> sourceList, List<Neuron> targetList,
+            NetworkPanel panel) {
+         // By default the lists are sorted horizontally.
+         // TODO: Allow for vertical sorting, or for some appropriate sorting
+         // when displaying an adjacency matrix
 
         // By default the lists are sorted horizontally.
         // TODO: Allow for vertical sorting, or for some appropriate sorting
@@ -129,7 +157,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             }
 
         });
-    }
+     }
 
     /**
      * Display a warning message if there are empty weights.

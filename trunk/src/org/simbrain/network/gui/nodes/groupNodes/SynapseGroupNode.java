@@ -120,7 +120,7 @@ public class SynapseGroupNode extends GroupNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Grid.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
             putValue(NAME, "Show weight matrix");
             putValue(SHORT_DESCRIPTION, "Show weight matrix");
         }

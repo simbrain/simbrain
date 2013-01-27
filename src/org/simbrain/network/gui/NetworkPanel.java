@@ -41,6 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
@@ -120,6 +121,12 @@ public class NetworkPanel extends JPanel {
 
     /** The model neural-Network object. */
     private Network network;
+
+    /** The Network hierarchy panel. */
+    private NetworkHierarchyPanel networkHierarchyPanel;
+
+    /** Main splitter pane: network in middle, hierarchy on left. */
+    private JSplitPane splitPane;
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -235,6 +242,9 @@ public class NetworkPanel extends JPanel {
     /** Whether to display update priorities. */
     private boolean prioritiesVisible = false;
 
+    /** Whether to display the network hierarchy panel. */
+    private boolean showNetworkHierarchyPanel = true;
+
     /** Text object event handler. */
     private TextEventHandler textHandle;
 
@@ -269,6 +279,7 @@ public class NetworkPanel extends JPanel {
         actionManager = new NetworkActionManager(this);
         undoManager = new UndoManager();
 
+
         createContextMenu();
         // createContextMenuAlt();
 
@@ -291,7 +302,15 @@ public class NetworkPanel extends JPanel {
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
 
-        this.add("Center", canvas);
+        networkHierarchyPanel = new NetworkHierarchyPanel(this);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(.2);
+        splitPane.setLeftComponent(networkHierarchyPanel);
+        splitPane.setRightComponent(canvas);
+        this.add("Center", splitPane);
+
+        setPrioritiesVisible(prioritiesVisible);
+        setHierarchyPanelVisible(showNetworkHierarchyPanel);
 
         // Event listeners
         removeDefaultEventListeners();
@@ -467,7 +486,7 @@ public class NetworkPanel extends JPanel {
                         parentGroupNode.setVisible(true);
                     }
                 }
- 
+
             }
 
             public void synapseRemoved(final NetworkEvent<Synapse> e) {
@@ -1313,6 +1332,15 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Add objects to the current selection.
+     *
+     * @param element the element to "select."
+     */
+    public void addSelection(final Object element) {
+        selectionModel.add(element);
+    }
+
+    /**
      * Add the specified Network selection listener.
      *
      * @param l Network selection listener to add
@@ -2058,6 +2086,26 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Set the visibility of the hiearchy panel.
+     *
+     * @param showIt whether it should be visible or not
+     */
+    public void setHierarchyPanelVisible(boolean showIt) {
+        this.showNetworkHierarchyPanel = showIt;
+        actionManager.getShowNetworkHierarchyPanel().setState(
+                showNetworkHierarchyPanel);
+        if (!showNetworkHierarchyPanel) {
+            splitPane.setLeftComponent(null);
+            splitPane.setDividerSize(0);
+        } else {
+            splitPane.setLeftComponent(networkHierarchyPanel);
+            splitPane.setDividerSize(4);
+        }
+        networkHierarchyPanel.setVisible(showNetworkHierarchyPanel);
+    }
+
+
+    /**
      * @return the prioritiesVisible
      */
     public boolean getPrioritiesVisible() {
@@ -2339,6 +2387,5 @@ public class NetworkPanel extends JPanel {
     public UndoManager getUndoManager() {
         return undoManager;
     }
-
 
 }

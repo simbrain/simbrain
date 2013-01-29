@@ -328,7 +328,7 @@ public class SynapseRouter {
      * @param synapse the synapse
      * @param synapseGroup the group to place the synapse in
      */
-    private void addSynapseToGroup(final Synapse synapse,
+    public static void addSynapseToGroup(final Synapse synapse,
             final SynapseGroup synapseGroup) {
 
         // If the synapse already exists in that group, don't add it.

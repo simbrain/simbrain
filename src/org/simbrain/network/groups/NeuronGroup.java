@@ -75,7 +75,7 @@ public class NeuronGroup extends Group {
 
     @Override
     public void update() {
-        getParentNetwork().updateNeurons(neuronList);
+        Network.updateNeurons(neuronList);
     }
 
     /**

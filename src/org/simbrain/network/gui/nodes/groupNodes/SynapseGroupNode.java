@@ -148,4 +148,13 @@ public class SynapseGroupNode extends GroupNode {
         interactionBox.moveToFront();
     }
 
+    /**
+     * Returns the SynapseGroup to this SynapseGroupNode.
+     * 
+     * @return the synapse group
+     */
+    public SynapseGroup getSynapseGroup() {
+    	return (SynapseGroup) getGroup();
+    }
+    
 }

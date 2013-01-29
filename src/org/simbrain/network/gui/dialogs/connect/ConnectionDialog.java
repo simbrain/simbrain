@@ -18,10 +18,22 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
@@ -44,6 +56,13 @@ public class ConnectionDialog extends StandardDialog {
     /** The connection object associated with the connection panel. */
     private ConnectNeurons connection;
 
+    /** The mapping of group names to available synapse groups. */
+    private LinkedHashMap<String, SynapseGroup> groupingOptions =
+    		new LinkedHashMap<String, SynapseGroup>();
+    
+    /** A combo-box showing the available group options. */
+    private JComboBox synapseGroups;
+    
     /**
      *
      * @param networkPanel
@@ -86,6 +105,14 @@ public class ConnectionDialog extends StandardDialog {
         ShowHelpAction helpAction = new ShowHelpAction(
                 "Pages/Network/connections.html");
         addButton(new JButton(helpAction));
+
+
+        synapseGroups = new JComboBox(updateAvailableGroups());
+        JPanel groupingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        groupingPanel.add(new JLabel("Add new synapses to group: "));
+        groupingPanel.add(synapseGroups);
+        optionsPanel.add(groupingPanel, BorderLayout.SOUTH);
+        
         setContentPane(optionsPanel);
     }
 
@@ -93,11 +120,60 @@ public class ConnectionDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         optionsPanel.commitChanges();
-        connection.connectNeurons(networkPanel.getNetwork(),
+        
+    	List<Synapse> synapses = connection.connectNeurons(networkPanel.getNetwork(),
                 networkPanel.getSourceModelNeurons(),
                 networkPanel.getSelectedModelNeurons());
+        
+    	SynapseGroup homeGroup = groupingOptions.get(synapseGroups.
+    			getSelectedItem());
+    	
+        if (homeGroup != null) {
+        	
+        	for (Synapse s : synapses) {
+        		SynapseRouter.addSynapseToGroup(s, homeGroup);  		
+        	}
+        	
+        	if (((String) (synapseGroups.getSelectedItem())).
+        			contentEquals("New Group")) {
+        	networkPanel.getNetwork().addGroup(homeGroup);
+        	} 
+        }
+
     }
 
+    /**
+     * Updates the list of synapse groups available for the new connections to
+     * be added to.
+     * @return an array of the names of each available group.
+     */
+    private String [] updateAvailableGroups() {
+    	groupingOptions.clear();
+        groupingOptions.put("None", null);
+        groupingOptions.put("New Group",
+        		new SynapseGroup(networkPanel.getNetwork()));
+  
+        int count = 2;
+        
+        for (Group sg : networkPanel.getNetwork().getGroupList()) {
+        	if (sg instanceof SynapseGroup) {
+        		groupingOptions.put(sg.getLabel(), (SynapseGroup) sg);
+        		count++;
+        	}
+        }
+        
+        String[] names = new String[count];
+        names[0] = "None";
+        names[1] = "New Group";
+        for(int i = 2; i < count; i++) {
+        	names[i] = (String)groupingOptions.keySet().toArray()[i];
+        }
+        
+        
+        return names;
+  
+    }
+    
     public AbstractConnectionPanel getOptionsPanel() {
         return optionsPanel;
     }

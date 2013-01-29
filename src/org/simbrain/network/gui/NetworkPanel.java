@@ -1441,6 +1441,36 @@ public class NetworkPanel extends JPanel {
         }
         return ret;
     }
+    
+    /**
+     * Returns selected neuron groups.
+     * 
+     * @return list of neuron groups.
+     */
+    public ArrayList<NeuronGroup> getSelectedModelNeuronGroups() {
+    	ArrayList<NeuronGroup> ng = new ArrayList<NeuronGroup>();
+    	for (PNode e : getSelection()) {
+    		if (e instanceof NeuronGroupNode) {
+    			ng.add(((NeuronGroupNode) e).getNeuronGroup());
+    		}
+    	}
+    	return ng;
+    }
+    
+    /**
+     * Returns selected synapse groups.
+     * 
+     * @return list of synapse groups
+     */
+    public ArrayList<SynapseGroup> getSelectedModelSynapseGroups() {
+    	ArrayList<SynapseGroup> sg = new ArrayList<SynapseGroup>();
+    	for (PNode e : getSelection()) {
+    		if (e instanceof SynapseGroupNode) {
+    			sg.add(((SynapseGroupNode) e).getSynapseGroup());
+    		}
+    	}
+    	return sg;
+    }
 
     /**
      * Returns model Network elements corresponding to selected screen elements.

@@ -51,5 +51,14 @@ public class NeuronGroupNode extends GroupNode {
             setStrokePaint(Color.gray);
         }
     }
+    
+    /**
+     * Returns the NeuronGroup to this NeuronGroupNode
+     * 
+     * @return the neuron group
+     */
+    public NeuronGroup getNeuronGroup(){
+    	return (NeuronGroup) getGroup();
+    }
 
 }

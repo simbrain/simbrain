@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -52,8 +53,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public AllToAllPanel(final AllToAll connection) {
         super(connection);
+        JPanel allP = new JPanel(new GridBagLayout());
         eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
-        this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -63,13 +64,13 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         gbc.gridheight = 9;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        this.add(eipPanel, gbc);
+        allP.add(eipPanel, gbc);
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 0, 10);
         gbc.gridy = 9;
         gbc.gridheight = 1;
-        this.add(new JSeparator(), gbc);
+        allP.add(new JSeparator(), gbc);
 
         gbc.gridy = 10;
         gbc.gridwidth = 2;
@@ -81,7 +82,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         allowSelfConnectPanel.add(new JLabel("Allow Self-Connections: "));
         allowSelfConnectPanel.add(allowSelfConnect);
 
-        this.add(allowSelfConnectPanel, gbc);
+        allP.add(allowSelfConnectPanel, gbc);
+        this.add(allP, BorderLayout.CENTER);
     }
 
     /**

@@ -91,6 +91,13 @@ public class Sparse extends ConnectNeurons {
             	targetList.add(i);
             }
         	int synsPerSource = numSyns / sourceNeurons.size();
+        	int targStart = 0;
+        	int targEnd = synsPerSource;
+        	if(synsPerSource > numSyns/2) {
+        		synsPerSource = numSyns - synsPerSource;
+        		targStart = synsPerSource;
+        		targEnd = targetList.size();
+        	}
         	for(int i = 0; i < sourceNeurons.size(); i++){
         		source = sourceNeurons.get(i);   	
         		if(!allowSelfConnection && sourceNeurons == targetNeurons) {
@@ -98,7 +105,8 @@ public class Sparse extends ConnectNeurons {
     			} else {
     				randShuffleK(targetList, synsPerSource, false, 0, rand);
     			}
-        		for(int j = 0; j < synsPerSource; j++){    			
+        		
+        		for(int j = targStart; j < targEnd; j++){    			
         			target = targetNeurons.get(targetList.get(j));
         			if (Math.random() < excitatoryRatio) {
                         synapse = baseExcitatorySynapse.instantiateTemplateSynapse(

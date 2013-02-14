@@ -122,6 +122,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         // Sensor display
         if (entityRef.getSensors().size() > 0) {
             tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
+            tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
         }
 
         // [Below not currently used]

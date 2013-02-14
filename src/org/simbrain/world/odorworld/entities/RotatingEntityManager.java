@@ -103,6 +103,7 @@ public class RotatingEntityManager {
 
         double angle = 7.5;
         cowMap.put(angle, new Animation(new String[] {
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0000.png",
                 ROTATING_IMAGE_DIR + tileBaseName + "/e0001.png",
                 ROTATING_IMAGE_DIR + tileBaseName + "/e0002.png",
                 ROTATING_IMAGE_DIR + tileBaseName + "/e0003.png",

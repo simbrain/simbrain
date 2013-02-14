@@ -16,6 +16,8 @@ Source: http://code.google.com/p/simbrain/source/checkout
 
 A folder containing the project source code will be created titled "simbrain" for project members and "simbrain-read-only" for non-members.
 
+Note: for some reason OSCWorld and 3dWorld are sometimes added to a new Simbrain project in an incorrect state.   To fix this go to Project > Properties > Source and remove everything but simbrain/src; also make sure that the "Excluded list" in the drop-down menu is empty.
+
 = In Eclipse =
 
 Select _File >  New > Java Project_

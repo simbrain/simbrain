@@ -38,103 +38,98 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
- * Panel showing an agent's sensors.
- *
- * TODO: Use Jtree instead? TODO: Do the same for effectors.
- *
+ * Panel showing an agent's effectors.
  */
-public class SensorPanel extends JPanel {
+public class EffectorPanel extends JPanel {
 
-	/** Table representing sensor. */
+	/** Table representing Effector. */
 	private JTable table;
 
 	/** Table model. */
-	private SensorModel model;
+	private EffectorModel model;
 
-	public SensorPanel(final OdorWorldEntity entity) {
+	public EffectorPanel(final OdorWorldEntity entity) {
 
 		// Set up table
-		model = new SensorModel();
+		model = new EffectorModel();
 		table = new JTable(model);
 		((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-		.setHorizontalAlignment(SwingConstants.CENTER);
+				.setHorizontalAlignment(SwingConstants.CENTER);
 		table.setRowSelectionAllowed(true);
 		table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		table.setGridColor(Color.LIGHT_GRAY);
 		table.setFocusable(false);
-
 		/**
 		 * Right Click Interface
 		 */
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(final MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
+				if (e.getButton() == java.awt.event.MouseEvent.BUTTON3) {
 					int row = table.rowAtPoint(e.getPoint());
 					int column = table.columnAtPoint(e.getPoint());
 					table.setRowSelectionInterval(row, row);
 					if (column == 0) {
-						JPopupMenu sensorPop = new JPopupMenu();
-						JMenuItem menuItem = new JMenuItem("Sensor Popup Menu");
-						sensorPop.add(menuItem);
-						sensorPop.show(e.getComponent(), e.getX(), e.getY());
+					    JPopupMenu sensorPop = new JPopupMenu();
+					    JMenuItem menuItem = new JMenuItem("Sensor Popup Menu");
+					    sensorPop.add(menuItem);
+					    sensorPop.show(e.getComponent(), e.getX(), e.getY());
 					}
 				}
 			}
 		});
 
-		for (Sensor sensor : entity.getSensors()) {
-			model.addRow(sensor);
+		for (Effector effector : entity.getEffectors()) {
+			model.addRow(effector);
 		}
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		JPanel buttonBar = new JPanel();
 		ImageIcon plus = new ImageIcon("src/org/simbrain/resource/plus.png");
 		ImageIcon minus = new ImageIcon("src/org/simbrain/resource/minus.png");
-		// TODO: addSensor
-		JButton addSensor;
-		JButton deleteSensor;
-		buttonBar.add(addSensor = new JButton(plus));
-		buttonBar.add(deleteSensor = new JButton(minus));
-		deleteSensor.addActionListener(new ActionListener() {
+		// TODO: addEffector
+		JButton addEffector;
+		JButton deleteEffector;
+		buttonBar.add(addEffector = new JButton(plus));
+		buttonBar.add(deleteEffector = new JButton(minus));
+		deleteEffector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent del) {
 				int [] selectedRows = table.getSelectedRows();
 				for (int i = 0; i < selectedRows.length; i++) {
-					model.removeRow(selectedRows[i]);
-					model.fireTableDataChanged();
+			        model.removeRow(selectedRows[i]);
+			        model.fireTableDataChanged();
 				}
 			}
 		});
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, scrollPane);
 		add(BorderLayout.SOUTH, buttonBar);
-	}
-
+		}
 	/**
-	 * Table model which represents sensors.
+	 * Table model which represents Effectors
 	 */
-	class SensorModel extends AbstractTableModel {
+	class EffectorModel extends AbstractTableModel {
 
 		/** Column names. */
 		String[] columnNames = { "Id", "Label", "Type" };
 
 		/** Internal list of components. */
-		private List<Sensor> data = new ArrayList<Sensor>();
+		private List<Effector> data = new ArrayList<Effector>();
 
 		/**
-		 * Add a row.
+		 * Add a row
 		 *
-		 * @param sensor
+		 * @param Effector
 		 */
-		public void addRow(Sensor sensor) {
-			data.add(sensor);
+		public void addRow(Effector effector) {
+			data.add(effector);
 		}
 
 		/**
-		 * Remove a row.
+		 * Remove a row
 		 *
 		 * @param row
 		 */
@@ -201,7 +196,7 @@ public class SensorPanel extends JPanel {
 		public boolean isCellEditable(int row, int col) {
 			switch (col) {
 			case 0:
-				return false;
+				return true;
 			case 1:
 				return true;
 			case 2:

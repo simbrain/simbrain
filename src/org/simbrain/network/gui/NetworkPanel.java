@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -243,7 +244,7 @@ public class NetworkPanel extends JPanel {
     private boolean prioritiesVisible = false;
 
     /** Whether to display the network hierarchy panel. */
-    private boolean showNetworkHierarchyPanel = true;
+    private boolean showNetworkHierarchyPanel;
 
     /** Text object event handler. */
     private TextEventHandler textHandle;
@@ -302,6 +303,12 @@ public class NetworkPanel extends JPanel {
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
 
+        // Set up network hierarchy panel
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("showNetworkHierarchyPanel")) {
+            showNetworkHierarchyPanel = Boolean.parseBoolean(properties
+                    .getProperty("showNetworkHierarchyPanel"));
+        }
         networkHierarchyPanel = new NetworkHierarchyPanel(this);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(.2);

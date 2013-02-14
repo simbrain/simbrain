@@ -25,7 +25,7 @@ public class Animation {
     /** Current frame index. */
     private int currFrameIndex;
 
-    /** Length of animation. */
+    /** Length of each frame. */
     private long animTime;
 
     /** Total duration of animation. */
@@ -36,11 +36,11 @@ public class Animation {
      * file locations.
      *
      * @param imageLocations array of image locations.
-     * @param totalDuration total duration of animation.
+     * @param animTime time to display each frame.
      */
-    public Animation(final String[] imageLocations, final long totalDuration) {
+    public Animation(final String[] imageLocations, final long animTime) {
         this.imageNames = imageLocations;
-        this.totalDuration = totalDuration;
+        this.animTime = animTime;
         initializeImages();
         start();
     }
@@ -121,7 +121,7 @@ public class Animation {
     }
 
     /**
-     * An single frame of an animation.
+     * A single frame of an animation.
      */
     private class AnimFrame {
 
@@ -165,13 +165,10 @@ public class Animation {
         if (frames == null) {
             frames = new ArrayList<AnimFrame>();
         }
-        for (int i = 0; i < imageNames.length; i++) {
-            long duration = 10;
-            if ((imageNames.length > 0) && (totalDuration > 0)) {
-                duration = totalDuration / imageNames.length;
-            }
-            this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]),
-                    duration);
-        }
+            if (imageNames.length > 0)
+                for (int i = 0; i < imageNames.length; i++)
+                    this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]),
+                    animTime);
+        
     }
 }

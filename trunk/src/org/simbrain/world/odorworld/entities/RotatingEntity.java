@@ -80,21 +80,21 @@ public class RotatingEntity extends OdorWorldEntity {
         if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
         } else if (entityType.equalsIgnoreCase("Amy")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("amy", 55);
+            imageMap = RotatingEntityManager.getRotatingTileset("amy", 20);
         } else if (entityType.equalsIgnoreCase("Arnold")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("arno", 55);
+            imageMap = RotatingEntityManager.getRotatingTileset("arno", 20);
         } else if (entityType.equalsIgnoreCase("Boy")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("boy", 25);
+            imageMap = RotatingEntityManager.getRotatingTileset("boy", 20);
         } else if (entityType.equalsIgnoreCase("Cow")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("cow", 15);
+            imageMap = RotatingEntityManager.getRotatingTileset("cow", 25);
         } else if (entityType.equalsIgnoreCase("Girl")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("girl", 25);
+            imageMap = RotatingEntityManager.getRotatingTileset("girl", 20);
         } else if (entityType.equalsIgnoreCase("Lion")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("lion", 25);
+            imageMap = RotatingEntityManager.getRotatingTileset("lion", 15);
         } else if (entityType.equalsIgnoreCase("Susi")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("susi", 55);
+            imageMap = RotatingEntityManager.getRotatingTileset("susi", 20);
         } else if (entityType.equalsIgnoreCase("Steve")) {
-            imageMap = RotatingEntityManager.getRotatingTileset("steve", 25);
+            imageMap = RotatingEntityManager.getRotatingTileset("steve", 20);
         }
         update(0);
     }

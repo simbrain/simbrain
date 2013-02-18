@@ -3,6 +3,10 @@
 = Introduction =
 
 This page is for those who want to contribute to Simbrain development. Notes for Eclipse users are below.   You will also need to use checkstyle, a program we use to ensure code consistency.    Of course, you will also need to contact an administrator to become a project member  before you can commit changes.
+
+== Eclipse Compile Error Note ==
+
+For some reason OSCWorld and 3dWorld are sometimes added to a new Simbrain project in an incorrect state.   To fix this go to Project > Properties > Source and remove everything but simbrain/src; also make sure that the "Excluded list" in the drop-down menu is empty.
 	
 == Checkstyle == 
 
@@ -34,12 +38,21 @@ Click on OK and then select Main and select the configuration file that was just
 
 Finally click the check box labeled Checkstyle active for this project to activate checkstyle and click OK to accept the settings. Eclipse will now ask to rebuild the project, click OK and any outstanding checkstyle errors will now be displayed.
 
-=== Eclipse Tabs to Spaces ===
+=== Configure Eclipse to fix checkstyle errors ==
 
-Since our checkstyle requires spaces, this may have to be changed in older versions of  Eclipse.  Here's an entry on how to do it:
+One quick way to fix checkstyle formatting  errors is to invokoke the format command.
+
+This still does not solve trailing whitespace problems, and in fact adds some trailing whitespace that checkstyle will complain about.  A quick way to fix this is by adding a key binding so that control-R calls the eclipse command "Remove Trailing Whitespace".  Here are the steps:
+
+ # Eclipse (Or Window) > Preferences > General > Keys > "Remove Trailing WhiteSpace"
+ # In binding click "control R". 
+ # Click OK
+
+With these two steps you can easily clear up a lot of checkstyle errors quickly, by doing invoking the format command (control-shift-F) then remove trailing white space (control-R).
+
+Also, note that since our checkstyle requires spaces, this may have to be changed in older versions of  Eclipse.  Here's an entry on how to do it:
 
 http://blog.dotkam.com/2007/03/21/changing-tabs-to-spaces-in-eclipse/
-
 
 == Log4J ==
 

@@ -38,193 +38,241 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Panel showing an agent's sensors.
  *
- * TODO: Use Jtree instead? TODO: Do the same for effectors.
+ * @author Jeff Yoshimi
+ * @author Lam Nguyen
  *
  */
 public class SensorPanel extends JPanel {
 
-	/** Table representing sensor. */
-	private JTable table;
+    /** Table representing sensor. */
+    private JTable table;
 
-	/** Table model. */
-	private SensorModel model;
+    /** Table model. */
+    private SensorModel model;
 
-	public SensorPanel(final OdorWorldEntity entity) {
+    /**
+     * Construct the sensor panel.
+     *
+     * @param entity the entity whose sensors should be represented.
+     */
+    public SensorPanel(final OdorWorldEntity entity) {
 
-		// Set up table
-		model = new SensorModel();
-		table = new JTable(model);
-		((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-		.setHorizontalAlignment(SwingConstants.CENTER);
-		table.setRowSelectionAllowed(true);
-		table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		table.setGridColor(Color.LIGHT_GRAY);
-		table.setFocusable(false);
+        // Set up table
+        model = new SensorModel();
+        table = new JTable(model);
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
+                .setHorizontalAlignment(SwingConstants.CENTER);
+        table.setRowSelectionAllowed(true);
+        table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table.setGridColor(Color.LIGHT_GRAY);
+        table.setFocusable(false);
 
-		/**
-		 * Right Click Interface
-		 */
-		table.addMouseListener(new MouseAdapter() {
-			public void mouseReleased(final MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					int row = table.rowAtPoint(e.getPoint());
-					int column = table.columnAtPoint(e.getPoint());
-					table.setRowSelectionInterval(row, row);
-					if (column == 0) {
-						JPopupMenu sensorPop = new JPopupMenu();
-						JMenuItem menuItem = new JMenuItem("Sensor Popup Menu");
-						sensorPop.add(menuItem);
-						sensorPop.show(e.getComponent(), e.getX(), e.getY());
-					}
-				}
-			}
-		});
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(final MouseEvent e) {
+                if (e.isControlDown() || (e.getButton() == MouseEvent.BUTTON3)) {
+                    final int row = table.rowAtPoint(e.getPoint());
+                    final int column = table.columnAtPoint(e.getPoint());
+                    table.setRowSelectionInterval(row, row);
+                    JPopupMenu sensorPop = new JPopupMenu();
+                    JMenuItem menuItem = new JMenuItem("Edit sensor...");
+                    sensorPop.add(menuItem);
+                    sensorPop.show(e.getComponent(), e.getX(), e.getY());
+                    Sensor sensor = model.getSensor(row);
+                    if (sensor instanceof SmellSensor) {
+                        menuItem.setAction(ReflectivePropertyEditor
+                                .getPropertiesDialogAction((SmellSensor) sensor));
+                    }
+                    // TODO: add ability to edit other sensors here
+                    sensorPop.add(menuItem);
+                    sensorPop.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
 
-		for (Sensor sensor : entity.getSensors()) {
-			model.addRow(sensor);
-		}
+        });
 
-		JScrollPane scrollPane = new JScrollPane(table);
-		JPanel buttonBar = new JPanel();
-		ImageIcon plus = new ImageIcon("src/org/simbrain/resource/plus.png");
-		ImageIcon minus = new ImageIcon("src/org/simbrain/resource/minus.png");
-		// TODO: addSensor
-		JButton addSensor;
-		JButton deleteSensor;
-		buttonBar.add(addSensor = new JButton(plus));
-		buttonBar.add(deleteSensor = new JButton(minus));
-		deleteSensor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent del) {
-				int [] selectedRows = table.getSelectedRows();
-				for (int i = 0; i < selectedRows.length; i++) {
-					model.removeRow(selectedRows[i]);
-					model.fireTableDataChanged();
-				}
-			}
-		});
-		setLayout(new BorderLayout());
-		add(BorderLayout.CENTER, scrollPane);
-		add(BorderLayout.SOUTH, buttonBar);
-	}
+        for (Sensor sensor : entity.getSensors()) {
+            model.addRow(sensor);
+        }
 
-	/**
-	 * Table model which represents sensors.
-	 */
-	class SensorModel extends AbstractTableModel {
+        JScrollPane scrollPane = new JScrollPane(table);
+        JPanel buttonBar = new JPanel();
+        // TODO: Use resource manager
+        ImageIcon plus = new ImageIcon("src/org/simbrain/resource/plus.png");
+        ImageIcon minus = new ImageIcon("src/org/simbrain/resource/minus.png");
+        JButton addSensor;
+        JButton deleteSensor;
+        buttonBar.add(addSensor = new JButton(plus));
+        buttonBar.add(deleteSensor = new JButton(minus));
+        deleteSensor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent del) {
+                int[] selectedRows = table.getSelectedRows();
+                for (int i = 0; i < selectedRows.length; i++) {
+                    Sensor sensor = model.getSensor(selectedRows[i]);
+                    if (sensor != null) {
+                        entity.removeSensor(sensor);
+                    }
+                }
+            }
+        });
 
-		/** Column names. */
-		String[] columnNames = { "Id", "Label", "Type" };
+        // Add sensor Listener
+        entity.getParentWorld().addListener(new WorldListenerAdapter() {
+            @Override
+            public void sensorRemoved(Sensor sensor) {
+                model.removeSensor(sensor);
+            }
+        });
+        setLayout(new BorderLayout());
+        add(BorderLayout.CENTER, scrollPane);
+        add(BorderLayout.SOUTH, buttonBar);
+    }
 
-		/** Internal list of components. */
-		private List<Sensor> data = new ArrayList<Sensor>();
+    /**
+     * Table model which represents sensors.
+     */
+    class SensorModel extends AbstractTableModel {
 
-		/**
-		 * Add a row.
-		 *
-		 * @param sensor
-		 */
-		public void addRow(Sensor sensor) {
-			data.add(sensor);
-		}
+        /** Column names. */
+        String[] columnNames = { "Id", "Label", "Type" };
 
-		/**
-		 * Remove a row.
-		 *
-		 * @param row
-		 */
-		public void removeRow(int row) {
-			data.remove(row);
-		}
+        /** Internal list of components. */
+        private List<Sensor> data = new ArrayList<Sensor>();
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public int getColumnCount() {
-			return columnNames.length;
-		}
+        /**
+         * Helper method to get a reference to the sensor displayed in a row.
+         *
+         * @param row the row index
+         * @return the sensor displayed in that row.
+         */
+        public Sensor getSensor(int row) {
+            if (row < data.size()) {
+                return data.get(row);
+            } else {
+                return null;
+            }
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public String getColumnName(int col) {
-			return columnNames[col];
-		}
+        /**
+         * Remove a sensor from the table representation.
+         *
+         * @param sensor the sensor to remove
+         */
+        public void removeSensor(Sensor sensor) {
+            data.remove(sensor);
+            fireTableDataChanged();
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public int getRowCount() {
-			return data.size();
-		}
+        /**
+         * Add a row.
+         *
+         * @param sensor
+         */
+        public void addRow(Sensor sensor) {
+            data.add(sensor);
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public Object getValueAt(int row, int col) {
-			switch (col) {
-			case 0:
-				return data.get(row).getId();
-			case 1:
-				return data.get(row).getLabel();
-			case 2:
-				return data.get(row).getClass().getSimpleName();
-			default:
-				return null;
-			}
-		}
+        /**
+         * Remove a row.
+         *
+         * @param row
+         */
+        public void removeRow(int row) {
+            data.remove(row);
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void setValueAt(Object value, int row, int col) {
-			switch (col) {
-			case 0:
-				return;
-			case 1:
-				data.get(row).setLabel((String) value);
-				return;
-			case 2:
-				return;
-			}
-			this.fireTableDataChanged();
-		}
+        /**
+         * {@inheritDoc}
+         */
+        public int getColumnCount() {
+            return columnNames.length;
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public boolean isCellEditable(int row, int col) {
-			switch (col) {
-			case 0:
-				return false;
-			case 1:
-				return true;
-			case 2:
-				return false;
-			default:
-				return false;
-			}
-		}
-		/**
-		 * {@inheritDoc}
-		 */
-		public Class getColumnClass(int col) {
-			switch (col) {
-			case 0:
-				return String.class;
-			case 1:
-				return String.class;
-			case 2:
-				return String.class;
-			default:
-				return null;
-			}
-		}
+        /**
+         * {@inheritDoc}
+         */
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
 
-	}
+        /**
+         * {@inheritDoc}
+         */
+        public int getRowCount() {
+            return data.size();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object getValueAt(int row, int col) {
+            switch (col) {
+            case 0:
+                return data.get(row).getId();
+            case 1:
+                return data.get(row).getLabel();
+            case 2:
+                return data.get(row).getClass().getSimpleName();
+            default:
+                return null;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void setValueAt(Object value, int row, int col) {
+            switch (col) {
+            case 0:
+                return;
+            case 1:
+                data.get(row).setLabel((String) value);
+                return;
+            case 2:
+                return;
+            }
+            this.fireTableDataChanged();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isCellEditable(int row, int col) {
+            switch (col) {
+            case 0:
+                return false;
+            case 1:
+                return true;
+            case 2:
+                return false;
+            default:
+                return false;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Class getColumnClass(int col) {
+            switch (col) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            default:
+                return null;
+            }
+        }
+
+    }
 }

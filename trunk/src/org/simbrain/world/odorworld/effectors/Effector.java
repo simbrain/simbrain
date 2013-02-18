@@ -31,10 +31,22 @@ public abstract class Effector {
     protected OdorWorldEntity parent;
 
     /** The id of this smell effector. */
-    protected String id;
+    private String id;
 
     /** Public label of this effector. */
     private String label;
+
+    /**
+     * Construct the effector.
+     *
+     * @param parent the parent entity
+     * @param label a label for this entity
+     */
+    public Effector(OdorWorldEntity parent, String label) {
+        super();
+        this.parent = parent;
+        this.label = label;
+    }
 
     /**
      * Move the agent in a manner appropriate to the effector type.

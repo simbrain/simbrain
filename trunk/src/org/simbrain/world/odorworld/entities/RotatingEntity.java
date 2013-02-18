@@ -96,7 +96,7 @@ public class RotatingEntity extends OdorWorldEntity {
         } else if (entityType.equalsIgnoreCase("Steve")) {
             imageMap = RotatingEntityManager.getRotatingTileset("steve", 20);
         }
-        update(0);
+        update();
     }
 
     /**
@@ -130,9 +130,9 @@ public class RotatingEntity extends OdorWorldEntity {
     }
 
     /**
-     * Ensures that value lies between 0 and 360.
+     * Ensures that angle lies between 0 and 360.
      *
-     * @param value the value to compute
+     * @param val the absolute angle
      * @return value's "absolute angle"
      */
     private double computeAngle(final double val) {
@@ -148,20 +148,16 @@ public class RotatingEntity extends OdorWorldEntity {
         return retVal;
     }
 
-    /**
-     * Updates this OdorWorldEntity's Animation and its position based on the
-     * velocity.
-     */
-    public void update(final long elapsedTime) {
-
-        behavior.apply(elapsedTime);
+    @Override
+    public void update() {
+        super.update();
 
         if (!isBlocked()) {
             heading = computeAngle(heading);
             // System.out.println("heading:" + heading);
             // TODO: only do this if heading has changed
             updateImageBasedOnHeading();
-            getAnimation().update(elapsedTime);
+            getAnimation().update();
         }
     }
 
@@ -250,21 +246,31 @@ public class RotatingEntity extends OdorWorldEntity {
     /**
      * Rotate left by the specified amount.
      *
-     * @param amount amount to turn left.
+     * @param amount amount to turn left. Assumes a positive number. 
      */
     public void turnLeft(double amount) {
+        turn(amount);
+    }
+
+    /**
+     * Turn by the specified amount, positive or negative.
+     *
+     * @param amount
+     */
+    public void turn(double amount) {
         if (amount == 0) {
             return;
         }
         if (!isBlocked()) {
             heading += amount;
         }
+
     }
 
     /**
      * Rotate right by the specified amount.
      *
-     * @param amount amount to turn right.
+     * @param amount amount to turn right.  Assumes a positive number.
      */
     public void turnRight(double amount) {
         if (amount == 0) {

@@ -31,7 +31,7 @@ public abstract class Sensor {
     protected OdorWorldEntity parent;
 
     /** The id of this smell sensor.. */
-    protected String id;
+    private String id;
 
     /** Public label of this sensor. */
     private String label;

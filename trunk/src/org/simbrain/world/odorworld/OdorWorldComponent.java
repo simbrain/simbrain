@@ -28,6 +28,8 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -49,9 +51,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             double.class, false));
     AttributeType yLocationType = (new AttributeType(this, "Location", "Y",
             double.class, false));
-    AttributeType leftRotationType = (new AttributeType(this, "Left",
-            double.class, true));
-    AttributeType rightRotationType = (new AttributeType(this, "Right",
+    AttributeType turningType = (new AttributeType(this, "Turning",
             double.class, true));
     AttributeType straightMovementType = (new AttributeType(this, "Straight",
             double.class, true));
@@ -91,8 +91,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
         addConsumerType(xLocationType);
         addConsumerType(yLocationType);
-        addConsumerType(leftRotationType);
-        addConsumerType(rightRotationType);
+        addConsumerType(turningType);
         addConsumerType(straightMovementType);
         addConsumerType(absoluteMovementType);
 
@@ -159,29 +158,43 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             // Turning and Going Straight
             if (entity instanceof RotatingEntity) {
-                if (leftRotationType.isVisible()) {
-                    String description =  entity.getName() + ":turnLeft";
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(entity, "turnLeft",
-                                    double.class);
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
-                }
-                if (rightRotationType.isVisible()) {
-                    String description =  entity.getName() + ":turnRight";
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(entity, "turnRight",
-                                    double.class);
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
-                }
-                if (straightMovementType.isVisible()) {
-                    String description =  entity.getName() + ":goStraight";
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(entity, "goStraight",
-                                    double.class);
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
+                for (Effector effector : entity.getEffectors()) {
+                    if (effector instanceof StraightMovement) {
+                        if (straightMovementType.isVisible()) {
+                            String description = entity.getName()
+                                    + ":goStraight";
+                            PotentialConsumer consumer = getAttributeManager()
+                                    .createPotentialConsumer(effector,
+                                            "setAmount", double.class);
+                            consumer.setCustomDescription(description);
+                            returnList.add(consumer);
+                        }
+                    } else if (effector instanceof Turning) {
+                        if (turningType.isVisible()) {
+                            double direction = ((Turning) effector)
+                                    .getDirection();
+                            // TODO: Rethink this approach; produces different
+                            // results in menu vs. dialog
+                            if (direction < 0) {
+                                String description = entity.getName()
+                                        + ":turnLeft";
+                                PotentialConsumer consumer = getAttributeManager()
+                                        .createPotentialConsumer(effector,
+                                                "setAmount", double.class);
+                                consumer.setCustomDescription(description);
+                                returnList.add(consumer);
+                            } else {
+                                String description = entity.getName()
+                                        + ":turnRight";
+                                PotentialConsumer consumer = getAttributeManager()
+                                        .createPotentialConsumer(effector,
+                                                "setAmount", double.class);
+                                consumer.setCustomDescription(description);
+                                returnList.add(consumer);
+                            }
+                        }
+                    }
+
                 }
 
             }
@@ -386,7 +399,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        world.update();
+        world.update(this.getWorkspace().getTime());
     }
 
     /**

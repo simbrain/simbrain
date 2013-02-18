@@ -36,7 +36,8 @@ public class BasicEntity extends OdorWorldEntity {
     /**
      * Construct a basic entity with a specified animation.
      *
-     * @param animation animation associated with this entity.
+     * @param anim animation associated with this entity.
+     * @param world parent world.
      */
     public BasicEntity(final Animation anim, final OdorWorld world) {
         super(anim, world);
@@ -59,13 +60,10 @@ public class BasicEntity extends OdorWorldEntity {
         super(STATIC_IMAGE_DIR + imageLocation, world);
     }
 
-    /**
-     * Updates this OdorWorldEntity's Animation and its position based on the
-     * velocity.
-     */
-    public void update(final long elapsedTime) {
-        behavior.apply(elapsedTime);
-        getAnimation().update(elapsedTime);
+    @Override
+    public void update() {
+        super.update();
+        getAnimation().update();
     }
 
     /**

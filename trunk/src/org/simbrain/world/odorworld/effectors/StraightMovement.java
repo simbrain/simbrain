@@ -16,31 +16,49 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld.behaviors;
+package org.simbrain.world.odorworld.effectors;
+
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Represents a type of behavior for an OdorWorldEntity. These behaviors can be
- * supplemented or overridden by scripts or other external components, in
- * particular neural networks. For example, a simple bouncing motion can be
- * supplemented by pushes from a simple neural network.
+ * Effector for straight ahead movement.
+ *
+ * @author Jeff Yoshimi
  */
-public interface Behavior {
+public class StraightMovement extends Effector {
+
+    /** Amount by which to move ahead. */
+    private double amount = 0;
+
+    //TODO: Add a settable scaling factor?
 
     /**
-     * Apply the rule associated with the behavior.
+     * Construct the straight movement effector.
      *
-     * @param time the odor world time.
+     * @param parent parent entity.
+     * @param label descriptive label
      */
-    void apply(int time);
+    public StraightMovement(RotatingEntity parent, String label) {
+        super(parent, label);
+    }
+
+    @Override
+    public void activate() {
+        ((RotatingEntity) parent).goStraight(amount);
+    }
 
     /**
-     * Register a collision in the x direction.
+     * @return the amount
      */
-    void collisionX();
+    public double getAmount() {
+        return amount;
+    }
 
     /**
-     * Register a collision in the y direction.
+     * @param amount the amount to set
      */
-    void collissionY();
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
 
 }

@@ -84,9 +84,9 @@ public class Animation {
     /**
      * Updates this animation's current image (frame), if necessary.
      */
-    public synchronized void update(final long elapsedTime) {
+    public synchronized void update() {
         if (frames.size() > 1) {
-            animTime += elapsedTime;
+            animTime += 1;
             if (animTime >= totalDuration) {
                 animTime = animTime % totalDuration;
                 currFrameIndex = 0;

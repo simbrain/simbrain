@@ -25,8 +25,11 @@ import java.util.List;
 
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.world.odorworld.LifeCycle;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
+import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -95,32 +98,17 @@ public abstract class OdorWorldEntity {
     /** Entity Id generator. */
     private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
 
-    /**
-     * Updates this OdorWorldEntity's Animation and its position based on the
-     * velocity.
-     */
-    public abstract void update(final long elapsedTime);
-
-    /**
-     * Called before update() if the creature collided with a tile horizontally.
-     */
-    public void collideHorizontal() {
-        behavior.collisionX();
-        collision = true;
-    }
-
-    /**
-     * Called before update() if the creature collided with a tile vertically.
-     */
-    public void collideVertical() {
-        behavior.collissionY();
-        collision = true;
-    }
+    // Un-implemented code for using lifcycle.
+    // private LifeCycle cycle;
+    // private boolean usesLifeCycle = false;
+    // Requires all constructors and post-serialization init include cycle = new
+    // LifeCycle(this);
 
     /**
      * Construct an entity from an animation.
      *
-     * @param animation animation to use.
+     * @param anim animation to use.
+     * @param world parent world
      */
     public OdorWorldEntity(final Animation anim, OdorWorld world) {
         this.animation = anim;
@@ -146,6 +134,32 @@ public abstract class OdorWorldEntity {
      */
     public OdorWorldEntity(OdorWorld world) {
         this.parentWorld = world;
+    }
+
+    /**
+     * Updates this OdorWorldEntity's Animation and its position based on the
+     * velocity.
+     */
+    public void update() {
+        //if (usesLifeCycle) {
+        //    cycle.update();
+        //}
+    }
+
+    /**
+     * Called before update() if the creature collided with a tile horizontally.
+     */
+    public void collideHorizontal() {
+        behavior.collisionX();
+        collision = true;
+    }
+
+    /**
+     * Called before update() if the creature collided with a tile vertically.
+     */
+    public void collideVertical() {
+        behavior.collissionY();
+        collision = true;
     }
 
     // TODO: Say in docs if this is upper right or not (but not center).
@@ -358,10 +372,20 @@ public abstract class OdorWorldEntity {
      * @param effector effector to add
      */
     public void addEffector(final Effector effector) {
-        // if (sensor.getApplicableTypes().contains(this.getClass()))...
+        // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(effectorIDGenerator.getId());
         parentWorld.fireEffectorAdded(effector);
+    }
+
+    /**
+     * Removes an effector.
+     *
+     * @param effector effector to remove
+     */
+    public void removeEffector(final Effector effector) {
+        effectors.remove(effector);
+        parentWorld.fireEffectorRemoved(effector);
     }
 
     /**
@@ -379,6 +403,16 @@ public abstract class OdorWorldEntity {
         }
 
         parentWorld.fireSensorAdded(sensor);
+    }
+
+    /**
+     * Removes a sensor.
+     *
+     * @param sensor sensor to remove
+     */
+    public void removeSensor(final Sensor sensor) {
+        sensors.remove(sensor);
+        parentWorld.fireSensorRemoved(sensor);
     }
 
     /**
@@ -573,6 +607,9 @@ public abstract class OdorWorldEntity {
      * @param collission the collision to set
      */
     public void setHasCollided(boolean collission) {
+        //if (collission) {
+        //    cycle.bite();
+        //}
         this.collision = collission;
     }
 
@@ -633,17 +670,48 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * @return the behavior
+     * Return the current behavior.
+     *
+     * @return behabior object.
      */
-    public Behavior getBehavior() {
+    public Behavior getBehavior () {
         return behavior;
     }
 
     /**
-     * @param behavior the behavior to set
+     * Return the object's current behavior.
+     *
+     * @return the current behavior
      */
-    public void setBehavior(Behavior behavior) {
-        this.behavior = behavior;
+    public ComboBoxWrapper getObjectBehavior() {
+        return new ComboBoxWrapper() {
+            public Object getCurrentObject() {
+                if (behavior instanceof StationaryBehavior) {
+                    return "Stationary";
+                } else if (behavior instanceof NewtonianBouncer) {
+                    return "Bouncer";
+                }
+                return behavior;
+            }
+
+            public Object[] getObjects() {
+                return new Object[] { "Stationary", "Bouncer"};
+            }
+        };
+    }
+
+    /**
+     * Set the object's current behavior.
+     *
+     * @param behaviorData the behavior selected in a gui combo box
+     */
+    public void setObjectBehavior(ComboBoxWrapper behaviorData) {
+        String behaviorString = ((String) behaviorData.getCurrentObject());
+        if (behaviorString.equalsIgnoreCase("Stationary")) {
+            behavior = new StationaryBehavior();
+        } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
+            behavior = new NewtonianBouncer(this);
+        }
     }
 
     // TODO: the methods below need not be double, but are double to accommodate

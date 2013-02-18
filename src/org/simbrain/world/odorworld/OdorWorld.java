@@ -25,6 +25,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.SimpleId;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -79,13 +81,15 @@ public class OdorWorld {
 
     /**
      * Update world.
+     *
+     * @time an integer representation of time.
      */
-    public void update() {
+    public void update(int time) {
         for (OdorWorldEntity object : entityList) {
             object.updateSmellSource();
             object.updateSensors();
             object.applyEffectors();
-            updateEntity(object, 1); // time defaults to 1 now
+            updateEntity(object, time);
         }
         fireUpdateEvent();
     }
@@ -133,9 +137,15 @@ public class OdorWorld {
 
         if (entity instanceof RotatingEntity) {
 
-            // Add effectors (currently none)
+            // Add default effectors
+            entity.addEffector(new StraightMovement((RotatingEntity) entity,
+                    "Go-straight"));
+            entity.addEffector(new Turning((RotatingEntity) entity,
+                    "Go-left", 1));
+            entity.addEffector(new Turning((RotatingEntity) entity,
+                    "Go-right", -1));
 
-            // Add sensors
+            // Add default sensors
             entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8,
                     50));
             entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
@@ -290,18 +300,18 @@ public class OdorWorld {
     }
 
     /**
-     * Updates all entities.
+     * Updates all entities.  TODO: Should this be in OdorWorldEntity?
      */
     private void updateEntity(final OdorWorldEntity entity,
-            final long elapsedTime) {
+            final int time) {
 
         // Collision detection
         float dx = entity.getVelocityX();
         float oldX = entity.getX();
-        float newX = oldX + dx * elapsedTime;
+        float newX = oldX + dx * time;
         float dy = entity.getVelocityY();
         float oldY = entity.getY();
-        float newY = oldY + dy * elapsedTime;
+        float newY = oldY + dy * time;
 
         // Very simple motion
         if (dx != 0) {
@@ -310,6 +320,9 @@ public class OdorWorld {
         if (dy != 0) {
             entity.setY(entity.getY() + dy);
         }
+
+        // Behavior
+        entity.getBehavior().apply(time);
 
         // Handle sprite collisions
         entity.setHasCollided(false);
@@ -323,21 +336,20 @@ public class OdorWorld {
             }
         }
 
-        // TODO: Refactor below! Needed for behaviors...
         // Handle sprite collisions
-        // if (xCollission(sprite, newX)) {
-        // sprite.collideHorizontal();
-        // } else {
-        // // sprite.setX(newX);
-        // }
-        // if (yCollission(sprite, newY)) {
-        // sprite.collideVertical();
-        // } else {
-        // // sprite.setY(newY);
-        // }
+        if (xCollission(entity, newX)) {
+            entity.collideHorizontal();
+        } else {
+            // sprite.setX(newX);
+        }
+        if (yCollission(entity, newY)) {
+            entity.collideVertical();
+        } else {
+            // sprite.setY(newY);
+        }
 
         // Update creature
-        entity.update(elapsedTime);
+        entity.update();
 
         // System.out.println(sprite.getId() + " new - x: " + sprite.getX() +
         // " y:" + sprite.getY());

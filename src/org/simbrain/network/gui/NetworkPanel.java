@@ -356,6 +356,8 @@ public class NetworkPanel extends JPanel {
 
         // Register key support
         KeyBindings.addBindings(this);
+        // Must pass action map to splitpane or some key bindings lost
+        splitPane.setActionMap(this.getActionMap());
 
         // Repaint whenever window is opened or changed.
         this.addComponentListener(new ComponentAdapter() {

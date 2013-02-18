@@ -38,6 +38,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.Turning;
@@ -99,13 +100,12 @@ public class EffectorPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel buttonBar = new JPanel();
-        // TODO Below use resource manager class
-        ImageIcon plus = new ImageIcon("src/org/simbrain/resource/plus.png");
-        ImageIcon minus = new ImageIcon("src/org/simbrain/resource/minus.png");
-        JButton addEffector;
-        JButton deleteEffector;
-        buttonBar.add(addEffector = new JButton(plus));
-        buttonBar.add(deleteEffector = new JButton(minus));
+        JButton addEffector = new JButton(
+                ResourceManager.getImageIcon("plus.png"));
+        JButton deleteEffector = new JButton(
+                ResourceManager.getImageIcon("minus.png"));
+        buttonBar.add(addEffector);
+        buttonBar.add(deleteEffector);
         deleteEffector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent del) {
                 int[] selectedRows = table.getSelectedRows();

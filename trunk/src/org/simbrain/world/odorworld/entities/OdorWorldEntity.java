@@ -565,7 +565,7 @@ public abstract class OdorWorldEntity {
      * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
-        getAnimation().initializeImages(); // TODO
+        getAnimation().initializeImages();
     }
 
     /**

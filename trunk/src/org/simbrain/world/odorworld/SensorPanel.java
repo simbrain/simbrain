@@ -38,6 +38,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -105,13 +106,12 @@ public class SensorPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel buttonBar = new JPanel();
-        // TODO: Use resource manager
-        ImageIcon plus = new ImageIcon("src/org/simbrain/resource/plus.png");
-        ImageIcon minus = new ImageIcon("src/org/simbrain/resource/minus.png");
-        JButton addSensor;
-        JButton deleteSensor;
-        buttonBar.add(addSensor = new JButton(plus));
-        buttonBar.add(deleteSensor = new JButton(minus));
+        JButton addSensor = new JButton(
+                ResourceManager.getImageIcon("plus.png"));
+        JButton deleteSensor = new JButton(
+                ResourceManager.getImageIcon("minus.png"));
+        buttonBar.add(addSensor);
+        buttonBar.add(deleteSensor);
         deleteSensor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent del) {
                 int[] selectedRows = table.getSelectedRows();

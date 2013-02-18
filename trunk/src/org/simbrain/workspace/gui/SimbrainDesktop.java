@@ -1153,7 +1153,7 @@ public class SimbrainDesktop {
                 && (workspace.getComponentList().size() > 0)) {
             int s = showHasChangedDialog();
             if (s == JOptionPane.OK_OPTION) {
-                this.save();
+                save();
                 quit(true);
             } else if (s == JOptionPane.NO_OPTION) {
                 quit(true);

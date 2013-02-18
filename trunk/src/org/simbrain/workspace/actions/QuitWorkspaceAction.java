@@ -22,18 +22,14 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
- * Clear the current workspace.
+ * Quit the application.
  */
 public final class QuitWorkspaceAction extends DesktopAction {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * Create a clear workspace action with the specified workspace.
@@ -48,9 +44,6 @@ public final class QuitWorkspaceAction extends DesktopAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace workspace = desktop.getWorkspace();
-        desktop.save();
-        workspace.removeAllComponents();
-        System.exit(0);
+        desktop.quit(false);
     }
 }

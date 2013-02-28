@@ -80,6 +80,12 @@ public abstract class ConnectNeurons {
 
     /** A switch for enabling randomized inhibitory connections. */
     protected boolean enableInhibitoryRandomization;
+    
+    /** 
+     * A flag denoting whether or not the connection is between the same set
+     * of neurons: i.e. is recurrent.
+     */
+    protected boolean recurrent;
 
     /**
      * Default constructor.
@@ -94,6 +100,7 @@ public abstract class ConnectNeurons {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;
+        recurrent = testRecurrence();
     }
 
     /**
@@ -117,6 +124,7 @@ public abstract class ConnectNeurons {
         sourceNeurons = neurons;
         targetNeurons = neurons2;
         return connectNeurons();
+        
     }
 
     /**
@@ -133,6 +141,25 @@ public abstract class ConnectNeurons {
         return network;
     }
 
+    /** 
+     * Tests whether or not these connections are recurrent, that is,
+     * whether or not the neurons in the source list are the same as those in
+     * the target list. 
+     * @return true or false: whether or not these connections are recurrent.
+     */
+    public boolean testRecurrence() {
+    	if(sourceNeurons.size() != targetNeurons.size()) {
+    		return false;
+    	} else {
+    		for(int i = 0; i < sourceNeurons.size(); i++) {
+    			if(sourceNeurons.get(i) != targetNeurons.get(i)) {
+    				return false;
+    			}
+    		}
+    	}
+    	return true;    	
+    }
+    
     /**
      * @return the baseExcitatorySynapse
      */
@@ -223,6 +250,7 @@ public abstract class ConnectNeurons {
 
 	public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
 		this.sourceNeurons = sourceNeurons;
+		recurrent = testRecurrence();
 	}
 
 	public List<? extends Neuron> getTargetNeurons() {
@@ -231,6 +259,7 @@ public abstract class ConnectNeurons {
 
 	public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
 		this.targetNeurons = targetNeurons;
+		recurrent = testRecurrence();
 	}
 	
 	/**

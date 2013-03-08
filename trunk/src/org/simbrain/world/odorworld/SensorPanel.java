@@ -43,6 +43,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.sensors.TileSensor;
 
 /**
  * Panel showing an agent's sensors.
@@ -78,54 +79,49 @@ public class SensorPanel extends JPanel {
 
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(final MouseEvent e) {
-				if (e.isControlDown() || (e.getButton() == MouseEvent.BUTTON3)) {
+				if (e.isControlDown() || (e.getClickCount() == 2)) {
 					final int row = table.rowAtPoint(e.getPoint());
-					final int column = table.columnAtPoint(e.getPoint());
-					table.setRowSelectionInterval(row, row);
-					JPopupMenu sensorPop = new JPopupMenu();
-					JMenuItem menuItem = new JMenuItem("Edit sensor...");
-					sensorPop.add(menuItem);
-					sensorPop.show(e.getComponent(), e.getX(), e.getY());
-					final Sensor sensor = model.getSensor(row);
-					menuItem.setAction(new AbstractAction() {
-						{
-							putValue(NAME, "Edit Sensor");
-						}
-						public void actionPerformed(ActionEvent e) {
-							StandardDialog dialog = new StandardDialog();
-							if (sensor instanceof SmellSensor) {
-								SmellSensorPanel smellSensorPanel = new SmellSensorPanel(entity);
-								smellSensorPanel.fillFieldValues((SmellSensor) sensor);
-								dialog.setContentPane(smellSensorPanel);
-								dialog.pack();
-								dialog.setLocationRelativeTo(null);
-								dialog.setVisible(true);
-								if (!dialog.hasUserCancelled()) {
-									smellSensorPanel.commitChanges((SmellSensor) sensor);
+					if (table.columnAtPoint(e.getPoint()) == 0) {
+						table.setRowSelectionInterval(row, row);
+						JPopupMenu sensorPop = new JPopupMenu();
+						JMenuItem menuItem = new JMenuItem("Edit sensor...");
+						sensorPop.add(menuItem);
+						sensorPop.show(e.getComponent(), e.getX(), e.getY());
+						final Sensor sensor = model.getSensor(row);
+						menuItem.setAction(new AbstractAction() {
+							{
+								putValue(NAME, "Edit Sensor");
+							}
+							public void actionPerformed(ActionEvent e) {
+								StandardDialog dialog = new StandardDialog();
+								if (sensor instanceof SmellSensor) {
+									SmellSensorPanel smellSensorPanel = new SmellSensorPanel(entity);
+									smellSensorPanel.fillFieldValues((SmellSensor) sensor);
+									dialog.setContentPane(smellSensorPanel);
+									dialog.pack();
+									dialog.setLocationRelativeTo(null);
+									dialog.setVisible(true);
+									if (!dialog.hasUserCancelled()) {
+										smellSensorPanel.commitChanges((SmellSensor) sensor);
+									}
+								}
+								if (sensor instanceof TileSensor) {
+									TileSensorPanel tileSensorPanel = new TileSensorPanel(entity);
+									tileSensorPanel.fillFieldValues((TileSensor)sensor);
+									dialog.setContentPane(tileSensorPanel);
+									dialog.pack();
+									dialog.setLocationRelativeTo(null);
+									dialog.setVisible(true);
+									if (!dialog.hasUserCancelled()) {
+										tileSensorPanel.commitChanges((TileSensor) sensor);
+									}
 								}
 							}
-							/* if (sensor instanceof TileSensor) { // TileSensor is uneditable?
-								TileSensorPanel tileSensorPanel = new TileSensorPanel(entity);
-								tileSensorPanel.fillFieldValues((TileSensor) sensor);
-								dialog.setContentPane(tileSensorPanel);
-								dialog.pack();
-								dialog.setLocationRelativeTo(null);
-								dialog.setVisible(true);
-								if (!dialog.hasUserCancelled()) {
-									tileSensorPanel.commitChanges((TileSensor) sensor);
-								}
-							} */
-						}
+						});
 
-					});
-
-					/** if (sensor instanceof SmellSensor) {
-                        menuItem.setAction(ReflectivePropertyEditor
-                                .getPropertiesDialogAction((SmellSensor) sensor));
-                    } */
-					// TODO: add ability to edit other sensors here
-					sensorPop.add(menuItem);
-					sensorPop.show(e.getComponent(), e.getX(), e.getY());
+						sensorPop.add(menuItem);
+						sensorPop.show(e.getComponent(), e.getX(), e.getY());
+					}
 				}
 			}
 
@@ -161,6 +157,7 @@ public class SensorPanel extends JPanel {
 				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
 				model.commitChanges();
+				model.fireTableDataChanged();
 			}
 		});
 

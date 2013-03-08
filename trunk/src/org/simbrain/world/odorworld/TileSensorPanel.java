@@ -47,14 +47,17 @@ public class TileSensorPanel extends AbstractSensorPanel {
 
 	}
 
-	/* public void fillFieldValues(TileSensor sensor) { // unused; see SensorPanel
-		x.setText(Integer.toString(sensor.getX()));
-		y.setText(Integer.toString(sensor.getY()));
-		width.setText(Integer.toString(sensor.getWidth()));
-		height.setText(Integer.toString(sensor.getHeight()));
+	public void fillFieldValues(TileSensor sensor) {
+		x.setText("" + Integer.toString(sensor.getX()));
+		y.setText("" + Integer.toString(sensor.getY()));
+		width.setText("" + Integer.toString(sensor.getWidth()));
+		height.setText("" + Integer.toString(sensor.getHeight()));
 	}
 
 	public void commitChanges(TileSensor sensor) {
-		sensor
-	} */
+		sensor.setX(Integer.parseInt(x.getText()));
+		sensor.setY(Integer.parseInt(y.getText()));
+		sensor.setWidth(Integer.parseInt(width.getText()));
+		sensor.setHeight(Integer.parseInt(height.getText()));
+	}
 }

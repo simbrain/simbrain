@@ -15,43 +15,44 @@ package org.simbrain.world.odorworld;
 
 import javax.swing.JFormattedTextField;
 
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
-public class SmellSensorPanel extends AbstractSensorPanel {
+public class TurningEffectorPanel extends AbstractEffectorPanel {
 
-	private JFormattedTextField label = new JFormattedTextField("SmellSensor");
+	private JFormattedTextField label = new JFormattedTextField("Turn");
 
-    private JFormattedTextField theta = new JFormattedTextField(Math.PI / 4);
+    private JFormattedTextField direction = new JFormattedTextField(0);
 
-    private JFormattedTextField radius = new JFormattedTextField(23);
+    private JFormattedTextField amount = new JFormattedTextField(0);
 
-    private OdorWorldEntity entity;
+    private RotatingEntity entity;
     /**
      * Default constructor.
      */
-    public SmellSensorPanel(OdorWorldEntity entity) {
-    	this.entity = entity;
+    public TurningEffectorPanel(OdorWorldEntity entity) {
+    	this.entity = (RotatingEntity) entity;
     	addItem("Label", label);
-    	addItem("Sensor angle", theta);
-    	addItem("Sensor length", radius);
+    	addItem("Turning direction", direction);
+    	addItem("Turning amount", amount);
     	setVisible(true);
     }
 
 	@Override
 	public void commitChanges() {
-		entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText()))); // todo: label
+		entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText()))); // todo: label
 
 	}
 
-	public void commitChanges(SmellSensor sensor) {
-		sensor.setTheta(Double.parseDouble(theta.getText()));
-		sensor.setRadius(Double.parseDouble(radius.getText()));
+	public void commitChanges(Turning effector) {
+		effector.setDirection(Double.parseDouble(direction.getText()));
+		effector.setAmount(Double.parseDouble(amount.getText()));
 	}
 
-	public void fillFieldValues(SmellSensor sensor) {
-		label.setText("" + sensor.getLabel()); // Label cannot be edited. Change to Title?
-		theta.setText("" + sensor.getTheta());
-		radius.setText("" + sensor.getRadius());
+	public void fillFieldValues(Turning effector) {
+		label.setText("" + effector.getLabel()); // Label cannot be edited. Change to Title?
+		direction.setText("" + effector.getDirection());
+		amount.setText("" + effector.getAmount());
 	}
 }

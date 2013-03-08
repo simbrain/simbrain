@@ -27,7 +27,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -39,11 +39,11 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
  * Panel showing an agent's effectors.
@@ -55,214 +55,254 @@ import org.simbrain.world.odorworld.sensors.Sensor;
  */
 public class EffectorPanel extends JPanel {
 
-    /** Table representing Effector. */
-    private JTable table;
+	/** Table representing Effector. */
+	private JTable table;
 
-    /** Table model. */
-    private EffectorModel model;
+	/** Table model. */
+	private EffectorModel model;
 
-    public EffectorPanel(final OdorWorldEntity entity) {
+	public EffectorPanel(final OdorWorldEntity entity) {
 
-        // Set up table
-        model = new EffectorModel();
-        table = new JTable(model);
-        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-                .setHorizontalAlignment(SwingConstants.CENTER);
-        table.setRowSelectionAllowed(true);
-        table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        table.setGridColor(Color.LIGHT_GRAY);
-        table.setFocusable(false);
-        table.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(final MouseEvent e) {
-                if (e.isControlDown() || (e.getButton() == MouseEvent.BUTTON3)) {
-                    final int row = table.rowAtPoint(e.getPoint());
-                    final int column = table.columnAtPoint(e.getPoint());
-                    table.setRowSelectionInterval(row, row);
-                    JPopupMenu effectorPopup = new JPopupMenu();
-                    JMenuItem menuItem = new JMenuItem("Edit effector...");
-                    effectorPopup.add(menuItem);
-                    effectorPopup.show(e.getComponent(), e.getX(), e.getY());
-                    Effector effector = model.getEffector(row);
-                    if (effector instanceof Turning) {
-                        // TODO: Exclude amount...
-                        menuItem.setAction(ReflectivePropertyEditor
-                                .getPropertiesDialogAction((Turning) effector));
-                    }
-                    effectorPopup.add(menuItem);
-                    effectorPopup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
+		// Set up table
+		model = new EffectorModel();
+		table = new JTable(model);
+		((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
+		.setHorizontalAlignment(SwingConstants.CENTER);
+		table.setRowSelectionAllowed(true);
+		table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.setGridColor(Color.LIGHT_GRAY);
+		table.setFocusable(false);
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseReleased(final MouseEvent e) {
+				if (e.isControlDown() || (e.getClickCount() == 2)) {
+					final int row = table.rowAtPoint(e.getPoint());
+					if (table.columnAtPoint(e.getPoint()) == 0) {
+						table.setRowSelectionInterval(row, row);
+						JPopupMenu effectorPopup = new JPopupMenu();
+						JMenuItem menuItem = new JMenuItem("Edit effector...");
+						effectorPopup.add(menuItem);
+						effectorPopup.show(e.getComponent(), e.getX(), e.getY());
+						final Effector effector = model.getEffector(row);
+						menuItem.setAction(new AbstractAction() {
+							{
+								putValue(NAME, "Edit Effector");
+							}
+							public void actionPerformed(ActionEvent e) {
+								StandardDialog dialog = new StandardDialog();
+								if (effector instanceof Turning) {
+									TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity);
+									turningEffectorPanel.fillFieldValues((Turning) effector);
+									dialog.setContentPane(turningEffectorPanel);
+									dialog.pack();
+									dialog.setLocationRelativeTo(null);
+									dialog.setVisible(true);
+									if (!dialog.hasUserCancelled()) {
+										turningEffectorPanel.commitChanges((Turning) effector);
+									}
+								}
+								if (effector instanceof StraightMovement) {
+									StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity);
+									straightEffectorPanel.fillFieldValues((StraightMovement) effector);
+									dialog.setContentPane(straightEffectorPanel);
+									dialog.pack();
+									dialog.setLocationRelativeTo(null);
+									dialog.setVisible(true);
+									if (!dialog.hasUserCancelled()) {
+										straightEffectorPanel.commitChanges((StraightMovement) effector);
+									}
+								}
+							}
 
-        for (Effector effector : entity.getEffectors()) {
-            model.addRow(effector);
-        }
+						});
+						effectorPopup.add(menuItem);
+						effectorPopup.show(e.getComponent(), e.getX(), e.getY());
+					}
+				}
+			}
+		});
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        JPanel buttonBar = new JPanel();
-        JButton addEffector = new JButton(
-                ResourceManager.getImageIcon("plus.png"));
-        JButton deleteEffector = new JButton(
-                ResourceManager.getImageIcon("minus.png"));
-        buttonBar.add(addEffector);
-        buttonBar.add(deleteEffector);
-        deleteEffector.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent del) {
-                int[] selectedRows = table.getSelectedRows();
-                for (int i = 0; i < selectedRows.length; i++) {
-                    entity.removeEffector(model.getEffector(selectedRows[i]));
-                }
-            }
-        });
-        setLayout(new BorderLayout());
-        add(BorderLayout.CENTER, scrollPane);
-        add(BorderLayout.SOUTH, buttonBar);
+		for (Effector effector : entity.getEffectors()) {
+			model.addRow(effector);
+		}
 
-        entity.getParentWorld().addListener(new WorldListenerAdapter() {
-            @Override
-            public void effectorRemoved(Effector effector) {
-                model.removeEffector(effector);
-            }
-        });
-    }
+		JScrollPane scrollPane = new JScrollPane(table);
+		JPanel buttonBar = new JPanel();
+		JButton addEffector = new JButton(
+				ResourceManager.getImageIcon("plus.png"));
+		JButton deleteEffector = new JButton(
+				ResourceManager.getImageIcon("minus.png"));
+		buttonBar.add(addEffector);
+		buttonBar.add(deleteEffector);
+		deleteEffector.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent del) {
+				int[] selectedRows = table.getSelectedRows();
+				for (int i = 0; i < selectedRows.length; i++) {
+					entity.removeEffector(model.getEffector(selectedRows[i]));
+				}
+			}
+		});
+		addEffector.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AddEffectorDialog dialog = new AddEffectorDialog(entity);
+				dialog.pack();
+				dialog.setLocationRelativeTo(null);
+				dialog.setVisible(true);
+				model.commitChanges();
+				model.fireTableDataChanged();
+			}
+		});
+		setLayout(new BorderLayout());
+		add(BorderLayout.CENTER, scrollPane);
+		add(BorderLayout.SOUTH, buttonBar);
 
-    /**
-     * Table model which represents Effectors
-     */
-    class EffectorModel extends AbstractTableModel {
+		entity.getParentWorld().addListener(new WorldListenerAdapter() {
+			@Override
+			public void effectorRemoved(Effector effector) {
+				model.removeEffector(effector);
+			}
+		});
+	}
 
-        /** Column names. */
-        String[] columnNames = { "Id", "Label", "Type" };
+	/**
+	 * Table model which represents Effectors
+	 */
+	class EffectorModel extends AbstractTableModel {
 
-        /** Internal list of components. */
-        private List<Effector> data = new ArrayList<Effector>();
+		/** Column names. */
+		String[] columnNames = { "Id", "Label", "Type" };
 
-        /**
-         * Helper method to get a reference to the effector displayed in a row.
-         *
-         * @param row the row index
-         * @return the effector displayed in that row.
-         */
-        public Effector getEffector(int row) {
-            if (row < data.size()) {
-                return data.get(row);
-            } else {
-                return null;
-            }
-        }
+		/** Internal list of components. */
+		private List<Effector> data = new ArrayList<Effector>();
 
-        /**
-         * Remove an effector from the table representation.
-         *
-         * @param effector the effector to remove
-         */
-        public void removeEffector(Effector effector) {
-            data.remove(effector);
-            fireTableDataChanged();
-        }
+		/**
+		 * Helper method to get a reference to the effector displayed in a row.
+		 *
+		 * @param row the row index
+		 * @return the effector displayed in that row.
+		 */
+		public Effector getEffector(int row) {
+			if (row < data.size()) {
+				return data.get(row);
+			} else {
+				return null;
+			}
+		}
 
-        /**
-         * Add a row
-         *
-         * @param Effector
-         */
-        public void addRow(Effector effector) {
-            data.add(effector);
-        }
+		public void commitChanges() {
 
-        /**
-         * Remove a row
-         *
-         * @param row
-         */
-        public void removeRow(int row) {
-            data.remove(row);
-        }
+		}
+		/**
+		 * Remove an effector from the table representation.
+		 *
+		 * @param effector the effector to remove
+		 */
+		public void removeEffector(Effector effector) {
+			data.remove(effector);
+			fireTableDataChanged();
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public int getColumnCount() {
-            return columnNames.length;
-        }
+		/**
+		 * Add a row
+		 *
+		 * @param Effector
+		 */
+		public void addRow(Effector effector) {
+			data.add(effector);
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
+		/**
+		 * Remove a row
+		 *
+		 * @param row
+		 */
+		public void removeRow(int row) {
+			data.remove(row);
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public int getRowCount() {
-            return data.size();
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public int getColumnCount() {
+			return columnNames.length;
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public Object getValueAt(int row, int col) {
-            switch (col) {
-            case 0:
-                return data.get(row).getId();
-            case 1:
-                return data.get(row).getLabel();
-            case 2:
-                return data.get(row).getClass().getSimpleName();
-            default:
-                return null;
-            }
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public String getColumnName(int col) {
+			return columnNames[col];
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void setValueAt(Object value, int row, int col) {
-            switch (col) {
-            case 0:
-                return;
-            case 1:
-                data.get(row).setLabel((String) value);
-                return;
-            case 2:
-                return;
-            }
-            this.fireTableDataChanged();
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public int getRowCount() {
+			return data.size();
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public boolean isCellEditable(int row, int col) {
-            switch (col) {
-            case 0:
-                return true;
-            case 1:
-                return true;
-            case 2:
-                return false;
-            default:
-                return false;
-            }
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public Object getValueAt(int row, int col) {
+			switch (col) {
+			case 0:
+				return data.get(row).getId();
+			case 1:
+				return data.get(row).getLabel();
+			case 2:
+				return data.get(row).getClass().getSimpleName();
+			default:
+				return null;
+			}
+		}
 
-        /**
-         * {@inheritDoc}
-         */
-        public Class getColumnClass(int col) {
-            switch (col) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return null;
-            }
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public void setValueAt(Object value, int row, int col) {
+			switch (col) {
+			case 0:
+				return;
+			case 1:
+				data.get(row).setLabel((String) value);
+				return;
+			case 2:
+				return;
+			}
+			this.fireTableDataChanged();
+		}
 
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public boolean isCellEditable(int row, int col) {
+			switch (col) {
+			case 0:
+				return false;
+			case 1:
+				return true;
+			case 2:
+				return false;
+			default:
+				return false;
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public Class getColumnClass(int col) {
+			switch (col) {
+			case 0:
+				return String.class;
+			case 1:
+				return String.class;
+			case 2:
+				return String.class;
+			default:
+				return null;
+			}
+		}
+
+	}
 }

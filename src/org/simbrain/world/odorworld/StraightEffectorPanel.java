@@ -15,43 +15,39 @@ package org.simbrain.world.odorworld;
 
 import javax.swing.JFormattedTextField;
 
+import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
-public class SmellSensorPanel extends AbstractSensorPanel {
+public class StraightEffectorPanel extends AbstractEffectorPanel {
 
-	private JFormattedTextField label = new JFormattedTextField("SmellSensor");
+	private JFormattedTextField label = new JFormattedTextField("Go-Straight");
 
-    private JFormattedTextField theta = new JFormattedTextField(Math.PI / 4);
+    private JFormattedTextField amount = new JFormattedTextField(0);
 
-    private JFormattedTextField radius = new JFormattedTextField(23);
-
-    private OdorWorldEntity entity;
+    private RotatingEntity entity;
     /**
      * Default constructor.
      */
-    public SmellSensorPanel(OdorWorldEntity entity) {
-    	this.entity = entity;
+    public StraightEffectorPanel(OdorWorldEntity entity) {
+    	this.entity = (RotatingEntity)entity;
     	addItem("Label", label);
-    	addItem("Sensor angle", theta);
-    	addItem("Sensor length", radius);
+    	addItem("Amount", amount);
     	setVisible(true);
     }
 
 	@Override
 	public void commitChanges() {
-		entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText()))); // todo: label
+		entity.addEffector(new StraightMovement(entity, label.getText())); // todo: label
 
 	}
 
-	public void commitChanges(SmellSensor sensor) {
-		sensor.setTheta(Double.parseDouble(theta.getText()));
-		sensor.setRadius(Double.parseDouble(radius.getText()));
+	public void commitChanges(StraightMovement effector) {
+		effector.setAmount(Double.parseDouble(amount.getText()));
 	}
 
-	public void fillFieldValues(SmellSensor sensor) {
-		label.setText("" + sensor.getLabel()); // Label cannot be edited. Change to Title?
-		theta.setText("" + sensor.getTheta());
-		radius.setText("" + sensor.getRadius());
+	public void fillFieldValues(StraightMovement effector) {
+		label.setText("" + effector.getLabel()); // Label cannot be edited. Change to Title?
+		amount.setText("" + effector.getAmount());
 	}
 }

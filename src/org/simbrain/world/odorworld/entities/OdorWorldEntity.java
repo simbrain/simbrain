@@ -26,7 +26,6 @@ import java.util.List;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.world.odorworld.LifeCycle;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
@@ -566,6 +565,9 @@ public abstract class OdorWorldEntity {
      */
     public void postSerializationInit() {
         getAnimation().initializeImages();
+        // Temporary hack because collision is turned off and some entities are
+        // saved in a collided state
+        this.collision = false; 
     }
 
     /**
@@ -672,47 +674,47 @@ public abstract class OdorWorldEntity {
     /**
      * Return the current behavior.
      *
-     * @return behabior object.
+     * @return behavior object.
      */
     public Behavior getBehavior () {
         return behavior;
     }
 
-    /**
-     * Return the object's current behavior.
-     *
-     * @return the current behavior
-     */
-    public ComboBoxWrapper getObjectBehavior() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                if (behavior instanceof StationaryBehavior) {
-                    return "Stationary";
-                } else if (behavior instanceof NewtonianBouncer) {
-                    return "Bouncer";
-                }
-                return behavior;
-            }
-
-            public Object[] getObjects() {
-                return new Object[] { "Stationary", "Bouncer"};
-            }
-        };
-    }
-
-    /**
-     * Set the object's current behavior.
-     *
-     * @param behaviorData the behavior selected in a gui combo box
-     */
-    public void setObjectBehavior(ComboBoxWrapper behaviorData) {
-        String behaviorString = ((String) behaviorData.getCurrentObject());
-        if (behaviorString.equalsIgnoreCase("Stationary")) {
-            behavior = new StationaryBehavior();
-        } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
-            behavior = new NewtonianBouncer(this);
-        }
-    }
+//    /**
+//     * Return the object's current behavior.
+//     *
+//     * @return the current behavior
+//     */
+//    public ComboBoxWrapper getObjectBehavior() {
+//        return new ComboBoxWrapper() {
+//            public Object getCurrentObject() {
+//                if (behavior instanceof StationaryBehavior) {
+//                    return "Stationary";
+//                } else if (behavior instanceof NewtonianBouncer) {
+//                    return "Bouncer";
+//                }
+//                return behavior;
+//            }
+//
+//            public Object[] getObjects() {
+//                return new Object[] { "Stationary", "Bouncer"};
+//            }
+//        };
+//    }
+//
+//    /**
+//     * Set the object's current behavior.
+//     *
+//     * @param behaviorData the behavior selected in a gui combo box
+//     */
+//    public void setObjectBehavior(ComboBoxWrapper behaviorData) {
+//        String behaviorString = ((String) behaviorData.getCurrentObject());
+//        if (behaviorString.equalsIgnoreCase("Stationary")) {
+//            behavior = new StationaryBehavior();
+//        } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
+//            behavior = new NewtonianBouncer(this);
+//        }
+//    }
 
     // TODO: the methods below need not be double, but are double to accommodate
     // the

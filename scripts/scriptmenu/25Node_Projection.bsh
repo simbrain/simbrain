@@ -36,7 +36,7 @@ import org.simbrain.workspace.*;
     network.randomizeNeurons();
 
     //Make a projection component
-    ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network");
+    ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network", numNeurons);
     workspace.addWorkspaceComponent(chart);
     desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
 

@@ -324,29 +324,29 @@ public class OdorWorld {
         // Behavior
         entity.getBehavior().apply(time);
 
-        // Handle sprite collisions
-        entity.setHasCollided(false);
-        for (OdorWorldEntity otherEntity : entityList) {
-            if (entity == otherEntity) {
-                continue;
-            }
-            if (otherEntity.getReducedBounds().intersects(
-                    entity.getReducedBounds())) {
-                otherEntity.setHasCollided(true);
-            }
-        }
-
-        // Handle sprite collisions
-        if (xCollission(entity, newX)) {
-            entity.collideHorizontal();
-        } else {
-            // sprite.setX(newX);
-        }
-        if (yCollission(entity, newY)) {
-            entity.collideVertical();
-        } else {
-            // sprite.setY(newY);
-        }
+        //        // Handle sprite collisions
+        //        entity.setHasCollided(false);
+        //        for (OdorWorldEntity otherEntity : entityList) {
+        //            if (entity == otherEntity) {
+        //                continue;
+        //            }
+        //            if (otherEntity.getReducedBounds().intersects(
+        //                    entity.getReducedBounds())) {
+        //                otherEntity.setHasCollided(true);
+        //            }
+        //        }
+        //
+        //        // Handle sprite collisions
+        //        if (xCollission(entity, newX)) {
+        //            entity.collideHorizontal();
+        //        } else {
+        //            // sprite.setX(newX);
+        //        }
+        //        if (yCollission(entity, newY)) {
+        //            entity.collideVertical();
+        //        } else {
+        //            // sprite.setY(newY);
+        //        }
 
         // Update creature
         entity.update();

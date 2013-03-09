@@ -47,6 +47,8 @@ public class SmellSensorPanel extends AbstractSensorPanel {
 	public void commitChanges(SmellSensor sensor) {
 		sensor.setTheta(Double.parseDouble(theta.getText()));
 		sensor.setRadius(Double.parseDouble(radius.getText()));
+        sensor.getParent().getParentWorld()
+                .fireEntityChanged(sensor.getParent());
 	}
 
 	public void fillFieldValues(SmellSensor sensor) {

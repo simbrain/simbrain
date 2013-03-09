@@ -21,33 +21,35 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 public class StraightEffectorPanel extends AbstractEffectorPanel {
 
-	private JFormattedTextField label = new JFormattedTextField("Go-Straight");
+    private JFormattedTextField label = new JFormattedTextField("Go-Straight");
 
-    private JFormattedTextField amount = new JFormattedTextField(0);
+    private JFormattedTextField bma = new JFormattedTextField(0);
 
     private RotatingEntity entity;
+
     /**
      * Default constructor.
      */
     public StraightEffectorPanel(OdorWorldEntity entity) {
-    	this.entity = (RotatingEntity)entity;
-    	addItem("Label", label);
-    	addItem("Amount", amount);
-    	setVisible(true);
+        this.entity = (RotatingEntity) entity;
+        addItem("Label", label);
+        addItem("Base movement amount", bma); // TODO: Better name?
+        setVisible(true);
     }
 
-	@Override
-	public void commitChanges() {
-		entity.addEffector(new StraightMovement(entity, label.getText())); // todo: label
+    @Override
+    public void commitChanges() {
+        entity.addEffector(new StraightMovement(entity, bma.getText())); // todo:
+                                                                           // label
+    }
 
-	}
+    public void commitChanges(StraightMovement effector) {
+        effector.setScalingFactor(Double.parseDouble(bma.getText()));
+    }
 
-	public void commitChanges(StraightMovement effector) {
-		effector.setAmount(Double.parseDouble(amount.getText()));
-	}
-
-	public void fillFieldValues(StraightMovement effector) {
-		label.setText("" + effector.getLabel()); // Label cannot be edited. Change to Title?
-		amount.setText("" + effector.getAmount());
-	}
+    public void fillFieldValues(StraightMovement effector) {
+        label.setText("" + effector.getLabel()); // Label cannot be edited.
+                                                 // Change to Title?
+        bma.setText("" + effector.getScalingFactor());
+    }
 }

@@ -27,10 +27,11 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class StraightMovement extends Effector {
 
-    /** Amount by which to move ahead. */
+    /** Amount by which to move ahead. Set externally. */
     private double amount = 0;
 
-    //TODO: Add a settable scaling factor?
+    /** Effector moves agent ahead by scaling factor times amount. */
+    private double scalingFactor = 1;
 
     /**
      * Construct the straight movement effector.
@@ -44,7 +45,7 @@ public class StraightMovement extends Effector {
 
     @Override
     public void activate() {
-        ((RotatingEntity) parent).goStraight(amount);
+        ((RotatingEntity) parent).goStraight(amount * scalingFactor);
     }
 
     /**
@@ -59,6 +60,20 @@ public class StraightMovement extends Effector {
      */
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    /**
+     * @return the scalingFactor
+     */
+    public double getScalingFactor() {
+        return scalingFactor;
+    }
+
+    /**
+     * @param scalingFactor the scalingFactor to set
+     */
+    public void setScalingFactor(double scalingFactor) {
+        this.scalingFactor = scalingFactor;
     }
 
 }

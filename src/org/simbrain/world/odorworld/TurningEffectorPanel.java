@@ -42,7 +42,6 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
 	@Override
 	public void commitChanges() {
 		entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText()))); // todo: label
-
 	}
 
 	public void commitChanges(Turning effector) {

@@ -44,6 +44,7 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
  * Panel showing an agent's effectors.
@@ -136,9 +137,15 @@ public class EffectorPanel extends JPanel {
 		deleteEffector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent del) {
 				int[] selectedRows = table.getSelectedRows();
-				for (int i = 0; i < selectedRows.length; i++) {
-					entity.removeEffector(model.getEffector(selectedRows[i]));
-				}
+                List<Effector> toDelete = new ArrayList<Effector>();
+                for (int i = 0; i < selectedRows.length; i++) {
+                    toDelete.add(model.getEffector(selectedRows[i]));
+                }
+                for (Effector effector: toDelete) {
+                    if (effector != null) {
+                        entity.removeEffector(effector);
+                    }
+                }
 			}
 		});
 		addEffector.addActionListener(new ActionListener() {
@@ -160,6 +167,11 @@ public class EffectorPanel extends JPanel {
 			public void effectorRemoved(Effector effector) {
 				model.removeEffector(effector);
 			}
+
+            @Override
+            public void effectorAdded(Effector effector) {
+                model.addRow(effector);
+            }
 		});
 	}
 

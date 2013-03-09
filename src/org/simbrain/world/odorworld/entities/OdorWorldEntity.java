@@ -26,6 +26,7 @@ import java.util.List;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
@@ -165,6 +166,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's current x position.
      */
+    @DisplayOrder(val = 50)
     public float getX() {
         return x;
     }
@@ -172,6 +174,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's current y position.
      */
+    @DisplayOrder(val = 60)
     public float getY() {
         return y;
     }
@@ -272,6 +275,7 @@ public abstract class OdorWorldEntity {
      * Gets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
+    @DisplayOrder(val = 80)
     public float getVelocityX() {
         return dx;
     }
@@ -280,6 +284,7 @@ public abstract class OdorWorldEntity {
      * Gets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
+    @DisplayOrder(val = 90)
     public float getVelocityY() {
         return dy;
     }
@@ -305,6 +310,7 @@ public abstract class OdorWorldEntity {
      *
      * @return entity's name.
      */
+    @DisplayOrder(val = 10)
     public String getName() {
         if (name == null) {
             return id;
@@ -618,6 +624,7 @@ public abstract class OdorWorldEntity {
     /**
      * @return the sensorsEnabled
      */
+    @DisplayOrder(val = 130)
     public boolean isSensorsEnabled() {
         return sensorsEnabled;
     }
@@ -632,6 +639,7 @@ public abstract class OdorWorldEntity {
     /**
      * @return the effectorsEnabled
      */
+    @DisplayOrder(val = 150)
     public boolean isEffectorsEnabled() {
         return effectorsEnabled;
     }
@@ -646,6 +654,7 @@ public abstract class OdorWorldEntity {
     /**
      * @return the showSensors
      */
+    @DisplayOrder(val = 100)
     public boolean isShowSensors() {
         return showSensors;
     }

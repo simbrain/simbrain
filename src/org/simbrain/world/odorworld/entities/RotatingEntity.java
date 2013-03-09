@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.world.odorworld.OdorWorld;
 
 /**
@@ -125,6 +126,7 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @return current heading.
      */
+    @DisplayOrder(val = 30)
     public double getHeading() {
         return heading;
     }

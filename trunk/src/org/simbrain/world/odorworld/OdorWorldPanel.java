@@ -438,9 +438,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         }
 
         ret.addSeparator();
-        ret.add(new JMenuItem(new AddTileSensorsAction(theEntity)));
-
-        ret.addSeparator();
         ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
 
         return ret;

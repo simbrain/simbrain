@@ -24,9 +24,9 @@ public class TileSensorPanel extends AbstractSensorPanel {
 
     private JFormattedTextField y = new JFormattedTextField(0);
 
-    private JFormattedTextField width = new JFormattedTextField(0);
+    private JFormattedTextField width = new JFormattedTextField(20);
 
-    private JFormattedTextField height = new JFormattedTextField(0);
+    private JFormattedTextField height = new JFormattedTextField(20);
 
     private OdorWorldEntity entity;
 
@@ -59,5 +59,7 @@ public class TileSensorPanel extends AbstractSensorPanel {
 		sensor.setY(Integer.parseInt(y.getText()));
 		sensor.setWidth(Integer.parseInt(width.getText()));
 		sensor.setHeight(Integer.parseInt(height.getText()));
+        sensor.getParent().getParentWorld()
+                .fireEntityChanged(sensor.getParent());
 	}
 }

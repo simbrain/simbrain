@@ -142,12 +142,15 @@ public class SensorPanel extends JPanel {
 		deleteSensor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int[] selectedRows = table.getSelectedRows();
-				for (int i = 0; i < selectedRows.length; i++) {
-					Sensor sensor = model.getSensor(selectedRows[i]);
-					if (sensor != null) {
-						entity.removeSensor(sensor);
-					}
-				}
+				List<Sensor> toDelete = new ArrayList<Sensor>();
+                for (int i = 0; i < selectedRows.length; i++) {
+                    toDelete.add(model.getSensor(selectedRows[i]));
+                }
+                for (Sensor sensor : toDelete) {
+                    if (sensor != null) {
+                        entity.removeSensor(sensor);
+                    }
+                }
 			}
 		});
 		addSensor.addActionListener(new ActionListener() {
@@ -156,7 +159,6 @@ public class SensorPanel extends JPanel {
 				dialog.pack();
 				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
-				model.commitChanges();
 				model.fireTableDataChanged();
 			}
 		});
@@ -168,7 +170,7 @@ public class SensorPanel extends JPanel {
 				model.removeSensor(sensor);
 			}
 			public void sensorAdded(Sensor sensor) {
-				model.addRow(sensor); // todo: get working
+				model.addRow(sensor);
 			}
 		});
 		setLayout(new BorderLayout());
@@ -211,9 +213,6 @@ public class SensorPanel extends JPanel {
 			fireTableDataChanged();
 		}
 
-		public void commitChanges() {
-
-		}
 		/**
 		 * Add a row.
 		 *

@@ -60,7 +60,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     AttributeType smellSensorType = (new AttributeType(this, "Smell",
             double.class, true));
     AttributeType tileSensorType = (new AttributeType(this, "Tile",
-            double.class, false));
+            double.class, true));
 
     /**
      * Default constructor.
@@ -258,7 +258,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                                 + ((TileSensor) sensor)
                                         .getLabel();
                         PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(sensor, "isActivated",
+                                .createPotentialProducer(sensor, "getValue",
                                         double.class);
                         producer.setCustomDescription(description);
                         returnList.add(producer);

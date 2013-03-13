@@ -20,6 +20,8 @@ import org.simbrain.world.odorworld.sensors.TileSensor;
 
 public class TileSensorPanel extends AbstractSensorPanel {
 
+    private JFormattedTextField value = new JFormattedTextField(0);
+
     private JFormattedTextField x = new JFormattedTextField(0);
 
     private JFormattedTextField y = new JFormattedTextField(0);
@@ -35,6 +37,7 @@ public class TileSensorPanel extends AbstractSensorPanel {
      */
     public TileSensorPanel(final OdorWorldEntity entity) {
     	this.entity = entity;
+    	addItem("Value", value);
     	addItem("X", x);
     	addItem("Y", y);
     	addItem("Width", width);
@@ -47,14 +50,18 @@ public class TileSensorPanel extends AbstractSensorPanel {
 
 	}
 
+    /** Fill in appropriate text fields when tile sensor is being modified. */
 	public void fillFieldValues(TileSensor sensor) {
+	    value.setText("" + Double.parseDouble(value.getText()));
 		x.setText("" + Integer.toString(sensor.getX()));
 		y.setText("" + Integer.toString(sensor.getY()));
 		width.setText("" + Integer.toString(sensor.getWidth()));
 		height.setText("" + Integer.toString(sensor.getHeight()));
 	}
 
+	/** Save changes to an edited straight movement effector. */
 	public void commitChanges(TileSensor sensor) {
+	    sensor.setValue(Double.parseDouble(value.getText()));
 		sensor.setX(Integer.parseInt(x.getText()));
 		sensor.setY(Integer.parseInt(y.getText()));
 		sensor.setWidth(Integer.parseInt(width.getText()));

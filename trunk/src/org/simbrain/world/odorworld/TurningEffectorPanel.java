@@ -21,37 +21,41 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 public class TurningEffectorPanel extends AbstractEffectorPanel {
 
-	private JFormattedTextField label = new JFormattedTextField("Turn");
+    private JFormattedTextField label = new JFormattedTextField("Turn");
 
     private JFormattedTextField direction = new JFormattedTextField(0);
 
     private JFormattedTextField amount = new JFormattedTextField(0);
 
     private RotatingEntity entity;
+
     /**
      * Default constructor.
      */
     public TurningEffectorPanel(OdorWorldEntity entity) {
-    	this.entity = (RotatingEntity) entity;
-    	addItem("Label", label);
-    	addItem("Turning direction", direction);
-    	addItem("Turning amount", amount);
-    	setVisible(true);
+        this.entity = (RotatingEntity) entity;
+        addItem("Label", label);
+        addItem("Turning direction", direction);
+        addItem("Turning amount", amount);
+        setVisible(true);
     }
 
-	@Override
-	public void commitChanges() {
-		entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText()))); // todo: label
-	}
+    @Override
+    public void commitChanges() {
+        entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText()))); // todo: label
+    }
 
-	public void commitChanges(Turning effector) {
-		effector.setDirection(Double.parseDouble(direction.getText()));
-		effector.setAmount(Double.parseDouble(amount.getText()));
-	}
+    /** Save changes to an edited turning effector. */
+    public void commitChanges(Turning effector) {
+        effector.setLabel(label.getText());
+        effector.setDirection(Double.parseDouble(direction.getText()));
+        effector.setAmount(Double.parseDouble(amount.getText()));
+    }
 
-	public void fillFieldValues(Turning effector) {
-		label.setText("" + effector.getLabel()); // Label cannot be edited. Change to Title?
-		direction.setText("" + effector.getDirection());
-		amount.setText("" + effector.getAmount());
-	}
+    /** Fill in appropriate text fields when turning effector is being modified. */
+    public void fillFieldValues(Turning effector) {
+        label.setText("" + effector.getLabel());
+        direction.setText("" + effector.getDirection());
+        amount.setText("" + effector.getAmount());
+    }
 }

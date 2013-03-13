@@ -39,17 +39,18 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
 
     @Override
     public void commitChanges() {
-        entity.addEffector(new StraightMovement(entity, bma.getText())); // todo:
-                                                                           // label
+        entity.addEffector(new StraightMovement(entity, bma.getText()));
     }
 
+    /** Save changes to an edited straight movement effector. */
     public void commitChanges(StraightMovement effector) {
+        effector.setLabel(label.getText());
         effector.setScalingFactor(Double.parseDouble(bma.getText()));
     }
 
+    /** Fill in appropriate text fields when straight movement effector is being modified. */
     public void fillFieldValues(StraightMovement effector) {
-        label.setText("" + effector.getLabel()); // Label cannot be edited.
-                                                 // Change to Title?
+        label.setText("" + effector.getLabel());
         bma.setText("" + effector.getScalingFactor());
     }
 }

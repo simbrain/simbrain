@@ -94,6 +94,13 @@ public class TileSensor extends Sensor {
     }
 
     /**
+     * @param value the value to set
+     */
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    /**
      * @return the activationAmount
      */
     public double getActivationAmount() {

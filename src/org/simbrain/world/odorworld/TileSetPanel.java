@@ -20,22 +20,21 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 public class TileSetPanel extends AbstractSensorPanel {
 
     /** Text field to edit x. */
-    private JFormattedTextField x = new JFormattedTextField(0);
+    private JFormattedTextField x = new JFormattedTextField(3);
 
     /** Text field to edit y. */
-    private JFormattedTextField y = new JFormattedTextField(0);
+    private JFormattedTextField y = new JFormattedTextField(3);
 
     /** Text field to edit offset. */
     private JFormattedTextField offset = new JFormattedTextField(1);
 
-    /** Entity which a set of tile sensors is being added. */
+    /** Entity to which a set of tile sensors is being added. */
     private OdorWorldEntity entity;
 
     /**
      * Default constructor.
      *
-     * @param entity
-     *            the entity to add a set of tile sensors.
+     * @param entity the entity to which tile sensors are added.
      */
     public TileSetPanel(final OdorWorldEntity entity) {
         this.entity = entity;

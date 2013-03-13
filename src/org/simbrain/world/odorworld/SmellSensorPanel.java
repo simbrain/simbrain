@@ -45,7 +45,7 @@ public class SmellSensorPanel extends AbstractSensorPanel {
 
     }
 
-    /** Save changes to an modified smell sensor. */
+    /** Save changes to an edited smell sensor. */
     public void commitChanges(SmellSensor sensor) {
         sensor.setLabel(label.getText());
         sensor.setTheta(Double.parseDouble(theta.getText()));
@@ -54,7 +54,7 @@ public class SmellSensorPanel extends AbstractSensorPanel {
         .fireEntityChanged(sensor.getParent());
     }
 
-    /** Fill in appropriate text fields when smell sensor is edited. */
+    /** Fill in appropriate text fields when smell sensor is being modified. */
     public void fillFieldValues(SmellSensor sensor) {
         label.setText("" + sensor.getLabel());
         theta.setText("" + sensor.getTheta());

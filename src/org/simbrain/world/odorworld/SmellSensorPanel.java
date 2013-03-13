@@ -20,40 +20,44 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 public class SmellSensorPanel extends AbstractSensorPanel {
 
-	private JFormattedTextField label = new JFormattedTextField("SmellSensor");
+    private JFormattedTextField label = new JFormattedTextField("SmellSensor");
 
     private JFormattedTextField theta = new JFormattedTextField(Math.PI / 4);
 
     private JFormattedTextField radius = new JFormattedTextField(23);
 
     private OdorWorldEntity entity;
+    
     /**
      * Default constructor.
      */
     public SmellSensorPanel(OdorWorldEntity entity) {
-    	this.entity = entity;
-    	addItem("Label", label);
-    	addItem("Sensor angle", theta);
-    	addItem("Sensor length", radius);
-    	setVisible(true);
+        this.entity = entity;
+        addItem("Label", label);
+        addItem("Sensor angle", theta);
+        addItem("Sensor length", radius);
+        setVisible(true);
     }
 
-	@Override
-	public void commitChanges() {
-		entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText()))); // todo: label
+    @Override
+    public void commitChanges() {
+        entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText()))); // todo: label
 
-	}
+    }
 
-	public void commitChanges(SmellSensor sensor) {
-		sensor.setTheta(Double.parseDouble(theta.getText()));
-		sensor.setRadius(Double.parseDouble(radius.getText()));
+    /** Save changes to an modified smell sensor. */
+    public void commitChanges(SmellSensor sensor) {
+        sensor.setLabel(label.getText());
+        sensor.setTheta(Double.parseDouble(theta.getText()));
+        sensor.setRadius(Double.parseDouble(radius.getText()));
         sensor.getParent().getParentWorld()
-                .fireEntityChanged(sensor.getParent());
-	}
+        .fireEntityChanged(sensor.getParent());
+    }
 
-	public void fillFieldValues(SmellSensor sensor) {
-		label.setText("" + sensor.getLabel()); // Label cannot be edited. Change to Title?
-		theta.setText("" + sensor.getTheta());
-		radius.setText("" + sensor.getRadius());
-	}
+    /** Fill in appropriate text fields when smell sensor is edited. */
+    public void fillFieldValues(SmellSensor sensor) {
+        label.setText("" + sensor.getLabel());
+        theta.setText("" + sensor.getTheta());
+        radius.setText("" + sensor.getRadius());
+    }
 }

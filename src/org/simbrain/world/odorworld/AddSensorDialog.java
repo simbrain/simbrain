@@ -33,7 +33,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
 
 	/** String of Sensor types. */
 
-	String[] sensors = { "SmellSensor", "TileSensor"};
+	String[] sensors = { "SmellSensor", "TileSensor", "Tile Set"};
 
 	OdorWorldEntity entity;
 	/** Select sensor type. */
@@ -88,7 +88,11 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
 			clearSensorPanel();
 			currentSensorPanel = new SmellSensorPanel(entity);
 			mainPanel.add(currentSensorPanel);
-		}
+		} else if (sensorType.getSelectedItem() == "Tile Set") {
+            clearSensorPanel();
+            currentSensorPanel = new TileSetPanel(entity);
+            mainPanel.add(currentSensorPanel);
+        }
 		pack();
 		setLocationRelativeTo(null);
 	}

@@ -14,6 +14,7 @@
 package org.simbrain.world.odorworld;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -26,7 +27,7 @@ public class TileSetPanel extends AbstractSensorPanel {
     private JFormattedTextField y = new JFormattedTextField(3);
 
     /** Text field to edit offset. */
-    private JFormattedTextField offset = new JFormattedTextField(1);
+    private JFormattedTextField offset = new JFormattedTextField(0);
 
     /** Entity to which a set of tile sensors is being added. */
     private OdorWorldEntity entity;
@@ -38,8 +39,9 @@ public class TileSetPanel extends AbstractSensorPanel {
      */
     public TileSetPanel(final OdorWorldEntity entity) {
         this.entity = entity;
-        addItem("X", x);
-        addItem("Y", y);
+        this.setName("Create grid of tile sensors");
+        addItem("Rows", x);
+        addItem("Columns", y);
         addItem("Offset", offset);
     }
 

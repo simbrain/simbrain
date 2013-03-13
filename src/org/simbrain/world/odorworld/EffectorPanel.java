@@ -87,26 +87,33 @@ public class EffectorPanel extends JPanel {
                             ResourceManager.getImageIcon("Properties.png")) {
                         public void actionPerformed(ActionEvent e) {
                             StandardDialog dialog = new StandardDialog();
+                            dialog.setTitle("Edit Effector");
                             if (effector instanceof Turning) {
-                                TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity);
-                                turningEffectorPanel.fillFieldValues((Turning) effector);
+                                TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(
+                                        entity);
+                                turningEffectorPanel
+                                        .fillFieldValues((Turning) effector);
                                 dialog.setContentPane(turningEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    turningEffectorPanel.commitChanges((Turning) effector);
+                                    turningEffectorPanel
+                                            .commitChanges((Turning) effector);
                                 }
                             }
                             if (effector instanceof StraightMovement) {
-                                StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity);
-                                straightEffectorPanel.fillFieldValues((StraightMovement) effector);
+                                StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(
+                                        entity);
+                                straightEffectorPanel
+                                        .fillFieldValues((StraightMovement) effector);
                                 dialog.setContentPane(straightEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    straightEffectorPanel.commitChanges((StraightMovement) effector);
+                                    straightEffectorPanel
+                                            .commitChanges((StraightMovement) effector);
                                 }
                             }
                         }
@@ -124,9 +131,9 @@ public class EffectorPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel buttonBar = new JPanel();
-        JButton addEffector = new JButton(
+        JButton addEffector = new JButton("Add",
                 ResourceManager.getImageIcon("plus.png"));
-        JButton deleteEffector = new JButton(
+        JButton deleteEffector = new JButton("Delete",
                 ResourceManager.getImageIcon("minus.png"));
         buttonBar.add(addEffector);
         buttonBar.add(deleteEffector);

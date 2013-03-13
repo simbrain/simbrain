@@ -62,7 +62,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         typePanel.addItem("Sensor Type", sensorType);
         sensorType.setSelectedItem("SmellSensor");
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld.html"); // todo: put in specific page
+                "Pages/Worlds/OdorWorld/OdorWorld.html"); // todo: put in specific page
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
@@ -82,14 +82,17 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
 	private void initPanel() {
 		if (sensorType.getSelectedItem() == "TileSensor") {
 			clearSensorPanel();
+            setTitle("Add a tile sensor");
 			currentSensorPanel = new TileSensorPanel(entity);
 			mainPanel.add(currentSensorPanel);
 		} else if (sensorType.getSelectedItem() == "SmellSensor") {
 			clearSensorPanel();
+            setTitle("Add a smell sensor");
 			currentSensorPanel = new SmellSensorPanel(entity);
 			mainPanel.add(currentSensorPanel);
 		} else if (sensorType.getSelectedItem() == "Tile Set") {
             clearSensorPanel();
+            setTitle("Add a grid of tile sensors");
             currentSensorPanel = new TileSetPanel(entity);
             mainPanel.add(currentSensorPanel);
         }

@@ -91,26 +91,33 @@ public class SensorPanel extends JPanel {
                             ResourceManager.getImageIcon("Properties.png")) {
                         public void actionPerformed(ActionEvent e) {
                             StandardDialog dialog = new StandardDialog();
+                            dialog.setTitle("Edit Sensor");
                             if (sensor instanceof SmellSensor) {
-                                SmellSensorPanel smellSensorPanel = new SmellSensorPanel(entity);
-                                smellSensorPanel.fillFieldValues((SmellSensor) sensor);
+                                SmellSensorPanel smellSensorPanel = new SmellSensorPanel(
+                                        entity);
+                                smellSensorPanel
+                                        .fillFieldValues((SmellSensor) sensor);
                                 dialog.setContentPane(smellSensorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    smellSensorPanel.commitChanges((SmellSensor) sensor);
+                                    smellSensorPanel
+                                            .commitChanges((SmellSensor) sensor);
                                 }
                             }
                             if (sensor instanceof TileSensor) {
-                                TileSensorPanel tileSensorPanel = new TileSensorPanel(entity);
-                                tileSensorPanel.fillFieldValues((TileSensor)sensor);
+                                TileSensorPanel tileSensorPanel = new TileSensorPanel(
+                                        entity);
+                                tileSensorPanel
+                                        .fillFieldValues((TileSensor) sensor);
                                 dialog.setContentPane(tileSensorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    tileSensorPanel.commitChanges((TileSensor) sensor);
+                                    tileSensorPanel
+                                            .commitChanges((TileSensor) sensor);
                                 }
                             }
                         }
@@ -127,9 +134,9 @@ public class SensorPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel buttonBar = new JPanel();
-        JButton addSensor = new JButton(
+        JButton addSensor = new JButton("Add",
                 ResourceManager.getImageIcon("plus.png"));
-        JButton deleteSensor = new JButton(
+        JButton deleteSensor = new JButton("Delete",
                 ResourceManager.getImageIcon("minus.png"));
         buttonBar.add(addSensor);
         buttonBar.add(deleteSensor);

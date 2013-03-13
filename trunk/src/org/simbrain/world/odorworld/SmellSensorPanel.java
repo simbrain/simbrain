@@ -14,6 +14,7 @@
 package org.simbrain.world.odorworld;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -22,12 +23,12 @@ public class SmellSensorPanel extends AbstractSensorPanel {
 
     private JFormattedTextField label = new JFormattedTextField("SmellSensor");
 
-    private JFormattedTextField theta = new JFormattedTextField(Math.PI / 4);
+    private JTextField theta = new JTextField("" + (Math.PI / 4));
 
-    private JFormattedTextField radius = new JFormattedTextField(23);
+    private JTextField radius = new JTextField("" + 23);
 
     private OdorWorldEntity entity;
-    
+
     /**
      * Default constructor.
      */

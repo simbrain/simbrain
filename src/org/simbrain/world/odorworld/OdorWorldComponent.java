@@ -28,10 +28,12 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
@@ -60,6 +62,10 @@ public class OdorWorldComponent extends WorkspaceComponent {
     AttributeType smellSensorType = (new AttributeType(this, "Smell",
             double.class, true));
     AttributeType tileSensorType = (new AttributeType(this, "Tile",
+            double.class, true));
+    AttributeType speechEffectorType = (new AttributeType(this, "Speech",
+            double.class, true));
+    AttributeType hearingSensorType = (new AttributeType(this, "Hearing",
             double.class, true));
 
     /**
@@ -94,6 +100,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         addConsumerType(turningType);
         addConsumerType(straightMovementType);
         addConsumerType(absoluteMovementType);
+        addConsumerType(speechEffectorType);
 
         addProducerType(xLocationType);
         addProducerType(yLocationType);
@@ -193,6 +200,17 @@ public class OdorWorldComponent extends WorkspaceComponent {
                                 returnList.add(consumer);
                             }
                         }
+                    } else if (effector instanceof Speech) {
+                        if (speechEffectorType.isVisible()) {
+                            String description = entity.getName()
+                                    + ((Speech)effector).getLabel();
+                            PotentialConsumer consumer = getAttributeManager()
+                                    .createPotentialConsumer(effector,
+                                            "setAmount", double.class);
+                            consumer.setCustomDescription(description);
+                            returnList.add(consumer);
+                        }
+
                     }
 
                 }
@@ -245,6 +263,21 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
+                    }
+                }
+            }
+
+            // Hearing Sensor
+            if (hearingSensorType.isVisible()) {
+                for (Sensor sensor : entity.getSensors()) {
+                    if (sensor instanceof Hearing) {
+                        String description = entity.getName()
+                                + ((Hearing) sensor).getLabel();
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(sensor,
+                                        "getValue", double.class);
+                        producer.setCustomDescription(description);
+                        returnList.add(producer);
                     }
                 }
             }

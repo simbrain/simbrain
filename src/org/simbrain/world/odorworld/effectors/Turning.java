@@ -46,7 +46,7 @@ public class Turning extends Effector {
     }
 
     @Override
-    public void activate() {
+    public void update() {
         ((RotatingEntity) parent).turn(direction * amount);
     }
 

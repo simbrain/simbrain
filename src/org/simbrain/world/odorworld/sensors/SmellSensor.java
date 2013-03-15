@@ -55,10 +55,10 @@ public class SmellSensor extends Sensor {
      */
     public SmellSensor(final OdorWorldEntity parent, final String label,
             double theta, double radius) {
+        super(parent, label);
         this.parent = parent;
         this.theta = theta;
         this.radius = radius;
-        setLabel(label);
     }
 
     /**

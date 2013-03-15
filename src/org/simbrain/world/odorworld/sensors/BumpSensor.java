@@ -42,7 +42,7 @@ public class BumpSensor extends Sensor {
      * @param bumpVal value
      */
     public BumpSensor(OdorWorldEntity parent, double bumpVal) {
-        this.parent = parent;
+        super(parent, "" + bumpVal);
         this.bumpValue = bumpVal;
     }
 

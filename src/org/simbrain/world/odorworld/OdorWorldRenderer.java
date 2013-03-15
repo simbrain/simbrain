@@ -23,7 +23,10 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
@@ -69,6 +72,7 @@ public class OdorWorldRenderer {
             g.drawImage(background, 0, 0, null);
         }
 
+
         // For debugging world bounds
         // g.setColor(Color.black);
         // g.drawRect(0, 0, world.getWidth(), world.getHeight());
@@ -91,6 +95,19 @@ public class OdorWorldRenderer {
             while (g.drawImage(entity.getImage(), x, y, null) == false) {
                 ; // keep trying to draw the image until you can. Dangerous?
             }
+
+            // Display effector related graphics
+            for (Effector effector : entity.getEffectors()) {
+                if (effector instanceof Speech) {
+                    if (((Speech) effector).isActivated()) {
+                        g.setColor(Color.black);
+                        g.drawString("Say:" + ((Speech) effector).getPhrase(),
+                                x + 50, y + 50);
+                    }
+                }
+            }
+
+            // Display sensor related graphics
             if (entity.isShowSensors()) {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
@@ -98,7 +115,15 @@ public class OdorWorldRenderer {
                         g.drawRect(tile.getX(), tile.getY(),
                                 tile.getWidth(), tile.getHeight());
 
+                    } else if (sensor instanceof Hearing) {
+                        if (((Hearing) sensor).isActivated()) {
+                            g.setColor(Color.black);
+                            g.drawString(
+                                    "Hear:" + ((Hearing) sensor).getPhrase(),
+                                    x + 50, y + 50);
+                        }
                     } else if (sensor instanceof SmellSensor) {
+
                         double val = SimbrainMath
                                 .getVectorNorm(((SmellSensor) sensor)
                                         .getCurrentValue());

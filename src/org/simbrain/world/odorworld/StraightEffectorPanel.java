@@ -13,22 +13,33 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
+/**
+ * Panel to add a straight movement effector to an entity.
+ *
+ * @author Lam Nguyen
+ *
+ */
 public class StraightEffectorPanel extends AbstractEffectorPanel {
 
-    private JFormattedTextField label = new JFormattedTextField("Go-Straight");
+    /** Text field to edit label. */
+    private JTextField label = new JTextField("Go-Straight");
 
-    private JFormattedTextField bma = new JFormattedTextField(0);
+    /** Text field to edit the base movement rate. */
+    private JTextField bma = new JTextField("" + 0);
 
+    /** Entity to which a straight movement effector is being added. */
     private RotatingEntity entity;
 
     /**
      * Default constructor.
+     * 
+     * @param entity the entity to which a straight movement effector is added.
      */
     public StraightEffectorPanel(OdorWorldEntity entity) {
         this.entity = (RotatingEntity) entity;

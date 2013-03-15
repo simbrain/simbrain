@@ -13,24 +13,36 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
+/**
+ * Panel to add a smell sensor to an entity.
+ *
+ * @author Lam Nguyen
+ *
+ */
 public class SmellSensorPanel extends AbstractSensorPanel {
 
-    private JFormattedTextField label = new JFormattedTextField("SmellSensor");
+    /** Text field to edit label. */
+    private JTextField label = new JTextField("SmellSensor");
 
-    private JTextField theta = new JTextField("" + (Math.PI / 4));
+    /** Text field to edit theta. */
+    private JTextField theta = new JTextField("" + Math.PI/4);
 
+    /** Text field to edit radius. */
     private JTextField radius = new JTextField("" + 23);
 
+    /** Entity to which a smell sensor is being added. */
     private OdorWorldEntity entity;
 
     /**
      * Default constructor.
+     *
+     * @param entity the entity to which a smell sensor is added.
      */
     public SmellSensorPanel(OdorWorldEntity entity) {
         this.entity = entity;

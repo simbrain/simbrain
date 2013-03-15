@@ -44,7 +44,7 @@ public class StraightMovement extends Effector {
     }
 
     @Override
-    public void activate() {
+    public void update() {
         ((RotatingEntity) parent).goStraight(amount * scalingFactor);
     }
 

@@ -40,7 +40,7 @@ public abstract class Effector {
      * Construct the effector.
      *
      * @param parent the parent entity
-     * @param label a label for this entity
+     * @param label a label for this effector
      */
     public Effector(OdorWorldEntity parent, String label) {
         super();
@@ -51,7 +51,7 @@ public abstract class Effector {
     /**
      * Move the agent in a manner appropriate to the effector type.
      */
-    public abstract void activate();
+    public abstract void update();
 
     /**
      * Return a list of entity types which can use this type of sensor.

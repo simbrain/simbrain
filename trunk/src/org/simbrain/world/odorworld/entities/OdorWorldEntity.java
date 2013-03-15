@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld.entities;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.util.SimpleId;
@@ -98,6 +99,9 @@ public abstract class OdorWorldEntity {
     /** Entity Id generator. */
     private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
 
+    /** Things currently being said by talking entities. */
+    private List<String> currentlyHeardPhrases = new ArrayList<String>();
+
     // Un-implemented code for using lifcycle.
     // private LifeCycle cycle;
     // private boolean usesLifeCycle = false;
@@ -141,6 +145,8 @@ public abstract class OdorWorldEntity {
      * velocity.
      */
     public void update() {
+        //System.out.println(Arrays.asList(currentlyHeardPhrases));
+        currentlyHeardPhrases.clear();
         //if (usesLifeCycle) {
         //    cycle.update();
         //}
@@ -426,7 +432,7 @@ public abstract class OdorWorldEntity {
     public void applyEffectors() {
         if (effectorsEnabled) {
             for (Effector effector : effectors) {
-                effector.activate();
+                effector.update();
             }
         }
     }
@@ -573,7 +579,7 @@ public abstract class OdorWorldEntity {
         getAnimation().initializeImages();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
-        this.collision = false; 
+        this.collision = false;
     }
 
     /**
@@ -814,5 +820,22 @@ public abstract class OdorWorldEntity {
             smellSource.update();
         }
     }
+
+    /**
+     * Add a phrase to the list of things currently being said.
+     *
+     * @param phrase the phrase to add
+     */
+    public void speakToEntity(String phrase) {
+        currentlyHeardPhrases.add(phrase);
+    }
+
+    /**
+     * @return the currentlyHeardPhrases
+     */
+    public List<String> getCurrentlyHeardPhrases() {
+        return currentlyHeardPhrases;
+    }
+
 
 }

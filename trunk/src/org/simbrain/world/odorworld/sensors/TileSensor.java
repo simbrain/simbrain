@@ -50,21 +50,20 @@ public class TileSensor extends Sensor {
 
     /**
      * Construct a tile sensor.
-     *
+     * 
      * @param entity parent entity
      * @param x upper left
      * @param y upper right
      * @param width width in pixels
      * @param height height
      */
-    public TileSensor(OdorWorldEntity entity, int x, int y, int width,
+    public TileSensor(OdorWorldEntity parent, int x, int y, int width,
             int height) {
-        this.parent = entity;
+        super(parent, "Tile (" + x + "," + y + "):" + width + "x" + height);
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        setLabel("Tile (" + x + "," + y + "):" + width + "x" + height);
     }
 
     /**

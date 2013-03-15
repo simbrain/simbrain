@@ -37,6 +37,18 @@ public abstract class Sensor {
     private String label;
 
     /**
+     * Construct the sensor.
+     *
+     * @param parent the parent entity
+     * @param label a label for this sensor
+     */
+    public Sensor(OdorWorldEntity parent, String label) {
+        super();
+        this.parent = parent;
+        this.label = label;
+    }
+
+    /**
      * Update the sensor.
      */
     public abstract void update();

@@ -25,12 +25,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.SimpleId;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 

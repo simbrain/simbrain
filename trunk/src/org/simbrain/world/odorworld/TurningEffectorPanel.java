@@ -13,24 +13,36 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
+/**
+ * Panel to add a turning effector to an entity.
+ *
+ * @author Lam Nguyen
+ *
+ */
 public class TurningEffectorPanel extends AbstractEffectorPanel {
 
-    private JFormattedTextField label = new JFormattedTextField("Turn");
+    /** Text field to edit label. */
+    private JTextField label = new JTextField("Turn");
 
-    private JFormattedTextField direction = new JFormattedTextField(0);
+    /** Text field to edit direction. */
+    private JTextField direction = new JTextField("" + 0);
 
-    private JFormattedTextField amount = new JFormattedTextField(0);
+    /** Text field to edit amount. */
+    private JTextField amount = new JTextField("" + 0);
 
+    /** Entity to which a turning effector is being added. */
     private RotatingEntity entity;
 
     /**
      * Default constructor.
+     *
+     * @param entity the entity to which a turning effector is added.
      */
     public TurningEffectorPanel(OdorWorldEntity entity) {
         this.entity = (RotatingEntity) entity;

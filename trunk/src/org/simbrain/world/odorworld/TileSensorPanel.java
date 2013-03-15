@@ -13,27 +13,41 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
+/**
+ * Panel to add a single tile sensor to an entity.
+ *
+ * @author Lam Nguyen
+ *
+ */
 public class TileSensorPanel extends AbstractSensorPanel {
 
-    private JFormattedTextField value = new JFormattedTextField(0);
+    /** Text field to edit value. */
+    private JTextField value = new JTextField("" + 0);
 
-    private JFormattedTextField x = new JFormattedTextField(0);
+    /** Text field to edit x. */
+    private JTextField x = new JTextField("" + 0);
 
-    private JFormattedTextField y = new JFormattedTextField(0);
+    /** Text field to edit y. */
+    private JTextField y = new JTextField("" + 0);
 
-    private JFormattedTextField width = new JFormattedTextField(20);
+    /** Text field to edit width. */
+    private JTextField width = new JTextField("" + 20);
 
-    private JFormattedTextField height = new JFormattedTextField(20);
+    /** Text field to edit height. */
+    private JTextField height = new JTextField("" + 20);
 
+    /** Entity to which a tile sensor is being added. */
     private OdorWorldEntity entity;
 
     /**
      * Default constructor.
+     * 
+     * @param entity the entity to which a tile sensor is added.
      */
     public TileSensorPanel(final OdorWorldEntity entity) {
     	this.entity = entity;

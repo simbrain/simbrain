@@ -27,22 +27,27 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * effectorDialog is a dialog box for adding effectors to Odor World.
+ * EffectorDialog is a dialog box for adding effectors to Odor World.
+ *
+ * @author Lam Nguyen
+ *
  */
 
 public class AddEffectorDialog extends StandardDialog implements ActionListener {
 
 	/** String of effector types. */
+	private String[] effectors = {"StraightMovement", "Turning"};
 
-	String[] effectors = { "StraightMovement", "Turning"};
-
+	/** Entity to which effector is being added. */
 	private OdorWorldEntity entity;
 
+	/** Instantiated entity to which effector is being added. */
 	private RotatingEntity rotatingEntity;
 
 	/** Select effector type. */
 	private JComboBox effectorType = new JComboBox(effectors);
 
+	/** Panel that changes to a specific effector panel. */
 	private AbstractEffectorPanel currentEffectorPanel;
 
 	/** Main dialog box. */
@@ -51,7 +56,7 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
 	/** Panel for setting effector type. */
 	private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-	/** effector Dialog add effector constructor. */
+	/** Effector Dialog add effector constructor. */
 	public AddEffectorDialog(OdorWorldEntity entity) {
 		this.entity = entity;
 		this.rotatingEntity = (RotatingEntity) entity;
@@ -87,10 +92,12 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
 	private void initPanel() {
 		if (effectorType.getSelectedItem() == "StraightMovement") {
 			cleareffectorPanel();
+			setTitle("Add a straight movement effector");
 			currentEffectorPanel = new StraightEffectorPanel(rotatingEntity);
 			mainPanel.add(currentEffectorPanel);
 		} else if (effectorType.getSelectedItem() == "Turning") {
 			cleareffectorPanel();
+			setTitle("Add a turning effector");
 			currentEffectorPanel = new TurningEffectorPanel(rotatingEntity);
 			mainPanel.add(currentEffectorPanel);
 		}

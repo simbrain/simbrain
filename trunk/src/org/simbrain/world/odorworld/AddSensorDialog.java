@@ -27,18 +27,23 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
+ *
+ * @author Lam Nguyen
+ *
  */
 
 public class AddSensorDialog extends StandardDialog implements ActionListener {
 
 	/** String of Sensor types. */
+	private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set"};
 
-	String[] sensors = { "SmellSensor", "TileSensor", "Tile Set"};
+	/** Entity to which sensor is being added. */
+	private OdorWorldEntity entity;
 
-	OdorWorldEntity entity;
 	/** Select sensor type. */
 	private JComboBox sensorType = new JComboBox(sensors);
 
+	/** Panel that changes to a specific sensor panel. */
 	private AbstractSensorPanel currentSensorPanel;
 
 	/** Main dialog box. */

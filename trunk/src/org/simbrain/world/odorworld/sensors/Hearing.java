@@ -18,7 +18,14 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 /**
  * Implement a simple hearing sensor. When the phrase is heard, the sensor is
@@ -30,7 +37,10 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 public class Hearing extends Sensor {
 
     /** The thing this hearing sensor listens for. */
-    private String phrase = "Test";
+    private String phrase = "";
+
+    /** The heard phrase thought bubble image to be rendered */
+    private BufferedImage image;
 
     /**
      * Whether this is activated.
@@ -47,10 +57,12 @@ public class Hearing extends Sensor {
      *
      * @param parent parent entity
      * @param phrase the phrase associated with this sensor
+     * @param outputAmount the amount to output when this sensor is activated
      */
-    public Hearing(OdorWorldEntity parent, String phrase) {
+    public Hearing(OdorWorldEntity parent, String phrase, double outputAmount) {
         super(parent, "Hear: \"" + phrase + "\"");
         this.phrase = phrase;
+        this.outputAmount = outputAmount;
     }
 
     @Override
@@ -108,5 +120,28 @@ public class Hearing extends Sensor {
             return 0;
         }
     }
-
+    /**
+     * @return the buffered image
+     */
+    public BufferedImage getImage() {
+        image = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.drawImage(OdorWorldResourceManager.getImage("ThoughtBubble.png"), 0, 0, null);
+        g.setColor(Color.black);
+        int fontSize = 20; // is there a more elegant way to change font size?
+        if (phrase.length() <= 4) {
+            fontSize = 15;
+        } else if (phrase.length() <= 8) {
+            fontSize = 10;
+        } else {
+            fontSize = 8;
+        }
+        g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+        FontMetrics fm = g.getFontMetrics(); // replace with toolkit?
+        int x = (image.getWidth() - fm.stringWidth(phrase)) / 2;
+        int y = (fm.getAscent() + ((image.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        g.drawString(phrase, x, y); // todo: fix bug: string appears before image. Put in OdorWorldRenderer instead?
+        g.dispose();
+        return image;
+    }
 }

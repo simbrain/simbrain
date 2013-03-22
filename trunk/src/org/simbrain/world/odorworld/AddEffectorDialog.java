@@ -36,7 +36,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 public class AddEffectorDialog extends StandardDialog implements ActionListener {
 
 	/** String of effector types. */
-	private String[] effectors = {"StraightMovement", "Turning"};
+	private String[] effectors = {"StraightMovement", "Turning", "Speech"};
 
 	/** Entity to which effector is being added. */
 	private OdorWorldEntity entity;
@@ -100,7 +100,12 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
 			setTitle("Add a turning effector");
 			currentEffectorPanel = new TurningEffectorPanel(rotatingEntity);
 			mainPanel.add(currentEffectorPanel);
-		}
+		} else if (effectorType.getSelectedItem() == "Speech") {
+            cleareffectorPanel();
+            setTitle("Add a speech effector");
+            currentEffectorPanel = new SpeechEffectorPanel(rotatingEntity);
+            mainPanel.add(currentEffectorPanel);
+        }
 		pack();
 		setLocationRelativeTo(null);
 	}

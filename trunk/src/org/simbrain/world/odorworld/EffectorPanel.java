@@ -41,10 +41,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
  * Panel showing an agent's effectors.
@@ -114,6 +114,20 @@ public class EffectorPanel extends JPanel {
                                 if (!dialog.hasUserCancelled()) {
                                     straightEffectorPanel
                                             .commitChanges((StraightMovement) effector);
+                                }
+                            }
+                            if (effector instanceof Speech) {
+                                SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(
+                                        entity);
+                                speechEffectorPanel
+                                        .fillFieldValues((Speech) effector);
+                                dialog.setContentPane(speechEffectorPanel);
+                                dialog.pack();
+                                dialog.setLocationRelativeTo(null);
+                                dialog.setVisible(true);
+                                if (!dialog.hasUserCancelled()) {
+                                    speechEffectorPanel
+                                            .commitChanges((Speech) effector);
                                 }
                             }
                         }

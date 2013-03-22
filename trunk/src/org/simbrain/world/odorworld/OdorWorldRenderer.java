@@ -100,9 +100,7 @@ public class OdorWorldRenderer {
             for (Effector effector : entity.getEffectors()) {
                 if (effector instanceof Speech) {
                     if (((Speech) effector).isActivated()) {
-                        g.setColor(Color.black);
-                        g.drawString("Say:" + ((Speech) effector).getPhrase(),
-                                x + 50, y + 50);
+                        g.drawImage(((Speech) effector).getImage(), null, x + entity.getWidth(), y - entity.getHeight());
                     }
                 }
             }
@@ -117,10 +115,7 @@ public class OdorWorldRenderer {
 
                     } else if (sensor instanceof Hearing) {
                         if (((Hearing) sensor).isActivated()) {
-                            g.setColor(Color.black);
-                            g.drawString(
-                                    "Hear:" + ((Hearing) sensor).getPhrase(),
-                                    x + 50, y + 50);
+                            g.drawImage(((Hearing) sensor).getImage(), null, x + entity.getWidth(), y - entity.getHeight());
                         }
                     } else if (sensor instanceof SmellSensor) {
 

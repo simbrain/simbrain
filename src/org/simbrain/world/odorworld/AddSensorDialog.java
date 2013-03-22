@@ -35,7 +35,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 public class AddSensorDialog extends StandardDialog implements ActionListener {
 
 	/** String of Sensor types. */
-	private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set"};
+	private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set", "Hearing"};
 
 	/** Entity to which sensor is being added. */
 	private OdorWorldEntity entity;
@@ -99,6 +99,11 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
             clearSensorPanel();
             setTitle("Add a grid of tile sensors");
             currentSensorPanel = new TileSetPanel(entity);
+            mainPanel.add(currentSensorPanel);
+        } else if (sensorType.getSelectedItem() == "Hearing") {
+            clearSensorPanel();
+            setTitle("Add a hearing sensor");
+            currentSensorPanel = new HearingSensorPanel(entity);
             mainPanel.add(currentSensorPanel);
         }
 		pack();

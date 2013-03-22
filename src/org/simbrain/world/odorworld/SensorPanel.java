@@ -41,6 +41,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 import org.simbrain.world.odorworld.sensors.TileSensor;
@@ -118,6 +119,19 @@ public class SensorPanel extends JPanel {
                                 if (!dialog.hasUserCancelled()) {
                                     tileSensorPanel
                                             .commitChanges((TileSensor) sensor);
+                                }
+                            }
+                            if (sensor instanceof Hearing) {
+                                HearingSensorPanel hearingSensorPanel = new HearingSensorPanel(
+                                        entity);
+                                hearingSensorPanel.fillFieldValues((Hearing) sensor);
+                                dialog.setContentPane(hearingSensorPanel);
+                                dialog.pack();
+                                dialog.setLocationRelativeTo(null);
+                                dialog.setVisible(true);
+                                if (!dialog.hasUserCancelled()) {
+                                    hearingSensorPanel
+                                            .commitChanges((Hearing) sensor);
                                 }
                             }
                         }

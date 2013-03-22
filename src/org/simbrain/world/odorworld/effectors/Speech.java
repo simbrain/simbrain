@@ -18,7 +18,14 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 /**
  * Model simple speech behaviors. Each speech effector is associated with a
@@ -31,10 +38,13 @@ public class Speech extends Effector {
 
     //TODO: Possibly add a radius of influence
     //      Possibly add a threshold for the value above which to "speak"
-    //      Possibly encapsulate phrase String in an utterance class 
+    //      Possibly encapsulate phrase String in an utterance class
 
     /** The thing this speech effector says. */
-    private String phrase = "Test";
+    private String phrase = "";
+
+    /** The speech balloon image to be rendered */
+    private BufferedImage image;
 
     /**
      * Whether this is activated. If so, display the phrase and notify all
@@ -56,9 +66,10 @@ public class Speech extends Effector {
      * @param parent parent entity
      * @param phrase the phrase associated with this effector
      */
-    public Speech(OdorWorldEntity parent, String phrase) {
+    public Speech(OdorWorldEntity parent, String phrase, double threshold) {
         super(parent, "Say: \"" + phrase + "\"");
         this.phrase = phrase;
+        this.threshold = threshold;
     }
 
     @Override
@@ -111,9 +122,9 @@ public class Speech extends Effector {
         this.activated = activated;
     }
 
-    /**
-     * @return the amount
-     */
+    //**
+     //* @return the amount // obsolete?
+     //*/
     public double getAmount() {
         return amount;
     }
@@ -125,4 +136,42 @@ public class Speech extends Effector {
         this.amount = amount;
     }
 
+    /**
+     * @return the threshold
+     */
+    public double getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * @param threshold the threshold to set
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    /**
+     * @return the buffered image
+     */
+    public BufferedImage getImage() {
+        image = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloon.png"), 0, 0, null);
+        g.setColor(Color.black);
+        int fontSize = 20; // is there a more elegant way to change font size?
+        if (phrase.length() <= 4) {
+            fontSize = 15;
+        } else if (phrase.length() <= 8) {
+            fontSize = 10;
+        } else {
+            fontSize = 8;
+        }
+        g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+        FontMetrics fm = g.getFontMetrics(); // replace with toolkit?
+        int x = (image.getWidth() - fm.stringWidth(phrase)) / 2;
+        int y = (fm.getAscent() + ((image.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        g.drawString(phrase, x, y); // todo: fix bug: string appears before image. Put in OdorWorldRenderer instead?
+        g.dispose();
+        return image;
+    }
 }

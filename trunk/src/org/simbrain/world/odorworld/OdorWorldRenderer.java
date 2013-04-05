@@ -47,9 +47,6 @@ public class OdorWorldRenderer {
     /** Background image. */
     private Image background;
 
-    /** The speech balloon or thought bubble image to be rendered */
-    private BufferedImage vocalize;
-
     /** Sensor color. */
     private static float sensorColor = Color.RGBtoHSB(255, 0, 0, null)[0];
 
@@ -250,7 +247,7 @@ public class OdorWorldRenderer {
                                 }
                             }
                             g.drawImage(getThoughtBubble((Hearing) sensor), null, imageX, imageY);
-                            System.out.println("agent: " + entity.getName() + " at " + x + "," + y + " ; imageX = " + imageX + " ; imageY = " + imageY);
+                            // System.out.println("agent: " + entity.getName() + " at " + x + "," + y + " ; imageX = " + imageX + " ; imageY = " + imageY);
                         }
                     } else if (sensor instanceof SmellSensor) {
 
@@ -286,7 +283,7 @@ public class OdorWorldRenderer {
      * @return the buffered image
      */
     public BufferedImage getSpeechBalloon(Speech effector) {
-        vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
         g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloon.png"), 0, 0, null);
         g.setColor(Color.black);
@@ -312,7 +309,7 @@ public class OdorWorldRenderer {
      * @return the buffered image
      */
     public BufferedImage getThoughtBubble(Hearing sensor) {
-        vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
         g.drawImage(OdorWorldResourceManager.getImage("ThoughtBubble.png"), 0, 0, null);
         g.setColor(Color.black);

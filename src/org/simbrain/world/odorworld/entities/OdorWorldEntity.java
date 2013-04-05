@@ -146,7 +146,11 @@ public abstract class OdorWorldEntity {
      */
     public void update() {
         //System.out.println(Arrays.asList(currentlyHeardPhrases));
-        currentlyHeardPhrases.clear();
+
+        // For Backwards compatibility
+        if (currentlyHeardPhrases != null) {
+            currentlyHeardPhrases.clear();
+        }
         //if (usesLifeCycle) {
         //    cycle.update();
         //}

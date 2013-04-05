@@ -13,12 +13,12 @@
  */
 package org.simbrain.world.odorworld;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.sensors.Hearing;
 
 /**
  * Panel to add a speech effector to an entity.
@@ -29,10 +29,10 @@ import org.simbrain.world.odorworld.sensors.Hearing;
 public class SpeechEffectorPanel extends AbstractEffectorPanel {
 
     /** Text field to edit uttered phrase. */
-    private JTextField phrase = new JTextField("");
+    private JTextField phrase = new JTextField("Hi!");
 
     /** Text field to edit threshold above which effector is activated. */
-    private JTextField threshold = new JTextField("");
+    private JTextField threshold = new JTextField("" + 0.1);
 
     /** Entity to which a speech effector is being added. */
     private RotatingEntity entity;
@@ -52,6 +52,9 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
     @Override
     public void commitChanges() {
         entity.addEffector(new Speech(entity, phrase.getText(), Double.parseDouble(threshold.getText())));
+        if (phrase.getText().length() > 10) {
+            checkPhrase();
+        }
     }
 
     /** Save changes to an edited speech effector. */
@@ -61,11 +64,21 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         effector.setThreshold(Double.parseDouble(threshold.getText()));
         effector.getParent().getParentWorld()
         .fireEntityChanged(effector.getParent());
+        if (phrase.getText().length() > 10) {
+            checkPhrase();
+        }
     }
 
     /** Fill in appropriate text fields when speech effector is being modified. */
     public void fillFieldValues(Speech effector) {
         phrase.setText("" + effector.getPhrase());
         threshold.setText("" + effector.getThreshold());
+    }
+
+    /** Displays message when utterance is above 10 char. */
+    private void checkPhrase() {
+        JOptionPane.showOptionDialog(null, "Speech utterance is greater than 10 chars! Not guaranteed to render correctly.", "Warning",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, null, null);
     }
 }

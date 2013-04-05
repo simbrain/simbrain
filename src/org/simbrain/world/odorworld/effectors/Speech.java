@@ -43,9 +43,6 @@ public class Speech extends Effector {
     /** The thing this speech effector says. */
     private String phrase = "";
 
-    /** The speech balloon image to be rendered */
-    private BufferedImage image;
-
     /**
      * Whether this is activated. If so, display the phrase and notify all
      * hearing sensors.
@@ -148,30 +145,5 @@ public class Speech extends Effector {
      */
     public void setThreshold(double threshold) {
         this.threshold = threshold;
-    }
-
-    /**
-     * @return the buffered image
-     */
-    public BufferedImage getImage() {
-        image = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloon.png"), 0, 0, null);
-        g.setColor(Color.black);
-        int fontSize = 20; // is there a more elegant way to change font size?
-        if (phrase.length() <= 4) {
-            fontSize = 15;
-        } else if (phrase.length() <= 8) {
-            fontSize = 10;
-        } else {
-            fontSize = 8;
-        }
-        g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
-        FontMetrics fm = g.getFontMetrics(); // replace with toolkit?
-        int x = (image.getWidth() - fm.stringWidth(phrase)) / 2;
-        int y = (fm.getAscent() + ((image.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
-        g.drawString(phrase, x, y); // todo: fix bug: string appears before image. Put in OdorWorldRenderer instead?
-        g.dispose();
-        return image;
     }
 }

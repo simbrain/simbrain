@@ -19,13 +19,18 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -41,6 +46,9 @@ public class OdorWorldRenderer {
 
     /** Background image. */
     private Image background;
+
+    /** The speech balloon or thought bubble image to be rendered */
+    private BufferedImage vocalize;
 
     /** Sensor color. */
     private static float sensorColor = Color.RGBtoHSB(255, 0, 0, null)[0];
@@ -90,7 +98,7 @@ public class OdorWorldRenderer {
 
             // For debugging entity boundary issues
             // g.drawRect((int) entity.getX(), (int) entity.getY(),
-            // entity.getWidth(), entity.getHeight());
+            //         entity.getWidth(), entity.getHeight());
 
             while (g.drawImage(entity.getImage(), x, y, null) == false) {
                 ; // keep trying to draw the image until you can. Dangerous?
@@ -100,7 +108,70 @@ public class OdorWorldRenderer {
             for (Effector effector : entity.getEffectors()) {
                 if (effector instanceof Speech) {
                     if (((Speech) effector).isActivated()) {
-                        g.drawImage(((Speech) effector).getImage(), null, x + entity.getWidth(), y - entity.getHeight());
+                        int imageX = x;
+                        int imageY = y;
+                        RotatingEntity rotatingEntity = (RotatingEntity) entity;
+
+                        if (entity.getWidth() == 40) {
+                            if (rotatingEntity.getHeading() < 7.5) {
+                                imageX = imageX + entity.getWidth();
+                                imageY = imageY - entity.getHeight();
+                            } else if (rotatingEntity.getHeading() < 52.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 97.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 142.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 187.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 232.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 277.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() >= 277.5) {
+                                // todo: fill in
+                            }
+                        } else if (rotatingEntity.getWidth() == 96) {
+                            if (rotatingEntity.getHeading() < 7.5) {
+                                imageX = x + entity.getWidth()*2/3;
+                                imageY = y - entity.getHeight()/3;
+                            } else if (rotatingEntity.getHeading() < 52.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 97.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 142.5) {
+
+                            } else if (rotatingEntity.getHeading() < 187.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 232.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 277.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() >= 277.5) {
+                                // todo: fill in
+                            }
+                        }
+                        else if (entity.getWidth() == 128) {
+                            if (rotatingEntity.getHeading() < 7.5) {
+                                imageX = x + entity.getWidth()*3/4;
+                                imageY = y - entity.getHeight()/8;
+                            } else if (rotatingEntity.getHeading() < 52.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 97.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 142.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 187.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 232.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() < 277.5) {
+                                // todo: fill in
+                            } else if (rotatingEntity.getHeading() >= 277.5) {
+                                // todo: fill in
+                            }
+                        }
+                        g.drawImage(getSpeechBalloon((Speech) effector), null, imageX, imageY);
                     }
                 }
             }
@@ -115,7 +186,71 @@ public class OdorWorldRenderer {
 
                     } else if (sensor instanceof Hearing) {
                         if (((Hearing) sensor).isActivated()) {
-                            g.drawImage(((Hearing) sensor).getImage(), null, x + entity.getWidth(), y - entity.getHeight());
+                            int imageX = x;
+                            int imageY = y;
+                            RotatingEntity rotatingEntity = (RotatingEntity) entity;
+
+                            if (entity.getWidth() == 40) {
+                                if (rotatingEntity.getHeading() < 7.5) {
+                                    imageX = imageX + entity.getWidth()*3/4;
+                                    imageY = imageY - entity.getHeight();
+                                } else if (rotatingEntity.getHeading() < 52.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 97.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 142.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 187.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 232.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 277.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() >= 277.5) {
+                                    // todo: fill in
+                                }
+                            } else if (rotatingEntity.getWidth() == 96) {
+                                if (rotatingEntity.getHeading() < 7.5) {
+                                    imageX = x + entity.getWidth()*2/3;
+                                    imageY = y - entity.getHeight()/3;
+                                } else if (rotatingEntity.getHeading() < 52.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 97.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 142.5) {
+
+                                } else if (rotatingEntity.getHeading() < 187.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 232.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 277.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() >= 277.5) {
+                                    // todo: fill in
+                                }
+                            }
+                            else if (entity.getWidth() == 128) {
+                                if (rotatingEntity.getHeading() < 7.5) {
+                                    imageX = x + entity.getWidth()*3/4;
+                                    imageY = y - entity.getHeight()/8;
+                                } else if (rotatingEntity.getHeading() < 52.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 97.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 142.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 187.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 232.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() < 277.5) {
+                                    // todo: fill in
+                                } else if (rotatingEntity.getHeading() >= 277.5) {
+                                    // todo: fill in
+                                }
+                            }
+                            g.drawImage(getThoughtBubble((Hearing) sensor), null, imageX, imageY);
+                            System.out.println("agent: " + entity.getName() + " at " + x + "," + y + " ; imageX = " + imageX + " ; imageY = " + imageY);
                         }
                     } else if (sensor instanceof SmellSensor) {
 
@@ -144,6 +279,58 @@ public class OdorWorldRenderer {
                 }
             }
         }
+    }
+
+    /**
+     * Draws the speech balloon.
+     * @return the buffered image
+     */
+    public BufferedImage getSpeechBalloon(Speech effector) {
+        vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = vocalize.createGraphics();
+        g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloon.png"), 0, 0, null);
+        g.setColor(Color.black);
+        int fontSize = 20; // is there a more elegant way to change font size?
+        if (effector.getPhrase().length() <= 4) {
+            fontSize = 15;
+        } else if (effector.getPhrase().length() <= 8) {
+            fontSize = 10;
+        } else {
+            fontSize = 8;
+        }
+        g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+        FontMetrics fm = g.getFontMetrics();
+        int x = (vocalize.getWidth() - fm.stringWidth(effector.getPhrase())) / 2;
+        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        g.drawString(effector.getPhrase(), x, y);
+        g.dispose();
+        return vocalize;
+    }
+
+    /**
+     * Draws the thought bubble.
+     * @return the buffered image
+     */
+    public BufferedImage getThoughtBubble(Hearing sensor) {
+        vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = vocalize.createGraphics();
+        g.drawImage(OdorWorldResourceManager.getImage("ThoughtBubble.png"), 0, 0, null);
+        g.setColor(Color.black);
+        int fontSize = 20; // is there a more elegant way to change font size?
+        if (sensor.getPhrase().length() <= 4) {
+            fontSize = 15;
+        } else if (sensor.getPhrase().length() <= 8) {
+            fontSize = 10;
+        } else {
+            fontSize = 8;
+        }
+        g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+        FontMetrics fm = g.getFontMetrics();
+        int x = (vocalize.getWidth() - fm.stringWidth(sensor.getPhrase())) / 2;
+        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        g.drawString(sensor.getPhrase(), x, y);
+        g.dispose();
+        return vocalize;
     }
 
     /**

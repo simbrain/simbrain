@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
@@ -47,6 +51,10 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('e'), this);
 
         this.networkPanel = networkPanel;
         updateAction();

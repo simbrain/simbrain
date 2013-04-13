@@ -326,17 +326,17 @@ public class OdorWorld {
         // Behavior
         entity.getBehavior().apply(time);
 
-        //        // Handle sprite collisions
-        //        entity.setHasCollided(false);
-        //        for (OdorWorldEntity otherEntity : entityList) {
-        //            if (entity == otherEntity) {
-        //                continue;
-        //            }
-        //            if (otherEntity.getReducedBounds().intersects(
-        //                    entity.getReducedBounds())) {
-        //                otherEntity.setHasCollided(true);
-        //            }
-        //        }
+        // Handle sprite collisions
+        entity.setHasCollided(false);
+        for (OdorWorldEntity otherEntity : entityList) {
+            if (entity == otherEntity) {
+                continue;
+            }
+            if (otherEntity.getReducedBounds().intersects(
+                    entity.getReducedBounds())) {
+                otherEntity.setHasCollided(true);
+            }
+        }
         //
         //        // Handle sprite collisions
         //        if (xCollission(entity, newX)) {

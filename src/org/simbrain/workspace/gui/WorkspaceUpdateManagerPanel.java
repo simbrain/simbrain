@@ -40,9 +40,9 @@ import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.util.scripteditor.ScriptEditor;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;

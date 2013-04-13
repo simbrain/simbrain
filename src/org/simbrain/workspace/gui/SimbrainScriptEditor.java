@@ -30,10 +30,10 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
+import org.simbrain.util.scripteditor.ScriptEditor;
 
 import bsh.EvalError;
 import bsh.Interpreter;

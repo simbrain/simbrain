@@ -155,7 +155,7 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the speech balloon.
-     * 
+     *
      * @return the buffered image
      */
     public BufferedImage getSpeechBalloon(Speech effector) {
@@ -186,7 +186,7 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the thought bubble.
-     * 
+     *
      * @return the buffered image
      */
     public BufferedImage getThoughtBubble(Hearing sensor) {
@@ -235,7 +235,7 @@ public class OdorWorldRenderer {
         return tempval;
     }
 
-    /** 
+    /**
      * @param entity the entity to be rendered.
      * @return the appropriate X coordinate to render speech balloons and thought bubbles.
      */

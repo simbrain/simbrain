@@ -18,10 +18,15 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -29,6 +34,8 @@ import javax.swing.UIManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.fife.ui.rtextarea.SearchContext;
+import org.fife.ui.rtextarea.SearchEngine;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
@@ -225,8 +232,14 @@ public class ScriptEditor extends JPanel {
             }
         });
         fileMenu.add(closeItem);
-
         bar.add(fileMenu);
+
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem findReplaceItem = new JMenuItem("Find / Replace...");
+        findReplaceItem.setAction(getFindReplaceAction(frame, editor));
+        editMenu.add(findReplaceItem);
+        bar.add(editMenu);
+
         frame.setJMenuBar(bar);
     }
 
@@ -369,6 +382,111 @@ public class ScriptEditor extends JPanel {
             }
 
         };
+    }
+
+    /**
+     * Returns the action for finding and replacing text
+     */
+    private Action getFindReplaceAction(final GenericFrame frame,
+            final ScriptEditor editor) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SHORT_DESCRIPTION, "Find/Replace");
+                putValue(Action.NAME, "Find/Replace...");
+                putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                        KeyEvent.VK_F, Toolkit.getDefaultToolkit()
+                                .getMenuShortcutKeyMask()));
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showFindReplaceDialog();
+            }
+
+        };
+    }
+
+    /** Search field. */
+    private JTextField searchField;
+
+    /** Whether to use regular expressions. */
+    private JCheckBox regexCB;
+
+    /** Match case.*/
+    private JCheckBox matchCaseCB;
+
+    /**
+     * Show the find/replace dialog
+     */
+    private void showFindReplaceDialog() {
+        JPanel cp = new JPanel(new BorderLayout());
+
+        // Create a toolbar with searching options.
+        JToolBar toolBar = new JToolBar();
+        searchField = new JTextField(30);
+        toolBar.add(searchField);
+        final JButton nextButton = new JButton("Find Next");
+        nextButton.setActionCommand("FindNext");
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                find(true);
+            }
+        });
+        toolBar.add(nextButton);
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                nextButton.doClick(0);
+            }
+        });
+        JButton prevButton = new JButton("Find Previous");
+        prevButton.setActionCommand("FindPrev");
+        prevButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                find(false);
+            }
+        });
+        toolBar.add(prevButton);
+        regexCB = new JCheckBox("Regex");
+        toolBar.add(regexCB);
+        matchCaseCB = new JCheckBox("Match Case");
+        toolBar.add(matchCaseCB);
+        cp.add(toolBar, BorderLayout.NORTH);
+
+        JFrame frame = new JFrame();
+        frame.setContentPane(cp);
+        frame.setTitle("Find and Replace");
+        frame.setVisible(true);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+    }
+
+    /**
+     * Find text in the text area.
+     *
+     * @param forward if true search forward, else search backward
+     */
+    private void find(boolean forward) {
+
+        // Create an object defining our search parameters.
+        SearchContext context = new SearchContext();
+        String text = searchField.getText();
+        if (text.length() == 0) {
+            return;
+        }
+        context.setSearchFor(text);
+        context.setMatchCase(matchCaseCB.isSelected());
+        context.setRegularExpression(regexCB.isSelected());
+        // context.setSearchForward(forward);
+        context.setWholeWord(false);
+
+        boolean found = SearchEngine.find(textArea, context);
+        if (!found) {
+            JOptionPane.showMessageDialog(this, "Text not found");
+        }
     }
 
 }

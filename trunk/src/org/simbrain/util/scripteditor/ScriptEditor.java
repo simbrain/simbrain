@@ -1,4 +1,21 @@
-package org.simbrain.util;
+/*
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package org.simbrain.util.scripteditor;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -18,15 +35,11 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -34,18 +47,18 @@ import javax.swing.UIManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.fife.ui.rtextarea.SearchContext;
-import org.fife.ui.rtextarea.SearchEngine;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 
 /**
  * An editor for beanshell scripts with syntax highlighting.
  *
- * Uses RSyntaxTextArea. See http://fifesoft.com/rsyntaxtextarea/
+ * Uses RSyntaxTextArea by Robert Futrell. See http://fifesoft.com/rsyntaxtextarea/
  *
- * @author jeffyoshimi
+ * @author Jeff Yoshimi
  */
 public class ScriptEditor extends JPanel {
 
@@ -68,6 +81,13 @@ public class ScriptEditor extends JPanel {
 
     /** Default height. */
     private final int DEFAULT_HEIGHT = 25;
+
+    /** Memory for last search string used in find and replace. */
+    private String lastSearch = "";
+
+    /** Memory for last replace string used in find and replace. */
+    private String lastReplace = "";
+
 
     /**
      * Construct the main frame.
@@ -408,85 +428,47 @@ public class ScriptEditor extends JPanel {
         };
     }
 
-    /** Search field. */
-    private JTextField searchField;
-
-    /** Whether to use regular expressions. */
-    private JCheckBox regexCB;
-
-    /** Match case.*/
-    private JCheckBox matchCaseCB;
-
     /**
      * Show the find/replace dialog
      */
     private void showFindReplaceDialog() {
-        JPanel cp = new JPanel(new BorderLayout());
-
-        // Create a toolbar with searching options.
-        JToolBar toolBar = new JToolBar();
-        searchField = new JTextField(30);
-        toolBar.add(searchField);
-        final JButton nextButton = new JButton("Find Next");
-        nextButton.setActionCommand("FindNext");
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                find(true);
-            }
-        });
-        toolBar.add(nextButton);
-        searchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                nextButton.doClick(0);
-            }
-        });
-        JButton prevButton = new JButton("Find Previous");
-        prevButton.setActionCommand("FindPrev");
-        prevButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                find(false);
-            }
-        });
-        toolBar.add(prevButton);
-        regexCB = new JCheckBox("Regex");
-        toolBar.add(regexCB);
-        matchCaseCB = new JCheckBox("Match Case");
-        toolBar.add(matchCaseCB);
-        cp.add(toolBar, BorderLayout.NORTH);
 
         JFrame frame = new JFrame();
-        frame.setContentPane(cp);
-        frame.setTitle("Find and Replace");
+        FindReplaceDialog dialog = new FindReplaceDialog(frame, this);
+        frame.setContentPane(dialog);
+        frame.setTitle("Find / Replace");
         frame.setVisible(true);
         frame.pack();
         frame.setLocationRelativeTo(null);
     }
 
     /**
-     * Find text in the text area.
-     *
-     * @param forward if true search forward, else search backward
+     * @return the lastSearch
      */
-    private void find(boolean forward) {
-
-        // Create an object defining our search parameters.
-        SearchContext context = new SearchContext();
-        String text = searchField.getText();
-        if (text.length() == 0) {
-            return;
-        }
-        context.setSearchFor(text);
-        context.setMatchCase(matchCaseCB.isSelected());
-        context.setRegularExpression(regexCB.isSelected());
-        // context.setSearchForward(forward);
-        context.setWholeWord(false);
-
-        boolean found = SearchEngine.find(textArea, context);
-        if (!found) {
-            JOptionPane.showMessageDialog(this, "Text not found");
-        }
+    public String getLastSearchString() {
+        return lastSearch;
     }
+
+    /**
+     * @param lastSearch the lastSearch to set
+     */
+    public void setLastSearchString(String lastSearch) {
+        this.lastSearch = lastSearch;
+    }
+
+    /**
+     * @return the lastReplace
+     */
+    public String getLastReplaceString() {
+        return lastReplace;
+    }
+
+    /**
+     * @param lastReplace the lastReplace to set
+     */
+    public void setLastReplaceString(String lastReplace) {
+        this.lastReplace = lastReplace;
+    }
+
 
 }

@@ -46,9 +46,9 @@ import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.util.scripteditor.ScriptEditor;
 
 /**
  * Panel for display and ordering of network update actions.

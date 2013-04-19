@@ -119,14 +119,40 @@ public class TableActionManager {
      * @param table table to randomize
      * @return the action
      */
-    public static Action getRandomizeAction(final NumericTable table) {
+    public static Action getRandomizeTableAction(final NumericTable table) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Randomize Table");
+                putValue(SHORT_DESCRIPTION, "Randomize Table");
+            }
+
+            /**
+             * {@ineritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                table.randomizeTable();
+            }
+
+        };
+    }
+
+    /**
+     * Action for randomizing selected parts of a table.
+     *
+     * @param table table to randomize
+     * @return the action
+     */
+    public static Action getRandomizeAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Randomize");
-                putValue(SHORT_DESCRIPTION, "Randomize Table");
+                putValue(SHORT_DESCRIPTION, "Randomize");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
@@ -143,49 +169,47 @@ public class TableActionManager {
     }
 
     /**
-     * Action for normalizing the currently selected column in a table.
+     * Action for normalizing a table.
      *
      * @param table table to normalize
-     * @param columnIndex column to normalize
      * @return the action
      */
-    public static Action getNormalizeColumnAction(final NumericTable table,
-            final int columnIndex) {
+    public static Action getNormalizeTableAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Rand.png"));
-                putValue(NAME, "Normalize column");
-                putValue(SHORT_DESCRIPTION, "Normalize column");
+                putValue(SMALL_ICON,
+                ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Normalize table");
+                putValue(SHORT_DESCRIPTION, "Normalize table");
             }
 
             /**
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                table.normalizeColumn(columnIndex);
+                table.normalizeTable();
             }
 
         };
     }
 
     /**
-     * Action for normalizing a table.
+     * Action for normalizing selected parts of a table.
      *
-     * @param jtable table to normalize
+     * @param table table to normalize
      * @return the action
      */
-    public static Action getNormalizeAction(final NumericTable table) {
+    public static Action getNormalizeAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Rand.png"));
-                putValue(NAME, "Normalize table");
-                putValue(SHORT_DESCRIPTION, "Normalize table");
+                putValue(SMALL_ICON,
+                ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Normalize");
+                putValue(SHORT_DESCRIPTION, "Normalize");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
@@ -195,7 +219,7 @@ public class TableActionManager {
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                table.normalizeTable();
+                table.normalize();
             }
 
         };

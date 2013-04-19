@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
@@ -29,10 +30,12 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
@@ -140,7 +143,15 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         // lifeCycleEditor = new
         // ReflectivePropertyEditor(entityRef.getLifeCycle());
         // tabbedPane.addTab("LifeCycle", lifeCycleEditor);
-
+        ShowHelpAction helpAction;
+        if (entityRef instanceof RotatingEntity) {
+            helpAction = new ShowHelpAction(
+                    "Pages/Worlds/OdorWorld/agents.html");
+        } else {
+            helpAction = new ShowHelpAction(
+                "Pages/Worlds/OdorWorld/objects.html");
+        }
+        addButton(new JButton(helpAction));
         setContentPane(tabbedPane);
     }
 

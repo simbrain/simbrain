@@ -24,6 +24,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
@@ -67,7 +68,7 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         typePanel.addItem("Sensor Type", sensorType);
         sensorType.setSelectedItem("SmellSensor");
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld/OdorWorld.html"); // todo: put in specific page
+                "Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);

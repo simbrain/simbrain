@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -347,12 +348,76 @@ public class SimbrainJTable extends JXTable {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
             toolbar.add(TableActionManager
-                    .getRandomizeAction((NumericTable) getData()));
+                    .getRandomizeAction(this));
+            toolbar.add(TableActionManager
+                    .getRandomizeTableAction((NumericTable) getData()));
             toolbar.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return toolbar;
         }
         return null;
+    }
+
+    /**
+     *
+     */
+    public JToolBar getToolbarNormalize() {
+        if (getData() instanceof NumericTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager
+                    .getNormalizeAction(this));
+            toolbar.add(TableActionManager
+                    .getNormalizeTableAction((NumericTable) getData()));
+            return toolbar;
+        }
+        return null;
+    }
+
+    /**
+     * Randomize neurons within specified bounds.
+     */
+    public void randomize() {
+        Random rand = new Random();
+        int range = ((NumericTable) getData()).getUpperBound() - ((NumericTable) getData()).getLowerBound();
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                if (isCellSelected(i,j)) {
+                    double value = (rand.nextDouble() * range) + ((NumericTable) getData()).getLowerBound();
+                    ((NumericTable) getData()).setValue(i, j-1, value, false);
+                }
+            }
+        }
+        ((NumericTable) getData()).fireTableDataChanged();
+    }
+
+    /**
+     * Normalize selected data. TODO: Use bounds?
+     *
+     */
+    public void normalize() {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                if (isCellSelected(i,j)) {
+                    double val = ((NumericTable) getData()).getValue(i, j-1);
+                    if (val > max) {
+                        max = val;
+                    }
+                    if (val < min) {
+                        min = val;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                if (isCellSelected(i,j)) {
+                    ((NumericTable) getData()).setValue(i, j-1, (((NumericTable) getData()).getValue(i, j-1) - min) / (max - min), false);
+                }
+            }
+        }
+        ((NumericTable) getData()).fireTableDataChanged();
     }
 
     /**
@@ -381,7 +446,9 @@ public class SimbrainJTable extends JXTable {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Randomize");
             menu.add(TableActionManager
-                    .getRandomizeAction((NumericTable) getData()));
+                    .getRandomizeAction(this));
+            menu.add(TableActionManager
+                    .getRandomizeTableAction((NumericTable) getData()));
             menu.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return menu;
@@ -397,10 +464,10 @@ public class SimbrainJTable extends JXTable {
     public JMenu getMenuNormalize() {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Normalize");
-            menu.add(TableActionManager.getNormalizeColumnAction(
-                    (NumericTable) getData(), this.getSelectedColumn() - 1));
             menu.add(TableActionManager
-                    .getNormalizeAction((NumericTable) getData()));
+                    .getNormalizeAction(this));
+            menu.add(TableActionManager.getNormalizeTableAction(
+                    (NumericTable) getData()));
             return menu;
         }
         return null;

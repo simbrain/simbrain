@@ -72,7 +72,7 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
         typePanel.addItem("Effector Type", effectorType);
         effectorType.setSelectedItem("SmellEffector");
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld/OdorWorld.html"); // todo: put in specific page
+                "Pages/Worlds/OdorWorld/effectors.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);

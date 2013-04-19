@@ -201,17 +201,21 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      *
      * @param columnIndex column to normalize.
      */
-    public void normalizeColumn(final int columnIndex) {
+    public void normalizeColumn(final int columnIndex) { // TODO: combine with normalizeTable?
         // TODO: Check for valid column
         double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < this.getRowCount(); i++) {
             double val = getValue(i, columnIndex);
             if (val > max) {
                 max = val;
             }
+            if (val < min) {
+                min = val;
+            }
         }
         for (int i = 0; i < this.getRowCount(); i++) {
-            setValue(i, columnIndex, getValue(i, columnIndex) / max, false);
+            setValue(i, columnIndex, (getValue(i, columnIndex) - min) / (max - min), false);
         }
         this.fireTableDataChanged();
     }
@@ -219,7 +223,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     /**
      * Randomize neurons within specified bounds.
      */
-    public void randomize() {
+    public void randomizeTable() {
         Random rand = new Random();
         int range = getUpperBound() - getLowerBound();
         for (int i = 0; i < getRowCount(); i++) {

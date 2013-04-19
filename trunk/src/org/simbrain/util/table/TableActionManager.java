@@ -114,32 +114,6 @@ public class TableActionManager {
     }
 
     /**
-     * Action for randomizing table.
-     *
-     * @param table table to randomize
-     * @return the action
-     */
-    public static Action getRandomizeTableAction(final NumericTable table) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-                putValue(NAME, "Randomize Table");
-                putValue(SHORT_DESCRIPTION, "Randomize Table");
-            }
-
-            /**
-             * {@ineritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                table.randomizeTable();
-            }
-
-        };
-    }
-
-    /**
      * Action for randomizing selected parts of a table.
      *
      * @param table table to randomize
@@ -168,32 +142,6 @@ public class TableActionManager {
         };
     }
 
-    /**
-     * Action for normalizing a table.
-     *
-     * @param table table to normalize
-     * @return the action
-     */
-    public static Action getNormalizeTableAction(final NumericTable table) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON,
-                ResourceManager.getImageIcon("Rand.png"));
-                putValue(NAME, "Normalize table");
-                putValue(SHORT_DESCRIPTION, "Normalize table");
-            }
-
-            /**
-             * {@ineritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                table.normalizeTable();
-            }
-
-        };
-    }
 
     /**
      * Action for normalizing selected parts of a table.

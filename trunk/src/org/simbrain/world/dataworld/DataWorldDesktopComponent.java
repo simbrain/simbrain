@@ -100,7 +100,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbarPanel.add(table.getToolbarEditTable());
         toolbarPanel.add(table.getToolbarRandomize());
-        toolbarPanel.add(table.getToolbarNormalize());
         add(toolbarPanel, BorderLayout.NORTH);
 
         addMenuBar(table);

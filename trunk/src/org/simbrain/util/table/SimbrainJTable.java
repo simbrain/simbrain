@@ -350,8 +350,6 @@ public class SimbrainJTable extends JXTable {
             toolbar.add(TableActionManager
                     .getRandomizeAction(this));
             toolbar.add(TableActionManager
-                    .getRandomizeTableAction((NumericTable) getData()));
-            toolbar.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return toolbar;
         }
@@ -366,8 +364,6 @@ public class SimbrainJTable extends JXTable {
             JToolBar toolbar = new JToolBar();
             toolbar.add(TableActionManager
                     .getNormalizeAction(this));
-            toolbar.add(TableActionManager
-                    .getNormalizeTableAction((NumericTable) getData()));
             return toolbar;
         }
         return null;
@@ -378,12 +374,17 @@ public class SimbrainJTable extends JXTable {
      */
     public void randomize() {
         Random rand = new Random();
-        int range = ((NumericTable) getData()).getUpperBound() - ((NumericTable) getData()).getLowerBound();
+        int range = ((NumericTable) getData()).getUpperBound()
+                - ((NumericTable) getData()).getLowerBound();
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i,j)) {
-                    double value = (rand.nextDouble() * range) + ((NumericTable) getData()).getLowerBound();
-                    ((NumericTable) getData()).setValue(i, j-1, value, false);
+                if (isCellSelected(i, j)) {
+                    if (j > 0) {
+                        double value = (rand.nextDouble() * range)
+                                + ((NumericTable) getData()).getLowerBound();
+                        ((NumericTable) getData()).setValue(i, j - 1, value,
+                                false);
+                    }
                 }
             }
         }
@@ -448,8 +449,6 @@ public class SimbrainJTable extends JXTable {
             menu.add(TableActionManager
                     .getRandomizeAction(this));
             menu.add(TableActionManager
-                    .getRandomizeTableAction((NumericTable) getData()));
-            menu.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return menu;
         }
@@ -466,8 +465,6 @@ public class SimbrainJTable extends JXTable {
             JMenu menu = new JMenu("Normalize");
             menu.add(TableActionManager
                     .getNormalizeAction(this));
-            menu.add(TableActionManager.getNormalizeTableAction(
-                    (NumericTable) getData()));
             return menu;
         }
         return null;

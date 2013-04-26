@@ -156,8 +156,40 @@ public class SimbrainJTable extends JXTable {
             showFillInPopupMenu = false;
             showCSVInPopupMenu = false;
         }
-
         hasChangedSinceLastSave = false;
+
+        getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.isControlDown() || (e.getButton() == 1)) {
+                    final int column = convertColumnIndexToModel(columnAtPoint(e.getPoint()));
+                    if (e.isShiftDown()) {
+                        for (int i = 1; i < getRowCount(); i++) {
+                            changeSelection(i, column, true, true);
+                        }
+                    } // todo? implement: else if (e.isControlDown()) {}
+                    else {
+                        changeSelection(0, column, false, false);
+                        for (int i = 1; i < getRowCount(); i++) {
+                            changeSelection(i, column, true, true);
+                        }
+                    }
+                }
+            }
+        });
+        this.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(final MouseEvent e) {
+                final int row = rowAtPoint(e.getPoint());
+                final int column = columnAtPoint(e.getPoint());
+                if (e.isControlDown() || (e.getButton() == 1)) {
+                    if (column == 0) {
+                        for (int j = 1; j < getColumnCount(); j++) {
+                            changeSelection(row, j, true, true);
+                        }
+                    }
+                }
+            }
+        } );
     }
 
     /**
@@ -401,12 +433,15 @@ public class SimbrainJTable extends JXTable {
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
                 if (isCellSelected(i,j)) {
-                    double val = ((NumericTable) getData()).getValue(i, j-1);
-                    if (val > max) {
-                        max = val;
-                    }
-                    if (val < min) {
-                        min = val;
+                    if (j > 0) {
+                        double val = ((NumericTable) getData()).getValue(i, j-1);
+
+                        if (val > max) {
+                            max = val;
+                        }
+                        if (val < min) {
+                            min = val;
+                        }
                     }
                 }
             }
@@ -414,7 +449,27 @@ public class SimbrainJTable extends JXTable {
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
                 if (isCellSelected(i,j)) {
-                    ((NumericTable) getData()).setValue(i, j-1, (((NumericTable) getData()).getValue(i, j-1) - min) / (max - min), false);
+                    if (j > 0) {
+                        ((NumericTable) getData()).setValue(i, j-1, (((NumericTable) getData()).getValue(i, j-1) - min) / (max - min), false);
+                    }
+                }
+            }
+        }
+        ((NumericTable) getData()).fireTableDataChanged();
+    }
+
+    /**
+     * Fills the table with the given value.
+     *
+     * @param value value to fill the table with.
+     */
+    public void fill(final double value) {
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                if (isCellSelected(i,j)) {
+                    if (j >0) {
+                        ((NumericTable) getData()).setValue(i, j-1, value, false);
+                    }
                 }
             }
         }
@@ -481,7 +536,7 @@ public class SimbrainJTable extends JXTable {
             menu.add(new JMenuItem(TableActionManager
                     .getFillAction((NumericTable) getData())));
             menu.add(new JMenuItem(TableActionManager
-                    .getZeroFillAction((NumericTable) getData())));
+                    .getZeroFillAction(this)));
             return menu;
         }
         return null;

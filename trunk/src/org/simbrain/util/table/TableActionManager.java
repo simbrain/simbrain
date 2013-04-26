@@ -154,8 +154,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON,
-                ResourceManager.getImageIcon("Rand.png"));
+                // putValue(SMALL_ICON, ResourceManager.getImageIcon(""));
                 putValue(NAME, "Normalize");
                 putValue(SHORT_DESCRIPTION, "Normalize");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
@@ -524,7 +523,7 @@ public class TableActionManager {
      * @param table table to zero out
      * @return the action
      */
-    public static Action getZeroFillAction(final NumericTable table) {
+    public static Action getZeroFillAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize

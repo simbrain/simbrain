@@ -27,7 +27,7 @@ import org.simbrain.world.odorworld.sensors.TileSensor;
 public class TileSensorPanel extends AbstractSensorPanel {
 
     /** Text field to edit value. */
-    private JTextField value = new JTextField("" + 0);
+    private JTextField activation = new JTextField("" + 1);
 
     /** Text field to edit x. */
     private JTextField x = new JTextField("" + 0);
@@ -46,41 +46,45 @@ public class TileSensorPanel extends AbstractSensorPanel {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param entity the entity to which a tile sensor is added.
      */
     public TileSensorPanel(final OdorWorldEntity entity) {
-    	this.entity = entity;
-    	addItem("Value", value);
-    	addItem("X", x);
-    	addItem("Y", y);
-    	addItem("Width", width);
-    	addItem("Height", height);
+        this.entity = entity;
+        addItem("Activation amount", activation);
+        addItem("X", x);
+        addItem("Y", y);
+        addItem("Width", width);
+        addItem("Height", height);
     }
 
     @Override
-	public void commitChanges() {
-		entity.addSensor(new TileSensor(entity, Integer.parseInt(x.getText()), Integer.parseInt(y.getText()), Integer.parseInt(width.getText()), Integer.parseInt(height.getText())));
-
-	}
+    public void commitChanges() {
+        TileSensor sensor = new TileSensor(entity,
+                Integer.parseInt(x.getText()), Integer.parseInt(y.getText()),
+                Integer.parseInt(width.getText()), Integer.parseInt(height
+                        .getText()));
+        sensor.setActivationAmount(Double.parseDouble(activation.getText()));
+        entity.addSensor(sensor);
+    }
 
     /** Fill in appropriate text fields when tile sensor is being modified. */
-	public void fillFieldValues(TileSensor sensor) {
-	    value.setText("" + Double.parseDouble(value.getText()));
-		x.setText("" + Integer.toString(sensor.getX()));
-		y.setText("" + Integer.toString(sensor.getY()));
-		width.setText("" + Integer.toString(sensor.getWidth()));
-		height.setText("" + Integer.toString(sensor.getHeight()));
-	}
+    public void fillFieldValues(TileSensor sensor) {
+        activation.setText("" + Double.toString(sensor.getActivationAmount()));
+        x.setText("" + Integer.toString(sensor.getX()));
+        y.setText("" + Integer.toString(sensor.getY()));
+        width.setText("" + Integer.toString(sensor.getWidth()));
+        height.setText("" + Integer.toString(sensor.getHeight()));
+    }
 
-	/** Save changes to an edited straight movement effector. */
-	public void commitChanges(TileSensor sensor) {
-	    sensor.setValue(Double.parseDouble(value.getText()));
-		sensor.setX(Integer.parseInt(x.getText()));
-		sensor.setY(Integer.parseInt(y.getText()));
-		sensor.setWidth(Integer.parseInt(width.getText()));
-		sensor.setHeight(Integer.parseInt(height.getText()));
+    /** Save changes to an edited straight movement effector. */
+    public void commitChanges(TileSensor sensor) {
+        sensor.setActivationAmount(Double.parseDouble(activation.getText()));
+        sensor.setX(Integer.parseInt(x.getText()));
+        sensor.setY(Integer.parseInt(y.getText()));
+        sensor.setWidth(Integer.parseInt(width.getText()));
+        sensor.setHeight(Integer.parseInt(height.getText()));
         sensor.getParent().getParentWorld()
                 .fireEntityChanged(sensor.getParent());
-	}
+    }
 }

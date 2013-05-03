@@ -161,4 +161,11 @@ public class TileSensor extends Sensor {
     public void setHeight(int height) {
         this.height = height;
     }
+
+    /**
+     * @param amount the activation amount to set
+     */
+    public void setActivationAmount(double amount) {
+        activationAmount = amount;        
+    }
 }

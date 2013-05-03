@@ -46,7 +46,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 public class BackpropNetworkNode extends SubnetworkNode {
 
     /**
-     * Create a layered network
+     * Create a layered network.
      *
      * @param networkPanel parent panel
      * @param group the layered network

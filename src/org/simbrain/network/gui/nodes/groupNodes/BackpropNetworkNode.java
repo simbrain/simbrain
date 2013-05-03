@@ -34,6 +34,7 @@ import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.table.TableActionManager;
 
 /**
  * PNode representation of a group of a backprop network
@@ -92,12 +93,12 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * Sets custom menu.
      */
     private void setContextMenu() {
+        final BackpropNetwork network = (BackpropNetwork) getGroup();
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
+        menu.add(TableActionManager.getTestNetworkAction(network));
         menu.addSeparator();
-
-        final BackpropNetwork network = (BackpropNetwork) getGroup();
 
         // Reference to the input data
         DataHolder inputData = new DataHolder() {

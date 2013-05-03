@@ -23,18 +23,20 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.BackpropTrainerPanel;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.TestNetworkPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.table.TableActionManager;
 
 /**
  * PNode representation of a group of a backprop network
@@ -97,7 +99,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
-        menu.add(TableActionManager.getTestNetworkAction(network));
+        menu.add(getTestNetworkAction(network));
         menu.addSeparator();
 
         // Reference to the input data
@@ -139,7 +141,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     /**
      * Action to train Backrop
      */
-    Action trainAction = new AbstractAction() {
+    private Action trainAction = new AbstractAction() {
 
         // Initialize
         {
@@ -159,5 +161,34 @@ public class BackpropNetworkNode extends SubnetworkNode {
             trainingPanel.setFrame(frame);
         }
     };
+
+
+    /**
+     * Action for testing networks.
+     *
+     * @param network the Backprop network to test
+     */
+    Action getTestNetworkAction(final BackpropNetwork network) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(NAME, "Test network...");
+                putValue(SHORT_DESCRIPTION, "Test network...");
+                putValue(SMALL_ICON, ResourceManager.
+                        getImageIcon("Trainer.png"));
+            }
+
+            /**
+             * {@ineritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                JPanel panel = TestNetworkPanel
+                        .getTestNetworkPanel(new TestNetworkPanel(network));
+                BackpropNetworkNode.this.getNetworkPanel().displayPanel(
+                        panel, "Test Inputs");
+            }
+        };
+    }
 
 }

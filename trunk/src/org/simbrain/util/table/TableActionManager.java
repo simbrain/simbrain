@@ -34,8 +34,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import org.simbrain.network.gui.WeightMatrixViewer;
+import org.simbrain.network.gui.trainer.TestNetworkPanel;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
@@ -169,6 +173,32 @@ public class TableActionManager {
                 table.normalize();
             }
 
+        };
+    }
+
+    /**
+     * Action for testing networks.
+     *
+     *
+     */
+    public static Action getTestNetworkAction (final BackpropNetwork network) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(NAME, "Test network...");
+                putValue(SHORT_DESCRIPTION, "Test network...");
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            }
+
+            /**
+             * {@ineritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                JPanel panel = TestNetworkPanel
+                        .getTestNetworkPanel(new TestNetworkPanel(network));
+                SimpleFrame.displayPanel(panel, "Test Inputs");
+            }
         };
     }
 

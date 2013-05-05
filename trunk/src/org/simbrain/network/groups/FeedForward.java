@@ -48,6 +48,24 @@ public class FeedForward extends Subnetwork {
     Point2D initialPosition = new Point2D.Double(0, 0);
 
     /**
+     * Construct a feed-forward network.
+     *
+     * @param network the parent network to which the layered network is being
+     *            added
+     * @param nodesPerLayer an array of integers which determines the number of
+     *            layers and neurons in each layer. Integers 1...n in the array
+     *            correspond to the number of nodes in layers 1...n.
+     * @param initialPosition upper left corner where network will be placed.
+     * @param inputNeuronTemplate the type of Neuron to use for the input layer
+     */
+    public FeedForward(final Network network, int[] nodesPerLayer,
+            Point2D initialPosition, final Neuron inputNeuronTemplate) {
+        super(network);
+        buildNetwork(network, nodesPerLayer, initialPosition,
+                inputNeuronTemplate);
+    }
+
+    /**
      * Add the layered network to the specified network, with a specified number
      * of layers and nodes in each layer.
      *
@@ -61,6 +79,25 @@ public class FeedForward extends Subnetwork {
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
         super(network);
+        Neuron neuron = new Neuron(network, new ClampedNeuronRule());
+        neuron.setIncrement(1); // For easier testing
+        neuron.setLowerBound(0);
+        buildNetwork(network, nodesPerLayer, initialPosition, neuron);
+    }
+
+    /**
+     * Create the network using the parameters.
+     *
+     * @param network the parent network to which the layered network is being
+     *            added
+     * @param nodesPerLayer an array of integers which determines the number of
+     *            layers and neurons in each layer. Integers 1...n in the array
+     *            correspond to the number of nodes in layers 1...n.
+     * @param initialPosition upper left corner where network will be placed.
+     * @param inputNeuronTemplate the type of Neuron to use for the input layer
+     */
+    private void buildNetwork(final Network network, int[] nodesPerLayer,
+            Point2D initialPosition, final Neuron inputNeuronTemplate) {
 
         this.initialPosition = initialPosition;
         setLabel("Layered Network");
@@ -72,10 +109,7 @@ public class FeedForward extends Subnetwork {
         // Set up input layer
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
-            neuron.setIncrement(1); // For easier testing
-            neuron.setLowerBound(0);
-            inputLayerNeurons.add(neuron);
+            inputLayerNeurons.add(new Neuron(network, inputNeuronTemplate));
         }
         NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
         addNeuronGroup(inputLayer);
@@ -118,7 +152,6 @@ public class FeedForward extends Subnetwork {
             // Reset last layer
             lastLayer = hiddenLayer;
         }
-
     }
 
     /**

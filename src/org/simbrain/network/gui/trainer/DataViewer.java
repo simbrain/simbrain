@@ -74,6 +74,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
                     + ")");
         }
+        this.setMaxVisibleColumns(5);
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
 
@@ -164,6 +165,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         JPanel panel = new JPanel();
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         // split.setDividerLocation(.5);
+                
         split.setLeftComponent(viewer1);
         split.setRightComponent(viewer2);
         panel.add(split);
@@ -178,14 +180,14 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     public interface DataHolder {
 
         /**
-         * Set the data
+         * Set the data.
          *
          * @param data the data to set
          */
         public void setData(double[][] data);
 
         /**
-         * Get the data
+         * Get the data.
          *
          * @return the data to get
          */

@@ -102,8 +102,8 @@ public class SynapseGroupNode extends GroupNode {
     }
 
     /**
-     * Sets custom menu for SynapseGroup nodes.  To add new menu items
-     * to context menu add them here.
+     * Sets custom menu for SynapseGroup nodes. To add new menu items to context
+     * menu add them here.
      */
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
@@ -132,10 +132,10 @@ public class SynapseGroupNode extends GroupNode {
             List<Neuron> targetNeurons = ((SynapseGroup) SynapseGroupNode.this
                     .getGroup()).getTargetNeurons();
             JPanel panel = WeightMatrixViewer
-                    .getWeightMatrixPanel(new WeightMatrixViewer(
-                            sourceNeurons, targetNeurons,
-                            SynapseGroupNode.this.getNetworkPanel()));
-            SimpleFrame.displayPanel(panel);
+                    .getWeightMatrixPanel(new WeightMatrixViewer(sourceNeurons,
+                            targetNeurons, SynapseGroupNode.this
+                                    .getNetworkPanel()));
+            getNetworkPanel().displayPanel(panel, "Edit weights");
         }
     };
 
@@ -150,11 +150,11 @@ public class SynapseGroupNode extends GroupNode {
 
     /**
      * Returns the SynapseGroup to this SynapseGroupNode.
-     * 
+     *
      * @return the synapse group
      */
     public SynapseGroup getSynapseGroup() {
-    	return (SynapseGroup) getGroup();
+        return (SynapseGroup) getGroup();
     }
-    
+
 }

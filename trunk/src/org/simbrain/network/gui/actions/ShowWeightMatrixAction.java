@@ -28,7 +28,6 @@ import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SimpleFrame;
 
 /**
  * Show weight matrix connecting selected source and target neurons.
@@ -84,6 +83,6 @@ public final class ShowWeightMatrixAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         JPanel panel = WeightMatrixViewer
                 .getWeightMatrixPanel(new WeightMatrixViewer(networkPanel));
-        SimpleFrame.displayPanel(panel);
+        networkPanel.displayPanel(panel, "Weight matrix viewer");
     }
 }

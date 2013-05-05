@@ -42,7 +42,8 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  * matrix, in a jtable.
  *
  * TODO: Better display of non-existent connections (perhaps by disabling those
- * cells for now).
+ * cells for now).  What would be super cool is gray for no synapse. and then as
+ * added or deleted ungray it.
  *
  * @author jyoshimi
  */

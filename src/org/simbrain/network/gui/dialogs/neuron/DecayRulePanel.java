@@ -27,11 +27,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.DecayRule;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>DecayNeuronPanel</b>.
@@ -59,7 +59,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
@@ -160,8 +160,8 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
     /**
      * @return A list of randomizers.
      */
-    private ArrayList<RandomSource> getRandomizers() {
-        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+    private ArrayList<Randomizer> getRandomizers() {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((DecayRule) ruleList.get(i)).getNoiseGenerator());
         }

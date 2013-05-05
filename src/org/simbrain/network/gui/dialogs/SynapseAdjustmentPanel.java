@@ -33,8 +33,8 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.listeners.NetworkListener;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Panel for editing collections of synapses.
@@ -47,10 +47,10 @@ public class SynapseAdjustmentPanel extends JPanel {
     // TODO: Use user preferences?
 
     /** Random source for randomizing. */
-    private RandomSource randomizer = new RandomSource();
+    private Randomizer randomizer = new Randomizer();
 
     /** Random source for perturbing. */
-    private RandomSource perturber = new RandomSource();
+    private Randomizer perturber = new Randomizer();
 
     /**
      * Construct the synapse editor panel.
@@ -63,9 +63,9 @@ public class SynapseAdjustmentPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Initialize random panels
-        final RandomPanel randomPanel = new RandomPanel(false);
+        final RandomPanelNetwork randomPanel = new RandomPanelNetwork(false);
         randomPanel.fillFieldValues(randomizer);
-        final RandomPanel perturberPanel = new RandomPanel(false);
+        final RandomPanelNetwork perturberPanel = new RandomPanelNetwork(false);
         perturberPanel.fillFieldValues(perturber);
 
         // TODO: Checkbox for excitatory or inhibitory only.

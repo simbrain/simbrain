@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to
@@ -49,7 +49,7 @@ public class NakaRushtonRule extends NeuronUpdateRule {
     private double timeConstant = .1;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to neuron. */
     private boolean addNoise = false;
@@ -92,7 +92,7 @@ public class NakaRushtonRule extends NeuronUpdateRule {
         rn.setUseAdaptation(getUseAdaptation());
         rn.setAdaptationParameter(getAdaptationParameter());
         rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
-        rn.noiseGenerator = new RandomSource(noiseGenerator);
+        rn.noiseGenerator = new Randomizer(noiseGenerator);
         return rn;
     }
 
@@ -191,14 +191,14 @@ public class NakaRushtonRule extends NeuronUpdateRule {
     /**
      * @return Returns the noiseGenerator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(final RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

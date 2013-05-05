@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave; inputs are ignored.
@@ -35,7 +35,7 @@ public class SinusoidalRule extends NeuronUpdateRule {
     private double frequency = .1;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise = false;
@@ -62,7 +62,7 @@ public class SinusoidalRule extends NeuronUpdateRule {
         sn.setPhase(getPhase());
         sn.setFrequency(getFrequency());
         sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator = new RandomSource(noiseGenerator);
+        sn.noiseGenerator = new Randomizer(noiseGenerator);
         return sn;
     }
 
@@ -88,14 +88,14 @@ public class SinusoidalRule extends NeuronUpdateRule {
     /**
      * @return Random noise generator dialog.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(final RandomSource noise) {
+    public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
     }
 

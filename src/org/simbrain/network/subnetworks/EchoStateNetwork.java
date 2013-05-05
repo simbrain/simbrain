@@ -40,8 +40,8 @@ import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Builds an Echo-State Network with options for all valid weight
@@ -117,7 +117,7 @@ public class EchoStateNetwork extends Subnetwork {
     private boolean noise;
 
     /** A noise generator. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /**
      * Input data. The sequence of inputs to be fed to the ESN's input layer.
@@ -584,11 +584,11 @@ public class EchoStateNetwork extends Subnetwork {
         this.noise = noise;
     }
 
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

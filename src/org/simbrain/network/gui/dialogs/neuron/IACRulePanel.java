@@ -25,11 +25,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.IACRule;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IACNeuronPanel</b>.
@@ -49,7 +49,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
     private JTextField tfRest = new JTextField();
 
     /** Random panel. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
@@ -107,8 +107,8 @@ public class IACRulePanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList<RandomSource> getRandomizers() {
-        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+    private ArrayList<Randomizer> getRandomizers() {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((IACRule) ruleList.get(i)).getNoiseGenerator());
         }

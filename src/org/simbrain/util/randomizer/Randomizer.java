@@ -16,15 +16,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.util;
+package org.simbrain.util.randomizer;
 
 import java.util.Random;
 
 /**
- * <b>RandomSource</b> produces random numbers according to a set of
- * user-specified parameters.
+ * <b>Randomizer</b> produces numbers drawn from a probability distribution
+ * according to a set of user-specified parameters.
  */
-public class RandomSource {
+public class Randomizer {
 
     /** Labels used by combo boxes. */
     private static String[] functionList = { "Uniform", "Gaussian" };
@@ -62,7 +62,7 @@ public class RandomSource {
     /**
      * Default constructor.
      */
-    public RandomSource() {
+    public Randomizer() {
     }
 
     /**
@@ -71,7 +71,7 @@ public class RandomSource {
      * @param dup the <code>RandomSource</code> to duplicate.
      * @return the duplicated <code>RandomSource</code> object.
      */
-    public RandomSource(final RandomSource dup) {
+    public Randomizer(final Randomizer dup) {
         setLowerBound(getLowerBound());
         setUpperBound(getUpperBound());
         setMean(getMean());
@@ -173,6 +173,11 @@ public class RandomSource {
         return distributionIndex;
     }
 
+    /**
+     * Returns the string name of the distribution.
+     *
+     * @return the distribution name.
+     */
     public String getDistributionName() {
         if (distributionIndex == 1) {
             return "Gaussian";

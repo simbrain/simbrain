@@ -37,9 +37,9 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.randomizer.Randomizer;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -85,7 +85,7 @@ public class Network {
     /** Time step. */
     private double timeStep = DEFAULT_TIME_STEP;
     
-    private RandomSource weightRandomizer = new RandomSource();
+    private Randomizer weightRandomizer = new Randomizer();
 
     /**
      * Two types of time used in simulations. DISCRETE: Network update
@@ -1749,9 +1749,9 @@ public class Network {
      *
      * @return the weight randomizer
      */
-    public RandomSource getWeightRandomizer() {
+    public Randomizer getWeightRandomizer() {
         if (weightRandomizer == null) {
-            weightRandomizer = new RandomSource();
+            weightRandomizer = new Randomizer();
         }
         return weightRandomizer;
     }

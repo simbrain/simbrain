@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
@@ -36,7 +36,7 @@ public class IACRule extends NeuronUpdateRule {
     private double rest = 0;
 
     /** Noise dialog box. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise = false;
@@ -60,7 +60,7 @@ public class IACRule extends NeuronUpdateRule {
         iac.setRest(getRest());
         iac.setClipping(getClipping());
         iac.setAddNoise(getAddNoise());
-        iac.noiseGenerator = new RandomSource(noiseGenerator);
+        iac.noiseGenerator = new Randomizer(noiseGenerator);
         return iac;
     }
 
@@ -162,14 +162,14 @@ public class IACRule extends NeuronUpdateRule {
     /**
      * @return Returns the noiseGenerator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(final RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

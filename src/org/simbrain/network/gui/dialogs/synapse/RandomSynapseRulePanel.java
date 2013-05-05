@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import java.util.ArrayList;
 
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
 
 /**
@@ -29,7 +29,7 @@ import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
 public class RandomSynapseRulePanel extends AbstractSynapsePanel {
 
     /** Random panel. */
-    private RandomPanel rp = new RandomPanel(false);
+    private RandomPanelNetwork rp = new RandomPanelNetwork(false);
 
     /**
      * This method is the default constructor.

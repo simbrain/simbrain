@@ -20,7 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>RandomSynapse</b>.
@@ -28,7 +28,7 @@ import org.simbrain.network.util.RandomSource;
 public class RandomSynapseRule extends SynapseUpdateRule {
 
     /** Randomizer. */
-    private RandomSource randomizer = new RandomSource();
+    private Randomizer randomizer = new Randomizer();
 
     @Override
     public void init(Synapse synapse) {
@@ -42,7 +42,7 @@ public class RandomSynapseRule extends SynapseUpdateRule {
     @Override
     public SynapseUpdateRule deepCopy() {
         RandomSynapseRule rs = new RandomSynapseRule();
-        rs.randomizer = new RandomSource(randomizer);
+        rs.randomizer = new Randomizer(randomizer);
         return rs;
     }
 
@@ -56,7 +56,7 @@ public class RandomSynapseRule extends SynapseUpdateRule {
     /**
      * @return Returns the randomizer.
      */
-    public RandomSource getRandomizer() {
+    public Randomizer getRandomizer() {
         return randomizer;
     }
 }

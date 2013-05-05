@@ -25,11 +25,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IntegrateAndFireNeuronPanel</b>.
@@ -61,7 +61,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
     private JTextField tfTimeStep = new JTextField();
 
     /** Random tab. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
@@ -147,8 +147,8 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList<RandomSource> getRandomizers() {
-        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+    private ArrayList<Randomizer> getRandomizers() {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((IntegrateAndFireRule) ruleList.get(i))
                     .getNoiseGenerator());

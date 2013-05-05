@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>AdditiveNeuron</b> See Haykin (2002), section 14.5. Used with continuous
@@ -40,7 +40,7 @@ public class AdditiveRule extends NeuronUpdateRule {
     private boolean clipping = false;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** For adding noise to the neuron. */
     private boolean addNoise = false;
@@ -70,7 +70,7 @@ public class AdditiveRule extends NeuronUpdateRule {
         an.setResistance(getResistance());
         an.setClipping(getClipping());
         an.setAddNoise(getAddNoise());
-        an.noiseGenerator = new RandomSource(noiseGenerator);
+        an.noiseGenerator = new Randomizer(noiseGenerator);
         return an;
     }
 
@@ -153,14 +153,14 @@ public class AdditiveRule extends NeuronUpdateRule {
     /**
      * @return Noise generator dialog.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(final RandomSource noise) {
+    public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
     }
 

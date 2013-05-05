@@ -12,10 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 public class ReservoirUtilsPanel extends JPanel {
 
@@ -27,10 +27,10 @@ public class ReservoirUtilsPanel extends JPanel {
     private EchoStateNetwork esn;
 
     /** The noise generator. */
-    private RandomSource randomSource;
+    private Randomizer randomSource;
 
     /** A panel for setting random values. */
-    private RandomPanel randomPanel = new RandomPanel(true);
+    private RandomPanelNetwork randomPanel = new RandomPanelNetwork(true);
 
     /** A reference to the parent panel. */
     private JPanel trainerPanel;

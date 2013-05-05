@@ -25,11 +25,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.SinusoidalRule;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SinusoidalNeuronPanel</b>.
@@ -49,7 +49,7 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Random panel. */
-    private RandomPanel randPanel = new RandomPanel(true);
+    private RandomPanelNetwork randPanel = new RandomPanelNetwork(true);
 
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();
@@ -99,8 +99,8 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList<RandomSource> getRandomizers() {
-        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+    private ArrayList<Randomizer> getRandomizers() {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((SinusoidalRule) ruleList.get(i)).getNoiseGenerator());

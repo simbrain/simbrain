@@ -42,7 +42,7 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -91,12 +91,12 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
     /**
      * A random panel to set the range and distribution of excitatory strengths.
      */
-    private RandomPanel exRandPanel = new RandomPanel(true);
+    private RandomPanelNetwork exRandPanel = new RandomPanelNetwork(true);
 
     /**
      * A random panel to set the range and distribution of inhibitory strengths.
      */
-    private RandomPanel inRandPanel = new RandomPanel(true);
+    private RandomPanelNetwork inRandPanel = new RandomPanelNetwork(true);
 
     /** A button opening a menu to a random panel for excitatory connections. */
     private final JButton randExButton = new JButton();

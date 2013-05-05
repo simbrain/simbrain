@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
@@ -29,7 +29,7 @@ import org.simbrain.network.util.RandomSource;
 public class RandomNeuronRule extends NeuronUpdateRule {
 
     /** Noise source. */
-    private RandomSource randomizer = new RandomSource();
+    private Randomizer randomizer = new Randomizer();
 
     /**
      * {@inheritDoc}
@@ -52,7 +52,7 @@ public class RandomNeuronRule extends NeuronUpdateRule {
      */
     public RandomNeuronRule deepCopy() {
         RandomNeuronRule rn = new RandomNeuronRule();
-        rn.randomizer = new RandomSource(randomizer);
+        rn.randomizer = new Randomizer(randomizer);
         return rn;
     }
 
@@ -68,14 +68,14 @@ public class RandomNeuronRule extends NeuronUpdateRule {
     /**
      * @return Returns the randomizer.
      */
-    public RandomSource getRandomizer() {
+    public Randomizer getRandomizer() {
         return randomizer;
     }
 
     /**
      * @param randomizer The randomizer to set.
      */
-    public void setRandomizer(final RandomSource randomizer) {
+    public void setRandomizer(final Randomizer randomizer) {
         this.randomizer = randomizer;
     }
 

@@ -20,7 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking".
@@ -43,7 +43,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     private double d = 6;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise = false;
@@ -58,7 +58,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
         in.setC(getC());
         in.setD(getD());
         in.setAddNoise(getAddNoise());
-        in.noiseGenerator = new RandomSource(noiseGenerator);
+        in.noiseGenerator = new Randomizer(noiseGenerator);
 
         return in;
     }
@@ -166,14 +166,14 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     /**
      * @return Returns the noiseGenerator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(final RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

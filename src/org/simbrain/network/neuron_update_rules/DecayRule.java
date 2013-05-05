@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
@@ -50,7 +50,7 @@ public class DecayRule extends NeuronUpdateRule {
     private boolean clipping = true;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise = false;
@@ -79,7 +79,7 @@ public class DecayRule extends NeuronUpdateRule {
         dn.setDecayFraction(getDecayFraction());
         dn.setClipping(getClipping());
         dn.setAddNoise(getAddNoise());
-        dn.noiseGenerator = new RandomSource(noiseGenerator);
+        dn.noiseGenerator = new Randomizer(noiseGenerator);
         return dn;
     }
 
@@ -197,14 +197,14 @@ public class DecayRule extends NeuronUpdateRule {
     /**
      * @return Returns the noiseGenerator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(final RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

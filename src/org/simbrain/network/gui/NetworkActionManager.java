@@ -37,6 +37,7 @@ import org.simbrain.network.gui.actions.ClampWeightsAction;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
+import org.simbrain.network.gui.actions.EditRandomizerPropertiesAction;
 import org.simbrain.network.gui.actions.GroupAction;
 import org.simbrain.network.gui.actions.IterateNetworkAction;
 import org.simbrain.network.gui.actions.NewCompetitiveNetworkAction;
@@ -59,6 +60,7 @@ import org.simbrain.network.gui.actions.SetAutoZoomAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
+import org.simbrain.network.gui.actions.ShowAdjustSynapsesDialog;
 import org.simbrain.network.gui.actions.ShowClampToolBarAction;
 import org.simbrain.network.gui.actions.ShowDebugAction;
 import org.simbrain.network.gui.actions.ShowEditToolBarAction;
@@ -66,9 +68,9 @@ import org.simbrain.network.gui.actions.ShowGUIAction;
 import org.simbrain.network.gui.actions.ShowIOInfoAction;
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
 import org.simbrain.network.gui.actions.ShowMainToolBarAction;
+import org.simbrain.network.gui.actions.ShowNetworkHierarchyPanel;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.ShowPrioritiesAction;
-import org.simbrain.network.gui.actions.ShowNetworkHierarchyPanel;
 import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.ShowTrainerAction;
 import org.simbrain.network.gui.actions.ShowWeightMatrixAction;
@@ -284,6 +286,12 @@ public final class NetworkActionManager {
     /** Shows a trainer dialog. */
     private final Action showTrainerAction;
 
+    /** Shows dialog to edit randomizer properties. */
+    private final Action setRandomizerPropertiesAction;
+
+    /** Shows dialog to adjust group of synapses. */
+    private final Action showAdjustSynapsesDialog;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -407,6 +415,10 @@ public final class NetworkActionManager {
 
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
+
+        setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(
+                networkPanel);
+        showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
     }
 
     /**
@@ -1021,4 +1033,19 @@ public final class NetworkActionManager {
         return selectionEditModeAction;
     }
 
+    /**
+     * @return the getSetRandomPropsAction
+     */
+    public Action getSetRandomizerPropsAction() {
+        return setRandomizerPropertiesAction;
+    }
+
+    /**
+     * @return the showAdjustSynapsesDialog
+     */
+    public Action getShowAdjustSynapsesDialog() {
+        return showAdjustSynapsesDialog;
+    }
+
+    
 }

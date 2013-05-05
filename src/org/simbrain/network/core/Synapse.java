@@ -471,7 +471,10 @@ public class Synapse {
      * @return the random value.
      */
     public double getRandomValue() {
-        return (upperBound - lowerBound) * Math.random() + lowerBound;
+        this.getParentNetwork().getWeightRandomizer().setUpperBound(upperBound);
+        this.getParentNetwork().getWeightRandomizer().setLowerBound(lowerBound);
+        return  this.getParentNetwork().getWeightRandomizer().getRandom();
+        //return (upperBound - lowerBound) * Math.random() + lowerBound;
     }
 
     /**
@@ -747,5 +750,6 @@ public class Synapse {
     public void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
     }
+
 
 }

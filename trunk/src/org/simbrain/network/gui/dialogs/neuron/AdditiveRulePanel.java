@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
@@ -51,7 +51,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();

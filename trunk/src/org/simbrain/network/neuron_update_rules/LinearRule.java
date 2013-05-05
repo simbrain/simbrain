@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
@@ -36,7 +36,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     private double bias = 0;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise = false;
@@ -67,7 +67,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
         ln.setSlope(getSlope());
         ln.setClipping(getClipping());
         ln.setAddNoise(getAddNoise());
-        ln.noiseGenerator = new RandomSource(noiseGenerator);
+        ln.noiseGenerator = new Randomizer(noiseGenerator);
         return ln;
     }
 
@@ -133,14 +133,14 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     /**
      * @return Returns the noise generator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noise The noise generator to set.
      */
-    public void setNoiseGenerator(final RandomSource noise) {
+    public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
     }
 

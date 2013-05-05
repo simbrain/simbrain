@@ -20,7 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
@@ -45,7 +45,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
     private double restingPotential = .5;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to neuron. */
     private boolean addNoise = false;
@@ -65,7 +65,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
         ifn.setResistance(getResistance());
         ifn.setClipping(getClipping());
         ifn.setAddNoise(getAddNoise());
-        ifn.noiseGenerator = new RandomSource(noiseGenerator);
+        ifn.noiseGenerator = new Randomizer(noiseGenerator);
 
         return ifn;
     }
@@ -143,7 +143,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
     /**
      * @param noise The noise to set.
      */
-    public void setAddNoise(final RandomSource noise) {
+    public void setAddNoise(final Randomizer noise) {
         this.noiseGenerator = noise;
     }
 
@@ -164,14 +164,14 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
     /**
      * @return Returns the noiseGenerator.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(final RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 

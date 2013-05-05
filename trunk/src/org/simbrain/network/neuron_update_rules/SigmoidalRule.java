@@ -21,7 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SigmoidalNeuron</b> provides various implementations of a standard
@@ -70,7 +70,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     private double slope = 1;
 
     /** Noise dialog. */
-    private RandomSource noiseGenerator = new RandomSource();
+    private Randomizer noiseGenerator = new Randomizer();
 
     /** Adds noise to neuron. */
     private boolean addNoise = false;
@@ -300,7 +300,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
         sn.setType(getType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator = new RandomSource(noiseGenerator);
+        sn.noiseGenerator = new Randomizer(noiseGenerator);
         return sn;
     }
 
@@ -335,14 +335,14 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     /**
      * @return Returns the noise.
      */
-    public RandomSource getNoiseGenerator() {
+    public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(final RandomSource noise) {
+    public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
     }
 

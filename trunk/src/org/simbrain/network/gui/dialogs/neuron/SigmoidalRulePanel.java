@@ -26,12 +26,12 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SigmoidalNeuronPanel</b>.
@@ -55,7 +55,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
@@ -115,8 +115,8 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList<RandomSource> getRandomizers() {
-        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+    private ArrayList<Randomizer> getRandomizers() {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((SigmoidalRule) ruleList.get(i)).getNoiseGenerator());

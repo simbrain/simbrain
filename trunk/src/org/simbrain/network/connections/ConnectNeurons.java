@@ -24,7 +24,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.util.RandomSource;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Subclasses create connections (collections of synapses) between groups of
@@ -70,10 +70,10 @@ public abstract class ConnectNeurons {
     protected Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     /** A source of random numbers for inhibitory connections. */
-    protected RandomSource inhibitoryRandomizer = new RandomSource();
+    protected Randomizer inhibitoryRandomizer = new Randomizer();
 
     /** A source of random numbers for excitatory connections. */
-    protected RandomSource excitatoryRandomizer = new RandomSource();
+    protected Randomizer excitatoryRandomizer = new Randomizer();
 
     /** A switch for enabling randomized excitatory connections. */
     protected boolean enableExcitatoryRandomization;
@@ -228,11 +228,11 @@ public abstract class ConnectNeurons {
         return DEFAULT_EXCITATORY_RATIO;
     }
 
-    public RandomSource getInhibitoryRandomizer() {
+    public Randomizer getInhibitoryRandomizer() {
         return inhibitoryRandomizer;
     }
 
-    public RandomSource getExcitatoryRandomizer() {
+    public Randomizer getExcitatoryRandomizer() {
         return excitatoryRandomizer;
     }
 

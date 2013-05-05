@@ -26,11 +26,11 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
-import org.simbrain.network.util.RandomSource;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Show synapse adjustment dialog.

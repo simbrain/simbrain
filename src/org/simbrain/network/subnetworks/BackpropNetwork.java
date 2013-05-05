@@ -16,7 +16,9 @@ package org.simbrain.network.subnetworks;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.FeedForward;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 
 /**
@@ -45,8 +47,8 @@ public class BackpropNetwork extends FeedForward implements Trainable {
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
-        super(network, nodesPerLayer, initialPosition);
-        int numLayers = getNeuronGroupCount();
+        super(network, nodesPerLayer, initialPosition, new Neuron(network,
+                new LinearRule()));
         setLabel("Backprop");
 
     }

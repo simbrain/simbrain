@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -110,6 +111,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getSetSourceNeuronsAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getConnectionMenu());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getSetRandomizerPropsAction());
+        editMenu.add(actionManager.getShowAdjustSynapsesDialog());
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowQuickConnectDialogAction());
         editMenu.addSeparator();
@@ -272,6 +276,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         frame.setContentPane(panel);
         component.getDesktop().addInternalFrame(frame);
         frame.pack();
+        frame.setResizable(true);
         frame.setMaximizable(true);
         frame.setIconifiable(true);
         frame.setClosable(true);

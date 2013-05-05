@@ -37,6 +37,7 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.util.RandomSource;
 import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 
@@ -83,6 +84,8 @@ public class Network {
 
     /** Time step. */
     private double timeStep = DEFAULT_TIME_STEP;
+    
+    private RandomSource weightRandomizer = new RandomSource();
 
     /**
      * Two types of time used in simulations. DISCRETE: Network update
@@ -704,7 +707,9 @@ public class Network {
      */
     public void randomizeWeights() {
         for (Synapse s : synapseList) {
-            s.randomize();
+            weightRandomizer.setUpperBound(s.getUpperBound());
+            weightRandomizer.setLowerBound(s.getLowerBound());
+            s.setStrength(weightRandomizer.getRandom());
         }
     }
 
@@ -1737,6 +1742,18 @@ public class Network {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
         }
+    }
+
+    /**
+     * Returns the weight randomizer for this network.
+     *
+     * @return the weight randomizer
+     */
+    public RandomSource getWeightRandomizer() {
+        if (weightRandomizer == null) {
+            weightRandomizer = new RandomSource();
+        }
+        return weightRandomizer;
     }
 
 }

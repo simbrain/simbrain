@@ -74,7 +74,6 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
                     + ")");
         }
-        this.setMaxVisibleColumns(5);
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
 

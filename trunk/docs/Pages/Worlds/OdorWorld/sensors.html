@@ -1,36 +1,154 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-  <title>Simbrain Documentation</title>
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+  
 
   
   
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../../Styles.css" rel="stylesheet" type="text/css">
-
-</head><body>
+  <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
-</div></a>
+</div>
+</a>
 <div id="main_docs">
 <div class="navi">
 <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="OdorWorld.html">OdorWorld</a>
 &gt; Sensors </p>
 </div>
-<p> </p>
-<h1>Sensors </h1><p>Agents in Odor World have sensors to gather information about its environment.<br>
+<div id="menu">
+<p class="menubold">Contents</p>
+
+
+<p class="menubold">&nbsp;&nbsp;&nbsp; <a href="#tile"><small>Smell<br>
+&nbsp;&nbsp;&nbsp;&nbsp; Hearing<br>
+&nbsp;&nbsp;&nbsp;&nbsp; Tile</small></a><br>
 </p>
+
+<p>
+ </p>
+</div>
+<h1>Sensors </h1>
+<p> In nature, organisms have sensors that send activation to cells in real life brains (or other hubs of cognition). An <a href="agents.html">agent</a> in Odor World also has sensors that it uses to receive information from its
+environment. These sensors can be <a href="../../Workspace/Couplings.html">coupled</a>
+with input neurons in neural networks so that a neuron fires each time
+a sensor gets activated. To display an agent's sensors, double click on
+the agent in Odor World and select the sensors tab. The sensor panel
+lists all of an agent's sensors along with its sensor type and label.
+Labels can be renamed by double clicking on the label column.</p>
 <p><br>
 </p>
-<span class="heading"></span>
+<p style="text-align: center;"><img style="width: 478px; height: 580px;" alt="" src="../../../Images/OdorWorld_SensorPanel.png"><br>
+</p>
+
+<p>To edit a sensor, right click on any part of the row and select "Edit Sensor..."</p>
+<p>To delete a sensor, select all the sensors to be deleted in the list
+and click on the "Delete" button at the bottom of the panel.</p>
+<p>To add a sensor, click on the "Add" button at the bottom of the
+panel. Then, select the sensor type and input the appropriate
+parameters.<br>
+</p>
+<p>The different types of sensors in Odor World are described below.<br>
+</p>
+
+<span class="heading"></span><br>
+
 <p class="heading">Smell<a name="smell"></a></p>
+<p><span style=""><span style="font-weight: normal;">Objects
+and agents in Odor World can emit smells that smell sensors can detect.
+</span></span><span style=""><span style="font-weight: normal;">See <a href="example.html">Example</a> for an implementation of smells. </span></span><span style=""><span style="font-weight: normal;">Sensor angle and length determine where the position of the smell sensor relative to that of the agent.&nbsp;</span></span></p>
+<p style="text-align: center;" class="heading"><span style=""><span style="font-weight: normal;"></span><img style="width: 296px; height: 242px;" alt="" src="../../../Images/OdorWorld_AddSmellSensor.png"></span></p>
+<blockquote>
+    
+    <p><span class="heading2">Sensor angle: </span>The
+angle at which the smell sensor will be added. A sensor angle of 0 a
+smell sensor that is directly in front of the agent. A positive sensor
+angle locates the sensor at a position to the left of the agent's
+heading. A negative sensor angle locates te sensor at a position to the
+right of the agent's heading.<br>
+ </p><p><span class="heading2">Sensor length: </span>The distance from
+the center of the entity to which the smell sensor is to be added. A
+sensor length of 0 makes sensor angle irrelevant since located at the
+center of the agent.<br>
+ </p>
+    
+  </blockquote>
 
 
 <p class="heading">Hearing<a name="hearing"></a></p>
+
+
+<p><span style="font-weight: normal;">A Hearing sensor listens for a <a href="effectors.html#speech">Speech effector</a>
+of the same utterance. When a hearing sensor is activated by a speech
+effector, a thought bubble containing the associated utterance
+is displayed in Odor World.<br>
+</span></p>
+<p style="text-align: center;" class="heading"><span style="font-weight: normal;"></span><img src="../../../Images/OdorWorld_AddHearingSensor.png" alt="" style="width: 272px; height: 212px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img style="width: 432px; height: 172px;" alt="" src="../../../Images/OdorWorld_Hearing.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+</p>
+<blockquote>
+    <p><span class="heading2">Utterance: </span>The string
+or phrase associated with this sensor. Hearing sensors get activated
+when it senses a speech effectors of the same utterance.<br>
+ </p>
+    <p><span class="heading2">Output Amount: </span>The amount of activation to be sent to a neuron coupled with this sensor.<br>
+ </p>
+    
+  </blockquote>
 <p class="heading">Tile<a name="tile"></a></p>
 
-<p>Tile sensors can be added individually or simultaneously as a Tile Set.<br>
-</p></div>
-</body></html>
+
+<p>A <a href="http://en.wikipedia.org/wiki/Place_cell" target="_blank">place cell</a>
+is a cell that fires when an organism senses that it is in a particular
+location associated with that cell. An input neuron coupled with a tile
+sensor
+mimics the behavior of a place cell. When an agent
+is located inside a tile, its corresponding tile sensor gets activated.<br>
+</p><br>
+<p style="text-align: center;"><img style="width: 272px; height: 300px;" alt="" src="../../../Images/OdorWorld_AddTileSensor.png"></p>
+<br>
+<blockquote>
+    <p><span class="heading2">Activation amount: </span>Amount of activation that a neuron coupled with the tile sensor receives when the tile sensor is activated.<br>
+ </p>
+    <p><span class="heading2">X and Y: </span>Coordinates for the location of the top-left corner of the tile sensor.</p>
+  <p><span class="heading2">Width and Height: </span>Determines
+the size of the tile. Width specifies the horizontal length of the tile
+sensor. Height specifies the vertical length. <br>
+</p>
+  <p><br>
+  </p>
+
+
+    
+  </blockquote>
+<p style="text-align: left; font-weight: bold;"><big><small><span class="heading">Tile Set</span><span class="heading"></span><span class="heading"></span></small><br>
+</big></p>
+<p style="text-align: left;">A grid of tile sensors can quickly be
+added by selecting tile set in the sensor type menu. The newly added
+grid will be the same size as the current size of the visible Odor
+World window. </p>
+
+
+<br>
+<p style="text-align: center;"><img style="width: 272px; height: 244px;" alt="" src="../../../Images/OdorWorld_AddTileSet.png"></p>
+<p style="text-align: left;"></p>
+<p><span class="heading2">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Rows: </span>The
+number of rows of tile sensors to add. The width of each tile will
+equal the width of the Odor World window divided by the number of rows.<br>
+</p>
+<p><span class="heading2">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Columns: </span>The
+number of columns of tile sensor to add. The height of each tile will
+the height of the Odor World window divided by the number of columns.<br>
+</p>
+<span class="heading2"></span>
+<p>
+ </p>
+
+    <span class="heading2">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; Offset: </span>Sets the X and Y coordinates where the top-left corner of the grid will be located.</div></body></html>

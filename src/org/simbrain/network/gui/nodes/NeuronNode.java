@@ -349,6 +349,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         //        .getShowTrainerAction());
         contextMenu.add(getNetworkPanel().getActionManager()
                 .getShowWeightMatrixAction());
+        contextMenu.add(getNetworkPanel().getActionManager()
+                .getShowAdjustConnectivityDialog());
         contextMenu.addSeparator();
 
         // Selection options

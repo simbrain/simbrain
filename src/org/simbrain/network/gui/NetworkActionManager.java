@@ -60,6 +60,7 @@ import org.simbrain.network.gui.actions.SetAutoZoomAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
+import org.simbrain.network.gui.actions.ShowAdjustConnectivityDialog;
 import org.simbrain.network.gui.actions.ShowAdjustSynapsesDialog;
 import org.simbrain.network.gui.actions.ShowClampToolBarAction;
 import org.simbrain.network.gui.actions.ShowDebugAction;
@@ -292,6 +293,9 @@ public final class NetworkActionManager {
     /** Shows dialog to adjust group of synapses. */
     private final Action showAdjustSynapsesDialog;
 
+    /** Shows dialog to adjust connectivity. */
+    private final Action showAdjustConnectivityDialog;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -419,6 +423,7 @@ public final class NetworkActionManager {
         setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(
                 networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
+        showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
     }
 
     /**
@@ -1047,5 +1052,11 @@ public final class NetworkActionManager {
         return showAdjustSynapsesDialog;
     }
 
-    
+    /**
+     * @return the showAdjustConnectivityDialog
+     */
+    public Action getShowAdjustConnectivityDialog() {
+        return showAdjustConnectivityDialog;
+    }
+
 }

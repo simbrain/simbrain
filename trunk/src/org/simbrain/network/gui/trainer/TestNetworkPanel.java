@@ -21,10 +21,11 @@ package org.simbrain.network.gui.trainer;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
@@ -42,38 +43,16 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  * @author jyoshimi
  * @author Lam Nguyen
  */
-public class TestNetworkPanel extends SimbrainJTableScrollPanel {
+public class TestNetworkPanel extends JPanel {
 
     /** JTable contained in scroller. */
     private SimbrainJTable table;
 
+    /** Scroll panel for table. */
+    private SimbrainJTableScrollPanel scroller;
+
     /** The Backprop network to test. */
     private BackpropNetwork network;
-
-    /**
-     * Embed the scrollpanel in a panel with a toolbar.
-     *
-     * @param scroller the scroller to embed
-     * @return the formatted jpanel.
-     */
-    public static JPanel getTestNetworkPanel(final TestNetworkPanel scroller) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add("Center", scroller);
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        toolbar.add(scroller.getTable().getToolbarCSV());
-        toolbar.add(scroller.getTable().getToolbarRandomize());
-        JButton step = new JButton(ResourceManager.getImageIcon("Step.png"));
-        step.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                scroller.advanceRow();
-            }
-        });
-        JToolBar stepToolBar = new JToolBar();
-        stepToolBar.add(step);
-        toolbar.add(stepToolBar);
-        panel.add("North", toolbar);
-        return panel;
-    }
 
     /**
      * Construct a test network panel using a specified Backprop network.
@@ -82,39 +61,90 @@ public class TestNetworkPanel extends SimbrainJTableScrollPanel {
      */
     public TestNetworkPanel(final BackpropNetwork network) {
         this.network = network;
-        table = new SimbrainJTable(new NumericTable(5, network.
-                getInputNeurons().size()));
+        table = new SimbrainJTable(new NumericTable(5, network
+                .getInputNeurons().size()));
         ((NumericTable) table.getData()).setIterationMode(true);
         // Set up column headings
         List<String> colHeaders = new ArrayList<String>();
         for (int i = 0; i < network.getInputNeurons().size(); i++) {
-            colHeaders.add(new String("" + (i + 1) + " (" + network.
-                    getInputNeurons().get(i).getId()) + ")");
+            colHeaders.add(new String("" + (i + 1) + " ("
+                    + network.getInputNeurons().get(i).getId())
+                    + ")");
         }
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
-
-        this.setTable(table);
+        scroller = new SimbrainJTableScrollPanel(table);
+        setLayout(new BorderLayout());
+        add("Center", scroller);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JToolBar editRowToolBar = new JToolBar();
+        toolbar.add(table.getToolbarCSV());
+        toolbar.add(editRowToolBar);
+        editRowToolBar.add(table.getToolbarEditRows());
+        toolbar.add(table.getToolbarRandomize());
+        JButton test = new JButton(testRowAction);
+        JButton advance = new JButton(advanceRowAction);
+        JToolBar testToolBar = new JToolBar();
+        testToolBar.add(test);
+        testToolBar.add(advance);
+        toolbar.add(testToolBar);
+        add("North", toolbar);
     }
+
+    /**
+     * Action for advancing a row to be tested.
+     */
+    private Action advanceRowAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(SHORT_DESCRIPTION, "Advance row");
+        }
+        /**
+         * {@ineritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            advanceRow();
+        }
+    };
+
+    /**
+     * Action to test a row.
+     */
+    private Action testRowAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+            putValue(SHORT_DESCRIPTION, "Test network");
+        }
+        /**
+         * {@ineritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            testRow();
+        }
+    };
 
     /**
      * Advances the row to test.
      */
     private void advanceRow() {
-        // Set input layer activation
-        int testRow = ((NumericTable) table.getData()).getCurrentRow() + 1;
+        ((NumericTable) table.getData()).updateCurrentRow();
+        table.updateRowSelection();
+    }
+
+    /**
+     * Test the selected row.
+     */
+    private void testRow() {
+        int testRow = ((NumericTable) table.getData()).getCurrentRow();
         if (testRow >=  ((NumericTable) table.getData()).getRowCount()) {
             testRow = 0;
         }
+        table.updateRowSelection();
         for (int j = 0; j < network.getInputNeurons().size(); j++) {
             network.getInputNeurons().get(j)
             .setInputValue(((NumericTable) table.getData()).
                     getValue(testRow, j));
         }
-        ((NumericTable) table.getData()).updateCurrentRow();
-        table.updateRowSelection();
-        repaint();
-
         network.update();
         network.getParentNetwork().fireNetworkChanged();
     }

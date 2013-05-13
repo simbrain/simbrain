@@ -21,6 +21,8 @@ package org.simbrain.util.table;
 import java.io.File;
 import java.util.Random;
 
+import javax.swing.JOptionPane;
+
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.Utils;
 
@@ -287,22 +289,28 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      */
     public void readData(final File file) {
         String[][] values = Utils.getStringMatrix(file);
-        reset(values.length, values[0].length);
-        for (int i = 0; i < values.length; i++) {
-            for (int j = 0; j < values[0].length; j++) {
-                if ((values[i][j]).length() > 0) {
-                    Double num = new Double(0);
-                    try {
-                        num = Double.valueOf(values[i][j]);
-                    } catch (NumberFormatException exception) {
-                    } finally {
-                        setValue(i, j, num, false);
+        if (values[0].length == getColumnCount()) {
+            reset(values.length, values[0].length);
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[0].length; j++) {
+                    if ((values[i][j]).length() > 0) {
+                        Double num = new Double(0);
+                        try {
+                            num = Double.valueOf(values[i][j]);
+                        } catch (NumberFormatException exception) {
+                        } finally {
+                            setValue(i, j, num, false);
+                        }
                     }
                 }
             }
+        } else {
+            JOptionPane.showOptionDialog(null,
+                    "Number of columns must equal the number of neurons.",
+                    "Warning", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, null, null);
         }
         fireTableStructureChanged();
-
     }
 
     /**

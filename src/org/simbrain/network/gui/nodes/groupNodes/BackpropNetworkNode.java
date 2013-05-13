@@ -183,8 +183,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                JPanel panel = TestNetworkPanel
-                        .getTestNetworkPanel(new TestNetworkPanel(network));
+                TestNetworkPanel panel = new TestNetworkPanel(network);
                 BackpropNetworkNode.this.getNetworkPanel().displayPanel(
                         panel, "Test Inputs");
             }

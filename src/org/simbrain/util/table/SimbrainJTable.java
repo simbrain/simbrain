@@ -143,11 +143,7 @@ public class SimbrainJTable extends JXTable {
         // to put it back in)
         this.setSortable(false);
 
-        // Below initially forces first column to specific width; but has other
-        // side effects
-        // setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        getColumnModel().getColumn(0).setPreferredWidth(30);
-        // TODO: Make preferred width for first column settable
+        setFirstColumnWidth();
 
         // Disable specific popupmenus for text tables
         if (data instanceof TextTable) {
@@ -190,6 +186,17 @@ public class SimbrainJTable extends JXTable {
                 }
             }
         } );
+    }
+
+    /**
+     * Special width for first column.
+     */
+    public void setFirstColumnWidth() {
+        // Initially forces first column to specific width; but has other
+        // side effects
+        // setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        getColumnModel().getColumn(0).setPreferredWidth(30);
+        // TODO: Make preferred width for first column settable
     }
 
     /**
@@ -311,25 +318,23 @@ public class SimbrainJTable extends JXTable {
                 ret.add(fillItem);
             }
         }
-        if (showCSVInPopupMenu) {
-            JMenuItem csvItem = getMenuCSV();
-            if (csvItem != null) {
-                ret.add(csvItem);
-            }
-        }
         return ret;
     }
 
     /**
      * Return a toolbar with buttons for opening from and saving to .csv files.
      *
-     * @return the csv toolbar
+      * @param allowRowChanges whether to allow number of rows to change
+      * @param allowColumnChanges whether to allow number of columns to change
+      * @return the csv toolbar
      */
-    public JToolBar getToolbarCSV() {
+    public JToolBar getToolbarCSV(final boolean allowRowChanges,
+            final boolean allowColumnChanges) {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(TableActionManager
-                    .getOpenCSVAction((NumericTable) getData()));
+            toolbar.add(TableActionManager.getOpenCSVAction(
+                    (NumericTable) getData(), allowRowChanges,
+                    allowColumnChanges));
             toolbar.add(TableActionManager
                     .getSaveCSVAction((NumericTable) getData()));
             return toolbar;
@@ -479,13 +484,17 @@ public class SimbrainJTable extends JXTable {
     /**
      * Return a menu with items for opening from and saving to .csv files.
      *
+     * @param allowRowChanges whether to allow number of rows to change
+     * @param allowColumnChanges whether to allow number of columns to change
      * @return the csv menu
      */
-    public JMenu getMenuCSV() {
+    public JMenu getMenuCSV(final boolean allowRowChanges,
+            final boolean allowColumnChanges) {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Import / Export .csv");
-            menu.add(new JMenuItem(TableActionManager
-                    .getOpenCSVAction((NumericTable) getData())));
+            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(
+                    (NumericTable) getData(), allowRowChanges,
+                    allowColumnChanges)));
             menu.add(new JMenuItem(TableActionManager
                     .getSaveCSVAction((NumericTable) getData())));
             return menu;

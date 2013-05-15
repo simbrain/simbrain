@@ -19,6 +19,7 @@
 package org.simbrain.util.genericframe;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyVetoException;
 
@@ -56,5 +57,17 @@ public interface GenericFrame {
     public void setLocation(int xposition, int yposition);
 
     public void setContentPane(Container container);
+
+    public void setMaximumSize(Dimension maximumSize);
+
+    public Dimension getMaximumSize();
+
+    public Dimension getSize();
+
+    public Dimension getPreferredSize();
+
+    public void setResizable(boolean b);
+
+    public void setMaximizable(boolean b);
 
 }

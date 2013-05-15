@@ -43,7 +43,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     private static final int DEFAULT_MAX_COLS = 6;
 
     /** Default column width. */
-    private static final int DEFAULT_MAX_ROWS = 20;
+    private static final int DEFAULT_MAX_ROWS = 21;
 
     /** How wide to make columns. */
     private int columnWidth = DEFAULT_COLUMN_WIDTH;
@@ -89,6 +89,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
 
         int rowHeight = jtable.getRowHeight();
         jtable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jtable.setFirstColumnWidth();
         int width, height;
 
         // Set width of scrollpane based on number of columns
@@ -146,5 +147,10 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         this.maxVisibleRows = maxVisibleRows;
         resize();
     }
+
+//    @Override
+//    public void repaint() {
+//        super.repaint();
+//    }
 
 }

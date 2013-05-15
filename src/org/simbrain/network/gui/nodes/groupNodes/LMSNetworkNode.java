@@ -27,7 +27,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.gui.trainer.LMSIterativePanel;
 import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
@@ -90,7 +90,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         final LMSNetwork lms = (LMSNetwork) getGroup();
 
         // Reference to the input data in the LMS
-        DataHolder inputData = new DataHolder() {
+        DataMatrix inputData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 lms.setInputData(data);
@@ -103,7 +103,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         };
         // Reference to the training data in the LMS
-        DataHolder trainingData = new DataHolder() {
+        DataMatrix trainingData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 lms.setTrainingData(data);
@@ -117,10 +117,11 @@ public class LMSNetworkNode extends SubnetworkNode {
         };
         menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
                 (Trainable) getGroup(), inputData, trainingData));
+        menu.addSeparator();
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 lms.getInputNeurons(), inputData, "Input"));
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                lms.getOutputNeurons(), trainingData, "Training"));
+                lms.getOutputNeurons(), trainingData, "Target"));
         setContextMenu(menu);
     }
 

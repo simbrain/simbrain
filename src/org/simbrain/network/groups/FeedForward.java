@@ -122,8 +122,8 @@ public class FeedForward extends Subnetwork {
 
         // Prepare base synapse for connecting layers
         Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapseRule());
-        synapse.setLowerBound(-10);
-        synapse.setUpperBound(10);
+        synapse.setLowerBound(-1);
+        synapse.setUpperBound(1);
 
         // Memory of last layer created
         NeuronGroup lastLayer = inputLayer;
@@ -146,6 +146,10 @@ public class FeedForward extends Subnetwork {
                     Direction.NORTH, betweenLayerInterval);
 
             AllToAll connection = new AllToAll(getParentNetwork());
+            connection.setBaseExcitatorySynapse(synapse);
+            connection.setBaseInhibitorySynapse(synapse);
+            connection.setEnableExcitatoryRandomization(true);
+            connection.setEnableInhibitoryRandomization(true);
 
             connectNeuronGroups(lastLayer, hiddenLayer, connection);
 

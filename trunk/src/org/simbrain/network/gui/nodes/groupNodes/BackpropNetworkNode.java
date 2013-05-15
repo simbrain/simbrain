@@ -27,10 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.TestInputPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.BackpropTrainerPanel;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
-import org.simbrain.network.gui.trainer.TestNetworkPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
@@ -99,7 +99,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
-        menu.add(getTestNetworkAction(network));
+        menu.add(new JMenuItem(testNetworkAction));
         menu.addSeparator();
 
         // Reference to the input data
@@ -162,32 +162,30 @@ public class BackpropNetworkNode extends SubnetworkNode {
         }
     };
 
-
     /**
-     * Action for testing networks.
+     * Action for testing the backprop network.
      *
      * @param network the Backprop network to test
      */
-    Action getTestNetworkAction(final BackpropNetwork network) {
-        return new AbstractAction() {
+    private Action testNetworkAction = new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(NAME, "Test network...");
-                putValue(SHORT_DESCRIPTION, "Test network...");
-                putValue(SMALL_ICON, ResourceManager.
-                        getImageIcon("Trainer.png"));
-            }
+        // Initialize
+        {
+            putValue(NAME, "Test network...");
+            putValue(SHORT_DESCRIPTION, "Test network...");
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+        }
 
-            /**
-             * {@ineritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                TestNetworkPanel panel = new TestNetworkPanel(network);
-                BackpropNetworkNode.this.getNetworkPanel().displayPanel(
-                        panel, "Test Inputs");
-            }
-        };
-    }
+        /**
+         * {@ineritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            BackpropNetwork network = (BackpropNetwork) getGroup();
+            TestInputPanel panel = new TestInputPanel(network,
+                    network.getInputNeurons());
+            BackpropNetworkNode.this.getNetworkPanel().displayPanel(panel,
+                    "Test Inputs");
+        }
+    };
 
 }

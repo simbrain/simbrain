@@ -49,10 +49,16 @@ public class BackpropTrainer extends IterableTrainer {
     private double rmsError;
 
     /** Default learning rate. */
-    private static final double DEFAULT_LEARNING_RATE = .1;
+    private static final double DEFAULT_LEARNING_RATE = .25;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
+
+    /** Default momentum. */
+    private static final double DEFAULT_MOMENTUM = .9;
+
+    /** Momentum. Must be between 0 and 1. */
+    private double momentum = DEFAULT_MOMENTUM;
 
     /** For storing current error contribution of each neuron. */
     private HashMap<Neuron, Double> errorMap;
@@ -202,8 +208,13 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Compute and store weight deltas for the fan-in to this neuron
         for (Synapse synapse : neuron.getFanIn()) {
+            double lastWeightDelta = 0;
+            if (weightDeltaMap.get(synapse) != null) {
+                lastWeightDelta = weightDeltaMap.get(synapse);
+            }
             double weightDelta = learningRate * errorSignal
-                    * synapse.getSource().getActivation();
+                    * synapse.getSource().getActivation() + momentum
+                    * lastWeightDelta;
             weightDeltaMap.put(synapse, weightDelta);
         }
 
@@ -415,6 +426,20 @@ public class BackpropTrainer extends IterableTrainer {
         // e.printStackTrace();
         // }
 
+    }
+
+    /**
+     * @return the momentum
+     */
+    public double getMomentum() {
+        return momentum;
+    }
+
+    /**
+     * @param momentum the momentum to set
+     */
+    public void setMomentum(double momentum) {
+        this.momentum = momentum;
     }
 
 }

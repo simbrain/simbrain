@@ -34,6 +34,7 @@ import javax.swing.event.MenuListener;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -51,7 +52,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private static final long serialVersionUID = 1L;
 
     /** World scroll pane. */
-    private JScrollPane scroller;
+    private SimbrainJTableScrollPanel scroller;
 
     /** Data world. */
     private DesktopJTable table;
@@ -91,8 +92,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Set up table
         table = new DesktopJTable(component.getDataModel(), component);
-        scroller = new JScrollPane();
-        scroller.setViewportView(table);
+        scroller = new SimbrainJTableScrollPanel(table);        
         add(scroller, BorderLayout.CENTER);
 
         // Add toolbars
@@ -121,7 +121,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         fileMenu.add(new SaveAction(this));
         fileMenu.add(new SaveAsAction(this));
         fileMenu.addSeparator();
-        fileMenu.add(table.getMenuCSV());
+        fileMenu.add(table.getMenuCSV(true, true));
         fileMenu.addSeparator();
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
@@ -191,7 +191,19 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         if (this.getParentFrame().getJMenuBar() == null) {
             addMenuBar(table);
         }
-        pack();
+        resizePanel();
+    }
+
+    /**
+     * Resize the panel and parent frame.
+     */
+    private void resizePanel() {
+        scroller.resize();
+        if (getParentFrame() != null) {
+            //getParentFrame()
+            //        .setMaximumSize(getParentFrame().getPreferredSize());
+            getParentFrame().pack();
+        }
     }
 
     /*

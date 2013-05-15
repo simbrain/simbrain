@@ -30,7 +30,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.TestInputPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.BackpropTrainerPanel;
-import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
@@ -103,7 +103,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.addSeparator();
 
         // Reference to the input data
-        DataHolder inputData = new DataHolder() {
+        DataMatrix inputData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 network.setInputData(data);
@@ -116,7 +116,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
         };
         // Reference to the training data
-        DataHolder trainingData = new DataHolder() {
+        DataMatrix trainingData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 network.setTrainingData(data);
@@ -130,10 +130,11 @@ public class BackpropNetworkNode extends SubnetworkNode {
         };
         menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
                 network, inputData, trainingData));
+        menu.addSeparator();
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 network.getInputNeurons(), inputData, "Input"));
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                network.getOutputNeurons(), trainingData, "Training"));
+                network.getOutputNeurons(), trainingData, "Target"));
 
         setContextMenu(menu);
     }

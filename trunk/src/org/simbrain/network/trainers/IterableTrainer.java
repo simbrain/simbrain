@@ -51,7 +51,7 @@ public abstract class IterableTrainer extends Trainer {
     public abstract double getError();
 
     /**
-     * Iterate the trainer for a set number of iterations
+     * Iterate the trainer for a set number of iterations.
      *
      * @param iterations
      */
@@ -62,6 +62,7 @@ public abstract class IterableTrainer extends Trainer {
         }
         fireTrainingEnd();
     }
+
 
     /**
      * Iterate the trainer until it is below a threshold. NOTE: Not yet used or
@@ -157,5 +158,6 @@ public abstract class IterableTrainer extends Trainer {
             errorListeners.remove(errorListener);
         }
     }
+
 
 }

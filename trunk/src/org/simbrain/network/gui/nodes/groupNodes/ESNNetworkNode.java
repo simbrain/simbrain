@@ -15,7 +15,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.Trainable;
@@ -85,7 +85,7 @@ public class ESNNetworkNode extends SubnetworkNode {
         final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
 
         // Reference to the input data in the ESN
-        DataHolder inputData = new DataHolder() {
+        DataMatrix inputData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 esn.setInputData(data);
@@ -98,7 +98,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
         };
         // Reference to the training data in the ESN
-        DataHolder trainingData = new DataHolder() {
+        DataMatrix trainingData = new DataMatrix() {
             @Override
             public void setData(double[][] data) {
                 esn.setTrainingData(data);
@@ -138,7 +138,7 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
                 .getInputLayer().getNeuronList(), inputData, "Input"));
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
-                .getOutputLayer().getNeuronList(), trainingData, "Training"));
+                .getOutputLayer().getNeuronList(), trainingData, "Target"));
         setContextMenu(menu);
     }
 

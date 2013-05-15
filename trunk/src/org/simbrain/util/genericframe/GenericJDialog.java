@@ -6,7 +6,7 @@ import java.beans.PropertyVetoException;
 import javax.swing.JDialog;
 
 /**
- * JDialog which implements Generic Frame
+ * JDialog which implements Generic Frame.
  */
 public class GenericJDialog extends JDialog implements GenericFrame {
 
@@ -18,6 +18,10 @@ public class GenericJDialog extends JDialog implements GenericFrame {
     }
 
     public void setIcon(boolean b) throws PropertyVetoException {
+    }
+
+    @Override
+    public void setMaximizable(boolean b) {
     }
 
 }

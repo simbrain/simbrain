@@ -63,7 +63,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         panel.add("Center", scroller);
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         toolbar.add(scroller.getTable().getToolbarRandomize());
-        toolbar.add(scroller.getTable().getToolbarCSV());
+        toolbar.add(scroller.getTable().getToolbarCSV(false, false));
         panel.add("North", toolbar);
         return panel;
     }

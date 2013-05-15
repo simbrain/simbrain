@@ -23,6 +23,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -35,7 +36,10 @@ import org.simbrain.util.table.TableActionManager;
  *
  * @author jyoshimi
  */
-public class DataViewer extends SimbrainJTableScrollPanel {
+public class DataPanel extends JPanel {
+
+    /** Scrollpane. */
+    private SimbrainJTableScrollPanel scroller;
 
     /** JTable contained in scroller. */
     private SimbrainJTable table;
@@ -43,20 +47,17 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     /** Default number of rows to open new table with. */
     private static final int DEFAULT_NUM_ROWS = 5;
 
-    /**
-     * @return the table
-     */
-    SimbrainJTable getTable() {
-        return table;
-    }
+    /** Parent frame. */
+    private GenericFrame parentFrame;
 
     /**
-     * Create a panel for viewing input or training data in a trainer.
+     * Panel which represents input or target data.
      *
-     * @param network the network to be trained
-     * @param type whether this is input or training data
+     * @param neurons neurons corresponding to columns
+     * @param data the numerical data
+     * @param name name for panel
      */
-    public DataViewer(final List<Neuron> neurons, final DataHolder data,
+    public DataPanel(final List<Neuron> neurons, final DataMatrix data,
             final String name) {
 
         // If no data exists, create it!
@@ -76,6 +77,35 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         }
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
+        scroller = new SimbrainJTableScrollPanel(table);
+        scroller.setMaxVisibleColumns(5);
+
+        setLayout(new BorderLayout());
+        add("Center", scroller);
+
+        // Toolbars
+        JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // Open / Save Tools
+        JToolBar fileToolBar = new JToolBar();
+        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table,
+                data));
+        fileToolBar.add(TableActionManager
+                .getSaveCSVAction((NumericTable) table.getData()));
+        toolbars.add(fileToolBar);
+
+        // Edit tools
+        JToolBar editToolBar = new JToolBar();
+        editToolBar
+                .add(TableActionManager.getInsertRowAction(table));
+        editToolBar
+                .add(TableActionManager.getDeleteRowAction(table));
+        toolbars.add(editToolBar);
+
+        // Randomize tools
+        toolbars.add(table.getToolbarRandomize());
+
+        add("North", toolbars);
 
         // Initialize listener
         table.getData().addListener(new SimbrainTableListener() {
@@ -90,10 +120,12 @@ public class DataViewer extends SimbrainJTableScrollPanel {
 
             public void rowAdded(int row) {
                 data.setData(((NumericTable) table.getData()).asDoubleArray());
+                resizePanel();
             }
 
             public void rowRemoved(int row) {
                 data.setData(((NumericTable) table.getData()).asDoubleArray());
+                resizePanel();
             }
 
             public void cellDataChanged(int row, int column) {
@@ -106,69 +138,30 @@ public class DataViewer extends SimbrainJTableScrollPanel {
 
             public void tableStructureChanged() {
                 data.setData(((NumericTable) table.getData()).asDoubleArray());
+                resizePanel();
             }
 
         });
-        // Set the table
-        this.setTable(table);
 
     }
 
     /**
-     * Factory method for creating a data viewer panel.
-     *
-     * @param trainerPanel parent trainer panel.
-     * @param type whether this is input or training data.
-     * @return the panel
+     * Resize the panel and parent frame.
      */
-    public static JPanel createDataViewerPanel(final List<Neuron> neurons,
-            final DataHolder data, final String name) {
-        final DataViewer viewer = new DataViewer(neurons, data, name);
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add("Center", viewer);
-
-        // Toolbars
-        JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        // Open / Save Tools
-        JToolBar fileToolBar = new JToolBar();
-        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(viewer.getTable(),
-                data));
-        fileToolBar.add(TableActionManager
-                .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
-        toolbars.add(fileToolBar);
-
-        // Edit tools
-        JToolBar editToolBar = new JToolBar();
-        editToolBar
-                .add(TableActionManager.getInsertRowAction(viewer.getTable()));
-        editToolBar
-                .add(TableActionManager.getDeleteRowAction(viewer.getTable()));
-        toolbars.add(editToolBar);
-
-        // Randomize tools
-        toolbars.add(viewer.getTable().getToolbarRandomize());
-
-        mainPanel.add("North", toolbars);
-        return mainPanel;
+    private void resizePanel() {
+        scroller.resize();
+        if (parentFrame != null) {
+            parentFrame.setMaximumSize(parentFrame.getPreferredSize());
+            parentFrame.pack();
+        }
     }
 
     /**
-     * Create a combined data viewer panel, which shows two panels in a split
-     * pane.
+     * @param parentFrame the parentFrame to set
      */
-    public static JPanel createCombinedDataViewerPanel(JPanel viewer1,
-            JPanel viewer2) {
-        // TODO: Plenty of enhancements are planned for this. As it matures it
-        // should probably be moved somewhere else.
-        JPanel panel = new JPanel();
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        // split.setDividerLocation(.5);
-                
-        split.setLeftComponent(viewer1);
-        split.setRightComponent(viewer2);
-        panel.add(split);
-        return panel;
+    public void setFrame(GenericFrame parentFrame) {
+        this.parentFrame = parentFrame;
+        resizePanel();
     }
 
     /**
@@ -176,7 +169,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
      * to be used with the data viewer.
      *
      */
-    public interface DataHolder {
+    public interface DataMatrix {
 
         /**
          * Set the data.
@@ -191,6 +184,13 @@ public class DataViewer extends SimbrainJTableScrollPanel {
          * @return the data to get
          */
         public double[][] getData();
+    }
+
+    /**
+     * @return the scroller
+     */
+    public SimbrainJTableScrollPanel getScroller() {
+        return scroller;
     }
 
 }

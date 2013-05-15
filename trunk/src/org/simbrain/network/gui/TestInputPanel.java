@@ -86,7 +86,7 @@ public class TestInputPanel extends JPanel {
         add("Center", scroller);
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JToolBar editRowToolBar = new JToolBar();
-        toolbar.add(table.getToolbarCSV());
+        toolbar.add(table.getToolbarCSV(true, false));
         toolbar.add(editRowToolBar);
         editRowToolBar.add(table.getToolbarEditRows());
         toolbar.add(table.getToolbarRandomize());

@@ -23,7 +23,6 @@ import java.util.Random;
 
 import javax.swing.JOptionPane;
 
-import org.simbrain.network.core.Synapse;
 import org.simbrain.util.Utils;
 
 import com.thoughtworks.xstream.XStream;
@@ -283,13 +282,28 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     }
 
     /**
-     * Read in stored dataset file as CVS File.
+     * Load a .csv file.
      *
      * @param file the CSV file
+     * @param allowRowChanges whether to allow data with a different number of
+     *            rows
+     * @param allowColumnChanges whether to allow data with a different number
+     *            of columns
+     * @throws Exception
      */
-    public void readData(final File file) {
+    public void readData(final File file, final boolean allowRowChanges,
+            final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
-        if (values[0].length == getColumnCount()) {
+
+        if (!allowRowChanges && values.length != getRowCount()) {
+            throw new TableDataException("Trying to import data with "
+                    + values.length + " rows into a table with "
+                    + getRowCount() + " rows.");
+        } else if (!allowColumnChanges && values[0].length != getColumnCount()) {
+            throw new TableDataException("Trying to import data with "
+                    + values[0].length + " columns into a table with "
+                    + getColumnCount() + " columns.");
+        } else {
             reset(values.length, values[0].length);
             for (int i = 0; i < values.length; i++) {
                 for (int j = 0; j < values[0].length; j++) {
@@ -304,13 +318,8 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
                     }
                 }
             }
-        } else {
-            JOptionPane.showOptionDialog(null,
-                    "Number of columns must equal the number of neurons.",
-                    "Warning", JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, null, null);
+            fireTableStructureChanged();
         }
-        fireTableStructureChanged();
     }
 
     /**
@@ -327,6 +336,24 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
             }
         }
         return returnList;
+    }
+
+    /**
+     * The wrong type of data is being read in to this table.
+     *
+     * @author jeffyoshimi
+     */
+    public class TableDataException extends RuntimeException {
+
+        /**
+         * Construct the exception.
+         *
+         * @param string message string
+         */
+        public TableDataException(String string) {
+            super(string);
+        }
+
     }
 
 }

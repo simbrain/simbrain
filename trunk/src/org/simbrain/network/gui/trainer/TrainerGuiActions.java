@@ -21,21 +21,21 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.table.NumericTable.TableDataException;
 import org.simbrain.util.table.SimbrainJTable;
 
 /**
@@ -70,23 +70,25 @@ public class TrainerGuiActions {
      * @return an action for opening this table
      */
     public static Action getEditDataAction(final NetworkPanel networkPanel,
-            final List<Neuron> neurons, final DataHolder dataHolder,
+            final List<Neuron> neurons, final DataMatrix dataHolder,
             final String name) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, "Edit " + name + " data..");
-                putValue(SHORT_DESCRIPTION, "Edit data...");
+                putValue(NAME, "Edit " + name + " Data...");
+                putValue(SHORT_DESCRIPTION, "Edit" + name + " Data...");
             }
 
             /**
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                networkPanel.displayPanel(DataViewer.createDataViewerPanel(
-                        neurons, dataHolder, name), "Edit " + name);
+                DataPanel panel = new DataPanel(neurons, dataHolder, name);
+                GenericFrame frame = networkPanel.displayPanel(panel, "Edit "
+                        + name);
+                panel.setFrame(frame);
             }
 
         };
@@ -101,33 +103,30 @@ public class TrainerGuiActions {
      *            output neurons
      * @param inputData access to input data via dataholder object
      * @param trainingData access to trainig data via dataholder object
-     * @return
+     * @return the action
      */
     public static Action getEditCombinedDataAction(
             final NetworkPanel networkPanel, final Trainable trainable,
-            final DataHolder inputData, final DataHolder trainingData) {
+            final DataMatrix inputData, final DataMatrix targetData) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, "Edit combined data...");
-                putValue(SHORT_DESCRIPTION, "Edit combined data...");
+                putValue(NAME, "Edit Training Set...");
+                putValue(SHORT_DESCRIPTION, "Edit Training Set...");
             }
 
             /**
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                JPanel inputPanel = DataViewer.createDataViewerPanel(
-                        trainable.getInputNeurons(), inputData, "Input data");
-                JPanel trainingPanel = DataViewer.createDataViewerPanel(
-                        trainable.getOutputNeurons(), trainingData,
-                        "Training data");
-                JPanel combinedPanel = DataViewer
-                        .createCombinedDataViewerPanel(inputPanel,
-                                trainingPanel);
-                networkPanel.displayPanel(combinedPanel, "Edit data");
+                TrainingSetPanel combinedPanel = new TrainingSetPanel(
+                        trainable.getInputNeurons(), inputData,
+                        trainable.getOutputNeurons(), targetData);
+                GenericFrame frame = networkPanel.displayPanel(combinedPanel,
+                        "Edit Training Set");
+                combinedPanel.setFrame(frame);
             }
 
         };
@@ -162,7 +161,7 @@ public class TrainerGuiActions {
      * @return the action for opening csv files
      */
     public static Action getOpenCSVAction(final SimbrainJTable table,
-            final DataHolder dataHolder) {
+            final DataMatrix dataHolder) {
         return new AbstractAction() {
 
             // Initialize
@@ -181,15 +180,19 @@ public class TrainerGuiActions {
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     try {
-                        ((NumericTable) table.getData()).readData(theFile);
+                        ((NumericTable) table.getData()).readData(theFile,
+                                true, false);
                         dataHolder.setData(((NumericTable) table.getData())
                                 .asDoubleArray());
-                        ((JFrame) table.getTopLevelAncestor()).setTitle(theFile
-                                .getName());
                     } catch (InvalidDataException exception) {
                         JOptionPane.showMessageDialog(null,
                                 exception.getMessage(), "Error",
                                 JOptionPane.ERROR_MESSAGE);
+                    } catch (TableDataException e) {
+                        JOptionPane.showOptionDialog(null,
+                                e.getMessage(),
+                                "Warning", JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
                 }
                 setDataDirectory(chooser.getCurrentLocation());
@@ -220,6 +223,7 @@ public class TrainerGuiActions {
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
                 editor.setUseSuperclass(false);
+                editor.setExcludeList(new String[] { "iteration" });
                 editor.setObject(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);

@@ -71,8 +71,10 @@ public class Histogram extends JPanel{
 	/** The default preferred width. */
 	private static final int DEFAULT_PREF_WIDTH = 500;
 	
+	/** The grid width of this panel, for use by possible parent panels. */
 	private static final int GRID_WIDTH = 3;
 	
+	/** The grid height of this panel, for use by possible parent panels. */
 	private static final int GRID_HEIGHT = 4;
 	
 	/** Constant Alpha value governing transparency of histogram colors. */
@@ -184,6 +186,7 @@ public class Histogram extends JPanel{
 		GridBagConstraints g = new GridBagConstraints();
 		g.weightx = 1.0;
 		g.weighty = 1.0;
+		g.fill = GridBagConstraints.BOTH;
 		mainPanel.add(cPanel, g);
 		initializeLayout();		
 		initializeListeners();
@@ -334,6 +337,7 @@ public class Histogram extends JPanel{
 		GridBagConstraints g = new GridBagConstraints();
 		g.weightx = 1.0;
 		g.weighty = 1.0;
+		g.fill = GridBagConstraints.BOTH;
 		mainPanel.add(cPanel, g);
 		mainPanel.revalidate();
 		mainPanel.repaint();

@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -56,7 +57,7 @@ import org.jfree.ui.RefineryUtilities;
 public class Histogram extends JPanel{
 
 	/** The default number of bins. **/
-	private static final int DEFAULT_BINS = 10;
+	public static final int DEFAULT_BINS = 10;
 	
 	/** 
 	 * The default (and maximum, unless otherwise changed) number of colors
@@ -72,19 +73,20 @@ public class Histogram extends JPanel{
 	private static final int DEFAULT_PREF_WIDTH = 500;
 	
 	/** The grid width of this panel, for use by possible parent panels. */
-	private static final int GRID_WIDTH = 3;
+	public static final int GRID_WIDTH = 3;
 	
 	/** The grid height of this panel, for use by possible parent panels. */
-	private static final int GRID_HEIGHT = 4;
+	public static final int GRID_HEIGHT = 4;
 	
 	/** Constant Alpha value governing transparency of histogram colors. */
-	private static final byte ALPHA = -0x50; 
+	public static final byte DEFAULT_ALPHA = -0x50; 
 	
 	/** The preferred dimensions of the histogram. */
 	private Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH, DEFAULT_PREF_HEIGHT);
 	
 	/** The color pallet, initialized to the default number of data sets. */
-	private Color [] pallet = new Color[DEFAULT_NUM_DATASETS];
+	public static final Color [] DEFAULT_PALLET =
+			new Color[DEFAULT_NUM_DATASETS];
 	
 	/**
 	 * 	The standard color pallet, Red, Blue, Green, Yellow.
@@ -95,21 +97,25 @@ public class Histogram extends JPanel{
 	 *	default alpha value, then shifted back and replaced with ALPHA.
 	 */
 	{
-		pallet[0] = new Color((Color.RED.getRGB() << 8) >>> 8 | ALPHA << 24,
-				true);
-		pallet[1] = new Color((Color.BLUE.getRGB() << 8) >>> 8 | ALPHA << 24,
-				true);
-		pallet[2] = new Color((Color.GREEN.getRGB() << 8) >>> 8 | ALPHA << 24,
-				true);
-		pallet[3] = new Color((Color.YELLOW.getRGB() << 8) >>> 8 | ALPHA << 24,
-				true);
+		DEFAULT_PALLET[0] = new Color((Color.RED.getRGB() << 8) >>> 8 |
+				DEFAULT_ALPHA << 24, true);
+		DEFAULT_PALLET[1] = new Color((Color.BLUE.getRGB() << 8) >>> 8 |
+				DEFAULT_ALPHA << 24, true);
+		DEFAULT_PALLET[2] = new Color((Color.GREEN.getRGB() << 8) >>> 8 |
+				DEFAULT_ALPHA << 24, true);
+		DEFAULT_PALLET[3] = new Color((Color.YELLOW.getRGB() << 8) >>> 8 |
+				DEFAULT_ALPHA << 24, true);
 	}
+	
+	/** The color pallet, initialized to the default number of data sets. */
+	private Color [] colorPallet = Arrays.copyOf(DEFAULT_PALLET,
+			DEFAULT_NUM_DATASETS);
 	
 	/** The main panel supporting the histogram chart. */
 	private JPanel mainPanel;
 	
 	/** The core chart supporting the actual histogram. */
-	JFreeChart mainChart = null;
+	private JFreeChart mainChart = null;
 	
 	/** The data set used to generate the histogram. */
 	private IntervalXYDataset dataSet;
@@ -178,7 +184,28 @@ public class Histogram extends JPanel{
 	 */
 	public Histogram(double [][] data, String [] dataNames, int bins,
 			String title, String xAxisName, String yAxisName) {
-
+		this(data, dataNames, bins, title, xAxisName, yAxisName, null);
+	}
+	
+	/**
+	 * Creates a histogram with the provided number of bins, data set(s),
+	 * data name(s), title, and x and y axis titles.
+	 * @param data the data set(s) to be plotted
+	 * @param dataNames the name(s) of the data set(s)
+	 * @param bins the number of bins used in the histogram
+	 * @param title the title of the histogram
+	 * @param xAxisName the title of the x axis
+	 * @param yAxisName the title of the y axis
+	 * @param pallet a custom color pallet
+	 */
+	public Histogram(double [][] data, String [] dataNames, int bins,
+			String title, String xAxisName, String yAxisName,
+			Color[] colorPallet) {
+		
+		if(colorPallet != null) {
+			this.colorPallet = colorPallet;
+		}
+		
 		this.data = data;
 		this.dataNames = dataNames;
 		this.bins = bins;
@@ -233,22 +260,25 @@ public class Histogram extends JPanel{
 						
 				mainChart = ChartFactory.createHistogram(
 						 title, xAxisName, yAxisName, dataSet,
-						 PlotOrientation.VERTICAL, true, true, false);		
+						 PlotOrientation.VERTICAL, true, true, false);	
+				mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
 				XYPlot plot = (XYPlot) mainChart.getPlot();
 				plot.setForegroundAlpha(0.75F);
 				XYBarRenderer renderer = (XYBarRenderer)plot.getRenderer(); 
 				renderer.setDrawBarOutline(false);	
-				renderer.setShadowVisible(false);
+				renderer.setShadowVisible(false);			
 				
 				for(int i = 0, n = data.length; i < n; i++) {
-					renderer.setSeriesPaint(i, pallet[i], true);
+					renderer.setSeriesPaint(i, colorPallet[i], true);
 				}
 				
 			} else {
 				
 				mainChart = ChartFactory.createHistogram(
 						 title, xAxisName, yAxisName, dataSet,
-						 PlotOrientation.VERTICAL, true, true, false);	
+						 PlotOrientation.VERTICAL, true, true, false);
+				mainChart.setBackgroundPaint(UIManager.
+						getColor("this.Background"));
 				
 			}
 			
@@ -374,7 +404,7 @@ public class Histogram extends JPanel{
 	private void sanityCheck(int bins, int numDataSeries) throws
 		IllegalArgumentException, IllegalStateException {
 		
-		if(numDataSeries > pallet.length) {
+		if(numDataSeries > colorPallet.length) {
 			throw new IllegalStateException("Quantity of data sets exceeds" +
 					" specified number of available pallet colors.");
 		}
@@ -456,8 +486,8 @@ public class Histogram extends JPanel{
 		this.dataSet = dataSet;
 	}
 
-	public Color[] getPallet() {
-		return pallet;
+	public Color [] getColorPallet() {
+		return colorPallet;
 	}
 
 	/**
@@ -470,14 +500,10 @@ public class Histogram extends JPanel{
 	 * consist of the alpha component. Specified colors must have an alpha
 	 * component, and should use the default ALPHA value specified here.
 	 * 
-	 * @param pallet the custom color pallet.
+	 * @param colorPallet the custom color pallet.
 	 */
-	public void setPallet(Color[] pallet) {
-		this.pallet = pallet;
-	}
-
-	public String getxAxisName() {
-		return xAxisName;
+	public void setColorPallet(Color [] colorPallet) {
+		this.colorPallet = colorPallet;
 	}
 
 	public void setxAxisName(String xAxisName) {
@@ -531,18 +557,6 @@ public class Histogram extends JPanel{
 		numBins.setText(Integer.toString(bins));
 	}
 
-	public static int getGridWidth() {
-		return GRID_WIDTH;
-	}
-
-	public static int getGridHeight() {
-		return GRID_HEIGHT;
-	}
-	
-	public static int getDefaultBins() {
-		return DEFAULT_BINS;
-	}
-
 	public static int getDefaultNumDatasets() {
 		return DEFAULT_NUM_DATASETS;
 	}
@@ -553,10 +567,6 @@ public class Histogram extends JPanel{
 
 	public static int getDefaultPrefWidth() {
 		return DEFAULT_PREF_WIDTH;
-	}
-
-	public static byte getAlpha() {
-		return ALPHA;
 	}
 
 	/****************************************************************
@@ -587,5 +597,7 @@ public class Histogram extends JPanel{
            bob.setVisible(true);         
 
 	}
+
+
 
 }

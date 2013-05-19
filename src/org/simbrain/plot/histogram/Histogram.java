@@ -87,7 +87,7 @@ public class Histogram extends JPanel{
 	private Color [] pallet = new Color[DEFAULT_NUM_DATASETS];
 	
 	/**
-	 * 	The standard color pallet, Red, Blue, Green, Yellow
+	 * 	The standard color pallet, Red, Blue, Green, Yellow.
 	 *	Colors are represented as a single integer where bits 0-7 
 	 *	consist of the blue component, bits 8-15 consist of the green
 	 *	component, bits 16-23 consist of the red component, and bits 24-31
@@ -107,6 +107,9 @@ public class Histogram extends JPanel{
 	
 	/** The main panel supporting the histogram chart. */
 	private JPanel mainPanel;
+	
+	/** The core chart supporting the actual histogram. */
+	JFreeChart mainChart = null;
 	
 	/** The data set used to generate the histogram. */
 	private IntervalXYDataset dataSet;
@@ -135,12 +138,12 @@ public class Histogram extends JPanel{
 	/** An array containing the names of each of the data series. */
 	private String [] dataNames;
 	
-	
+	/** The number of bins used by the histogram. */
 	private int bins;
 	
 	/** 
 	 * This flag is used for safety, minimum and maximum values are
-	 * determined assuming a sorted dataset.
+	 * determined assuming sorted data series.
 	 */
 	private boolean sortedFlag;
 	
@@ -152,26 +155,30 @@ public class Histogram extends JPanel{
 	}
 	
 	/**
-	 * Creates a blank histogram
-	 * @param data
-	 * @param dataNames
-	 * @param bins
+	 * Creates a histogram with the provided number of bins, data set(s),
+	 * and data name(s), but does not include titles for the histogram, the x
+	 * axis or the y axis.
+	 * @param data the data set(s) to be plotted
+	 * @param dataNames the name(s) of the data set(s)
+	 * @param bins the number of bins used in the histogram
 	 */
 	public Histogram(double [][] data, String [] dataNames, int bins) {
 		this(data, dataNames, bins, "", "", "");
 	}
 	
 	/**
-	 * 
-	 * @param data
-	 * @param dataNames
-	 * @param bins
-	 * @param title
-	 * @param xAxisName
-	 * @param yAxisName
+	 * Creates a histogram with the provided number of bins, data set(s),
+	 * data name(s), title, and x and y axis titles.
+	 * @param data the data set(s) to be plotted
+	 * @param dataNames the name(s) of the data set(s)
+	 * @param bins the number of bins used in the histogram
+	 * @param title the title of the histogram
+	 * @param xAxisName the title of the x axis
+	 * @param yAxisName the title of the y axis
 	 */
 	public Histogram(double [][] data, String [] dataNames, int bins,
 			String title, String xAxisName, String yAxisName) {
+
 		this.data = data;
 		this.dataNames = dataNames;
 		this.bins = bins;
@@ -179,6 +186,7 @@ public class Histogram extends JPanel{
 		this.xAxisName = xAxisName;
 		this.yAxisName = yAxisName;
 		numBins.setText(Integer.toString(bins));
+
 		mainPanel = new JPanel();
 		JPanel cPanel = new ChartPanel(createHistogram(data, dataNames, bins));
 		cPanel.setPreferredSize(dimPref);
@@ -188,34 +196,36 @@ public class Histogram extends JPanel{
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
 		mainPanel.add(cPanel, g);
+		
 		initializeLayout();		
 		initializeListeners();
+		
 	}
 	
 	/**
 	 * Draws the core histogram implemented as a JFreeChart. In addition to
 	 * reflecting the specified inputs, the created histogram will reflect any
 	 * changes to the titles of the histogram, x, and y axis. 
-	 * @param data the data series being represented, each row is interpreted
-	 *  as a distinct series.
-	 * @param dataNames the names of each of the data series
+	 * @param data the data set(s) being represented, each row is interpreted
+	 * as a distinct series.
+	 * @param dataNames the name(s) of each of the data series
 	 * @param bins the number of bins to be used for the histogram
-	 * @return the core histogram represented as a JFreeChart
+	 * @return the core histogram represented by a JFreeChart
 	 */
-	private JFreeChart createHistogram(double [][] data, String[] dataNames, int bins) {
+	private JFreeChart createHistogram(double [][] data, String[] dataNames, int bins) {	
 		
-		JFreeChart mainChart = null;
-		
-		try {		
+		try {
+			
 			dataSet = new HistogramDataset();
+
 			if(data != null){
-				
+
 				sanityCheck(bins, data.length);					
-				
+
 				for(int i = 0, n = data.length; i < n; i++) {
 					sort(data[i]);
-					double min = getMinValue(data[i]);
-					double max = getMaxValue(data[i]);
+					double min = minValue(data[i]);
+					double max = maxValue(data[i]);
 					sortedFlag = false;
 					((HistogramDataset) dataSet).addSeries(dataNames[i], data[i], bins,
 							min, max);
@@ -229,21 +239,23 @@ public class Histogram extends JPanel{
 				XYBarRenderer renderer = (XYBarRenderer)plot.getRenderer(); 
 				renderer.setDrawBarOutline(false);	
 				renderer.setShadowVisible(false);
-	
+				
 				for(int i = 0, n = data.length; i < n; i++) {
 					renderer.setSeriesPaint(i, pallet[i], true);
 				}
+				
 			} else {
+				
 				mainChart = ChartFactory.createHistogram(
 						 title, xAxisName, yAxisName, dataSet,
 						 PlotOrientation.VERTICAL, true, true, false);	
+				
 			}
 			
 		} catch (IllegalArgumentException iaEx) {	
 			iaEx.printStackTrace();
 			JOptionPane.showMessageDialog(getParent(), iaEx.getMessage(),
-					"Error", JOptionPane.ERROR_MESSAGE);
-			
+					"Error", JOptionPane.ERROR_MESSAGE);			
 		} catch (IllegalStateException isEx) {
 			isEx.printStackTrace();
 			JOptionPane.showMessageDialog(getParent(), isEx.getMessage(),
@@ -279,10 +291,9 @@ public class Histogram extends JPanel{
 		gbc.gridy = 3;
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridheight = 1;
-		gbc.gridwidth = 1;
+		gbc.gridwidth = 2;
 		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		
+		gbc.weighty = 0.0;	
 		JPanel binPanel = new JPanel();
 		binPanel.setLayout(new FlowLayout());
 		binPanel.add(numBinLabel);
@@ -290,8 +301,9 @@ public class Histogram extends JPanel{
 		
 		this.add(binPanel, gbc);
 		
-		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
+		gbc.gridx = 2;
+		gbc.gridwidth = 1;
 		
 		this.add(reHistogram, gbc);
 		
@@ -346,11 +358,18 @@ public class Histogram extends JPanel{
 	}
 	
 	/**
-	 * 
-	 * @param bins
-	 * @param numDataSeries
-	 * @throws IllegalArgumentException
-	 * @throws IllegalStateException
+	 * Checks to make sure of two things: 1) That the number of data series
+	 * requested for being plotted does not exceed the number of available 
+	 * pallet colors for representation (other classes can defined custom
+	 * pallets with more or less than the default color set), and 2) that the
+	 * number of bins does not exceed the preferred number of pixels available
+	 * to represent those bins and is non-zero and non-negative.
+	 * @param bins the specified/requested number of bins
+	 * @param numDataSeries the specified/requested number of data sets
+	 * @throws IllegalArgumentException if an invalid number of bins is
+	 * requested
+	 * @throws IllegalStateException if the number of data sets exceeds the
+	 * number of available colors in the pallet to represent them.
 	 */
 	private void sanityCheck(int bins, int numDataSeries) throws
 		IllegalArgumentException, IllegalStateException {
@@ -359,9 +378,10 @@ public class Histogram extends JPanel{
 			throw new IllegalStateException("Quantity of data sets exceeds" +
 					" specified number of available pallet colors.");
 		}
-		if(bins >= dimPref.getWidth()){
-			throw new IllegalArgumentException("Number of bins exceeds" +
-					" available pixels.");
+		if(bins >= dimPref.getWidth() || bins <= 0){
+			throw new IllegalArgumentException("Invalid number of bins." +
+					"Number of bins exceeds available pixels or is less" +
+					" than or equal to zero.");
 		}
 		
 	}		
@@ -369,38 +389,50 @@ public class Histogram extends JPanel{
 	/**
 	 * Sorts the data set. This must be used before getMaxValue(...) or
 	 * getMinValue(...) is used.
-	 * @param dataSet
+	 * @param dataSeries the data set to be sorted.
 	 */
-	private void sort(double dataSet []) {
-		Arrays.sort(dataSet);
+	private void sort(double dataSeries []) {
+		Arrays.sort(dataSeries);
 		sortedFlag = true;
 	}
 	
 	/**
 	 * Returns the max value from the data set by returning the last element 
 	 * of the sorted data set.
-	 * @param dataset
-	 * @return
+	 * @param dataSeries the data series being queried.
+	 * @return the maximum value of the data set, according to their natural
+	 * ordering as double-precision floating point values.
+	 * @throws IllegalStateException if the sorted flag has not been set to
+	 * true (indicating the data set is unsorted or data is being manipulated
+	 * in a way that breaks the contract of this class).
 	 */
-	private double getMaxValue(double [] dataset) {
+	private double maxValue(double [] dataSeries) throws
+		IllegalStateException {
 		if(sortedFlag) {
-			return dataset[dataset.length-1];
+			return dataSeries[dataSeries.length-1];
 		} else {
-			throw new IllegalStateException("Unsorted Dataset Exception");
+			throw new IllegalStateException("Unsorted Dataset or Improper" +
+					"Dataset Manipulation Exception");
 		}
 	}
 	
 	/**
-	 * Returns the min value from the data set by returning the first element
-	 * of the sorted data set.
-	 * @param dataset
-	 * @return
+	 * Returns the minimum value from the data set by returning the first
+	 * element of the sorted data set.
+	 * @param dataSeries the data series being queried.
+	 * @return the minimum value of the data set, according to their natural
+	 * ordering as double-precision floating point values.
+	 * @throws IllegalStateException if the sorted flag has not been set to
+	 * true (indicating the data set is unsorted or data is being manipulated
+	 * in a way that breaks the contract of this class).
 	 */
-	private double getMinValue(double [] dataset) {
+	private double minValue(double [] dataSeries) throws
+		IllegalStateException {
 		if(sortedFlag) {
-			return dataset[0];
+			return dataSeries[0];
 		} else {
-			throw new IllegalStateException("Unsorted Dataset Exception");
+			throw new IllegalStateException("Unsorted Dataset or Improper" +
+					"Dataset Manipulation Exception");
 		}
 	}
 	
@@ -428,6 +460,18 @@ public class Histogram extends JPanel{
 		return pallet;
 	}
 
+	/**
+	 * Set a custom color pallet for this histogram to allow more data series
+	 * to be represented or to alter the default colors. Colors specified in
+	 * the pallet should be interpretable as a bitwise representation. That is:
+	 * Colors ought to be represented as a single integer where bits 0-7 
+	 * consist of the blue component, bits 8-15 consist of the green
+	 * component, bits 16-23 consist of the red component, and bits 24-31
+	 * consist of the alpha component. Specified colors must have an alpha
+	 * component, and should use the default ALPHA value specified here.
+	 * 
+	 * @param pallet the custom color pallet.
+	 */
 	public void setPallet(Color[] pallet) {
 		this.pallet = pallet;
 	}
@@ -495,9 +539,30 @@ public class Histogram extends JPanel{
 		return GRID_HEIGHT;
 	}
 	
+	public static int getDefaultBins() {
+		return DEFAULT_BINS;
+	}
+
+	public static int getDefaultNumDatasets() {
+		return DEFAULT_NUM_DATASETS;
+	}
+
+	public static int getDefaultPrefHeight() {
+		return DEFAULT_PREF_HEIGHT;
+	}
+
+	public static int getDefaultPrefWidth() {
+		return DEFAULT_PREF_WIDTH;
+	}
+
+	public static byte getAlpha() {
+		return ALPHA;
+	}
+
 	/****************************************************************
 	 							Test Main
 	 ****************************************************************/
+	
 	public static void main(String[] args) {
 		
 		   double[][]  r = new double[2][1000];
@@ -513,9 +578,9 @@ public class Histogram extends JPanel{
            
            JFrame bob = new JFrame();
            
-           Histogram h = new Histogram(r, name, 50);
-   		 
-           
+           Histogram h = new Histogram(r, name, 50, "What?", "Platypuses",
+        		   "Manatees");
+   		       
            bob.setContentPane(h);
            bob.pack();
            RefineryUtilities.centerFrameOnScreen(bob);

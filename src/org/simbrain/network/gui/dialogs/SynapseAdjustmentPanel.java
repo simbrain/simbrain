@@ -32,25 +32,43 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.listeners.NetworkAdapter;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Panel for editing collections of synapses.
  *
  * @author Jeff Yoshimi
- *
  */
 public class SynapseAdjustmentPanel extends JPanel {
 
-    // TODO: Use user preferences?
+    // TODO: Use user preferences.
 
     /** Random source for randomizing. */
-    private Randomizer randomizer = new Randomizer();
+    final private Randomizer randomizer = new Randomizer();
 
     /** Random source for perturbing. */
-    private Randomizer perturber = new Randomizer();
+    final private Randomizer perturber = new Randomizer();
+
+    /** Display number of synapses being adjusted. */
+    final private JLabel numSynapses = new JLabel();
+
+    /** Display number of excitatory synapses being adjusted. */
+    final private JLabel numExcitatory = new JLabel();
+
+    /** Display number of inhibitory synapses being adjusted. */
+    final private JLabel numInhibitory = new JLabel();
+
+    /** Display mean value of the synapses. */
+    final private JLabel meanValue = new JLabel();
+
+    /** Display mean excitatory value of the synapses. */
+    final private JLabel excitatoryValue = new JLabel();
+
+    /** Display mean inhibitory value of the synapses. */
+    final private JLabel inhibitoryValue = new JLabel();
 
     /**
      * Construct the synapse editor panel.
@@ -72,53 +90,22 @@ public class SynapseAdjustmentPanel extends JPanel {
         // Useful? If so, for all?
 
         // Stats Panel
-        // TODO:Move below to separate methods and initialize so it's filled
-        // when opened
-        JPanel statsPanel = new JPanel(new GridLayout(3, 1));
+        JPanel statsPanel = new JPanel(new GridLayout(3, 2));
         statsPanel.setBorder(BorderFactory.createTitledBorder("Synapse Stats"));
-        final JLabel meanValue = new JLabel("Overall Mean:");
-        final JLabel excitatoryValue = new JLabel("Excitatory Mean:");
-        final JLabel inhibitoryValue = new JLabel("Inhibitory Mean:");
+        statsPanel.add(numSynapses);
         statsPanel.add(meanValue);
+        statsPanel.add(numExcitatory);
         statsPanel.add(excitatoryValue);
+        statsPanel.add(numInhibitory);
         statsPanel.add(inhibitoryValue);
         add("North", statsPanel);
-        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
-
+        networkPanel.getNetwork().addNetworkListener(new NetworkAdapter() {
             @Override
             public void networkChanged() {
-
-                // Mean
-                double overall = 0, positive = 0, negative = 0;
-                int overallCount = 0, positiveCount = 0, negativeCount = 0;
-                for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
-                    overall += synapse.getStrength();
-                    overallCount++;
-                    if (synapse.getStrength() > 0) {
-                        positive += synapse.getStrength();
-                        positiveCount++;
-                    } else if (synapse.getStrength() < 0) {
-                        negative += synapse.getStrength();
-                        negativeCount++;
-                    }
-                }
-                meanValue.setText("Overall Mean: " + overall / overallCount);
-                excitatoryValue.setText("Excitatory Mean: " + positive
-                        / positiveCount);
-                inhibitoryValue.setText("Inhibitory Mean: " + negative
-                        / negativeCount);
-
+                updateStatsPanel(networkPanel);
             }
-
-            @Override
-            public void neuronClampToggled() {
-            }
-
-            @Override
-            public void synapseClampToggled() {
-            }
-
         });
+        updateStatsPanel(networkPanel);
 
         // Center Panel
         LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -171,12 +158,75 @@ public class SynapseAdjustmentPanel extends JPanel {
             }
         });
 
+        // Decrease / Increase
+        final JTextField tfIncreaseDecrease= new JTextField(".1");
+        JButton increaseButton = new JButton("Increase");
+        mainPanel.addItem("Increase", increaseButton);
+        increaseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                double amount = Double.parseDouble(tfIncreaseDecrease.getText());
+                for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
+                    synapse.setStrength(synapse.getStrength()
+                            + synapse.getStrength() * amount);
+                }
+                networkPanel.getNetwork().fireNetworkChanged();
+            }
+        });
+        JButton decreaseButton = new JButton("Decrease");
+        mainPanel.addItem("Decrease", decreaseButton);
+        decreaseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                double amount = Double.parseDouble(tfIncreaseDecrease.getText());
+                for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
+                    synapse.setStrength(synapse.getStrength()
+                            - synapse.getStrength() * amount);
+                }
+                networkPanel.getNetwork().fireNetworkChanged();
+            }
+        });
+        mainPanel.addItem("Increase / Decrease percent", tfIncreaseDecrease);
+
         JTabbedPane bottomPanel = new JTabbedPane();
         bottomPanel.addTab("Randomizer", randomPanel);
         bottomPanel.addTab("Perturber", perturberPanel);
 
         this.add("South", bottomPanel);
 
+    }
+
+    /**
+     * Update the synapse statistics panel.
+     *
+     * @param networkPanel reference to the network panel whose selected
+     *            synapses are being adjusted.
+     */
+    private void updateStatsPanel(NetworkPanel networkPanel) {
+
+        // Mean
+        double overall = 0, positive = 0, negative = 0;
+        int positiveCount = 0, negativeCount = 0;
+        for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
+            overall += synapse.getStrength();
+            if (synapse.getStrength() > 0) {
+                positive += synapse.getStrength();
+                positiveCount++;
+            } else if (synapse.getStrength() < 0) {
+                negative += synapse.getStrength();
+                negativeCount++;
+            }
+        }
+        numSynapses.setText("Synapses: " + (positiveCount + negativeCount));
+        numExcitatory.setText("Excitatory: " + positiveCount);
+        numInhibitory.setText("Inhibitory: " + negativeCount);
+        meanValue.setText("Overall Mean: "
+                + SimbrainMath.roundDouble(overall
+                        / (positiveCount + negativeCount), 4));
+        excitatoryValue.setText("Excitatory Mean: "
+                + SimbrainMath.roundDouble(positive / positiveCount, 4));
+        inhibitoryValue.setText("Inhibitory Mean: "
+                + SimbrainMath.roundDouble(negative / negativeCount, 4));
     }
 
 }

@@ -43,9 +43,6 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Panel for editing collections of synapses. Updated first draft.
- * TODO: Create method which routes the correct list based on selected synapse
- * type to various methods in this class.
- * TODO: Have randomization/perturbation act only on selected synapse type(s).
  * TODO: Re-implement pruning, sparsity altering, possibly other plasticity
  * rules.
  *
@@ -275,9 +272,18 @@ public class SynapseAdjustmentPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 randomPanel.commitRandom(perturber);
+                String type = (String)synTypeSelector.getSelectedItem();
                 for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
-                    synapse.setStrength(synapse.getStrength()
+                	
+                	if (type == "Excitatory Only" && synapse.getStrength() < 0)      
+                		continue;
+                	
+                	if(type == "Inhibitory Only" && synapse.getStrength() > 0)
+                		continue;
+                	
+                	synapse.setStrength(synapse.getStrength()
                             + perturber.getRandom());
+                	
                 }
                 //Automatically extracts new weights, and updates stats and
                 //histogram
@@ -289,7 +295,14 @@ public class SynapseAdjustmentPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 randomPanel.commitRandom(randomizer);
+                String type = (String)synTypeSelector.getSelectedItem();
                 for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
+                	if (type == "Excitatory Only" && synapse.getStrength() < 0)      
+                		continue;
+                	
+                	if(type == "Inhibitory Only" && synapse.getStrength() > 0)
+                		continue;
+                	
                     synapse.setStrength(randomizer.getRandom());
                 }
                 //Automatically extracts new weights, and updates stats and
@@ -352,8 +365,6 @@ public class SynapseAdjustmentPanel extends JPanel {
      * inhibitory weight (absolute) values.
      */
     public double [][] extractWeightValues() { 	
-    	
-    	//TODO:Should the network keep track of inhibitory/excitatory synapses?
     	
     	int exWeights = 0;
     	int inWeights = 0;   	
@@ -552,7 +563,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 					c++;
 				}
 			}
-		} else if (type == "Excitatory Only") {
+		} else if (type == "Excitatory Only" && weights[0].length != 0) {
 			tot = weights[0].length;
 			data = new double[tot];
 			for(int j = 0; j < tot; j++) {
@@ -562,36 +573,39 @@ public class SynapseAdjustmentPanel extends JPanel {
 			}
 			
 		} else {
-			
-			tot = weights[1].length;
-			data = new double[tot];
-			for(int j = 0; j < tot; j++) {
-				double val = weights[1][j];
-				runningVal += val;
-				data[j] = val;
+			if(weights[1].length != 0){
+				tot = weights[1].length;
+				data = new double[tot];
+				for(int j = 0; j < tot; j++) {
+					double val = weights[1][j];
+					runningVal += val;
+					data[j] = val;
+				}
 			}
 			
 		}
 		
-    	double mean = runningVal/tot;
-    	stats[0] = mean;
-    	
-    	Arrays.sort(data);
-    	double median = 0;
-    	if(tot % 2 == 0) {
-    		median = (data[tot/2] + data[(tot/2) - 1])/2;
-    	} else {
-    		median = data[(int)Math.floor(tot/2)];
-    	}
-    	stats[1] = median;
-    	
-    	runningVal = 0;
-    	for(int i = 0; i < tot; i++) {
-    		runningVal += Math.pow((mean - data[i]), 2);
-    	}
-    	runningVal = runningVal/tot;
-    	double stdDev = Math.sqrt(runningVal);
-    	stats[2] = stdDev;
+		if(data != null){
+	    	double mean = runningVal/tot;
+	    	stats[0] = mean;
+	    	
+	    	Arrays.sort(data);
+	    	double median = 0;
+	    	if(tot % 2 == 0) {
+	    		median = (data[tot/2] + data[(tot/2) - 1])/2;
+	    	} else {
+	    		median = data[(int)Math.floor(tot/2)];
+	    	}
+	    	stats[1] = median;
+	    	
+	    	runningVal = 0;
+	    	for(int i = 0; i < tot; i++) {
+	    		runningVal += Math.pow((mean - data[i]), 2);
+	    	}
+	    	runningVal = runningVal/tot;
+	    	double stdDev = Math.sqrt(runningVal);
+	    	stats[2] = stdDev;	
+		}
     	
     	return stats;
     }

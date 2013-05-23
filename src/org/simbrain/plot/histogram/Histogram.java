@@ -239,29 +239,35 @@ public class Histogram extends JPanel{
 	 * @param bins the number of bins to be used for the histogram
 	 * @return the core histogram represented by a JFreeChart
 	 */
-	private JFreeChart createHistogram(double [][] data, String[] dataNames, int bins) {	
+	private JFreeChart createHistogram(double [][] data, String[] dataNames,
+			int bins) {	
 		
 		try {
 			
 			dataSet = new HistogramDataset();
+			
 
+			
 			if(data != null){
 
 				sanityCheck(bins, data.length);					
 
 				for(int i = 0, n = data.length; i < n; i++) {
-					sort(data[i]);
-					double min = minValue(data[i]);
-					double max = maxValue(data[i]);
-					sortedFlag = false;
-					((HistogramDataset) dataSet).addSeries(dataNames[i], data[i], bins,
-							min, max);
+					if(data[i].length != 0) {
+						sort(data[i]);
+						double min = minValue(data[i]);
+						double max = maxValue(data[i]);
+						sortedFlag = false;
+						((HistogramDataset) dataSet).addSeries(dataNames[i],
+								data[i], bins, min, max);
+					}
 				}	
 						
 				mainChart = ChartFactory.createHistogram(
 						 title, xAxisName, yAxisName, dataSet,
 						 PlotOrientation.VERTICAL, true, true, false);	
-				mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
+				mainChart.setBackgroundPaint(UIManager.
+						getColor("this.Background"));
 				XYPlot plot = (XYPlot) mainChart.getPlot();
 				plot.setForegroundAlpha(0.75F);
 				XYBarRenderer renderer = (XYBarRenderer)plot.getRenderer(); 

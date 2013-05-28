@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -131,6 +130,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
         editMenu.add(createClampMenu());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getTestInputAction());
         editMenu.addSeparator();
         // editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());

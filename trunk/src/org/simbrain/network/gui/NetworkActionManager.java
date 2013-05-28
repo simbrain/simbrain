@@ -79,6 +79,7 @@ import org.simbrain.network.gui.actions.ShowWeightsAction;
 import org.simbrain.network.gui.actions.SpaceHorizontalAction;
 import org.simbrain.network.gui.actions.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.StopNetworkAction;
+import org.simbrain.network.gui.actions.TestInputAction;
 import org.simbrain.network.gui.actions.TextEditModeAction;
 import org.simbrain.network.gui.actions.UngroupAction;
 import org.simbrain.network.gui.actions.WandEditModeAction;
@@ -296,6 +297,9 @@ public final class NetworkActionManager {
     /** Shows dialog to adjust connectivity. */
     private final Action showAdjustConnectivityDialog;
 
+    /** Test inputs to selected neurons */
+    private Action testInputAction;
+    
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -424,6 +428,7 @@ public final class NetworkActionManager {
                 networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
         showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
+        testInputAction = new TestInputAction(networkPanel);
     }
 
     /**
@@ -1059,4 +1064,10 @@ public final class NetworkActionManager {
         return showAdjustConnectivityDialog;
     }
 
+    /**
+     * @return the testInputAction
+     */
+    public Action getTestInputAction() {
+        return testInputAction;
+    }
 }

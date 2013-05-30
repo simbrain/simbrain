@@ -112,4 +112,11 @@ public abstract class Trainer {
         }
     }
 
+    /**
+     * @return the network
+     */
+    public Trainable getTrainableNetwork() {
+        return network;
+    }
+
 }

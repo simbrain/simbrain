@@ -46,6 +46,7 @@ public class BackpropCreationDialog extends StandardDialog {
     public BackpropCreationDialog(final NetworkPanel np) {
         networkPanel = np;
         init();
+        networkTopology.requestFocus();
     }
 
     /**
@@ -66,7 +67,7 @@ public class BackpropCreationDialog extends StandardDialog {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        networkTopology.setText("5,3,5");
+        networkTopology.setText("5,7,5");
     }
 
     /**
@@ -84,10 +85,11 @@ public class BackpropCreationDialog extends StandardDialog {
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
         // Create the layered network
-        networkPanel.getNetwork().addGroup(
-                new BackpropNetwork(networkPanel.getNetwork(), topology,
-                        lastClicked));
+        BackpropNetwork network = new BackpropNetwork(networkPanel.getNetwork(), topology,
+                lastClicked);
+        networkPanel.getNetwork().addGroup(network);
 
+        
         networkPanel.repaint();
         super.closeDialogOk();
     }

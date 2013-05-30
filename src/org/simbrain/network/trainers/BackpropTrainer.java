@@ -46,7 +46,7 @@ public class BackpropTrainer extends IterableTrainer {
     private int iteration;
 
     /** Current error. */
-    private double rmsError;
+    private double mse;
 
     /** Default learning rate. */
     private static final double DEFAULT_LEARNING_RATE = .25;
@@ -85,19 +85,21 @@ public class BackpropTrainer extends IterableTrainer {
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
         iteration = 0;
-        rmsError = 0;
+        mse = 0;
         // SimnetUtils.printLayers(layers);
     }
 
     // One pass through the training data
     @Override
     public void apply() {
-        rmsError = 0;
+        mse = 0;
+
         int numRows = getMinimumNumRows(network);
         int numInputs = network.getInputNeurons().size();
         // System.out.println("Data:" + numInputs + "/" + numRows);
 
         if ((numRows == 0) || (numInputs == 0)) {
+            // TODO: Throw warning
             return;
         }
 
@@ -105,8 +107,10 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Set activations on input layer
             for (int i = 0; i < numInputs; i++) {
-                network.getInputNeurons().get(i)
-                        .setActivation(network.getInputData()[row][i]);
+                network.getInputNeurons()
+                        .get(i)
+                        .setActivation(
+                                network.getTrainingSet().getInputData()[row][i]);
             }
 
             // Update network
@@ -134,9 +138,8 @@ public class BackpropTrainer extends IterableTrainer {
 
         }
 
-        // Update RMS error.
-        rmsError = Math.sqrt(rmsError
-                / (numRows * network.getOutputNeurons().size()));
+        // Update MSE
+        mse = mse / (numRows * network.getOutputNeurons().size());
         iteration++;
         fireErrorUpdated();
     }
@@ -159,11 +162,12 @@ public class BackpropTrainer extends IterableTrainer {
             if (i == layers.size() - 1) {
                 for (int j = 0; j < numOutputs; j++) {
                     Neuron outputNeuron = network.getOutputNeurons().get(j);
-                    double targetValue = network.getTrainingData()[row][j];
+                    double targetValue = network.getTrainingSet()
+                            .getTargetData()[row][j];
                     double outputError = targetValue
                             - outputNeuron.getActivation();
                     storeErrorAndDeltas(outputNeuron, outputError);
-                    rmsError += Math.pow(outputError, 2);
+                    mse += Math.pow(outputError, 2);
                 }
             } else {
                 for (Neuron hiddenLayerNeuron : layer) {
@@ -251,7 +255,7 @@ public class BackpropTrainer extends IterableTrainer {
      * {@inheritDoc}
      */
     public double getError() {
-        return rmsError;
+        return mse;
     }
 
     /**
@@ -301,12 +305,12 @@ public class BackpropTrainer extends IterableTrainer {
      * @return least number of rows
      */
     private int getMinimumNumRows(Trainable network) {
-        if ((network.getInputData() == null)
-                || (network.getTrainingData() == null)) {
+        if ((network.getTrainingSet().getInputData() == null)
+                || (network.getTrainingSet() == null)) {
             return 0;
         }
-        int inputRows = network.getInputData().length;
-        int targetRows = network.getTrainingData().length;
+        int inputRows = network.getTrainingSet().getInputData().length;
+        int targetRows = network.getTrainingSet().getTargetData().length;
         if (inputRows < targetRows) {
             return inputRows;
         } else {

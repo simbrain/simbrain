@@ -66,6 +66,8 @@ public interface GenericFrame {
 
     public Dimension getPreferredSize();
 
+    public void setPreferredSize(Dimension dim);
+
     public void setResizable(boolean b);
 
     public void setMaximizable(boolean b);

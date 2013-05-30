@@ -13,17 +13,16 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.List;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
+import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
@@ -36,23 +35,27 @@ public class TrainingSetPanel extends JPanel {
     /** Parent frame. */
     private GenericFrame parentFrame;
 
-    DataPanel inputPanel;
-    DataPanel targetPanel;
-    /**
-     * Construct the training set panel.
-     *
-     * TODO: This will change soon, since it will display a training set object.
-     */
-    public TrainingSetPanel(List<Neuron> inputNeurons,
-            final DataMatrix inputData, final List<Neuron> outputNeurons,
-            final DataMatrix targetData) {
+    /** Representation of input data. */
+    private DataPanel inputPanel;
 
-        inputPanel = new DataPanel(
-                inputNeurons, inputData, "Input data");
-        inputPanel.getScroller().setMaxVisibleColumns(4);
-        targetPanel = new DataPanel(
-                outputNeurons, targetData, "Input data");
-        targetPanel.getScroller().setMaxVisibleColumns(4);
+    /** Representation of target data. */
+    private DataPanel targetPanel;
+
+    /**
+     * Construct a new pane for displaying training sets.
+     *
+     * @param trainable the parent trainable object.
+     * @param numVisibleColumnsPerTable number of columns to make visible
+     *  in the input and target data tables.
+     */
+    public TrainingSetPanel(Trainable trainable, int numVisibleColumnsPerTable) {
+
+        inputPanel = new DataPanel(trainable.getInputNeurons(), trainable
+                .getTrainingSet().getInputDataMatrix(),
+                numVisibleColumnsPerTable, "Input data");
+        targetPanel = new DataPanel(trainable.getOutputNeurons(), trainable
+                .getTrainingSet().getTargetDataMatrix(),
+                numVisibleColumnsPerTable, "Target data");
 
         final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         inputPanel.setBorder(BorderFactory.createTitledBorder("Input data"));
@@ -61,37 +64,69 @@ public class TrainingSetPanel extends JPanel {
         split.setLeftComponent(inputPanel);
         split.setRightComponent(targetPanel);
         split.setResizeWeight(.5);
-        add(split);
         split.setBorder(null);
 
-//        addComponentListener(new ComponentAdapter() {
-//            public void componentResized(ComponentEvent evt) {
-//                resizePanels();
-//            }
-//        });
+        setLayout(new GridBagLayout());
+        GridBagConstraints wholePanelConstraints = new GridBagConstraints();
+        // wholePanelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        wholePanelConstraints.fill = GridBagConstraints.BOTH;
+        wholePanelConstraints.weightx = 0.5;
+        wholePanelConstraints.weighty = 0.5;
+        wholePanelConstraints.gridx = 0;
+        wholePanelConstraints.gridy = 0;
+        add(split, wholePanelConstraints);
+
+    }
+
+    /**
+     * Create a panel for use in testing.
+     */
+    public TrainingSetPanel() {
+
+        final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        // split.setDividerLocation(.5);
+        JPanel filler1 = new JPanel();
+        filler1.setBackground(Color.lightGray);
+        JPanel filler2 = new JPanel();
+        filler2.setBackground(Color.lightGray);
+        split.setLeftComponent(filler1);
+        split.setRightComponent(filler2);
+        split.setResizeWeight(.5);
+        split.setBorder(null);
+
+        setLayout(new GridBagLayout());
+        GridBagConstraints wholePanelConstraints = new GridBagConstraints();
+        // wholePanelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        wholePanelConstraints.fill = GridBagConstraints.BOTH;
+        wholePanelConstraints.weightx = 0.5;
+        wholePanelConstraints.weighty = 0.5;
+        wholePanelConstraints.gridx = 0;
+        wholePanelConstraints.gridy = 0;
+        add(split, wholePanelConstraints);
     }
 
     /**
      * Hacked code for resizing sub-panels as this panel is resized.
      */
     private void resizePanels() {
-        inputPanel.setPreferredSize(new Dimension(getWidth() / 2 - 20,
-                inputPanel.getHeight()));
-        inputPanel.revalidate();
-        targetPanel.setPreferredSize(new Dimension(getWidth() / 2 - 20,
-                targetPanel.getHeight()));
-        targetPanel.revalidate();
+        // inputPanel.setPreferredSize(new Dimension(getWidth() / 2 - 20,
+        // inputPanel.getHeight()));
+        // inputPanel.revalidate();
+        // targetPanel.setPreferredSize(new Dimension(getWidth() / 2 - 20,
+        // targetPanel.getHeight()));
+        // targetPanel.revalidate();
 
     }
 
     /**
-     * Set the frame.
+     * Set the frame. Used for dynamically resizing the internal frame as data
+     * changes. See DataPanel.java.
      *
      * @param frame frame to set
      */
     public void setFrame(GenericFrame frame) {
         parentFrame = frame;
-        //parentFrame.setResizable(false);
+        // parentFrame.setResizable(false);
         parentFrame.setMaximizable(false);
         inputPanel.setFrame(frame);
         targetPanel.setFrame(frame);

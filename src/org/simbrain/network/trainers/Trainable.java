@@ -30,25 +30,22 @@ public interface Trainable {
     /**
      * Returns the list of input neurons.
      *
-     * @return
+     * @return the list of input neurons.
      */
-    public List<Neuron> getInputNeurons();
+    List<Neuron> getInputNeurons();
 
     /**
-     * Returns the list of output neurons
+     * Returns the list of output neurons.
      *
-     * @return
+     * @return list of output neurons
      */
-    public List<Neuron> getOutputNeurons();
+    List<Neuron> getOutputNeurons();
 
     /**
-     * Return input data. Must be same number of columns as input neurons.
+     * Returns the the training set, which contains input and target data.
+     *
+     * @return the training set.
      */
-    public double[][] getInputData();
-
-    /**
-     * Return training data. Must be same number of columns as output neurons.
-     */
-    public double[][] getTrainingData();
+    TrainingSet getTrainingSet();
 
 }

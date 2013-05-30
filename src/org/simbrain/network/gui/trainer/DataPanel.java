@@ -14,15 +14,16 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -31,8 +32,8 @@ import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.util.table.TableActionManager;
 
 /**
- * Widget to display data used in training a neural network using supervised
- * learning.
+ * A simple wrapper for a jtable used to represent input and target data for
+ * neural networks.
  *
  * @author jyoshimi
  */
@@ -55,10 +56,11 @@ public class DataPanel extends JPanel {
      *
      * @param neurons neurons corresponding to columns
      * @param data the numerical data
+     * @param numVisibleColumns how many columns to try to make visible
      * @param name name for panel
      */
-    public DataPanel(final List<Neuron> neurons, final DataMatrix data,
-            final String name) {
+    public DataPanel(final List<Neuron> neurons, final NumericMatrix data,
+            final int numVisibleColumns, final String name) {
 
         // If no data exists, create it!
         if (data.getData() == null) {
@@ -78,7 +80,7 @@ public class DataPanel extends JPanel {
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
         scroller = new SimbrainJTableScrollPanel(table);
-        scroller.setMaxVisibleColumns(5);
+        scroller.setMaxVisibleColumns(numVisibleColumns);
 
         setLayout(new BorderLayout());
         add("Center", scroller);
@@ -100,7 +102,7 @@ public class DataPanel extends JPanel {
                 .add(TableActionManager.getInsertRowAction(table));
         editToolBar
                 .add(TableActionManager.getDeleteRowAction(table));
-        toolbars.add(editToolBar);
+        //toolbars.add(editToolBar);
 
         // Randomize tools
         toolbars.add(table.getToolbarRandomize());
@@ -147,43 +149,30 @@ public class DataPanel extends JPanel {
 
     /**
      * Resize the panel and parent frame.
+     *
+     * TODO: This method resizes the parent frame to the scroller height, and so
+     * ignores the added height of any additional components in the parent
+     * frame. There should be a way to get extraHeight = (ParentFrame.height -
+     * scroller.height) and then add that extraHeight to newHeight;
      */
     private void resizePanel() {
         scroller.resize();
+        int newHeight = scroller.getPreferredSize().height;
         if (parentFrame != null) {
-            parentFrame.setMaximumSize(parentFrame.getPreferredSize());
+            // Reset height of parent frame
+            parentFrame.setPreferredSize(new Dimension(parentFrame
+                    .getPreferredSize().width, newHeight));
             parentFrame.pack();
         }
     }
 
     /**
+     * Set the frame.  Used for dynamically resizing the internal frame.
+     *
      * @param parentFrame the parentFrame to set
      */
     public void setFrame(GenericFrame parentFrame) {
         this.parentFrame = parentFrame;
-        resizePanel();
-    }
-
-    /**
-     * Interface that indicates where the data is held in a class, and allows it
-     * to be used with the data viewer.
-     *
-     */
-    public interface DataMatrix {
-
-        /**
-         * Set the data.
-         *
-         * @param data the data to set
-         */
-        public void setData(double[][] data);
-
-        /**
-         * Get the data.
-         *
-         * @return the data to get
-         */
-        public double[][] getData();
     }
 
     /**
@@ -191,6 +180,20 @@ public class DataPanel extends JPanel {
      */
     public SimbrainJTableScrollPanel getScroller() {
         return scroller;
+    }
+
+    /**
+     * @return the table
+     */
+    public SimbrainJTable getTable() {
+        return table;
+    }
+
+    /**
+     * @param table the table to set
+     */
+    public void setTable(SimbrainJTable table) {
+        this.table = table;
     }
 
 }

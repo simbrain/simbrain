@@ -27,7 +27,6 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.gui.trainer.LMSIterativePanel;
 import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
@@ -36,17 +35,18 @@ import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * PNode representation of a group of a LMS network
+ * PNode representation of a group of a LMS network.
  *
  * @author jyoshimi
  */
 public class LMSNetworkNode extends SubnetworkNode {
 
     /**
-     * Create a layered network
+     * Create a layered network.
      *
      * @param networkPanel parent panel
      * @param group the layered network
@@ -90,33 +90,33 @@ public class LMSNetworkNode extends SubnetworkNode {
         final LMSNetwork lms = (LMSNetwork) getGroup();
 
         // Reference to the input data in the LMS
-        DataMatrix inputData = new DataMatrix() {
+        NumericMatrix inputData = new NumericMatrix() {
             @Override
             public void setData(double[][] data) {
-                lms.setInputData(data);
+                lms.getTrainingSet().setInputData(data);
             }
 
             @Override
             public double[][] getData() {
-                return lms.getInputData();
+                return lms.getTrainingSet().getInputData();
             }
 
         };
         // Reference to the training data in the LMS
-        DataMatrix trainingData = new DataMatrix() {
+        NumericMatrix trainingData = new NumericMatrix() {
             @Override
             public void setData(double[][] data) {
-                lms.setTrainingData(data);
+                lms.getTrainingSet().setTargetData(data);
             }
 
             @Override
             public double[][] getData() {
-                return lms.getTrainingData();
+                return lms.getTrainingSet().getTargetData();
             }
 
         };
         menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-                (Trainable) getGroup(), inputData, trainingData));
+                (Trainable) getGroup()));
         menu.addSeparator();
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 lms.getInputNeurons(), inputData, "Input"));

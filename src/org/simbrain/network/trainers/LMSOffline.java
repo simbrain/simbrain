@@ -101,10 +101,10 @@ public class LMSOffline extends Trainer {
         int index = 0;
         for (Neuron n : network.getOutputNeurons()) {
             if (n.getUpdateRule() instanceof SigmoidalRule) {
-                for (int i = 0; i < network.getTrainingData().length; i++) {
-                    network.getTrainingData()[i][index] = ((SigmoidalRule) n
-                            .getUpdateRule()).getInverse(
-                            network.getTrainingData()[i][index], n);
+                for (int i = 0; i < network.getTrainingSet().getTargetData().length; i++) {
+                    network.getTrainingSet().getTargetData()[i][index] = ((SigmoidalRule) n
+                            .getUpdateRule()).getInverse(network
+                            .getTrainingSet().getTargetData()[i][index], n);
                 }
             }
             index++;
@@ -127,8 +127,8 @@ public class LMSOffline extends Trainer {
      * Implements the Wiener-Hopf solution to LMS linear regression.
      */
     public void weinerHopfSolution(Trainable network) {
-        Matrix inputMatrix = new Matrix(network.getInputData());
-        Matrix trainingMatrix = new Matrix(network.getTrainingData());
+        Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
+        Matrix trainingMatrix = new Matrix(network.getTrainingSet().getTargetData());
 
         fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
         trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
@@ -172,8 +172,8 @@ public class LMSOffline extends Trainer {
      * Moore penrose.
      */
     public void moorePenroseSolution(Trainable network) {
-        Matrix inputMatrix = new Matrix(network.getInputData());
-        Matrix trainingMatrix = new Matrix(network.getTrainingData());
+        Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
+        Matrix trainingMatrix = new Matrix(network.getTrainingSet().getTargetData());
 
         fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse

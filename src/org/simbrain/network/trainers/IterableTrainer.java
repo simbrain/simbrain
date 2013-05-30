@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+
 /**
  * Superclass for all types of trainer which can be iterated and which return an
  * error when they are iterated.
@@ -31,8 +33,50 @@ public abstract class IterableTrainer extends Trainer {
     /** Listener list. */
     private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
 
-    /** Iteration number. */
+    /** Iteration number.  An epoch. */
     private int iteration;
+
+    /** Iterate through the dataset polling random rows. */ // TODO
+    private boolean stochasticIteration = false;
+
+    /** If used, stopped iterating if validation error is below this. */
+    private double validationErrorThreshold = .2;
+
+    /** If used, stop iterating if error is below this value. */
+    private double errorThreshold = .2;
+
+    /**
+     * When stopping condition is based on iterations, stop when iterations
+     * exceeds this value.
+     */
+    private int iterationsBeforeStopping = 1000;
+
+    /** Stopping condition. */
+    public enum StoppingCondition {
+        THERESHOLD_ERROR {
+            public String toString() {
+                return "Threshold error";
+            }
+        },
+        THRESHOLD_VALIDATION_ERROR {
+            public String toString() {
+                return "Threshold error in validation set";
+            }
+        },
+        NUM_ITERATIONS {
+            public String toString() {
+                return "Number of epochs";
+            }
+        },
+        NONE {
+            public String toString() {
+                return "None (keep going until manual stop)";
+            }
+        }
+    };
+
+    /** Current stopping condition. */
+    private StoppingCondition stoppingCondition = StoppingCondition.NONE;
 
     /**
      * Construct the iterable trainer.
@@ -44,39 +88,59 @@ public abstract class IterableTrainer extends Trainer {
     }
 
     /**
-     * Get the current error.
+     * Get the current MSE error.
      *
-     * @return the current error
+     * @return the current MSE error
      */
     public abstract double getError();
 
     /**
-     * Iterate the trainer for a set number of iterations.
-     *
-     * @param iterations
+     * Randomize the network being trained. Convenience method so guis wrapping
+     * trainers have access to network randomization when the user wishes to
+     * "restart" training.
      */
-    public void iterate(int iterations) {
-        fireTrainingBegin();
-        for (int i = 0; i < iterations; i++) {
-            apply();
-        }
-        fireTrainingEnd();
-    }
-
+    public abstract void randomize();
 
     /**
-     * Iterate the trainer until it is below a threshold. NOTE: Not yet used or
-     * tested.
+     * Get the current MSE error.
      *
-     * @param iterations
+     * @return the current MSE error
      */
-    public void iterateBelowThreshold(double threshold) {
+    public double getValidationError() {
+        return 0;
+    }
+
+    /**
+     * Iterate the training algorithm and stop iteration based on the selected
+     * stopping condition.
+     */
+    public void iterate() {
         fireTrainingBegin();
-        // TODO: Need some way of escaping... manually via a stop
-        // button or through a pre-set max iterations
-        while (getError() > threshold) {
+        switch (stoppingCondition) {
+        case NONE:
             apply();
+            break;
+        case NUM_ITERATIONS:
+            for (int i = 0; i < iterationsBeforeStopping; i++) {
+                if (updateCompleted) {
+                    break;
+                }
+                apply();
+            }
+            setUpdateCompleted(true);
+            break;
+        case THERESHOLD_ERROR:
+            do {
+                apply();
+            } while ((getError() > errorThreshold) && (!updateCompleted));
+            setUpdateCompleted(true);
+            break;
+        case THRESHOLD_VALIDATION_ERROR:
+            break;
+        default:
+            break;
         }
+
         fireTrainingEnd();
     }
 
@@ -159,5 +223,89 @@ public abstract class IterableTrainer extends Trainer {
         }
     }
 
+    /**
+     * @return the stoppingCondition
+     */
+    public StoppingCondition getStoppingCondition() {
+        return stoppingCondition;
+    }
+
+    /**
+     * @param stoppingCondition the stoppingCondition to set
+     */
+    public void setStoppingCondition(StoppingCondition stoppingCondition) {
+        this.stoppingCondition = stoppingCondition;
+    }
+
+    /**
+     * @return the iterationsBeforeStopping
+     */
+    public int getIterationsBeforeStopping() {
+        return iterationsBeforeStopping;
+    }
+
+    /**
+     * @param iterationsBeforeStopping the number of iterations before stopping.
+     */
+    public void setIterationsBeforeStopping(int iterationsBeforeStopping) {
+        this.iterationsBeforeStopping = iterationsBeforeStopping;
+    }
+
+
+    /**
+     * Returns the current solution type inside a comboboxwrapper. Used by
+     * preference dialog.
+     *
+     * @return the the comboBox
+     */
+    public ComboBoxWrapper getStoppingCond() {
+        return new ComboBoxWrapper() {
+            public Object getCurrentObject() {
+                return stoppingCondition;
+            }
+
+            public Object[] getObjects() {
+                return StoppingCondition.values();
+            }
+        };
+    }
+
+    /**
+     * Set the current stopping condition. Used by preference dialog.
+     *
+     * @param ComboBoxWrapper the current solution set up for combo box.
+     */
+    public void setStoppingCond(ComboBoxWrapper stoppingConditionWrapper) {
+        setStoppingCondition((StoppingCondition) stoppingConditionWrapper
+                .getCurrentObject());
+    }
+
+    /**
+     * @return the validationErrorThreshold
+     */
+    public double getValidationErrorThreshold() {
+        return validationErrorThreshold;
+    }
+
+    /**
+     * @param validationErrorThreshold the validationErrorThreshold to set
+     */
+    public void setValidationErrorThreshold(double validationErrorThreshold) {
+        this.validationErrorThreshold = validationErrorThreshold;
+    }
+
+    /**
+     * @return the errorThreshold
+     */
+    public double getErrorThreshold() {
+        return errorThreshold;
+    }
+
+    /**
+     * @param errorThreshold the errorThreshold to set
+     */
+    public void setErrorThreshold(double errorThreshold) {
+        this.errorThreshold = errorThreshold;
+    }
 
 }

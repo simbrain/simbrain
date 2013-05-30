@@ -15,11 +15,12 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.Trainable;
+import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 /**
@@ -29,7 +30,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
     /**
      * Create an ESN network.
-     *
+     * 
      * @param networkPanel parent panel
      * @param group the ESN
      */
@@ -83,33 +84,9 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.addSeparator();
 
         final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
+        final TrainingSet trainingSet =  new TrainingSet(esn.getInputData(), esn
+                .getTargetData());
 
-        // Reference to the input data in the ESN
-        DataMatrix inputData = new DataMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                esn.setInputData(data);
-            }
-
-            @Override
-            public double[][] getData() {
-                return esn.getInputData();
-            }
-
-        };
-        // Reference to the training data in the ESN
-        DataMatrix trainingData = new DataMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                esn.setTrainingData(data);
-            }
-
-            @Override
-            public double[][] getData() {
-                return esn.getTrainingData();
-            }
-
-        };
         menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
                 new Trainable() {
                     @Override
@@ -125,20 +102,17 @@ public class ESNNetworkNode extends SubnetworkNode {
                     }
 
                     @Override
-                    public double[][] getInputData() {
-                        return null;
+                    public TrainingSet getTrainingSet() {
+                        return trainingSet;
                     }
-
-                    @Override
-                    public double[][] getTrainingData() {
-                        return null;
-                    }
-                }, inputData, trainingData));
+                }));
 
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
-                .getInputLayer().getNeuronList(), inputData, "Input"));
+                .getInputLayer().getNeuronList(), trainingSet
+                .getInputDataMatrix(), "Input"));
         menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
-                .getOutputLayer().getNeuronList(), trainingData, "Target"));
+                .getOutputLayer().getNeuronList(), trainingSet
+                .getTargetDataMatrix(), "Target"));
         setContextMenu(menu);
     }
 

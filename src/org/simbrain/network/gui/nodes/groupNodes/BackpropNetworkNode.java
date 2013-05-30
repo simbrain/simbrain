@@ -28,8 +28,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.TestInputAction;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.BackpropTrainerPanel;
-import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
+import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
@@ -37,7 +36,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * PNode representation of a group of a backprop network
+ * PNode representation of a group of a backprop network.
  *
  * @author jyoshimi
  */
@@ -49,10 +48,12 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public BackpropNetworkNode(NetworkPanel networkPanel, BackpropNetwork group) {
+    public BackpropNetworkNode(final NetworkPanel networkPanel,
+            final BackpropNetwork group) {
         super(networkPanel, group);
         setInteractionBox(new BackpropInteractionBox(networkPanel));
         setContextMenu();
+
     }
 
     /**
@@ -99,46 +100,20 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainAction));
         menu.add(new JMenuItem(testInputAction));
         menu.addSeparator();
-
-        // Reference to the input data
-        DataMatrix inputData = new DataMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                network.setInputData(data);
-            }
-
-            @Override
-            public double[][] getData() {
-                return network.getInputData();
-            }
-
-        };
-        // Reference to the training data
-        DataMatrix trainingData = new DataMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                network.setTrainingData(data);
-            }
-
-            @Override
-            public double[][] getData() {
-                return network.getTrainingData();
-            }
-
-        };
         menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-                network, inputData, trainingData));
+                network));
         menu.addSeparator();
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                network.getInputNeurons(), inputData, "Input"));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                network.getOutputNeurons(), trainingData, "Target"));
-
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
+                .getInputNeurons(), network.getTrainingSet()
+                .getInputDataMatrix(), "Input"));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
+                .getOutputNeurons(), network.getTrainingSet()
+                .getTargetDataMatrix(), "Target"));
         setContextMenu(menu);
     }
 
     /**
-     * Action to train Backrop
+     * Action to train Backprop
      */
     private Action trainAction = new AbstractAction() {
 
@@ -152,7 +127,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             BackpropNetwork network = (BackpropNetwork) getGroup();
-            BackpropTrainerPanel trainingPanel = new BackpropTrainerPanel(
+            IterativeControlsPanel trainingPanel = new IterativeControlsPanel(
                     getNetworkPanel(), new BackpropTrainer(network,
                             network.getNeuronGroupsAsList()));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

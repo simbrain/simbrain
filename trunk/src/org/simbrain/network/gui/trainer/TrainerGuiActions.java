@@ -25,12 +25,12 @@ import javax.swing.JOptionPane;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.DataPanel.DataMatrix;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
@@ -70,7 +70,7 @@ public class TrainerGuiActions {
      * @return an action for opening this table
      */
     public static Action getEditDataAction(final NetworkPanel networkPanel,
-            final List<Neuron> neurons, final DataMatrix dataHolder,
+            final List<Neuron> neurons, final NumericMatrix dataHolder,
             final String name) {
         return new AbstractAction() {
 
@@ -85,7 +85,7 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                DataPanel panel = new DataPanel(neurons, dataHolder, name);
+                DataPanel panel = new DataPanel(neurons, dataHolder, 5, name);
                 GenericFrame frame = networkPanel.displayPanel(panel, "Edit "
                         + name);
                 panel.setFrame(frame);
@@ -101,13 +101,10 @@ public class TrainerGuiActions {
      * @param networkPanel the parent network panel.
      * @param trainable the trainable object providing access to input and
      *            output neurons
-     * @param inputData access to input data via dataholder object
-     * @param trainingData access to trainig data via dataholder object
      * @return the action
      */
     public static Action getEditCombinedDataAction(
-            final NetworkPanel networkPanel, final Trainable trainable,
-            final DataMatrix inputData, final DataMatrix targetData) {
+            final NetworkPanel networkPanel, final Trainable trainable) {
         return new AbstractAction() {
 
             // Initialize
@@ -122,8 +119,7 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 TrainingSetPanel combinedPanel = new TrainingSetPanel(
-                        trainable.getInputNeurons(), inputData,
-                        trainable.getOutputNeurons(), targetData);
+                        trainable, 5);
                 GenericFrame frame = networkPanel.displayPanel(combinedPanel,
                         "Edit Training Set");
                 combinedPanel.setFrame(frame);
@@ -161,7 +157,7 @@ public class TrainerGuiActions {
      * @return the action for opening csv files
      */
     public static Action getOpenCSVAction(final SimbrainJTable table,
-            final DataMatrix dataHolder) {
+            final NumericMatrix dataHolder) {
         return new AbstractAction() {
 
             // Initialize
@@ -222,8 +218,8 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-                editor.setUseSuperclass(false);
-                editor.setExcludeList(new String[] { "iteration" });
+                editor.setExcludeList(new String[] { "iteration",
+                        "updateCompleted" });
                 editor.setObject(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);

@@ -19,24 +19,28 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
+import org.simbrain.network.trainers.TrainingSet;
 
 /**
- * An LMS Network
+ * A Least Mean Squares network.
  *
  * @author Jeff Yoshimi
  */
 public class LMSNetwork extends FeedForward implements Trainable {
 
-    /**
-     * Input data.
-     */
-    private double[][] inputData;
 
     /**
-     * Training Data
+     * Training set.
      */
-    private double[][] trainingData;
+    private final TrainingSet trainingSet = new TrainingSet();
 
+    /**
+     * Construct a new LMS Network.
+     * @param network the parent network
+     * @param numInputNeurons number of input neurons
+     * @param numOutputNeurons number of output neurons
+     * @param initialPosition initial location of the network
+     */
     public LMSNetwork(final Network network, int numInputNeurons,
             int numOutputNeurons, Point2D initialPosition) {
         super(network, new int[] { numInputNeurons, numOutputNeurons },
@@ -46,32 +50,8 @@ public class LMSNetwork extends FeedForward implements Trainable {
     }
 
     @Override
-    public double[][] getInputData() {
-        return inputData;
-    }
-
-    @Override
-    public double[][] getTrainingData() {
-        return trainingData;
-    }
-
-    /**
-     * Set the input data.
-     *
-     * @param inputData the data to set.
-     */
-    public void setInputData(double[][] inputData) {
-        this.inputData = inputData;
-
-    }
-
-    /**
-     * Set the training data.
-     *
-     * @param trainingData the data to set
-     */
-    public void setTrainingData(double[][] trainingData) {
-        this.trainingData = trainingData;
+    public TrainingSet getTrainingSet() {
+        return trainingSet;
     }
 
 }

@@ -64,7 +64,7 @@ public class LMSIterative extends IterableTrainer {
         rmsError = 0;
 
         // Set local variables
-        int numRows = network.getInputData().length;
+        int numRows = network.getTrainingSet().getInputData().length;
         int numInputs = network.getInputNeurons().size();
         int numOutputs = network.getOutputNeurons().size();
 
@@ -74,7 +74,7 @@ public class LMSIterative extends IterableTrainer {
             // Set input layer values
             for (int i = 0; i < numInputs; i++) {
                 network.getInputNeurons().get(i)
-                        .setActivation(network.getInputData()[row][i]);
+                        .setActivation(network.getTrainingSet().getInputData()[row][i]);
             }
 
             // Update output node
@@ -85,7 +85,7 @@ public class LMSIterative extends IterableTrainer {
 
                 // Get target neuron and compute error
                 Neuron outputNeuron = network.getOutputNeurons().get(i);
-                double targetValue = network.getTrainingData()[row][i];
+                double targetValue = network.getTrainingSet().getTargetData()[row][i];
                 double error = targetValue - outputNeuron.getActivation();
                 rmsError += (error * error); // TODO: Validate rmse
 
@@ -110,7 +110,7 @@ public class LMSIterative extends IterableTrainer {
                         .getUpdateRule();
                 bias.setBias(bias.getBias() + (learningRate * error));
             }
-            rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
+            rmsError = rmsError / (numInputs * numOutputs);
         }
         fireErrorUpdated();
         incrementIteration();

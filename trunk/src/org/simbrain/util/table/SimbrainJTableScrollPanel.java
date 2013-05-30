@@ -26,8 +26,9 @@ import javax.swing.JTable;
 /**
  * A scroll panel for a jtable, which sizes itself to fit whatever data it
  * shows. The rule is: if there are fewer rows or columns than the user
- * specifies, "shrink to fit", otherwise set the panel to a specified maximum
- * size.
+ * specifies, "shrink to fit"; otherwise set the panel to a specified maximum
+ * size. Maintain fixed size for column widths and row heights, except for the
+ * first column.
  *
  * @author jyoshimi
  */
@@ -43,7 +44,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     private static final int DEFAULT_MAX_COLS = 6;
 
     /** Default column width. */
-    private static final int DEFAULT_MAX_ROWS = 21;
+    private static final int DEFAULT_MAX_ROWS = 25;
 
     /** How wide to make columns. */
     private int columnWidth = DEFAULT_COLUMN_WIDTH;
@@ -106,16 +107,16 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         }
 
         // Set height of scrollpane based on number of rows
+        //  Add 1 to numrows for header row
         int rows = jtable.getData().getRowCount() + 1;
         if (rows < maxVisibleRows) {
             height = rows * rowHeight;
         } else {
-            height = maxVisibleRows * rowHeight;
+            height = (maxVisibleRows + 1) * rowHeight;
         }
 
         setPreferredSize(new Dimension(width, height));
         revalidate();
-
     }
 
     /**
@@ -148,9 +149,5 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         resize();
     }
 
-//    @Override
-//    public void repaint() {
-//        super.repaint();
-//    }
 
 }

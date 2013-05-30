@@ -38,6 +38,7 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
+import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
@@ -121,14 +122,17 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Input data. The sequence of inputs to be fed to the ESN's input layer.
+     * Note that this is not the same as the input data used by the underlying
+     * classifier (embedded in the trainable object created when getTrainer is
+     * called).
      */
     private double[][] inputData;
 
     /**
-     * Training Data. The desired sequence of inputs from the ESN's output
+     * Target Data. The desired sequence of inputs from the ESN's output
      * layer.
      */
-    private double[][] trainingData;
+    private double[][] targetData;
 
     /**
      * Constructor with size of layers specified.
@@ -284,7 +288,7 @@ public class EchoStateNetwork extends Subnetwork {
     public Trainer getTrainer() {
 
         // Exception if training data is not set properly at this point
-        if (trainingData[0].length != outputLayer.getNeuronList().size()) {
+        if (targetData[0].length != outputLayer.getNeuronList().size()) {
             throw new IllegalArgumentException("Output data length does not "
                     + "match the number of output nodes");
         }
@@ -311,10 +315,10 @@ public class EchoStateNetwork extends Subnetwork {
         // in to the sigmoidal it will produce the desired output.
         for (Neuron n : outputLayer.getNeuronList()) {
             if (n.getUpdateRule() instanceof SigmoidalRule) {
-                for (int i = 0; i < trainingData.length; i++) {
+                for (int i = 0; i < targetData.length; i++) {
                     int col = outputLayer.getNeuronList().indexOf(n);
-                    trainingData[i][col] = ((SigmoidalRule) n.getUpdateRule())
-                            .getInverse(trainingData[i][col], n);
+                    targetData[i][col] = ((SigmoidalRule) n.getUpdateRule())
+                            .getInverse(targetData[i][col], n);
                 }
             }
         }
@@ -332,8 +336,11 @@ public class EchoStateNetwork extends Subnetwork {
                 return getOutputLayer().getNeuronList();
             }
 
+
             @Override
-            public double[][] getInputData() {
+            public TrainingSet getTrainingSet() {
+
+                // Below from getInputData
                 // Harvest the reservoir states
                 final double[][] harvestedData = harvestData();
                 if (harvestedData[0].length != full.size()) {
@@ -343,12 +350,11 @@ public class EchoStateNetwork extends Subnetwork {
                 }
                 // System.out.println("-------");
                 // System.out.println(Utils.doubleMatrixToString(mainInputData));
-                return harvestedData;
-            }
+                TrainingSet trainingSet = new TrainingSet();
+                trainingSet.setInputData(harvestedData);
+                trainingSet.setTargetData(targetData);
 
-            @Override
-            public double[][] getTrainingData() {
-                return trainingData;
+                return trainingSet;
             }
 
         };
@@ -415,7 +421,7 @@ public class EchoStateNetwork extends Subnetwork {
                     for (Neuron neuron : getOutputLayer().getNeuronList()) {
                         // Teacher forcing
                         if (row > 0) {
-                            clampValue = trainingData[row - 1][count];
+                            clampValue = targetData[row - 1][count];
                         }
                         neuron.setActivation(clampValue);
                         count++;
@@ -444,9 +450,9 @@ public class EchoStateNetwork extends Subnetwork {
                 // Add output states to state matrix if there are recurrent
                 // outputs
                 if (recurrentOutWeights && harvest) {
-                    for (int i = 0; i < trainingData[0].length; i++) {
+                    for (int i = 0; i < targetData[0].length; i++) {
                         // Teacher-forcing
-                        returnMatrix[row][col] = trainingData[row][i];
+                        returnMatrix[row][col] = targetData[row][i];
                         col++;
                     }
                 }
@@ -467,7 +473,7 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Set spectral radius
+     * Set spectral radius.
      *
      * @param spectralRadius the spectral radius
      */
@@ -557,17 +563,17 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * @return the trainingData
+     * @return the targetData
      */
-    public double[][] getTrainingData() {
-        return trainingData;
+    public double[][] getTargetData() {
+        return targetData;
     }
 
     /**
-     * @param trainingData the trainingData to set
+     * @param targetData the targetData to set
      */
-    public void setTrainingData(double[][] trainingData) {
-        this.trainingData = trainingData;
+    public void setTrainingData(double[][] targetData) {
+        this.targetData = targetData;
     }
 
     /**

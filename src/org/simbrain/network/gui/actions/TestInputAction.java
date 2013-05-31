@@ -171,9 +171,11 @@ public class TestInputAction extends AbstractAction {
         toolbar.add(table.getToolbarRandomize());
         JButton test = new JButton(testRowAction);
         JButton advance = new JButton(advanceRowAction);
+        JButton testTable = new JButton(testTableAction);
         JToolBar testToolBar = new JToolBar();
         testToolBar.add(test);
         testToolBar.add(advance);
+        testToolBar.add(testTable);
         toolbar.add(testToolBar);
         testInputPanel.add("North", toolbar);
     }
@@ -201,7 +203,7 @@ public class TestInputAction extends AbstractAction {
     private Action testRowAction = new AbstractAction() {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-            putValue(SHORT_DESCRIPTION, "Test network");
+            putValue(SHORT_DESCRIPTION, "Test row");
         }
 
         /**
@@ -213,11 +215,31 @@ public class TestInputAction extends AbstractAction {
     };
 
     /**
+     * Action to test the entire table.
+     */
+    private Action testTableAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            putValue(SHORT_DESCRIPTION, "Test table");
+        }
+
+        /**
+         * {@ineritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            testTable();
+        }
+    };
+
+    /**
      * Advances the row to test.
      */
     private void advanceRow() {
         ((NumericTable) table.getData()).updateCurrentRow();
         table.updateRowSelection();
+        table.scrollRectToVisible(table.getCellRect(
+                ((NumericTable) table.getData()).getCurrentRow(),
+                table.getColumnCount(), true));
     }
 
     /**
@@ -239,6 +261,20 @@ public class TestInputAction extends AbstractAction {
         } else {
             inputNeurons.get(0).getParentNetwork().update();
             inputNeurons.get(0).getParentNetwork().fireNetworkChanged();
+        }
+    }
+
+    /**
+     * Advance through the entire table and test each row.
+     */
+    private void testTable() {
+        for (int j = 0; j < ((NumericTable) table.getData()).getRowCount(); j++)
+        {
+            ((NumericTable) table.getData()).setCurrentRow(j);
+            table.scrollRectToVisible(table.getCellRect(
+                    ((NumericTable) table.getData()).getCurrentRow(),
+                    table.getColumnCount(), true));
+            testRow();
         }
     }
 

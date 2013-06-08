@@ -48,19 +48,22 @@ public abstract class Trainer {
 
     /**
      * Apply the algorithm.
+     *
+     * @throws DataNotInitializedException when input or target data have not
+     *             been set.
      */
-    public abstract void apply();
+    public abstract void apply() throws DataNotInitializedException;
 
     /**
      * Add a trainer listener.
      *
      * @param trainerListener the listener to add
      */
-    public void addListener(final TrainerListener eventListener) {
+    public void addListener(final TrainerListener trainerListener) {
         if (listeners == null) {
             listeners = new ArrayList<TrainerListener>();
         }
-        listeners.add(eventListener);
+        listeners.add(trainerListener);
     }
 
     /**
@@ -68,9 +71,9 @@ public abstract class Trainer {
      *
      * @param trainerListener the listener to add
      */
-    public void removeListener(final TrainerListener eventListener) {
+    public void removeListener(final TrainerListener trainerListener) {
         if (listeners != null) {
-            listeners.remove(eventListener);
+            listeners.remove(trainerListener);
         }
     }
 
@@ -117,6 +120,24 @@ public abstract class Trainer {
      */
     public Trainable getTrainableNetwork() {
         return network;
+    }
+
+    /**
+     * Exception thrown when a training algorithm is applied but no data have
+     * been initialized.
+     *
+     * @author jyoshimi
+     *
+     */
+    public class DataNotInitializedException extends Exception {
+
+        /**
+         * @param message error message
+         */
+        public DataNotInitializedException(final String message) {
+            super(message);
+        }
+
     }
 
 }

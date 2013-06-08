@@ -22,13 +22,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.TestInputAction;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.IterativeControlsPanel;
+import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
@@ -100,15 +101,19 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainAction));
         menu.add(new JMenuItem(testInputAction));
         menu.addSeparator();
-        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+        JMenu dataActions = new JMenu("View / Edit Data");
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
                 network));
-        menu.addSeparator();
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
+        dataActions.addSeparator();
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
                 .getInputNeurons(), network.getTrainingSet()
                 .getInputDataMatrix(), "Input"));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
                 .getOutputNeurons(), network.getTrainingSet()
                 .getTargetDataMatrix(), "Target"));
+        menu.add(dataActions);
+
+
         setContextMenu(menu);
     }
 
@@ -127,7 +132,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             BackpropNetwork network = (BackpropNetwork) getGroup();
-            IterativeControlsPanel trainingPanel = new IterativeControlsPanel(
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new BackpropTrainer(network,
                             network.getNeuronGroupsAsList()));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

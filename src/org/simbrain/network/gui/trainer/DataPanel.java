@@ -52,7 +52,8 @@ public class DataPanel extends JPanel {
     private GenericFrame parentFrame;
 
     /**
-     * Panel which represents input or target data.
+     * Panel which represents input or target data. Can be created without
+     * data initially, in which case a default dataset is created.
      *
      * @param neurons neurons corresponding to columns
      * @param data the numerical data

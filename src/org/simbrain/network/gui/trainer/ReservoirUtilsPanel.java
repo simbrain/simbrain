@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.trainer;
 
 import java.awt.Color;
@@ -7,20 +25,19 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
-import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.randomizer.Randomizer;
 
+/**
+ * Panel displaying controls specific to reservoir computing.
+ */
 public class ReservoirUtilsPanel extends JPanel {
-
-    /** The title of the panel. */
-    private TitledBorder title = BorderFactory.createTitledBorder("Noise");
 
     // TODO: change to more general ReservoirNetwork, when LSMs are added
     /** The esn being set. */
@@ -32,9 +49,6 @@ public class ReservoirUtilsPanel extends JPanel {
     /** A panel for setting random values. */
     private RandomPanelNetwork randomPanel = new RandomPanelNetwork(true);
 
-    /** A reference to the parent panel. */
-    private JPanel trainerPanel;
-
     /** Enables noise. */
     private JButton enableNoise = new JButton();
 
@@ -44,22 +58,25 @@ public class ReservoirUtilsPanel extends JPanel {
     /** Commits changes made in the random panel. */
     private JButton noiseButton = new JButton("Apply");
 
-    /** Contraints on the layout made accessable to all methods. */
+    /** Constraints on the layout made accessible to all methods. */
     private GridBagConstraints gbc = new GridBagConstraints();
+
+    /** The parent frame. */
+    private GenericFrame frame;
 
     /**
      * The constructor, requiring both a reference to an esn and the parent
      * trainer panel.
      *
-     * @param trainerPanel the parent trainer panel
      * @param esn the esn where state noise is being injected.
      */
-    public ReservoirUtilsPanel(JPanel trainerPanel, EchoStateNetwork esn) {
-        this.trainerPanel = trainerPanel;
+    public ReservoirUtilsPanel(EchoStateNetwork esn) {
         this.esn = esn;
         this.setLayout(new GridBagLayout());
-        this.setBorder(title);
+        //this.setBorder(title);
         randomSource = esn.getNoiseGenerator();
+
+
         noiseEnabled = false;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -77,11 +94,11 @@ public class ReservoirUtilsPanel extends JPanel {
                 if (noiseEnabled) {
                     noiseEnabled = false;
                     paintNoiseDisabled();
-                    ((ESNTrainingPanel) trainerPanel).getGenericParent().pack();
+                    frame.pack();
                 } else {
                     noiseEnabled = true;
                     paintNoiseEnabled();
-                    ((ESNTrainingPanel) trainerPanel).getGenericParent().pack();
+                    frame.pack();
                 }
 
                 esn.setNoise(noiseEnabled);
@@ -106,21 +123,33 @@ public class ReservoirUtilsPanel extends JPanel {
      */
     private void paintNoiseEnabled() {
         clearAll();
+        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        this.add(new JLabel("Noise"), gbc);
+
+        gbc.gridy = 1;
+        gbc.gridx = 2;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         enableNoise.setText("On");
         enableNoise.setForeground(Color.green);
         this.add(enableNoise, gbc);
-        gbc.gridy += 1;
-        gbc.gridx = 0;
+
+        gbc.gridy = 1;
+        gbc.gridx = 3;
         gbc.gridwidth = 2;
         gbc.gridheight = 6;
         gbc.weightx = 1;
         gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.CENTER;
+        randomPanel.fillFieldValues(randomSource);
         this.add(randomPanel, gbc);
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         gbc.gridy = 20;
-        gbc.gridx = 2;
+        gbc.gridx = 4;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.NORTHEAST;
         this.add(noiseButton, gbc);
@@ -132,8 +161,18 @@ public class ReservoirUtilsPanel extends JPanel {
      */
     private void paintNoiseDisabled() {
         clearAll();
+        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        this.add(new JLabel("Noise"), gbc);
+
         enableNoise.setText("Off");
         enableNoise.setForeground(Color.red);
+        gbc.gridy = 1;
+        gbc.gridx = 2;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         this.add(enableNoise, gbc);
         this.repaint();
     }
@@ -160,5 +199,13 @@ public class ReservoirUtilsPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.NORTHWEST;
     }
+
+    /**
+     * @param frame the parentFrame to set
+     */
+    public void setFrame(GenericFrame frame) {
+        this.frame = frame;
+    }
+
 
 }

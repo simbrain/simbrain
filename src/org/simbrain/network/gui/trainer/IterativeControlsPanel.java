@@ -32,6 +32,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
@@ -40,6 +41,7 @@ import javax.swing.SwingConstants;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimpleFrame;
@@ -47,8 +49,11 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * Component for choosing what kind of supervised learning to use. Can be
- * initialized with a set or trainer types.
+ * The main controller panel for iterative learning, with buttons etc. to run
+ * the trainer. Wraps a trainer object. Used in conjunction with a training set
+ * panel in the iterative training panel.
+ *
+ * Iterative abstracts over different iterative algorithms, via IterableTrainer.
  *
  * @author Jeff Yoshimi
  */
@@ -57,20 +62,14 @@ public class IterativeControlsPanel extends JPanel {
     /** Reference to trainer object. */
     private final IterableTrainer trainer;
 
-    /** Reference to training set panel. */
-    private final TrainingSetPanel trainingSetPanel;
-
     /** Current number of iterations. */
     private JLabel iterationsLabel = new JLabel("--- ");
 
-       /** Reference to network panel. */
+    /** Reference to network panel. */
     private final NetworkPanel panel;
 
     /** Flag for showing updates in GUI. */
     private final JCheckBox showUpdates = new JCheckBox("Show updates");
-
-    /** Parent frame. */
-    private GenericFrame parentFrame;
 
     /** Error progress bar. */
     private JProgressBar errorBar;
@@ -92,8 +91,8 @@ public class IterativeControlsPanel extends JPanel {
 
         this.trainer = trainer;
         this.panel = networkPanel;
-        JPanel controlPanel = new JPanel(new GridBagLayout());
-        controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
+        setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createTitledBorder("Controls"));
         GridBagConstraints controlPanelConstraints = new GridBagConstraints();
 
         // Run Tools
@@ -104,7 +103,7 @@ public class IterativeControlsPanel extends JPanel {
         controlPanelConstraints.weightx = 0.5;
         controlPanelConstraints.gridx = 0;
         controlPanelConstraints.gridy = 0;
-        controlPanel.add(runTools, controlPanelConstraints);
+        add(runTools, controlPanelConstraints);
 
         // Separator
         controlPanelConstraints.weightx = 1;
@@ -114,7 +113,7 @@ public class IterativeControlsPanel extends JPanel {
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setPreferredSize(new Dimension(200, 15));
         // separator.setBackground(Color.red);
-        controlPanel.add(separator, controlPanelConstraints);
+        add(separator, controlPanelConstraints);
 
         // Labels
         LabelledItemPanel labelPanel = new LabelledItemPanel();
@@ -129,7 +128,7 @@ public class IterativeControlsPanel extends JPanel {
         controlPanelConstraints.weightx = 0.5;
         controlPanelConstraints.gridx = 0;
         controlPanelConstraints.gridy = 2;
-        controlPanel.add(labelPanel, controlPanelConstraints);
+        add(labelPanel, controlPanelConstraints);
 
         // Separator
         controlPanelConstraints.weightx = 0.5;
@@ -139,7 +138,7 @@ public class IterativeControlsPanel extends JPanel {
         JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
         separator2.setPreferredSize(new Dimension(200, 15));
         // separator.setBackground(Color.red);
-        controlPanel.add(separator2, controlPanelConstraints);
+        add(separator2, controlPanelConstraints);
 
         // Button panel at bottom
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -157,44 +156,14 @@ public class IterativeControlsPanel extends JPanel {
         controlPanelConstraints.weightx = 0.5;
         controlPanelConstraints.gridx = 0;
         controlPanelConstraints.gridy = 4;
-        controlPanel.add(buttonPanel, controlPanelConstraints);
+        add(buttonPanel, controlPanelConstraints);
 
         // Set up control panel
         int width = 290;
         int height = 260;
-        controlPanel.setMaximumSize(new Dimension(width, height));
-        controlPanel.setPreferredSize(new Dimension(width, height));
-        controlPanel.setMinimumSize(new Dimension(width, height));
-
-        // Training Set Panel
-        if (trainer != null) {
-            trainingSetPanel = new TrainingSetPanel(
-                    trainer.getTrainableNetwork(), 3);
-        } else {
-            trainingSetPanel = new TrainingSetPanel();
-        }
-
-        // Layout the whole panel
-        setLayout(new GridBagLayout());
-        GridBagConstraints wholePanelConstraints = new GridBagConstraints();
-        // Control Panel
-        wholePanelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        wholePanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        wholePanelConstraints.insets = new Insets(10, 10, 10, 10);
-        wholePanelConstraints.weightx = 0;
-        wholePanelConstraints.weighty = 0.5;
-        wholePanelConstraints.gridx = 0;
-        wholePanelConstraints.gridy = 0;
-        add(controlPanel, wholePanelConstraints);
-        // Training Set
-        wholePanelConstraints.anchor = GridBagConstraints.PAGE_START;
-        wholePanelConstraints.fill = GridBagConstraints.BOTH;
-        wholePanelConstraints.insets = new Insets(10, 10, 10, 10);
-        wholePanelConstraints.weightx = 1;
-        wholePanelConstraints.weighty = 0.5;
-        wholePanelConstraints.gridx = 1;
-        wholePanelConstraints.gridy = 0;
-        add(trainingSetPanel, wholePanelConstraints);
+        setMaximumSize(new Dimension(width, height));
+        setPreferredSize(new Dimension(width, height));
+        setMinimumSize(new Dimension(width, height));
 
         // Add listener
         if (trainer != null) {
@@ -243,27 +212,35 @@ public class IterativeControlsPanel extends JPanel {
                 trainer.setUpdateCompleted(false);
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     public void run() {
-                        while (!trainer.isUpdateCompleted()) {
-                            trainer.iterate();
-                            if (showUpdates.isSelected()) {
-                                panel.getNetwork().setUpdateCompleted(false);
-                                panel.getNetwork().fireNetworkChanged();
-                                while (panel.getNetwork().isUpdateCompleted() == false) {
-                                    try {
-                                        Thread.sleep(1);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                        try {
+                            while (!trainer.isUpdateCompleted()) {
+                                trainer.iterate();
+                                if (showUpdates.isSelected()) {
+                                    panel.getNetwork()
+                                            .setUpdateCompleted(false);
+                                    panel.getNetwork().fireNetworkChanged();
+                                    while (!panel.getNetwork()
+                                            .isUpdateCompleted()) {
+                                        try {
+                                            Thread.sleep(1);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        putValue(SMALL_ICON, ResourceManager
+                                                .getImageIcon("Stop.png"));
                                     }
                                 }
+                                putValue(SMALL_ICON, ResourceManager
+                                        .getImageIcon("Play.png"));
                             }
-                        }
-                        {
-                            putValue(SMALL_ICON,
-                                    ResourceManager.getImageIcon("Play.png"));
+                        } catch (DataNotInitializedException e) {
+                            JOptionPane.showOptionDialog(null, e.getMessage(),
+                                    "Warning", JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.WARNING_MESSAGE, null, null,
+                                    null);
                         }
                     }
                 });
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
             } else {
                 // Stop running
                 trainer.setUpdateCompleted(true);
@@ -290,10 +267,15 @@ public class IterativeControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            trainer.apply();
-
-            if (showUpdates.isSelected()) {
-                panel.getNetwork().fireNetworkChanged();
+            try {
+                trainer.iterate();
+                if (showUpdates.isSelected()) {
+                    panel.getNetwork().fireNetworkChanged();
+                }
+            } catch (DataNotInitializedException e) {
+                JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
             }
         }
 
@@ -321,22 +303,5 @@ public class IterativeControlsPanel extends JPanel {
             }
         }
     };
-
-    /**
-     * @param parentFrame the parentFrame to set
-     */
-    public void setFrame(GenericFrame parentFrame) {
-        this.parentFrame = parentFrame;
-        trainingSetPanel.setFrame(parentFrame);
-    }
-
-    /**
-     * Test method for GUI layout.
-     */
-    public static void main(String args[]) {
-        IterativeControlsPanel test = new IterativeControlsPanel(null, null);
-        test.errorBar.setValue(5);
-        SimpleFrame.displayPanel(test);
-    }
 
 }

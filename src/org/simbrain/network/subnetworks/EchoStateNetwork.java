@@ -572,7 +572,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * @param targetData the targetData to set
      */
-    public void setTrainingData(double[][] targetData) {
+    public void setTargetData(double[][] targetData) {
         this.targetData = targetData;
     }
 

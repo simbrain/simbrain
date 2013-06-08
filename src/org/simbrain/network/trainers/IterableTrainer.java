@@ -33,10 +33,11 @@ public abstract class IterableTrainer extends Trainer {
     /** Listener list. */
     private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
 
-    /** Iteration number.  An epoch. */
+    /** Iteration number. An epoch. */
     private int iteration;
 
-    /** Iterate through the dataset polling random rows. */ // TODO
+    /** Iterate through the dataset polling random rows. */
+    // TODO
     private boolean stochasticIteration = false;
 
     /** If used, stopped iterating if validation error is below this. */
@@ -113,8 +114,18 @@ public abstract class IterableTrainer extends Trainer {
     /**
      * Iterate the training algorithm and stop iteration based on the selected
      * stopping condition.
+     *
+     * @throws DataNotInitializedException if input or target data not set
      */
-    public void iterate() {
+    public void iterate() throws DataNotInitializedException {
+
+        if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
+            throw new DataNotInitializedException("Input data not initalized");
+        }
+        if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
+            throw new DataNotInitializedException("Target data not initalized");
+        }
+
         fireTrainingBegin();
         switch (stoppingCondition) {
         case NONE:
@@ -140,8 +151,8 @@ public abstract class IterableTrainer extends Trainer {
         default:
             break;
         }
-
         fireTrainingEnd();
+
     }
 
     /**
@@ -250,7 +261,6 @@ public abstract class IterableTrainer extends Trainer {
     public void setIterationsBeforeStopping(int iterationsBeforeStopping) {
         this.iterationsBeforeStopping = iterationsBeforeStopping;
     }
-
 
     /**
      * Returns the current solution type inside a comboboxwrapper. Used by

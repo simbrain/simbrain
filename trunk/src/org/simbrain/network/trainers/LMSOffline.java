@@ -94,7 +94,14 @@ public class LMSOffline extends Trainer {
     };
 
     @Override
-    public void apply() {
+    public void apply() throws DataNotInitializedException {
+
+        if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
+            throw new DataNotInitializedException("Input data not initalized");
+        }
+        if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
+            throw new DataNotInitializedException("Target data not initalized");
+        }
 
         fireTrainingBegin();
 

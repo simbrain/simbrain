@@ -14,15 +14,17 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
+import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
@@ -32,14 +34,14 @@ import org.simbrain.util.genericframe.GenericFrame;
  */
 public class TrainingSetPanel extends JPanel {
 
-    /** Parent frame. */
-    private GenericFrame parentFrame;
-
     /** Representation of input data. */
     private DataPanel inputPanel;
 
     /** Representation of target data. */
     private DataPanel targetPanel;
+
+    /** Parent frame. */
+    private GenericFrame parentFrame;
 
     /**
      * Construct a new pane for displaying training sets.
@@ -48,7 +50,8 @@ public class TrainingSetPanel extends JPanel {
      * @param numVisibleColumnsPerTable number of columns to make visible
      *  in the input and target data tables.
      */
-    public TrainingSetPanel(Trainable trainable, int numVisibleColumnsPerTable) {
+    public TrainingSetPanel(final Trainable trainable,
+            final int numVisibleColumnsPerTable) {
 
         inputPanel = new DataPanel(trainable.getInputNeurons(), trainable
                 .getTrainingSet().getInputDataMatrix(),
@@ -56,7 +59,36 @@ public class TrainingSetPanel extends JPanel {
         targetPanel = new DataPanel(trainable.getOutputNeurons(), trainable
                 .getTrainingSet().getTargetDataMatrix(),
                 numVisibleColumnsPerTable, "Target data");
+        init();
 
+    }
+
+    /**
+     * For data that is not embedded in traineable, so that all the data must be
+     * specified.
+     *
+     * @param inputNeurons the input neurons
+     * @param inputData the input data
+     * @param targetNeurons the output neurons
+     * @param targetData target data
+     * @param numVisibleColumnsPerTable number of columns to make visible
+     *  in the input and target data tables.
+     */
+    public TrainingSetPanel(List<Neuron> inputNeurons, NumericMatrix inputData,
+            List<Neuron> targetNeurons, NumericMatrix targetData,
+            int numVisibleColumnsPerTable) {
+        inputPanel = new DataPanel(inputNeurons, inputData,
+                numVisibleColumnsPerTable, "Input data");
+        targetPanel = new DataPanel(targetNeurons, targetData,
+                numVisibleColumnsPerTable, "Target data");
+
+        init();
+    }
+
+    /**
+     * Initialize the panel.
+     */
+    private void init() {
         final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         inputPanel.setBorder(BorderFactory.createTitledBorder("Input data"));
         targetPanel.setBorder(BorderFactory.createTitledBorder("Target data"));
@@ -75,7 +107,6 @@ public class TrainingSetPanel extends JPanel {
         wholePanelConstraints.gridx = 0;
         wholePanelConstraints.gridy = 0;
         add(split, wholePanelConstraints);
-
     }
 
     /**
@@ -104,6 +135,7 @@ public class TrainingSetPanel extends JPanel {
         wholePanelConstraints.gridy = 0;
         add(split, wholePanelConstraints);
     }
+
 
     /**
      * Hacked code for resizing sub-panels as this panel is resized.

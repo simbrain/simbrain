@@ -22,13 +22,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.LMSIterativePanel;
-import org.simbrain.network.gui.trainer.LMSOfflinePanel;
+import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
+import org.simbrain.network.gui.trainer.LMSOfflineTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
@@ -86,6 +87,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainIterativelyAction));
         menu.add(new JMenuItem(trainOfflineAction));
         menu.addSeparator();
+        JMenu dataActions = new JMenu("View / Edit Data");
 
         final LMSNetwork lms = (LMSNetwork) getGroup();
 
@@ -115,13 +117,14 @@ public class LMSNetworkNode extends SubnetworkNode {
             }
 
         };
-        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
                 (Trainable) getGroup()));
-        menu.addSeparator();
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+        dataActions.addSeparator();
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 lms.getInputNeurons(), inputData, "Input"));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 lms.getOutputNeurons(), trainingData, "Target"));
+        menu.add(dataActions);
         setContextMenu(menu);
     }
 
@@ -140,7 +143,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             LMSNetwork network = (LMSNetwork) getGroup();
-            LMSIterativePanel trainingPanel = new LMSIterativePanel(
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new LMSIterative(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
                     "Trainer");
@@ -163,9 +166,11 @@ public class LMSNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             LMSNetwork network = (LMSNetwork) getGroup();
-            LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(
-                    network));
-            getNetworkPanel().displayPanel(trainingPanel, "Trainer");
+            LMSOfflineTrainingPanel trainingPanel = new LMSOfflineTrainingPanel(
+                    getNetworkPanel(), new LMSOffline(network));
+            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
+                    "Trainer");
+            trainingPanel.setFrame(frame);
         }
     };
 

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.event.ActionEvent;
@@ -7,20 +24,22 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.trainer.ESNOfflineTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.NumericMatrix;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 /**
@@ -30,7 +49,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
     /**
      * Create an ESN network.
-     * 
+     *
      * @param networkPanel parent panel
      * @param group the ESN
      */
@@ -87,32 +106,14 @@ public class ESNNetworkNode extends SubnetworkNode {
         final TrainingSet trainingSet =  new TrainingSet(esn.getInputData(), esn
                 .getTargetData());
 
-        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-                new Trainable() {
-                    @Override
-                    public List<Neuron> getInputNeurons() {
-                        return ((EchoStateNetwork) getGroup()).getInputLayer()
-                                .getNeuronList();
-                    }
-
-                    @Override
-                    public List<Neuron> getOutputNeurons() {
-                        return ((EchoStateNetwork) getGroup()).getOutputLayer()
-                                .getNeuronList();
-                    }
-
-                    @Override
-                    public TrainingSet getTrainingSet() {
-                        return trainingSet;
-                    }
-                }));
-
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
+        JMenu dataActions = new JMenu("View / Edit Data");
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
                 .getInputLayer().getNeuronList(), trainingSet
                 .getInputDataMatrix(), "Input"));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
                 .getOutputLayer().getNeuronList(), trainingSet
                 .getTargetDataMatrix(), "Target"));
+        menu.add(dataActions);
         setContextMenu(menu);
     }
 
@@ -130,19 +131,12 @@ public class ESNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            try {
-                EchoStateNetwork network = (EchoStateNetwork) getGroup();
-                ESNTrainingPanel trainingPanel = new ESNTrainingPanel(network);
-                trainingPanel.setGenericParent(getNetworkPanel().displayPanel(
-                        trainingPanel, "Trainer"));
-                trainingPanel.init();
-            } catch (NullPointerException npe) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "Input and training data must\nbe entered prior to"
-                                + " training.", "Warning",
-                        JOptionPane.WARNING_MESSAGE);
-                npe.printStackTrace();
-            }
+            EchoStateNetwork network = (EchoStateNetwork) getGroup();
+            ESNOfflineTrainingPanel trainingPanel = new ESNOfflineTrainingPanel(
+                    getNetworkPanel(), network);
+            GenericFrame frame  = getNetworkPanel().displayPanel(
+                    trainingPanel, "Trainer");
+            trainingPanel.setFrame(frame);
         }
     };
 

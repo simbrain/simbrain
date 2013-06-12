@@ -26,6 +26,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -45,6 +46,7 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.StopLight;
 
@@ -247,6 +249,13 @@ public class ESNCreationDialog extends StandardDialog implements
 
         setContentPane(esnPanel);
         fillFieldValues();
+
+        // Add a help button
+        JButton helpButton = new JButton("Help");
+        Action helpAction = new ShowHelpAction(
+                "Pages/Network/network/echostatenetwork.html");
+        helpButton.setAction(helpAction);
+        this.addButton(helpButton);
 
     }
 

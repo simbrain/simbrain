@@ -194,6 +194,25 @@ public class NeuronGroup extends Group {
         return neuronList.isEmpty();
     }
 
+
+    /**
+     * Set activations of neurons using an array of doubles. Assumes the order
+     * of the items in the array should match the order of items in the
+     * arraylist. Does not throw an exception if the provided input and neuron
+     * list do not match in size.
+     *
+     * @param inputs the input vector as a double array.
+     */
+    public void setActivations(double[] inputs) {
+        int i = 0;
+        for (Neuron neuron : neuronList) {
+            if (i > inputs.length) {
+                return;
+            }
+            neuron.setActivation(inputs[i++]);
+        }
+    }
+
     /**
      * True if the group contains the specified neuron.
      *

@@ -150,15 +150,13 @@ public class DataPanel extends JPanel {
 
     /**
      * Resize the panel and parent frame.
-     *
-     * TODO: This method resizes the parent frame to the scroller height, and so
-     * ignores the added height of any additional components in the parent
-     * frame. There should be a way to get extraHeight = (ParentFrame.height -
-     * scroller.height) and then add that extraHeight to newHeight;
      */
     private void resizePanel() {
+        int additionalParentHeight = (parentFrame.getBounds().height - scroller
+                .getHeight());
         scroller.resize();
-        int newHeight = scroller.getPreferredSize().height;
+        int newHeight = scroller.getPreferredSize().height
+                + additionalParentHeight;
         if (parentFrame != null) {
             // Reset height of parent frame
             parentFrame.setPreferredSize(new Dimension(parentFrame

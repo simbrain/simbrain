@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
@@ -31,6 +30,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -42,11 +42,11 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
+import org.simbrain.network.trainers.TrainerListener;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.Utils;
-import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 /**
  * The main controller panel for iterative learning, with buttons etc. to run
@@ -60,7 +60,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 public class IterativeControlsPanel extends JPanel {
 
     /** Reference to trainer object. */
-    private final IterableTrainer trainer;
+    private IterableTrainer trainer;
 
     /** Current number of iterations. */
     private JLabel iterationsLabel = new JLabel("--- ");
@@ -81,7 +81,20 @@ public class IterativeControlsPanel extends JPanel {
     private int numTicks = 1000;
 
     /**
-     * Construct a rule chooser panel.
+     * Construct the panel with no trainer. It will be supplied later once it
+     * has been created. This is used by SRN and ESN for example where the
+     * "logical input data" must first be constructed and only then is the
+     * trainer created.
+     *
+     * @param networkPanel the parent network panel
+     */
+    public IterativeControlsPanel(final NetworkPanel networkPanel) {
+        this.panel = networkPanel;
+        init();
+    }
+
+    /**
+     * Construct the panel with a trainer specified.
      *
      * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
@@ -91,6 +104,13 @@ public class IterativeControlsPanel extends JPanel {
 
         this.trainer = trainer;
         this.panel = networkPanel;
+        init();
+    }
+
+    /**
+     * Initialize the panel.
+     */
+    public void init() {
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createTitledBorder("Controls"));
         GridBagConstraints controlPanelConstraints = new GridBagConstraints();
@@ -142,15 +162,14 @@ public class IterativeControlsPanel extends JPanel {
 
         // Button panel at bottom
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton propertiesButton = new JButton(
-                TrainerGuiActions.getPropertiesDialogAction(trainer));
+        JButton propertiesButton = new JButton(setPropertiesAction);
         propertiesButton.setHideActionText(true);
         buttonPanel.add(propertiesButton);
         JButton randomizeButton = new JButton(randomizeAction);
         randomizeButton.setHideActionText(true);
         buttonPanel.add(randomizeButton);
         JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(
-                networkPanel, trainer));
+                panel, trainer));
         plotButton.setHideActionText(true);
         buttonPanel.add(plotButton);
         controlPanelConstraints.weightx = 0.5;
@@ -165,18 +184,27 @@ public class IterativeControlsPanel extends JPanel {
         setPreferredSize(new Dimension(width, height));
         setMinimumSize(new Dimension(width, height));
 
+        addErrorListener();
+    }
+
+    ErrorListener errorListener;
+    //todo
+    public void addErrorListener() {
         // Add listener
         if (trainer != null) {
-            trainer.addErrorListener(new ErrorListener() {
+            if (errorListener != null) {
+                trainer.removeErrorListener(errorListener);
+            }
+            errorListener = new ErrorListener() {
 
                 public void errorUpdated() {
                     iterationsLabel.setText("" + trainer.getIteration());
                     updateError();
                 }
 
-            });
+            };
+            trainer.addErrorListener(errorListener);
         }
-
     }
 
     /**
@@ -190,11 +218,23 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     /**
+     * Called whenever the trainer should be reinitialized. Actual trainer
+     * initialization happens in subclasses that override this method. If
+     * forcereinit is true the training set is recreated. If not some useful
+     * data integrity checks still happen. See subclasses in for example
+     * SRNTrainingPanel.
+     *
+     * @param forceReinit whether to require that data be reinitialized
+     */
+    protected void initTrainer(boolean forceReinit) {
+    }
+
+    /**
      * A "play" action, that can be used to repeatedly iterate iterable training
      * algorithms.
      *
      */
-    Action runAction = new AbstractAction() {
+    private Action runAction = new AbstractAction() {
 
         // Initialize
         {
@@ -207,6 +247,10 @@ public class IterativeControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
+            initTrainer(false);
+            if (trainer == null) {
+                return;
+            }
             if (trainer.isUpdateCompleted()) {
                 // Start running
                 trainer.setUpdateCompleted(false);
@@ -254,7 +298,7 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * A step action, for iterating iteratable learning algorithms one time.
      */
-    Action stepAction = new AbstractAction() {
+    private Action stepAction = new AbstractAction() {
 
         // Initialize
         {
@@ -267,6 +311,10 @@ public class IterativeControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
+            initTrainer(false);
+            if (trainer == null) {
+                return;
+            }
             try {
                 trainer.iterate();
                 if (showUpdates.isSelected()) {
@@ -284,7 +332,7 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * Action for randomizing the underlying network.
      */
-    Action randomizeAction = new AbstractAction() {
+    private Action randomizeAction = new AbstractAction() {
 
         // Initialize
         {
@@ -297,11 +345,58 @@ public class IterativeControlsPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
+            initTrainer(true);
             if (trainer != null) {
                 trainer.randomize();
                 panel.getNetwork().fireNetworkChanged();
             }
         }
     };
+
+    /**
+     * Action for setting properties.
+     */
+    private Action setPropertiesAction = new AbstractAction() {
+
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+            putValue(NAME, "Properties");
+            putValue(SHORT_DESCRIPTION, "Edit Properties");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            initTrainer(false);
+            if (trainer == null) {
+                return;
+            }
+            ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+            editor.setExcludeList(new String[] { "iteration",
+                    "updateCompleted" });
+            editor.setObject(trainer);
+            JDialog dialog = editor.getDialog();
+            dialog.setModal(true);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        }
+    };
+
+    /**
+     * @return the trainer
+     */
+    public IterableTrainer getTrainer() {
+        return trainer;
+    }
+
+    /**
+     * @param trainer the trainer to set
+     */
+    public void setTrainer(IterableTrainer trainer) {
+        this.trainer = trainer;
+    }
 
 }

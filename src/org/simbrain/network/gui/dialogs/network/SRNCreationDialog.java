@@ -40,7 +40,7 @@ import org.simbrain.util.StandardDialog;
  * Creates a GUI dialog to set the parameters for and then build a simple
  * recurrent network.
  *
- * @author ztosi
+ * @author Jeff Yoshimi
  */
 
 @SuppressWarnings("serial")
@@ -161,31 +161,31 @@ public class SRNCreationDialog extends StandardDialog {
      * Fills the fields with default values.
      */
     public void fillFieldValues() {
-        tfNumInputs.setText("" + 12);
-        tfNumHidden.setText("" + 10);
-        tfNumOutputs.setText("" + 12);
+        tfNumInputs.setText("" + 5);
+        tfNumHidden.setText("" + 7);
+        tfNumOutputs.setText("" + 5);
+        hiddenNeuronTypes.setSelectedIndex(2);
     }
 
     @Override
     public void closeDialogOk() {
         try {
 
-            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(
+
+            NeuronUpdateRule hidType = boxMap.get(hiddenNeuronTypes
+                    .getSelectedItem());
+            NeuronUpdateRule outType = boxMap.get(outputNeuronTypes
+                    .getSelectedItem());
+            SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(
                     panel.getNetwork(),
                     Integer.parseInt(tfNumInputs.getText()),
                     Integer.parseInt(tfNumHidden.getText()),
                     Integer.parseInt(tfNumOutputs.getText()),
+                    hidType,
+                    outType,
                     panel.getLastClickedPosition());
 
-            NeuronUpdateRule nur0 = boxMap.get(hiddenNeuronTypes
-                    .getSelectedItem());
-            srnBuild.setHiddenNeuronType(nur0);
-
-            NeuronUpdateRule nur1 = boxMap.get(outputNeuronTypes
-                    .getSelectedItem());
-            srnBuild.setOutputNeuronType(nur1);
-
-            srnBuild.build();
+            srn.getParentNetwork().addGroup(srn);
             srnPanel.setVisible(false);
             dispose();
 

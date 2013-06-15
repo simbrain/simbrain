@@ -458,15 +458,10 @@ public class Subnetwork extends Group {
         this.estimatedFinalSynapses = estimatedFinalSynapses;
     }
 
-    public boolean getNeuronGroupsVisible() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     /**
      * @return the displayNeuronGroups
      */
-    public boolean isDisplayNeuronGroups() {
+    public boolean displayNeuronGroups() {
         return displayNeuronGroups;
     }
 

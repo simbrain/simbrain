@@ -52,7 +52,7 @@ public class SubnetworkNode extends GroupNode {
             }
         }
 
-        if (((Subnetwork) getGroup()).getNeuronGroupsVisible()) {
+        if (((Subnetwork) getGroup()).displayNeuronGroups()) {
             // Add a little extra height at top
             double inset = getOutlinePadding();
             bounds.setRect(bounds.getX() - inset, bounds.getY() - inset - 15,

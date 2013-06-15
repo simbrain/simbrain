@@ -94,7 +94,7 @@ public class SynapseGroupNode extends GroupNode {
 
         } else {
             // TODO Need to get reference to parent nodes.
-            System.err.println("Bounds are null");
+            //System.err.println("Bounds are null");
             bounds = null;
         }
 

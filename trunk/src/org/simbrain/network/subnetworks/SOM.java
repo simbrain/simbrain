@@ -19,37 +19,34 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 public class SOM extends Subnetwork {
 
     /** Default alpha. */
-    private static final double DEFAULT_ALPHA = 0.6;
+    public static final double DEFAULT_ALPHA = 0.06;
 
     /** Default initial neighborhood size. */
-    private static final double DEFAULT_INIT_NSIZE = 100;
+    public static final double DEFAULT_INIT_NSIZE = 100;
 
     /** Default numInputVectors. */
-    private static final int DEFAULT_INPUT_VECTORS = 4;
+    public static final int DEFAULT_INPUT_VECTORS = 4;
 
     /** Default Update Interval. */
-    private static final int DEFAULT_UPDATE_INTERVAL = 50;
+    public static final int DEFAULT_UPDATE_INTERVAL = 50;
 
     /** Standard update. */
-    private static final int STANDARD = 0;
+    public static final int STANDARD = 0;
 
     /** WTA update. */
-    private static final int WTA = 1;
+    public static final int WTA = 1;
 
     /** Update method. */
-    private static final int updateMethod = WTA;
-
-    /** Update interval. */
-    private int updateInterval = DEFAULT_UPDATE_INTERVAL;
+    public static final int updateMethod = WTA;
 
     /** Default batchSize. */
-    private static final int DEFAULT_BATCH_SIZE = 100;
+    public static final int DEFAULT_BATCH_SIZE = 100;
 
     /** The default alphaDecayRate. */
-    private static final double DEFAULT_DECAY_RATE = 0.005;
+    public static final double DEFAULT_DECAY_RATE = 0.002;
 
     /** The default neighborhoodDecayAmount. */
-    private static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = .05;
+    public static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = .05;
 
     /** Initial Learning Rate. */
     private double initAlpha = DEFAULT_ALPHA;
@@ -113,15 +110,13 @@ public class SOM extends Subnetwork {
      * @param root reference to Network.
      */
     public SOM(final Network root, final int numNeurons, final Layout layout) {
-        super(root, 1, 1);
+        super(root, 1, 0);
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(
                     new Neuron(getParentNetwork(), new LinearRule()));
         }
+        setDisplayNeuronGroups(false);
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        getSynapseGroup().setDeleteWhenEmpty(false);
-        root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-                getNeuronGroup(), getSynapseGroup());
         setLabel("SOM");
     }
 

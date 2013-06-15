@@ -51,7 +51,7 @@ public class HopfieldNode extends SubnetworkNode {
         // setStrokePaint(Color.green);
         setInteractionBox(new HopfieldInteractionBox(networkPanel));
         setContextMenu();
-        setOutlinePadding(15f);
+        //setOutlinePadding(15f);
     }
 
     /**

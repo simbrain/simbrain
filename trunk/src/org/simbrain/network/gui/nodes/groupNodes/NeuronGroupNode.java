@@ -22,6 +22,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 
@@ -46,19 +47,26 @@ public class NeuronGroupNode extends GroupNode {
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
         super(networkPanel, group);
+        if (group.getParentGroup() instanceof Subnetwork) {
+            if (!((Subnetwork) group.getParentGroup()).getNeuronGroupsVisible()) {
+                this.removeChild(this.getInteractionBox());
+                this.setStroke(null);
+                return;
+            }
+        }
         if (!group.isTopLevelGroup()) {
             setStroke(LAYER_OUTLINE_STROKE);
             setStrokePaint(Color.gray);
         }
     }
-    
+
     /**
-     * Returns the NeuronGroup to this NeuronGroupNode
-     * 
+     * Returns the NeuronGroup to this NeuronGroupNode.
+     *
      * @return the neuron group
      */
     public NeuronGroup getNeuronGroup(){
-    	return (NeuronGroup) getGroup();
+        return (NeuronGroup) getGroup();
     }
 
 }

@@ -52,16 +52,20 @@ public class SubnetworkNode extends GroupNode {
             }
         }
 
-        // Add a little extra height at top
-        double inset = getOutlinePadding();
-        bounds.setRect(bounds.getX() - inset, bounds.getY() - inset - 15,
-                bounds.getWidth() + (2 * inset), bounds.getHeight()
-                        + (2 * inset) + 15);
+        if (((Subnetwork) getGroup()).getNeuronGroupsVisible()) {
+            // Add a little extra height at top
+            double inset = getOutlinePadding();
+            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset - 15,
+                    bounds.getWidth() + (2 * inset), bounds.getHeight()
+                            + (2 * inset) + 15);
 
-        setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                (float) bounds.getWidth(), (float) bounds.getHeight());
+            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+                    (float) bounds.getWidth(), (float) bounds.getHeight());
 
-        updateInteractionBox();
+            updateInteractionBox();
+        } else {
+            super.updateBounds();
+        }
     }
 
 }

@@ -48,7 +48,7 @@ public class NeuronGroupNode extends GroupNode {
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
         super(networkPanel, group);
         if (group.getParentGroup() instanceof Subnetwork) {
-            if (!((Subnetwork) group.getParentGroup()).getNeuronGroupsVisible()) {
+            if (!((Subnetwork) group.getParentGroup()).displayNeuronGroups()) {
                 this.removeChild(this.getInteractionBox());
                 this.setStroke(null);
                 return;

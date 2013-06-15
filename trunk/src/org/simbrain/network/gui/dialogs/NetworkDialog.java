@@ -131,6 +131,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     /** Precision text field. */
     private JTextField precisionField = new JTextField();
 
+    /**
+     * Threshold above which subnetworks or groups with that many synapses stop
+     * displaying them.
+     */
+    private JTextField tfSynapseVisibilityThreshold= new JTextField();
+
     /** Rounding check box. */
     private JCheckBox isRoundingBox = new JCheckBox();
 
@@ -201,6 +207,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         graphicsPanel.addItem("Show time", showTimeBox);
 
         // Set up Misc Panel
+        miscPanel.addItem("Synapse visibility threshold", tfSynapseVisibilityThreshold);
         miscPanel.addItem("Round off neuron values", isRoundingBox);
         miscPanel.addItem("Precision of round-off", precisionField);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
@@ -341,6 +348,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
         precisionField.setText(Integer.toString(networkPanel.getNetwork()
                 .getPrecision()));
+        tfSynapseVisibilityThreshold.setText(Integer.toString(networkPanel
+                .getNetwork().getSynapseVisibilityThreshold()));
         nudgeAmountField.setText(Double.toString(NetworkGuiSettings
                 .getNudgeAmount()));
         isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
@@ -356,6 +365,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getText()));
         networkPanel.getNetwork().setPrecision(
                 Integer.parseInt(precisionField.getText()));
+        networkPanel.getNetwork().setSynapseVisibilityThreshold(
+                Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
     }
 
     /**

@@ -84,8 +84,17 @@ public class Network {
 
     /** Time step. */
     private double timeStep = DEFAULT_TIME_STEP;
-    
+
+    /**
+     * The weight randomizer.
+     */
     private Randomizer weightRandomizer = new Randomizer();
+
+    /**
+     * If a subnetwork or synapse group has more than this many synapses,
+     * synapses won't be displayed.
+     */
+    private int synapseVisibilityThreshold = 200;
 
     /**
      * Two types of time used in simulations. DISCRETE: Network update
@@ -421,10 +430,24 @@ public class Network {
      * @param synapse the weight object to add
      */
     public void addSynapse(final Synapse synapse) {
+        addSynapse(synapse, true);
+    }
+
+    /**
+     * Adds a weight to the neuron network, where that weight already has
+     * designated source and target neurons.
+     *
+     * @param fireEvent if true fire an event notifying listeners that
+     *  the synapse has been added.
+     * @param synapse the weight object to add
+     */
+    public void addSynapse(final Synapse synapse, boolean fireEvent) {
         synapse.initSpikeResponder();
         synapseList.add(synapse);
         synapse.setId(getSynapseIdGenerator().getId());
-        fireSynapseAdded(synapse);
+        if (fireEvent) {
+            fireSynapseAdded(synapse);
+        }
         // TODO: Possibly optimize so that this is only called if
         // at least one neuron group / or synapse group exists.
         getSynapseRouter().routeSynapse(synapse);
@@ -1755,5 +1778,20 @@ public class Network {
         }
         return weightRandomizer;
     }
+
+    /**
+     * @return the synapseVisibilityThreshold
+     */
+    public int getSynapseVisibilityThreshold() {
+        return synapseVisibilityThreshold;
+    }
+
+    /**
+     * @param synapseVisibilityThreshold the synapseVisibilityThreshold to set
+     */
+    public void setSynapseVisibilityThreshold(int synapseVisibilityThreshold) {
+        this.synapseVisibilityThreshold = synapseVisibilityThreshold;
+    }
+
 
 }

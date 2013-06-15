@@ -80,12 +80,18 @@ public abstract class ConnectNeurons {
 
     /** A switch for enabling randomized inhibitory connections. */
     protected boolean enableInhibitoryRandomization;
-    
-    /** 
-     * A flag denoting whether or not the connection is between the same set
-     * of neurons: i.e. is recurrent.
+
+    /**
+     * A flag denoting whether or not the connection is between the same set of
+     * neurons: i.e. is recurrent.
      */
     protected boolean recurrent;
+
+    /**
+     * If this flag is set to false, then no event is fired when the synapse is
+     * added, so that the synapse won't be displayed in the GUI.
+     */
+    protected boolean displaySynapses = true;
 
     /**
      * Default constructor.
@@ -117,6 +123,7 @@ public abstract class ConnectNeurons {
      * @param network reference to parent network
      * @param neurons source neurons
      * @param neurons2 target neurons
+     * @return the synapses that were created
      */
     public List<Synapse> connectNeurons(final Network network,
             final List<Neuron> neurons, final List<Neuron> neurons2) {
@@ -124,11 +131,31 @@ public abstract class ConnectNeurons {
         sourceNeurons = neurons;
         targetNeurons = neurons2;
         return connectNeurons();
-        
+    }
+
+    /**
+     * Apply connection using specified parameters.
+     *
+     * @param parentNetwork reference to parent network
+     * @param neuronList source neurons
+     * @param neuronList2 target neurons
+     * @param displaySynapses whether to display synapses or not.
+     * @return the synapses that were created
+     */
+    public List<Synapse> connectNeurons(Network parentNetwork,
+            List<Neuron> neuronList, List<Neuron> neuronList2,
+            boolean displaySynapses) {
+        this.network = parentNetwork;
+        sourceNeurons = neuronList;
+        targetNeurons = neuronList2;
+        this.displaySynapses = displaySynapses;
+        return connectNeurons();
     }
 
     /**
      * Connect the source to the target neurons using some method.
+     *
+     * @return the synapses that were created
      */
     public abstract List<Synapse> connectNeurons();
 
@@ -141,25 +168,26 @@ public abstract class ConnectNeurons {
         return network;
     }
 
-    /** 
-     * Tests whether or not these connections are recurrent, that is,
-     * whether or not the neurons in the source list are the same as those in
-     * the target list. 
+    /**
+     * Tests whether or not these connections are recurrent, that is, whether or
+     * not the neurons in the source list are the same as those in the target
+     * list.
+     *
      * @return true or false: whether or not these connections are recurrent.
      */
     public boolean testRecurrence() {
-    	if(sourceNeurons.size() != targetNeurons.size()) {
-    		return false;
-    	} else {
-    		for(int i = 0; i < sourceNeurons.size(); i++) {
-    			if(sourceNeurons.get(i) != targetNeurons.get(i)) {
-    				return false;
-    			}
-    		}
-    	}
-    	return true;    	
+        if (sourceNeurons.size() != targetNeurons.size()) {
+            return false;
+        } else {
+            for (int i = 0; i < sourceNeurons.size(); i++) {
+                if (sourceNeurons.get(i) != targetNeurons.get(i)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
-    
+
     /**
      * @return the baseExcitatorySynapse
      */
@@ -203,7 +231,6 @@ public abstract class ConnectNeurons {
         this.excitatoryRatio = excitatoryRatio;
     }
 
-
     /**
      * Helper method for setting excitatory ratio using an excitatory
      * percentage.
@@ -244,48 +271,52 @@ public abstract class ConnectNeurons {
         this.enableInhibitoryRandomization = enableInRand;
     }
 
-	public List<? extends Neuron> getSourceNeurons() {
-		return sourceNeurons;
-	}
+    public List<? extends Neuron> getSourceNeurons() {
+        return sourceNeurons;
+    }
 
-	public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
-		this.sourceNeurons = sourceNeurons;
-		recurrent = testRecurrence();
-	}
+    public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
+        this.sourceNeurons = sourceNeurons;
+        recurrent = testRecurrence();
+    }
 
-	public List<? extends Neuron> getTargetNeurons() {
-		return targetNeurons;
-	}
+    public List<? extends Neuron> getTargetNeurons() {
+        return targetNeurons;
+    }
 
-	public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
-		this.targetNeurons = targetNeurons;
-		recurrent = testRecurrence();
-	}
-	
-	/**
-	 * Sets all the major parameters for the connection: source, target, and
-	 * network. This is used in place of a constructor for when other variables
-	 * of the connection are being set before a specific network is defined.
-	 * @param network the network where the connections are being made
-	 * @param source the source neurons
-	 * @param target the target neurons
-	 */
-	public void setParameters(final Network network, NeuronGroup source, NeuronGroup target){
-		setParameters(network, source.getNeuronList(), target.getNeuronList());
-	}
+    public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
+        this.targetNeurons = targetNeurons;
+        recurrent = testRecurrence();
+    }
 
-	/**
-	 * Sets all the major parameters for the connection: source, target, and
-	 * network. This is used in place of a constructor for when other variables
-	 * of the connection are being set before a specific network is defined.
-	 * @param network the network where the connections are being made
-	 * @param source the source neurons
-	 * @param target the target neurons
-	 */
-	public void setParameters(final Network network, List<Neuron> source, List<Neuron> target){
-		this.network = network;
-		this.sourceNeurons = source;
-		this.targetNeurons = target;
-	}
-	
+    /**
+     * Sets all the major parameters for the connection: source, target, and
+     * network. This is used in place of a constructor for when other variables
+     * of the connection are being set before a specific network is defined.
+     *
+     * @param network the network where the connections are being made
+     * @param source the source neurons
+     * @param target the target neurons
+     */
+    public void setParameters(final Network network, NeuronGroup source,
+            NeuronGroup target) {
+        setParameters(network, source.getNeuronList(), target.getNeuronList());
+    }
+
+    /**
+     * Sets all the major parameters for the connection: source, target, and
+     * network. This is used in place of a constructor for when other variables
+     * of the connection are being set before a specific network is defined.
+     *
+     * @param network the network where the connections are being made
+     * @param source the source neurons
+     * @param target the target neurons
+     */
+    public void setParameters(final Network network, List<Neuron> source,
+            List<Neuron> target) {
+        this.network = network;
+        this.sourceNeurons = source;
+        this.targetNeurons = target;
+    }
+
 }

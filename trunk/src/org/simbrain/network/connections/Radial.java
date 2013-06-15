@@ -119,7 +119,7 @@ public class Radial extends ConnectNeurons {
                 Synapse synapse = baseInhibitorySynapse
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(-1);
-                network.addSynapse(synapse);
+                network.addSynapse(synapse, displaySynapses);
                 syns.add(synapse);
             }
         }
@@ -150,7 +150,7 @@ public class Radial extends ConnectNeurons {
                 Synapse synapse = baseExcitatorySynapse
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(1);
-                network.addSynapse(synapse);
+                network.addSynapse(synapse, displaySynapses);
                 syns.add(synapse);
             }
         }

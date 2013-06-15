@@ -36,6 +36,13 @@ public class Subnetwork extends Group {
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
+     * An estimate of how many synapses this subnetwork will have. A bit of a
+     * hack. Needed because when synapse visibility is being determined, not all
+     * synapses may have been added to the network.
+     */
+    private int estimatedFinalSynapses = 0;
+
+    /**
      * Create subnetwork group.
      *
      * @param net parent network.
@@ -102,7 +109,7 @@ public class Subnetwork extends Group {
     }
 
     /**
-     * Add a synapse group
+     * Add a synapse group.
      *
      * @param group the synapse group to add
      */
@@ -165,14 +172,14 @@ public class Subnetwork extends Group {
             NeuronGroup target, String sourceLabel, String targetLabel,
             ConnectNeurons connection) {
         List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
-                source.getNeuronList(), target.getNeuronList());
+                source.getNeuronList(), target.getNeuronList(), displaySynapses());
         SynapseGroup newGroup = new SynapseGroup(getParentNetwork());
         getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
         addSynapseGroup(newGroup);
         newGroup.setDeleteWhenEmpty(false);
         setSynapseGroupLabel(source, target, newGroup, sourceLabel, targetLabel);
 
-        // By default set up a synapse routing...
+        // By default set up synapse routing...
         getParentNetwork().getSynapseRouter()
                 .associateSynapseGroupWithNeuronGroupPair(source, target,
                         newGroup);
@@ -408,6 +415,38 @@ public class Subnetwork extends Group {
         for (NeuronGroup neuronGroup : neuronGroupList) {
             neuronGroup.update();
         }
+    }
+
+    /**
+     * Determine whether synapses should be displayed. If total synapses in the
+     * subnetwork is greater than the parent network's (user set) synpase
+     * visibility threshold, do not display synapses.
+     *
+     * @return whether to display synapses or not.
+     */
+    public boolean displaySynapses() {
+        int threshold = getParentNetwork()
+                .getSynapseVisibilityThreshold();
+
+        if ((getFlatSynapseList().size() > threshold)
+                || (estimatedFinalSynapses > threshold)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return the estimatedFinalSynapses
+     */
+    public int getEstimatedFinalSynapses() {
+        return estimatedFinalSynapses;
+    }
+
+    /**
+     * @param estimatedFinalSynapses the estimatedFinalSynapses to set
+     */
+    public void setEstimatedFinalSynapses(int estimatedFinalSynapses) {
+        this.estimatedFinalSynapses = estimatedFinalSynapses;
     }
 
 }

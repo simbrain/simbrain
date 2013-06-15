@@ -40,6 +40,7 @@ import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.util.Utils;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991).
@@ -99,6 +100,9 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         super(network);
 
         this.initialPosition = initialPosition;
+
+        this.setEstimatedFinalSynapses((int) (numInputNodes * numHiddenNodes)
+                + (2 * numHiddenNodes * numOutputNodes));
 
         setLabel("SRN");
 
@@ -200,7 +204,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     @Override
     public void update() {
 
-        inputLayer.update();
+        //inputLayer.update();
         hiddenLayer.update();
 
         // Update context Layer
@@ -229,8 +233,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         // Create the logicalTrainingSet
         final double[][] logicalInputData = createLogicalInputData();
-        // System.out.println("-------");
-        // System.out.println(Utils.doubleMatrixToString(logicalInputData));
+        //System.out.println("-------");
+        //System.out.println(Utils.doubleMatrixToString(logicalInputData));
         final TrainingSet logicalTrainingSet = new TrainingSet();
         logicalTrainingSet.setInputData(logicalInputData);
         logicalTrainingSet.setTargetData(trainingSet.getTargetData());
@@ -285,7 +289,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
                 logicalInputData[row][i + inputLayer.getNeuronList().size()] = contextLayer
                         .getNeuronList().get(i).getActivation();
             }
-            // System.out.println(Utils.doubleArrayToString((logicalInputData[row])));
+            //System.out.println(Utils.doubleArrayToString((logicalInputData[row])));
         }
         // System.out.println(Utils.doubleMatrixToString(logicalInputData));
         return logicalInputData;

@@ -164,11 +164,13 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * @param node node to add.
      */
     public void addPNode(final PNode node) {
-        node.addPropertyChangeListener(this);
-        // Below was the source of major performance issues
-        // node.getParent().addPropertyChangeListener(this);
-        outlinedObjects.add(node);
-        updateVisibility();
+        if (node != null) {
+            node.addPropertyChangeListener(this);
+            // Below was the source of major performance issues
+            // node.getParent().addPropertyChangeListener(this);
+            outlinedObjects.add(node);
+            updateVisibility();
+        }
     }
 
     /**

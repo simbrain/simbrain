@@ -94,7 +94,7 @@ public class FixedFanout extends ConnectNeurons {
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 synapse.setStrength(outboundWeights[i]);
-                network.addSynapse(synapse);
+                network.addSynapse(synapse, displaySynapses);
                 syns.add(synapse);
                 i++;
             }

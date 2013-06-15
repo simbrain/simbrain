@@ -26,16 +26,19 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**
- * <b>Competitive</b> implements a simple competitive network (See PDP 1, ch.
- * 151-193.)
+ * <b>Competitive</b> implements a simple competitive network.
  *
- * TODO: Add "recall" function as with SOM
+ * Current implementations include Rummelhart-Zipser (PDP, 151-193), and
+ * Alvarez-Squire 1994, PNAS, 7041-7045.
  *
  * @author Jeff Yoshimi
  */
 public class Competitive extends Subnetwork {
+
+    // TODO: Add "recall" function as with SOM
 
     /** Learning rate. */
     private double epsilon = .1;
@@ -46,9 +49,6 @@ public class Competitive extends Subnetwork {
     /** loser value. */
     private double loseValue = 0;
 
-    /** Number of neurons. */
-    private int numNeurons = 5;
-
     /** Normalize inputs boolean. */
     private boolean normalizeInputs = true;
 
@@ -58,11 +58,45 @@ public class Competitive extends Subnetwork {
     /** Leaky epsilon value. */
     private double leakyEpsilon = epsilon / 4;
 
+    /**
+     * Percentage by which to decay synapses on each update for for
+     * Alvarez-Squire update.
+     */
+    private double synpaseDecayPercent = .0008;
+
     /** Max, value and activation values. */
     private double max, val, activation;
 
     /** Winner value. */
     private int winner;
+
+    /** Current update method. */
+    private UpdateMethod updateMethod = UpdateMethod.RUMM_ZIPSER;
+
+    /**
+     * Specific implementation of competitive learning.
+     */
+    public enum UpdateMethod {
+        /**
+         * Rummelhart-Zipser.
+         */
+        RUMM_ZIPSER {
+            @Override
+            public String toString() {
+                return "Rummelhart-Zipser";
+            }
+        },
+
+        /**
+         * Alvarez-Squire.
+         */
+        ALVAREZ_SQUIRE {
+            @Override
+            public String toString() {
+                return "Alvarez-Squire";
+            }
+        }
+    }
 
     /**
      * Constructs a competitive network with specified number of neurons.
@@ -74,9 +108,9 @@ public class Competitive extends Subnetwork {
     public Competitive(final Network root, final int numNeurons,
             final Layout layout) {
         super(root, 1, 1);
-        getSynapseGroup().setDeleteWhenEmpty(false);
-        root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-                getNeuronGroup(), getSynapseGroup());
+        // getSynapseGroup().setDeleteWhenEmpty(false);
+        // root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
+        // getNeuronGroup(), getSynapseGroup());
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(root, new LinearRule()));
         }
@@ -103,13 +137,14 @@ public class Competitive extends Subnetwork {
     public void update() {
 
         getNeuronGroup().update();
+
         max = 0;
         winner = 0;
 
         // Determine Winner
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             Neuron n = getNeuronGroup().getNeuronList().get(i);
-            n.getAverageInput();
+            n.update();
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;
@@ -119,31 +154,17 @@ public class Competitive extends Subnetwork {
         // Update weights on winning neuron
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             Neuron neuron = getNeuronGroup().getNeuronList().get(i);
-            double sumOfInputs = neuron.getTotalInput();
 
-            // Don't update weights if no incoming lines have greater than zero
-            // activation
-            if (neuron.getNumberOfActiveInputs(0) == 0) {
-                return;
-            }
             if (i == winner) {
                 if (!getParentNetwork().getClampNeurons()) {
                     neuron.setActivation(winValue);
                 }
                 if (!getParentNetwork().getClampWeights()) {
-
-                    // Apply learning rule
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        activation = incoming.getSource().getActivation();
-
-                        // Normalize the input values
-                        if (normalizeInputs) {
-                            activation /= sumOfInputs;
-                        }
-
-                        val = incoming.getStrength() + epsilon
-                                * (activation - incoming.getStrength());
-                        incoming.setStrength(val);
+                    if (updateMethod == UpdateMethod.RUMM_ZIPSER) {
+                        rummelhartZipser(neuron);
+                    } else if (updateMethod == UpdateMethod.ALVAREZ_SQUIRE) {
+                        squireAlvarezWeightUpdate(neuron);
+                        decayAllSynapses();
                     }
                 }
             } else {
@@ -152,19 +173,79 @@ public class Competitive extends Subnetwork {
                 }
                 if ((useLeakyLearning)
                         & (!getParentNetwork().getClampWeights())) {
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        activation = incoming.getSource().getActivation();
-                        if (normalizeInputs) {
-                            activation /= sumOfInputs;
-                        }
-                        val = incoming.getStrength() + leakyEpsilon
-                                * (activation - incoming.getStrength());
-                        incoming.setStrength(val);
-                    }
+                    leakyLearning(neuron);
                 }
+
             }
         }
         // normalizeIncomingWeights();
+    }
+
+    /**
+     * Update winning neuron's weights in accordance with Alvarez and Squire
+     * 1994, eq 2.
+     *
+     * @param neuron winning neuron.
+     */
+    private void squireAlvarezWeightUpdate(final Neuron neuron) {
+        for (Synapse synapse : neuron.getFanIn()) {
+            double deltaw = epsilon
+                    * synapse.getTarget().getActivation()
+                    * (synapse.getSource().getActivation() - synapse
+                            .getTarget().getAverageInput());
+            synapse.setStrength(synapse.getStrength() + deltaw);
+        }
+    }
+
+    /**
+     * Update winning neuron's weights in accordance with PDP 1, p. 179.
+     *
+     * @param neuron winning neuron.
+     */
+    private void rummelhartZipser(final Neuron neuron) {
+        double sumOfInputs = neuron.getTotalInput();
+        // Apply learning rule
+        for (Synapse synapse : neuron.getFanIn()) {
+            activation = synapse.getSource().getActivation();
+
+            // Normalize the input values
+            if (normalizeInputs) {
+                activation /= sumOfInputs;
+            }
+
+            double deltaw = epsilon * (activation - synapse.getStrength());
+            synapse.setStrength(synapse.getStrength() + deltaw);
+        }
+    }
+
+    /**
+     * Decay attached synapses in accordance with Alvarez and Squire 1994, eq 3.
+     */
+    private void decayAllSynapses() {
+        for (Neuron n : getNeuronGroup().getNeuronList()) {
+            for (Synapse synapse : n.getFanIn()) {
+                synapse.decay(synpaseDecayPercent);
+            }
+        }
+
+    }
+
+    /**
+     * Apply leaky learning to provided learning.
+     *
+     * @param neuron neuron to apply leaky learning to
+     */
+    private void leakyLearning(final Neuron neuron) {
+        double sumOfInputs = neuron.getTotalInput();
+        for (Synapse incoming : neuron.getFanIn()) {
+            activation = incoming.getSource().getActivation();
+            if (normalizeInputs) {
+                activation /= sumOfInputs;
+            }
+            val = incoming.getStrength() + leakyEpsilon
+                    * (activation - incoming.getStrength());
+            incoming.setStrength(val);
+        }
     }
 
     /**
@@ -172,9 +253,7 @@ public class Competitive extends Subnetwork {
      */
     public void normalizeIncomingWeights() {
 
-        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i
-                .hasNext();) {
-            Neuron n = (Neuron) i.next();
+        for (Neuron n : getNeuronGroup().getNeuronList()) {
             double normFactor = n.getSummedIncomingWeights();
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
@@ -188,9 +267,7 @@ public class Competitive extends Subnetwork {
     public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
-        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i
-                .hasNext();) {
-            Neuron n = (Neuron) i.next();
+        for (Neuron n : getNeuronGroup().getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
             }
@@ -289,13 +366,6 @@ public class Competitive extends Subnetwork {
     }
 
     /**
-     * @return The initial number of neurons.
-     */
-    public int getNumNeurons() {
-        return numNeurons;
-    }
-
-    /**
      * Return leaky epsilon value.
      *
      * @return Leaky epsilon value
@@ -349,14 +419,32 @@ public class Competitive extends Subnetwork {
         this.useLeakyLearning = useLeakyLearning;
     }
 
-    public boolean getEnabled() {
-        // TODO Auto-generated method stub
-        return false;
+    /**
+     * @return the synpaseDecayPercent
+     */
+    public double getSynpaseDecayPercent() {
+        return synpaseDecayPercent;
     }
 
-    public void setEnabled(boolean enabled) {
-        // TODO Auto-generated method stub
+    /**
+     * @param synpaseDecayPercent the synpaseDecayPercent to set
+     */
+    public void setSynpaseDecayPercent(double synpaseDecayPercent) {
+        this.synpaseDecayPercent = synpaseDecayPercent;
+    }
 
+    /**
+     * @return the updateMethod
+     */
+    public UpdateMethod getUpdateMethod() {
+        return updateMethod;
+    }
+
+    /**
+     * @param updateMethod the updateMethod to set
+     */
+    public void setUpdateMethod(UpdateMethod updateMethod) {
+        this.updateMethod = updateMethod;
     }
 
 }

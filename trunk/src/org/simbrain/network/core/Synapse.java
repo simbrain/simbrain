@@ -751,5 +751,15 @@ public class Synapse {
         this.parentGroup = parentGroup;
     }
 
+    /**
+     * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength
+     * in half.
+     *
+     * @param decayPercent decay percent
+     */
+    public void decay(final double decayPercent) {
+        double decayAmount = decayPercent * getStrength();
+        setStrength(getStrength() - decayAmount);
+    }
 
 }

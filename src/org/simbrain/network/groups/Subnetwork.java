@@ -43,6 +43,15 @@ public class Subnetwork extends Group {
     private int estimatedFinalSynapses = 0;
 
     /**
+     * Whether the GUI should display neuron groups contained in this
+     * subnetwork. This will usually be true, but in cases where a subnetwork
+     * has just one neuron group it is redundant to display both. So this flag
+     * indicates to the GUI that neuron groups in this subnetwork need not be
+     * displayed.
+     */
+    private boolean displayNeuronGroups = true;
+
+    /**
      * Create subnetwork group.
      *
      * @param net parent network.
@@ -447,6 +456,25 @@ public class Subnetwork extends Group {
      */
     public void setEstimatedFinalSynapses(int estimatedFinalSynapses) {
         this.estimatedFinalSynapses = estimatedFinalSynapses;
+    }
+
+    public boolean getNeuronGroupsVisible() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /**
+     * @return the displayNeuronGroups
+     */
+    public boolean isDisplayNeuronGroups() {
+        return displayNeuronGroups;
+    }
+
+    /**
+     * @param displayNeuronGroups the displayNeuronGroups to set
+     */
+    public void setDisplayNeuronGroups(boolean displayNeuronGroups) {
+        this.displayNeuronGroups = displayNeuronGroups;
     }
 
 }

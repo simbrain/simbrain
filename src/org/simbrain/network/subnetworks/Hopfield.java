@@ -75,6 +75,7 @@ public class Hopfield extends Subnetwork {
         setLabel("Hopfield network");
 
         this.setEstimatedFinalSynapses((int) Math.pow(numNeurons, 2));
+        this.setDisplayNeuronGroups(false);
 
         // Create the neurons
         for (int i = 0; i < numNeurons; i++) {

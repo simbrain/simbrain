@@ -106,7 +106,7 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
         som.setNeighborhoodDecayAmount(Double
                 .parseDouble(tfNeigborhoodDecayAmount.getText()));
         networkPanel.getNetwork().addGroup(som);
-        networkPanel.repaint();
+        networkPanel.getNetwork().fireNetworkChanged(); // Force interaction box to update
         super.closeDialogOk();
     }
 
@@ -125,7 +125,7 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
         logicPanel.addItem("Number of Neurons", tfNumNeurons);
         logicPanel.addItem("Initial Learning Rate", tfAlpha);
         logicPanel.addItem("Initial Neighborhood Size", tfNeighborhoodSize);
-        logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
+        //logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
         logicPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
         logicPanel.addItem("Neighborhood Decay Amount",
                 tfNeigborhoodDecayAmount);
@@ -149,13 +149,13 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        // SOM som = new SOM();
-        tfAlpha.setText("" + .6);
-        tfNeighborhoodSize.setText("" + 100);
+        tfAlpha.setText("" + SOM.DEFAULT_ALPHA);
+        tfNeighborhoodSize.setText("" + SOM.DEFAULT_INIT_NSIZE);
         tfNumNeurons.setText("" + 25);
         tfNumInputVectors.setText("" + 10);
-        tfAlphaDecayRate.setText("" + .2);
-        tfNeigborhoodDecayAmount.setText("" + .9);
+        tfAlphaDecayRate.setText("" + SOM.DEFAULT_DECAY_RATE);
+        tfNeigborhoodDecayAmount.setText(""
+                + SOM.DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT);
     }
 
 }

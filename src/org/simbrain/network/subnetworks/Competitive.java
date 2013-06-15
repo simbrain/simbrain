@@ -108,9 +108,7 @@ public class Competitive extends Subnetwork {
     public Competitive(final Network root, final int numNeurons,
             final Layout layout) {
         super(root, 1, 1);
-        // getSynapseGroup().setDeleteWhenEmpty(false);
-        // root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-        // getNeuronGroup(), getSynapseGroup());
+        this.setDisplayNeuronGroups(false);
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(root, new LinearRule()));
         }

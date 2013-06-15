@@ -74,126 +74,137 @@ public class Sparse extends ConnectNeurons {
 
     /** @inheritDoc */
     public List<Synapse> connectNeurons() {
+        //long begin = System.nanoTime();
         recurrent = testRecurrence();
         Neuron source;
         Neuron target;
         Synapse synapse;
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
         Random rand = new Random();
-        
 
-        if(sparseSpecific){         	
+        if (sparseSpecific) {
             ArrayList<Integer> targetList = new ArrayList<Integer>();
             ArrayList<Integer> tListCopy;
-            for(int i = 0; i < targetNeurons.size(); i++) {
-            	targetList.add(i);
+            for (int i = 0; i < targetNeurons.size(); i++) {
+                targetList.add(i);
             }
-            int numSyns;           
-            if(!allowSelfConnection && sourceNeurons == targetNeurons){
-            	numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons.size() - 1));
+            int numSyns;
+            if (!allowSelfConnection && sourceNeurons == targetNeurons) {
+                numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons
+                        .size() - 1));
             } else {
-            	numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size() );
+                numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons
+                        .size());
             }
-        	int synsPerSource = numSyns / sourceNeurons.size();
-        	int targStart = 0;
-        	int targEnd = synsPerSource;
-        	if(synsPerSource > numSyns/2) {
-        		synsPerSource = numSyns - synsPerSource;
-        		targStart = synsPerSource;
-        		targEnd = targetList.size();
-        	}
-        	
-        	for(int i = 0; i < sourceNeurons.size(); i++){
-        		source = sourceNeurons.get(i);   	
-        		if(!allowSelfConnection && recurrent) {
-        			tListCopy = new ArrayList<Integer>();
-        			for (int k = 0; k < targetList.size(); k++) {
-        				if (k == i) //Exclude oneself as a possible target
-        					continue;
-        				tListCopy.add(targetList.get(k));
-        			}
-    				randShuffleK(tListCopy, synsPerSource, rand);
-    			} else {
-    				randShuffleK(targetList, synsPerSource, rand);
-    				tListCopy = targetList;
-    			}
-        		
-        		for(int j = targStart; j < targEnd; j++){    			
-        			target = targetNeurons.get(tListCopy.get(j));
-        			if (Math.random() < excitatoryRatio) {
-                        synapse = baseExcitatorySynapse.instantiateTemplateSynapse(
-                                source, target, network);
+            int synsPerSource = numSyns / sourceNeurons.size();
+            int targStart = 0;
+            int targEnd = synsPerSource;
+            if (synsPerSource > numSyns / 2) {
+                synsPerSource = numSyns - synsPerSource;
+                targStart = synsPerSource;
+                targEnd = targetList.size();
+            }
+
+            for (int i = 0; i < sourceNeurons.size(); i++) {
+                source = sourceNeurons.get(i);
+                if (!allowSelfConnection && recurrent) {
+                    tListCopy = new ArrayList<Integer>();
+                    for (int k = 0; k < targetList.size(); k++) {
+                        if (k == i) // Exclude oneself as a possible target
+                            continue;
+                        tListCopy.add(targetList.get(k));
+                    }
+                    randShuffleK(tListCopy, synsPerSource, rand);
+                } else {
+                    randShuffleK(targetList, synsPerSource, rand);
+                    tListCopy = targetList;
+                }
+
+                for (int j = targStart; j < targEnd; j++) {
+                    target = targetNeurons.get(tListCopy.get(j));
+                    if (Math.random() < excitatoryRatio) {
+                        synapse = baseExcitatorySynapse
+                                .instantiateTemplateSynapse(source, target,
+                                        network);
                         if (enableExcitatoryRandomization) {
-                            synapse.setStrength(excitatoryRandomizer.getRandom());
+                            synapse.setStrength(excitatoryRandomizer
+                                    .getRandom());
                         } else {
                             synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
                         }
                     } else {
-                        synapse = baseInhibitorySynapse.instantiateTemplateSynapse(
-                                source, target, network);
+                        synapse = baseInhibitorySynapse
+                                .instantiateTemplateSynapse(source, target,
+                                        network);
                         if (enableInhibitoryRandomization) {
-                            synapse.setStrength(inhibitoryRandomizer.getRandom());
+                            synapse.setStrength(inhibitoryRandomizer
+                                    .getRandom());
                         } else {
                             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                         }
-                    }  			
-        			network.addSynapse(synapse);
+                    }
+                    network.addSynapse(synapse, displaySynapses);
                     syns.add(synapse);
-        		}
-        	}      	
+                }
+            }
         } else {
-        	for (int i=0; i < sourceNeurons.size(); i++) {
-        		for (int j = 0; j < targetNeurons.size(); j++) {
-        			if(!allowSelfConnection && recurrent &&
-        					i == j) {
-        				continue;
-        			} else {
-        				if(Math.random() < sparsity) {
-        					source = sourceNeurons.get(i);
-        	        		target = targetNeurons.get(j);
-        	        		if (Math.random() < excitatoryRatio) {
-        	                    synapse = baseExcitatorySynapse.instantiateTemplateSynapse(
-        	                            source, target, network);
-        	                    if (enableExcitatoryRandomization) {
-        	                        synapse.setStrength(excitatoryRandomizer.getRandom());
-        	                    } else {
-        	                        synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
-        	                    }
-        	                } else {
-        	                    synapse = baseInhibitorySynapse.instantiateTemplateSynapse(
-        	                            source, target, network);
-        	                    if (enableInhibitoryRandomization) {
-        	                        synapse.setStrength(inhibitoryRandomizer.getRandom());
-        	                    } else {
-        	                        synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
-        	                    }
-        	                }
-        	    			network.addSynapse(synapse);
-        	                syns.add(synapse);
-        				}
-        			}
-        		}
-        		                                                                           
-        	}	       	
-        }                   
+            for (int i = 0; i < sourceNeurons.size(); i++) {
+                for (int j = 0; j < targetNeurons.size(); j++) {
+                    if (!allowSelfConnection && recurrent && i == j) {
+                        continue;
+                    } else {
+                        if (Math.random() < sparsity) {
+                            source = sourceNeurons.get(i);
+                            target = targetNeurons.get(j);
+                            if (Math.random() < excitatoryRatio) {
+                                synapse = baseExcitatorySynapse
+                                        .instantiateTemplateSynapse(source,
+                                                target, network);
+                                if (enableExcitatoryRandomization) {
+                                    synapse.setStrength(excitatoryRandomizer
+                                            .getRandom());
+                                } else {
+                                    synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+                                }
+                            } else {
+                                synapse = baseInhibitorySynapse
+                                        .instantiateTemplateSynapse(source,
+                                                target, network);
+                                if (enableInhibitoryRandomization) {
+                                    synapse.setStrength(inhibitoryRandomizer
+                                            .getRandom());
+                                } else {
+                                    synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+                                }
+                            }
+                            network.addSynapse(synapse, displaySynapses);
+                            syns.add(synapse);
+                        }
+                    }
+                }
+
+            }
+        }
+        //long end = System.nanoTime();
+        //System.out.println("Connection:" + (end - begin) / Math.pow(10, 9));
         return syns;
     }
-    
+
     /**
-     * Randomly shuffles k integers in a list. The first k elements are
-     * randomly swapped with other elements in the list. This method will
-     * alter the list passed to it, so situations where this would be
-     * undesirable should pass this method a copy.
+     * Randomly shuffles k integers in a list. The first k elements are randomly
+     * swapped with other elements in the list. This method will alter the list
+     * passed to it, so situations where this would be undesirable should pass
+     * this method a copy.
      *
-     * @param inds a list of integers. This methods WILL shuffle inds, so pass
-     * a copy unless inds being shuffled is not a problem.
+     * @param inds a list of integers. This methods WILL shuffle inds, so pass a
+     *            copy unless inds being shuffled is not a problem.
      * @param k how many elements will be shuffled
      * @param rand a random number generator
      */
-    public void randShuffleK(ArrayList<Integer> inds, int k, Random rand) { 	
-    	for(int i = 0; i < k; i++) {
-    		Collections.swap(inds, i, rand.nextInt(inds.size()));
-    	}	
+    public void randShuffleK(ArrayList<Integer> inds, int k, Random rand) {
+        for (int i = 0; i < k; i++) {
+            Collections.swap(inds, i, rand.nextInt(inds.size()));
+        }
     }
 
     public static double getDEFAULT_SPARSITY() {
@@ -217,15 +228,15 @@ public class Sparse extends ConnectNeurons {
     }
 
     public void setSparseSpecific(boolean sparseSpecific) {
-    	
+
         this.sparseSpecific = sparseSpecific;
     }
 
-    public boolean isAllowSelfConnection() {   	
+    public boolean isAllowSelfConnection() {
         return allowSelfConnection;
     }
 
-    public void setAllowSelfConnection(boolean allowSelfConnection) {  	
+    public void setAllowSelfConnection(boolean allowSelfConnection) {
         this.allowSelfConnection = allowSelfConnection;
     }
 

@@ -115,7 +115,14 @@ import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
- * Network panel.
+ * Network panel where the logical neural network is displayed.
+ *
+ * Refactoring note: In a future refactor (perhaps for java 8 when this moves to
+ * FX) enforce a rule whereby composite objects are completely built and only
+ * then in a separate process are represented in the GUI. Currently this code
+ * can be hard to understand and maintain because of the various orders in which
+ * objects are added to the canvas. Another Example: the need for
+ * Subnetwork.estimatedFinalSynapses.
  */
 public class NetworkPanel extends JPanel {
 
@@ -239,7 +246,11 @@ public class NetworkPanel extends JPanel {
     /** Turn GUI on or off. */
     private boolean guiOn = true;
 
-    /** Whether synapses are visible or not. */
+    /**
+     * Whether synapses are visible or not. This is independent of
+     * synapsevisibilitythreshold, which prevents synapse pnodes from being
+     * created altogether.
+     */
     private boolean weightsVisible = true;
 
     /** Whether to display update priorities. */
@@ -780,6 +791,15 @@ public class NetworkPanel extends JPanel {
     /**
      * Add a model group node to the piccolo canvas.
      *
+     * Be aware that creation of groups is complex. parts of the groups can be
+     * added in different orders (e.g. a neurongroup inside a subnetwork, or
+     * neurons inside a neuron group, etc). These may or may not fire listeners
+     * So it is hard to make assumptions about which parts of a group have been
+     * added when this method is called. As an example, feedforward networks are
+     * created using all-to-all connection objects, which can call addSynpase as
+     * they are invoked, so that synapse nodes may are already here when the
+     * feed-forward node is created and added.
+     *
      * @param group the group to add
      */
     private void addGroup(Group group) {
@@ -808,25 +828,29 @@ public class NetworkPanel extends JPanel {
             objectNodeMap.put(group, neuronGroup);
             neuronGroup.updateBounds();
         } else if (group instanceof SynapseGroup) {
-            // Add synapse nodes to canvas
-            for (Synapse synapse : ((SynapseGroup) group).getSynapseList()) {
-                addSynapse(synapse);
-                SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-                canvas.getLayer().addChild(node);
-                nodes.add(node);
-            }
-            // Add synapse nodes to group node
-            GroupNode synapseGroupNode = createGroupNode(group);
-            for (PNode node : nodes) {
-                synapseGroupNode.addPNode(node);
-                node.moveToBack();
-            }
-            // Add neuron group to canvas
-            canvas.getLayer().addChild(synapseGroupNode);
-            objectNodeMap.put(group, synapseGroupNode);
-            synapseGroupNode.updateBounds();
-        } else if (group instanceof Subnetwork) {
+            if (((SynapseGroup) group).displaySynapses()) {
+                // Add synapse nodes to canvas
+                for (Synapse synapse : ((SynapseGroup) group).getSynapseList()) {
+                    addSynapse(synapse);
+                    SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
+                    canvas.getLayer().addChild(node);
+                    nodes.add(node);
+                }
+                // Add synapse nodes to group node
+                GroupNode synapseGroupNode = createGroupNode(group);
+                for (PNode node : nodes) {
+                    synapseGroupNode.addPNode(node);
+                    node.moveToBack();
+                }
 
+                // Add neuron group to canvas
+                canvas.getLayer().addChild(synapseGroupNode);
+                objectNodeMap.put(group, synapseGroupNode);
+                synapseGroupNode.updateBounds();
+            } else {
+                //TODO: Add code to display "empty synapse group" here.
+            }
+        } else if (group instanceof Subnetwork) {
             // Add neuron groups
             for (NeuronGroup neuronGroup : ((Subnetwork) group)
                     .getNeuronGroupList()) {
@@ -1458,10 +1482,10 @@ public class NetworkPanel extends JPanel {
         }
         return ret;
     }
-    
+
     /**
      * Returns selected neuron groups.
-     * 
+     *
      * @return list of neuron groups.
      */
     public ArrayList<NeuronGroup> getSelectedModelNeuronGroups() {
@@ -1473,10 +1497,10 @@ public class NetworkPanel extends JPanel {
     	}
     	return ng;
     }
-    
+
     /**
      * Returns selected synapse groups.
-     * 
+     *
      * @return list of synapse groups
      */
     public ArrayList<SynapseGroup> getSelectedModelSynapseGroups() {

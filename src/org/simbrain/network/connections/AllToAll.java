@@ -45,7 +45,8 @@ public class AllToAll extends ConnectNeurons {
     }
 
     /**
-     * Construct all to all connection object specifying only the parent network.
+     * Construct all to all connection object specifying only the parent
+     * network.
      *
      * @param network parent network
      */
@@ -56,6 +57,8 @@ public class AllToAll extends ConnectNeurons {
     /** {@inheritDoc} */
     public AllToAll() {
     }
+
+
 
     @Override
     public String toString() {
@@ -105,7 +108,7 @@ public class AllToAll extends ConnectNeurons {
                             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                         }
                     }
-                    network.addSynapse(synapse);
+                    network.addSynapse(synapse, displaySynapses);
                     syns.add(synapse);
                 }
             }

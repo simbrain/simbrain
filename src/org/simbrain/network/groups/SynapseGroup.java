@@ -32,6 +32,13 @@ public class SynapseGroup extends Group {
     private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
 
     /**
+     * An estimate of how many synapses this subnetwork will have. A bit of a
+     * hack. Needed because when synapse visibility is being determined, not all
+     * synapses may have been added to the network.
+     */
+    private int estimatedFinalSynapses = 0;
+
+    /**
      * Construct a synapse group from a list of synapses.
      *
      * @param net parent network
@@ -202,4 +209,41 @@ public class SynapseGroup extends Group {
         return synapseList.isEmpty();
     }
 
+    /**
+     * Determine whether this synpasegroup should have its synapses displayed.
+     * For isolated synapse groups check its number of synapses. For
+     * synapsegroups inside of subnetworks check the total synapses in the
+     * parent subnetwork.
+     *
+     * @return whether to display synapses or not.
+     */
+    public boolean displaySynapses() {
+        int threshold = getParentNetwork()
+                .getSynapseVisibilityThreshold();
+
+        // Isolated synapse group
+        if (getParentGroup() == null) {
+            if ((getSynapseList().size() > threshold)
+                    || (estimatedFinalSynapses > threshold)) {
+                return false;
+            }
+        } else if (getParentGroup() instanceof Subnetwork) {
+            return ((Subnetwork) getParentGroup()).displaySynapses();
+        }
+        return true;
+    }
+
+    /**
+     * @return the estimatedFinalSynapses
+     */
+    public int getEstimatedFinalSynapses() {
+        return estimatedFinalSynapses;
+    }
+
+    /**
+     * @param estimatedFinalSynapses the estimatedFinalSynapses to set
+     */
+    public void setEstimatedFinalSynapses(int estimatedFinalSynapses) {
+        this.estimatedFinalSynapses = estimatedFinalSynapses;
+    }
 }

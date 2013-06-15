@@ -413,13 +413,15 @@ public class ESNCreationDialog extends StandardDialog implements
             }
 
             // Initialize logical network builder
-            EchoStateNetwork esn = new EchoStateNetwork(
-                    panel.getNetwork(),
-                    // Get layer size values from fields...
-                    Integer.parseInt(tfNumInputs.getText()),
-                    Integer.parseInt(tfNumReservoir.getText()),
-                    Integer.parseInt(tfNumOutputs.getText()),
-                    panel.getLastClickedPosition());
+            int numInputs = Integer.parseInt(tfNumInputs.getText());
+            int numRes= Integer.parseInt(tfNumReservoir.getText());
+            int numOut = Integer.parseInt(tfNumOutputs.getText());
+            EchoStateNetwork esn = new EchoStateNetwork(panel.getNetwork(),
+                    numInputs, numRes, numOut, panel.getLastClickedPosition());
+
+            // TODO: Add other connections to estimate;
+            esn.setEstimatedFinalSynapses((int) (Math.pow(numRes, 2) * resRecurrent
+                    .getConnection().getSparsity()));
 
             esn.setSpectralRadius(Double.parseDouble(maxEigenValue.getText()));
             esn.setRecurrentOutWeights(recurrentOutputWeights.isSelected());
@@ -433,7 +435,6 @@ public class ESNCreationDialog extends StandardDialog implements
             esn.setOutputNeuronType(outUp);
 
             // Build network
-
             esn.buildNetwork();
             esn.connectLayers(inToRes.getConnection(),
                     resRecurrent.getConnection(), outToRes.getConnection());

@@ -74,6 +74,8 @@ public class Hopfield extends Subnetwork {
         super(root, 1, 1);
         setLabel("Hopfield network");
 
+        this.setEstimatedFinalSynapses((int) Math.pow(numNeurons, 2));
+
         // Create the neurons
         for (int i = 0; i < numNeurons; i++) {
             BinaryRule binary = new BinaryRule();
@@ -95,7 +97,7 @@ public class Hopfield extends Subnetwork {
                     Synapse newSynapse = new Synapse(source, target,
                             new ClampedSynapseRule());
                     newSynapse.setStrength(0);
-                    getSynapseGroup().addSynapse(newSynapse);
+                    getSynapseGroup().addSynapse(newSynapse, displaySynapses());
                 }
             }
         }

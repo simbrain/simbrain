@@ -92,6 +92,7 @@ import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
+import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
@@ -570,6 +571,8 @@ public final class NetworkActionManager {
         return Arrays.asList(new Action[] {
                 new AddGroupAction(networkPanel, new BackpropCreationDialog(
                         networkPanel), "Backprop"),
+                new AddGroupAction(networkPanel, new BPTTCreationDialog(
+                        networkPanel), "Backprop Through Time"),
                 new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
                         networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new ESNCreationDialog(

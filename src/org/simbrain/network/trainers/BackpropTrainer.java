@@ -42,9 +42,6 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
  */
 public class BackpropTrainer extends IterableTrainer {
 
-    /** Iteration number. */
-    private int iteration;
-
     /** Current error. */
     private double mse;
 
@@ -84,7 +81,7 @@ public class BackpropTrainer extends IterableTrainer {
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
-        iteration = 0;
+        this.setIteration(0);
         mse = 0;
         //SimnetUtils.printLayers(layers);
     }
@@ -141,7 +138,7 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Update MSE
         mse = mse / (numRows * network.getOutputNeurons().size());
-        iteration++;
+        incrementIteration();
         fireErrorUpdated();
     }
 
@@ -252,13 +249,6 @@ public class BackpropTrainer extends IterableTrainer {
             neuron.randomizeFanIn();
             neuron.randomizeBias(-.5, .5);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getIteration() {
-        return iteration;
     }
 
     /**

@@ -200,6 +200,7 @@ public class ESNCreationDialog extends StandardDialog implements
         sectionSeparator("Network Parameters", gbc, 1);
 
         // Add text-fields
+        tfNumInputs.setColumns(5);
         esnPanel.addItem("Input Nodes:", tfNumInputs);
         esnPanel.addItem(new JLabel("Reservoir Neuron Type:"),
                 reservoirNeuronTypes, 2);

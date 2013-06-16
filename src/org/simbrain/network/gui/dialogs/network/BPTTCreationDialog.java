@@ -18,13 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.GridBagConstraints;
 import java.util.HashMap;
 
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -32,19 +29,16 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
-import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
+import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * Creates a GUI dialog to set the parameters for and then build a simple
- * recurrent network.
+ * Creates a GUI dialog to set the parameters for and then build a BPTT Network.
  *
  * @author Jeff Yoshimi
  */
-
-@SuppressWarnings("serial")
-public class SRNCreationDialog extends StandardDialog {
+public class BPTTCreationDialog extends StandardDialog {
 
     /** Underlying Network Panel */
     private final NetworkPanel panel;
@@ -53,13 +47,10 @@ public class SRNCreationDialog extends StandardDialog {
     private LabelledItemPanel srnPanel = new LabelledItemPanel();
 
     /** Text field for number of input nodes */
-    private JTextField tfNumInputs = new JTextField();
+    private JTextField tfNumInputsOutputs = new JTextField();
 
     /** Text field for number of hidden layer nodes */
     private JTextField tfNumHidden = new JTextField();
-
-    /** Text field for number of output nodes */
-    private JTextField tfNumOutputs = new JTextField();
 
     /**
      * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
@@ -87,40 +78,26 @@ public class SRNCreationDialog extends StandardDialog {
     /** Combo box for selecting update rule for the hidden layer */
     private JComboBox hiddenNeuronTypes = new JComboBox(options);
 
-    /** Combo box for selecting the update rule for the ourput layer */
+    /** Combo box for selecting the update rule for the output layer */
     private JComboBox outputNeuronTypes = new JComboBox(options);
 
     /**
      * Constructs a labeled item panel dialog for the creation of a simple
      * recurrent network.
      *
-     * @param panel the network panel the SRN will be tied to
+     * @param panel the network panel the BPTT will be tied to
      */
-    public SRNCreationDialog(final NetworkPanel panel) {
+    public BPTTCreationDialog(final NetworkPanel panel) {
         this.panel = panel;
 
-        // Grid bag constraints for manual positioning see #sectionSeparator
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        setTitle("Build Simple Recurrent Network");
-
-        // Set grid bag constraints
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        srnPanel.setMyNextItemRow(1);
-        gbc.gridy = srnPanel.getMyNextItemRow();
-        gbc.gridx = 0;
-
-        // Add separator and title for fields below the separator
-        sectionSeparator("Network Parameters", gbc, 1);
+        setTitle("Build Backprop Through Time Network");
 
         // Add fields
-        tfNumInputs.setColumns(5);
-        srnPanel.addItem("Number of input nodes:", tfNumInputs);
-        srnPanel.addItem("Hidden Neuron Type:", hiddenNeuronTypes, 2);
+        tfNumInputsOutputs.setColumns(5);
+        srnPanel.addItem("Number of input / outupt nodes:", tfNumInputsOutputs);
+        // srnPanel.addItem("Hidden Neuron Type:", hiddenNeuronTypes, 2);
         srnPanel.addItem("Number of hidden nodes:", tfNumHidden);
-        srnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
-        srnPanel.addItem("Number of output nodes:", tfNumOutputs);
+        // srnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
 
         // Fill fields with default values
         fillFieldValues();
@@ -129,42 +106,11 @@ public class SRNCreationDialog extends StandardDialog {
     }
 
     /**
-     * Creates a new dialog section given a title and using a JSeparator.
-     *
-     * @param label name of the section
-     * @param gbc current GridBagConstraints, to align label and separators
-     * @param cRow current row relative to LabeledItemPanel
-     */
-    public void sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
-        // Section label
-        srnPanel.add(new JLabel(label), gbc);
-
-        // Place separator directly below label
-        cRow++;
-        srnPanel.setMyNextItemRow(cRow);
-        gbc.gridy = srnPanel.getMyNextItemRow();
-
-        // Add separators upping gridx each time to cover each column
-        srnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        gbc.gridx = 1;
-        srnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        gbc.gridx = 2;
-        srnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-
-        // Ensures section content will be below section separator
-        cRow++;
-        srnPanel.setMyNextItemRow(cRow);
-        // Reset column value
-        gbc.gridx = 0;
-    }
-
-    /**
      * Fills the fields with default values.
      */
     public void fillFieldValues() {
-        tfNumInputs.setText("" + 5);
-        tfNumHidden.setText("" + 7);
-        tfNumOutputs.setText("" + 5);
+        tfNumInputsOutputs.setText("" + 5);
+        tfNumHidden.setText("" + 5);
         hiddenNeuronTypes.setSelectedIndex(2);
     }
 
@@ -172,21 +118,17 @@ public class SRNCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-
             NeuronUpdateRule hidType = boxMap.get(hiddenNeuronTypes
                     .getSelectedItem());
             NeuronUpdateRule outType = boxMap.get(outputNeuronTypes
                     .getSelectedItem());
-            SimpleRecurrentNetwork srn = new SimpleRecurrentNetwork(
-                    panel.getNetwork(),
-                    Integer.parseInt(tfNumInputs.getText()),
+            BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(),
+                    Integer.parseInt(tfNumInputsOutputs.getText()),
                     Integer.parseInt(tfNumHidden.getText()),
-                    Integer.parseInt(tfNumOutputs.getText()),
-                    hidType,
-                    outType,
+                    Integer.parseInt(tfNumInputsOutputs.getText()),
                     panel.getLastClickedPosition());
 
-            srn.getParentNetwork().addGroup(srn);
+            bptt.getParentNetwork().addGroup(bptt);
             srnPanel.setVisible(false);
             dispose();
 

@@ -319,5 +319,25 @@ public class NeuronGroup extends Group {
             neuron.setY(neuron.getY() + offsetY);
         }
     }
+    
+    /**
+     * Set all activations to 0.
+     */
+    public void clearActivations() {
+        for (Neuron n : this.getNeuronList()) {
+            n.clear();
+        }
+    }
+
+    /**
+     * Set all activations to specified values.
+     *
+     * @value the value to set neurons to
+     */
+    public void setActivationLevels(double value) {
+        for (Neuron n : this.getNeuronList()) {
+            n.setActivation(value);
+        }
+    }
 
 }

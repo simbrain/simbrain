@@ -323,6 +323,19 @@ public class EchoStateNetwork extends Subnetwork {
             }
         }
 
+        // Make the training set by harvesting reservoir states
+        final double[][] harvestedData = harvestData();
+        if (harvestedData[0].length != full.size()) {
+            throw new IllegalArgumentException(
+                    "Input data length does not "
+                            + "match training node set");
+        }
+        // System.out.println("-------");
+        // System.out.println(Utils.doubleMatrixToString(mainInputData));
+        final TrainingSet trainingSet = new TrainingSet();
+        trainingSet.setInputData(harvestedData);
+        trainingSet.setTargetData(targetData);
+
         // Make Trainable object
         Trainable trainable = new Trainable() {
 
@@ -339,22 +352,11 @@ public class EchoStateNetwork extends Subnetwork {
 
             @Override
             public TrainingSet getTrainingSet() {
-
-                // Below from getInputData
-                // Harvest the reservoir states
-                final double[][] harvestedData = harvestData();
-                if (harvestedData[0].length != full.size()) {
-                    throw new IllegalArgumentException(
-                            "Input data length does not "
-                                    + "match training node set");
-                }
-                // System.out.println("-------");
-                // System.out.println(Utils.doubleMatrixToString(mainInputData));
-                TrainingSet trainingSet = new TrainingSet();
-                trainingSet.setInputData(harvestedData);
-                trainingSet.setTargetData(targetData);
-
                 return trainingSet;
+            }
+
+            @Override
+            public void initNetwork() {
             }
 
         };

@@ -235,6 +235,26 @@ public abstract class IterableTrainer extends Trainer {
     }
 
     /**
+     * Returns the number of rows in whichever dataset has fewer rows.
+     * Used when mismatched datasets are in use.
+     *
+     * @return least number of rows
+     */
+    protected int getMinimumNumRows(Trainable network) {
+        if ((network.getTrainingSet().getInputData() == null)
+                || (network.getTrainingSet() == null)) {
+            return 0;
+        }
+        int inputRows = network.getTrainingSet().getInputData().length;
+        int targetRows = network.getTrainingSet().getTargetData().length;
+        if (inputRows < targetRows) {
+            return inputRows;
+        } else {
+            return targetRows;
+        }
+    }
+
+    /**
      * @return the stoppingCondition
      */
     public StoppingCondition getStoppingCondition() {

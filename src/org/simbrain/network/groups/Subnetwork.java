@@ -472,4 +472,13 @@ public class Subnetwork extends Group {
         this.displayNeuronGroups = displayNeuronGroups;
     }
 
+    /**
+     * Set all activations to 0.
+     */
+    public void clearActivations() {
+        for (Neuron n : this.getFlatNeuronList()) {
+            n.clear();
+        }
+    }
+
 }

@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,6 +26,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.Utils;
 
 /**
  * A group of neurons.
@@ -338,6 +340,28 @@ public class NeuronGroup extends Group {
         for (Neuron n : this.getNeuronList()) {
             n.setActivation(value);
         }
+    }
+
+    /**
+     * Copy activations from one neuron group to this one.
+     *
+     * @param toCopy the group to copy activations from.
+     */
+    public void copyActivations(NeuronGroup toCopy) {
+        int i = 0;
+        for (Neuron neuron : toCopy.getNeuronList()) {
+            if (i < neuronList.size()) {
+                neuronList.get(i++).setActivation(neuron.getActivation());
+            }
+        }
+    }
+
+    /**
+     * Print activations as a vector.
+     */
+    public void printActivations() {
+        System.out.println(Utils.doubleArrayToString(Network
+                .getActivationVector(neuronList)));
     }
 
 }

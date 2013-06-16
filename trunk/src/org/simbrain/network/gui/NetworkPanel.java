@@ -76,6 +76,7 @@ import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.BPTTNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNode;
 import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
@@ -93,6 +94,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
@@ -646,6 +648,9 @@ public class NetworkPanel extends JPanel {
                 } else if (group instanceof LMSNetwork) {
                     ret = new LMSNetworkNode(NetworkPanel.this,
                             (LMSNetwork) group);
+                } else if (group instanceof BPTTNetwork) {
+                    ret = new BPTTNode(NetworkPanel.this,
+                            (BPTTNetwork) group);
                 } else {
                     ret = new SubnetworkNode(NetworkPanel.this,
                             (Subnetwork) group);

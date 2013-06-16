@@ -58,13 +58,13 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     private NeuronGroup contextLayer;
 
     /** Reference to the input layer. */
-    private NeuronGroup inputLayer;
+    private final NeuronGroup inputLayer;
 
     /** Reference to the hidden layer. */
-    private NeuronGroup hiddenLayer;
+    private final NeuronGroup hiddenLayer;
 
     /** Reference to the output layer. */
-    private NeuronGroup outputLayer;
+    private final NeuronGroup outputLayer;
 
     /** Initial position of network (from bottom left). */
     private Point2D initialPosition;
@@ -146,9 +146,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         contextLayer.setLabel("Context nodes");
         addNeuronGroup(contextLayer);
-        for (Neuron n : contextLayer.getNeuronList()) {
-            n.setActivation(0.5); // TODO: Make helper method
-        }
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
                 Direction.EAST, betweenLayerInterval);
 
@@ -202,6 +199,14 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     }
 
     @Override
+    public void initNetwork() {
+        clearActivations();
+        // TODO: Do this once there is a GUI hook to make sure this is done
+        // when the user tests the network
+        //contextLayer.setActivationLevels(.5);
+    }
+
+    @Override
     public void update() {
 
         //inputLayer.update();
@@ -217,82 +222,13 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         outputLayer.update();
     }
 
-    /**
-     * Return a trainer object that can be used to train this SRN. The trainer
-     * contains the "logical" training set for this network, which consists of
-     * input vectors concatenated with context unit vectors, paired with target
-     * vectors. Compare getTrainer() in ESN.
-     *
-     * @return the trainer.
-     */
-    public IterableTrainer getTrainer() {
-
-        final ArrayList<Neuron> logicalInputLayer = new ArrayList<Neuron>();
-        logicalInputLayer.addAll(getInputNeurons());
-        logicalInputLayer.addAll(contextLayer.getNeuronList());
-
-        // Create the logicalTrainingSet
-        final double[][] logicalInputData = createLogicalInputData();
-        //System.out.println("-------");
-        //System.out.println(Utils.doubleMatrixToString(logicalInputData));
-        final TrainingSet logicalTrainingSet = new TrainingSet();
-        logicalTrainingSet.setInputData(logicalInputData);
-        logicalTrainingSet.setTargetData(trainingSet.getTargetData());
-
-        // Make Trainable object
-        Trainable trainable = new Trainable() {
-
-            @Override
-            public List<Neuron> getInputNeurons() {
-                return logicalInputLayer;
-            }
-
-            @Override
-            public List<Neuron> getOutputNeurons() {
-                return SimpleRecurrentNetwork.this.getOutputNeurons();
-            }
-
-            @Override
-            public TrainingSet getTrainingSet() {
-                return logicalTrainingSet;
-            }
-
-        };
-        // Create the backprop trainer.
-        BackpropTrainer trainer = new BackpropTrainer(trainable,
-                this.getNeuronGroupsAsList());
-        return trainer;
-
-    }
-
-    /**
-     * Creates the "logical" input data, harvesting it in a way, by going
-     * through each row vector of the regular input data (which the user
-     * specifies) finding the context layer activations, and adding this vector
-     * to a concatenated vector which is the input vector used by the backprop
-     * trainer.
-     *
-     * @return the logical input data
-     */
-    private double[][] createLogicalInputData() {
-        double inputData[][] = trainingSet.getInputData();
-        int columns = inputLayer.getNeuronList().size()
-                + contextLayer.getNeuronList().size();
-        double logicalInputData[][] = new double[inputData.length][columns];
-        for (int row = 0; row < inputData.length; row++) {
-            inputLayer.setActivations(inputData[row]);
-            update();
-            for (int i = 0; i < inputLayer.getNeuronList().size(); i++) {
-                logicalInputData[row][i] = inputData[row][i];
-            }
-            for (int i = 0; i < contextLayer.getNeuronList().size(); i++) {
-                logicalInputData[row][i + inputLayer.getNeuronList().size()] = contextLayer
-                        .getNeuronList().get(i).getActivation();
-            }
-            //System.out.println(Utils.doubleArrayToString((logicalInputData[row])));
-        }
-        // System.out.println(Utils.doubleMatrixToString(logicalInputData));
-        return logicalInputData;
+    @Override
+    public List<List<Neuron>> getNeuronGroupsAsList() {
+        List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
+        ret.add(getInputNeurons());
+        ret.add(getHiddenLayer().getNeuronList());
+        ret.add(getOutputNeurons());
+        return ret;
     }
 
     @Override
@@ -308,6 +244,20 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
+    }
+
+    /**
+     * @return the contextLayer
+     */
+    public NeuronGroup getContextLayer() {
+        return contextLayer;
+    }
+
+    /**
+     * @return the hiddenLayer
+     */
+    public NeuronGroup getHiddenLayer() {
+        return hiddenLayer;
     }
 
 }

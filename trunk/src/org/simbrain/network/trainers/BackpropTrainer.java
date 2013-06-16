@@ -86,7 +86,7 @@ public class BackpropTrainer extends IterableTrainer {
         biasDeltaMap = new HashMap<Neuron, Double>();
         iteration = 0;
         mse = 0;
-        // SimnetUtils.printLayers(layers);
+        //SimnetUtils.printLayers(layers);
     }
 
     // One pass through the training data
@@ -103,6 +103,7 @@ public class BackpropTrainer extends IterableTrainer {
             return;
         }
 
+        network.initNetwork();
         for (int row = 0; row < numRows; row++) {
 
             // Set activations on input layer
@@ -114,7 +115,7 @@ public class BackpropTrainer extends IterableTrainer {
             }
 
             // Update network
-            updateNetwork(network);
+            updateNetwork();
 
             // Set weight and bias deltas by backpropagating error
             backpropagateError(network, row);
@@ -235,12 +236,21 @@ public class BackpropTrainer extends IterableTrainer {
         for (List<Neuron> layer : layers) {
             // Don't update input layer
             if (layers.indexOf(layer) > 0) {
-                for (Neuron neuron : layer) {
-                    neuron.clear(); // Looks nicer in the GUI
-                    neuron.randomizeFanIn();
-                    neuron.randomizeBias(-.5, .5);
-                }
+                randomize(layer);
             }
+        }
+    }
+
+    /**
+     * Randomize the specified layer.
+     *
+     * @param layer the layer to randomize
+     */
+    protected void randomize(List<Neuron> layer) {
+        for (Neuron neuron : layer) {
+            neuron.clear(); // Looks nicer in the GUI
+            neuron.randomizeFanIn();
+            neuron.randomizeBias(-.5, .5);
         }
     }
 
@@ -259,23 +269,9 @@ public class BackpropTrainer extends IterableTrainer {
     }
 
     /**
-     * @return the layers
-     */
-    public List<List<Neuron>> getLayers() {
-        return layers;
-    }
-
-    /**
-     * @param layers the layers to set
-     */
-    public void setLayers(List<List<Neuron>> layers) {
-        this.layers = layers;
-    }
-
-    /**
      * Update internally constructed network.
      */
-    private void updateNetwork(Trainable network) {
+    protected void updateNetwork() {
         for (List<Neuron> layer : layers) {
             if (layers.indexOf(layer) != 0) {
                 Network.updateNeurons(layer);
@@ -297,26 +293,7 @@ public class BackpropTrainer extends IterableTrainer {
         this.learningRate = learningRate;
     }
 
-    /**
-     * Returns the number of rows in whichever dataset has fewer rows.
-     *
-     * TODO: Move to superclass? Clarify use.
-     *
-     * @return least number of rows
-     */
-    private int getMinimumNumRows(Trainable network) {
-        if ((network.getTrainingSet().getInputData() == null)
-                || (network.getTrainingSet() == null)) {
-            return 0;
-        }
-        int inputRows = network.getTrainingSet().getInputData().length;
-        int targetRows = network.getTrainingSet().getTargetData().length;
-        if (inputRows < targetRows) {
-            return inputRows;
-        } else {
-            return targetRows;
-        }
-    }
+
 
     /**
      * Test method.

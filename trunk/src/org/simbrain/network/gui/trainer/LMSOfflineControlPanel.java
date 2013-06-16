@@ -276,7 +276,9 @@ public class LMSOfflineControlPanel extends JPanel {
                     regSwitch.setForeground(Color.green);
                     alpha.setEnabled(true);
                 }
-                frame.pack();
+                if (frame != null) {
+                    frame.pack();
+                }
             }
 
         });

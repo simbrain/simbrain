@@ -54,4 +54,8 @@ public class LMSNetwork extends FeedForward implements Trainable {
         return trainingSet;
     }
 
+    @Override
+    public void initNetwork() {
+    }
+
 }

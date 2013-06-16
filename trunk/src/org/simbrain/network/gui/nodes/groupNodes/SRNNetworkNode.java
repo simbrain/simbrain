@@ -28,9 +28,10 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.SRNTrainingPanel;
+import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
+import org.simbrain.network.trainers.SRNTrainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
@@ -128,8 +129,8 @@ public class SRNNetworkNode extends SubnetworkNode {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getGroup();
-            SRNTrainingPanel trainingPanel = new SRNTrainingPanel(
-                    getNetworkPanel(), network);
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
+                    getNetworkPanel(), new SRNTrainer(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
                     "Trainer");
             trainingPanel.setFrame(frame);

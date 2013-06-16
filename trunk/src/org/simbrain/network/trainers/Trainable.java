@@ -48,4 +48,10 @@ public interface Trainable {
      */
     TrainingSet getTrainingSet();
 
+    /**
+     * Initialize the network. E.g. used before a training run for SRN's to
+     * clear activations.
+     */
+    void initNetwork();
+
 }

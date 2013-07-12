@@ -361,15 +361,15 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Connect input layer to hidden layer
         AllToAll connection = new AllToAll(network, inputLayer, hiddenLayer);
-        connection.connectNeurons();
+        connection.connectNeurons(true);
 
         // Connect hidden layer to hidden layer2
         AllToAll connection2 = new AllToAll(network, hiddenLayer, hiddenLayer2);
-        connection2.connectNeurons();
+        connection2.connectNeurons(true);
 
         // Connect hidden layer2 to output layer
         AllToAll connection3 = new AllToAll(network, hiddenLayer2, outputLayer);
-        connection3.connectNeurons();
+        connection3.connectNeurons(true);
 
         // Randomize weights and biases
         network.randomizeWeights();

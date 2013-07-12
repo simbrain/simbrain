@@ -66,7 +66,7 @@ public class AllToAll extends ConnectNeurons {
     }
 
     /** {@inheritDoc} */
-    public List<Synapse> connectNeurons() {
+    public List<Synapse> connectNeurons(final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
         Random rGen = new Random();
         int numConnects = 0;
@@ -76,7 +76,7 @@ public class AllToAll extends ConnectNeurons {
         int numEx = (int) (excitatoryRatio * numConnects);
         int numIn = numConnects - numEx;
 
-        // TODO: percent excititory currently not guaranteed for recurrent
+        // TODO: percent excitatory currently not guaranteed for recurrent
         // connections (source list == target list) when self connection is
         // not allowed
 
@@ -108,7 +108,9 @@ public class AllToAll extends ConnectNeurons {
                             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                         }
                     }
-                    network.addSynapse(synapse, displaySynapses);
+                    if (looseSynapses) {
+                        network.addSynapse(synapse);
+                    }
                     syns.add(synapse);
                 }
             }

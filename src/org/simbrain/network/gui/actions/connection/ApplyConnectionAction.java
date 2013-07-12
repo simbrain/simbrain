@@ -79,7 +79,7 @@ public final class ApplyConnectionAction extends AbstractAction {
             // Not used..
             connection.connectNeurons(networkPanel.getNetwork(),
                     networkPanel.getSelectedModelNeurons(),
-                    networkPanel.getSelectedModelNeurons());
+                    networkPanel.getSelectedModelNeurons(), true);
         } else {
             if (connection instanceof AllToAll) {
                 optionsPanel = new AllToAllPanel((AllToAll) connection);
@@ -96,7 +96,7 @@ public final class ApplyConnectionAction extends AbstractAction {
                 optionsPanel.fillFieldValues();
             }
             ConnectionDialog dialog = new ConnectionDialog(networkPanel,
-            		optionsPanel, connection);   
+            		optionsPanel, connection);
             dialog.setLocationRelativeTo(null);
             dialog.pack();
             dialog.setVisible(true);

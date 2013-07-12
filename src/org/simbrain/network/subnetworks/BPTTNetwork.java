@@ -57,9 +57,6 @@ public final class BPTTNetwork extends FeedForward implements
         super(network, new int[] { numInputNodes, numHiddenNodes,
                 numOutputNodes }, initialPosition);
 
-        this.setEstimatedFinalSynapses((int) (numInputNodes * numHiddenNodes)
-                + (numHiddenNodes * numOutputNodes));
-
         this.getInputLayer().setNeuronType(new LinearRule());
         setLabel("BPTT");
 

@@ -17,7 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.Arrays;
+import java.awt.geom.Point2D;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,12 +26,18 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.Utils;
 
 /**
  * A group of neurons.
  */
 public class NeuronGroup extends Group {
+
+    /** Space between neurons within a layer. */
+    private int betweenNeuronInterval = 50;
 
     /** The neurons in this group. */
     private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
@@ -46,12 +52,47 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     *
+     * @param net
+     * @param initialPosition
+     * @param numNeurons
+     */
+    public NeuronGroup(final Network net, Point2D initialPosition,
+            final int numNeurons) {
+        super(net);
+        // Layout
+        LineLayout layout = new LineLayout(betweenNeuronInterval,
+                LineOrientation.HORIZONTAL);
+
+        for (int i = 0; i < numNeurons; i++) {
+            addNeuron(new Neuron(net, new LinearRule()));
+        }
+
+        layout.setInitialLocation(initialPosition);
+        layout.layoutNeurons(this.getNeuronList());
+        // Collections.sort(neuronList, Comparators.X_ORDER);
+    }
+
+    /**
      * Create a neuron group without any initial neurons.
      *
      * @param root parent network
      */
     public NeuronGroup(final Network root) {
         super(root);
+    }
+    //TODO: Rename root
+    /**
+     * Copy constructor.
+     * pass in network for cases where a group is pasted from one network to another
+     *
+     * @param root parent network
+     */
+    public NeuronGroup(final Network root, final NeuronGroup toCopy) {
+        super(root);
+        for(Neuron neuron : toCopy.getNeuronList()) {
+            this.addNeuron(new Neuron(root, neuron));
+        }
     }
 
     @Override
@@ -68,8 +109,7 @@ public class NeuronGroup extends Group {
             if (getParentGroup() instanceof Subnetwork) {
                 ((Subnetwork) getParentGroup()).removeNeuronGroup(this);
             }
-            if (getParentGroup().isEmpty()
-                    && getParentGroup().isDeleteWhenEmpty()) {
+            if (getParentGroup().isEmpty()) {
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
@@ -177,7 +217,8 @@ public class NeuronGroup extends Group {
     public void removeNeuron(Neuron toDelete) {
 
         neuronList.remove(toDelete);
-        if (isEmpty() && isDeleteWhenEmpty()) {
+        //System.out.println("NeuronGroup.removeNeuron" + toDelete);
+        if (isEmpty()) {
             delete();
         }
         // getParent().fireGroupChanged(this, this);
@@ -195,7 +236,6 @@ public class NeuronGroup extends Group {
     public boolean isEmpty() {
         return neuronList.isEmpty();
     }
-
 
     /**
      * Set activations of neurons using an array of doubles. Assumes the order
@@ -321,7 +361,7 @@ public class NeuronGroup extends Group {
             neuron.setY(neuron.getY() + offsetY);
         }
     }
-    
+
     /**
      * Set all activations to 0.
      */

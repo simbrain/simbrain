@@ -25,11 +25,14 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
  * collections of network objects (neurons, synapses, groups, text objects,
  * etc.).
+ *
+ * TODO: Move back to GUI? Why here?
  */
 public class CopyPaste {
 
@@ -65,6 +68,10 @@ public class CopyPaste {
                 NetworkTextObject newText = new NetworkTextObject(newParent,
                         text);
                 ret.add(newText);
+            } else if (item instanceof NeuronGroup) {
+                NeuronGroup oldGroup = (NeuronGroup) item;
+                NeuronGroup newGroup = new NeuronGroup(newParent, oldGroup);
+                ret.add(newGroup);
             }
         }
 

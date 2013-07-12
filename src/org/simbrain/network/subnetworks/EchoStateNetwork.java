@@ -243,13 +243,13 @@ public class EchoStateNetwork extends Subnetwork {
         // If recurrent output weights are on, set up an empty, growing synapse
         // group on the output layer
         if (recurrentOutWeights) {
-            addEmptySynapseGroup(outputLayer, outputLayer);
+            connectNeuronGroups(outputLayer, outputLayer);
         }
 
         // If direct in-out weights are on, set up an empty, growing synapse
         // group connecting the input layer directly to the output layer
         if (directInOutWeights) {
-            addEmptySynapseGroup(inputLayer, outputLayer);
+            connectNeuronGroups(inputLayer, outputLayer);
         }
 
         // Scale the reservoir's weights to have the desired spectral radius

@@ -652,24 +652,6 @@ public class Neuron {
     }
 
     /**
-     * Return true if this neuron has a motor coupling attached.
-     *
-     * @return true if this neuron has a motor coupling attached
-     */
-    public boolean isOutput() {
-        return false;
-    }
-
-    /**
-     * Return true if this neuron has a sensory coupling attached.
-     *
-     * @return true if this neuron has a sensory coupling attached
-     */
-    public boolean isInput() {
-        return false;
-    }
-
-    /**
      * True if the synapse is connected to this neuron, false otherwise.
      *
      * @param s the synapse to check.

@@ -84,12 +84,12 @@ public class Radial extends ConnectNeurons {
         return "Radial";
     }
 
-    /** @inheritDoc */
-    public List<Synapse> connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons(final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
-            makeExcitatory(source, syns);
-            makeInhibitory(source, syns);
+            makeExcitatory(source, syns, looseSynapses);
+            makeInhibitory(source, syns, looseSynapses);
         }
         return syns;
     }
@@ -100,7 +100,8 @@ public class Radial extends ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeInhibitory(final Neuron source, List<Synapse> syns) {
+    private void makeInhibitory(final Neuron source, List<Synapse> syns,
+            boolean looseSynapses) {
         for (Neuron target : network.getNeuronsInRadius(source,
                 inhibitoryRadius)) {
             if (!sourceNeurons.contains(target)) {
@@ -119,7 +120,9 @@ public class Radial extends ConnectNeurons {
                 Synapse synapse = baseInhibitorySynapse
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(-1);
-                network.addSynapse(synapse, displaySynapses);
+                if (looseSynapses) {
+                    network.addSynapse(synapse);
+                }
                 syns.add(synapse);
             }
         }
@@ -131,7 +134,8 @@ public class Radial extends ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeExcitatory(final Neuron source, List<Synapse> syns) {
+    private void makeExcitatory(final Neuron source, List<Synapse> syns,
+            boolean looseSynapses) {
         for (Neuron target : network.getNeuronsInRadius(source,
                 excitatoryRadius)) {
             if (!sourceNeurons.contains(target)) {
@@ -150,7 +154,9 @@ public class Radial extends ConnectNeurons {
                 Synapse synapse = baseExcitatorySynapse
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(1);
-                network.addSynapse(synapse, displaySynapses);
+                if (looseSynapses) {
+                    network.addSynapse(synapse);
+                }
                 syns.add(synapse);
             }
         }

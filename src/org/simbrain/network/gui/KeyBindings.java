@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -29,6 +29,9 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -109,7 +112,7 @@ public class KeyBindings {
 //        // Redo
 //        inputMap.put(
 //                KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
-//                        .getDefaultToolkit().getMenuShortcutKeyMask() + 
+//                        .getDefaultToolkit().getMenuShortcutKeyMask() +
 //                        ActionEvent.SHIFT_MASK), "redo");
 //        panel.getActionMap().put("redo", new AbstractAction() {
 //            public void actionPerformed(ActionEvent e) {
@@ -163,7 +166,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");
         panel.getActionMap().put("setSource", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.setSourceNeurons();
+                panel.setSourceElements();
                 // TODO: This does not work when I use the action manager's
                 // action. Not sure why not.
             }
@@ -172,11 +175,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                ConnectNeurons connection = QuickConnectPreferences
-                        .getCurrentConnection();
-                connection.connectNeurons(panel.getNetwork(),
-                        panel.getSourceModelNeurons(),
-                        panel.getSelectedModelNeurons());
+                panel.connectSourceToTargetElements();
             }
         });
 

@@ -36,7 +36,6 @@ import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SimpleFrame;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -67,7 +66,6 @@ public class SynapseGroupNode extends GroupNode {
     public void updateBounds() {
         PBounds bounds = new PBounds();
         if (getOutlinedObjects().size() > 0) {
-
             for (PNode node : getOutlinedObjects()) {
                 PBounds childBounds = node.getGlobalBounds();
                 bounds.add(childBounds);
@@ -94,7 +92,7 @@ public class SynapseGroupNode extends GroupNode {
 
         } else {
             // TODO Need to get reference to parent nodes.
-            //System.err.println("Bounds are null");
+            System.err.println("Bounds are null");
             bounds = null;
         }
 
@@ -105,7 +103,7 @@ public class SynapseGroupNode extends GroupNode {
      * Sets custom menu for SynapseGroup nodes. To add new menu items to context
      * menu add them here.
      */
-    private void setContextMenu() {
+    protected void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         ((SynapseGroup) this.getGroup()).getSynapseList();
@@ -143,9 +141,8 @@ public class SynapseGroupNode extends GroupNode {
     protected void updateInteractionBox() {
         InteractionBox interactionBox = getInteractionBox();
         interactionBox.setOffset(
-                this.getBounds().getCenterX() - interactionBox.getWidth() * 2,
-                this.getBounds().getCenterY() - interactionBox.getHeight());
-        interactionBox.moveToFront();
+                this.getBounds().getCenterX() - interactionBox.getWidth() / 2,
+                this.getBounds().getCenterY() - interactionBox.getHeight() / 2);
     }
 
     /**

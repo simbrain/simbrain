@@ -88,7 +88,6 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         setInteractionBox(box);
         this.setContextMenu(getDefaultContextMenu());
         this.setTextLabel(group.getLabel());
-        updateVisibility();
     }
 
     /**
@@ -116,8 +115,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     }
 
     /** @see PPath. */
-    public void propertyChange(final PropertyChangeEvent arg0) {
-        updateBounds();
+    public void propertyChange(final PropertyChangeEvent event) {
+        //System.out.println("Property change source:" + event.getSource());
+        //System.out.println("Property change:" + event.getPropertyName());
+        //if (event.getPropertyName().equalsIgnoreCase("transform ")) {
+            updateBounds();
+        //}
     }
 
     /**
@@ -165,11 +168,11 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     public void addPNode(final PNode node) {
         if (node != null) {
-            node.addPropertyChangeListener(this);
+            //TODO: Think about this.  Always neuronnodes?
+            node.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
             // Below was the source of major performance issues
             // node.getParent().addPropertyChangeListener(this);
             outlinedObjects.add(node);
-            updateVisibility();
         }
     }
 
@@ -181,21 +184,6 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     public void removePNode(final PNode node) {
         outlinedObjects.remove(node);
         node.removePropertyChangeListener(this);
-        updateVisibility();
-    }
-
-    /**
-     * If this node has not been deleted, then it should be visible or not based
-     * on whether there are items to display.
-     *
-     * TODO: But keep interaction box visible?
-     */
-    private void updateVisibility() {
-        if (getOutlinedObjects().isEmpty()) {
-            setVisible(false);
-        } else {
-            setVisible(true);
-        }
     }
 
     /**
@@ -204,6 +192,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     public void updateText() {
         this.setTextLabel(group.getLabel());
         this.updateInteractionBox();
+        interactionBox.updateText();
     }
 
     /**
@@ -217,7 +206,8 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Updated bounds of outline based on location of its outlined objects.
      */
     public void updateBounds() {
-
+        // System.out.println(getGroup().getLabel());
+        //TODO: Called too often because of GroupNode.propertychanged.  Analyze.
         PBounds bounds = new PBounds();
         for (PNode node : outlinedObjects) {
             PBounds childBounds = node.getGlobalBounds();
@@ -238,15 +228,10 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Update location of interaction box.
      */
     protected void updateInteractionBox() {
-        // System.out.println(getGroup().getLabel()); TODO: Uncomment this to
-        // see just how often
-        // this method is called. Too much!
         if (interactionBox != null) {
             interactionBox.setOffset(
-                    getBounds().getX() + interactionBox.getBoxOffset_X(),
-                    getBounds().getY() - interactionBox.getHeight()
-                            + interactionBox.getBoxOffset_Y());
-            interactionBox.moveToFront();
+                    getBounds().getX(),
+                    getBounds().getY() - interactionBox.getHeight() + 1);
         }
     }
 

@@ -136,7 +136,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     public NeuronNode(final NetworkPanel net, final Neuron neuron) {
         super(net);
         this.neuron = neuron;
-        offset(neuron.getX(), neuron.getY());
+        this.centerFullBoundsOnPoint(neuron.getX(), neuron.getY());
         init();
     }
 
@@ -144,7 +144,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * Initialize the NeuronNode.
      */
     private void init() {
-        circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
+        circle = PPath.createEllipse(0 - DIAMETER / 2, 0 - DIAMETER / 2,
+                DIAMETER, DIAMETER);
 
         addChild(circle);
 

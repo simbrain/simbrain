@@ -295,7 +295,7 @@ public class LMSOffline extends Trainer {
 
         // ConnectionLayers
         AllToAll connection = new AllToAll(network, inputList, outputList);
-        connection.connectNeurons();
+        connection.connectNeurons(true);
 
         // AND Task
         double inputData[][] = { { -1, -1 }, { 1, -1 }, { -1, 1 }, { 1, 1 } };
@@ -350,7 +350,7 @@ public class LMSOffline extends Trainer {
 
         // Connect Layers
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-        connection.connectNeurons();
+        connection.connectNeurons(true);
 
         // Initialize the trainer
         // REDO

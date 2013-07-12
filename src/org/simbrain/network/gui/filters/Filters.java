@@ -24,6 +24,8 @@ import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.util.Predicate;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -37,6 +39,14 @@ public final class Filters {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
             return ((node instanceof NeuronNode) && (!isGrouped(node)));
+        }
+    };
+
+    /** Neuron group node filter. */
+    private static final AbstractFilter NEURON_GROUP_NODE_FILTER = new AbstractFilter() {
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return (node.getParent() instanceof NeuronGroupNode);
         }
     };
 
@@ -171,5 +181,9 @@ public final class Filters {
      */
     public static AbstractFilter getTextNodeFilter() {
         return TEXT_NODE_FILTER;
+    }
+
+    public static AbstractFilter getNeuronGroupNodeFilter() {
+        return NEURON_GROUP_NODE_FILTER;
     }
 }

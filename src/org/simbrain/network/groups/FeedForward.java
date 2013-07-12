@@ -107,7 +107,6 @@ public class FeedForward extends Subnetwork {
         for (int i = 0; i < nodesPerLayer.length - 1; i++) {
             estSynapses += (nodesPerLayer[i] * nodesPerLayer[i + 1]);
         }
-        this.setEstimatedFinalSynapses(estSynapses);
 
         // Layout
         LineLayout layout = new LineLayout(betweenNeuronInterval,

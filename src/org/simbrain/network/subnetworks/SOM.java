@@ -5,6 +5,7 @@ import java.io.File;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -110,7 +111,8 @@ public class SOM extends Subnetwork {
      * @param root reference to Network.
      */
     public SOM(final Network root, final int numNeurons, final Layout layout) {
-        super(root, 1, 0);
+        super(root);
+        this.addNeuronGroup(new NeuronGroup(root));
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(
                     new Neuron(getParentNetwork(), new LinearRule()));

@@ -65,7 +65,7 @@ public class FixedFanout extends ConnectNeurons {
     }
 
     @Override
-    public List<Synapse> connectNeurons() {
+    public List<Synapse> connectNeurons(final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
             Random generator = new Random();
@@ -94,7 +94,9 @@ public class FixedFanout extends ConnectNeurons {
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 synapse.setStrength(outboundWeights[i]);
-                network.addSynapse(synapse, displaySynapses);
+                if (looseSynapses) {
+                    network.addSynapse(synapse);
+                }
                 syns.add(synapse);
                 i++;
             }

@@ -23,6 +23,7 @@ import java.util.Collections;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
@@ -71,10 +72,12 @@ public class Hopfield extends Subnetwork {
      */
     public Hopfield(final Network root, final int numNeurons,
             final Layout layout) {
-        super(root, 1, 1);
+        super(root);
         setLabel("Hopfield network");
+        NeuronGroup hopfieldGroup = new NeuronGroup(root);
+        this.addNeuronGroup(hopfieldGroup);
+        this.connectNeuronGroups(hopfieldGroup, hopfieldGroup);
 
-        this.setEstimatedFinalSynapses((int) Math.pow(numNeurons, 2));
         this.setDisplayNeuronGroups(false);
 
         // Create the neurons
@@ -98,7 +101,7 @@ public class Hopfield extends Subnetwork {
                     Synapse newSynapse = new Synapse(source, target,
                             new ClampedSynapseRule());
                     newSynapse.setStrength(0);
-                    getSynapseGroup().addSynapse(newSynapse, displaySynapses());
+                    getSynapseGroup().addSynapse(newSynapse);
                 }
             }
         }

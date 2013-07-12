@@ -49,6 +49,8 @@ import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
+import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
@@ -69,6 +71,7 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
 import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.network.gui.nodes.GroupNode;
+import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
@@ -81,6 +84,7 @@ import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNode;
 import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
+import org.simbrain.network.gui.nodes.groupNodes.InvisibleSynapseGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SOMNode;
@@ -121,10 +125,8 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  *
  * Refactoring note: In a future refactor (perhaps for java 8 when this moves to
  * FX) enforce a rule whereby composite objects are completely built and only
- * then in a separate process are represented in the GUI. Currently this code
- * can be hard to understand and maintain because of the various orders in which
- * objects are added to the canvas. Another Example: the need for
- * Subnetwork.estimatedFinalSynapses.
+ * then in a separate process are represented in the GUI.  (This was improved
+ * with revision 2737).
  */
 public class NetworkPanel extends JPanel {
 
@@ -218,8 +220,11 @@ public class NetworkPanel extends JPanel {
     /** Clamp tool bar. */
     private CustomToolBar clampToolBar;
 
-    /** Source neurons. */
-    private Collection<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
+    /**
+     * Source elements (when setting a source node or group and then connecting
+     * to a target).
+     */
+    private Collection<PNode> sourceElements = new ArrayList<PNode>();
 
     /** Toggle button for neuron clamping. */
     protected JToggleButton neuronClampButton = new JToggleButton();
@@ -500,8 +505,8 @@ public class NetworkPanel extends JPanel {
             }
 
             public void synapseAdded(final NetworkEvent<Synapse> e) {
-                NetworkPanel.this.addSynapse(e.getObject());
                 final Synapse synapse = e.getObject();
+                NetworkPanel.this.addSynapse(e.getObject());
                 if (synapse.getParentGroup() != null) {
                     GroupNode parentGroupNode = (GroupNode) objectNodeMap
                             .get(synapse.getParentGroup());
@@ -510,7 +515,6 @@ public class NetworkPanel extends JPanel {
                         parentGroupNode.setVisible(true);
                     }
                 }
-
             }
 
             public void synapseRemoved(final NetworkEvent<Synapse> e) {
@@ -567,26 +571,27 @@ public class NetworkPanel extends JPanel {
             public void groupChanged(final NetworkEvent<Group> e,
                     final String description) {
 
-                // This method may become more complex eventually, as more types
-                // of group change are supported. For now a single case is
-                // handled: adding synapses to an existing synapse group in a
-                // subnet
-                Group group = e.getObject();
-                if (description.equalsIgnoreCase("synapseAddedToGroup")) {
-                    SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap
-                            .get(group);
-                    SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
-                            .getAuxiliaryObject());
-                    if ((synapseNode != null) && (sgn != null)) {
-                        sgn.addPNode(synapseNode);
-                        sgn.updateBounds();
-                    }
-                }
+//                // This method may become more complex eventually, as more types
+//                // of group change are supported. For now a single case is
+//                // handled: adding synapses to an existing synapse group in a
+//                // subnet
+//                Group group = e.getObject();
+//                if (description.equalsIgnoreCase("synapseAddedToGroup")) {
+//                    SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap
+//                            .get(group);
+//                    SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
+//                            .getAuxiliaryObject());
+//                    if ((synapseNode != null) && (sgn != null)) {
+//                        sgn.addPNode(synapseNode);
+//                        sgn.updateBounds();
+//                    }
+//                }
 
             }
 
             /** @see NetworkListener */
             public void groupRemoved(final NetworkEvent<Group> event) {
+                //System.out.println("Group removed: " + event.getObject());
                 Group group = event.getObject();
                 GroupNode node = (GroupNode) objectNodeMap.get(group);
                 if (node != null) {
@@ -630,9 +635,8 @@ public class NetworkPanel extends JPanel {
     private GroupNode createGroupNode(Group group) {
 
         GroupNode ret = null;
-        if (group instanceof SynapseGroup) {
-            ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
-        } else if (group instanceof NeuronGroup) {
+        // Note that synapseGroupNodes are created inside of addGroup
+        if (group instanceof NeuronGroup) {
             ret = new NeuronGroupNode(NetworkPanel.this, (NeuronGroup) group);
         } else if (group instanceof Subnetwork) {
             if (group instanceof Hopfield) {
@@ -832,7 +836,11 @@ public class NetworkPanel extends JPanel {
             canvas.getLayer().addChild(neuronGroup);
             objectNodeMap.put(group, neuronGroup);
             neuronGroup.updateBounds();
+            //for (PNode node : nodes) {
+            //    node.moveInFrontOf(neuronGroup);
+            //}
         } else if (group instanceof SynapseGroup) {
+            // Create SynapseGroupNode for case of visible synapses
             if (((SynapseGroup) group).displaySynapses()) {
                 // Add synapse nodes to canvas
                 for (Synapse synapse : ((SynapseGroup) group).getSynapseList()) {
@@ -842,7 +850,8 @@ public class NetworkPanel extends JPanel {
                     nodes.add(node);
                 }
                 // Add synapse nodes to group node
-                GroupNode synapseGroupNode = createGroupNode(group);
+                SynapseGroupNode synapseGroupNode = new SynapseGroupNode(
+                        NetworkPanel.this, (SynapseGroup) group);
                 for (PNode node : nodes) {
                     synapseGroupNode.addPNode(node);
                     node.moveToBack();
@@ -853,7 +862,24 @@ public class NetworkPanel extends JPanel {
                 objectNodeMap.put(group, synapseGroupNode);
                 synapseGroupNode.updateBounds();
             } else {
-                //TODO: Add code to display "empty synapse group" here.
+                // Create SynapseGroupNode for case of invisible synapses
+                //System.out.println("Add invisible synapse group");
+                InvisibleSynapseGroupNode synapseGroupNode = new InvisibleSynapseGroupNode(
+                        NetworkPanel.this, (SynapseGroup) group);
+                canvas.getLayer().addChild(synapseGroupNode);
+                objectNodeMap.put(group, synapseGroupNode);
+               //If used, clean up listeners?
+                GroupNode srcNode = (GroupNode) objectNodeMap
+                        .get(((SynapseGroup) group).getSourceNeuronGroup());
+                if (srcNode != null) {
+                    srcNode.addPropertyChangeListener(synapseGroupNode);
+                }
+                GroupNode tarNode = (GroupNode) objectNodeMap
+                        .get(((SynapseGroup) group).getTargetNeuronGroup());
+                if (tarNode != null) {
+                    tarNode.addPropertyChangeListener(synapseGroupNode);
+                }
+                synapseGroupNode.updateBounds();
             }
         } else if (group instanceof Subnetwork) {
             // Add neuron groups
@@ -1448,6 +1474,10 @@ public class NetworkPanel extends JPanel {
         return Utils.select(getSelection(), Filters.getSynapseNodeFilter());
     }
 
+    public Collection<PNode> getSelectedNeuronGroups() {
+        return Utils.select(getSelection(), Filters.getNeuronGroupNodeFilter());
+    }
+
     /**
      * Returns the selected Text objects.
      *
@@ -1496,11 +1526,27 @@ public class NetworkPanel extends JPanel {
     public ArrayList<NeuronGroup> getSelectedModelNeuronGroups() {
     	ArrayList<NeuronGroup> ng = new ArrayList<NeuronGroup>();
     	for (PNode e : getSelection()) {
-    		if (e instanceof NeuronGroupNode) {
-    			ng.add(((NeuronGroupNode) e).getNeuronGroup());
+    		if (e.getParent() instanceof NeuronGroupNode) {
+    			ng.add(((NeuronGroupNode) e.getParent()).getNeuronGroup());
     		}
     	}
     	return ng;
+    }
+
+    /**
+     * Returns neuron groups which are "source elements" that can be
+     * connected to other neuron groups.
+     *
+     * @return the source model group
+     */
+    public ArrayList<NeuronGroup> getSourceModelGroups() {
+        ArrayList<NeuronGroup> ret = new ArrayList<NeuronGroup>();
+        for (PNode node: sourceElements) {
+            if (node.getParent() instanceof NeuronGroupNode) {
+                ret.add(((NeuronGroupNode) node.getParent()).getNeuronGroup());
+            }
+        }
+        return ret;
     }
 
     /**
@@ -1526,27 +1572,17 @@ public class NetworkPanel extends JPanel {
     public Collection getSelectedModelElements() {
         Collection ret = new ArrayList();
         for (PNode e : getSelection()) {
+            // System.out.println("=="+e);
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
             } else if (e instanceof TextNode) {
                 ret.add(((TextNode) e).getTextObject());
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns model Network elements corresponding to selected screen elements.
-     *
-     * @return list of selected model elements
-     */
-    public Collection getCoupledNodes() {
-        Collection ret = new ArrayList();
-        for (NeuronNode node : getNeuronNodes()) {
-            if (node.getNeuron().isInput() || node.getNeuron().isOutput()) {
-                ret.add(node);
+            } else if (e instanceof InteractionBox) {
+                if (e.getParent() instanceof NeuronGroupNode) {
+                    ret.add(((NeuronGroupNode) e.getParent()).getNeuronGroup());
+                }
             }
         }
         return ret;
@@ -2092,26 +2128,52 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Clear all source neurons.
+     * Clear all source elements.
      */
-    public void clearSourceNeurons() {
-        for (NeuronNode node : sourceNeurons) {
+    public void clearSourceElements() {
+        for (PNode node : sourceElements) {
             SourceHandle.removeSourceHandleFrom(node);
         }
-        sourceNeurons.clear();
+        sourceElements.clear();
         selectionModel.fireSelectionChanged();
     }
 
     /**
-     * Set source neurons to selected neurons.
+     * Set selected elements to be source elements (with red rectangles around
+     * them).
      */
-    public void setSourceNeurons() {
-        clearSourceNeurons();
-        sourceNeurons = this.getSelectedNeurons();
-        for (NeuronNode node : sourceNeurons) {
+    public void setSourceElements() {
+        clearSourceElements();
+        for (PNode node : this.getSelectedNeurons()) {
+            sourceElements.add(node);
+            SourceHandle.addSourceHandleTo(node);
+        }
+        for (PNode node : this.getSelectedNeuronGroups()) {
+            sourceElements.add(node);
             SourceHandle.addSourceHandleTo(node);
         }
         selectionModel.fireSelectionChanged();
+    }
+
+    /**
+     * Connect source elements (with red selection rectangles in gui) to target
+     * elements (with green selection rectangles in gui).
+     */
+    public void connectSourceToTargetElements() {
+        // Connect neurons
+        ConnectNeurons connection = QuickConnectPreferences
+                .getCurrentConnection();
+        connection.connectNeurons(getNetwork(), getSourceModelNeurons(),
+                getSelectedModelNeurons(), true);
+
+        // Connect neuron groups
+        for (NeuronGroup sng : getSourceModelGroups()) {
+            for (NeuronGroup tng : getSelectedModelNeuronGroups()) {
+                SynapseGroup group = new SynapseGroup(getNetwork(), sng, tng,
+                        connection);
+                getNetwork().addGroup(group);
+            }
+        }
     }
 
     /**
@@ -2189,19 +2251,14 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * @return Returns the sourceNeurons.
-     */
-    public Collection<NeuronNode> getSourceNeurons() {
-        return sourceNeurons;
-    }
-
-    /**
      * @return the model source neurons (used in connecting groups of neurons)
      */
     public ArrayList<Neuron> getSourceModelNeurons() {
         ArrayList<Neuron> ret = new ArrayList<Neuron>();
-        for (NeuronNode neuronNode : sourceNeurons) {
-            ret.add(neuronNode.getNeuron());
+        for (PNode node : sourceElements) {
+            if (node instanceof NeuronNode) {
+                ret.add(((NeuronNode) node).getNeuron());
+            }
         }
         return ret;
     }

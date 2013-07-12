@@ -51,7 +51,7 @@ public final class SetSourceNeurons extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        networkPanel.setSourceNeurons();
+        networkPanel.setSourceElements();
 
     }
 }

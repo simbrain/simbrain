@@ -40,12 +40,6 @@ public class InteractionBox extends ScreenElement {
     /** Height of interaction box. */
     private final static float DEFAULT_HEIGHT = 10;
 
-    /** Distance from upper left corner of group. */
-    private float boxOffset_X = 0;
-
-    /** Distance from upper left corner of group. */
-    private float boxOffset_Y = -2;
-
     /** Main circle of node. */
     private PPath box;
 
@@ -71,29 +65,38 @@ public class InteractionBox extends ScreenElement {
         box.setStrokePaint(java.awt.Color.GRAY);
         setBounds(box.getBounds());
         addChild(box);
+        textLabel = new PText();
+        box.addChild(textLabel);
     }
 
     /**
      * Set text for interaction box.
      *
-     * @param textLabel the textLabel to set
+     * @param text the textLabel to set
      */
     public void setText(String text) {
         if (text == null) {
             return;
         }
-        if (this.textLabel == null) {
-            this.textLabel = new PText(text);
-            this.addChild(textLabel);
+        if (textLabel.getScale() == 1) {
             textLabel.scaleAboutPoint(.8, box.getBounds().getCenter2D().getX(),
                     box.getBounds().getCenter2D().getY());
-        } else {
-            textLabel.setText(text);
-            textLabel.resetBounds();
         }
+        textLabel.setText(text);
+        textLabel.resetBounds();
+        updateText();
+    }
 
+    /**
+     * Update the text label bounds.
+     */
+    public void updateText() {
         // Reset box bounds
+        textLabel.centerFullBoundsOnPoint(box.getBounds().getCenter2D().getX(),
+                box.getBounds().getCenter2D().getY());
         box.setBounds(textLabel.getBounds());
+        setBounds(box.getBounds());
+        getNetworkPanel().repaint();
     }
 
     @Override
@@ -138,7 +141,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     public boolean isSelectable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -148,7 +151,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     public boolean showSelectionHandle() {
-        return false;
+        return true;
     }
 
     /**
@@ -156,34 +159,6 @@ public class InteractionBox extends ScreenElement {
      */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
-    }
-
-    /**
-     * @return the boxOffset_Y
-     */
-    public float getBoxOffset_Y() {
-        return boxOffset_Y;
-    }
-
-    /**
-     * @param boxOffset_Y the boxOffset_Y to set
-     */
-    public void setBoxOffset_Y(float boxOffset_Y) {
-        this.boxOffset_Y = boxOffset_Y;
-    }
-
-    /**
-     * @return the boxOffset_X
-     */
-    public float getBoxOffset_X() {
-        return boxOffset_X;
-    }
-
-    /**
-     * @param boxOffset_X the boxOffset_X to set
-     */
-    public void setBoxOffset_X(float boxOffset_X) {
-        this.boxOffset_X = boxOffset_X;
     }
 
     @Override

@@ -101,9 +101,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         this.initialPosition = initialPosition;
 
-        this.setEstimatedFinalSynapses((int) (numInputNodes * numHiddenNodes)
-                + (2 * numHiddenNodes * numOutputNodes));
-
         setLabel("SRN");
 
         // TODO: implement new connectNeuronGroups method

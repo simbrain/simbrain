@@ -298,7 +298,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.getGlobalBounds()
                     .intersects(bounds);
-            // Allow selection of a synapes via the line associated with it
+            // Allow selection of synapses via the line associated with it
             if (node instanceof SynapseNode) {
                 Line2D.Double line = ((SynapseNode) node).getLine();
                 if (bounds.intersectsLine(line)) {

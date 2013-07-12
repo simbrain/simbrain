@@ -36,13 +36,6 @@ public class Subnetwork extends Group {
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
-     * An estimate of how many synapses this subnetwork will have. A bit of a
-     * hack. Needed because when synapse visibility is being determined, not all
-     * synapses may have been added to the network.
-     */
-    private int estimatedFinalSynapses = 0;
-
-    /**
      * Whether the GUI should display neuron groups contained in this
      * subnetwork. This will usually be true, but in cases where a subnetwork
      * has just one neuron group it is redundant to display both. So this flag
@@ -61,26 +54,6 @@ public class Subnetwork extends Group {
         setLabel("Subnetwork");
     }
 
-    /**
-     * Create a subnetwork group initialized with a specified numbers of neuron
-     * groups and synapse groups.
-     *
-     * @param net parent network
-     * @param numNeuronGroups number of neuron groups
-     * @param numSynapseGroups number of synapse groups
-     */
-    public Subnetwork(final Network net, int numNeuronGroups,
-            int numSynapseGroups) {
-        super(net);
-        setLabel("Subnetwork");
-        for (int i = 0; i < numNeuronGroups; i++) {
-            addNeuronGroup(new NeuronGroup(net));
-        }
-        for (int i = 0; i < numSynapseGroups; i++) {
-            addSynapseGroup(new SynapseGroup(net));
-        }
-    }
-
     @Override
     public void delete() {
         if (isMarkedForDeletion()) {
@@ -89,11 +62,9 @@ public class Subnetwork extends Group {
             setMarkedForDeletion(true);
         }
         for (NeuronGroup neuronGroup : neuronGroupList) {
-            neuronGroup.setDeleteWhenEmpty(true);
             getParentNetwork().removeGroup(neuronGroup);
         }
         for (SynapseGroup synapseGroup : synapseGroupList) {
-            synapseGroup.setDeleteWhenEmpty(true);
             getParentNetwork().removeGroup(synapseGroup);
         }
     }
@@ -138,10 +109,12 @@ public class Subnetwork extends Group {
     }
 
     /**
-     * Connects one group of neurons all to all to another group of neurons.
+     * Connects one group of neurons to another group of neurons using an All to
+     * All connection.
      *
      * @param source the source group
      * @param target the target group
+     * @return the new neuron group
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
             NeuronGroup target) {
@@ -158,12 +131,13 @@ public class Subnetwork extends Group {
      * @param source the source group
      * @param target the target group
      * @param connection the type of connection desired between the two groups
+     * @return the new group
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
             NeuronGroup target, ConnectNeurons connection) {
         SynapseGroup newGroup = connectNeuronGroups(source, target, ""
-                + (indexOfNeuronGroup(source) + 1), ""
-                + (indexOfNeuronGroup(target) + 1), connection);
+                + (getIndexOfNeuronGroup(source) + 1), ""
+                + (getIndexOfNeuronGroup(target) + 1), connection);
         return newGroup;
     }
 
@@ -176,45 +150,16 @@ public class Subnetwork extends Group {
      * @param sourceLabel the name of the source group in the weights label
      * @param targetLabel the name of the target group in the weights label
      * @param connection the type of connection desired between the two groups
+     * @return the new group
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
             NeuronGroup target, String sourceLabel, String targetLabel,
             ConnectNeurons connection) {
-        List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
-                source.getNeuronList(), target.getNeuronList(), displaySynapses());
-        SynapseGroup newGroup = new SynapseGroup(getParentNetwork());
-        getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
+        SynapseGroup newGroup = new SynapseGroup(getParentNetwork(), source,
+                target, connection);
         addSynapseGroup(newGroup);
-        newGroup.setDeleteWhenEmpty(false);
         setSynapseGroupLabel(source, target, newGroup, sourceLabel, targetLabel);
-
-        // By default set up synapse routing...
-        getParentNetwork().getSynapseRouter()
-                .associateSynapseGroupWithNeuronGroupPair(source, target,
-                        newGroup);
         return newGroup;
-    }
-
-    /**
-     * The source and target neuron groups are associated with a synapse group
-     * that is initially empty. A routing rule is set up so that the synapse
-     * group will be automatically populated when synapses are added which
-     * connect the source and parent neuron group.
-     *
-     * @param source the source neuron group
-     * @param target the target neuron group
-     */
-    public void addEmptySynapseGroup(NeuronGroup source, NeuronGroup target) {
-        SynapseGroup sg = new SynapseGroup(getParentNetwork());
-        addSynapseGroup(sg);
-        sg.setDeleteWhenEmpty(false);
-        setSynapseGroupLabel(source, target, sg, ""
-                + (indexOfNeuronGroup(source) + 1), ""
-                + (indexOfNeuronGroup(target) + 1));
-
-        getParentNetwork().getSynapseRouter()
-                .associateSynapseGroupWithNeuronGroupPair(source, target, sg);
-
     }
 
     /**
@@ -318,7 +263,7 @@ public class Subnetwork extends Group {
      * @param group the group being queried.
      * @return the index of the group in the list.
      */
-    public int indexOfNeuronGroup(NeuronGroup group) {
+    public int getIndexOfNeuronGroup(NeuronGroup group) {
         return getNeuronGroupList().indexOf(group);
     }
 
@@ -437,25 +382,10 @@ public class Subnetwork extends Group {
         int threshold = getParentNetwork()
                 .getSynapseVisibilityThreshold();
 
-        if ((getFlatSynapseList().size() > threshold)
-                || (estimatedFinalSynapses > threshold)) {
+        if (getFlatSynapseList().size() > threshold) {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return the estimatedFinalSynapses
-     */
-    public int getEstimatedFinalSynapses() {
-        return estimatedFinalSynapses;
-    }
-
-    /**
-     * @param estimatedFinalSynapses the estimatedFinalSynapses to set
-     */
-    public void setEstimatedFinalSynapses(int estimatedFinalSynapses) {
-        this.estimatedFinalSynapses = estimatedFinalSynapses;
     }
 
     /**

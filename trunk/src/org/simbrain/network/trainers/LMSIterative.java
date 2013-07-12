@@ -193,7 +193,7 @@ public class LMSIterative extends IterableTrainer {
 
         // Connect input layer to output layer
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-        connection.connectNeurons();
+        connection.connectNeurons(true);
 
         // Set initial weights (from an Emergent sim)
         Network.getSynapse(inputLayer.get(0), outputLayer.get(0)).setStrength(
@@ -264,7 +264,7 @@ public class LMSIterative extends IterableTrainer {
 
         // Connect input layer to output layer
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-        connection.connectNeurons();
+        connection.connectNeurons(true);
 
         // Set initial weights
         network.randomizeWeights();

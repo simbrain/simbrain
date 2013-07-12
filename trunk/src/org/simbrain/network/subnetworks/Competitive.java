@@ -23,10 +23,10 @@ import java.util.Iterator;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**
  * <b>Competitive</b> implements a simple competitive network.
@@ -107,7 +107,8 @@ public class Competitive extends Subnetwork {
      */
     public Competitive(final Network root, final int numNeurons,
             final Layout layout) {
-        super(root, 1, 1);
+        super(root);
+        this.addNeuronGroup(new NeuronGroup(root));
         this.setDisplayNeuronGroups(false);
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(root, new LinearRule()));

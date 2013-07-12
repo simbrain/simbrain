@@ -20,12 +20,14 @@ package org.simbrain.network.gui;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 
@@ -33,6 +35,10 @@ import org.simbrain.network.util.SimnetUtils;
  * Buffer which holds network objects for cutting and pasting.
  */
 public class Clipboard {
+
+    // To add new copy-pastable items, must update all elseifs here,
+    // util.CopyPaste, Network.addObjects, and
+    // NetworkPanel.getSelectedModelElements()
 
     /** Static list of cut or copied objects. */
     private static ArrayList clipboard = new ArrayList();
@@ -58,6 +64,7 @@ public class Clipboard {
      */
     public static void add(final ArrayList objects) {
         clipboard = objects;
+        //System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged();
     }
 
@@ -74,6 +81,7 @@ public class Clipboard {
 
         // Create a copy of the clipboard objects.
         ArrayList copy = CopyPaste.getCopy(net.getNetwork(), clipboard);
+        //System.out.println("paste-->"+ Arrays.asList(copy));
 
         // Gather data for translating the object then add the objects to the
         // network.
@@ -101,6 +109,8 @@ public class Clipboard {
             if (object instanceof Neuron) {
                 ret.add(net.getObjectNodeMap().get(object));
             } else if (object instanceof NetworkTextObject) {
+                ret.add(net.getObjectNodeMap().get(object));
+            } else if (object instanceof NeuronGroup) {
                 ret.add(net.getObjectNodeMap().get(object));
             }
         }
@@ -212,6 +222,9 @@ public class Clipboard {
                 NetworkTextObject text = (NetworkTextObject) object;
                 text.setX(text.getX() + offsetX);
                 text.setY(text.getY() + offsetY);
+            } else if (object instanceof NeuronGroup) {
+                NeuronGroup group = (NeuronGroup) object;
+                group.offset(offsetX, offsetY);
             }
         }
     }

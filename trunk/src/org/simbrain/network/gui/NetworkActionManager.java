@@ -91,7 +91,6 @@ import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
-import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
@@ -100,6 +99,7 @@ import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
 import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
 import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
+import org.simbrain.network.gui.dialogs.network.NeuronGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
 import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
@@ -242,9 +242,6 @@ public final class NetworkActionManager {
 
     /** Create a neuron group. */
     private final Action neuronGroupAction;
-
-    /** Create a synapse group. */
-    private final Action synapseGroupAction;
 
     /** Connection types. */
     private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf,
@@ -420,7 +417,6 @@ public final class NetworkActionManager {
                 networkPanel.getViewGroupNode());
 
         neuronGroupAction = new NewNeuronGroupAction(networkPanel);
-        synapseGroupAction = new NewSynapseGroupAction(networkPanel);
 
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
         showTrainerAction = new ShowTrainerAction(networkPanel);
@@ -513,9 +509,9 @@ public final class NetworkActionManager {
      * @return the group menu
      */
     public JMenu getGroupMenu() {
+        //TODO: Fix menu.  Alone with one right now.
         JMenu groupMenu = new JMenu("Group");
         groupMenu.add(neuronGroupAction);
-        groupMenu.add(synapseGroupAction);
         return groupMenu;
     }
 
@@ -569,6 +565,8 @@ public final class NetworkActionManager {
      */
     public List<Action> getNewNetworkActions() {
         return Arrays.asList(new Action[] {
+                new AddGroupAction(networkPanel, new NeuronGroupCreationDialog(
+                        networkPanel), "(Bare) Neuron Group"),
                 new AddGroupAction(networkPanel, new BackpropCreationDialog(
                         networkPanel), "Backprop"),
                 new AddGroupAction(networkPanel, new BPTTCreationDialog(

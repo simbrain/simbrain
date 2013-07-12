@@ -22,6 +22,7 @@ import java.util.Comparator;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
@@ -54,19 +55,6 @@ public class KWTA extends Subnetwork {
      */
     private double inhibitoryConductance;
 
-    // REDO
-    //
-    // /**
-    // * Copy constructor.
-    // *
-    // * @param newRoot new root network
-    // * @param oldNet old network.
-    // */
-    // public KWTA(Network newRoot, KWTA oldNet) {
-    // super(newRoot, oldNet);
-    // setK(oldNet.getK());
-    // }
-
     /**
      * Default constructor.
      *
@@ -75,15 +63,14 @@ public class KWTA extends Subnetwork {
      * @param root reference to Network.
      */
     public KWTA(final Network root, final int k, final Layout layout) {
-        super(root, 1, 1);
+        super(root);
+        this.addNeuronGroup(new NeuronGroup(root));
         for (int i = 0; i < k; i++) {
             getNeuronGroup().addNeuron(
                     new Neuron(getParentNetwork(), new PointNeuronRule()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        getSynapseGroup().setDeleteWhenEmpty(false);
-        root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-                getNeuronGroup(), getSynapseGroup());
+        this.setDisplayNeuronGroups(false);
         setLabel("K-Winner Take All");
     }
 

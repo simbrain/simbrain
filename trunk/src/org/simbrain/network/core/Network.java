@@ -37,7 +37,6 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -69,9 +68,6 @@ public class Network {
 
     /** The update manager for this network. */
     private NetworkUpdateManager updateManager;
-
-    /** Object which routes synapses to synapse groups. */
-    private final SynapseRouter synapseRouter;
 
     /** The initial time-step for the network. */
     private static final double DEFAULT_TIME_STEP = .01;
@@ -161,7 +157,6 @@ public class Network {
      */
     public Network() {
         updateManager = new NetworkUpdateManager(this);
-        synapseRouter = new SynapseRouter();
         prioritySortedNeuronList = new ArrayList<Neuron>();
     }
 
@@ -430,27 +425,10 @@ public class Network {
      * @param synapse the weight object to add
      */
     public void addSynapse(final Synapse synapse) {
-        addSynapse(synapse, true);
-    }
-
-    /**
-     * Adds a weight to the neuron network, where that weight already has
-     * designated source and target neurons.
-     *
-     * @param fireEvent if true fire an event notifying listeners that
-     *  the synapse has been added.
-     * @param synapse the weight object to add
-     */
-    public void addSynapse(final Synapse synapse, boolean fireEvent) {
         synapse.initSpikeResponder();
         synapseList.add(synapse);
         synapse.setId(getSynapseIdGenerator().getId());
-        if (fireEvent) {
-            fireSynapseAdded(synapse);
-        }
-        // TODO: Possibly optimize so that this is only called if
-        // at least one neuron group / or synapse group exists.
-        getSynapseRouter().routeSynapse(synapse);
+        fireSynapseAdded(synapse);
     }
 
     /**
@@ -579,7 +557,7 @@ public class Network {
             if (parentGroup instanceof SynapseGroup) {
                 ((SynapseGroup) parentGroup).removeSynapse(toDelete);
             }
-            if (parentGroup.isEmpty() && parentGroup.isDeleteWhenEmpty()) {
+            if (parentGroup.isEmpty()) {
                 removeGroup(toDelete.getParentGroup());
             }
         } else {
@@ -603,31 +581,6 @@ public class Network {
             neuronList.remove(neuron);
             group.addNeuron(neuron, false);
         }
-    }
-
-    /**
-     * Remove the given synapses from the synapse list (without firing an event)
-     * and add them to the specified group.
-     *
-     * @param list the list of synapses to transfer
-     * @param group the group to transfer them to
-     */
-    public void transferSynapsesToGroup(List<Synapse> list, SynapseGroup group) {
-        for (Synapse synapse : list) {
-            transferSynapseToGroup(synapse, group);
-        }
-    }
-
-    /**
-     * Remove the given synapse from the synapse list (without firing an event)
-     * and add it to the specified group.
-     *
-     * @param list the synapse to transfer
-     * @param group the group to transfer them to
-     */
-    public void transferSynapseToGroup(Synapse synapse, SynapseGroup group) {
-        synapseList.remove(synapse);
-        group.addSynapse(synapse, false);
     }
 
     /**
@@ -1729,14 +1682,7 @@ public class Network {
     }
 
     /**
-     * @return the synapseRouter
-     */
-    public SynapseRouter getSynapseRouter() {
-        return synapseRouter;
-    }
-
-    /**
-     * Adds a list of network elements to this network. Used in copy paste.
+     * Adds a list of network elements to this network. Used in copy / paste.
      *
      * @param toAdd list of objects to add.
      */
@@ -1750,6 +1696,8 @@ public class Network {
                 addSynapse(synapse);
             } else if (object instanceof NetworkTextObject) {
                 addText((NetworkTextObject) object);
+            } else if (object instanceof NeuronGroup) {
+                addGroup((NeuronGroup) object);
             }
         }
     }

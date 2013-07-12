@@ -420,10 +420,6 @@ public class ESNCreationDialog extends StandardDialog implements
             EchoStateNetwork esn = new EchoStateNetwork(panel.getNetwork(),
                     numInputs, numRes, numOut, panel.getLastClickedPosition());
 
-            // TODO: Add other connections to estimate;
-            esn.setEstimatedFinalSynapses((int) (Math.pow(numRes, 2) * resRecurrent
-                    .getConnection().getSparsity()));
-
             esn.setSpectralRadius(Double.parseDouble(maxEigenValue.getText()));
             esn.setRecurrentOutWeights(recurrentOutputWeights.isSelected());
             esn.setDirectInOutWeights(directInOutWeights.isSelected());

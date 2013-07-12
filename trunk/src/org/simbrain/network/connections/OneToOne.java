@@ -85,8 +85,8 @@ public class OneToOne extends ConnectNeurons {
         return list;
     }
 
-    /** @inheritDoc */
-    public List<Synapse> connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons(final boolean looseSynapses) {
 
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
 
@@ -103,7 +103,9 @@ public class OneToOne extends ConnectNeurons {
                 Neuron target = targetsX.next();
                 Synapse synapse = baseSynapse.instantiateTemplateSynapse(
                         source, target, network);
-                network.addSynapse(synapse, displaySynapses);
+                if (looseSynapses) {
+                    network.addSynapse(synapse);
+                }
                 syns.add(synapse);
                 // Allow neurons to be connected back to source.
                 if (useBidirectionalConnections) {
@@ -111,7 +113,9 @@ public class OneToOne extends ConnectNeurons {
                             source, target, network);
                     synapse2.setSource(target);
                     synapse2.setTarget(source);
-                    network.addSynapse(synapse2, displaySynapses);
+                    if (looseSynapses) {
+                        network.addSynapse(synapse);
+                    }
                     syns.add(synapse2);
                 }
             } else {

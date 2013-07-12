@@ -51,7 +51,7 @@ public final class ClearSourceNeurons extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        networkPanel.clearSourceNeurons();
+        networkPanel.clearSourceElements();
 
     }
 }

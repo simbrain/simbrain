@@ -72,8 +72,8 @@ public class Sparse extends ConnectNeurons {
         return "Sparse";
     }
 
-    /** @inheritDoc */
-    public List<Synapse> connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons(final boolean looseSynapses) {
         //long begin = System.nanoTime();
         recurrent = testRecurrence();
         Neuron source;
@@ -143,7 +143,9 @@ public class Sparse extends ConnectNeurons {
                             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                         }
                     }
-                    network.addSynapse(synapse, displaySynapses);
+                    if (looseSynapses) {
+                        network.addSynapse(synapse);
+                    }
                     syns.add(synapse);
                 }
             }
@@ -177,7 +179,9 @@ public class Sparse extends ConnectNeurons {
                                     synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                                 }
                             }
-                            network.addSynapse(synapse, displaySynapses);
+                            if (looseSynapses) {
+                                network.addSynapse(synapse);
+                            }
                             syns.add(synapse);
                         }
                     }

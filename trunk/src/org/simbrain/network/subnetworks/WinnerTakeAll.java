@@ -59,7 +59,7 @@ public class WinnerTakeAll extends NeuronGroup {
      * @param oldNet old network
      */
     public WinnerTakeAll(Network newRoot, WinnerTakeAll oldNet) {
-        super(null, null);
+        super(newRoot, oldNet);
         setLoseValue(oldNet.getLoseValue());
         setWinValue(oldNet.getWinValue());
         setUseRandom(oldNet.isUseRandom());

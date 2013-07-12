@@ -38,7 +38,6 @@ public abstract class Group {
     /**
      * Whether this group should be deleted when all its components are deleted.
      */
-    private boolean deleteWhenEmpty = true;
 
     /** Flag which prevents infinite loops when deleting composite groups. */
     private boolean markedForDeletion = false;
@@ -136,12 +135,12 @@ public abstract class Group {
         this.parentGroup = parentGroup;
     }
 
-    /**
-     * @return the deleteWhenEmpty
-     */
-    public boolean isDeleteWhenEmpty() {
-        return deleteWhenEmpty;
-    }
+    // /**
+    // * @return the deleteWhenEmpty
+    // */
+    // public boolean isDeleteWhenEmpty() {
+    // return deleteWhenEmpty;
+    // }
 
     /**
      * Returns true if this group has a parent group (i.e. it is a sub-group
@@ -169,13 +168,6 @@ public abstract class Group {
         } else {
             return true;
         }
-    }
-
-    /**
-     * @param deleteWhenEmpty the deleteWhenEmpty to set
-     */
-    public void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
-        this.deleteWhenEmpty = deleteWhenEmpty;
     }
 
     /**

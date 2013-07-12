@@ -88,12 +88,6 @@ public abstract class ConnectNeurons {
     protected boolean recurrent;
 
     /**
-     * If this flag is set to false, then no event is fired when the synapse is
-     * added, so that the synapse won't be displayed in the GUI.
-     */
-    protected boolean displaySynapses = true;
-
-    /**
      * Default constructor.
      *
      * @param network network to receive connections
@@ -123,41 +117,29 @@ public abstract class ConnectNeurons {
      * @param network reference to parent network
      * @param neurons source neurons
      * @param neurons2 target neurons
+     * @param looseSynapses true if the connections that are being created are
+     *            "loose"; false if the connections will be placed in a synapse
+     *            group
      * @return the synapses that were created
      */
     public List<Synapse> connectNeurons(final Network network,
-            final List<Neuron> neurons, final List<Neuron> neurons2) {
+            final List<Neuron> neurons, final List<Neuron> neurons2,
+            final boolean looseSynapses) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;
-        return connectNeurons();
-    }
-
-    /**
-     * Apply connection using specified parameters.
-     *
-     * @param parentNetwork reference to parent network
-     * @param neuronList source neurons
-     * @param neuronList2 target neurons
-     * @param displaySynapses whether to display synapses or not.
-     * @return the synapses that were created
-     */
-    public List<Synapse> connectNeurons(Network parentNetwork,
-            List<Neuron> neuronList, List<Neuron> neuronList2,
-            boolean displaySynapses) {
-        this.network = parentNetwork;
-        sourceNeurons = neuronList;
-        targetNeurons = neuronList2;
-        this.displaySynapses = displaySynapses;
-        return connectNeurons();
+        return connectNeurons(looseSynapses);
     }
 
     /**
      * Connect the source to the target neurons using some method.
      *
+     * @param looseSynapses true if the connections that are being created are
+     *            "loose"; false if the connections will be placed in a synapse
+     *            group
      * @return the synapses that were created
      */
-    public abstract List<Synapse> connectNeurons();
+    public abstract List<Synapse> connectNeurons(final boolean looseSynapses);
 
     /**
      * An accessor for the parent network.

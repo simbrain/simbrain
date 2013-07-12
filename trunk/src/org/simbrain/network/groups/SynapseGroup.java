@@ -19,46 +19,71 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
 /**
- * A group of synapses.
+ * A group of synapses.  Must connect a source and target neuron group.
  */
 public class SynapseGroup extends Group {
 
-    /** Set of synapses. */
+    /** The synapses in this group. */
     private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
 
-    /**
-     * An estimate of how many synapses this subnetwork will have. A bit of a
-     * hack. Needed because when synapse visibility is being determined, not all
-     * synapses may have been added to the network.
-     */
-    private int estimatedFinalSynapses = 0;
+    /** Reference to source neuron group. */
+    private final NeuronGroup sourceNeuronGroup;
+
+    /** Reference to target neuron group. */
+    private final NeuronGroup targetNeuronGroup;
 
     /**
-     * Construct a synapse group from a list of synapses.
+     * Create a new synapse group.
      *
      * @param net parent network
-     * @param list list of synapses
+     * @param source source neuron group
+     * @param target target neuron group
      */
-    public SynapseGroup(final Network net, final List<Synapse> list) {
+    public SynapseGroup(final Network net, final NeuronGroup source,
+            final NeuronGroup target) {
         super(net);
-        for (Synapse synapse : list) {
+        this.sourceNeuronGroup = source;
+        this.targetNeuronGroup = target;
+
+        AllToAll connection = new AllToAll(net);
+        List<Synapse> synapses = connection.connectNeurons(net,
+                sourceNeuronGroup.getNeuronList(),
+                targetNeuronGroup.getNeuronList(), true);
+        for (Synapse synapse : synapses) {
             addSynapse(synapse);
         }
     }
 
+
     /**
-     * Construct a new synapse group.
+     * Create a new synapse group using a connection object.
      *
      * @param net parent network
+     * @param source source neuron group
+     * @param target target neuron group
+     * @param connection the connection object to use.
      */
-    public SynapseGroup(final Network net) {
+    public SynapseGroup(final Network net, final NeuronGroup source,
+            final NeuronGroup target, final ConnectNeurons connection) {
         super(net);
+        this.sourceNeuronGroup = source;
+        this.targetNeuronGroup = target;
+
+        List<Synapse> synapses = connection.connectNeurons(net,
+                sourceNeuronGroup.getNeuronList(),
+                targetNeuronGroup.getNeuronList(), false);
+        for (Synapse synapse : synapses) {
+            addSynapse(synapse);
+        }
     }
+
 
     @Override
     public void delete() {
@@ -74,8 +99,8 @@ public class SynapseGroup extends Group {
             if (getParentGroup() instanceof Subnetwork) {
                 ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
             }
-            if (getParentGroup().isEmpty()
-                    && getParentGroup().isDeleteWhenEmpty()) {
+            if (getParentGroup().isEmpty()) {
+                //System.out.println("SynapseGroup.delete");
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
@@ -94,7 +119,7 @@ public class SynapseGroup extends Group {
      * @param synapse synapse to add
      * @param fireEvent whether to fire a synapse added event
      */
-    public boolean addSynapse(final Synapse synapse, final boolean fireEvent) {
+    public boolean addSynapse(final Synapse synapse) {
         // Don't add the synapse if it conflicts with an existing synapse.
         if (conflictsWithExistingSynapse(synapse)) {
             return false;
@@ -102,19 +127,7 @@ public class SynapseGroup extends Group {
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
-        if (fireEvent) {
-            getParentNetwork().fireSynapseAdded(synapse);
-        }
         return true;
-    }
-
-    /**
-     * Add a synapse.
-     *
-     * @param synapse synapse to add
-     */
-    public boolean addSynapse(final Synapse synapse) {
-        return addSynapse(synapse, true);
     }
 
     /**
@@ -145,7 +158,8 @@ public class SynapseGroup extends Group {
         synapseList.remove(toDelete);
         getParentNetwork().fireSynapseRemoved(toDelete);
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
-        if (isEmpty() && isDeleteWhenEmpty()) {
+        if (isEmpty()) {
+            //System.out.println("SynapseGroup.removeSynapse:" + toDelete);
             delete();
         }
     }
@@ -223,8 +237,7 @@ public class SynapseGroup extends Group {
 
         // Isolated synapse group
         if (getParentGroup() == null) {
-            if ((getSynapseList().size() > threshold)
-                    || (estimatedFinalSynapses > threshold)) {
+            if (getSynapseList().size() > threshold) {
                 return false;
             }
         } else if (getParentGroup() instanceof Subnetwork) {
@@ -233,17 +246,20 @@ public class SynapseGroup extends Group {
         return true;
     }
 
-    /**
-     * @return the estimatedFinalSynapses
-     */
-    public int getEstimatedFinalSynapses() {
-        return estimatedFinalSynapses;
-    }
 
     /**
-     * @param estimatedFinalSynapses the estimatedFinalSynapses to set
+     * @return the sourceNeuronGroup
      */
-    public void setEstimatedFinalSynapses(int estimatedFinalSynapses) {
-        this.estimatedFinalSynapses = estimatedFinalSynapses;
+    public NeuronGroup getSourceNeuronGroup() {
+        return sourceNeuronGroup;
     }
+
+
+    /**
+     * @return the targetNeuronGroup
+     */
+    public NeuronGroup getTargetNeuronGroup() {
+        return targetNeuronGroup;
+    }
+
 }

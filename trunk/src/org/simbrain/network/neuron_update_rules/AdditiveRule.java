@@ -81,13 +81,7 @@ public class AdditiveRule extends NeuronUpdateRule {
 
         // Update buffer of additive neuron using Euler's method.
 
-        // external input, if any
-        double externalInput = 0;
-        if (neuron.isInput()) {
-            externalInput = g(neuron.getInputValue());
-        }
-        double wtdSum = externalInput;
-
+        double wtdSum = 0;
         if (neuron.getFanIn().size() > 0) {
             for (int j = 0; j < neuron.getFanIn().size(); j++) {
                 Synapse w = neuron.getFanIn().get(j);

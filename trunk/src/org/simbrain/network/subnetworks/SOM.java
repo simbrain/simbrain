@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.subnetworks;
 
 import java.io.File;
@@ -6,7 +24,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
@@ -15,9 +32,9 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  *
  * @author William B. St. Clair
  *
- *         TODO: Move all "training" functions over to trainer
+ * TODO: Move all "training" functions over to trainer
  */
-public class SOM extends Subnetwork {
+public class SOM extends NeuronGroup {
 
     /** Default alpha. */
     public static final double DEFAULT_ALPHA = 0.06;
@@ -85,9 +102,6 @@ public class SOM extends Subnetwork {
     /** Number of vectors seen by the SOM since last full iteration. */
     private int vectorNumber = 0;
 
-    /** Winner index. */
-    private int winner;
-
     /** Input training file for persistence. */
     private File trainingINFile = null;
 
@@ -112,76 +126,12 @@ public class SOM extends Subnetwork {
      */
     public SOM(final Network root, final int numNeurons, final Layout layout) {
         super(root);
-        this.addNeuronGroup(new NeuronGroup(root));
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(
+            addNeuron(
                     new Neuron(getParentNetwork(), new LinearRule()));
         }
-        setDisplayNeuronGroups(false);
-        layout.layoutNeurons(getNeuronGroup().getNeuronList());
+        layout.layoutNeurons(getNeuronList());
         setLabel("SOM");
-    }
-
-    // /**
-    // * Copy constructor.
-    // *
-    // * @param newRoot new root net
-    // * @param oldNet old network
-    // */
-    // public SOM(Network newRoot, SOM oldNet) {
-    // super(newRoot, oldNet);
-    // this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
-    // this.setInitAlpha(oldNet.getInitAlpha());
-    // this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
-    // this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
-    // }
-
-    /**
-     * Discovers the current index of the SOM neuron which is closest to the
-     * input vector.
-     *
-     * @return winner
-     */
-    private int calculateWinnerIndex() {
-        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron n = getNeuronGroup().getNeuronList().get(i);
-            distance = findDistance(n);
-            if (distance < winDistance) {
-                winDistance = distance;
-                winner = i;
-            }
-        }
-        return winner;
-    }
-
-    /**
-     * Calculates the euclidian distance between the SOM neuron's weight vector
-     * and the input vector.
-     *
-     * @param n The SOM neuron one wishes to find the for.
-     * @return distance.
-     */
-    private double findDistance(final Neuron n) {
-        double ret = 0;
-        for (Synapse incoming : n.getFanIn()) {
-            ret += Math.pow(incoming.getStrength()
-                    - incoming.getSource().getActivation(), 2);
-        }
-        return ret;
-    }
-
-    /**
-     * Finds the physical euclidian Distance between two neurons.
-     *
-     * @param neuron1 First neuron.
-     * @param neuron2 Second neuron.
-     * @return physical distance between two neurons in Simbrain.
-     */
-    private double findPhysicalDistance(final Neuron neuron1,
-            final Neuron neuron2) {
-        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
-                + Math.pow(neuron2.getY() - neuron1.getY(), 2));
-        return ret;
     }
 
     /**
@@ -194,14 +144,14 @@ public class SOM extends Subnetwork {
         for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
             winDistance = Double.POSITIVE_INFINITY;
-            winner = 0;
             int counter;
             double physicalDistance;
+            Neuron winner = null;
 
             // Determine Winner: The SOM Neuron with the lowest distance between
             // it's weight vector and the input neurons's weight vector.
-            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron n = getNeuronGroup().getNeuronList().get(i);
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron n = getNeuronList().get(i);
                 distance = 0;
                 counter = 0;
                 for (Synapse incoming : n.getFanIn()) {
@@ -211,18 +161,16 @@ public class SOM extends Subnetwork {
                 }
                 if (distance < winDistance) {
                     winDistance = distance;
-                    winner = i;
+                    winner = n;
                 }
             }
-            Neuron winningNeuron = getNeuronGroup().getNeuronList()
-                    .get(winner);
 
             // Update Weights of the neurons within the radius of the winning
             // neuron.
-            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronGroup().getNeuronList().get(
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron neuron = getNeuronList().get(
                         i);
-                physicalDistance = findPhysicalDistance(neuron, winningNeuron);
+                physicalDistance = findPhysicalDistance(neuron, winner);
 
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {
@@ -253,7 +201,7 @@ public class SOM extends Subnetwork {
      * between 0 and the upper bound of each synapse.
      */
     public void randomizeIncomingWeights() {
-        for (Neuron n : getNeuronGroup().getNeuronList()) {
+        for (Neuron n : getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getUpperBound() * Math.random());
             }
@@ -265,16 +213,15 @@ public class SOM extends Subnetwork {
      */
     public void recall() {
         winDistance = 0;
-        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron n = getNeuronGroup().getNeuronList().get(i);
+        Neuron winner = null;
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = getNeuronList().get(i);
             if (n.getActivation() > winDistance) {
                 winDistance = n.getActivation();
-                winner = i;
+                winner = n;
             }
         }
-        Neuron winningNeuron = getNeuronGroup().getNeuronList().get(
-                winner);
-        for (Synapse incoming : winningNeuron.getFanIn()) {
+        for (Synapse incoming : winner.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
 
@@ -302,15 +249,15 @@ public class SOM extends Subnetwork {
             for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
                 winDistance = Double.POSITIVE_INFINITY;
-                winner = 0;
+                Neuron winner = null;
                 int counter;
                 double physicalDistance;
 
                 // Determine Winner: The SOM Neuron with the lowest distance
                 // between
                 // it's weight vector and the input neurons's weight vector.
-                for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                    Neuron n = getNeuronGroup().getNeuronList().get(i);
+                for (int i = 0; i < getNeuronList().size(); i++) {
+                    Neuron n = getNeuronList().get(i);
                     distance = 0;
                     counter = 0;
                     for (Synapse incoming : n.getFanIn()) {
@@ -320,17 +267,15 @@ public class SOM extends Subnetwork {
                     }
                     if (distance < winDistance) {
                         winDistance = distance;
-                        winner = i;
+                        winner = n;
                     }
                 }
-                Neuron winningNeuron = getNeuronGroup()
-                        .getNeuronList().get(winner);
 
                 // Update Weights of the neurons within the radius of the
                 // winning neuron.
-                for (Neuron neuron : getNeuronGroup().getNeuronList()) {
+                for (Neuron neuron : getNeuronList()) {
                     physicalDistance = findPhysicalDistance(neuron,
-                            winningNeuron);
+                            winner);
 
                     // The center of the neuron is within the update region.
                     if (physicalDistance <= neighborhoodSize) {
@@ -380,19 +325,16 @@ public class SOM extends Subnetwork {
 
         // Determine Winner: The SOM Neuron with the lowest distance between
         // its weight vector and the input neurons's weight vector.
-
-        winner = calculateWinnerIndex();
-        Neuron winningNeuron = getNeuronGroup().getNeuronList().get(
-                winner);
+        Neuron winner = calculateWinner();
 
         // Neuron update
         if (!getParentNetwork().getClampNeurons()) {
             if (updateMethod == STANDARD) {
-                getNeuronGroup().update();
+               super.update();
             } else {
-                for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                    Neuron n = getNeuronGroup().getNeuronList().get(i);
-                    if (n == winningNeuron) {
+                for (int i = 0; i < getNeuronList().size(); i++) {
+                    Neuron n = getNeuronList().get(i);
+                    if (n == winner) {
                         n.setActivation(1);
                     } else {
                         n.setActivation(0);
@@ -404,10 +346,10 @@ public class SOM extends Subnetwork {
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
         if (!getParentNetwork().getClampWeights()) {
-            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronGroup().getNeuronList().get(
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron neuron = getNeuronList().get(
                         i);
-                physicalDistance = findPhysicalDistance(neuron, winningNeuron);
+                physicalDistance = findPhysicalDistance(neuron, winner);
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {
                     for (Synapse incoming : neuron.getFanIn()) {
@@ -419,7 +361,6 @@ public class SOM extends Subnetwork {
                     }
                 }
             }
-            alpha = (alpha - alphaDecayRate * alpha);
             // TODO: Now reducing decay rate as
             // percentage. Document and make
             // others consistent with this.
@@ -429,6 +370,56 @@ public class SOM extends Subnetwork {
                 neighborhoodSize = 0;
             }
         }
+    }
+
+
+    /**
+     * Find the SOM neuron which is closest to the
+     * input vector.  TODO: Reuse this more.
+     *
+     * @return winner
+     */
+    private Neuron calculateWinner() {
+        Neuron winner = null;
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = getNeuronList().get(i);
+            distance = findDistance(n);
+            if (distance < winDistance) {
+                winDistance = distance;
+                winner = n;
+            }
+        }
+        return winner;
+    }
+
+    /**
+     * Calculates the Euclidian distance between the SOM neuron's weight vector
+     * and the input vector.
+     *
+     * @param n The SOM neuron one wishes to find the for.
+     * @return distance.
+     */
+    private double findDistance(final Neuron n) {
+        double ret = 0;
+        for (Synapse incoming : n.getFanIn()) {
+            ret += Math.pow(incoming.getStrength()
+                    - incoming.getSource().getActivation(), 2);
+        }
+        return ret;
+    }
+
+    /**
+     * Finds the physical Euclidian Distance between two neurons.
+     *
+     * @param neuron1 First neuron.
+     * @param neuron2 Second neuron.
+     * @return physical distance between two neurons in Simbrain.
+     */
+    private double findPhysicalDistance(final Neuron neuron1,
+            final Neuron neuron2) {
+        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
+                + Math.pow(neuron2.getY() - neuron1.getY(), 2));
+        return ret;
     }
 
     /**

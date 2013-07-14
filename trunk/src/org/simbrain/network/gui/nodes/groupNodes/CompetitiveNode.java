@@ -35,7 +35,7 @@ import org.simbrain.network.subnetworks.Competitive;
  *
  * @author jyoshimi
  */
-public class CompetitiveNode extends SubnetworkNode {
+public class CompetitiveNode extends NeuronGroupNode {
 
     /**
      * Create a Competitive Network PNode.
@@ -45,7 +45,6 @@ public class CompetitiveNode extends SubnetworkNode {
      */
     public CompetitiveNode(final NetworkPanel networkPanel, final Competitive group) {
         super(networkPanel, group);
-        // setStrokePaint(Color.green);
         setInteractionBox(new CompetitiveInteractionBox(networkPanel));
         setContextMenu();
         //setOutlinePadding(15f);
@@ -70,7 +69,7 @@ public class CompetitiveNode extends SubnetworkNode {
     }
 
     /**
-     * Custom interaction box for Comeptitive network node.
+     * Custom interaction box for Competitive network node.
      */
     private class CompetitiveInteractionBox extends InteractionBox {
         public CompetitiveInteractionBox(NetworkPanel net) {

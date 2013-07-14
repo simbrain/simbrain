@@ -637,14 +637,18 @@ public class NetworkPanel extends JPanel {
         GroupNode ret = null;
         // Note that synapseGroupNodes are created inside of addGroup
         if (group instanceof NeuronGroup) {
-            ret = new NeuronGroupNode(NetworkPanel.this, (NeuronGroup) group);
+            if (group instanceof SOM) {
+                ret = new SOMNode(NetworkPanel.this, (SOM) group);
+            } else if (group instanceof Competitive) {
+                ret = new CompetitiveNode(NetworkPanel.this,
+                        (Competitive) group);
+            } else {
+                ret = new NeuronGroupNode(NetworkPanel.this,
+                        (NeuronGroup) group);
+            }
         } else if (group instanceof Subnetwork) {
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
-            } else if (group instanceof SOM) {
-                ret = new SOMNode(NetworkPanel.this, (SOM) group);
-            } else if (group instanceof Competitive) {
-                ret = new CompetitiveNode(NetworkPanel.this, (Competitive) group);
             } else if (group instanceof FeedForward) {
                 if (group instanceof BackpropNetwork) {
                     ret = new BackpropNetworkNode(NetworkPanel.this,
@@ -926,6 +930,7 @@ public class NetworkPanel extends JPanel {
         // Insert actions
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(new AddNeuronsAction(this));
+        contextMenu.add(actionManager.getNewGroupMenu());
         contextMenu.add(actionManager.getNewNetworkMenu());
 
         // Clipboard actions
@@ -2169,9 +2174,7 @@ public class NetworkPanel extends JPanel {
         // Connect neuron groups
         for (NeuronGroup sng : getSourceModelGroups()) {
             for (NeuronGroup tng : getSelectedModelNeuronGroups()) {
-                SynapseGroup group = new SynapseGroup(getNetwork(), sng, tng,
-                        connection);
-                getNetwork().addGroup(group);
+                network.connectNeuronGroups(sng, tng, connection);
             }
         }
     }

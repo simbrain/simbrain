@@ -102,11 +102,11 @@ public class CompetitiveCreationDialog extends StandardDialog implements
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         Competitive competitive = new Competitive(networkPanel.getNetwork(),
                 Integer.parseInt(tfNumNeurons.getText()), layout);
-        competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
+        competitive.setLearningRate(Double.parseDouble(tfEpsilon.getText()));
         competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
         competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
         competitive
-                .setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
+                .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
         networkPanel.getNetwork().addGroup(competitive);

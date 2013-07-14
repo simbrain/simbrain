@@ -297,7 +297,7 @@ public final class NetworkActionManager {
 
     /** Test inputs to selected neurons */
     private Action testInputAction;
-    
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -561,18 +561,14 @@ public final class NetworkActionManager {
     }
 
     /**
-     * @return a list of the network types.
+     * @return a list of new networks that can be inserted
      */
     public List<Action> getNewNetworkActions() {
         return Arrays.asList(new Action[] {
-                new AddGroupAction(networkPanel, new NeuronGroupCreationDialog(
-                        networkPanel), "(Bare) Neuron Group"),
                 new AddGroupAction(networkPanel, new BackpropCreationDialog(
                         networkPanel), "Backprop"),
                 new AddGroupAction(networkPanel, new BPTTCreationDialog(
                         networkPanel), "Backprop Through Time"),
-                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
-                        networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new ESNCreationDialog(
                         networkPanel), "Echo State Network"),
                 new AddGroupAction(networkPanel, new FeedForwardCreationDialog(
@@ -581,24 +577,48 @@ public final class NetworkActionManager {
                         networkPanel), "Hopfield"),
                 new AddGroupAction(networkPanel, new LMSCreationDialog(
                         networkPanel), "LMS (Least Mean Squares)"),
+                new AddGroupAction(networkPanel, new SRNCreationDialog(
+                        networkPanel), "SRN (Simple Recurrent Network)") });
+    }
+
+    /**
+     * @return a list of the new neuron groups that can be inserted
+     */
+    public List<Action> getNewGroupActions() {
+        return Arrays.asList(new Action[] {
+                new AddGroupAction(networkPanel, new NeuronGroupCreationDialog(
+                        networkPanel), "(Bare) Neuron Group"),
+                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
+                        networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new KwtaCreationDialog(
                         networkPanel), "KWTA"),
                 new AddGroupAction(networkPanel, new SOMCreationDialog(
                         networkPanel), "SOM (Self organizing map)"),
-                new AddGroupAction(networkPanel, new SRNCreationDialog(
-                        networkPanel), "SRN (Simple Recurrent Network)"),
                 new AddGroupAction(networkPanel, new WTACreationDialog(
                         networkPanel), "WTA (Winner take all)") });
     }
 
     /**
-     * Return a JManue for creating new networks.
+     * Return a JMenu for creating new networks.
      *
      * @return the new JMenu.
      */
     public JMenu getNewNetworkMenu() {
         JMenu ret = new JMenu("Insert Network");
         for (Action action : getNewNetworkActions()) {
+            ret.add(action);
+        }
+        return ret;
+    }
+
+    /**
+     * Return a JMenu for creating new neuron groups.
+     *
+     * @return the new JMenu.
+     */
+    public JMenu getNewGroupMenu() {
+        JMenu ret = new JMenu("Insert Neuron Group");
+        for (Action action : getNewGroupActions()) {
             ret.add(action);
         }
         return ret;

@@ -123,13 +123,13 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
     protected void closeDialogOk() {
         competitive.setUpdateMethod((UpdateMethod) updateMethod
                 .getSelectedItem());
-        competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
+        competitive.setLearningRate(Double.parseDouble(tfEpsilon.getText()));
         competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
         competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
         competitive.setSynpaseDecayPercent(Double
                 .parseDouble(tfSynpaseDecayPercent.getText()));
         competitive
-                .setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
+                .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
         super.closeDialogOk();
@@ -140,10 +140,10 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
      */
     public void fillFieldValues() {
         updateMethod.setSelectedItem(competitive.getUpdateMethod());
-        tfEpsilon.setText(Double.toString(competitive.getEpsilon()));
+        tfEpsilon.setText(Double.toString(competitive.getLearningRate()));
         tfLoserValue.setText(Double.toString(competitive.getLoseValue()));
         tfWinnerValue.setText(Double.toString(competitive.getWinValue()));
-        tfLeakyEpsilon.setText(Double.toString(competitive.getLeakyEpsilon()));
+        tfLeakyEpsilon.setText(Double.toString(competitive.getLeakyLearningRate()));
         tfSynpaseDecayPercent.setText(Double.toString(competitive
                 .getSynpaseDecayPercent()));
         cbUseLeakyLearning.setSelected(competitive.getUseLeakyLearning());

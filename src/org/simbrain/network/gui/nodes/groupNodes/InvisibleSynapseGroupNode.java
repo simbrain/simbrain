@@ -29,9 +29,9 @@ import org.simbrain.network.gui.nodes.InteractionBox;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * PNode representation of a group of synpases, where the synapses themselves
+ * PNode representation of a group of synapses, where the synapses themselves
  * are not visible.
- * 
+ *
  * @author jyoshimi
  */
 public class InvisibleSynapseGroupNode extends SynapseGroupNode {

@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -36,6 +37,8 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
+import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.randomizer.Randomizer;
@@ -1739,6 +1742,29 @@ public class Network {
      */
     public void setSynapseVisibilityThreshold(int synapseVisibilityThreshold) {
         this.synapseVisibilityThreshold = synapseVisibilityThreshold;
+    }
+
+    /**
+     * Connect a source neuron group to a target neuron group using a connection
+     * object.
+     *
+     * @param sng source neuron group
+     * @param tng target neuron group
+     * @param connection conection object
+     */
+    public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng,
+            final ConnectNeurons connection) {
+        
+        final SynapseGroup group;
+
+        // TODO: Below is temporary rule.  As more rules are added something more sophisticated
+        //   might be needed.
+        if (tng instanceof Competitive) {
+            group = new SynapseGroupWithLearningRate(this, sng, tng, connection);
+        } else {
+            group = new SynapseGroup(this, sng, tng, connection);
+        }
+        addGroup(group);
     }
 
 

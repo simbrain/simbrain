@@ -72,7 +72,7 @@ public class NeuronGroup extends Group {
         layout.layoutNeurons(this.getNeuronList());
         // Collections.sort(neuronList, Comparators.X_ORDER);
     }
-
+    
     /**
      * Create a neuron group without any initial neurons.
      *

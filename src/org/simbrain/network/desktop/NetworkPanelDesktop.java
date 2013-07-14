@@ -158,6 +158,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         insertMenu.add(actionManager.getNewNeuronAction());
         insertMenu.add(new AddNeuronsAction(this));
+        insertMenu.add(actionManager.getNewGroupMenu());
         insertMenu.add(actionManager.getNewNetworkMenu());
         return insertMenu;
     }

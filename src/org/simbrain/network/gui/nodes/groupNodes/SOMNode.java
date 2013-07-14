@@ -38,7 +38,7 @@ import org.simbrain.util.Utils;
  *
  * @author jyoshimi
  */
-public class SOMNode extends SubnetworkNode {
+public class SOMNode extends NeuronGroupNode {
 
     /**
      * Create a SOM Network PNode.

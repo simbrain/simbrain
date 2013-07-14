@@ -20,11 +20,12 @@ package org.simbrain.network.subnetworks;
 
 import java.util.Iterator;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
@@ -36,12 +37,12 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends Subnetwork {
+public class Competitive extends NeuronGroup {
 
     // TODO: Add "recall" function as with SOM
 
     /** Learning rate. */
-    private double epsilon = .1;
+    private double learningRate = .1;
 
     /** Winner value. */
     private double winValue = 1;
@@ -55,8 +56,8 @@ public class Competitive extends Subnetwork {
     /** Use leaky learning boolean. */
     private boolean useLeakyLearning = false;
 
-    /** Leaky epsilon value. */
-    private double leakyEpsilon = epsilon / 4;
+    /** Leaky learning rate . */
+    private double leakyLearningRate = learningRate / 4;
 
     /**
      * Percentage by which to decay synapses on each update for for
@@ -108,12 +109,10 @@ public class Competitive extends Subnetwork {
     public Competitive(final Network root, final int numNeurons,
             final Layout layout) {
         super(root);
-        this.addNeuronGroup(new NeuronGroup(root));
-        this.setDisplayNeuronGroups(false);
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(new Neuron(root, new LinearRule()));
+            addNeuron(new Neuron(root, new LinearRule()));
         }
-        layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
+        layout.layoutNeurons(this.getNeuronList());
         setLabel("Competitive Network");
     }
 
@@ -135,14 +134,14 @@ public class Competitive extends Subnetwork {
     @Override
     public void update() {
 
-        getNeuronGroup().update();
+        super.update();
 
         max = 0;
         winner = 0;
 
         // Determine Winner
-        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron n = getNeuronGroup().getNeuronList().get(i);
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = getNeuronList().get(i);
             n.update();
             if (n.getActivation() > max) {
                 max = n.getActivation();
@@ -151,9 +150,8 @@ public class Competitive extends Subnetwork {
         }
 
         // Update weights on winning neuron
-        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            Neuron neuron = getNeuronGroup().getNeuronList().get(i);
-
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron neuron = getNeuronList().get(i);
             if (i == winner) {
                 if (!getParentNetwork().getClampNeurons()) {
                     neuron.setActivation(winValue);
@@ -187,8 +185,13 @@ public class Competitive extends Subnetwork {
      * @param neuron winning neuron.
      */
     private void squireAlvarezWeightUpdate(final Neuron neuron) {
+        double rate = learningRate;
         for (Synapse synapse : neuron.getFanIn()) {
-            double deltaw = epsilon
+            if (synapse.getParentGroup() instanceof SynapseGroupWithLearningRate) {
+                rate = ((SynapseGroupWithLearningRate) synapse.getParentGroup())
+                        .getLearningRate();
+            }
+            double deltaw = learningRate
                     * synapse.getTarget().getActivation()
                     * (synapse.getSource().getActivation() - synapse
                             .getTarget().getAverageInput());
@@ -209,10 +212,12 @@ public class Competitive extends Subnetwork {
 
             // Normalize the input values
             if (normalizeInputs) {
-                activation /= sumOfInputs;
+                if (sumOfInputs != 0) {
+                    activation = activation / sumOfInputs;
+                }
             }
 
-            double deltaw = epsilon * (activation - synapse.getStrength());
+            double deltaw = learningRate * (activation - synapse.getStrength());
             synapse.setStrength(synapse.getStrength() + deltaw);
         }
     }
@@ -221,7 +226,7 @@ public class Competitive extends Subnetwork {
      * Decay attached synapses in accordance with Alvarez and Squire 1994, eq 3.
      */
     private void decayAllSynapses() {
-        for (Neuron n : getNeuronGroup().getNeuronList()) {
+        for (Neuron n : getNeuronList()) {
             for (Synapse synapse : n.getFanIn()) {
                 synapse.decay(synpaseDecayPercent);
             }
@@ -241,7 +246,7 @@ public class Competitive extends Subnetwork {
             if (normalizeInputs) {
                 activation /= sumOfInputs;
             }
-            val = incoming.getStrength() + leakyEpsilon
+            val = incoming.getStrength() + leakyLearningRate
                     * (activation - incoming.getStrength());
             incoming.setStrength(val);
         }
@@ -252,7 +257,7 @@ public class Competitive extends Subnetwork {
      */
     public void normalizeIncomingWeights() {
 
-        for (Neuron n : getNeuronGroup().getNeuronList()) {
+        for (Neuron n : getNeuronList()) {
             double normFactor = n.getSummedIncomingWeights();
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
@@ -266,7 +271,7 @@ public class Competitive extends Subnetwork {
     public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
-        for (Neuron n : getNeuronGroup().getNeuronList()) {
+        for (Neuron n : getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
             }
@@ -278,7 +283,7 @@ public class Competitive extends Subnetwork {
      */
     public void randomizeIncomingWeights() {
 
-        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i
+        for (Iterator i = getNeuronList().iterator(); i
                 .hasNext();) {
             Neuron n = (Neuron) i.next();
             for (Synapse s : n.getFanIn()) {
@@ -294,7 +299,7 @@ public class Competitive extends Subnetwork {
      */
     private double getSummedIncomingWeights() {
         double ret = 0;
-        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i
+        for (Iterator i = getNeuronList().iterator(); i
                 .hasNext();) {
             Neuron n = (Neuron) i.next();
             ret += n.getSummedIncomingWeights();
@@ -311,21 +316,21 @@ public class Competitive extends Subnetwork {
     }
 
     /**
-     * Return the epsilon.
+     * Return the learning rate.
      *
-     * @return the epsilon value.
+     * @return the learning rate
      */
-    public double getEpsilon() {
-        return epsilon;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
-     * Sets epsilon.
+     * Sets learning rate.
      *
-     * @param epsilon The new epsilon value.
+     * @param rate The new epsilon value.
      */
-    public void setEpsilon(final double epsilon) {
-        this.epsilon = epsilon;
+    public void setLearningRate(final double rate) {
+        this.learningRate = rate;
     }
 
     /**
@@ -365,21 +370,21 @@ public class Competitive extends Subnetwork {
     }
 
     /**
-     * Return leaky epsilon value.
+     * Return leaky learning rate.
      *
-     * @return Leaky epsilon value
+     * @return Leaky learning rate
      */
-    public double getLeakyEpsilon() {
-        return leakyEpsilon;
+    public double getLeakyLearningRate() {
+        return leakyLearningRate;
     }
 
     /**
-     * Sets the leaky epsilon value.
+     * Sets the leaky learning rate.
      *
-     * @param leakyEpsilon Leaky epsilon value to set
+     * @param leakyRate Leaky rate value to set
      */
-    public void setLeakyEpsilon(final double leakyEpsilon) {
-        this.leakyEpsilon = leakyEpsilon;
+    public void setLeakyLearningRate(final double leakyRate) {
+        this.leakyLearningRate = leakyRate;
     }
 
     /**
@@ -444,6 +449,47 @@ public class Competitive extends Subnetwork {
      */
     public void setUpdateMethod(UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
+    }
+
+    /**
+     * Subclass of neuron group that simply adds a settable learning rate. For
+     * use with competitive networks where it is desirable to have different
+     * learning rates for different synapse groups.
+     *
+     * TODO: Generalize this for other cases, e.g. SOM.
+     */
+    public static class SynapseGroupWithLearningRate extends SynapseGroup {
+
+        /** The learning rate. */
+        private double learningRate = .1;
+
+        /**
+         * Construct the synapse group with learning rate.
+         *
+         * @param net parent net
+         * @param source source neuron group
+         * @param target target neuron group
+         * @param connection  the connection to be used in creating this synapse group
+         */
+        public SynapseGroupWithLearningRate(Network net, NeuronGroup source,
+                NeuronGroup target, ConnectNeurons connection) {
+            super(net, source, target, connection);
+        }
+
+        /**
+         * @return the learningRate
+         */
+        public double getLearningRate() {
+            return learningRate;
+        }
+
+        /**
+         * @param learningRate the learningRate to set
+         */
+        public void setLearningRate(double learningRate) {
+            this.learningRate = learningRate;
+        }
+
     }
 
 }

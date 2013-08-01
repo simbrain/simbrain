@@ -37,6 +37,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
@@ -1016,6 +1017,7 @@ public class Network {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(Network.class, "synapseRouter");
         xstream.omitField(Network.class, "logger");
         xstream.omitField(Network.class, "component");
         xstream.omitField(Network.class, "customRule");
@@ -1027,12 +1029,14 @@ public class Network {
         xstream.omitField(Network.class, "textListeners");
         xstream.omitField(Network.class, "updateCompleted");
         xstream.omitField(Network.class, "networkThread");
+        xstream.omitField(Network.class, "logger");
+
+        xstream.omitField(Group.class, "deleteWhenEmpty");
 
         xstream.omitField(NetworkUpdateManager.class, "listeners");
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 
-        xstream.omitField(Network.class, "logger");
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
@@ -1754,7 +1758,7 @@ public class Network {
      */
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng,
             final ConnectNeurons connection) {
-        
+
         final SynapseGroup group;
 
         // TODO: Below is temporary rule.  As more rules are added something more sophisticated

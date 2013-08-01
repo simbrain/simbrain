@@ -132,6 +132,15 @@ public abstract class ConnectNeurons {
     }
 
     /**
+     * Connect source to target neurons. Assumes that synapses will not be in a
+     * synapse group but rather will be loose neurons. If the synapses will be
+     * placed in a synapse group connectNeurons(false) must be used.
+     */
+    public void connectNeurons() {
+        connectNeurons(true);
+    }
+
+    /**
      * Connect the source to the target neurons using some method.
      *
      * @param looseSynapses true if the connections that are being created are

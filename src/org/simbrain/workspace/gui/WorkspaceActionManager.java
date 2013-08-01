@@ -37,6 +37,7 @@ import org.simbrain.workspace.actions.GlobalUpdateAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
 import org.simbrain.workspace.actions.NewDisplayWorldAction;
+import org.simbrain.workspace.actions.NewDocViewerAction;
 import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
@@ -123,6 +124,9 @@ public class WorkspaceActionManager {
     /** New console action. */
     private final Action newConsoleAction;
 
+    /** New document viewer. */
+    private final Action newDocViewerAction;
+
     /** Clear workspace action. */
     private final Action clearWorkspaceAction;
 
@@ -198,6 +202,7 @@ public class WorkspaceActionManager {
 
         newNetworkAction = new NewNetworkAction(workspace);
         newConsoleAction = new NewConsoleAction(workspace);
+        newDocViewerAction = new NewDocViewerAction(workspace);
 
         newBarChartAction = new NewBarChartAction(workspace);
         newPieChartAction = new NewPieChartAction(workspace);
@@ -359,6 +364,13 @@ public class WorkspaceActionManager {
      */
     public Action getNewConsoleAction() {
         return newConsoleAction;
+    }
+
+    /**
+     * @return the newDocViewerAction.
+     */
+    public Action getNewDocViewerAction() {
+        return newDocViewerAction;
     }
 
     /**

@@ -70,10 +70,14 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
+import org.simbrain.docviewer.DocViewerComponent;
+import org.simbrain.docviewer.DocViewerDesktopComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.plot.barchart.BarChartGui;
+import org.simbrain.plot.histogram.HistogramComponent;
+import org.simbrain.plot.histogram.HistogramGui;
 import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartGui;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -369,6 +373,7 @@ public class SimbrainDesktop {
     private static void registerComponents() {
         // TODO use a configuration file
         registerComponent(BarChartComponent.class, BarChartGui.class);
+        registerComponent(DocViewerComponent.class, DocViewerDesktopComponent.class);
         registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         registerComponent(DisplayComponent.class,
                 DisplayComponentDesktopGui.class);
@@ -376,6 +381,7 @@ public class SimbrainDesktop {
                 DataWorldDesktopComponent.class);
         // registerComponent(MidiWorldComponent.class,
         // MidiWorldDesktopComponent.class);
+        registerComponent(HistogramComponent.class, HistogramGui.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
         registerComponent(OdorWorldComponent.class,
                 OdorWorldDesktopComponent.class);
@@ -652,6 +658,7 @@ public class SimbrainDesktop {
         }
         insertMenu.add(newWorldSubMenu);
         insertMenu.addSeparator();
+        insertMenu.add(actionManager.getNewDocViewerAction());
         insertMenu.add(actionManager.getNewConsoleAction());
         return insertMenu;
     }
@@ -700,6 +707,7 @@ public class SimbrainDesktop {
         }
         contextMenu.add(newWorldSubMenu);
         contextMenu.addSeparator();
+        contextMenu.add(actionManager.getNewDocViewerAction());
         contextMenu.add(actionManager.getNewConsoleAction());
 
     }

@@ -59,6 +59,7 @@ import org.simbrain.workspace.actions.ScriptEditorAction;
 import org.simbrain.workspace.actions.ShowPropertyDialogAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
+import org.simbrain.workspace.actions.chart.NewHistogramAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
 import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
@@ -108,6 +109,9 @@ public class WorkspaceActionManager {
 
     /** New bar chart action. */
     private final Action newBarChartAction;
+
+    /** New histogram chart action. */
+    private final Action newHistogramAction;
 
     /** New pie chart action. */
     private final Action newPieChartAction;
@@ -205,6 +209,7 @@ public class WorkspaceActionManager {
         newDocViewerAction = new NewDocViewerAction(workspace);
 
         newBarChartAction = new NewBarChartAction(workspace);
+        newHistogramAction = new NewHistogramAction(workspace);
         newPieChartAction = new NewPieChartAction(workspace);
         newProjectionPlotAction = new NewProjectionPlotAction(workspace);
         newScatterPlotAction = new NewScatterPlotAction(workspace);
@@ -276,7 +281,7 @@ public class WorkspaceActionManager {
      */
     public List<Action> getPlotActions() {
         return Arrays.asList(new Action[] { newBarChartAction,
-                newPieChartAction, newProjectionPlotAction,
+                newHistogramAction, newPieChartAction, newProjectionPlotAction,
                 newScatterPlotAction, newTimeSeriesAction });
     }
 

@@ -262,4 +262,19 @@ public class SynapseGroup extends Group {
         return targetNeuronGroup;
     }
 
+    /**
+     * Return weight strengths as a double vector.
+     *
+     * @return weights
+     */
+    public double[] getWeightVector() {
+        double[] retArray = new double[synapseList.size()];
+        int i = 0;
+        for (Synapse synapse : synapseList) {
+            retArray[i++] = synapse.getStrength();
+        }
+        return retArray;
+    }
+
+
 }

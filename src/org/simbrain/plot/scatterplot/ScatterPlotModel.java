@@ -118,8 +118,8 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void addDataSource() {
         Integer index = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(index));
-        this.fireDataSourceAdded(index);
+        dataset.addSeries(new XYSeries(index + 1));
+        this.fireDataSourceAdded(index + 1);
     }
 
     /**

@@ -334,7 +334,7 @@ public class Network {
      * @return group with that id, null otherwise
      */
     public Group getGroup(final String id) {
-        for (Group group : getGroupList()) {
+        for (Group group : getFlatGroupList()) {
             if (group.getId().equalsIgnoreCase(id)) {
                 return group;
             }

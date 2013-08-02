@@ -66,7 +66,7 @@ public class PieChartModel extends ChartModel {
      * Adds a data source to the plot.
      */
     public void addDataSource() {
-        Integer index = dataset.getItemCount();
+        Integer index = dataset.getItemCount() + 1;
         dataset.setValue(index, 1);
         this.fireDataSourceAdded(index);
     }
@@ -75,7 +75,7 @@ public class PieChartModel extends ChartModel {
      * Removes a data source from the plot.
      */
     public void removeDataSource() {
-        int removalIndex = dataset.getItemCount() - 1;
+        int removalIndex = dataset.getItemCount();
         if (removalIndex > 0) {
             this.fireDataSourceRemoved(removalIndex);
             dataset.remove(removalIndex);

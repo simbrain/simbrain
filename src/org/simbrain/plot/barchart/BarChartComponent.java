@@ -175,7 +175,7 @@ public class BarChartComponent extends WorkspaceComponent {
         if (barChartConsumer.isVisible()) {
             for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
                 String description = barChartConsumer
-                        .getSimpleDescription("Bar" + i);
+                        .getSimpleDescription("Bar " + (i + 1));
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(model, "setValue",
                                 new Class[] { double.class, Integer.class },

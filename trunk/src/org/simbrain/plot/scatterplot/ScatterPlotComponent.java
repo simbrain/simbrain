@@ -110,7 +110,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         for (ScatterPlotSetter setter : setterList) {
             if (xAttributeType.isVisible()) {
                 String xDesc = xAttributeType.getSimpleDescription("Point "
-                        + setter.getIndex() + "[X]");
+                        + (setter.getIndex() + 1) + "[X]");
                 PotentialConsumer xConsumer = getAttributeManager()
                         .createPotentialConsumer(setter, xAttributeType);
                 xConsumer.setCustomDescription(xDesc);
@@ -118,7 +118,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             }
             if (yAttributeType.isVisible()) {
                 String yDesc = yAttributeType.getSimpleDescription("Point "
-                        + setter.getIndex() + "[Y]");
+                        + (setter.getIndex() + 1) + "[Y]");
                 PotentialConsumer yConsumer = getAttributeManager()
                         .createPotentialConsumer(setter, yAttributeType);
                 yConsumer.setCustomDescription(yDesc);
@@ -257,7 +257,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public void update() {
         // Constantly erase. How is performance for this version?
         for (ScatterPlotSetter setter : setterList) {
-            Integer index = setter.getIndex();
+            Integer index = setter.getIndex()+1;
             if (!model.isShowHistory()) {
                 model.getDataset().getSeries(index).clear();
             }

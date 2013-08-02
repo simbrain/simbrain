@@ -96,7 +96,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
                 String description = timeSeriesConsumerType
                         .getSimpleDescription("Time Series "
-                                + i);
+                                + (i + 1));
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(this, "setValue",
                                 new Class[] { double.class, Integer.class },

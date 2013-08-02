@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.piechart;
+package org.simbrain.plot.histogram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,70 +29,52 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Data for a JFreeChart pie chart.
- * 
+ * The Component representation of a histogram.   Contains attributes that allow
+ * other components to couple to this one.
  */
-public class PieChartComponent extends WorkspaceComponent {
+public class HistogramComponent extends WorkspaceComponent {
 
     /** Data model. */
-    private PieChartModel model;
+    private HistogramModel model;
 
-    /** Pie chart consumer type. */
-    private AttributeType pieChartConsumer;
+    /** Neuron group consumer type. */
+    private AttributeType histogramConsumer;
 
     /**
-     * Create new PieChart Component.
+     * Create new Histogram Component.
      *
-     * @param name of chart
+     * @param name chart name
      */
-    public PieChartComponent(final String name) {
+    public HistogramComponent(final String name) {
         super(name);
-        model = new PieChartModel();
-        model.defaultInit();
-        initializeAttributes();
+        model = new HistogramModel(HistogramModel.INITIAL_DATA_SOURCES);
+        init();
         addListener();
     }
 
     /**
-     * Initializes a pie chart with a model.
+     * Create new Histogram Component from a specified model. Used in
+     * deserializing.
      *
-     * Used in deserializing.
-     *
-     * @param name name of component
-     * @param model to use for the plot
+     * @param name chart name
+     * @param model chart model
      */
-    public PieChartComponent(final String name, final PieChartModel model) {
+    public HistogramComponent(final String name, final HistogramModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
+        init();
         addListener();
     }
 
     /**
-     * Initialize consuming attributes.
+     * Initialize component.
      */
-    private void initializeAttributes() {
-        pieChartConsumer = new AttributeType(this, "Slice", "setValue",
-                double.class, true);
-        addConsumerType(pieChartConsumer);
-    }
+    private void init() {
 
-    @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (pieChartConsumer.isVisible()) {
-            for (int i = 0; i < model.getDataset().getItemCount(); i++) {
-                String description = pieChartConsumer
-                        .getSimpleDescription("Slice " + (i + 1));
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(model, "setValue",
-                                new Class[] { double.class, Integer.class },
-                                new Object[] { i });
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
-            }
-        }
-        return returnList;
+        histogramConsumer = new AttributeType(this, "Histogram", "getValue",
+                double[].class, true);
+        addConsumerType(histogramConsumer);
+
     }
 
     /**
@@ -122,7 +104,6 @@ public class PieChartComponent extends WorkspaceComponent {
             public void chartInitialized(int numSources) {
                 // No implementation yet (not used in this component thus far).
             }
-
         });
     }
 
@@ -132,54 +113,64 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     /**
-     * Streams file data for opening saved charts.
+     * Returns model.
      *
-     * @param input stream
-     * @param name file name
-     * @param format format
-     * @return component to be opened
-     */
-    public static PieChartComponent open(final InputStream input,
-            final String name, final String format) {
-        PieChartModel dataModel = (PieChartModel) PieChartModel.getXStream()
-                .fromXML(input);
-        return new PieChartComponent(name, dataModel);
-    }
-
-    /**
      * @return the model.
      */
-    public PieChartModel getModel() {
+    public HistogramModel getModel() {
         return model;
     }
 
     /**
-     * {@inheritDoc}
+     * Opens a saved bar chart.
+     *
+     * @param input stream
+     * @param name name of file
+     * @param format format
+     * @return bar chart component to be opened
      */
+    public static HistogramComponent open(final InputStream input,
+            final String name, final String format) {
+        HistogramModel dataModel = (HistogramModel) HistogramModel.getXStream()
+                .fromXML(input);
+        return new HistogramComponent(name, dataModel);
+    }
+
     @Override
     public void save(final OutputStream output, final String format) {
-        PieChartModel.getXStream().toXML(model, output);
+        HistogramModel.getXStream().toXML(model, output);
     }
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void update() {
-        model.updateTotalValue();
     }
 
     @Override
     public String getXML() {
-        return PieChartModel.getXStream().toXML(model);
+        return HistogramModel.getXStream().toXML(model);
     }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        if (histogramConsumer.isVisible()) {
+            for (int i = 0; i < model.getData().size(); i++) {
+                String description = "Histogram " + (i + 1) + " <double[]>";
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(model, "addData",
+                                new Class[] { double[].class, Integer.class },
+                                new Object[] { i });
+                consumer.setCustomDescription(description);
+                returnList.add(consumer);
+            }
+        }
+        return returnList;
+    }
+
 
 }

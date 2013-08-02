@@ -92,7 +92,7 @@ public class BarChartModel extends ChartModel {
      * Adds a new column to the dataset.
      */
     public void addColumn(final int index) {
-        dataset.addValue(0, new Integer(1), new Integer(index));
+        dataset.addValue(0, new Integer(1), new Integer(index + 1));
         fireDataSourceAdded(index);
     }
 

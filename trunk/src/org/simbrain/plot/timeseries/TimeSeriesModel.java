@@ -114,7 +114,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void addDataSource() {
         Integer currentSize = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(currentSize));
+        dataset.addSeries(new XYSeries(currentSize + 1));
         this.fireDataSourceAdded(currentSize);
     }
 

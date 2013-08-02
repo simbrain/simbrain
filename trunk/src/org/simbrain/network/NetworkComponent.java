@@ -27,6 +27,9 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
@@ -76,6 +79,10 @@ public final class NetworkComponent extends WorkspaceComponent {
                 String.class, false));
         addProducerType(new AttributeType(this, "Synapse", "getStrength",
                 double.class, false));
+        addProducerType(new AttributeType(this, "NeuronGroup", "getActivations",
+                double[].class, true));
+        addProducerType(new AttributeType(this, "SynapseGroup",
+                "getWeightVector", double[].class, true));
 
         addConsumerType(new AttributeType(this, "Neuron", "setInputValue",
                 double.class, true));
@@ -205,17 +212,47 @@ public final class NetworkComponent extends WorkspaceComponent {
                     producer.setCustomDescription(description);
                     returnList.add(producer);
                 }
+            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroup")) {
+                // Handle NeuronGroup attributes
+                for (Group group : network.getFlatGroupList()) {
+                    if (group instanceof NeuronGroup) {
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(group,
+                                        "getActivations", double[].class);
+                        producer.setCustomDescription("Neuron Group: "
+                                + group.getLabel() + "<double[]>");
+                        returnList.add(producer);
+
+                    }
+                }
+            } else if (type.getTypeName().equalsIgnoreCase("SynapseGroup")) {
+                // Handle SynapseGroup attributes
+                for (Group group : network.getFlatGroupList()) {
+                    if (group instanceof SynapseGroup) {
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(group,
+                                        "getWeightVector", double[].class);
+                        producer.setCustomDescription("Synapse Group: "
+                                + group.getLabel() + "<double[]>");
+                        returnList.add(producer);
+                    }
+                }
             }
         }
+
         return returnList;
     }
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        if (objectKey.startsWith("Neuron")) {
+        if (objectKey.startsWith("Neuron_")) {
             return this.getNetwork().getNeuron(objectKey);
-        } else if (objectKey.startsWith("Synapse")) {
+        } else if (objectKey.startsWith("Synapse_")) {
             return this.getNetwork().getSynapse(objectKey);
+        } else if (objectKey.startsWith("NeuronGroup")) {
+            return this.getNetwork().getGroup(objectKey.split(":")[1]);
+        } else if (objectKey.startsWith("SynapseGroup")) {
+            return this.getNetwork().getGroup(objectKey.split(":")[1]);
         }
         return null;
     }
@@ -226,6 +263,10 @@ public final class NetworkComponent extends WorkspaceComponent {
             return ((Neuron) object).getId();
         } else if (object instanceof Synapse) {
             return ((Synapse) object).getId();
+        } else if (object instanceof NeuronGroup) {
+            return "NeuronGroup:" + ((NeuronGroup) object).getId();
+        } else if (object instanceof SynapseGroup) {
+            return "SynapseGroup:" + ((SynapseGroup) object).getId();
         }
         return null;
     }

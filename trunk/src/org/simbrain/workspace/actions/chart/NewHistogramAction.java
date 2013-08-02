@@ -39,7 +39,7 @@ public final class NewHistogramAction extends WorkspaceAction {
      * @param workspace workspace, must not be null
      */
     public NewHistogramAction(final Workspace workspace) {
-        super("Histogram Chart", workspace);
+        super("Histogram", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("BarChart.png"));
         putValue(SHORT_DESCRIPTION, "New Histogram");
     }

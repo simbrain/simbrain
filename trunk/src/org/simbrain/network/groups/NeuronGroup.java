@@ -72,7 +72,7 @@ public class NeuronGroup extends Group {
         layout.layoutNeurons(this.getNeuronList());
         // Collections.sort(neuronList, Comparators.X_ORDER);
     }
-    
+
     /**
      * Create a neuron group without any initial neurons.
      *
@@ -253,6 +253,20 @@ public class NeuronGroup extends Group {
             }
             neuron.setActivation(inputs[i++]);
         }
+    }
+
+    /**
+     * Return activations as a double vector
+     *
+     * @return activations
+     */
+    public double[] getActivations() {
+        double[] retArray = new double[neuronList.size()];
+        int i = 0;
+        for (Neuron neuron : neuronList) {
+            retArray[i++] = neuron.getActivation();
+        }
+        return retArray;
     }
 
     /**

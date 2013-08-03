@@ -173,7 +173,8 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
-                if (sourceTabbedPane.getTitleAt(index).equalsIgnoreCase("Doc")) {
+                // Assumes index of view tab is 0
+                if (index == 0) {
                     textArea.setText(htmlEditor.getText());
                     DocViewerDesktopComponent.this.getWorkspaceComponent()
                             .setText(htmlEditor.getText());

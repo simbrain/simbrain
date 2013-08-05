@@ -18,30 +18,21 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.table.NumericTable;
-import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
 /**
- * Action to send inputs from a table to a network. The user of this class
+ * Action to construct a test input panel. The user of this class
  * provides the input neurons and network panel from which the action gets
  * the network to be updated. If input neurons are not provided, selected
  * neurons are used as input neurons.
@@ -63,18 +54,6 @@ public class TestInputAction extends AbstractAction {
     /** The panel used to test inputs to a network. */
     private JPanel testInputPanel;
 
-    /** JTable contained in scroller. */
-    private SimbrainJTable table;
-
-    /** Scroll panel for table. */
-    private SimbrainJTableScrollPanel scroller;
-
-    /**
-     * This is the network that should be updated whenever the input neurons are
-     * updated. If null, update the whole network
-     */
-    private Network network;
-
     /** The nodes to test. */
     private List<Neuron> inputNeurons;
 
@@ -92,8 +71,6 @@ public class TestInputAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-
-        //        updateAction();
 
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
@@ -140,148 +117,7 @@ public class TestInputAction extends AbstractAction {
      * Initialize and display the test input panel.
      */
     public void actionPerformed(ActionEvent event) {
-        initTestInputPanel();
+        testInputPanel = new TestInputPanel(networkPanel, inputNeurons);
         networkPanel.displayPanel(testInputPanel, "Test inputs");
-    }
-
-    /**
-     * Construct a test network panel using the network panel.
-     */
-    private void initTestInputPanel() {
-        testInputPanel = new JPanel();
-        network = networkPanel.getNetwork();
-        table = new SimbrainJTable(new NumericTable(5, inputNeurons.size()));
-        ((NumericTable) table.getData()).setIterationMode(true);
-        // Set up column headings
-        List<String> colHeaders = new ArrayList<String>();
-        for (int i = 0; i < inputNeurons.size(); i++) {
-            colHeaders.add(new String("" + (i + 1) + " ("
-                    + inputNeurons.get(i).getId()) + ")");
-        }
-        table.setColumnHeadings(colHeaders);
-        table.getData().fireTableStructureChanged();
-        scroller = new SimbrainJTableScrollPanel(table);
-        testInputPanel.setLayout(new BorderLayout());
-        testInputPanel.add("Center", scroller);
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JToolBar editRowToolBar = new JToolBar();
-        toolbar.add(table.getToolbarCSV(true, false));
-        toolbar.add(editRowToolBar);
-        editRowToolBar.add(table.getToolbarEditRows());
-        toolbar.add(table.getToolbarRandomize());
-        JButton test = new JButton(testRowAction);
-        JButton advance = new JButton(advanceRowAction);
-        JButton testTable = new JButton(testTableAction);
-        JToolBar testToolBar = new JToolBar();
-        testToolBar.add(test);
-        testToolBar.add(advance);
-        testToolBar.add(testTable);
-        toolbar.add(testToolBar);
-        testInputPanel.add("North", toolbar);
-    }
-
-    /**
-     * Action for advancing a row to be tested.
-     */
-    private Action advanceRowAction = new AbstractAction() {
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(SHORT_DESCRIPTION, "Advance row");
-        }
-
-        /**
-         * {@ineritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            advanceRow();
-        }
-    };
-
-    /**
-     * Action to test a row.
-     */
-    private Action testRowAction = new AbstractAction() {
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-            putValue(SHORT_DESCRIPTION, "Test row");
-        }
-
-        /**
-         * {@ineritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            testRow();
-        }
-    };
-
-    /**
-     * Action to test the entire table.
-     */
-    private Action testTableAction = new AbstractAction() {
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
-            putValue(SHORT_DESCRIPTION, "Test table");
-        }
-
-        /**
-         * {@ineritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            testTable();
-        }
-    };
-
-    /**
-     * Advances the row to test.
-     */
-    private void advanceRow() {
-        ((NumericTable) table.getData()).updateCurrentRow();
-        table.updateRowSelection();
-        table.scrollRectToVisible(table.getCellRect(
-                ((NumericTable) table.getData()).getCurrentRow(),
-                table.getColumnCount(), true));
-    }
-
-    /**
-     * Test the selected row.
-     */
-    private void testRow() {
-        int testRow = ((NumericTable) table.getData()).getCurrentRow();
-        if (testRow >= ((NumericTable) table.getData()).getRowCount()) {
-            testRow = 0;
-        }
-        table.updateRowSelection();
-        for (int j = 0; j < inputNeurons.size(); j++) {
-            inputNeurons.get(j).setInputValue(
-                    ((NumericTable) table.getData()).getValue(testRow, j));
-        }
-        if (network != null) {
-            network.update();
-            network.fireNetworkChanged();
-        } else {
-            inputNeurons.get(0).getParentNetwork().update();
-            inputNeurons.get(0).getParentNetwork().fireNetworkChanged();
-        }
-    }
-
-    /**
-     * Advance through the entire table and test each row.
-     */
-    private void testTable() {
-        for (int j = 0; j < ((NumericTable) table.getData()).getRowCount(); j++)
-        {
-            ((NumericTable) table.getData()).setCurrentRow(j);
-            table.scrollRectToVisible(table.getCellRect(
-                    ((NumericTable) table.getData()).getCurrentRow(),
-                    table.getColumnCount(), true));
-            testRow();
-        }
-    }
-
-    /**
-     * @return the table
-     */
-    public SimbrainJTable getTable() {
-        return table;
     }
 }

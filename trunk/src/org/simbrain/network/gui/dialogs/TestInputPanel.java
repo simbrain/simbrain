@@ -27,6 +27,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
@@ -56,6 +57,12 @@ public class TestInputPanel extends JPanel {
 
     /** Scroll panel for table. */
     private SimbrainJTableScrollPanel scroller;
+
+    /** True when iteration mode is on. */
+    private boolean iterationMode = false;
+
+    /** Button used to advance row. Disabled when iteration mode is on. */
+    private JButton advance;
 
     /**
      * This is the network that should be updated whenever the input neurons are
@@ -107,12 +114,14 @@ public class TestInputPanel extends JPanel {
         editRowToolBar.add(table.getToolbarEditRows());
         toolbar.add(table.getToolbarRandomize());
         JButton test = new JButton(testRowAction);
-        JButton advance = new JButton(advanceRowAction);
+        advance = new JButton(advanceRowAction);
         JButton testTable = new JButton(testTableAction);
+        JCheckBox iterationCheckBox = new JCheckBox(iterationModeAction);
         JToolBar testToolBar = new JToolBar();
         testToolBar.add(test);
         testToolBar.add(advance);
         testToolBar.add(testTable);
+        testToolBar.add(iterationCheckBox);
         toolbar.add(testToolBar);
         this.add("North", toolbar);
     }
@@ -148,6 +157,28 @@ public class TestInputPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             testRow();
+        }
+    };
+
+    /**
+     * Action to test a row.
+     */
+    private Action iterationModeAction = new AbstractAction() {
+        {
+            putValue(NAME, "Iteration mode");
+        }
+
+        /**
+         * {@ineritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            if (iterationMode) {
+                iterationMode = false;
+                advance.setEnabled(true);
+            } else {
+                iterationMode = true;
+                advance.setEnabled(false);
+            }
         }
     };
 
@@ -198,6 +229,9 @@ public class TestInputPanel extends JPanel {
         } else {
             inputNeurons.get(0).getParentNetwork().update();
             inputNeurons.get(0).getParentNetwork().fireNetworkChanged();
+        }
+        if (iterationMode) {
+            advanceRow();
         }
     }
 

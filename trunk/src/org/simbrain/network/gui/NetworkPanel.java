@@ -946,9 +946,6 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getShowQuickConnectDialogAction());
         contextMenu.addSeparator();
 
-        // Test input action
-        contextMenu.add(actionManager.getTestInputAction());
-
         // Preferences
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
 

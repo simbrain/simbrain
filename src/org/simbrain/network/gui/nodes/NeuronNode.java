@@ -42,6 +42,7 @@ import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.TestInputAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 
@@ -341,6 +342,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             contextMenu.addSeparator();
         }
 
+        // Test input action
+        contextMenu.add(new TestInputAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+        
         // Add property set item
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
         contextMenu.addSeparator();

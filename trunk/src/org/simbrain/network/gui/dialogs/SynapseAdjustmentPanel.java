@@ -439,8 +439,10 @@ public class SynapseAdjustmentPanel extends JPanel {
                 }
             }
 
-            names.add("Synapse Weights");
+            names.add("Weights");
+            names.add("---");
             data.add(hist);
+            data.add(new double[] { 0 });
 
             // Use the default pallet.
             SynapseAdjustmentPanel.this.histogramPanel

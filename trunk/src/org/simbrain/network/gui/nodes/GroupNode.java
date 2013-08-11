@@ -147,7 +147,8 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         }
         Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {
-                String newName = JOptionPane.showInputDialog("Name:");
+                String newName = JOptionPane.showInputDialog("Name:",
+                        group.getLabel());
                 group.setLabel(newName);
             }
         };

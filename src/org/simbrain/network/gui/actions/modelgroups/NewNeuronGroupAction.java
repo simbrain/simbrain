@@ -28,7 +28,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * Create a new neuron group.
+ * Convert selected neurons to a neuron group.
  */
 public final class NewNeuronGroupAction extends AbstractAction {
 
@@ -36,7 +36,7 @@ public final class NewNeuronGroupAction extends AbstractAction {
     private final NetworkPanel networkPanel;
 
     /**
-     * Create a new new competitive network action with the specified network
+     * Create a new new neuron group network action with the specified network
      * panel.
      *
      * @param networkPanel networkPanel, must not be null

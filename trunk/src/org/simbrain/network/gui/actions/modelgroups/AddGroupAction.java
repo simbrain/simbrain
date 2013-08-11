@@ -35,7 +35,7 @@ public final class AddGroupAction extends AbstractAction {
     private final NetworkPanel networkPanel;
 
     /** Parent dialog. */
-    private JDialog dialog;
+    private StandardDialog dialog;
 
     /**
      * Create a new set synapse properties action with the specified network
@@ -60,10 +60,13 @@ public final class AddGroupAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent arg0) {
+        networkPanel.repaint();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        networkPanel.repaint();
+        // Not sure why call below needed, but for some reason the ok button
+        // sometimes goes out of focus when creating a new dialog.
+        dialog.getRootPane().setDefaultButton(dialog.getOkButton());
     }
 
 }

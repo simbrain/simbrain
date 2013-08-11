@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -48,8 +49,6 @@ public class SFileChooser {
 
     /**
      * Whether to use the native file chooser, or the Swing file chooser.
-     *
-     * TODO: Move this to choice to a property file.
      */
     private boolean useNativeFileChooser = true;
 
@@ -74,6 +73,16 @@ public class SFileChooser {
 
     /** File separator. */
     private static final String FS = System.getProperty("file.separator");
+
+    /** Static initializer */
+    {
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("useNativeFileChooser")) {
+            useNativeFileChooser = Boolean.parseBoolean(properties
+                    .getProperty("useNativeFileChooser"));
+        }
+
+    }
 
     /**
      * Creates file chooser dialog.

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -42,6 +43,7 @@ import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 
 import com.thoughtworks.xstream.XStream;
@@ -155,6 +157,16 @@ public class Network {
 
     /** Degree to which to round off values. */
     private int precision = 0;
+
+    /** Static initializer */
+    {
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("defaultSynapseVisibilityThreshold")) {
+            synapseVisibilityThreshold = Integer.parseInt(properties
+                    .getProperty("defaultSynapseVisibilityThreshold"));
+        }
+
+    }
 
     /**
      * Used to create an instance of network (Default constructor).

@@ -75,7 +75,7 @@ public class IterativeControlsPanel extends JPanel {
     private JProgressBar errorBar;
 
     /** Validation progress bar. */
-    private JProgressBar validationBar;
+    //private JProgressBar validationBar;
 
     /** Number of "ticks" in progress bars. */
     private int numTicks = 1000;
@@ -147,9 +147,9 @@ public class IterativeControlsPanel extends JPanel {
         errorBar.setStringPainted(true);
         errorBar.setMinimumSize(new Dimension(200,100));
         labelPanel.addItem("Error:", errorBar);
-        validationBar = new JProgressBar(0, numTicks);
-        validationBar.setStringPainted(true);
-        labelPanel.addItem("Validation Error:", validationBar);
+        //validationBar = new JProgressBar(0, numTicks);
+        //validationBar.setStringPainted(true);
+        //labelPanel.addItem("Validation Error:", validationBar);
         controlPanelConstraints.weightx = 0.5;
         controlPanelConstraints.gridx = 0;
         controlPanelConstraints.gridy = 2;
@@ -218,9 +218,9 @@ public class IterativeControlsPanel extends JPanel {
      */
     private void updateError() {
         errorBar.setValue((int) (numTicks * trainer.getError()));
-        validationBar.setValue((int) (numTicks * trainer.getError()));
+        //validationBar.setValue((int) (numTicks * trainer.getError()));
         errorBar.setString("" + Utils.round(trainer.getError(), 4));
-        validationBar.setString("" + Utils.round(trainer.getError(), 4));
+        //validationBar.setString("" + Utils.round(trainer.getError(), 4));
     }
 
     /**

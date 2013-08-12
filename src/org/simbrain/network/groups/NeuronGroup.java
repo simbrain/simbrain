@@ -240,7 +240,9 @@ public class NeuronGroup extends Group {
     /**
      * Set activations of neurons using an array of doubles. Assumes the order
      * of the items in the array should match the order of items in the
-     * arraylist. Does not throw an exception if the provided input and neuron
+     * neuronlist.
+     *
+     * Does not throw an exception if the provided input array and neuron
      * list do not match in size.
      *
      * @param inputs the input vector as a double array.
@@ -248,15 +250,15 @@ public class NeuronGroup extends Group {
     public void setActivations(double[] inputs) {
         int i = 0;
         for (Neuron neuron : neuronList) {
-            if (i > inputs.length) {
-                return;
+            if (i >= inputs.length) {
+                break;
             }
-            neuron.setActivation(inputs[i++]);
+            neuron.setInputValue(inputs[i++]);
         }
     }
 
     /**
-     * Return activations as a double vector
+     * Return activations as a double vector.
      *
      * @return activations
      */

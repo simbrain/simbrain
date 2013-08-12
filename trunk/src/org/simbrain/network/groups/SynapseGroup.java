@@ -276,5 +276,24 @@ public class SynapseGroup extends Group {
         return retArray;
     }
 
+    /**
+     * Set the weights using an array of doubles. Assumes the order
+     * of the items in the array should match the order of items in the
+     * synapselist.
+     *
+     * Does not throw an exception if the provided input array and synapse
+     * list do not match in size.
+     *
+     * @param weightVector the weight vector to set.
+     */
+    public void setWeightVector(double[] weightVector) {
+        int i = 0;
+        for (Synapse synapse : synapseList) {
+            if (i >= weightVector.length) {
+                break;
+            }
+            synapse.setStrength(weightVector[i++]);
+        }
+    }
 
 }

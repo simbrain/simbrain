@@ -96,6 +96,10 @@ public final class NetworkComponent extends WorkspaceComponent {
                 String.class, false));
         addConsumerType(new AttributeType(this, "Synapse", "setStrength",
                 double.class, false));
+        addConsumerType(new AttributeType(this, "NeuronGroup", "setActivations",
+                double[].class, true));
+        addConsumerType(new AttributeType(this, "SynapseGroup",
+                "setWeightVector", double[].class, false));
 
         network.addNeuronListener(new NeuronListener() {
             /**
@@ -185,6 +189,31 @@ public final class NetworkComponent extends WorkspaceComponent {
                             .createPotentialConsumer(synapse, type);
                     consumer.setCustomDescription(description);
                     returnList.add(consumer);
+                }
+            }  else if (type.getTypeName().equalsIgnoreCase("NeuronGroup")) {
+                // Handle NeuronGroup attributes
+                for (Group group : network.getFlatGroupList()) {
+                    if (group instanceof NeuronGroup) {
+                        PotentialConsumer consumer = getAttributeManager()
+                                .createPotentialConsumer(group,
+                                        "setActivations", double[].class);
+                        consumer.setCustomDescription("Neuron Group: "
+                                + group.getLabel() + "<double[]>");
+                        returnList.add(consumer);
+
+                    }
+                }
+            } else if (type.getTypeName().equalsIgnoreCase("SynapseGroup")) {
+                // Handle SynapseGroup attributes
+                for (Group group : network.getFlatGroupList()) {
+                    if (group instanceof SynapseGroup) {
+                        PotentialConsumer consumer = getAttributeManager()
+                                .createPotentialConsumer(group,
+                                        "setWeightVector", double[].class);
+                        consumer.setCustomDescription("Synapse Group: "
+                                + group.getLabel() + "<double[]>");
+                        returnList.add(consumer);
+                    }
                 }
             }
 

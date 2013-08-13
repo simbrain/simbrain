@@ -145,7 +145,7 @@ public class IterativeControlsPanel extends JPanel {
         numTicks = 10;
         errorBar = new JProgressBar(0, numTicks);
         errorBar.setStringPainted(true);
-        errorBar.setMinimumSize(new Dimension(200,100));
+        //errorBar.setMinimumSize(new Dimension(200,100));
         labelPanel.addItem("Error:", errorBar);
         //validationBar = new JProgressBar(0, numTicks);
         //validationBar.setStringPainted(true);

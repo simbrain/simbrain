@@ -64,6 +64,9 @@ public class TestInputPanel extends JPanel {
     /** Button used to advance row. Disabled when iteration mode is on. */
     private JButton advance;
 
+    /** The training input data. */
+    private double[][] data;
+
     /**
      * This is the network that should be updated whenever the input neurons are
      * updated. If null, update the whole network
@@ -90,11 +93,35 @@ public class TestInputPanel extends JPanel {
     }
 
     /**
+     * Construct panel using data as default input data.
+     *
+     * @param networkPanel networkPanel, must not be null
+     * @param inputNeurons input neurons of the network to be tested
+     * @param data input data to test
+     */
+
+    public TestInputPanel(NetworkPanel networkPanel,
+            List<Neuron> inputNeurons, double[][] data) {
+        if (networkPanel == null) {
+            throw new IllegalArgumentException("networkPanel must not be null");
+        }
+
+        this.networkPanel = networkPanel;
+        this.inputNeurons = inputNeurons;
+        this.data = data;
+        initTestInputPanel();
+    }
+
+    /**
      * Initiate the test network panel using the network panel.
      */
     private void initTestInputPanel() {
         network = networkPanel.getNetwork();
-        table = new SimbrainJTable(new NumericTable(5, inputNeurons.size()));
+        NumericTable numericTable = new NumericTable(5, inputNeurons.size());
+        if (data != null) {
+            numericTable.setData(data);
+        }
+        table = new SimbrainJTable(numericTable);
         ((NumericTable) table.getData()).setIterationMode(true);
         // Set up column headings
         List<String> colHeaders = new ArrayList<String>();

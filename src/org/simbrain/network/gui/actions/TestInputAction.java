@@ -45,7 +45,7 @@ public class TestInputAction extends AbstractAction {
     {
         putValue(NAME, "Test network...");
         putValue(SHORT_DESCRIPTION, "Test network...");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
     }
 
     /** Network panel. */

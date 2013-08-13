@@ -148,7 +148,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     private Action testInputAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
             putValue(NAME, "Test network...");
             putValue(SHORT_DESCRIPTION, "Test network...");
         }

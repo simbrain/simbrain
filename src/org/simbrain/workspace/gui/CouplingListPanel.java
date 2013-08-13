@@ -19,6 +19,7 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -27,6 +28,7 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -38,6 +40,7 @@ import javax.swing.KeyStroke;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
+import org.simbrain.workspace.gui.couplingmanager.CouplingManagerUtils;
 
 /**
  * Displays a list of the current couplings in the network.
@@ -110,6 +113,9 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         // Populates the coupling list with data.
         couplings.setListData(this.couplingList);
 
+        couplings.setCellRenderer(new CouplingCellRenderer());
+
+
         // Scroll pane for showing lists larger than viewing window and setting
         // maximum size
         final JScrollPane listScroll = new JScrollPane(couplings);
@@ -164,6 +170,30 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      */
     public void couplingRemoved(Coupling coupling) {
         couplingsUpdated();
+    }
+
+    /**
+     * Custom attribute renderer for JList.
+     */
+    private class CouplingCellRenderer extends DefaultListCellRenderer {
+
+        /**
+         * @overrides java.awt.Component
+         */
+        public java.awt.Component getListCellRendererComponent(
+                final JList list, final Object object, final int index,
+                final boolean isSelected, final boolean cellHasFocus) {
+            DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
+                    .getListCellRendererComponent(list, object, index,
+                            isSelected, cellHasFocus);
+            Coupling<?> coupling = (Coupling<?>) object;
+
+            // Set text color based on data type
+            renderer.setForeground(CouplingManagerUtils.getColor(coupling
+                    .getDataType()));
+            return renderer;
+        }
+
     }
 
 }

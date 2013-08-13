@@ -82,24 +82,6 @@ public class TestInputAction extends AbstractAction {
     }
 
     /**
-     * Construct action.
-     *
-     * @param networkPanel networkPanel, must not be null
-     * @param inputNeurons input neurons of the network to be tested
-     */
-    public TestInputAction(NetworkPanel networkPanel, List<Neuron> inputNeurons) {
-
-        super("Test inputs...");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
-        this.inputNeurons = inputNeurons;
-    }
-
-    /**
      * Set test input panel based on number of selected neurons.
      */
     private void updateAction() {

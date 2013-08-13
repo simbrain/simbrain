@@ -28,6 +28,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.TestInputAction;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
@@ -125,8 +126,8 @@ public class BackpropNetworkNode extends SubnetworkNode {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-            putValue(NAME, "Train backprop net...");
-            putValue(SHORT_DESCRIPTION, "Train backprop net...");
+            putValue(NAME, "Train network...");
+            putValue(SHORT_DESCRIPTION, "Train network...");
         }
 
         @Override
@@ -144,7 +145,21 @@ public class BackpropNetworkNode extends SubnetworkNode {
     /**
      * Action for testing inputs to the backprop network.
      */
-    private Action testInputAction = new TestInputAction(
-            BackpropNetworkNode.this.getNetworkPanel(),
-            ((BackpropNetwork) getGroup()).getInputNeurons());
+    private Action testInputAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(NAME, "Test network...");
+            putValue(SHORT_DESCRIPTION, "Test network...");
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
+            BackpropNetwork network = (BackpropNetwork) getGroup();
+            TestInputPanel testInputPanel = new TestInputPanel(
+                    BackpropNetworkNode.this.getNetworkPanel(), network.
+                    getInputNeurons(), network.getTrainingSet().getInputData());
+            BackpropNetworkNode.this.getNetworkPanel().displayPanel(
+                    testInputPanel, "Test inputs");
+        }
+    };
 }

@@ -19,6 +19,7 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -280,6 +281,10 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
             PotentialAttribute id = (PotentialAttribute) object;
+
+            // Set text color based on data type
+            renderer.setForeground(CouplingManagerUtils.getColor(id
+                    .getDataType()));
 
             renderer.setText(id.getDescription());
             return renderer;

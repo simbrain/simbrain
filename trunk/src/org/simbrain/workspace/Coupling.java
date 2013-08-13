@@ -260,4 +260,13 @@ public final class Coupling<E> {
         return producer.hashCode() + (ARBITRARY_PRIME * consumer.hashCode());
     }
 
+    /**
+     * Returns the datatype associated with this coupling.
+     *
+     * @return the data type associated with this coupling.
+     */
+    public Class<?> getDataType() {
+        return consumer.getDataType();
+    }
+
 }

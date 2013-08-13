@@ -204,7 +204,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         synTypePanel.add(sdLabel);
 
         gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.weighty = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -221,6 +221,8 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         this.add(synTypeSelector, gbc);
 
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridwidth = HistogramPanel.GRID_WIDTH;
         gbc.gridheight = HistogramPanel.GRID_HEIGHT;

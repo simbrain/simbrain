@@ -71,6 +71,7 @@ import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
 import org.simbrain.network.gui.actions.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.ShowNetworkHierarchyPanel;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
+import org.simbrain.network.gui.actions.ShowNetworkUpdaterDialog;
 import org.simbrain.network.gui.actions.ShowPrioritiesAction;
 import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.ShowTrainerAction;
@@ -295,6 +296,9 @@ public final class NetworkActionManager {
     /** Shows dialog to adjust connectivity. */
     private final Action showAdjustConnectivityDialog;
 
+    /** Shows dialog to adjust updater. */
+    private final Action showUpdaterDialog;
+
     /** Test inputs to selected neurons */
     private Action testInputAction;
 
@@ -424,7 +428,9 @@ public final class NetworkActionManager {
         setRandomizerPropertiesAction = new EditRandomizerPropertiesAction(
                 networkPanel);
         showAdjustSynapsesDialog = new ShowAdjustSynapsesDialog(networkPanel);
-        showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(networkPanel);
+        showAdjustConnectivityDialog = new ShowAdjustConnectivityDialog(
+                networkPanel);
+        showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
         testInputAction = new TestInputAction(networkPanel);
     }
 
@@ -1076,6 +1082,13 @@ public final class NetworkActionManager {
      */
     public Action getShowAdjustSynapsesDialog() {
         return showAdjustSynapsesDialog;
+    }
+
+    /**
+     * @return the showUpdaterDialog
+     */
+    public Action getShowUpdaterDialog() {
+        return showUpdaterDialog;
     }
 
     /**

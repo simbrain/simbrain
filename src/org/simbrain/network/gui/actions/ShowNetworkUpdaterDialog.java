@@ -18,21 +18,17 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.network.gui.NetworkUpdateManagerPanel;
 
 /**
- * Show synapse adjustment dialog.
+ * Show network updater panel.
  */
-public final class ShowAdjustSynapsesDialog extends AbstractAction {
+public final class ShowNetworkUpdaterDialog extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -42,17 +38,17 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public ShowAdjustSynapsesDialog(final NetworkPanel networkPanel) {
+    public ShowNetworkUpdaterDialog(final NetworkPanel networkPanel) {
 
-        super("Show synapse adjustment dialog...");
+        super("Show updater panel...");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
-                toolkit.getMenuShortcutKeyMask());
-        putValue(ACCELERATOR_KEY, keyStroke);
+//        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+//        Toolkit toolkit = Toolkit.getDefaultToolkit();
+//        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
+//                toolkit.getMenuShortcutKeyMask());
+//        putValue(ACCELERATOR_KEY, keyStroke);
 
         this.networkPanel = networkPanel;
     }
@@ -60,8 +56,8 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                networkPanel);
-        networkPanel.displayPanel(synapsePanel, "Adjust selected synapses");
+        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(
+                networkPanel.getNetwork());
+        networkPanel.displayPanel(updatePanel, "Network update manager...");
     }
 }

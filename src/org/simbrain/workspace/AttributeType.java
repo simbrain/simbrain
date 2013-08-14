@@ -98,9 +98,9 @@ public class AttributeType {
      */
     public String getDescription(String baseName) {
         if (methodName != null) {
-            return baseName + ":" + methodName + getTypeDescription();
+            return baseName + ":" + methodName;
         } else {
-            return baseName + " " + getTypeDescription();
+            return baseName;
         }
     }
 
@@ -111,33 +111,7 @@ public class AttributeType {
      * @return the formatted String
      */
     public String getSimpleDescription(String baseName) {
-        return baseName + getTypeDescription();
-    }
-
-    /**
-     * @return a formatted description of the class.
-     */
-    public String getTypeDescription() {
-        return " <" + dataType.getSimpleName() + ">";
-    }
-
-    /**
-     * Returns a description of this type, including method base name and data
-     * type.
-     *
-     * @return the formatted String
-     */
-    public String getDescription() {
-        return getBaseDescription() + getTypeDescription();
-    }
-
-    /**
-     * Like getDescription() but does not return method base name.
-     *
-     * @return the formatted String
-     */
-    public String getSimpleDescription() {
-        return typeName + getTypeDescription();
+        return baseName;
     }
 
     /**

@@ -197,7 +197,7 @@ public class Workspace {
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(final List<PotentialProducer> producerKeys,
-            final List<PotentialConsumer> consumerKeys) {
+            final List<PotentialConsumer> consumerKeys) throws UmatchedAttributesException {
 
         Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
 
@@ -209,7 +209,7 @@ public class Workspace {
                 try {
                     getCouplingManager().addCoupling(coupling);
                 } catch (UmatchedAttributesException e) {
-                    e.printStackTrace();
+                    throw e;
                 }
             }
         }

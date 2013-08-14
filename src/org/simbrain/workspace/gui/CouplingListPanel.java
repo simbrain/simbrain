@@ -19,7 +19,6 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,7 +39,7 @@ import javax.swing.KeyStroke;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
-import org.simbrain.workspace.gui.couplingmanager.CouplingManagerUtils;
+import org.simbrain.workspace.CouplingManager;
 
 /**
  * Displays a list of the current couplings in the network.
@@ -189,7 +188,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             Coupling<?> coupling = (Coupling<?>) object;
 
             // Set text color based on data type
-            renderer.setForeground(CouplingManagerUtils.getColor(coupling
+            renderer.setForeground(CouplingManager.getColor(coupling
                     .getDataType()));
             return renderer;
         }

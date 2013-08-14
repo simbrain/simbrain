@@ -198,7 +198,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                                 .createPotentialConsumer(group,
                                         "setActivations", double[].class);
                         consumer.setCustomDescription("Neuron Group: "
-                                + group.getLabel() + "<double[]>");
+                                + group.getLabel());
                         returnList.add(consumer);
 
                     }
@@ -211,7 +211,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                                 .createPotentialConsumer(group,
                                         "setWeightVector", double[].class);
                         consumer.setCustomDescription("Synapse Group: "
-                                + group.getLabel() + "<double[]>");
+                                + group.getLabel());
                         returnList.add(consumer);
                     }
                 }
@@ -249,7 +249,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                                 .createPotentialProducer(group,
                                         "getActivations", double[].class);
                         producer.setCustomDescription("Neuron Group: "
-                                + group.getLabel() + "<double[]>");
+                                + group.getLabel());
                         returnList.add(producer);
 
                     }
@@ -262,7 +262,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                                 .createPotentialProducer(group,
                                         "getWeightVector", double[].class);
                         producer.setCustomDescription("Synapse Group: "
-                                + group.getLabel() + "<double[]>");
+                                + group.getLabel());
                         returnList.add(producer);
                     }
                 }

@@ -19,7 +19,6 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -38,6 +37,7 @@ import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.CouplingManager;
 import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -283,10 +283,12 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             PotentialAttribute id = (PotentialAttribute) object;
 
             // Set text color based on data type
-            renderer.setForeground(CouplingManagerUtils.getColor(id
+            renderer.setForeground(CouplingManager.getColor(id
                     .getDataType()));
 
-            renderer.setText(id.getDescription());
+            renderer.setText(id.getDescription() + "<"
+                    + CouplingManager.getTypeDescriptor(id.getDataType())
+                    + ">");
             return renderer;
         }
 

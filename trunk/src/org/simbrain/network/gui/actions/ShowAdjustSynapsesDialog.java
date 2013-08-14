@@ -26,11 +26,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
-import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
+import org.simbrain.network.gui.NetworkUpdateManagerPanel;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Show synapse adjustment dialog.
@@ -63,8 +60,11 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                networkPanel);
-        networkPanel.displayPanel(synapsePanel, "Adjust selected synapses");
+//        final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
+//                networkPanel);
+//        networkPanel.displayPanel(synapsePanel, "Adjust selected synapses");
+        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(networkPanel.getNetwork());
+
+        networkPanel.displayPanel(updatePanel, "Update manager...");
     }
 }

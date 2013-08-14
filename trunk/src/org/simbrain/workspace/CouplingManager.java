@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import org.apache.log4j.Logger;
  * Manages all the couplings for a Workspace instance.
  *
  * @author Matt Watson
+ * @author Jeff Yoshimi
  *
  * @see Coupling
  */
@@ -312,10 +314,11 @@ public class CouplingManager {
         if (coupling.getConsumer().getDataType() != coupling.getProducer()
                 .getDataType()) {
             String warning = "Producer type ("
-                    + coupling.getProducer().getDataType().getCanonicalName()
+                    + CouplingManager.getTypeDescriptor(coupling
+                            .getProducer().getDataType())
                     + ") does not match consumer type ("
-                    + coupling.getConsumer().getDataType().getCanonicalName()
-                    + ")";
+                    + CouplingManager.getTypeDescriptor(coupling
+                            .getConsumer().getDataType()) + ")";
             throw new UmatchedAttributesException(warning);
         }
         couplingList.add(coupling);
@@ -623,6 +626,42 @@ public class CouplingManager {
         for (Coupling<?> coupling : couplingList) {
             coupling.update();
         }
+    }
+
+    /**
+     * Associates attribute and coupling data types (classes) with colors used
+     * in displaying attributes and couplings.
+     *
+     * @param dataType the data type to associate with a color
+     * @return the color associated with a data type
+     */
+    public static Color getColor(Class<?> dataType) {
+        if (dataType == double.class) {
+            return Color.black;
+        } else if (dataType == double[].class) {
+            return Color.green.darker().darker();
+        } else if (dataType == String.class) {
+            return Color.blue.brighter();
+        }
+        return Color.black;
+    }
+
+    /**
+     * Associates attribute and coupling data types (classes) with text
+     * descriptions used in displaying attributes.
+     *
+     * @param dataType the data type to associate with a description
+     * @return the text description of the data type
+     */
+    public static String getTypeDescriptor(Class<?> dataType) {
+        if (dataType == double.class) {
+            return "scalar";
+        } else if (dataType == double[].class) {
+            return "vector";
+        } else if (dataType == String.class) {
+            return "text";
+        }
+        return null;
     }
 
 }

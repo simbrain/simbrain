@@ -160,7 +160,7 @@ public class HistogramComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (histogramConsumer.isVisible()) {
             for (int i = 0; i < model.getData().size(); i++) {
-                String description = "Histogram " + (i + 1) + " <double[]>";
+                String description = "Histogram " + (i + 1);
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(model, "addData",
                                 new Class[] { double[].class, Integer.class },

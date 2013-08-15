@@ -130,21 +130,21 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected JPopupMenu getDefaultContextMenu() {
         JPopupMenu ret = new JPopupMenu();
-        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        editor.setUseSuperclass(false);
-        editor.setObject(getGroup());
-        // Only add edit properties action if there are properties to edit
-        if (editor.getFieldCount() > 0) {
-            Action editGroup = new AbstractAction("Group properties...") {
-                public void actionPerformed(final ActionEvent event) {
-                    JDialog dialog = editor.getDialog();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            };
-            //ret.add(editGroup);
-        }
+//        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+//        editor.setUseSuperclass(false);
+//        editor.setObject(getGroup());
+//        // Only add edit properties action if there are properties to edit
+//        if (editor.getFieldCount() > 0) {
+//            Action editGroup = new AbstractAction("Group properties...") {
+//                public void actionPerformed(final ActionEvent event) {
+//                    JDialog dialog = editor.getDialog();
+//                    dialog.setLocationRelativeTo(null);
+//                    dialog.pack();
+//                    dialog.setVisible(true);
+//                }
+//            };
+//           ret.add(editGroup);
+//        }
         Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {
                 String newName = JOptionPane.showInputDialog("Name:",

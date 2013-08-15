@@ -21,14 +21,17 @@ package org.simbrain.network.gui.nodes.groupNodes;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesDialog;
+import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.network.subnetworks.Hopfield;
 
 /**
  * PNode representation of Competitive network.
@@ -106,6 +109,15 @@ public class CompetitiveNode extends NeuronGroupNode {
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
+        Action editNet = new AbstractAction("Set Competitive Network Properties...") {
+            public void actionPerformed(final ActionEvent event) {
+                CompetitivePropertiesDialog dialog = new CompetitivePropertiesDialog((Competitive) getGroup());
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        };
+        menu.add(new JMenuItem(editNet));
         menu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
                 ((Competitive) getGroup()).randomize();

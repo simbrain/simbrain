@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -36,6 +37,7 @@ import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -106,6 +108,21 @@ public class SynapseGroupNode extends GroupNode {
     protected void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
+        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+        editor.setUseSuperclass(false);
+        editor.setObject(getGroup());
+        // Only add edit properties action if there are properties to edit
+        if (editor.getFieldCount() > 0) {
+            Action editGroup = new AbstractAction("Synapse group properties...") {
+                public void actionPerformed(final ActionEvent event) {
+                    JDialog dialog = editor.getDialog();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            };
+            menu.add(editGroup);
+        }
         ((SynapseGroup) this.getGroup()).getSynapseList();
         menu.add(new JMenuItem(showWeightMatrixAction));
         setContextMenu(menu);

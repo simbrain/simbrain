@@ -38,6 +38,9 @@ public class DisplayComponent extends WorkspaceComponent {
     /** Instance of world of type DisplayWorld. */
     private final DisplayWorld world;
 
+    /** Default number of string reader attributes to add. */
+    private int DEFAULT_STRING_READERS = 10;
+
     /**
      * Creates a new frame of type TextWorld.
      *
@@ -66,7 +69,7 @@ public class DisplayComponent extends WorkspaceComponent {
      */
     private void init() {
         addConsumerType(new AttributeType(this, "StringReader", String.class,
-                false));
+                true));
         addConsumerType(new AttributeType(this, "WordReader", double.class,
                 true));
         world.addListener(new TextListener() {
@@ -92,12 +95,14 @@ public class DisplayComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("StringReader")) {
-                String description = "String reader";
-                PotentialConsumer consumer = this
-                        .getAttributeManager()
-                        .createPotentialConsumer(world, "addText", String.class);
-                consumer.setCustomDescription(description);
-                returnList.add(consumer);
+                for (int i = 0; i < DEFAULT_STRING_READERS; i++) {
+                    String description = "String reader " + (i + 1);
+                    PotentialConsumer consumer = this.getAttributeManager()
+                            .createPotentialConsumer(world, "addText",
+                                    String.class);
+                    consumer.setCustomDescription(description);
+                    returnList.add(consumer);
+                }
             }
             if (type.getTypeName().equalsIgnoreCase("WordReader")) {
                 for (String word : world.getDictionary()) {

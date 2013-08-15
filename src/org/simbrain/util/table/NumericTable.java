@@ -120,6 +120,33 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     }
 
     /**
+     * Set the current row using an array of doubles.
+     *
+     * @param data the values to use in setting the current row
+     */
+    public void setVectorCurrentRow(double[] data) {
+        int i = getCurrentRow();
+        for (int j = 0; j < data.length; j++) {
+            this.setValue(i, j, data[j], false);
+        }
+        fireTableDataChanged();
+    }
+
+    /**
+     * Return the current row of doubles as an array.
+     *
+     * @return the values of the current row
+     */
+    public double[] getVectorCurrentRow() {
+        double[] retVec = new double[this.getColumnCount()];
+        int currRow = getCurrentRow();
+        for (int i = 0; i < this.getColumnCount(); i++) {
+            retVec[i] = this.getValue(currRow, i);
+        }
+        return retVec;
+    }
+
+    /**
      * Set the values of the specified column in the current row.
      *
      * @param column column index

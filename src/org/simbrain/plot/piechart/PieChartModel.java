@@ -24,7 +24,7 @@ import org.simbrain.plot.ChartModel;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * Model for saving pie charts.
+ * Model data for pie charts.
  */
 public class PieChartModel extends ChartModel {
 
@@ -127,12 +127,29 @@ public class PieChartModel extends ChartModel {
         return this;
     }
 
+    /**
+     * Set the value of a specified "slice".
+     *
+     * @param value the value to set
+     * @param index the index of the slice to set
+     */
     public void setValue(double value, Integer index) {
         if ((total == 0) || (index > dataset.getItemCount())) {
             return;
         }
         //System.out.println(index + "," + Math.abs(value) / total);
         this.getDataset().setValue(index, Math.abs(value) / total);
+    }
+
+    /**
+     * Set the values for all the "slices" using an array.
+     *
+     * @param input the values for the slices as an array
+     */
+    public void setValues(double[] input) {
+        for (int i = 0; i < input.length; i++) {
+            setValue(input[i], new Integer(i));
+        }
     }
 
 }

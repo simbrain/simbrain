@@ -29,16 +29,18 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Data for a JFreeChart pie chart.
- * 
+ * Pie chart component.
  */
 public class PieChartComponent extends WorkspaceComponent {
 
     /** Data model. */
     private PieChartModel model;
 
-    /** Pie chart consumer type. */
+    /** Pie chart consumer type (for one "slice" at a time). */
     private AttributeType pieChartConsumer;
+
+    /** Pit chart vector consumer type (for all "slice" at once). */
+    private AttributeType pieChartVectorConsumer;
 
     /**
      * Create new PieChart Component.
@@ -75,6 +77,11 @@ public class PieChartComponent extends WorkspaceComponent {
         pieChartConsumer = new AttributeType(this, "Slice", "setValue",
                 double.class, true);
         addConsumerType(pieChartConsumer);
+
+        pieChartVectorConsumer = new AttributeType(this, "Pie Slices",
+                double[].class, true);
+        addConsumerType(pieChartVectorConsumer);
+
     }
 
     @Override
@@ -91,6 +98,13 @@ public class PieChartComponent extends WorkspaceComponent {
                 consumer.setCustomDescription(description);
                 returnList.add(consumer);
             }
+        }
+        if (pieChartVectorConsumer.isVisible()) {
+            PotentialConsumer consumer = getAttributeManager()
+                    .createPotentialConsumer(model, "setValues",
+                           double[].class);
+            consumer.setCustomDescription("Set slices");
+            returnList.add(consumer);
         }
         return returnList;
     }

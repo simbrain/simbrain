@@ -39,8 +39,11 @@ public class ProjectionComponent extends WorkspaceComponent {
     /** Data model. */
     private ProjectionModel projectionModel;
 
-    /** Time Series consumer type. */
+    /** Projection scalar consumer for one dimension. */
     private AttributeType projectionConsumerType;
+
+    /** Projection vector consumer. */
+    private AttributeType projectionVectorConsumer;
 
     /** Objects which can be used to add data to time series plot. */
     private List<Dimension> dimensionList = new ArrayList<Dimension>();
@@ -98,17 +101,27 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     protected void initializeConsumers() {
         dimensionList.clear();
-        projectionConsumerType = new AttributeType(this, "Dimension",
-                "setValue", double.class, true);
+        projectionConsumerType = new AttributeType(this, "Single scalars",
+                double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
             addDimension(i);
         }
+        projectionVectorConsumer = new AttributeType(this, "Vector values",
+                double[].class, true);
+        addConsumerType(projectionVectorConsumer);
     }
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        if (projectionVectorConsumer.isVisible()) {
+            PotentialConsumer consumer = getAttributeManager()
+                    .createPotentialConsumer(this, "addPoint",
+                           double[].class);
+            consumer.setCustomDescription("Set point");
+            returnList.add(consumer);
+        }
         if (projectionConsumerType.isVisible()) {
             for (Dimension dimension : dimensionList) {
                 String description = projectionConsumerType
@@ -262,6 +275,20 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     @Override
     public void closing() {
+    }
+
+    /**
+     * Add a new point to the projection dataset using an array.
+     *
+     * @param newPoint the new point
+     */
+    public void addPoint(double[] newPoint) {
+        for (int i = 0; i < newPoint.length; i++) {
+            if (i >= dimensionList.size()) {
+                break;
+            }
+            dimensionList.get(i).setValue(newPoint[i]);
+        }
     }
 
     /**

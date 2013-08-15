@@ -62,6 +62,13 @@ public class DataWorldComponent extends WorkspaceComponent {
     private final AttributeType consumingColumnType = new AttributeType(this,
             "Column", "setValue", double.class, true);
 
+    private final AttributeType consumingColumnVectorType = new AttributeType(this,
+            "Current row", "setVector", double[].class, true);
+
+    private final AttributeType producingColumnVectorType = new AttributeType(this,
+            "Current row", "getVector", double[].class, true);
+
+
     /**
      * This method is the default constructor.
      */
@@ -117,6 +124,9 @@ public class DataWorldComponent extends WorkspaceComponent {
 
         addProducerType(producingColumnType);
         addConsumerType(consumingColumnType);
+        addProducerType(producingColumnVectorType);
+        addConsumerType(consumingColumnVectorType);
+
         initProducerConsumerLists();
         dataModel.addListener(listener);
     }
@@ -148,6 +158,13 @@ public class DataWorldComponent extends WorkspaceComponent {
                 returnList.add(consumer);
             }
         }
+        if (consumingColumnVectorType.isVisible()) {
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(dataModel, "setVectorCurrentRow",
+                               double[].class);
+                consumer.setCustomDescription("Set current row");
+                returnList.add(consumer);
+        }
         return returnList;
     }
 
@@ -159,11 +176,18 @@ public class DataWorldComponent extends WorkspaceComponent {
                 String description = producingColumnType
                         .getDescription("Column_" + (attribute.getIndex() + 1));
                 PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(attribute,
-                                producingColumnType);
+                        .createPotentialProducer(attribute, producingColumnType);
                 producer.setCustomDescription(description);
                 returnList.add(producer);
             }
+        }
+        if (producingColumnVectorType.isVisible()) {
+
+            PotentialProducer producer = getAttributeManager()
+                    .createPotentialProducer(dataModel, "getVectorCurrentRow",
+                            double[].class);
+            producer.setCustomDescription("Get current row");
+            returnList.add(producer);
         }
         return returnList;
     }

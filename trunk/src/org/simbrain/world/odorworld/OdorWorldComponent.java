@@ -59,8 +59,10 @@ public class OdorWorldComponent extends WorkspaceComponent {
             double.class, true));
     AttributeType absoluteMovementType = (new AttributeType(this,
             "Absolute-movement", double.class, false));
-    AttributeType smellSensorType = (new AttributeType(this, "Smell",
-            double.class, true));
+    AttributeType smellSensorScalars = (new AttributeType(this, "Smell Scalar",
+            double.class, false));
+    AttributeType smellSensorVectors = (new AttributeType(this, "Smell Vector",
+            double[].class, true));
     AttributeType tileSensorType = (new AttributeType(this, "Tile",
             double.class, true));
     AttributeType speechEffectorType = (new AttributeType(this, "Speech",
@@ -104,8 +106,10 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
         addProducerType(xLocationType);
         addProducerType(yLocationType);
-        addProducerType(smellSensorType);
+        addProducerType(smellSensorScalars);
+        addProducerType(smellSensorVectors);
         addProducerType(tileSensorType);
+        addProducerType(hearingSensorType);
     }
 
     @Override
@@ -210,7 +214,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
                             consumer.setCustomDescription(description);
                             returnList.add(consumer);
                         }
-
                     }
 
                 }
@@ -245,8 +248,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 returnList.add(producer);
             }
 
-            // Smell sensor
-            if (smellSensorType.isVisible()) {
+            // Smell scalar sensors
+            if (smellSensorScalars.isVisible()) {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
@@ -263,6 +266,21 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
+                    }
+                }
+            }
+            if (smellSensorVectors.isVisible()) {
+                for (Sensor sensor : entity.getSensors()) {
+                    if (sensor instanceof SmellSensor) {
+                        SmellSensor smell = (SmellSensor) sensor;
+                        if (sensor instanceof SmellSensor) {
+                            PotentialProducer producer = getAttributeManager()
+                                    .createPotentialProducer(smell,
+                                            "getCurrentValue", double[].class);
+                            producer.setCustomDescription(entity.getName()
+                                    + ":" + sensor.getLabel());
+                            returnList.add(producer);
+                        }
                     }
                 }
             }

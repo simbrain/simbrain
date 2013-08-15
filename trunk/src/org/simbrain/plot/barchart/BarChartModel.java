@@ -238,4 +238,15 @@ public class BarChartModel extends ChartModel {
         fireSettingsChanged();
     }
 
+    /**
+     * Set the values for all the bars using an array.
+     *
+     * @param input the values for the bars as an array
+     */
+    public void setBars(double[] input) {
+        for (int i = 0; i < input.length; i++) {
+            getDataset().setValue((Number) input[i], new Integer(1), i);
+        }
+    }
+
 }

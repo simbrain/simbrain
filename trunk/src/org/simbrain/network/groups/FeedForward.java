@@ -236,4 +236,9 @@ public class FeedForward extends Subnetwork {
         return getOutputLayer().getNeuronList();
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Layered update";
+    }
+
 }

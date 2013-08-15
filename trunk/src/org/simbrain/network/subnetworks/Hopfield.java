@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.Collections;
+import java.util.Random;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -50,6 +50,9 @@ public class Hopfield extends Subnetwork {
 
     /** Number of neurons. */
     private int numUnits = DEFAULT_NUM_UNITS;
+    
+    /** Random integer generator. */
+    private Random randInt;
 
     /**
      * Copy constructor.
@@ -160,14 +163,24 @@ public class Hopfield extends Subnetwork {
         Neuron n;
 
         if (updateOrder == RANDOM_UPDATE) {
-            Collections.shuffle(getNeuronGroup().getNeuronList());
+            if (randInt == null) {
+                randInt = new Random();
+            }
+            for (int i = 0; i < nCount; i++) {
+                n = getNeuronGroup().getNeuronList().get(
+                        randInt.nextInt(nCount));
+                n.update();
+                n.setActivation(n.getBuffer());
+            }
+        } else {
+            for (int i = 0; i < nCount; i++) {
+                n = getNeuronGroup().getNeuronList().get(i);
+                n.update();
+                n.setActivation(n.getBuffer());
+            }
+
         }
 
-        for (int i = 0; i < nCount; i++) {
-            n = getNeuronGroup().getNeuronList().get(i);
-            n.update();
-            n.setActivation(n.getBuffer());
-        }
     }
 
     /**
@@ -191,6 +204,16 @@ public class Hopfield extends Subnetwork {
      */
     public void setUpdateOrder(final int updateOrder) {
         this.updateOrder = updateOrder;
+    }
+
+
+    @Override
+    public String getUpdateMethodDesecription() {
+        if (updateOrder == RANDOM_UPDATE) {
+            return "Random update of neurons";
+        } else {
+            return "Sequential update of neurons";
+        }
     }
 
 }

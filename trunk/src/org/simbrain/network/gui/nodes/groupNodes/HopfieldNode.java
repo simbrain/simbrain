@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -89,6 +90,15 @@ public class HopfieldNode extends SubnetworkNode {
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
+        Action editNet = new AbstractAction("Set Hopfield Network Properties...") {
+            public void actionPerformed(final ActionEvent event) {
+                HopfieldPropertiesDialog dialog = new HopfieldPropertiesDialog((Hopfield) getGroup());
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        };
+        menu.add(new JMenuItem(editNet));
         Action trainNet = new AbstractAction("Train Hopfield Network...") {
             public void actionPerformed(final ActionEvent event) {
                 ((Hopfield) getGroup()).train();
@@ -102,6 +112,7 @@ public class HopfieldNode extends SubnetworkNode {
         };
         menu.add(new JMenuItem(randWeights));
         setContextMenu(menu);
-    }
+    }    
+
 
 }

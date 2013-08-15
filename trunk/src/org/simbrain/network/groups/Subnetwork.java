@@ -411,4 +411,9 @@ public class Subnetwork extends Group {
         }
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Unspecified";
+    }
+
 }

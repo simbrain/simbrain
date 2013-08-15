@@ -43,7 +43,7 @@ public class PriorityUpdate implements NetworkUpdateAction {
 
     @Override
     public String getDescription() {
-        return "Priority update";
+        return "Loose neurons (priority) and synapses";
     }
 
     @Override

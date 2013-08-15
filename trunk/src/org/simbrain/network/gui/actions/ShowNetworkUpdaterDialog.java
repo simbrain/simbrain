@@ -40,7 +40,7 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
      */
     public ShowNetworkUpdaterDialog(final NetworkPanel networkPanel) {
 
-        super("Show updater panel...");
+        super("Network update preferences...");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }

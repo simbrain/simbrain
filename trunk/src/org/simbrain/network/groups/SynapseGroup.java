@@ -296,4 +296,9 @@ public class SynapseGroup extends Group {
         }
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Update synapses";
+    }
+
 }

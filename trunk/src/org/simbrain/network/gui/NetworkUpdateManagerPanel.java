@@ -19,6 +19,7 @@ import java.awt.Component;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -34,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
@@ -42,9 +42,7 @@ import javax.swing.TransferHandler;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
-import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
@@ -64,11 +62,11 @@ public class NetworkUpdateManagerPanel extends JPanel {
     /** The model object for current actions. */
     private final DefaultListModel currentActionListModel = new DefaultListModel();
 
-//    /** The JList which represents available actions. */
-//    private final JList availableActionJList = new JList();
-//
-//    /** The model object for current actions. */
-//    private final DefaultListModel availableActionListModel = new DefaultListModel();
+    /** The JList which represents available actions. */
+    private final JList availableActionJList = new JList();
+
+    /** The model object for current actions. */
+    private final DefaultListModel availableActionListModel = new DefaultListModel();
 
     /** Reference to root network. */
     private final Network network;
@@ -104,19 +102,19 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // currentListScroll.setBackground(null);
 
         // Set up Available Action list
-//        availableActionJList.setModel(availableActionListModel);
-//        updateAvailableActionsList();
-//        configureAvailableJList();
-//        JScrollPane availableListScroll = new JScrollPane(availableActionJList);
+        availableActionJList.setModel(availableActionListModel);
+        updateAvailableActionsList();
+        configureAvailableJList();
+        JScrollPane availableListScroll = new JScrollPane(availableActionJList);
         // availableActionJList.setBackground(getBackground());
         // availableListScroll.setBackground(null);
 
-//        availableListScroll
-//                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//        availableListScroll
-//                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-//        availableListScroll.setBorder(BorderFactory
-//                .createTitledBorder("Unused Update Actions"));
+        availableListScroll
+                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        availableListScroll
+                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        availableListScroll.setBorder(BorderFactory
+                .createTitledBorder("Unused Update Actions"));
 
         // Add lists
 //        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -126,13 +124,46 @@ public class NetworkUpdateManagerPanel extends JPanel {
 
         // Buttons
         JPanel buttonPanel = new JPanel();
+        JButton addActionsButton = new JButton(addPresetAction);
+        buttonPanel.add(addActionsButton);
         JButton customActionButton = new JButton(addCustomAction);
         buttonPanel.add(customActionButton);
-        JButton addActionsButton = new JButton(addActionsAction);
-        buttonPanel.add(addActionsButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
-        //updateAvailableActionsList();
+
+        // Add buttons for moving update actions up and down
+        JButton upButton = new JButton(ResourceManager.getImageIcon("Up.png"));
+        upButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        buttonPanel.add(upButton);
+        JButton upFullButton = new JButton(
+                ResourceManager.getImageIcon("UpFull.png"));
+        upFullButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        buttonPanel.add(upFullButton);
+        JButton downButton = new JButton(
+                ResourceManager.getImageIcon("Down.png"));
+        downButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        buttonPanel.add(downButton);
+        JButton downFullButton = new JButton(
+                ResourceManager.getImageIcon("DownFull.png"));
+        downFullButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        buttonPanel.add(downFullButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         // Listen for network updates
@@ -200,26 +231,26 @@ public class NetworkUpdateManagerPanel extends JPanel {
         });
     }
 
-//    /**
-//     * Configure the JList.
-//     */
-//    private void configureAvailableJList() {
-//        availableActionJList.setCellRenderer(listRenderer);
-//        availableActionJList.addMouseListener(new MouseAdapter() {
-//            public void mouseClicked(MouseEvent e) {
-//                if (e.getClickCount() == 2) {
-//                    NetworkUpdateAction action = (NetworkUpdateAction) availableActionJList
-//                            .getModel().getElementAt(
-//                                    availableActionJList.locationToIndex(e
-//                                            .getPoint()));
-//                    if (action instanceof CustomUpdate) {
-//                        openScriptEditorPanel((CustomUpdate) action);
-//                    }
-//                }
-//
-//            }
-//        });
-//    }
+    /**
+     * Configure the JList.
+     */
+    private void configureAvailableJList() {
+        availableActionJList.setCellRenderer(listRenderer);
+        availableActionJList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    NetworkUpdateAction action = (NetworkUpdateAction) availableActionJList
+                            .getModel().getElementAt(
+                                    availableActionJList.locationToIndex(e
+                                            .getPoint()));
+                    if (action instanceof CustomUpdate) {
+                        openScriptEditorPanel((CustomUpdate) action);
+                    }
+                }
+
+            }
+        });
+    }
 
     /**
      * Open the script editor panel with appropriate defaults.
@@ -245,7 +276,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
-            putValue(NAME, "Remove selected action(s)");
+            putValue(NAME, "Remove");
             putValue(SHORT_DESCRIPTION, "Delete selected actions");
             NetworkUpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -282,7 +313,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Custom action");
+            putValue(NAME, "Custom");
             putValue(SHORT_DESCRIPTION, "Add custom action");
         }
 
@@ -314,11 +345,11 @@ public class NetworkUpdateManagerPanel extends JPanel {
     };
 
     /** Action which deletes selected actions. */
-    Action addActionsAction = new AbstractAction() {
+    Action addPresetAction = new AbstractAction() {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Add selected action(s)");
+            putValue(NAME, "Preset");
             putValue(SHORT_DESCRIPTION, "Add selected actions");
         }
 
@@ -326,10 +357,24 @@ public class NetworkUpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-//            for (Object action : availableActionJList.getSelectedValues()) {
-//                network.getUpdateManager().addAction(
-//                        (NetworkUpdateAction) action);
-//            }
+            StandardDialog addActionsDialog = new StandardDialog() {
+                @Override
+                protected void closeDialogOk() {
+                    super.closeDialogOk();
+                    for (Object action : availableActionJList
+                            .getSelectedValues()) {
+                        network.getUpdateManager().addAction(
+                                (NetworkUpdateAction) action);
+                    }
+                    ;
+                }
+            };
+            addActionsDialog.setTitle("Add predefined action");
+            addActionsDialog.setContentPane(availableActionJList);
+            addActionsDialog.pack();
+            addActionsDialog.setLocationRelativeTo(null);
+            addActionsDialog.setVisible(true);
+
         }
     };
 
@@ -345,17 +390,17 @@ public class NetworkUpdateManagerPanel extends JPanel {
         repaint();
     }
 
-//    /**
-//     * Update the combo box showing potential actions.
-//     */
-//    private void updateAvailableActionsList() {
-//        availableActionListModel.clear();
-//        for (NetworkUpdateAction action : network.getUpdateManager()
-//                .getAvailableActionList()) {
-//            availableActionListModel.addElement(action);
-//        }
-//        repaint();
-//    }
+    /**
+     * Update the combo box showing potential actions.
+     */
+    private void updateAvailableActionsList() {
+        availableActionListModel.clear();
+        for (NetworkUpdateAction action : network.getUpdateManager()
+                .getAvailableActionList()) {
+            availableActionListModel.addElement(action);
+        }
+        repaint();
+    }
 
     /**
      * Listener for update manager changes.
@@ -374,14 +419,14 @@ public class NetworkUpdateManagerPanel extends JPanel {
             updateCurrentActionsList();
         }
 
-        
+
         //TODO!!
         public void availableActionAdded(NetworkUpdateAction action) {
-           // updateAvailableActionsList();
+           updateAvailableActionsList();
         }
 
         public void availableActionRemoved(NetworkUpdateAction action) {
-           // updateAvailableActionsList();
+           updateAvailableActionsList();
         }
 
     };

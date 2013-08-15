@@ -74,6 +74,15 @@ public abstract class Group {
      */
     public abstract void delete();
 
+    /**
+     * Returns a description of this group's update method, which
+     * is displayed in the update manager panel.
+     *
+     * @return a description of the update method.
+     */
+    public abstract String getUpdateMethodDesecription();
+
+
     @Override
     public String toString() {
         if (label != null) {

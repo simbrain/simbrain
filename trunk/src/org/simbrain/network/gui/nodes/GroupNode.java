@@ -143,7 +143,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
                     dialog.setVisible(true);
                 }
             };
-            ret.add(editGroup);
+            //ret.add(editGroup);
         }
         Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {

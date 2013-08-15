@@ -257,4 +257,9 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         return hiddenLayer;
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Hidden layer, copy hidden to context, update layer";
+    }
+
 }

@@ -420,4 +420,9 @@ public class NeuronGroup extends Group {
                 .getActivationVector(neuronList)));
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Update neurons";
+    }
+
 }

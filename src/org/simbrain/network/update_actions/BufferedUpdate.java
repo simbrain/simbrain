@@ -47,7 +47,7 @@ public class BufferedUpdate implements NetworkUpdateAction {
 
     @Override
     public String getDescription() {
-        return "Buffered update";
+        return "Loose neurons (buffered) and synapses";
     }
 
     @Override

@@ -604,4 +604,9 @@ public class EchoStateNetwork extends Subnetwork {
         this.noise = noise;
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Input layer, reservoir, output layer";
+    }
+
 }

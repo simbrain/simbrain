@@ -20,6 +20,9 @@ package org.simbrain.network.update_actions;
 
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an
@@ -46,7 +49,20 @@ public class UpdateGroup implements NetworkUpdateAction {
 
     @Override
     public String getDescription() {
-        return "Update " + group.getLabel();
+        String groupUpdateDescription = group.getUpdateMethodDesecription();
+        if (group instanceof Subnetwork) {
+            return "Subnetwork:" + group.getLabel() + " ("
+                    + groupUpdateDescription + ")";
+        } else if (group instanceof NeuronGroup) {
+            return "NeuronGroup:" + group.getLabel() + " ("
+                    + groupUpdateDescription + ")";
+        } else if (group instanceof SynapseGroup) {
+            return "SynapseGroup:" + group.getLabel() + " ("
+                    + groupUpdateDescription + ")";
+        } else {
+            return "Group:" + group.getLabel() + " (" + groupUpdateDescription
+                    + ")";
+        }
     }
 
     @Override

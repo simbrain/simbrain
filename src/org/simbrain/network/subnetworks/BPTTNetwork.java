@@ -105,5 +105,9 @@ public final class BPTTNetwork extends FeedForward implements
         this.stepsPerSequences = stepsPerSequences;
     }
 
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Hidden layer, output layer, copy output to input";
+    }
 
 }

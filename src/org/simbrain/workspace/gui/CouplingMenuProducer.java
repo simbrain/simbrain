@@ -65,10 +65,12 @@ public class CouplingMenuProducer extends JMenu {
             JMenu componentMenu = new JMenu(component.getName());
             for (PotentialConsumer potentialConsumer : component
                     .getPotentialConsumers()) {
-                CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
-                        potentialConsumer.getDescription(), producer,
-                        potentialConsumer);
-                componentMenu.add(menuItem);
+                if (potentialConsumer.getDataType() == producer.getDataType()) {
+                    CouplingMenuItem menuItem = new CouplingMenuItem(workspace,
+                            potentialConsumer.getDescription(), producer,
+                            potentialConsumer);
+                    componentMenu.add(menuItem);
+                }
             }
 
             this.add(componentMenu);

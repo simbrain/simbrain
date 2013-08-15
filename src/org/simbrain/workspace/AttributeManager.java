@@ -460,7 +460,6 @@ public class AttributeManager {
      */
     private String getDescriptionString(Object baseObject, String methodName,
             Class<?> dataType) {
-        return baseObject.getClass().getSimpleName() + ":" + methodName + "<"
-                + dataType.getSimpleName() + ">";
+        return baseObject.getClass().getSimpleName() + ":" + methodName;
     }
 }

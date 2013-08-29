@@ -26,6 +26,8 @@ import Jama.Matrix;
 /**
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two
  * principal components to the low-d dataset.
+ *
+ * @author Scott Hotton
  */
 public class ProjectPCA extends ProjectionMethod {
 

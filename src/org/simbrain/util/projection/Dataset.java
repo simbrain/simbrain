@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.Utils;
 
 import Jama.Matrix;
 
@@ -523,17 +524,15 @@ public class Dataset {
      *
      * @param k the number of points to retrieve
      * @param point the point to find neighbors for
-     * @return the indexs of the neighbors
+     * @return the indices of the neighbors
      */
     public int[] getKNearestNeighbors(final int k, final DataPoint point) {
         if (k >= this.getNumPoints()) {
             return null;
         }
 
-        // TODO Not returnig 3 points
         int[] nearest = new int[k];
         List<DataPoint> neighbors = ntree.getClosestPoints(k, point);
-
         for (int i = 0; i < k; i++) {
             nearest[i] = ntree.getIndex(neighbors.get(i));
         }
@@ -662,7 +661,7 @@ public class Dataset {
      * to the jth component.
      *
      * @param i first dimension
-     * @param j seconnd dimesion
+     * @param j second dimension
      *
      * @return covariance of i with respect to j
      */

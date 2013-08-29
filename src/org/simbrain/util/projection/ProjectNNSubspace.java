@@ -32,6 +32,8 @@ package org.simbrain.util.projection;
  * projection method (whichever one is currently being used).
  *
  * (4) Applies the affine map to the new datapoint.
+ * 
+ * @author Scott Hotton
  */
 public class ProjectNNSubspace extends ProjectionMethod {
 

@@ -158,7 +158,7 @@ public class Projector {
 
         // Add the point directly to the upstairs dataset. If the point already
         // exists just change colors and return. If the point is new. add a
-        // point downstairs, and call the projection. algorithm.
+        // point downstairs, and call the projection algorithm.
         DataPoint existingPoint = upstairs.addPoint(point, tolerance);
         colorManager.updateDataPointColors(upstairs);
         if (existingPoint != null) {

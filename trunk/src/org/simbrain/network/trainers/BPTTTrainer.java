@@ -29,7 +29,7 @@ import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.util.Utils;
 
 /**
- * Trainer for vackprop through time Networks.
+ * Trainer for backprop through time Networks. As a test use the "Walker" tables.
  *
  * @author jyoshimi
  */

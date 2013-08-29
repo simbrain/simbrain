@@ -30,6 +30,8 @@ package org.simbrain.util.projection;
  * the projected image of the new point on this line is determined by the
  * relative sizes of the distances between the new point and its two nearest
  * neighbors in the current data set.
+ *
+ * @author Scott Hotton
  */
 public class ProjectTriangulate extends ProjectionMethod {
 

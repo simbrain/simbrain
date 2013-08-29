@@ -19,6 +19,7 @@
 package org.simbrain.util.projection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -423,6 +424,8 @@ public class NTree implements Iterable<DataPoint> {
         List<DataPoint> points = new ArrayList<DataPoint>();
         for (DistancePoint dp : getClosestPoints(root, number, point)) {
             points.add(dp.point);
+            // TODO: Returning multiple copies of same number
+            System.out.println(Arrays.asList(dp.point));
         }
 
         return points;
@@ -432,7 +435,7 @@ public class NTree implements Iterable<DataPoint> {
      * Gets the closest points to the passed in point. The amount of points to
      * determine is specified by the number argument
      *
-     * @param from then node to start from
+     * @param from the node to start from
      * @param number the number of points to collect
      * @param point the point to find points close to
      * @return the closest points
@@ -442,23 +445,26 @@ public class NTree implements Iterable<DataPoint> {
         List<DistancePoint> points;
 
         /*
-         * if from is a branch, recurse otherwise get the closest points in the
+         * If from is a branch, recurse otherwise get the closest points in the
          * leaf
          */
         if (from.type == Type.branch) {
-            /* cast to Branch */
+
+            /* Cast to Branch */
             Branch branch = (Branch) from;
-            /* the point's value on the splitDimension */
+
+            /* The point's value on the splitDimension */
             double d = point.get(branch.splitDimension);
-            /* determine whether the normal path is left or right */
+
+            /* Determine whether the normal path is left or right */
             boolean left = d < branch.midPoint;
 
-            /* recurse on branch determined above */
+            /* Recurse on branch determined above */
             points = getClosestPoints(left ? branch.left : branch.right,
                     number, point);
 
             /*
-             * determine whether to recurse on the other path. if the farthest
+             * Determine whether to recurse on the other path. if the farthest
              * out point from the main branch is less than the distance to the
              * split, get the n points from the other branch
              */
@@ -482,11 +488,11 @@ public class NTree implements Iterable<DataPoint> {
             }
         } else {
             points = new ArrayList<DistancePoint>();
-            /* cast to Leaf */
+            /* Cast to Leaf */
             Leaf leaf = (Leaf) from;
 
             /*
-             * loop over the points in the leaf adding any that are less than
+             * Loop over the points in the leaf adding any that are less than
              * the current or adding if there are less than n
              */
             for (DataPoint d : leaf.points) {
@@ -502,7 +508,7 @@ public class NTree implements Iterable<DataPoint> {
             }
         }
 
-        /* trim the list to size, if necessary */
+        /* Trim the list to size, if necessary */
         return points.size() < number ? points : points.subList(0, number);
     }
 

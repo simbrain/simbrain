@@ -24,6 +24,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkUpdateManagerPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * Show network updater panel.
@@ -44,11 +45,6 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
-//                toolkit.getMenuShortcutKeyMask());
-//        putValue(ACCELERATOR_KEY, keyStroke);
 
         this.networkPanel = networkPanel;
     }
@@ -58,6 +54,10 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
 
         final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(
                 networkPanel.getNetwork());
-        networkPanel.displayPanel(updatePanel, "Network update manager...");
+        StandardDialog dialog = new StandardDialog();
+        dialog.setContentPane(updatePanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 }

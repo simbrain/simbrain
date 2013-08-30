@@ -1045,6 +1045,7 @@ public class Network {
 
         xstream.omitField(Group.class, "deleteWhenEmpty");
 
+        xstream.omitField(NetworkUpdateManager.class, "availableActionList");
         xstream.omitField(NetworkUpdateManager.class, "listeners");
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
@@ -1689,7 +1690,6 @@ public class Network {
      * @param action new action
      */
     public void setUpdateAction(NetworkUpdateAction action) {
-        updateManager.clearCurrentActions();
         updateManager.addAction(action);
     }
 

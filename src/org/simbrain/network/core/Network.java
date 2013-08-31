@@ -555,7 +555,6 @@ public class Network {
      * Delete a specified weight.
      *
      * @param toDelete the weight to delete
-     * @param notify whether to fire a synapse deleted event
      */
     public void removeSynapse(final Synapse toDelete) {
 

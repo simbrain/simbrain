@@ -35,18 +35,19 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.plot.histogram.HistogramModel;
 import org.simbrain.plot.histogram.HistogramPanel;
+import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * Panel for editing collections of synapses. Updated first draft. TODO:
- * Re-implement pruning, sparsity altering, possibly other plasticity rules.
+ * Panel for editing collections of synapses.
  *
  * @author Zach Tosi
  * @author Jeff Yoshimi
@@ -88,15 +89,15 @@ public class SynapseAdjustmentPanel extends JPanel {
     private JComboBox<String> synTypeSelector = new JComboBox<String>();
 
     /**
-     * The options for the combo box. "All" treats all the synapse strengths, as
-     * a single pool, "I/E overlay" does not have different stats from "All" but
-     * overlays rather than combines synapse values in the histogram.
-     * "Excitatory Only" shows stats for and histograms only excitatory strength
-     * values, and "Inhibitory Only" does the same for inhibitory synapse
-     * strengths.
-     *
+     * The options for the combo box, which determines which synapses are
+     * displayed in the panel and filters which synapses are modified using the
+     * panel. "All" and "I/E" overlay cover all the synapse, but display them
+     * differently in the histogram (I/E overlay present them in different
+     * colors).
      */
     {
+        // TOOD: Use an enumeration or somehow remove dependencies on the text
+        // in these items below.
         synTypeSelector.addItem("All");
         synTypeSelector.addItem("I/E Overlay");
         synTypeSelector.addItem("Excitatory Only");
@@ -237,6 +238,8 @@ public class SynapseAdjustmentPanel extends JPanel {
         JTabbedPane bottomPanel = new JTabbedPane();
         JPanel randTab = new JPanel();
         JPanel perturbTab = new JPanel();
+        JPanel prunerTab = new JPanel();
+        JPanel scalerTab = new JPanel();
 
         randTab.setLayout(new GridBagLayout());
         perturbTab.setLayout(new GridBagLayout());
@@ -251,6 +254,8 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         randTab.add(randomPanel, c);
         perturbTab.add(perturberPanel, c);
+        scalerTab.add(new ScalerPanel(networkPanel), c);
+        prunerTab.add(new PrunerPanel(networkPanel), c);
 
         c.gridwidth = 1;
         c.gridx = 1;
@@ -266,6 +271,8 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         bottomPanel.addTab("Randomizer", randTab);
         bottomPanel.addTab("Perturber", perturbTab);
+        bottomPanel.addTab("Pruner", prunerTab);
+        bottomPanel.addTab("Scaler", scalerTab);
 
         this.add(bottomPanel, gbc);
 
@@ -284,19 +291,11 @@ public class SynapseAdjustmentPanel extends JPanel {
                 randomPanel.commitRandom(perturber);
                 String type = (String) synTypeSelector.getSelectedItem();
                 for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
-
-                    if (type == "Excitatory Only" && synapse.getStrength() < 0)
-                        continue;
-
-                    if (type == "Inhibitory Only" && synapse.getStrength() > 0)
-                        continue;
-
-                    synapse.setStrength(synapse.getStrength()
-                            + perturber.getRandom());
-
+                    if (synapseIsAdjustable(type, synapse)) {
+                        synapse.setStrength(synapse.getStrength()
+                                + perturber.getRandom());
+                    }
                 }
-                // Automatically extracts new weights, and updates stats and
-                // histogram
                 networkPanel.getNetwork().fireNetworkChanged();
             }
         });
@@ -307,16 +306,10 @@ public class SynapseAdjustmentPanel extends JPanel {
                 randomPanel.commitRandom(randomizer);
                 String type = (String) synTypeSelector.getSelectedItem();
                 for (Synapse synapse : networkPanel.getSelectedModelSynapses()) {
-                    if (type == "Excitatory Only" && synapse.getStrength() < 0)
-                        continue;
-
-                    if (type == "Inhibitory Only" && synapse.getStrength() > 0)
-                        continue;
-
-                    synapse.setStrength(randomizer.getRandom());
+                    if (synapseIsAdjustable(type, synapse)) {
+                        synapse.setStrength(randomizer.getRandom());
+                    }
                 }
-                // Automatically extracts new weights, and updates stats and
-                // histogram
                 networkPanel.getNetwork().fireNetworkChanged();
             }
         });
@@ -481,7 +474,7 @@ public class SynapseAdjustmentPanel extends JPanel {
             // Name the series
             names.add("Excitatory  ");
             names.add("Inhibitory ");
-            // Use the default pallet
+            // Use the default pallete
             SynapseAdjustmentPanel.this.histogramPanel
                     .setColorPallet(HistogramPanel.DEFAULT_PALLET);
             data.add(hist);
@@ -628,6 +621,131 @@ public class SynapseAdjustmentPanel extends JPanel {
         }
 
         return stats;
+    }
+
+    /**
+     * Panel for scaling synapses.
+     */
+    public class ScalerPanel extends LabelledItemPanel {
+
+        /** Percentage to increase or decrease indicated synapses. */
+        private JTextField tfIncreaseDecrease = new JTextField(".1");
+
+        /** Button for increasing synapse strengths. */
+        private JButton increaseButton = new JButton("Increase");
+
+        /** Button for decreasing synapse strengths. */
+        private JButton decreaseButton = new JButton("Decrease");
+
+        /**
+         * Construct the scaler panel.
+         *
+         * @param networkPanel parent network panel
+         */
+        public ScalerPanel(final NetworkPanel networkPanel) {
+            addItem("Percent to change", tfIncreaseDecrease);
+            addItem("Increase", increaseButton);
+            increaseButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    double amount = Double.parseDouble(tfIncreaseDecrease
+                            .getText());
+                    for (Synapse synapse : networkPanel
+                            .getSelectedModelSynapses()) {
+                        if (synapseIsAdjustable( ((String) synTypeSelector
+                                .getSelectedItem()), synapse)) {
+                            synapse.setStrength(synapse.getStrength()
+                                    + synapse.getStrength() * amount);
+                        }
+                    }
+                    networkPanel.getNetwork().fireNetworkChanged();
+                }
+            });
+
+            addItem("Decrease", decreaseButton);
+            decreaseButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    double amount = Double.parseDouble(tfIncreaseDecrease
+                            .getText());
+                    for (final Synapse synapse : networkPanel
+                            .getSelectedModelSynapses()) {
+                        if (synapseIsAdjustable( ((String) synTypeSelector
+                                .getSelectedItem()), synapse)) {
+                            synapse.setStrength(synapse.getStrength()
+                                    - synapse.getStrength() * amount);
+                        }
+                    }
+                    networkPanel.getNetwork().fireNetworkChanged();
+                }
+            });
+        }
+    }
+
+    /**
+     * Panel for pruning synapses.
+     */
+    public class PrunerPanel extends LabelledItemPanel {
+
+        /**
+         * Threshold. If synapse strength above absolute value of this value
+         * prune the synapse when the prune button is pressed.
+         */
+        private final JTextField tfThreshold = new JTextField(".1");
+
+        /**
+         * Construct the panel.
+         *
+         * @param networkPanel reference to parent network panel.
+         */
+        public PrunerPanel(final NetworkPanel networkPanel) {
+            JButton pruneButton = new JButton("Prune");
+            addItem("Prune", pruneButton);
+            addItem("Threshold", tfThreshold);
+
+            pruneButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    double threshold = Double.parseDouble(tfThreshold.getText());
+                    for (Synapse synapse : networkPanel
+                            .getSelectedModelSynapses()) {
+                        if (synapseIsAdjustable(
+                                ((String) synTypeSelector.getSelectedItem()),
+                                synapse)) {
+                            if (Math.abs(synapse.getStrength()) < threshold) {
+                                networkPanel.getNetwork()
+                                        .removeSynapse(synapse);
+                            }
+                        }
+                    }
+                    networkPanel.getNetwork().fireNetworkChanged();
+                }
+            });
+        }
+    }
+
+    /**
+     * Helper method to determine if a synapse can be modified given the current
+     * selection of the synapse type selector.
+     *
+     * @param filterValue value of the synapse type selector
+     * @param synapse the synapse to check
+     * @return true if the synapse can be adjusted, false otherwise
+     */
+    private boolean synapseIsAdjustable(String filterValue,
+            final Synapse synapse) {
+        if (filterValue.equalsIgnoreCase("Excitatory Only")) {
+            if (synapse.getStrength() < 0) {
+                return false;
+            }
+        }
+        if (filterValue.equalsIgnoreCase("Inhibitory Only")) {
+            if (synapse.getStrength() > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

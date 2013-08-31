@@ -444,6 +444,7 @@ public class NetworkPanel extends JPanel {
                 Neuron neuron = e.getObject();
                 NeuronNode node = (NeuronNode) objectNodeMap.get(neuron);
                 if (node != null) {
+                    selectionModel.remove(node);
                     node.removeFromParent();
                     objectNodeMap.remove(neuron);
                     if (neuron.getParentGroup() != null) {
@@ -522,6 +523,7 @@ public class NetworkPanel extends JPanel {
                 SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
                         .getObject());
                 if (synapseNode != null) {
+                    selectionModel.remove(synapseNode);
                     synapseNode.getTarget().getConnectedSynapses()
                             .remove(synapseNode);
                     synapseNode.getSource().getConnectedSynapses()

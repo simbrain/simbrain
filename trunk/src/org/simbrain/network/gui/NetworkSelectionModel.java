@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.swing.event.EventListenerList;
 
@@ -36,8 +37,13 @@ final class NetworkSelectionModel {
     /** Source of selection events. */
     private final NetworkPanel networkPanel;
 
+    // NOTE: selection used to be a HashSet. CopyOnWriteArraySet is slower,
+    // so it's worth keeping an eye on this. No noticeable performance lag for
+    // small groups of neurons and weights so far. Without this,
+    // ConcurrentModificationException when deleting synapses or nodes and
+    // calling remove(Object) in this class.
     /** Set of selected elements. */
-    private final Set selection;
+    private final CopyOnWriteArraySet selection;
 
     /** Adjusting. */
     private boolean adjusting;
@@ -51,7 +57,7 @@ final class NetworkSelectionModel {
     public NetworkSelectionModel(final NetworkPanel networkPanel) {
 
         adjusting = false;
-        selection = new HashSet();
+        selection = new CopyOnWriteArraySet();
         this.networkPanel = networkPanel;
         listenerList = new EventListenerList();
     }

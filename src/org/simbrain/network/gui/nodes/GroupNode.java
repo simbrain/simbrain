@@ -28,7 +28,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
@@ -36,7 +35,9 @@ import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
+import org.simbrain.network.trainers.Trainable;
+import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -159,6 +160,10 @@ public class GroupNode extends PPath implements PropertyChangeListener {
             }
         };
         ret.add(removeGroup);
+        if (group instanceof Trainable) {
+            ret.addSeparator();
+            ret.add(testInputAction);
+        }
         return ret;
     }
 
@@ -315,4 +320,28 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         return ret;
     }
 
+    /**
+     * Action for testing inputs to trainable networks.
+     */
+    private Action testInputAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
+            putValue(NAME, "Test network...");
+            putValue(SHORT_DESCRIPTION, "Test network...");
+        }
+
+        public void actionPerformed(ActionEvent arg0) {
+            Subnetwork network = (Subnetwork) getGroup();
+            if (network instanceof Trainable) {
+                TestInputPanel testInputPanel = new TestInputPanel(
+                        GroupNode.this.getNetworkPanel(),
+                        ((Trainable) network).getInputNeurons(),
+                        ((Trainable) network).getTrainingSet().getInputData());
+                GroupNode.this.getNetworkPanel().displayPanel(testInputPanel,
+                        "Test inputs");
+
+            }
+        }
+    };
 }

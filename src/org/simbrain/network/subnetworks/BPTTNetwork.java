@@ -74,6 +74,7 @@ public final class BPTTNetwork extends FeedForward implements
         getHiddenLayer().update();
         getOutputLayer().update();
         getInputLayer().copyActivations(getOutputLayer());
+        getInputLayer().applyInputs();
     }
 
     /**

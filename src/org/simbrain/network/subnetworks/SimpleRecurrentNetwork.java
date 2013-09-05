@@ -206,7 +206,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     @Override
     public void update() {
 
-        //inputLayer.update();
+        inputLayer.update();
         hiddenLayer.update();
 
         // Update context Layer

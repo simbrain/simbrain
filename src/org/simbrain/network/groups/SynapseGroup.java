@@ -213,8 +213,13 @@ public class SynapseGroup extends Group {
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Synapse Group [" + getLabel() + "] Synapse group with "
-                + this.getSynapseList().size() + " synapse(s)\n");
+        ret += ("Synapse Group [" + getLabel() + "]. Contains "
+                + this.getSynapseList().size() + " synapse(s)." + " Connects "
+                + getSourceNeuronGroup().getId() + " ("
+                + getSourceNeuronGroup().getLabel() + ")" + " to "
+                + getTargetNeuronGroup().getId() + " ("
+                + getTargetNeuronGroup().getLabel() + ")\n");
+
         return ret;
     }
 

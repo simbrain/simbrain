@@ -425,4 +425,14 @@ public class NeuronGroup extends Group {
         return "Update neurons";
     }
 
+    /**
+     * Apply any input values to the activations of the neurons in this group.
+     */
+    public void applyInputs() {
+        for (Neuron neuron : getNeuronList()) {
+            neuron.setActivation(neuron.getActivation()
+                    + neuron.getInputValue());
+        }
+    }
+
 }

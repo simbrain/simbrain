@@ -100,7 +100,6 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
-        menu.add(new JMenuItem(testInputAction));
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
@@ -142,24 +141,4 @@ public class BackpropNetworkNode extends SubnetworkNode {
         }
     };
 
-    /**
-     * Action for testing inputs to the backprop network.
-     */
-    private Action testInputAction = new AbstractAction() {
-
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
-            putValue(NAME, "Test network...");
-            putValue(SHORT_DESCRIPTION, "Test network...");
-        }
-
-        public void actionPerformed(ActionEvent arg0) {
-            BackpropNetwork network = (BackpropNetwork) getGroup();
-            TestInputPanel testInputPanel = new TestInputPanel(
-                    BackpropNetworkNode.this.getNetworkPanel(), network.
-                    getInputNeurons(), network.getTrainingSet().getInputData());
-            BackpropNetworkNode.this.getNetworkPanel().displayPanel(
-                    testInputPanel, "Test inputs");
-        }
-    };
 }

@@ -99,6 +99,7 @@ public class TestInputAction extends AbstractAction {
      * Initialize and display the test input panel.
      */
     public void actionPerformed(ActionEvent event) {
+        updateAction();
         testInputPanel = new TestInputPanel(networkPanel, inputNeurons);
         networkPanel.displayPanel(testInputPanel, "Test inputs");
     }

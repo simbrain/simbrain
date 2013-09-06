@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -86,6 +87,11 @@ public abstract class AbstractSynapsePanel extends JPanel {
      */
     public abstract void commitChanges();
 
+    
+    public abstract void commitChanges(List<Synapse> commitSynapses);
+    
+    public abstract void commitChanges(Synapse templateSynapse);
+    
     /**
      * @return Returns the synapse_list.
      */

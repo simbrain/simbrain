@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
+import org.simbrain.network.core.Synapse;
+
 /**
  * <b>ClampedSynapsePanel</b>.
  */
@@ -46,4 +50,12 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
      */
     public void commitChanges() {
     }
+
+	public void commitChanges(List<Synapse> commitSynapses) {
+	}
+
+	public void commitChanges(Synapse templateSynapse) {	
+	}
+    
+   
 }

@@ -19,7 +19,9 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
 
@@ -68,4 +70,25 @@ public class RandomSynapseRulePanel extends AbstractSynapsePanel {
             rp.commitRandom(synapseRef.getRandomizer());
         }
     }
+
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		RandomSynapseRule synapseRef = new RandomSynapseRule();
+		rp.commitRandom(synapseRef.getRandomizer());
+		
+		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}
+		
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		RandomSynapseRule synapseRef = new RandomSynapseRule();
+		rp.commitRandom(synapseRef.getRandomizer());
+		
+		templateSynapse.setLearningRule(synapseRef);
+		
+	}
+	
 }

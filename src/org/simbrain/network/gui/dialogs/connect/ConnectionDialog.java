@@ -18,13 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.util.LinkedHashMap;
-
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -48,12 +44,13 @@ public class ConnectionDialog extends StandardDialog {
     /** The connection object associated with the connection panel. */
     private ConnectNeurons connection;
 
-    /** The mapping of group names to available synapse groups. */
-    private LinkedHashMap<String, SynapseGroup> groupingOptions =
-    		new LinkedHashMap<String, SynapseGroup>();
-    
-    /** A combo-box showing the available group options. */
-    private JComboBox synapseGroups;
+    //TODO: Unused, find use or schedule for removal
+//    /** The mapping of group names to available synapse groups. */
+//    private LinkedHashMap<String, SynapseGroup> groupingOptions =
+//    		new LinkedHashMap<String, SynapseGroup>();
+//    
+//    /** A combo-box showing the available group options. */
+//    private JComboBox synapseGroups;
     
     /**
      *

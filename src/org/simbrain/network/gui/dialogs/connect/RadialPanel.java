@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -140,5 +141,12 @@ public class RadialPanel extends AbstractConnectionPanel {
         allowSelfConnect.setSelected(((Radial) connection)
                 .isAllowSelfConnections());
     }
+
+	@Override
+	public void fillFieldValues(ConnectNeurons connection)
+			throws ClassCastException {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

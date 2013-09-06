@@ -38,7 +38,6 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
-import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
@@ -396,6 +395,45 @@ public class Network {
      */
     public List<? extends Group> getGroupList() {
         return Collections.unmodifiableList(groupList);
+    }
+    
+    /**
+     * Returns a list of all neuron groups.
+     * @return a neuron group list
+     */
+    public List<NeuronGroup> getFlatNeuronGroupList(){
+    	ArrayList<NeuronGroup> ngs = new ArrayList<NeuronGroup>();
+    	
+    	for(Group g : groupList) {
+    		if(g instanceof NeuronGroup) {
+    			ngs.add(((NeuronGroup) g));
+    		}
+    	}
+    	
+    	return ngs;
+    }
+    
+    /**
+     * Returns the synapse group between some source neuron group and some
+     * target neuron group, if it exists. Returns null otherwise.
+     * @param src the source neuron group
+     * @param targ the target neuron group
+     * @return the synapse group between src and targ, null if there is none
+     */
+    public SynapseGroup getSynapseGroup(NeuronGroup src, NeuronGroup targ){
+    	
+    	SynapseGroup s = null;
+    	
+    	for(Group g : groupList) {
+    		if(g instanceof SynapseGroup) {
+    			if(src == ((SynapseGroup) g).getSourceNeuronGroup() &&
+    					targ == ((SynapseGroup) g).getTargetNeuronGroup())
+    				s = (SynapseGroup) g;
+    		}
+    	}
+    	
+    	return s;
+    	
     }
 
     /**

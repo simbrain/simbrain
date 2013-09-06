@@ -847,7 +847,7 @@ public class NetworkPanel extends JPanel {
             //}
         } else if (group instanceof SynapseGroup) {
             // Create SynapseGroupNode for case of visible synapses
-            if (((SynapseGroup) group).displaySynapses()) {
+            if (((SynapseGroup) group).displaySynapses() && weightsVisible) {
                 // Add synapse nodes to canvas
                 for (Synapse synapse : ((SynapseGroup) group).getSynapseList()) {
                     addSynapse(synapse);
@@ -2187,19 +2187,10 @@ public class NetworkPanel extends JPanel {
     public void setWeightsVisible(final boolean synapseNodeOn) {
         this.weightsVisible = synapseNodeOn;
         actionManager.getShowWeightsAction().setState(synapseNodeOn);
-
-        if (synapseNodeOn) {
-            for (Iterator<SynapseNode> synapseNodes = this.getSynapseNodes()
-                    .iterator(); synapseNodes.hasNext();) {
-                SynapseNode node = synapseNodes.next();
-                node.setVisible(true);
-            }
-        } else {
-            for (Iterator<SynapseNode> synapseNodes = this.getSynapseNodes()
-                    .iterator(); synapseNodes.hasNext();) {
-                SynapseNode node = synapseNodes.next();
-                node.setVisible(false);
-            }
+        for (Iterator<SynapseNode> synapseNodes = this.getSynapseNodes()
+               .iterator(); synapseNodes.hasNext();) {
+           SynapseNode node = synapseNodes.next();
+           node.setVisible(synapseNodeOn);
         }
     }
 

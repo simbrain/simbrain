@@ -18,8 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 
@@ -128,4 +131,60 @@ public class STDPRulePanel extends AbstractSynapsePanel {
             }
         }
     }
+
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		synapseRef = new STDPRule();
+		
+		if (!tfTauMinus.getText().equals(NULL_STRING)) {
+            synapseRef
+                    .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
+        }
+        if (!tfTauPlus.getText().equals(NULL_STRING)) {
+            synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
+        }
+        if (!tfWMinus.getText().equals(NULL_STRING)) {
+            synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
+        }
+        if (!tfWPlus.getText().equals(NULL_STRING)) {
+            synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
+        }
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+		
+  		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}    
+		
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		
+		synapseRef = new STDPRule();
+		
+		if (!tfTauMinus.getText().equals(NULL_STRING)) {
+            synapseRef
+                    .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
+        }
+        if (!tfTauPlus.getText().equals(NULL_STRING)) {
+            synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
+        }
+        if (!tfWMinus.getText().equals(NULL_STRING)) {
+            synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
+        }
+        if (!tfWPlus.getText().equals(NULL_STRING)) {
+            synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
+        }
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+        
+		templateSynapse.setLearningRule(synapseRef);
+		
+	}
 }

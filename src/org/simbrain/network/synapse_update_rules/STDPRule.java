@@ -74,7 +74,7 @@ public class STDPRule extends SynapseUpdateRule {
 
     @Override
     public String getDescription() {
-        return "Spike Timing Dependent Plasticity Synapse";
+        return "STDP";
     }
 
     @Override

@@ -81,22 +81,30 @@ public final class ApplyConnectionAction extends AbstractAction {
                     networkPanel.getSelectedModelNeurons(),
                     networkPanel.getSelectedModelNeurons(), true);
         } else {
+        	
+        	String title = "Connect ";
+        	
             if (connection instanceof AllToAll) {
                 optionsPanel = new AllToAllPanel((AllToAll) connection);
                 optionsPanel.fillFieldValues();
+                title += "All to All";
             } else if (connection instanceof OneToOne) {
                 optionsPanel = new OneToOnePanel((OneToOne) connection);
                 optionsPanel.fillFieldValues();
+                title += "One to One";
             } else if (connection instanceof Radial) {
                 optionsPanel = new RadialPanel((Radial) connection);
                 optionsPanel.fillFieldValues();
+                title += "Radial";
             } else if (connection instanceof Sparse) {
                 optionsPanel = new SparsePanel((Sparse) connection,
                         networkPanel);
                 optionsPanel.fillFieldValues();
+                title += "Sparse";
             }
             ConnectionDialog dialog = new ConnectionDialog(networkPanel,
             		optionsPanel, connection);
+            dialog.setTitle(title);
             dialog.setLocationRelativeTo(null);
             dialog.pack();
             dialog.setVisible(true);

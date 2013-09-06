@@ -18,39 +18,59 @@
  */
 package org.simbrain.util.randomizer;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JFormattedTextField;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer object.
  */
-public class RandomizerPanel extends LabelledItemPanel implements ActionListener {
+public class RandomizerPanel extends JPanel implements ActionListener {
 
     /** Distribution combo box. */
     private JComboBox cbDistribution = new JComboBox(
-            Randomizer.getFunctionList());
+            Randomizer.getFunctionList()){
+    	
+    	@Override
+    	public void setSelectedIndex(int index){
+    		this.setSelectedItem(Randomizer.getFunctionList()[index]);
+    		this.firePropertyChange("Distribution", null,
+    				null);
+    	}
+    	
+    };
+    
+  
 
     /** Upper bound field. */
-    private JTextField tfUpBound = new JTextField();
+    private JFormattedTextField tfUpBound = new JFormattedTextField();
 
     /** Lower bound field. */
-    private JTextField tfLowBound = new JTextField();
+    private JFormattedTextField tfLowBound = new JFormattedTextField();
 
     /** Mean value field. */
-    private JTextField tfMean = new JTextField();
+    private JFormattedTextField tfMean = new JFormattedTextField();
 
     /** Standard deviation field. */
-    private JTextField tfStandardDeviation = new JTextField();
+    private JFormattedTextField tfStandardDeviation = new JFormattedTextField();
 
-    /** Clipping combo box. */
-    private TristateDropDown tsClipping = new TristateDropDown();
+//    /** Clipping combo box. */
+//    private TristateDropDown tsClipping = new TristateDropDown();
+    
+    private JCheckBox tsClipping = new JCheckBox();
 
     /**
      * This method is the default constructor.
@@ -58,21 +78,40 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
      * @param useLocalBounds Should local bounds be used
      */
     public RandomizerPanel(final boolean useLocalBounds) {
+    	
+    	JPanel center = new JPanel(new GridLayout(0, 2));
+    	
+    	
+    	this.setLayout(new GridBagLayout());
+    	GridBagConstraints gbc = new GridBagConstraints();
+    	gbc.anchor = GridBagConstraints.CENTER;
+    	gbc.fill = GridBagConstraints.BOTH;
+    	gbc.weightx = 1.0;
+    	gbc.weighty = 1.0;
+    	gbc.insets = new Insets(5, 5, 5, 5);
         cbDistribution.addActionListener(this);
         tsClipping.addActionListener(this);
         tsClipping.setActionCommand("useBounds");
-
-        this.addItem("Distribution", cbDistribution);
-
-        if (useLocalBounds) {
-            this.addItem("Upper bound", tfUpBound);
-            this.addItem("Lower bound", tfLowBound);
-        }
-
-        this.addItem("Mean value", tfMean);
-        this.addItem("Standard deviation", tfStandardDeviation);
-        this.addItem("Use clipping", tsClipping);
-
+        
+        center.add(new JLabel("Distribution"));
+        center.add(cbDistribution);
+        
+        center.add(new JLabel("Ceiling:"));
+        center.add(tfUpBound);
+        
+        center.add(new JLabel("Floor:"));
+        center.add(tfLowBound);
+        
+        center.add(new JLabel("Mean:"));
+        center.add(tfMean);
+        
+        center.add(new JLabel("Std. Dev.:"));
+        center.add(tfStandardDeviation);
+        
+        center.add(new JLabel("Clipping"));
+        center.add(tsClipping);
+        
+        this.add(center, gbc);
         init();
     }
 
@@ -85,7 +124,6 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
             tfLowBound.setEnabled(true);
             tfMean.setEnabled(false);
             tfStandardDeviation.setEnabled(false);
-            tsClipping.setSelectedIndex(TristateDropDown.getTRUE());
             tsClipping.setEnabled(false);
         } else if (cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN) {
             tfMean.setEnabled(true);
@@ -99,14 +137,9 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
      * Enable or disable the upper and lower bounds fields depending on state of
      * rounding button.
      */
-    private void checkBounds() {
-        if (tsClipping.getSelectedIndex() == TristateDropDown.getFALSE()) {
-            tfLowBound.setEnabled(false);
-            tfUpBound.setEnabled(false);
-        } else {
-            tfLowBound.setEnabled(true);
-            tfUpBound.setEnabled(true);
-        }
+    public void checkBounds() {
+    	tfLowBound.setEnabled(tsClipping.isSelected());
+        tfUpBound.setEnabled(tsClipping.isSelected());
     }
 
     /** @see ActionListener */
@@ -114,7 +147,6 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
         if (e.getActionCommand().equals("useBounds")) {
             checkBounds();
         }
-
         init();
     }
 
@@ -128,11 +160,11 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
 
         cbDistribution.setSelectedIndex(rand.getDistributionIndex());
         tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setText(Double.toString(rand.getLowerBound()));
-        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
+        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
         tfStandardDeviation
-                .setText(Double.toString(rand.getStandardDeviation()));
-        tfMean.setText(Double.toString(rand.getMean()));
+                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfMean.setValue(Double.toString(rand.getMean()));
 
     }
 
@@ -144,11 +176,11 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
     public void fillFieldValues(Randomizer rand) {
         cbDistribution.setSelectedIndex(rand.getDistributionIndex());
         tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setText(Double.toString(rand.getLowerBound()));
-        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
+        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
         tfStandardDeviation
-                .setText(Double.toString(rand.getStandardDeviation()));
-        tfMean.setText(Double.toString(rand.getMean()));
+                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfMean.setValue(Double.toString(rand.getMean()));
     }
 
     /**
@@ -158,11 +190,11 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
         Randomizer rand = new Randomizer();
         cbDistribution.setSelectedIndex(rand.getDistributionIndex());
         tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setText(Double.toString(rand.getLowerBound()));
-        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
+        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
         tfStandardDeviation
-                .setText(Double.toString(rand.getStandardDeviation()));
-        tfMean.setText(Double.toString(rand.getMean()));
+                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfMean.setValue(Double.toString(rand.getMean()));
     }
 
     /**
@@ -182,6 +214,25 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
         rand.setClipping(tsClipping.isSelected());
     }
 
+    
+    public void setEnabled(boolean enabled){
+    	
+    	boolean gaussConditions = enabled &&
+    			(cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN);
+    	boolean roundingConditions = (tsClipping.isSelected() ||
+    			(cbDistribution.getSelectedIndex() == Randomizer.UNIFORM)) && enabled;
+    	
+    	cbDistribution.setEnabled(enabled);
+    	
+    	tfUpBound.setEnabled(roundingConditions);
+    	tfLowBound.setEnabled(roundingConditions);	
+    	
+    	tfMean.setEnabled(gaussConditions);
+    	tfStandardDeviation.setEnabled(gaussConditions); 	
+    	tsClipping.setEnabled(gaussConditions);
+    	
+    }
+    
     /**
      * @return Returns the cbDistribution.
      */
@@ -196,73 +247,99 @@ public class RandomizerPanel extends LabelledItemPanel implements ActionListener
         this.cbDistribution = cbDistribution;
     }
 
+//    /**
+//     * @return Returns the isUseBoundsBox.
+//     */
+//    public TristateDropDown getTsClipping() {
+//        return tsClipping;
+//    }
+
     /**
      * @return Returns the isUseBoundsBox.
      */
-    public TristateDropDown getTsClipping() {
+    public JCheckBox getTsClipping() {
         return tsClipping;
     }
 
+    
+//    /**
+//     * @param isUseBoundsBox The isUseBoundsBox to set.
+//     */
+//    public void setTsClipping(final TristateDropDown isUseBoundsBox) {
+//        this.tsClipping = isUseBoundsBox;
+//    }
+    
     /**
      * @param isUseBoundsBox The isUseBoundsBox to set.
      */
-    public void setTsClipping(final TristateDropDown isUseBoundsBox) {
+    public void setTsClipping(final JCheckBox isUseBoundsBox) {
         this.tsClipping = isUseBoundsBox;
     }
 
     /**
      * @return Returns the tfLowBound.
      */
-    public JTextField getTfLowBound() {
+    public JFormattedTextField getTfLowBound() {
         return tfLowBound;
     }
 
     /**
      * @param tfLowBound The tfLowBound to set.
      */
-    public void setTfLowBound(final JTextField tfLowBound) {
+    public void setTfLowBound(final JFormattedTextField tfLowBound) {
         this.tfLowBound = tfLowBound;
     }
 
     /**
      * @return Returns the tfMean.
      */
-    public JTextField getTfMean() {
+    public JFormattedTextField getTfMean() {
         return tfMean;
     }
 
     /**
      * @param tfMean The tfMean to set.
      */
-    public void setTfMean(final JTextField tfMean) {
+    public void setTfMean(final JFormattedTextField tfMean) {
         this.tfMean = tfMean;
     }
 
     /**
      * @return Returns the tfStandardDeviation.
      */
-    public JTextField getTfStandardDeviation() {
+    public JFormattedTextField getTfStandardDeviation() {
         return tfStandardDeviation;
     }
 
     /**
      * @param tfStandardDeviation The tfStandardDeviation to set.
      */
-    public void setTfStandardDeviation(final JTextField tfStandardDeviation) {
+    public void setTfStandardDeviation(final JFormattedTextField tfStandardDeviation) {
         this.tfStandardDeviation = tfStandardDeviation;
     }
 
     /**
      * @return Returns the tfUpBound.
      */
-    public JTextField getTfUpBound() {
+    public JFormattedTextField getTfUpBound() {
         return tfUpBound;
     }
 
     /**
      * @param tfUpBound The tfUpBound to set.
      */
-    public void setTfUpBound(final JTextField tfUpBound) {
+    public void setTfUpBound(final JFormattedTextField tfUpBound) {
         this.tfUpBound = tfUpBound;
+    }
+    
+   
+    
+    public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
+    	cbDistribution.addPropertyChangeListener(pc);
+    	tfUpBound.addPropertyChangeListener(pc);
+    	tfLowBound.addPropertyChangeListener(pc);
+    	tfMean.addPropertyChangeListener(pc);
+    	tfStandardDeviation.addPropertyChangeListener(pc);
+    	tsClipping.addPropertyChangeListener(pc); 	
     }
 }

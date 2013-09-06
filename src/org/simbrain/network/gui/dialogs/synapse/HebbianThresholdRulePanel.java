@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.synapse_update_rules.HebbianRule;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.util.TristateDropDown;
 
@@ -135,4 +139,64 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
             }
         }
     }
+    
+    @Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		synapseRef = new HebbianThresholdRule();		
+		
+		  if (!tfLearningRate.getText().equals(NULL_STRING)) {
+              synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                      .getText()));
+          }
+
+          if (!tfOutputThresholdMomentum.getText().equals(NULL_STRING)) {
+              synapseRef.setOutputThresholdMomentum(Double
+                      .parseDouble(tfOutputThresholdMomentum.getText()));
+          }
+
+          if (!tfOutputThreshold.getText().equals(NULL_STRING)) {
+              synapseRef.setOutputThreshold(Double
+                      .parseDouble(tfOutputThreshold.getText()));
+          }
+
+          if (!isOutputThreshold.isNull()) {
+              synapseRef.setUseSlidingOutputThreshold(isOutputThreshold
+                      .isSelected());
+          }
+        
+		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}
+        
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		synapseRef = new HebbianThresholdRule();		
+		
+		  if (!tfLearningRate.getText().equals(NULL_STRING)) {
+              synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                      .getText()));
+          }
+
+          if (!tfOutputThresholdMomentum.getText().equals(NULL_STRING)) {
+              synapseRef.setOutputThresholdMomentum(Double
+                      .parseDouble(tfOutputThresholdMomentum.getText()));
+          }
+
+          if (!tfOutputThreshold.getText().equals(NULL_STRING)) {
+              synapseRef.setOutputThreshold(Double
+                      .parseDouble(tfOutputThreshold.getText()));
+          }
+
+          if (!isOutputThreshold.isNull()) {
+              synapseRef.setUseSlidingOutputThreshold(isOutputThreshold
+                      .isSelected());
+          }
+		
+        templateSynapse.setLearningRule(synapseRef); 
+        
+	}
+    
 }

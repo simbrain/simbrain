@@ -20,16 +20,16 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.border.Border;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectNeurons;
 
 /**
  * <b>AllToAllPanel</b> creates displays preferences for all to all neuron
@@ -41,7 +41,11 @@ import org.simbrain.network.connections.AllToAll;
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
-    private ExcitatoryInhibitoryPropertiesPanel eipPanel;
+	/** The panel for setting the ratio of excitatory to inhibitory synapses.*/
+    private ExcitatoryInhibitoryRatioPanel eirPanel;
+    
+    /** The panel for setting learning rules and randomization for synapses.*/
+    private SynapsePropertiesPanel spPanel;
 
     /** Allow self connection check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
@@ -52,54 +56,60 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * @param connection type
      */
     public AllToAllPanel(final AllToAll connection) {
-        super(connection);
-        JPanel allP = new JPanel(new GridBagLayout());
-        eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        gbc.gridheight = 9;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        allP.add(eipPanel, gbc);
-
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 10, 0, 10);
-        gbc.gridy = 9;
-        gbc.gridheight = 1;
-        allP.add(new JSeparator(), gbc);
-
-        gbc.gridy = 10;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 5, 0, 10);
-
-        JPanel allowSelfConnectPanel = new JPanel();
-        FlowLayout ASCPFL = new FlowLayout(FlowLayout.LEFT);
-        allowSelfConnectPanel.setLayout(ASCPFL);
-        allowSelfConnectPanel.add(new JLabel("Allow Self-Connections: "));
-        allowSelfConnectPanel.add(allowSelfConnect);
-
-        allP.add(allowSelfConnectPanel, gbc);
-        this.add(allP, BorderLayout.CENTER);
+        super(connection);  
+        eirPanel = new ExcitatoryInhibitoryRatioPanel(connection);
+        spPanel = new SynapsePropertiesPanel(connection);     
+        initializeLayout();
     }
+    
+    private void initializeLayout(){
+
+    	//A sub-panel for the synapse properties and ei panel
+        JPanel pPanel = new JPanel(new BorderLayout());
+        //A sub-sub-panel for the "allow self connections" checkbox and label
+        JPanel allowSelfConnectPanel = new JPanel(new FlowLayout());
+        JLabel selfConnectLabel = new JLabel("Self-Connections: ");
+        Font font = selfConnectLabel.getFont();
+        Font bold = new Font(font.getName(), Font.BOLD, font.getSize());
+        selfConnectLabel.setFont(bold);
+        allowSelfConnectPanel.add(selfConnectLabel);
+        allowSelfConnectPanel.add(allowSelfConnect);
+        
+        pPanel.add(eirPanel, BorderLayout.NORTH);
+        pPanel.add(allowSelfConnectPanel, BorderLayout.CENTER);
+        pPanel.add(spPanel, BorderLayout.SOUTH);
+        Border b = BorderFactory.createEtchedBorder();
+        Border pBorder = BorderFactory.createTitledBorder(b,
+        		"Excitatory/Inhibitory Properties");
+        pPanel.setBorder(pBorder);
+        
+        //Add the first sub-sub panel (eip and synapse properties)
+        this.add(pPanel, BorderLayout.CENTER);
+       
+    }
+    
 
     /**
      * {@inheritDoc}
      */
-    public void commitChanges() {
+    public void commitChanges() {     
+        eirPanel.commitChanges();
+        spPanel.commitChanges();
         ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
                 .isSelected());
-        eipPanel.commitChanges();
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-
     }
+
+	@Override
+	public void fillFieldValues(ConnectNeurons connection)
+			throws ClassCastException {
+		eirPanel.fillFieldValues(connection);
+		spPanel.fillFieldValues(connection);	
+	}
 
 }

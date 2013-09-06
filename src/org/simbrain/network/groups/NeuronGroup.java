@@ -345,6 +345,66 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Returns the maximum X position of this group based on the neurons that
+     * comprise it.
+     * @return the x position of the farthest right neuron in the group.
+     */
+    public double getMaxX(){
+        double max = Double.NEGATIVE_INFINITY;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getX() > max) {
+                max = neuron.getX();
+            }
+        }
+        return max;
+    }
+    
+    /**
+     * Returns the minimum X position of this group based on the neurons that
+     * comprise it.
+     * @return the x position of the farthest left neuron in the group.
+     */
+    public double getMinX(){
+        double min = Double.POSITIVE_INFINITY;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getX() < min) {
+                min = neuron.getX();
+            }
+        }
+        return min;
+    }
+    
+    /**
+     * Returns the maximum Y position of this group based on the neurons that
+     * comprise it.
+     * @return the y position of the farthest north neuron in the group.
+     */
+    public double getMaxY() {
+    	  double max = Double.NEGATIVE_INFINITY;
+          for (Neuron neuron : neuronList) {
+              if (neuron.getY() > max) {
+                  max = neuron.getY();
+              }
+          }
+          return max;
+    }
+    
+    /**
+     * Returns the minimum Y position of this group based on the neurons that
+     * comprise it.
+     * @return the y position of the farthest south neuron in the group.
+     */
+    public double getMinY(){
+        double min = Double.POSITIVE_INFINITY;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getY() < min) {
+                min = neuron.getY();
+            }
+        }
+        return min;
+    }
+    
+    /**
      * Return the height of this group, based on the positions of the neurons
      * that comprise it.
      *

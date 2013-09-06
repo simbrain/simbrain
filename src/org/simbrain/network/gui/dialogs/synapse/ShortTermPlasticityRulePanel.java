@@ -18,8 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.util.TristateDropDown;
@@ -152,4 +155,74 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
             }
         }
     }
+
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		synapseRef = new ShortTermPlasticityRule();
+		
+		  if (!cbPlasticityType.isNull()) {
+              synapseRef.setPlasticityType(cbPlasticityType
+                      .getSelectedIndex());
+          }
+
+          if (!tfBaseLineStrength.getText().equals(NULL_STRING)) {
+              synapseRef.setBaseLineStrength(Double
+                      .parseDouble(tfBaseLineStrength.getText()));
+          }
+
+          if (!tfFiringThreshold.getText().equals(NULL_STRING)) {
+              synapseRef.setFiringThreshold(Double
+                      .parseDouble(tfFiringThreshold.getText()));
+          }
+
+          if (!tfBumpRate.getText().equals(NULL_STRING)) {
+              synapseRef
+                      .setBumpRate(Double.parseDouble(tfBumpRate.getText()));
+          }
+
+          if (!tfDecayRate.getText().equals(NULL_STRING)) {
+              synapseRef.setDecayRate(Double.parseDouble(tfDecayRate
+                      .getText()));
+          }
+          
+  		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}      
+		
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		
+		synapseRef = new ShortTermPlasticityRule();
+		
+		  if (!cbPlasticityType.isNull()) {
+            synapseRef.setPlasticityType(cbPlasticityType
+                    .getSelectedIndex());
+        }
+
+        if (!tfBaseLineStrength.getText().equals(NULL_STRING)) {
+            synapseRef.setBaseLineStrength(Double
+                    .parseDouble(tfBaseLineStrength.getText()));
+        }
+
+        if (!tfFiringThreshold.getText().equals(NULL_STRING)) {
+            synapseRef.setFiringThreshold(Double
+                    .parseDouble(tfFiringThreshold.getText()));
+        }
+
+        if (!tfBumpRate.getText().equals(NULL_STRING)) {
+            synapseRef
+                    .setBumpRate(Double.parseDouble(tfBumpRate.getText()));
+        }
+
+        if (!tfDecayRate.getText().equals(NULL_STRING)) {
+            synapseRef.setDecayRate(Double.parseDouble(tfDecayRate
+                    .getText()));
+        }
+		
+		templateSynapse.setLearningRule(synapseRef);
+		
+	}
 }

@@ -310,4 +310,24 @@ public abstract class ConnectNeurons {
         this.targetNeurons = target;
     }
 
+	public void setInhibitoryRandomizer(Randomizer inhibitoryRandomizer) {
+		this.inhibitoryRandomizer = inhibitoryRandomizer;
+	}
+
+	public void setExcitatoryRandomizer(Randomizer excitatoryRandomizer) {
+		this.excitatoryRandomizer = excitatoryRandomizer;
+	}
+
+	public double getExcitatoryRatio() {
+		return excitatoryRatio;
+	}
+
+	public boolean isEnableExcitatoryRandomization() {
+		return enableExcitatoryRandomization;
+	}
+
+	public boolean isEnableInhibitoryRandomization() {
+		return enableInhibitoryRandomization;
+	}
+
 }

@@ -18,8 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.OjaRule;
 
@@ -95,4 +98,43 @@ public class OjaRulePanel extends AbstractSynapsePanel {
             }
         }
     }
+
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		 OjaRule synapseRef = new OjaRule();
+
+         if (!tfNormalize.getText().equals(NULL_STRING)) {
+             synapseRef.setNormalizationFactor(Double
+                     .parseDouble(tfNormalize.getText()));
+         }
+
+         if (!tfLearningRate.getText().equals(NULL_STRING)) {
+             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                     .getText()));
+         }
+		
+ 		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}
+         
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		 OjaRule synapseRef = new OjaRule();
+
+         if (!tfNormalize.getText().equals(NULL_STRING)) {
+             synapseRef.setNormalizationFactor(Double
+                     .parseDouble(tfNormalize.getText()));
+         }
+
+         if (!tfLearningRate.getText().equals(NULL_STRING)) {
+             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                     .getText()));
+         }		
+ 		
+			templateSynapse.setLearningRule(synapseRef);	
+		
+	}
 }

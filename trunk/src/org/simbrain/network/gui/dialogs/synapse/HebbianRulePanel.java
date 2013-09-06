@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
 
 /**
@@ -76,4 +80,34 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
             }
         }
     }
+    
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		synapseRef = new HebbianRule();		
+		
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+        
+		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}
+        
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		synapseRef = new HebbianRule();		
+		
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+		
+        templateSynapse.setLearningRule(synapseRef); 
+        
+	}
+	
 }

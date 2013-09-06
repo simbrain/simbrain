@@ -22,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -91,4 +92,11 @@ public class OneToOnePanel extends AbstractConnectionPanel {
                 .getConnectOrientation());
     }
 
+    /**
+     * 
+     */
+    public void fillFieldValues(ConnectNeurons connection){
+    	//TODO Auto-Generated Method Stub
+    }
+    
 }

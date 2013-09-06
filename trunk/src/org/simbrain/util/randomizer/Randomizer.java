@@ -80,6 +80,27 @@ public class Randomizer {
     }
 
     /**
+     * Creates a "mirrored" copy of this randomizer, wherein the mirror's
+     * lower bound is set to the additive inverse of the original's
+     * upper bound and likewise the mirror's upper bound is set to the
+     * additive inverse of the original's lower bound. The mean of the mirror
+     * is the additive inverse of the mean of the original. The standard
+     * deviation and clipping are directly copied.
+     * 
+     * @return a mirrored copy of this randomizer
+     */
+    public Randomizer mirrorCopy() {
+    	Randomizer mirror = new Randomizer();
+    	mirror.setDistributionIndex(this.getDistributionIndex());
+    	mirror.setLowerBound(-this.getUpperBound());
+    	mirror.setUpperBound(-this.getLowerBound());
+    	mirror.setMean(-this.getMean());
+    	mirror.setStandardDeviation(this.getStandardDeviation());
+    	mirror.setClipping(this.getClipping());
+    	return mirror;
+    }
+    
+    /**
      * Returns a random number.
      *
      * @return the next random number

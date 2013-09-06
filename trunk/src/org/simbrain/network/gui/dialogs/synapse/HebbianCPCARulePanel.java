@@ -18,8 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 
@@ -117,4 +120,51 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
             }
         }
     }
+
+	@Override
+	public void commitChanges(List<Synapse> commitSynapses) {
+		
+		synapseRef = new HebbianCPCARule();		
+		
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+        if (!tfM.getText().equals(NULL_STRING)) {
+            synapseRef.setM(Double.parseDouble(tfM.getText()));
+        }
+        if (!tfTheta.getText().equals(NULL_STRING)) {
+            synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
+        }
+        if (!tfLambda.getText().equals(NULL_STRING)) {
+            synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
+        }
+        
+		for(Synapse s : commitSynapses) {
+			s.setLearningRule(synapseRef);
+		}
+        
+	}
+
+	@Override
+	public void commitChanges(Synapse templateSynapse) {
+		synapseRef = new HebbianCPCARule();		
+		
+        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                    .getText()));
+        }
+        if (!tfM.getText().equals(NULL_STRING)) {
+            synapseRef.setM(Double.parseDouble(tfM.getText()));
+        }
+        if (!tfTheta.getText().equals(NULL_STRING)) {
+            synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
+        }
+        if (!tfLambda.getText().equals(NULL_STRING)) {
+            synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
+        }
+		
+        templateSynapse.setLearningRule(synapseRef); 
+	}
+    
 }

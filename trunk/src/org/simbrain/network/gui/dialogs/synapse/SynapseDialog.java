@@ -233,7 +233,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * @param updateRuleClass the class to match
      * @return panel the matching panel
      */
-    private AbstractSynapsePanel getSynapsePanel(Class<?> updateRuleClass) {
+    public static AbstractSynapsePanel getSynapsePanel(Class<?> updateRuleClass) {
         // The panel name to look for
         String panelClassName = "org.simbrain.network.gui.dialogs.synapse."
                 + updateRuleClass.getSimpleName() + "Panel";

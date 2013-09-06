@@ -43,7 +43,7 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryPropertiesPanel;
+import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryRatioPanel;
 
 /**
  * Panel for adjusting the connectivity between a source and target set of
@@ -54,7 +54,7 @@ import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryPropertiesPa
  */
 public class ConnectivityAdjustmentPanel extends JPanel {
 
-    private final ExcitatoryInhibitoryPropertiesPanel eipPanel;
+    private final ExcitatoryInhibitoryRatioPanel eipPanel;
 
     /** A slider for setting the sparsity of the connections. */
     private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
@@ -92,7 +92,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
     public ConnectivityAdjustmentPanel(final Sparse connection,
             final NetworkPanel networkPanel) {
-        eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
+        eipPanel = new ExcitatoryInhibitoryRatioPanel(connection);
         // eipPanel.turnStuffOff = true;
         numTargs = networkPanel.getSelectedModelNeurons().size();
         // fillFieldValues();

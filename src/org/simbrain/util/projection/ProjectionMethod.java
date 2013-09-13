@@ -63,4 +63,17 @@ public abstract class ProjectionMethod {
         return this instanceof IterableProjectionMethod;
     }
 
+    /**
+     * Some projection methods require a certain number of datapoints to be
+     * added before they work well. By default this is 0 because most methods
+     * don't require this. Those methods that do can override this. It is used
+     * to generate a warning in the GUI if a method is selected when fewer then
+     * suggested min points have been added to the dataset.
+     *
+     * @return the suggested minimum number of points.
+     */
+    public int suggestedMinPoints() {
+        return 0;
+    }
+
 }

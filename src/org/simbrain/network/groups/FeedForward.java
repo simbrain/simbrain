@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.util.NetworkLayoutManager;
@@ -79,7 +79,7 @@ public class FeedForward extends Subnetwork {
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
         super(network);
-        Neuron neuron = new Neuron(network, new ClampedNeuronRule());
+        Neuron neuron = new Neuron(network, new LinearRule());
         neuron.setIncrement(1); // For easier testing
         neuron.setLowerBound(0);
         buildNetwork(network, nodesPerLayer, initialPosition, neuron);

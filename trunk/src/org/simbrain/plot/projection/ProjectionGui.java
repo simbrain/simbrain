@@ -411,12 +411,9 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
                 "Datapoint Coloring...");
         colorPrefs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
-                        getWorkspaceComponent().getProjectionModel()
-                                .getProjector().getColorManager());
-                JDialog dialog = editor.getDialog();
+                DataPointColoringDialog dialog = new DataPointColoringDialog(
+                        getWorkspaceComponent().getProjectionModel());
                 dialog.pack();
-                dialog.setContentPane(editor);
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
 

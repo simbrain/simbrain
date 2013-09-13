@@ -67,7 +67,7 @@ public class DataColoringManager {
     /**
      * The lower bound for "activation" of a point in frequency and decay trail.
      */
-    private double floor = 3;
+    private double floor = 1;
 
     /**
      * The upper bound for "activation" of a point in frequency and decay trail.
@@ -84,7 +84,7 @@ public class DataColoringManager {
      * How much to decrement activation at each time step (used in decay trail
      * coloring method).
      */
-    private double decrementAmount = .5;
+    private double decrementAmount = .2;
 
     /**
      * Helper variable holding the float representation of the current base
@@ -140,30 +140,35 @@ public class DataColoringManager {
     }
 
     /**
-     * Get the coloring method.
+     * Get the coloring method as a string.
      *
-     * @return the method
+     * @return coloringMethodString the coloring method
      */
-    @DisplayOrder(val = 1)
-    public ComboBoxWrapper getColoringMethod() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return coloringMethod;
-            }
-
-            public Object[] getObjects() {
-                return ColoringMethod.values();
-            }
-        };
+    public String getColoringMethodString() {
+        if (coloringMethod == ColoringMethod.HotPoint) {
+            return "HotPoint";
+        } else if (coloringMethod == ColoringMethod.DecayTrail) {
+            return "DecayTrail";
+        } else if (coloringMethod == ColoringMethod.Frequency) {
+            return "Frequency";
+        } else {
+            return "None";
+        }
     }
 
     /**
      * Set the coloring method.
-     *
-     * @param method the method to set
      */
-    public void setColoringMethod(ComboBoxWrapper method) {
-        coloringMethod = ((ColoringMethod) method.getCurrentObject());
+    public void setColoringMethod(String selectedMethod) {
+        if (selectedMethod == "None") {
+            coloringMethod = ColoringMethod.None;
+        } else if (selectedMethod == "HotPoint") {
+            coloringMethod = ColoringMethod.HotPoint;
+        } else if (selectedMethod == "DecayTrail") {
+            coloringMethod = ColoringMethod.DecayTrail;
+        } else if (selectedMethod == "Frequency") {
+            coloringMethod = ColoringMethod.Frequency;
+        }
     }
 
     /**
@@ -226,6 +231,7 @@ public class DataColoringManager {
      */
     public void setBaseColor(Color baseColor) {
         this.baseColor = baseColor;
+        floatColor = Utils.colorToFloat(baseColor);
     }
 
     /**

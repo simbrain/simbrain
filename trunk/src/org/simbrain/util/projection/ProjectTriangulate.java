@@ -112,4 +112,9 @@ public class ProjectTriangulate extends ProjectionMethod {
         }
     }
 
+    @Override
+    public int suggestedMinPoints() {
+        return 10;
+    }
+
 }

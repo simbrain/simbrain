@@ -32,7 +32,7 @@ package org.simbrain.util.projection;
  * projection method (whichever one is currently being used).
  *
  * (4) Applies the affine map to the new datapoint.
- * 
+ *
  * @author Scott Hotton
  */
 public class ProjectNNSubspace extends ProjectionMethod {
@@ -74,8 +74,12 @@ public class ProjectNNSubspace extends ProjectionMethod {
         projector.getDownstairs().perturbOverlappingPoints(.0000001);
 
         switch (numPoints) { // assumes numPoints is a positive integer
+        case -1: {
+            return;
+        }
         case 0: {
             lastAdded2D.setData(new double[] { 0, 0 });
+            return;
         }
         case 1: {
             System.out.println("Only one point upstairs");
@@ -239,5 +243,10 @@ public class ProjectNNSubspace extends ProjectionMethod {
         }
         }
 
+    }
+
+    @Override
+    public int suggestedMinPoints() {
+        return 10;
     }
 }

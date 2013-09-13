@@ -24,11 +24,16 @@ import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -39,6 +44,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 import org.jfree.chart.ChartFactory;
@@ -56,9 +62,12 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.IterableProjectionMethod;
+import org.simbrain.util.projection.ProjectCoordinate;
+import org.simbrain.util.projection.ProjectSammon;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.util.projection.ProjectorListener;
+import org.simbrain.util.projection.ProjectorPreferences;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -129,6 +138,20 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
     /** Show error option. */
     private boolean showError = true;
 
+    /** Warning label. */
+    JLabel warningLabel = new JLabel(
+            ResourceManager.getImageIcon("Warning.png"));
+
+    /** Shows the epsilon value for Sammon map. */
+    JTextField sammonEpsilon = new JTextField(""
+            + ProjectorPreferences.getEpsilon());
+
+    /** Combo box for first dimension of coordinate projection. */
+    private JComboBox<Integer> adjustDimension1 = new JComboBox<Integer>();
+
+    /** Combo box for first dimension of coordinate projection. */
+    private JComboBox<Integer> adjustDimension2 = new JComboBox<Integer>();
+
     /** Plot Action Manager. */
     private PlotActionManager actionManager;
 
@@ -145,8 +168,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
 
         @Override
         public Paint getItemPaint(int row, int column) {
-            Projector projector = getWorkspaceComponent()
-                    .getProjectionModel().getProjector();
+            Projector projector = getWorkspaceComponent().getProjectionModel()
+                    .getProjector();
             return ((DataPointColored) projector.getUpstairs().getPoint(column))
                     .getColor();
         }
@@ -160,8 +183,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
     private class CustomToolTipGenerator extends CustomXYToolTipGenerator {
         @Override
         public String generateToolTip(XYDataset data, int series, int item) {
-            return Utils.doubleArrayToString(getWorkspaceComponent().getProjector()
-                    .getUpstairs().getPoint(item).getVector());
+            return Utils.doubleArrayToString(getWorkspaceComponent()
+                    .getProjector().getUpstairs().getPoint(item).getVector());
         }
     }
 
@@ -222,6 +245,20 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
         theToolBar.add(iterateBtn);
         theToolBar.add(clearBtn);
         theToolBar.add(randomBtn);
+        theToolBar.addSeparator();
+        theToolBar.add(warningLabel);
+        theToolBar.add(sammonEpsilon);
+        theToolBar.add(adjustDimension1);
+        theToolBar.add(adjustDimension2);
+        sammonEpsilon.setColumns(3);
+
+        // Set up Warning Label
+        warningLabel.setPreferredSize(new Dimension(16, 16));
+        warningLabel.setToolTipText("This method works best with more "
+                + "datapoints already added");
+
+        // Set up coordinate projection combo boxes
+        initCoordinateProjectionComboBoxes();
 
         // Add/Remove dimension buttons
         JButton addButton = new JButton("Add Dimension");
@@ -259,6 +296,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
         addListeners();
     }
 
+
     /**
      * Add listeners. The chart listener mainly concerns workspace and gui level
      * stuff. The projector listener concerns the underlying projection model.
@@ -295,30 +333,107 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
 
         // List to events from the underlying projector model.
         // Currently the main action is to just update the labels at the bottom.
-        getWorkspaceComponent().getProjectionModel()
-        .getProjector().addListener(new ProjectorListener() {
+        getWorkspaceComponent().getProjectionModel().getProjector()
+                .addListener(new ProjectorListener() {
 
+                    @Override
+                    public void projectionMethodChanged() {
+                        updateProjectionListCurrentItem();
+                        update();
+                    }
+
+                    @Override
+                    public void projectorDataChanged() {
+                        update();
+                    }
+
+                    @Override
+                    public void datapointAdded() {
+                        update();
+                    }
+
+                    @Override
+                    public void projectorColorsChanged() {
+                    }
+
+                });
+
+        // Epsilon field should update the model whenever a user clicks out of
+        // it.
+        sammonEpsilon.addFocusListener(new FocusAdapter() {
             @Override
-            public void projectionMethodChanged() {
-                updateProjectionListCurrentItem();
-                update();
+            public void focusLost(FocusEvent e) {
+                ProjectionMethod proj = getWorkspaceComponent().getProjector()
+                        .getProjectionMethod();
+                if (proj != null) {
+                    if (proj instanceof ProjectSammon) {
+                        ((ProjectSammon) proj).setEpsilon(Double
+                                .parseDouble(sammonEpsilon.getText()));
+                    }
+                }
             }
+        });
+
+
+    }
+
+    /**
+     * Initialize the Coordinate projection combo boxes.
+     */
+    private void initCoordinateProjectionComboBoxes() {
+
+        // Initialize the coordinate combo boxes with an appropriate number of
+        //  numbers
+        int dims = getWorkspaceComponent().getProjector()
+                .getDimensions();
+        Integer[] array1 = new Integer[dims];
+        Integer[] array2 = new Integer[dims];
+        for (int i = 0; i < dims; i++) {
+            array1[i] = i + 1;
+            array2[i] = i + 1;
+        }
+        adjustDimension1.setModel(new DefaultComboBoxModel<Integer>(array1));
+        adjustDimension1.addActionListener(new ActionListener() {
 
             @Override
-            public void projectorDataChanged() {
-                update();
-            }
-
-            @Override
-            public void datapointAdded() {
-                update();
-            }
-
-            @Override
-            public void projectorColorsChanged() {
+            public void actionPerformed(ActionEvent e) {
+                ProjectionMethod proj = getWorkspaceComponent().getProjector()
+                        .getProjectionMethod();
+                if (proj != null) {
+                    if (proj instanceof ProjectCoordinate) {
+                        ((ProjectCoordinate) proj).setHiD1(adjustDimension1
+                                .getSelectedIndex());
+                        ((ProjectCoordinate) proj).project();
+                        getWorkspaceComponent().getProjector()
+                                .fireProjectorDataChanged();
+                    }
+                }
             }
 
         });
+        adjustDimension1.setSelectedIndex(ProjectorPreferences.getHiDim1());
+
+        adjustDimension2.setModel(new DefaultComboBoxModel<Integer>(array2));
+        adjustDimension2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProjectionMethod proj = getWorkspaceComponent().getProjector()
+                        .getProjectionMethod();
+                if (proj != null) {
+                    if (proj instanceof ProjectCoordinate) {
+                        ((ProjectCoordinate) proj).setHiD2(adjustDimension2
+                                .getSelectedIndex());
+                        ((ProjectCoordinate) proj).project();
+                        getWorkspaceComponent().getProjector()
+                                .fireProjectorDataChanged();
+
+                    }
+                }
+            }
+
+        });
+        adjustDimension2.setSelectedIndex(ProjectorPreferences.getHiDim2());
     }
 
     /**
@@ -326,14 +441,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
      * underlying projector object.
      */
     private void updateProjectionListCurrentItem() {
-        if (getWorkspaceComponent()
-                .getProjectionModel().getProjector()
+        if (getWorkspaceComponent().getProjectionModel().getProjector()
                 .getCurrentMethod() == null) {
             return;
         }
         projectionList.setSelectedItem(getWorkspaceComponent()
-                .getProjectionModel().getProjector()
-                .getCurrentMethod());
+                .getProjectionModel().getProjector().getCurrentMethod());
 
     }
 
@@ -382,13 +495,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
                 dialog.setContentPane(editor);
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-
             }
 
         });
         editMenu.add(preferencesGeneral);
 
-        final JMenuItem preferences = new JMenuItem("Projection Method Preferences...");
+        final JMenuItem preferences = new JMenuItem(
+                "Projection Method Preferences...");
         preferences.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
@@ -407,12 +520,20 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
         editMenu.add(preferences);
         editMenu.addSeparator();
 
-        final JMenuItem colorPrefs = new JMenuItem(
-                "Datapoint Coloring...");
+        final JMenuItem colorPrefs = new JMenuItem("Datapoint Coloring...");
         colorPrefs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 DataPointColoringDialog dialog = new DataPointColoringDialog(
                         getWorkspaceComponent().getProjectionModel());
+                dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                dialog.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        System.out.println("closing...");
+                        update();
+                    }
+                });
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -427,14 +548,14 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
             public void actionPerformed(ActionEvent arg0) {
                 String dimensions = JOptionPane.showInputDialog("Dimensions:");
                 if (dimensions != null) {
-                    getWorkspaceComponent().getProjectionModel().getProjector().init(
-                            Integer.parseInt(dimensions));
+                    getWorkspaceComponent().getProjectionModel().getProjector()
+                            .init(Integer.parseInt(dimensions));
                 }
 
             }
 
         });
-        //editMenu.add(dims);
+        // editMenu.add(dims);
 
         JMenu helpMenu = new JMenu("Help");
         ShowHelpAction helpAction = new ShowHelpAction(
@@ -472,6 +593,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
                     + ((IterableProjectionMethod) getWorkspaceComponent()
                             .getProjector().getProjectionMethod()).getError());
         }
+        //initCoordinateProjectionComboBoxes();
     }
 
     /**
@@ -487,17 +609,45 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
 
             getWorkspaceComponent().getProjector().setProjectionMethod(
                     selectedMethod);
-
             ProjectionMethod proj = getWorkspaceComponent().getProjector()
                     .getProjectionMethod();
             if (proj == null) {
                 return;
             }
+
+            // Clear things
+            if (!(proj instanceof ProjectSammon)) {
+                sammonEpsilon.setVisible(false);
+            }
+            if (!(proj instanceof ProjectCoordinate)) {
+                adjustDimension1.setVisible(false);
+                adjustDimension2.setVisible(false);
+            }
+
+            // Handle error bar
             if ((proj.isIterable()) && (showError)) {
                 errorBar.setVisible(true);
             } else {
                 errorBar.setVisible(false);
             }
+
+            // Handle warning
+            if (getWorkspaceComponent().getProjector().getNumPoints() < proj
+                    .suggestedMinPoints()) {
+                warningLabel.setVisible(true);
+            } else {
+                warningLabel.setVisible(false);
+            }
+
+            // Handle new toolbar items
+            if (proj instanceof ProjectSammon) {
+                sammonEpsilon.setVisible(true);
+            } else if (proj instanceof ProjectCoordinate) {
+                adjustDimension1.setVisible(true);
+                adjustDimension2.setVisible(true);
+            }
+
+            // Handle iterable
             setToolbarIterable(proj.isIterable());
         }
 

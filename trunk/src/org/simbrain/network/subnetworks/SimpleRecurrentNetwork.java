@@ -33,14 +33,12 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
-import org.simbrain.network.trainers.BackpropTrainer;
-import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
-import org.simbrain.util.Utils;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991).
@@ -111,7 +109,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
 
         // TODO: Think about these defaults...
-        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(), 0,
+        initializeLayer(inputLayerNeurons, new LinearRule(), 0,
                 numInputNodes);
         initializeLayer(hiddenLayerNeurons, hiddenNeuronType, -1,
                 numHiddenNodes);

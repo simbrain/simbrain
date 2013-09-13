@@ -195,7 +195,7 @@ public class Competitive extends NeuronGroup {
                     * synapse.getTarget().getActivation()
                     * (synapse.getSource().getActivation() - synapse
                             .getTarget().getAverageInput());
-            synapse.setStrength(synapse.getStrength() + deltaw);
+            synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
         }
     }
 
@@ -218,7 +218,7 @@ public class Competitive extends NeuronGroup {
             }
 
             double deltaw = learningRate * (activation - synapse.getStrength());
-            synapse.setStrength(synapse.getStrength() + deltaw);
+            synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
         }
     }
 
@@ -244,7 +244,9 @@ public class Competitive extends NeuronGroup {
         for (Synapse incoming : neuron.getFanIn()) {
             activation = incoming.getSource().getActivation();
             if (normalizeInputs) {
-                activation /= sumOfInputs;
+                if (sumOfInputs != 0) {
+                    activation =  activation / sumOfInputs;                    
+                }
             }
             val = incoming.getStrength() + leakyLearningRate
                     * (activation - incoming.getStrength());
@@ -280,6 +282,8 @@ public class Competitive extends NeuronGroup {
 
     /**
      * Randomize all weights coming in to this network.
+     *
+     * TODO: Add gaussian option...
      */
     public void randomizeIncomingWeights() {
 

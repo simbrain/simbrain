@@ -18,14 +18,19 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.LogisticRule;
 
 /**
- * <b>LogisticNeuronPanel</b>.
+ * <b>LogisticNeuronPanel</b>
+ * TODO: Work into new Input Generator Framework, currently no implementation.
  */
 public class LogisticRulePanel extends AbstractNeuronPanel {
 
@@ -43,20 +48,20 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
                 + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
     }
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-        LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
-
-        tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-
-        // Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
-                "getGrowthRate")) {
-            tfGrowthRate.setText(NULL_STRING);
-        }
-    }
+//    /**
+//     * Populate fields with current data.
+//     */
+//    public void fillFieldValues() {
+//        LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
+//
+//        tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
+//
+//        // Handle consistency of multiple selections
+//        if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
+//                "getGrowthRate")) {
+//            tfGrowthRate.setText(NULL_STRING);
+//        }
+//    }
 
     /**
      * Populate fields with default data.
@@ -66,17 +71,35 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
         tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
+//    /**
+//     * Called externally when the dialog is closed, to commit any changes made.
+//     */
+//    public void commitChanges() {
+//        for (int i = 0; i < ruleList.size(); i++) {
+//            LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
+//
+//            if (!tfGrowthRate.getText().equals(NULL_STRING)) {
+//                neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
+//                        .getText()));
+//            }
+//        }
+//    }
 
-            if (!tfGrowthRate.getText().equals(NULL_STRING)) {
-                neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
-                        .getText()));
-            }
-        }
-    }
+	@Override
+	public void commitChanges(Neuron neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commitChanges(List<Neuron> neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		// TODO Auto-generated method stub
+		
+	}
 }

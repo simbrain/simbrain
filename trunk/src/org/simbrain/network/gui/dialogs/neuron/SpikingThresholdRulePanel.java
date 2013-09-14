@@ -18,24 +18,21 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import javax.swing.JTabbedPane;
+import java.util.List;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
-import org.simbrain.util.LabelledItemPanel;
 
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>.
+ * TODO: Deactivated until discussion about "SpikingNeuronUpdateRule".
  */
 public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
-
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Time step field. */
     private JTextField tfThreshold = new JTextField();
@@ -53,12 +50,14 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
         SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList.get(0);
 
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, SpikingThresholdRule.class,
                 "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
@@ -74,18 +73,44 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		SpikingThresholdRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof SpikingThresholdRule) {
+			neuronRef = (SpikingThresholdRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new SpikingThresholdRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Threshold
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef
+                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
+		
+	}
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList
-                    .get(i);
-
-            if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef
-                        .setThreshold(Double.parseDouble(tfThreshold.getText()));
-            }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		SpikingThresholdRule neuronRef = new SpikingThresholdRule();
+		
+		// Threshold
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef
+                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
+		
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+        
+	}
+
 }

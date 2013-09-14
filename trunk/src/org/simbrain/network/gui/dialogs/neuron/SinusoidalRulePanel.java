@@ -19,11 +19,14 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.SinusoidalRule;
@@ -71,35 +74,42 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
     /**
      * Populates the field with current data.
      */
-    public void fillFieldValues() {
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+    	
         SinusoidalRule neuronRef = (SinusoidalRule) ruleList.get(0);
 
-        tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
-        tfPhase.setText(Double.toString(neuronRef.getPhase()));
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Frequency
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getFrequency")) {
+                "getFrequency"))
             tfFrequency.setText(NULL_STRING);
-        }
-
+        else
+        	tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
+        
+        // Handle Phase
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getPhase")) {
+                "getPhase"))
             tfPhase.setText(NULL_STRING);
-        }
-
+        else
+        	tfPhase.setText(Double.toString(neuronRef.getPhase()));
+        
+        // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getAddNoise")) {
+                "getAddNoise"))
             isAddNoise.setNull();
-        }
-        randPanel.fillFieldValues(getRandomizers());
+        else
+        	isAddNoise.setSelected(neuronRef.getAddNoise());
+        
+        randPanel.fillFieldValues(getRandomizers(ruleList));
+        
     }
 
     /**
      * @return List of randomizers.
      */
-    private ArrayList<Randomizer> getRandomizers() {
+    private ArrayList<Randomizer> getRandomizers(
+    		List<NeuronUpdateRule> ruleList) {
         ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
@@ -121,25 +131,64 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            SinusoidalRule neuronRef = (SinusoidalRule) ruleList.get(i);
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		SinusoidalRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof SinusoidalRule) {
+			neuronRef = (SinusoidalRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new SinusoidalRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Phase
+        if (!tfPhase.getText().equals(NULL_STRING))
+            neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
+        
+        // Frequency
+        if (!tfFrequency.getText().equals(NULL_STRING)) 
+            neuronRef
+                    .setFrequency(Double.parseDouble(tfFrequency.getText()));
+        
+        // Noise
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());  
 
-            if (!tfPhase.getText().equals(NULL_STRING)) {
-                neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
-            }
-            if (!tfFrequency.getText().equals(NULL_STRING)) {
-                neuronRef
-                        .setFrequency(Double.parseDouble(tfFrequency.getText()));
-            }
-            if (!isAddNoise.isNull()) {
-                neuronRef.setAddNoise(isAddNoise.isSelected());
-            }
+        randPanel.commitRandom(neuronRef.getNoiseGenerator());
+		
+	}
 
-            randPanel.commitRandom(neuronRef.getNoiseGenerator());
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		SinusoidalRule neuronRef = new SinusoidalRule();
+		
+		// Phase
+        if (!tfPhase.getText().equals(NULL_STRING))
+            neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
+        
+        // Frequency
+        if (!tfFrequency.getText().equals(NULL_STRING)) 
+            neuronRef
+                    .setFrequency(Double.parseDouble(tfFrequency.getText()));
+        
+        // Noise
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());  
 
+        randPanel.commitRandom(neuronRef.getNoiseGenerator());
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+		
+	}
+
 }

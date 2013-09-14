@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.StochasticRule;
 
@@ -46,17 +50,20 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
     /**
      * Populates the fields with current data.
      */
-    public void fillFieldValues() {
-        StochasticRule neuronRef = (StochasticRule) ruleList.get(0);
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        
+    	StochasticRule neuronRef = (StochasticRule) ruleList.get(0);
 
-        tfFiringProbability.setText(Double.toString(neuronRef
-                .getFiringProbability()));
-
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Firing Probability
         if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class,
-                "getFiringProbability")) {
+                "getFiringProbability"))
             tfFiringProbability.setText(NULL_STRING);
-        }
+        else
+        	tfFiringProbability.setText(Double.toString(neuronRef
+                    .getFiringProbability()));
+        
     }
 
     /**
@@ -68,17 +75,45 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
                 .getFiringProbability()));
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            StochasticRule neuronRef = (StochasticRule) ruleList.get(i);
 
-            if (!tfFiringProbability.getText().equals(NULL_STRING)) {
-                neuronRef.setFiringProbability(Double
-                        .parseDouble(tfFiringProbability.getText()));
-            }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		StochasticRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof StochasticRule) {
+			neuronRef = (StochasticRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new StochasticRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Firing Probability
+        if (!tfFiringProbability.getText().equals(NULL_STRING))
+            neuronRef.setFiringProbability(Double
+                    .parseDouble(tfFiringProbability.getText()));
+	
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		StochasticRule neuronRef = new StochasticRule();
+		
+		// Firing Probability
+        if (!tfFiringProbability.getText().equals(NULL_STRING))
+            neuronRef.setFiringProbability(Double
+                    .parseDouble(tfFiringProbability.getText()));
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+		
+	}
 }

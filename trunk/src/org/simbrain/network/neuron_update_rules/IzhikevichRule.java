@@ -179,7 +179,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
 
     @Override
     public String getDescription() {
-        return "Izhikevich spiking neuron";
+        return "Izhikevich";
     }
 
 }

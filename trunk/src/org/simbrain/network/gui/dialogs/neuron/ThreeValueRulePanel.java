@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.LabelledItemPanel;
@@ -69,43 +73,56 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        ThreeValueRule neuronRef = (ThreeValueRule) ruleList.get(0);
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        
+    	ThreeValueRule neuronRef = (ThreeValueRule) ruleList.get(0);
 
-        tfLowerThreshold
-                .setText(Double.toString(neuronRef.getLowerThreshold()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfUpperThreshold
-                .setText(Double.toString(neuronRef.getUpperThreshold()));
-        tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
-        tfMiddleValue.setText(Double.toString(neuronRef.getMiddleValue()));
-        tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
-
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+            
+        // Handle Lower Threshold
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getLowerThreshold")) {
+                "getLowerThreshold")) 
             tfLowerThreshold.setText(NULL_STRING);
-        }
+        else
+        	tfLowerThreshold
+            	.setText(Double.toString(neuronRef.getLowerThreshold()));
+        
+        // Handle Upper Threshold
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getBias")) {
-            tfBias.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getUpperThreshold")) {
+                "getUpperThreshold"))
             tfUpperThreshold.setText(NULL_STRING);
-        }
+        else
+        	tfUpperThreshold
+            	.setText(Double.toString(neuronRef.getUpperThreshold()));
+        
+        // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getLowerValue")) {
+                "getBias"))
+            tfBias.setText(NULL_STRING);
+        else
+        	tfBias.setText(Double.toString(neuronRef.getBias()));
+        
+        // Handle Lower Value
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+                "getLowerValue"))
             tfLowerValue.setText(NULL_STRING);
-        }
+        else
+        	tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
+        
+        // Handle Middle Value
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getMiddleValue")) {
+                "getMiddleValue"))
             tfMiddleValue.setText(NULL_STRING);
-        }
+        else
+        	tfMiddleValue.setText(Double.toString(neuronRef.getMiddleValue()));
+        
+        // Handle Upper Value
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getUpperValue")) {
+                "getUpperValue"))
             tfUpperValue.setText(NULL_STRING);
-        }
+        else
+        	tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
+        
     }
 
     /**
@@ -123,36 +140,95 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
         tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            ThreeValueRule neuronRef = (ThreeValueRule) ruleList.get(i);
 
-            if (!tfLowerThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold
-                        .getText()));
-            }
-            if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-            }
-            if (!tfUpperThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setUpperThreshold(Double.parseDouble(tfUpperThreshold
-                        .getText()));
-            }
-            if (!tfLowerValue.getText().equals(NULL_STRING)) {
-                neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
-                        .getText()));
-            }
-            if (!tfMiddleValue.getText().equals(NULL_STRING)) {
-                neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
-                        .getText()));
-            }
-            if (!tfUpperValue.getText().equals(NULL_STRING)) {
-                neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
-                        .getText()));
-            }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		ThreeValueRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof ThreeValueRule) {
+			neuronRef = (ThreeValueRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new ThreeValueRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		
+		// Lower Threshold
+        if (!tfLowerThreshold.getText().equals(NULL_STRING))
+            neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold
+                    .getText()));
+        
+        // Upper Threshold
+        if (!tfUpperThreshold.getText().equals(NULL_STRING))
+            neuronRef.setUpperThreshold(Double.parseDouble(tfUpperThreshold
+                    .getText()));
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Lower Value
+        if (!tfLowerValue.getText().equals(NULL_STRING))
+            neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
+                    .getText()));
+        
+        // Middle Value
+        if (!tfMiddleValue.getText().equals(NULL_STRING))
+            neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
+                    .getText()));
+        
+        // Upper Value
+        if (!tfUpperValue.getText().equals(NULL_STRING))
+            neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
+                    .getText()));
+        
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		ThreeValueRule neuronRef = new ThreeValueRule();
+		
+		// Lower Threshold
+        if (!tfLowerThreshold.getText().equals(NULL_STRING))
+            neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold
+                    .getText()));
+        
+        // Upper Threshold
+        if (!tfUpperThreshold.getText().equals(NULL_STRING))
+            neuronRef.setUpperThreshold(Double.parseDouble(tfUpperThreshold
+                    .getText()));
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Lower Value
+        if (!tfLowerValue.getText().equals(NULL_STRING))
+            neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
+                    .getText()));
+        
+        // Middle Value
+        if (!tfMiddleValue.getText().equals(NULL_STRING))
+            neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
+                    .getText()));
+        
+        // Upper Value
+        if (!tfUpperValue.getText().equals(NULL_STRING))
+            neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
+                    .getText()));
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+		
+	}
+
 }

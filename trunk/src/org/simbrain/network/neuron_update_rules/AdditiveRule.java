@@ -91,7 +91,7 @@ public class AdditiveRule extends NeuronUpdateRule {
         }
 
         double val = neuron.getActivation()
-                + neuron.getParentNetwork().getTimeStep()
+                + neuron.getNetwork().getTimeStep()
                 * (-neuron.getActivation() / resistance + wtdSum);
 
         if (addNoise) {

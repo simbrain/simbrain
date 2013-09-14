@@ -18,18 +18,24 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
- * <b>PointNeuronPanel</b>.
+ * <b>PointNeuronPanel</b>
+ * TODO: Check this class for consistency. Excitatory normalization was removed
+ * because it was both unused and had no accessor methods in PointNeuronRule.
  */
 public class PointNeuronRulePanel extends AbstractNeuronPanel {
 
@@ -60,11 +66,13 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     /** Bias for excitatory inputs. */
     private JTextField tfBias = new JTextField();
 
-    /** Time averaging for excitatory inputs. */
+    
+    /** 
+     * Time averaging for excitatory inputs.
+     * TODO: Rename to "Time Constant"? Inconsistency between name in the rule
+     * panel and name in the rule model class.
+     */
     private JTextField tfTimeAveraging = new JTextField();
-
-    /** A normalization factor for excitatory inputs. */
-    private JTextField tfNormFactor = new JTextField();
 
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
@@ -97,7 +105,6 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         outputFunctionTab.addItem("Gain", tfGain);
         inputsTab.addItem("Bias", tfBias);
         inputsTab.addItem("Time averaging time constant", tfTimeAveraging);
-        inputsTab.addItem("Excitatory normalization factor", tfNormFactor);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(inputsTab, "Inputs");
         tabbedPane.add(outputFunctionTab, "Output Function");
@@ -106,58 +113,81 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        PointNeuronRule neuronRef = (PointNeuronRule) ruleList.get(0);
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        
+    	PointNeuronRule neuronRef = (PointNeuronRule) ruleList.get(0);
 
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
-        tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
-        tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
-        tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
-        tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-        cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
-        tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
-        tfGain.setText(Double.toString(neuronRef.getGain()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfTimeAveraging
-                .setText(Double.toString(neuronRef.getNetTimeConstant()));
-        // tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
-
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Excitatory Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getExcitatoryReversal")) {
+                "getExcitatoryReversal"))
             tfER.setText(NULL_STRING);
-        }
-
+        else
+        	tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
+        
+        // Handle Inhibitory Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getInhibitoryReversal")) {
+                "getInhibitoryReversal"))
             tfIR.setText(NULL_STRING);
-        }
+        else
+        	tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
 
+        // Handle Leak Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getLeakReversal")) {
+                "getLeakReversal"))
             tfLR.setText(NULL_STRING);
-        }
+        else
+        	tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
 
+        // Handle Leak Conductance
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getLeakConductance")) {
+                "getLeakConductance"))
             tfLC.setText(NULL_STRING);
-        }
-        // if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
-        // neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
-        // }
+        else
+        	tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
+        
+        //TODO: Was there a reason this wasn't handled previously?
+        // Handle Output Function
+        if(!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
+        		"getOutputFunction")) {
+        	cbOutputFunction.addItem(NULL_STRING);
+        	cbOutputFunction.setSelectedIndex(cbOutputFunction.getItemCount());
+        } else 
+        	cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
+        
+        // Handles Threshold Potential
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getThresholdPotential")) {
+                "getThresholdPotential"))
             tfThreshold.setText(NULL_STRING);
-        }
+        else
+        	tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
+        
+        // Handle Gain
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getGain")) {
+                "getGain"))
             tfGain.setText(NULL_STRING);
-        }
+        else
+        	tfGain.setText(Double.toString(neuronRef.getGain()));
+        
+        // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getBias")) {
+                "getBias"))
             tfBias.setText(NULL_STRING);
-        }
+        else
+        	tfBias.setText(Double.toString(neuronRef.getBias()));
+        
+        //TODO: Was there a reason this wasn't handled previously?
+        // Handle Time Averaging
+        if(!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
+        		"getNetTimeConstant"))
+        	tfTimeAveraging.setText(NULL_STRING);
+        else
+        	tfTimeAveraging
+            .setText(Double.toString(neuronRef.getNetTimeConstant()));
+        
     }
 
     /**
@@ -180,53 +210,118 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		PointNeuronRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof PointNeuronRule) {
+			neuronRef = (PointNeuronRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new PointNeuronRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Excitatory Reversal	
+        if (!tfER.getText().equals(NULL_STRING))
+            neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
+                    .getText()));
+        
+        // Inhibitory Reversal
+        if (!tfIR.getText().equals(NULL_STRING))
+            neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR
+                    .getText()));
+        
+        // Leak Reversal
+        if (!tfLR.getText().equals(NULL_STRING))
+            neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
+        
+        // Leak Conductance
+        if (!tfLC.getText().equals(NULL_STRING))
+            neuronRef
+                    .setLeakConductance(Double.parseDouble(tfLC.getText()));
+        
+        // Output Function
+        if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING))
+        	neuronRef.setOutputFunction((OutputFunction) cbOutputFunction
+                .getSelectedItem());
+        
+        // Threshold Potential
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold
+                    .getText()));
+        
+        // Gain
+        if (!tfGain.getText().equals(NULL_STRING))
+            neuronRef.setGain(Double.parseDouble(tfGain.getText()));
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Time Averaging
+        if (!tfTimeAveraging.getText().equals(NULL_STRING))
+            neuronRef.setNetTimeConstant((Double
+                    .parseDouble(tfTimeAveraging.getText())));
+		
+	}
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            PointNeuronRule neuronRef = (PointNeuronRule) ruleList.get(i);
-
-            if (!tfER.getText().equals(NULL_STRING)) {
-                neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
-                        .getText()));
-            }
-            if (!tfIR.getText().equals(NULL_STRING)) {
-                neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR
-                        .getText()));
-            }
-            if (!tfLR.getText().equals(NULL_STRING)) {
-                neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
-            }
-            if (!tfLC.getText().equals(NULL_STRING)) {
-                neuronRef
-                        .setLeakConductance(Double.parseDouble(tfLC.getText()));
-            }
-            // if
-            // (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING))
-            // {
-            neuronRef.setOutputFunction((OutputFunction) cbOutputFunction
-                    .getSelectedItem());
-            // }
-            if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold
-                        .getText()));
-            }
-            if (!tfGain.getText().equals(NULL_STRING)) {
-                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
-            }
-            if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-            }
-            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
-                neuronRef.setNetTimeConstant((Double
-                        .parseDouble(tfTimeAveraging.getText())));
-            }
-            // if (!tfNormFactor.getText().equals(NULL_STRING)) {
-            // neuronRef.setNormFactor(Double.parseDouble(tfNormFactor.getText()));
-            // }
-
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		PointNeuronRule neuronRef = new PointNeuronRule();
+		
+		// Excitatory Reversal	
+        if (!tfER.getText().equals(NULL_STRING))
+            neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
+                    .getText()));
+        
+        // Inhibitory Reversal
+        if (!tfIR.getText().equals(NULL_STRING))
+            neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR
+                    .getText()));
+        
+        // Leak Reversal
+        if (!tfLR.getText().equals(NULL_STRING))
+            neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
+        
+        // Leak Conductance
+        if (!tfLC.getText().equals(NULL_STRING))
+            neuronRef
+                    .setLeakConductance(Double.parseDouble(tfLC.getText()));
+        
+        // Output Function
+        if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING))
+        	neuronRef.setOutputFunction((OutputFunction) cbOutputFunction
+                .getSelectedItem());
+        
+        // Threshold Potential
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold
+                    .getText()));
+        
+        // Gain
+        if (!tfGain.getText().equals(NULL_STRING))
+            neuronRef.setGain(Double.parseDouble(tfGain.getText()));
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Time Averaging
+        if (!tfTimeAveraging.getText().equals(NULL_STRING))
+            neuronRef.setNetTimeConstant((Double
+                    .parseDouble(tfTimeAveraging.getText())));
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+		
+	}
+
 }

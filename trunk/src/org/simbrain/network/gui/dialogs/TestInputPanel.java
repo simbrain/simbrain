@@ -254,8 +254,8 @@ public class TestInputPanel extends JPanel {
             network.update();
             network.fireNetworkChanged();
         } else {
-            inputNeurons.get(0).getParentNetwork().update();
-            inputNeurons.get(0).getParentNetwork().fireNetworkChanged();
+            inputNeurons.get(0).getNetwork().update();
+            inputNeurons.get(0).getNetwork().fireNetworkChanged();
         }
         if (iterationMode) {
             advanceRow();

@@ -79,7 +79,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
     /** An ArrayList containing the GUI neurons. */
     private final ArrayList<NeuronNode> nodes = new ArrayList<NeuronNode>();
-
+    
     /**
      * Constructs the dialog.
      *
@@ -93,7 +93,8 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * Initializes the add neurons panel with default settings.
      */
-    private void init() {
+    private void init() {	
+    	
         setTitle("Add Neurons...");
 
         GridBagConstraints c = new GridBagConstraints();

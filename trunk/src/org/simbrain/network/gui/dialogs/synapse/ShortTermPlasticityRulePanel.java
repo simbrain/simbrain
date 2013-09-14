@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.util.TristateDropDown;
@@ -65,52 +66,59 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        synapseRef = (ShortTermPlasticityRule) ruleList.get(0);
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
+    	
+    	synapseRef = (ShortTermPlasticityRule) ruleList.get(0);    
 
-        cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
-        tfBaseLineStrength.setText(Double.toString(synapseRef
-                .getBaseLineStrength()));
-        tfFiringThreshold.setText(Double.toString(synapseRef
-                .getFiringThreshold()));
-        tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
-        tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
-
-        // Handle consistency of multiply selections
+        //(Below) Handle consistency of multiply selections
+        
+        // Handle Plasticity Type
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
-                "getPlasticityType")) {
+                "getPlasticityType")) 
             cbPlasticityType.setNull();
-        }
+        else
+        	cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
 
+        // Handle Base Line Strength
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
-                "getBaseLineStrength")) {
+                "getBaseLineStrength")) 
             tfBaseLineStrength.setText(NULL_STRING);
-        }
+        else
+            tfBaseLineStrength.setText(Double.toString(synapseRef
+                    .getBaseLineStrength()));
 
+        // Handle Firing Threshold
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
-                "getFiringThreshold")) {
+                "getFiringThreshold")) 
             tfFiringThreshold.setText(NULL_STRING);
-        }
+        else
+            tfFiringThreshold.setText(Double.toString(synapseRef
+                    .getFiringThreshold()));
 
+        // Handle Bump Rate
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
-                "getBumpRate")) {
+                "getBumpRate")) 
             tfBumpRate.setText(NULL_STRING);
-        }
+        else
+        	tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
 
+        // Handle Decay Rate
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
-                "getDecayRate")) {
+                "getDecayRate")) 
             tfDecayRate.setText(NULL_STRING);
-        }
+        else
+        	tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
+        
     }
 
     /**
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        // ShortTermPlasticitySynapse synapseRef = new
-        // ShortTermPlasticitySynapse();
+    	
         cbPlasticityType
-                .setSelectedIndex(ShortTermPlasticityRule.DEFAULT_PLASTICITY_TYPE);
+                .setSelectedIndex(ShortTermPlasticityRule
+                		.DEFAULT_PLASTICITY_TYPE);
         tfBaseLineStrength.setText(Double
                 .toString(ShortTermPlasticityRule.DEFAULT_BASE_LINE_STRENGTH));
         tfFiringThreshold.setText(Double
@@ -119,41 +127,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
                 .toString(ShortTermPlasticityRule.DEFAULT_BUMP_RATE));
         tfDecayRate.setText(Double
                 .toString(ShortTermPlasticityRule.DEFAULT_DECAY_RATE));
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            ShortTermPlasticityRule synapseRef = (ShortTermPlasticityRule) ruleList
-                    .get(i);
-
-            if (!cbPlasticityType.isNull()) {
-                synapseRef.setPlasticityType(cbPlasticityType
-                        .getSelectedIndex());
-            }
-
-            if (!tfBaseLineStrength.getText().equals(NULL_STRING)) {
-                synapseRef.setBaseLineStrength(Double
-                        .parseDouble(tfBaseLineStrength.getText()));
-            }
-
-            if (!tfFiringThreshold.getText().equals(NULL_STRING)) {
-                synapseRef.setFiringThreshold(Double
-                        .parseDouble(tfFiringThreshold.getText()));
-            }
-
-            if (!tfBumpRate.getText().equals(NULL_STRING)) {
-                synapseRef
-                        .setBumpRate(Double.parseDouble(tfBumpRate.getText()));
-            }
-
-            if (!tfDecayRate.getText().equals(NULL_STRING)) {
-                synapseRef.setDecayRate(Double.parseDouble(tfDecayRate
-                        .getText()));
-            }
-        }
+        
     }
 
 	@Override
@@ -225,4 +199,5 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
 		templateSynapse.setLearningRule(synapseRef);
 		
 	}
+	
 }

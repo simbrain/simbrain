@@ -25,9 +25,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.gui.dialogs.synapse.ClampedSynapseRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
-import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwitchableActionListener;
 import org.simbrain.util.LinkIcon;
@@ -50,15 +47,15 @@ public class SynapsePropertiesPanel extends JPanel{
      * A combo-box containing select-able synapse learning rules for
      * excitatory synapses.
      */
-	private JComboBox<ClassDescriptionPair> exSynTypes =
-			new JComboBox<ClassDescriptionPair>(Synapse.getRuleList());
+	private JComboBox<String> exSynTypes =
+			new JComboBox<String>(Synapse.getRuleList());
 	
     /** 
      * A combo-box containing select-able synapse learning rules for
      * inhibitory synapses.
      */
-	private JComboBox<ClassDescriptionPair> inSynTypes =
-			new JComboBox<ClassDescriptionPair>(Synapse.getRuleList());	
+	private JComboBox<String> inSynTypes =
+			new JComboBox<String>(Synapse.getRuleList());	
 	
 
 	/**
@@ -289,12 +286,11 @@ public class SynapsePropertiesPanel extends JPanel{
     		   	 public void actionPerformed(ActionEvent e) {
     		   		Object selected = exSynTypes.getSelectedItem();
     	            if (selected != NULL_STRING && isEnabled()) {
-    	            	synapsePanel = SynapseDialog.getSynapsePanel(
-    	            			((ClassDescriptionPair)selected).
-    	            			getTheClass());
+    	            	synapsePanel = Synapse.
+    	            			RULE_MAP.get(exSynTypes.getSelectedItem());
     	                synapsePanel.fillDefaultValues();
-    	                if((((ClassDescriptionPair) selected).getTheClass()) !=
-    	                		ClampedSynapseRule.class){ 	                	
+    	                if(!(synapsePanel instanceof
+    	                		ClampedSynapseRulePanel)){ 	                	
 	    	                StandardDialog sdsp = new StandardDialog(){    	
 	    	                	@Override
 	    	                	protected void closeDialogOk(){
@@ -328,12 +324,11 @@ public class SynapsePropertiesPanel extends JPanel{
     	   	 public void actionPerformed(ActionEvent e) {
     	            Object selected = inSynTypes.getSelectedItem();
     	            if (selected != NULL_STRING && isEnabled()) {
-    	            	synapsePanel = SynapseDialog.getSynapsePanel(
-    	            			((ClassDescriptionPair)selected).
-    	            			getTheClass());
+    	            	synapsePanel = Synapse.
+    	            			RULE_MAP.get(inSynTypes.getSelectedItem());
     	                synapsePanel.fillDefaultValues();
-    	                if((((ClassDescriptionPair) selected).getTheClass()) !=
-    	                		ClampedSynapseRule.class){ 	                	
+    	                if(!(synapsePanel instanceof
+    	                		ClampedSynapseRulePanel)){ 	                	
 	    	                StandardDialog sdsp = new StandardDialog(){    	
 	    	                	@Override
 	    	                	protected void closeDialogOk(){
@@ -512,14 +507,6 @@ public class SynapsePropertiesPanel extends JPanel{
      * Set default values.
      */
     public void fillFieldValues() {
-        Synapse e = Synapse.getTemplateSynapse(
-        		((ClassDescriptionPair)exSynTypes.getSelectedItem()).
-        		getSimpleName());
-        connection.setBaseExcitatorySynapse(e);
-        Synapse i = Synapse.getTemplateSynapse(
-        		((ClassDescriptionPair)inSynTypes.getSelectedItem()).
-        		getSimpleName());
-        connection.setBaseInhibitorySynapse(i);
         inRandPanel.fillFieldValues(connection.getInhibitoryRandomizer());
         exRandPanel.fillFieldValues(connection.getExcitatoryRandomizer());
     }
@@ -542,33 +529,16 @@ public class SynapsePropertiesPanel extends JPanel{
     	exRandPanel.fillFieldValues(connection.getExcitatoryRandomizer());
     	inRandPanel.fillFieldValues(connection.getInhibitoryRandomizer());
     	
-    	setComboBox(connection.getBaseExcitatorySynapse().getLearningRule().
-    			getDescription(), exSynTypes);
-    	setComboBox(connection.getBaseInhibitorySynapse().getLearningRule().
-    			getDescription(), inSynTypes);
+    	exSynTypes.setSelectedItem(connection.getBaseExcitatorySynapse().
+    			getLearningRule().getDescription());
+    	inSynTypes.setSelectedItem(connection.getBaseInhibitorySynapse().
+    			getLearningRule().getDescription());
     	
     	randExListener.enable();
     	randInListener.enable();
     	exSynListener.enable();
     	inSynListener.enable();
     	
-    }
-    
-    /**
-     * Utility for setting the selected item of a combo box based on a synapse's
-     * update rule description.
-     * TODO: This method was directly copied from synapse dialog... bad smell.
-     */
-    private void setComboBox(final String description,
-    		final JComboBox<ClassDescriptionPair> cbSynapseType) {
-        for (int i = 0; i < cbSynapseType.getItemCount(); i++) {
-            ClassDescriptionPair pair = (ClassDescriptionPair) cbSynapseType
-                    .getItemAt(i);
-            if (pair.getDescription().equalsIgnoreCase(description)) {
-                cbSynapseType.setSelectedIndex(i);
-                return;
-            }
-        }
     }
     
     /**

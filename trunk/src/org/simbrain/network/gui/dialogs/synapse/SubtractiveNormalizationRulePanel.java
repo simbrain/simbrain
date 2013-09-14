@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 
@@ -47,16 +48,20 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        synapseRef = (SubtractiveNormalizationRule) ruleList.get(0);
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+    	synapseRef = (SubtractiveNormalizationRule) ruleList.get(0);
 
-        // Handle consistency of multiply selections
+        //(Below) Handle consistency of multiply selections
+        
+        // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList,
-                SubtractiveNormalizationRule.class, "getLearningRate")) {
+                SubtractiveNormalizationRule.class, "getLearningRate"))
             tfLearningRate.setText(NULL_STRING);
-        }
+        else
+        	tfLearningRate.setText(Double.toString(synapseRef
+        			.getLearningRate()));
+        
     }
 
     /**
@@ -67,21 +72,6 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
         // SubtractiveNormalizationSynapse();
         tfLearningRate.setText(Double
                 .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            SubtractiveNormalizationRule synapseRef = (SubtractiveNormalizationRule) ruleList
-                    .get(i);
-
-            if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                        .getText()));
-            }
-        }
     }
 
 	@Override

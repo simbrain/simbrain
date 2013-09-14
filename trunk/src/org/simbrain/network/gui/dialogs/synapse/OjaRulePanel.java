@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.OjaRule;
 
@@ -51,23 +52,28 @@ public class OjaRulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        synapseRef = (OjaRule) ruleList.get(0);
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
+    	
+    	synapseRef = (OjaRule) ruleList.get(0);
 
-        tfNormalize
-                .setText(Double.toString(synapseRef.getNormalizationFactor()));
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-
-        // Handle consistency of multiply selections
+        //(Below) Handle consistency of multiply selections
+        
+        // Handle Normalization Factor
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getNormalizationFactor")) {
+                "getNormalizationFactor")) 
             tfNormalize.setText(NULL_STRING);
-        }
-
+        else
+        	tfNormalize
+            .setText(Double.toString(synapseRef.getNormalizationFactor()));
+        
+        // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getLearningRate")) {
+                "getLearningRate")) 
             tfLearningRate.setText(NULL_STRING);
-        }
+        else
+        	tfLearningRate.setText(
+        			Double.toString(synapseRef.getLearningRate()));
+        
     }
 
     /**
@@ -78,25 +84,6 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         tfNormalize.setText(Double
                 .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
         tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            OjaRule synapseRef = (OjaRule) ruleList.get(i);
-
-            if (!tfNormalize.getText().equals(NULL_STRING)) {
-                synapseRef.setNormalizationFactor(Double
-                        .parseDouble(tfNormalize.getText()));
-            }
-
-            if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                        .getText()));
-            }
-        }
     }
 
 	@Override

@@ -154,12 +154,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
             }
         };
         ret.add(editGroupName);
-        Action removeGroup = new AbstractAction("Remove group") {
-            public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().getNetwork().removeGroup(group);
-            }
-        };
-        ret.add(removeGroup);
+        ret.add(removeGroupAction);
         if (group instanceof Trainable) {
             ret.addSeparator();
             ret.add(testInputAction);
@@ -321,6 +316,22 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     }
 
     /**
+     * Action for removing this group
+     */
+    protected Action removeGroupAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(NAME, "Remove group...");
+            putValue(SHORT_DESCRIPTION, "Remove group...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            getNetworkPanel().getNetwork().removeGroup(group);
+        }
+    };
+    /**
      * Action for testing inputs to trainable networks.
      */
     private Action testInputAction = new AbstractAction() {
@@ -331,6 +342,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
             putValue(SHORT_DESCRIPTION, "Test network...");
         }
 
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             Subnetwork network = (Subnetwork) getGroup();
             if (network instanceof Trainable) {

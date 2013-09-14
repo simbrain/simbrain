@@ -108,7 +108,7 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (neuron.getParentNetwork().getTimeStep() / adaptationTimeConstant)
+            a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant)
                     * (adaptationParameter * val - a);
         } else {
             a = 0;
@@ -123,10 +123,10 @@ public class NakaRushtonRule extends NeuronUpdateRule {
         }
 
         if (addNoise) {
-            val += (neuron.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
+            val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
                     .getRandom()));
         } else {
-            val += (neuron.getParentNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         neuron.setBuffer(val);

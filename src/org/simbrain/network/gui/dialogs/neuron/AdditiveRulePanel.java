@@ -19,16 +19,20 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>AdditiveNeuronPanel</b>.
@@ -79,7 +83,8 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
+    @Override
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
         AdditiveRule neuronRef = (AdditiveRule) ruleList.get(0);
 
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
@@ -109,14 +114,14 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
             isAddNoise.setNull();
         }
 
-        randTab.fillFieldValues(getRandomizers());
+        randTab.fillFieldValues(getRandomizers(ruleList));
     }
 
     /**
      * @return List of radomizers.
      */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
+    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((AdditiveRule) ruleList.get(i)).getNoiseGenerator());
@@ -138,33 +143,70 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
         randTab.fillDefaultValues();
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+		
+		AdditiveRule neuronRef;
+		if(neuron.getUpdateRule() instanceof AdditiveRule) {
+			neuronRef = (AdditiveRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new AdditiveRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		//Lambda
+		if (!tfLambda.getText().equals(NULL_STRING)) 
+			neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));		
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            AdditiveRule neuronRef = (AdditiveRule) ruleList.get(i);
+		//Resistance
+		if (!tfResistance.getText().equals(NULL_STRING)) 
+			neuronRef.setResistance(Double.parseDouble(tfResistance
+					.getText()));		
 
-            if (!tfLambda.getText().equals(NULL_STRING)) {
-                neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));
-            }
+		//Noise On/Of
+		if (!isAddNoise.isNull()) 
+			neuronRef.setClipping(isClipping.isSelected());		
 
-            if (!tfResistance.getText().equals(NULL_STRING)) {
-                neuronRef.setResistance(Double.parseDouble(tfResistance
-                        .getText()));
-            }
+		//Noise
+		if (!isAddNoise.isNull()) 
+			neuronRef.setAddNoise(isAddNoise.isSelected());
+		
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+        		
+	}
 
-            if (!isAddNoise.isNull()) {
-                neuronRef.setClipping(isClipping.isSelected());
-            }
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+		
+		AdditiveRule neuronRef = new AdditiveRule();
+		
+		//Lambda
+		if (!tfLambda.getText().equals(NULL_STRING)) 
+			neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));		
 
-            if (!isAddNoise.isNull()) {
-                neuronRef.setAddNoise(isAddNoise.isSelected());
-            }
+		//Resistance
+		if (!tfResistance.getText().equals(NULL_STRING)) 
+			neuronRef.setResistance(Double.parseDouble(tfResistance
+					.getText()));		
 
-            randTab.commitRandom(neuronRef.getNoiseGenerator());
+		//Noise On/Of
+		if (!isAddNoise.isNull()) 
+			neuronRef.setClipping(isClipping.isSelected());		
+
+		//Noise
+		if (!isAddNoise.isNull()) 
+			neuronRef.setAddNoise(isAddNoise.isSelected());
+		
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+        
+	}
+	
 }

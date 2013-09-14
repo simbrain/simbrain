@@ -18,15 +18,21 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.RunningAverageRule;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
- * <b>RunningAverageNeuronPanel</b>.
+ * <b>RunningAverageNeuronPanel</b>
+ * Unimplemented: Scheduled for deletion pending discussion
+ * because rule model does not work.
  */
 public class RunningAverageRulePanel extends AbstractNeuronPanel {
 
@@ -45,20 +51,20 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
         mainTab.addItem("Rate Constant", tfRateConstant);
     }
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-        RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(0);
-
-        tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
-
-        // Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class,
-                "getRateConstant")) {
-            tfRateConstant.setText(NULL_STRING);
-        }
-    }
+//    /**
+//     * Populate fields with current data.
+//     */
+//    public void fillFieldValues() {
+//        RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(0);
+//
+//        tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
+//
+//        // Handle consistency of multiple selections
+//        if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class,
+//                "getRateConstant")) {
+//            tfRateConstant.setText(NULL_STRING);
+//        }
+//    }
 
     /**
      * Populate fields with default data.
@@ -68,17 +74,35 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
         tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(i);
+//    /**
+//     * Called externally when the dialog is closed, to commit any changes made.
+//     */
+//    public void commitChanges() {
+//        for (int i = 0; i < ruleList.size(); i++) {
+//            RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(i);
+//
+//            if (!tfRateConstant.getText().equals(NULL_STRING)) {
+//                neuronRef.setRateConstant(Double.parseDouble(tfRateConstant
+//                        .getText()));
+//            }
+//        }
+//    }
 
-            if (!tfRateConstant.getText().equals(NULL_STRING)) {
-                neuronRef.setRateConstant(Double.parseDouble(tfRateConstant
-                        .getText()));
-            }
-        }
-    }
+	@Override
+	public void commitChanges(Neuron neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commitChanges(List<Neuron> neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		// TODO Auto-generated method stub
+		
+	}
 }

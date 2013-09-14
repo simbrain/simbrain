@@ -19,13 +19,14 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -39,13 +40,10 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Parent network. */
-    protected final Network parentNet;
+    protected  Network parentNet;
 
     /** Main panel. */
     private final LabelledItemPanel mainPanel = new LabelledItemPanel();
-
-    /** The neuron update rules whose values are being modified. */
-    protected ArrayList<NeuronUpdateRule> ruleList;
 
     /**
      * This method is the default constructor.
@@ -79,7 +77,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * Populate fields with current data.
      */
-    public abstract void fillFieldValues();
+    public abstract void fillFieldValues(List<NeuronUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
@@ -89,21 +87,12 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
-    public abstract void commitChanges();
-
+    public abstract void commitChanges(Neuron neuron);
+    
     /**
-     * @return Returns the neuron_list.
+     * Called externally when the dialog is closed, to commit any changes made.
      */
-    public ArrayList<NeuronUpdateRule> getRuleList() {
-        return ruleList;
-    }
-
-    /**
-     * @param ruleList The neuron_list to set.
-     */
-    public void setRuleList(final ArrayList<NeuronUpdateRule> ruleList) {
-        this.ruleList = ruleList;
-    }
+    public abstract void commitChanges(List<Neuron> neuron);
 
     /**
      * Override to add custom notes or other text to bottom of panel. Can be
@@ -124,4 +113,12 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public Network getParentNetwork() {
         return parentNet;
     }
+
+	public Network getParentNet() {
+		return parentNet;
+	}
+
+	public void setParentNet(Network parentNet) {
+		this.parentNet = parentNet;
+	}
 }

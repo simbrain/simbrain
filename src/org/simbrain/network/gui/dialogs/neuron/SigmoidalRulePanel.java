@@ -19,12 +19,15 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
@@ -78,44 +81,51 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(0);
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        
+    	SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(0);
 
-        cbImplementation.setSelectedItem(neuronRef.getType());
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfSlope.setText(Double.toString(neuronRef.getSlope()));
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-
-        // Handle consistency of multiple selections
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Implementation/Type
         if (!NetworkUtils
                 .isConsistent(ruleList, SigmoidalRule.class, "getType")) {
             if ((cbImplementation.getItemCount() == SigmoidType.values().length)) {
                 cbImplementation.addItem(NULL_STRING);
             }
             cbImplementation.setSelectedIndex(SigmoidType.values().length);
-        }
+        } else 
+        	cbImplementation.setSelectedItem(neuronRef.getType());
 
-        if (!tfBias.getText().equals(NULL_STRING)) {
+        // Handle Bias
+        if (!tfBias.getText().equals(NULL_STRING))
             neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        }
+        else
+        	tfBias.setText(Double.toString(neuronRef.getBias()));
 
+        // Handle Slope
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getSlope")) {
+                "getSlope"))
             tfSlope.setText(NULL_STRING);
-        }
+        else
+        	tfSlope.setText(Double.toString(neuronRef.getSlope()));
 
+        // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getAddNoise")) {
+                "getAddNoise"))
             isAddNoise.setNull();
-        }
+        else
+        	isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        randTab.fillFieldValues(getRandomizers());
+        randTab.fillFieldValues(getRandomizers(ruleList));
+        
     }
 
     /**
      * @return List of randomizers.
      */
-    private ArrayList<Randomizer> getRandomizers() {
+    private ArrayList<Randomizer> getRandomizers(
+    		List<NeuronUpdateRule> ruleList) {
         ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
@@ -139,29 +149,72 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(i);
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		SigmoidalRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof SigmoidalRule) {
+			neuronRef = (SigmoidalRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new SigmoidalRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Implementation: Logistic/Tanh/ArcTan
+        if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
+            neuronRef.setType((SigmoidType) cbImplementation
+                    .getSelectedItem());
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Slope
+        if (!tfSlope.getText().equals(NULL_STRING))
+            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
+        
+        // Noise
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());
 
-            if (!cbImplementation.getSelectedItem().equals(NULL_STRING)) {
-                neuronRef.setType((SigmoidType) cbImplementation
-                        .getSelectedItem());
-            }
-            if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-            }
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+		
+	}
 
-            if (!tfSlope.getText().equals(NULL_STRING)) {
-                neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
-            }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		SigmoidalRule neuronRef = new SigmoidalRule();
+		
+		// Implementation: Logistic/Tanh/ArcTan
+        if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
+            neuronRef.setType((SigmoidType) cbImplementation
+                    .getSelectedItem());
+        
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+        
+        // Slope
+        if (!tfSlope.getText().equals(NULL_STRING))
+            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
+        
+        // Noise
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());
 
-            if (!isAddNoise.isNull()) {
-                neuronRef.setAddNoise(isAddNoise.isSelected());
-            }
-
-            randTab.commitRandom(neuronRef.getNoiseGenerator());
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+        
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+		
+	}
+
 }

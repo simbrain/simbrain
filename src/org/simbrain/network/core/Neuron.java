@@ -21,29 +21,42 @@ package org.simbrain.network.core;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.neuron_update_rules.AdditiveRule;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.BinaryRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.ClampedNeuronRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.DecayRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.IACRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.IntegrateAndFireRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.IzhikevichRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.LinearRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.NakaRushtonRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.PointNeuronRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.RandomNeuronRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.SigmoidalRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.SinusoidalRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.SpikingThresholdRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.StochasticRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.ThreeValueRulePanel;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.LogisticRule;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
-import org.simbrain.network.neuron_update_rules.StochasticRule;
-import org.simbrain.network.neuron_update_rules.ThreeValueRule;
-import org.simbrain.util.ClassDescriptionPair;
 
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
@@ -113,43 +126,43 @@ public class Neuron {
      */
     private int updatePriority = 0;
 
-    /** List of Neuron update rules; used in Gui Combo boxes. */
-    private static final ClassDescriptionPair[] RULE_LIST = {
-            new ClassDescriptionPair(AdditiveRule.class,
-                    new AdditiveRule().getDescription()),
-            new ClassDescriptionPair(BinaryRule.class,
-                    new BinaryRule().getDescription()),
-            new ClassDescriptionPair(ClampedNeuronRule.class,
-                    new ClampedNeuronRule().getDescription()),
-            new ClassDescriptionPair(DecayRule.class,
-                    new DecayRule().getDescription()),
-            new ClassDescriptionPair(IACRule.class,
-                    new IACRule().getDescription()),
-            new ClassDescriptionPair(IntegrateAndFireRule.class,
-                    new IntegrateAndFireRule().getDescription()),
-            new ClassDescriptionPair(IzhikevichRule.class,
-                    new IzhikevichRule().getDescription()),
-            new ClassDescriptionPair(LinearRule.class,
-                    new LinearRule().getDescription()),
-            new ClassDescriptionPair(LogisticRule.class,
-                    new LogisticRule().getDescription()),
-            new ClassDescriptionPair(NakaRushtonRule.class,
-                    new NakaRushtonRule().getDescription()),
-            new ClassDescriptionPair(PointNeuronRule.class,
-                    new PointNeuronRule().getDescription()),
-            new ClassDescriptionPair(RandomNeuronRule.class,
-                    new RandomNeuronRule().getDescription()),
-            new ClassDescriptionPair(SigmoidalRule.class,
-                    new SigmoidalRule().getDescription()),
-            new ClassDescriptionPair(SinusoidalRule.class,
-                    new SinusoidalRule().getDescription()),
-            new ClassDescriptionPair(SpikingThresholdRule.class,
-                    new SpikingThresholdRule().getDescription()),
-            new ClassDescriptionPair(StochasticRule.class,
-                    new StochasticRule().getDescription()),
-            new ClassDescriptionPair(ThreeValueRule.class,
-                    new ThreeValueRule().getDescription()) };
-
+    /**
+     * 
+     */
+    public static final HashMap<String, AbstractNeuronPanel> RULE_MAP =
+    		new HashMap<String, AbstractNeuronPanel>();
+    
+    {
+    	RULE_MAP.put(new BinaryRule().getDescription(),
+    			new BinaryRulePanel(parent));
+    	RULE_MAP.put("Clamped", new ClampedNeuronRulePanel(parent));
+    	RULE_MAP.put(new DecayRule().getDescription(),
+    			new DecayRulePanel(parent));
+    	RULE_MAP.put(new IACRule().getDescription(),
+    			new IACRulePanel(parent));
+    	RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
+    			new IntegrateAndFireRulePanel(parent));
+    	RULE_MAP.put(new IzhikevichRule().getDescription(),
+    			new IzhikevichRulePanel(parent));
+    	RULE_MAP.put(new LinearRule().getDescription(),
+    			new LinearRulePanel(parent));
+    	RULE_MAP.put(new NakaRushtonRule().getDescription(),
+    			new NakaRushtonRulePanel(parent));
+    	RULE_MAP.put(new PointNeuronRule().getDescription(),
+    			new PointNeuronRulePanel(parent));
+    	RULE_MAP.put(new RandomNeuronRule().getDescription(),
+    			new RandomNeuronRulePanel(parent));
+    	RULE_MAP.put(new SigmoidalRule().getDescription(),
+    			new SigmoidalRulePanel(parent));
+    	RULE_MAP.put(new SinusoidalRule().getDescription(),
+    			new SinusoidalRulePanel(parent));
+    	RULE_MAP.put(new SpikingThresholdRule().getDescription(),
+    			new SpikingThresholdRulePanel(parent));
+    	RULE_MAP.put("Stochastic",
+    			new StochasticRulePanel(parent));
+    	RULE_MAP.put("Three Valued", new ThreeValueRulePanel(parent));
+    }
+    
     /**
      * Construct a specific type of neuron from a string description.
      *
@@ -247,7 +260,7 @@ public class Neuron {
         for (Synapse s : getFanOut()) {
             s.initSpikeResponder();
         }
-        if (getParentNetwork() != null) {
+        if (getNetwork() != null) {
             getNetwork().updateTimeType();
             getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
         }
@@ -381,7 +394,7 @@ public class Neuron {
         if (activation < upperBound) {
             activation += increment;
         }
-        this.getParentNetwork().fireNeuronChanged(this);
+        this.getNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -391,7 +404,7 @@ public class Neuron {
         if (activation > lowerBound) {
             activation -= increment;
         }
-        this.getParentNetwork().fireNeuronChanged(this);
+        this.getNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -549,13 +562,6 @@ public class Neuron {
     }
 
     /**
-     * @return reference to the Network object this neuron is part of
-     */
-    public Network getParentNetwork() {
-        return parent;
-    }
-
-    /**
      * Temporary buffer which can be used for algorithms which should not depend
      * on the order in which neurons are updated.
      *
@@ -680,9 +686,9 @@ public class Neuron {
      */
     public void setX(final double x) {
         this.x = x;
-        if (this.getParentNetwork() != null) {
-            if (this.getParentNetwork() != null) {
-                this.getParentNetwork().fireNeuronMoved(this);
+        if (this.getNetwork() != null) {
+            if (this.getNetwork() != null) {
+                this.getNetwork().fireNeuronMoved(this);
             }
         }
     }
@@ -692,8 +698,8 @@ public class Neuron {
      */
     public void setY(final double y) {
         this.y = y;
-        if (this.getParentNetwork() != null) {
-            this.getParentNetwork().fireNeuronMoved(this);
+        if (this.getNetwork() != null) {
+            this.getNetwork().fireNeuronMoved(this);
         }
     }
 
@@ -721,7 +727,7 @@ public class Neuron {
      */
     public void deleteFanIn() {
         for (Synapse synapse : fanIn) {
-            synapse.getParentNetwork().removeSynapse(synapse);
+            synapse.getNetwork().removeSynapse(synapse);
         }
     }
 
@@ -730,7 +736,7 @@ public class Neuron {
      */
     public void deleteFanOut() {
         for (Synapse synapse : fanOut) {
-            synapse.getParentNetwork().removeSynapse(synapse);
+            synapse.getNetwork().removeSynapse(synapse);
         }
     }
 
@@ -787,7 +793,7 @@ public class Neuron {
     public void setUpdatePriority(final int updatePriority) {
         this.updatePriority = updatePriority;
         // Update the root network's priority tree map
-        if (this.getParentNetwork() != null) {
+        if (this.getNetwork() != null) {
             // Resort the neuron in the priority sorted list
             getNetwork().resortPriorities();
         }
@@ -821,7 +827,7 @@ public class Neuron {
      */
     public void setLabel(final String label) {
         this.label = label;
-        this.getParentNetwork().fireNeuronLabelChanged(this);
+        this.getNetwork().fireNeuronLabelChanged(this);
     }
 
     /**
@@ -869,10 +875,45 @@ public class Neuron {
     /**
      * @return the rulelist
      */
-    public static ClassDescriptionPair[] getRulelist() {
-        return RULE_LIST;
+    public static String[] getRulelist() {
+        return RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]);
     }
 
+    
+    /**
+     * A method that returns a compact list of all the neuron update rules 
+     * associated with a list of neurons. The list is compact in the sense
+     * that the size of the list is determined by the number of active update
+     * rule objects managing the neurons in the list. For instance, the list
+     * being queried may have 1000 neurons, but only 1 neuron update rule
+     * since one neuron update rule object can service any number of neurons.
+     * In such a case this method would return a singleton list. This makes
+     * multiple consistency checks down the line much faster.
+     * 
+     * @see org.simbrain.network.gui.dialogs.neuron.NeuronDialog.java
+     * @see org.simbrain.network.gui.NetworkUtils.java
+     * 
+     * TODO: Written with expanding support for heterogeneous groups of
+     * neurons.
+     * 
+     * @param neuronList The list of neurons whose update rules we want to
+     * query.
+     * @return Returns a compact list of neuron update rules associated with
+     * a group of neurons
+     */
+    public static List<NeuronUpdateRule> getRuleList(List<Neuron> neuronList) {
+    	HashSet<NeuronUpdateRule> ruleSet = new HashSet<NeuronUpdateRule>();
+    	
+    	for(Neuron n : neuronList) {
+    		NeuronUpdateRule nur = n.getUpdateRule();
+    		if(!ruleSet.contains(nur))
+    			ruleSet.add(nur);
+    	}	
+    	
+        return Arrays.asList(ruleSet.toArray(new NeuronUpdateRule[ruleSet.size()]));
+        
+    }
+    
     /**
      * TODO: Possibly make this be a NeuronGroup. See design notes.
      *

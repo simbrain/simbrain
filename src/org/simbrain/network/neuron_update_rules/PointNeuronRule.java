@@ -161,8 +161,8 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     public void init(Neuron neuron) {
         neuron.setLowerBound(0);
         setInputLists(neuron);
-        if (neuron.getParentNetwork() != null) {
-            neuron.getParentNetwork().addSynapseListener(this);
+        if (neuron.getNetwork() != null) {
+            neuron.getNetwork().addSynapseListener(this);
         }
 
     }
@@ -322,25 +322,26 @@ public class PointNeuronRule extends NeuronUpdateRule implements
                 + SimbrainMath.roundDouble(leakCurrent, 2);
     }
 
-    /**
-     * Print debugging information.
-     */
-    private void printState(Neuron neuron) {
-        // System.out.println("\nNeuron: " + this.getId());
-        System.out.println("excitatoryConductance:"
-                + SimbrainMath.roundDouble(excitatoryConductance, 2));
-        System.out.println("excitatoryCurrent:"
-                + SimbrainMath.roundDouble(excitatoryCurrent, 2));
-        System.out.println("inhibitoryCurrent:"
-                + SimbrainMath.roundDouble(inhibitoryCurrent, 2));
-        System.out.println("leakCurrent:"
-                + SimbrainMath.roundDouble(leakCurrent, 2));
-        System.out.println("netCurrent:"
-                + SimbrainMath.roundDouble(netCurrent, 2));
-        System.out.println("membranePotential:"
-                + SimbrainMath.roundDouble(membranePotential, 2));
-        System.out.println("output:" + neuron.getActivation());
-    }
+    //TODO: Never Used Locally: Schedule for removal?
+//    /**
+//     * Print debugging information.
+//     */
+//    private void printState(Neuron neuron) {
+//        // System.out.println("\nNeuron: " + this.getId());
+//        System.out.println("excitatoryConductance:"
+//                + SimbrainMath.roundDouble(excitatoryConductance, 2));
+//        System.out.println("excitatoryCurrent:"
+//                + SimbrainMath.roundDouble(excitatoryCurrent, 2));
+//        System.out.println("inhibitoryCurrent:"
+//                + SimbrainMath.roundDouble(inhibitoryCurrent, 2));
+//        System.out.println("leakCurrent:"
+//                + SimbrainMath.roundDouble(leakCurrent, 2));
+//        System.out.println("netCurrent:"
+//                + SimbrainMath.roundDouble(netCurrent, 2));
+//        System.out.println("membranePotential:"
+//                + SimbrainMath.roundDouble(membranePotential, 2));
+//        System.out.println("output:" + neuron.getActivation());
+//    }
 
     /**
      * Returns net input to this neuron (source activations times weights), from

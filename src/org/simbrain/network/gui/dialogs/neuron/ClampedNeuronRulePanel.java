@@ -18,7 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.util.List;
+
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 
 /**
  * <b>ClampedNeuronPanel</b>.
@@ -49,4 +53,23 @@ public class ClampedNeuronRulePanel extends AbstractNeuronPanel {
      */
     public void commitChanges() {
     }
+
+	@Override
+	public void commitChanges(Neuron neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commitChanges(List<Neuron> neuron) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

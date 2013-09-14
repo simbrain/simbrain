@@ -19,11 +19,14 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
@@ -91,63 +94,78 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
         IntegrateAndFireRule neuronRef = (IntegrateAndFireRule) ruleList.get(0);
 
-        tfRestingPotential.setText(Double.toString(neuronRef
-                .getRestingPotential()));
-        tfResistance.setText(Double.toString(neuronRef.getResistance()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfReset.setText(Double.toString(neuronRef.getResetPotential()));
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-        isClipping.setSelected(neuronRef.getClipping());
-
-        // Handle consistency of multiple selections
+        
+        //(Below) Handle consistency of multiple selections
+        
+        // Handle Resting Potential
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getRestingPotential")) {
+                "getRestingPotential")) 
             tfRestingPotential.setText(NULL_STRING);
-        }
+        else
+        	tfRestingPotential.setText(Double.toString(neuronRef
+                    .getRestingPotential()));
 
+        // Handle Resistance
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getResistance")) {
+                "getResistance"))
             tfResistance.setText(NULL_STRING);
-        }
+        else
+        	tfResistance.setText(Double.toString(neuronRef.getResistance()));
 
+        // Handle Clipping
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getClipping")) {
+                "getClipping"))
             isClipping.setNull();
-        }
-
+        else
+        	isClipping.setSelected(neuronRef.getClipping());
+        
+        // Handle Add Noise
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getAddNoise")) {
+                "getAddNoise"))
             isAddNoise.setNull();
-        }
+        else
+        	isAddNoise.setSelected(neuronRef.getAddNoise());
+        
 
+        // Handle Reset Potential
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getResetPotential")) {
+                "getResetPotential"))
             tfReset.setText(NULL_STRING);
-        }
+        else
+        	tfReset.setText(Double.toString(neuronRef.getResetPotential()));
+       
 
+        // Handle Time Constant
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getTimeConstant")) {
+                "getTimeConstant"))
             tfTimeConstant.setText(NULL_STRING);
-        }
+        else
+        	tfTimeConstant.setText(Double.toString(neuronRef.
+        			getTimeConstant()));
+        
 
+        // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-                "getThreshold")) {
+                "getThreshold"))
             tfThreshold.setText(NULL_STRING);
-        }
+        else
+        	tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        
 
-        randTab.fillFieldValues(getRandomizers());
+        randTab.fillFieldValues(getRandomizers(ruleList));
+        
     }
 
     /**
      * @return List of randomizers.
      */
-    private ArrayList<Randomizer> getRandomizers() {
+    private ArrayList<Randomizer> getRandomizers(
+    		List<NeuronUpdateRule> ruleList) {
         ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((IntegrateAndFireRule) ruleList.get(i))
@@ -175,49 +193,106 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+	@Override
+	public void commitChanges(Neuron neuron) {
+		
+		parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+		
+		IntegrateAndFireRule neuronRef;
+		
+		if(neuron.getUpdateRule() instanceof IntegrateAndFireRule) {
+			neuronRef = (IntegrateAndFireRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = new IntegrateAndFireRule();
+			neuron.setUpdateRule(neuronRef);
+		}
+		
+		// Resistance
+		if (!tfResistance.getText().equals(NULL_STRING))
+            neuronRef.setResistance(Double.parseDouble(tfResistance
+                    .getText()));
+ 
+		// Resting Potential
+        if (!tfRestingPotential.getText().equals(NULL_STRING))
+            neuronRef.setRestingPotential(Double
+                    .parseDouble(tfRestingPotential.getText()));
+        
+        // Clipping?
+        if (!isClipping.isNull())
+            neuronRef.setClipping(isClipping.isSelected());
+      
+        // Noise?
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());
+       
+        // Reset Potential
+        if (!tfReset.getText().equals(NULL_STRING))
+            neuronRef.setResetPotential(Double.parseDouble(tfReset
+                    .getText()));
+        
+        // Threshold
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef
+                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
+        
+        // Time Constant
+        if (!tfTimeConstant.getText().equals(NULL_STRING))
+            neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
+                    .getText()));
+        
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+		
+	}
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            IntegrateAndFireRule neuronRef = (IntegrateAndFireRule) ruleList
-                    .get(i);
-
-            if (!tfResistance.getText().equals(NULL_STRING)) {
-                neuronRef.setResistance(Double.parseDouble(tfResistance
-                        .getText()));
-            }
-
-            if (!tfRestingPotential.getText().equals(NULL_STRING)) {
-                neuronRef.setRestingPotential(Double
-                        .parseDouble(tfRestingPotential.getText()));
-            }
-
-            if (!isClipping.isNull()) {
-                neuronRef.setClipping(isClipping.isSelected());
-            }
-
-            if (!isAddNoise.isNull()) {
-                neuronRef.setAddNoise(isAddNoise.isSelected());
-            }
-
-            if (!tfReset.getText().equals(NULL_STRING)) {
-                neuronRef.setResetPotential(Double.parseDouble(tfReset
-                        .getText()));
-            }
-
-            if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef
-                        .setThreshold(Double.parseDouble(tfThreshold.getText()));
-            }
-
-            if (!tfTimeConstant.getText().equals(NULL_STRING)) {
-                neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
-                        .getText()));
-            }
-
-            randTab.commitRandom(neuronRef.getNoiseGenerator());
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+		
+		IntegrateAndFireRule neuronRef = new IntegrateAndFireRule();
+		
+		// Resistance
+		if (!tfResistance.getText().equals(NULL_STRING))
+            neuronRef.setResistance(Double.parseDouble(tfResistance
+                    .getText()));
+ 
+		// Resting Potential
+        if (!tfRestingPotential.getText().equals(NULL_STRING))
+            neuronRef.setRestingPotential(Double
+                    .parseDouble(tfRestingPotential.getText()));
+        
+        // Clipping?
+        if (!isClipping.isNull())
+            neuronRef.setClipping(isClipping.isSelected());
+      
+        // Noise?
+        if (!isAddNoise.isNull())
+            neuronRef.setAddNoise(isAddNoise.isSelected());
+       
+        // Reset Potential
+        if (!tfReset.getText().equals(NULL_STRING))
+            neuronRef.setResetPotential(Double.parseDouble(tfReset
+                    .getText()));
+        
+        // Threshold
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef
+                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
+        
+        // Time Constant
+        if (!tfTimeConstant.getText().equals(NULL_STRING))
+            neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
+                    .getText()));
+        
+        randTab.commitRandom(neuronRef.getNoiseGenerator());
+		
+        for(Neuron n : neurons) {
+        	n.setUpdateRule(neuronRef);
         }
-    }
+        
+	}
+
 }

@@ -38,9 +38,6 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /** Null string. */
     public static final String NULL_STRING = "...";
 
-    /** The synapse update rules being modified. */
-    protected List<SynapseUpdateRule> ruleList;
-
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
@@ -75,36 +72,18 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Populate fields with current data.
      */
-    public abstract void fillFieldValues();
+    public abstract void fillFieldValues(List<SynapseUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
      */
     public abstract void fillDefaultValues();
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public abstract void commitChanges();
-
+    
     
     public abstract void commitChanges(List<Synapse> commitSynapses);
     
     public abstract void commitChanges(Synapse templateSynapse);
     
-    /**
-     * @return Returns the synapse_list.
-     */
-    public List<SynapseUpdateRule> getRuleList() {
-        return ruleList;
-    }
-
-    /**
-     * @param ruleList The rule list to set.
-     */
-    public void setRuleList(final List<SynapseUpdateRule> ruleList) {
-        this.ruleList = ruleList;
-    }
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.

@@ -35,9 +35,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -94,20 +92,18 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JLabel lowerLabel = new JLabel("Lower bound");
 
     /** Synapse type combo box. */
-    private JComboBox cbSynapseType = new JComboBox(Synapse.getRuleList());
+    private JComboBox<String> cbSynapseType =
+    		new JComboBox<String>(Synapse.getRuleList());
 
     /** The synapses being modified. */
     private List<Synapse> synapseList = new ArrayList<Synapse>();
-
-    /** Weights have changed boolean. */
-    private boolean weightsHaveChanged = false;
 
     /** Help Button. */
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
     private ShowHelpAction helpAction;
-
+    
     /**
      * Constructor for a list of SynapseNodes.
      *
@@ -198,82 +194,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getRuleList().length);
-            // Default to clamped synapse panel
-            synapsePanel = new ClampedSynapseRulePanel();
         } else {
-            setComboBox(synapseList.get(0).getLearningRule().getDescription());
-            Class<?> synapseType = ((ClassDescriptionPair) cbSynapseType
-                    .getSelectedItem()).getTheClass();
-            synapsePanel = getSynapsePanel(synapseType);
-            synapsePanel.setRuleList(getRuleList());
-            synapsePanel.fillFieldValues();
-        }
-    }
-
-    /**
-     * Utility for setting the selected item of a combo box based on a synapse's
-     * update rule description.
-     */
-    private void setComboBox(final String description) {
-        for (int i = 0; i < cbSynapseType.getItemCount(); i++) {
-            ClassDescriptionPair pair = (ClassDescriptionPair) cbSynapseType
-                    .getItemAt(i);
-            if (pair.getDescription().equalsIgnoreCase(description)) {
-                cbSynapseType.setSelectedIndex(i);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Returns synapse panel corresponding to the given update rule. Assumes the
-     * panel class name = update rule class name + "Panel" E.g. "HebbianSynapse"
-     * > "HebbianSynapsePanel".
-     *
-     * @param updateRuleClass the class to match
-     * @return panel the matching panel
-     */
-    public static AbstractSynapsePanel getSynapsePanel(Class<?> updateRuleClass) {
-        // The panel name to look for
-        String panelClassName = "org.simbrain.network.gui.dialogs.synapse."
-                + updateRuleClass.getSimpleName() + "Panel";
-
-        try {
-            return (AbstractSynapsePanel) Class.forName(panelClassName)
-                    .newInstance();
-        } catch (ClassNotFoundException e) {
-            System.err.print("The class, \"" + panelClassName
-                    + "\", was not found.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Return the neuron update rules associated with the selected neurons.
-     *
-     * @return the rule list.
-     */
-    private ArrayList<SynapseUpdateRule> getRuleList() {
-        ArrayList<SynapseUpdateRule> ret = new ArrayList<SynapseUpdateRule>();
-        for (Synapse synapse : synapseList) {
-            ret.add(synapse.getLearningRule());
-        }
-        return ret;
-    }
-
-    /**
-     * Change all the synapses from their current type to the new specified in
-     * the dialog.
-     */
-    public void changeSynapseTypes() {
-        Object selected = cbSynapseType.getSelectedItem();
-        if (selected != NULL_STRING) {
-            String name = ((ClassDescriptionPair) selected).getSimpleName();
-            for (int i = 0; i < synapseList.size(); i++) {
-                synapseList.get(i).setLearningRule(name);
-            }
+        	String synName =
+        			synapseList.get(0).getLearningRule().getDescription();
+            cbSynapseType.setSelectedItem(synName);
+            synapsePanel = Synapse.RULE_MAP.get(synName);
+            synapsePanel.fillFieldValues(Synapse.getRuleList(synapseList));
         }
     }
 
@@ -284,13 +210,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     public void actionPerformed(final ActionEvent e) {
 
-        weightsHaveChanged = true;
         updateHelp();
-        Object selected = cbSynapseType.getSelectedItem();
+        String selected = (String) cbSynapseType.getSelectedItem();
         if (selected != NULL_STRING) {
             mainPanel.remove(scrollPane);
-            synapsePanel = getSynapsePanel(((ClassDescriptionPair) selected)
-                    .getTheClass());
+            synapsePanel = Synapse.RULE_MAP.get(selected);
             synapsePanel.fillDefaultValues();
             initScrollPane(synapsePanel);
             mainPanel.add(scrollPane);
@@ -318,7 +242,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         tfDelay.setText(Integer.toString(synapseRef.getDelay()));
 
-        synapsePanel.fillFieldValues();
+        synapsePanel.fillFieldValues(Synapse.getRuleList(synapseList));
 
         if (spikeResponsePanel != null) {
             spikeResponsePanel.fillFieldValues();
@@ -383,10 +307,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             }
         }
 
-        if (weightsHaveChanged) {
-            changeSynapseTypes();
-        }
-
         if (spikeResponsePanel != null) {
             spikeResponsePanel.commitChanges();
         }
@@ -398,8 +318,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         }
 
         // Now commit changes specific to the synapse type
-        synapsePanel.setRuleList(getRuleList());
-        synapsePanel.commitChanges();
+        synapsePanel.commitChanges(synapseList);
     }
 
     /**
@@ -417,8 +336,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                     "Pages/Network/synapse/spikeresponders/" + spacelessString
                             + ".html");
         } else {
-            String name = ((ClassDescriptionPair) cbSynapseType
-                    .getSelectedItem()).getSimpleName().replaceAll("Rule", "");
+        	//TODO:Check Me
+            String name = (String)cbSynapseType.getSelectedItem();
+            name.replaceAll(" ", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
             helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
                     + ".html");

@@ -135,7 +135,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
             cbSpikeResponseType.setSelectedIndex(SpikeResponder
                     .getSpikerTypeIndex(RiseAndDecay.getName()));
             spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder
-                    .getParent().getSource().getParentNetwork());
+                    .getParent().getSource().getNetwork());
             spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
             spikeFunctionPanel.fillFieldValues();
         } else if (spikeResponder instanceof ProbabilisticResponder) {
@@ -200,7 +200,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
                 RiseAndDecay.getName())) {
             mainPanel.remove(spikeFunctionPanel);
             spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder
-                    .getParent().getSource().getParentNetwork());
+                    .getParent().getSource().getNetwork());
             spikeFunctionPanel.fillDefaultValues();
             mainPanel.add(spikeFunctionPanel);
         } else if (cbSpikeResponseType.getSelectedItem().equals(

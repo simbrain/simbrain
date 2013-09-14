@@ -18,22 +18,32 @@
  */
 package org.simbrain.network.core;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.ClampedSynapseRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.HebbianCPCARulePanel;
+import org.simbrain.network.gui.dialogs.synapse.HebbianRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.HebbianThresholdRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.OjaRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.STDPRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.ShortTermPlasticityRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.SubtractiveNormalizationRulePanel;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.network.synapse_update_rules.OjaRule;
-import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
 
 /**
@@ -99,28 +109,35 @@ public class Synapse {
 
     /** Manages synaptic delay */
     private LinkedList<Double> delayManager;
-
-    /** List of Neuron update rules; used in Gui Combo boxes. */
-    private static final ClassDescriptionPair[] RULE_LIST = {
-            new ClassDescriptionPair(ClampedSynapseRule.class,
-                    new ClampedSynapseRule().getDescription()),
-            new ClassDescriptionPair(HebbianRule.class,
-                    new HebbianRule().getDescription()),
-            new ClassDescriptionPair(HebbianCPCARule.class,
-                    new HebbianCPCARule().getDescription()),
-            new ClassDescriptionPair(HebbianThresholdRule.class,
-                    new HebbianThresholdRule().getDescription()),
-            new ClassDescriptionPair(OjaRule.class,
-                    new OjaRule().getDescription()),
-            new ClassDescriptionPair(RandomSynapseRule.class,
-                    new RandomSynapseRule().getDescription()),
-            new ClassDescriptionPair(ShortTermPlasticityRule.class,
-                    new ShortTermPlasticityRule().getDescription()),
-            new ClassDescriptionPair(STDPRule.class,
-                    new STDPRule().getDescription()),
-            new ClassDescriptionPair(SubtractiveNormalizationRule.class,
-                    new SubtractiveNormalizationRule().getDescription()) };
-
+    
+    /**
+     * A mapping of available update rules to their respective panels. Used as 
+     * a reference (especially for combo-boxes) by GUI classes.
+     * TODO: Is this the best place for this? This is more efficient, but seems
+     * like it might violate the MVC paradigm.
+     */
+    public static final LinkedHashMap<String, AbstractSynapsePanel> RULE_MAP = 
+    		new LinkedHashMap<String, AbstractSynapsePanel>();
+    
+    {
+    	RULE_MAP.put("Clamped (no learning)",
+    			new ClampedSynapseRulePanel());
+    	RULE_MAP.put(new HebbianRule().getDescription(),
+    			new HebbianRulePanel());
+    	RULE_MAP.put(new HebbianCPCARule().getDescription(),
+    			new HebbianCPCARulePanel());
+    	RULE_MAP.put(new HebbianThresholdRule().getDescription(),
+    			new HebbianThresholdRulePanel());
+    	RULE_MAP.put(new OjaRule().getDescription(),
+    			new OjaRulePanel());
+    	RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
+    			new ShortTermPlasticityRulePanel());
+    	RULE_MAP.put(new STDPRule().getDescription(),
+    			new STDPRulePanel());
+    	RULE_MAP.put(new SubtractiveNormalizationRule().getDescription(),
+    			new SubtractiveNormalizationRulePanel());   	
+    }  
+    
     /**
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent
@@ -147,7 +164,7 @@ public class Synapse {
         setTarget(target);
         setLearningRule(learningRule);
         if (source != null) {
-            parentNetwork = source.getParentNetwork();
+            parentNetwork = source.getNetwork();
         }
     }
 
@@ -168,7 +185,7 @@ public class Synapse {
         setTarget(target);
         setLearningRule(learningRule);
         if (source != null) {
-            parentNetwork = source.getParentNetwork();
+            parentNetwork = source.getNetwork();
         }
     }
 
@@ -474,7 +491,6 @@ public class Synapse {
         this.getParentNetwork().getWeightRandomizer().setUpperBound(upperBound);
         this.getParentNetwork().getWeightRandomizer().setLowerBound(lowerBound);
         return  this.getParentNetwork().getWeightRandomizer().getRandom();
-        //return (upperBound - lowerBound) * Math.random() + lowerBound;
     }
 
     /**
@@ -625,7 +641,7 @@ public class Synapse {
      * @return reference to root network.
      */
     public Network getNetwork() {
-        return this.getSource().getParentNetwork();
+        return this.getSource().getNetwork();
     }
 
     /**
@@ -678,8 +694,8 @@ public class Synapse {
     /**
      * @return the ruleList
      */
-    public static ClassDescriptionPair[] getRuleList() {
-        return RULE_LIST;
+    public static String[] getRuleList() {
+        return RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]);
     }
 
     /**
@@ -716,6 +732,41 @@ public class Synapse {
         Synapse synapse = getTemplateSynapse();
         synapse.setLearningRule(rule);
         return synapse;
+    }
+    
+    /**
+     * A method that returns a compact list of all the synapse update rules 
+     * associated with a list of synapses. The list is compact in the sense
+     * that the size of the list is determined by the number of active update
+     * rule objects managing the synapses in the list. For instance, the list
+     * being queried may have 1000 synapses, but only 1 synapse update rule,
+     * since one synapse update rule object can service any number of synapses.
+     * In such a case this method would return a singleton list. This makes
+     * multiple consistency checks down the line much more efficient.
+     * 
+     * @see org.simbrain.network.gui.dialogs.synapse.SynapseDialog.java
+     * @see org.simbrain.network.gui.NetworkUtils.java
+     * 
+     * TODO: Written with expanding support for heterogeneous groups of
+     * synapses.
+     * 
+     * @param synapseList The list of neurons whose update rules we want to
+     * query.
+     * @return Returns a compact list of synapse update rules associated with
+     * a group of synapses
+     */
+    public static List<SynapseUpdateRule> getRuleList(List<Synapse> synapseList) {
+    	HashSet<SynapseUpdateRule> ruleSet =
+    			new HashSet<SynapseUpdateRule>();
+    	for(Synapse s : synapseList){
+    		SynapseUpdateRule slr = s.getLearningRule();
+    		if(!ruleSet.contains(slr))
+    			ruleSet.add(slr);
+    	}
+    	
+        return Arrays.asList(ruleSet
+        		.toArray(new SynapseUpdateRule[ruleSet.size()]));
+        
     }
 
     /**

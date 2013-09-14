@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 
@@ -60,30 +61,39 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        synapseRef = (HebbianCPCARule) ruleList.get(0);
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        tfM.setText(Double.toString(synapseRef.getM()));
-        tfTheta.setText(Double.toString(synapseRef.getTheta()));
-        tfLambda.setText(Double.toString(synapseRef.getLambda()));
+    	synapseRef = (HebbianCPCARule) ruleList.get(0);
 
         // Handle consistency of multiply selections
+    	
+    	// Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLearningRate")) {
+                "getLearningRate"))
             tfLearningRate.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) {
+        else 
+        	tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+        
+        //Handle M
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) 
             tfM.setText(NULL_STRING);
-        }
+        else 
+        	tfM.setText(Double.toString(synapseRef.getM()));
+        
+        //Handle Theta
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getTheta")) {
+                "getTheta")) 
             tfTheta.setText(NULL_STRING);
-        }
+        else
+        	tfTheta.setText(Double.toString(synapseRef.getTheta()));
+        
+        //Handle Lambda
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLambda")) {
+                "getLambda"))
             tfLambda.setText(NULL_STRING);
-        }
+        else
+        	tfLambda.setText(Double.toString(synapseRef.getLambda()));
+        
     }
 
     /**
@@ -96,29 +106,6 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
         tfM.setText(Double.toString(HebbianCPCARule.DEFAULT_M));
         tfTheta.setText(Double.toString(HebbianCPCARule.DEFAULT_THETA));
         tfLambda.setText(Double.toString(HebbianCPCARule.DEFAULT_LAMBDA));
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < ruleList.size(); i++) {
-            HebbianCPCARule synapseRef = (HebbianCPCARule) ruleList.get(i);
-
-            if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                        .getText()));
-            }
-            if (!tfM.getText().equals(NULL_STRING)) {
-                synapseRef.setM(Double.parseDouble(tfM.getText()));
-            }
-            if (!tfTheta.getText().equals(NULL_STRING)) {
-                synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
-            }
-            if (!tfLambda.getText().equals(NULL_STRING)) {
-                synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
-            }
-        }
     }
 
 	@Override

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import java.util.List;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 
 /**
  * <b>ClampedSynapsePanel</b>.
@@ -36,7 +37,7 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
     }
 
     /**
@@ -45,11 +46,6 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
     public void fillDefaultValues() {
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-    }
 
 	public void commitChanges(List<Synapse> commitSynapses) {
 	}

@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 
@@ -63,33 +64,46 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     /**
      * Populate fields with current data.
      */
-    public void fillFieldValues() {
-        synapseRef = (STDPRule) ruleList.get(0);
+    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
-        tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
-        tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
-        tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+    	synapseRef = (STDPRule) ruleList.get(0);
 
-        // Handle consistency of multiply selections
+        //(Below) Handle consistency of multiply selections
+        
+        // Handle Tau Minus
         if (!NetworkUtils
-                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
+                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) 
             tfTauMinus.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getTau_plus")) {
-            tfTauPlus.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_minus")) {
-            tfWMinus.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus")) {
-            tfWPlus.setText(NULL_STRING);
-        }
+        else
+        	tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
+        
+        // Handle Tau Plus
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getLearningRate")) {
+        		"getTau_plus"))
+            tfTauPlus.setText(NULL_STRING);
+        else
+        	tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
+        
+        // Handle W Minus
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_minus"))
+            tfWMinus.setText(NULL_STRING);
+        else
+        	tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
+        
+        // Handle W Plus
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus"))
+            tfWPlus.setText(NULL_STRING);
+        else
+        	tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
+        
+        // Handle Learning Rate
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
+                "getLearningRate")) 
             tfLearningRate.setText(NULL_STRING);
-        }
+        else
+        	tfLearningRate.setText(Double.toString(synapseRef
+        			.getLearningRate()));
+        
     }
 
     /**
@@ -102,34 +116,6 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         tfWPlus.setText("" + template.getW_plus());
         tfWMinus.setText("" + template.getW_minus());
         tfLearningRate.setText("" + template.getLearningRate());
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            STDPRule synapseRef = (STDPRule) ruleList.get(i);
-
-            if (!tfTauMinus.getText().equals(NULL_STRING)) {
-                synapseRef
-                        .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
-            }
-            if (!tfTauPlus.getText().equals(NULL_STRING)) {
-                synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
-            }
-            if (!tfWMinus.getText().equals(NULL_STRING)) {
-                synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
-            }
-            if (!tfWPlus.getText().equals(NULL_STRING)) {
-                synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
-            }
-            if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                        .getText()));
-            }
-        }
     }
 
 	@Override

@@ -248,8 +248,8 @@ public class SynapseAdjustmentPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1.0;
-        c.weighty = 1.0;
-        c.fill = GridBagConstraints.BOTH;
+        c.weighty = 0.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.CENTER;
 
         randTab.add(randomPanel, c);

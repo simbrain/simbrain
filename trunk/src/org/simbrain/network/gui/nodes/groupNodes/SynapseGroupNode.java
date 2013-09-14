@@ -20,6 +20,7 @@ package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -30,11 +31,14 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
@@ -49,6 +53,9 @@ import edu.umd.cs.piccolo.util.PBounds;
  */
 public class SynapseGroupNode extends GroupNode {
 
+    /** Reference to represented group node. */
+    private final SynapseGroup group;
+
     /**
      * Create a Synapse Group PNode.
      *
@@ -57,6 +64,7 @@ public class SynapseGroupNode extends GroupNode {
      */
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
+        this.group = group;
         setStroke(null); // Comment this out to see outline
         // getInteractionBox().setPaint(Color.white);
         // setOutlinePadding(-30);
@@ -106,14 +114,15 @@ public class SynapseGroupNode extends GroupNode {
      * menu add them here.
      */
     protected void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
-        menu.addSeparator();
+        JPopupMenu menu = new JPopupMenu();
+
+        // Edit
         final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
         editor.setUseSuperclass(false);
         editor.setObject(getGroup());
         // Only add edit properties action if there are properties to edit
         if (editor.getFieldCount() > 0) {
-            Action editGroup = new AbstractAction("Synapse group properties...") {
+            Action editGroup = new AbstractAction("Edit...") {
                 public void actionPerformed(final ActionEvent event) {
                     JDialog dialog = editor.getDialog();
                     dialog.setLocationRelativeTo(null);
@@ -123,9 +132,78 @@ public class SynapseGroupNode extends GroupNode {
             };
             menu.add(editGroup);
         }
+        menu.add(removeGroupAction);
+
+        // Weight adjustment stuff
+        menu.addSeparator();
+        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
+            public void actionPerformed(final ActionEvent event) {
+                selectSynapses();
+                final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
+                        getNetworkPanel(), group.getSynapseList());
+                getNetworkPanel().displayPanel(synapsePanel,
+                        "Adjust selected synapses");
+            }
+        };
+        menu.add(adjustSynapses);
         ((SynapseGroup) this.getGroup()).getSynapseList();
         menu.add(new JMenuItem(showWeightMatrixAction));
+
+        // Selection stuff
+        menu.addSeparator();
+        Action selectSynapses = new AbstractAction("Select Synapses") {
+            public void actionPerformed(final ActionEvent event) {
+                selectSynapses();
+            }
+        };
+        menu.add(selectSynapses);
+        Action selectIncomingNodes = new AbstractAction(
+                "Select incoming neurons") {
+            public void actionPerformed(final ActionEvent event) {
+                List<NeuronNode> incomingNodes = new ArrayList<NeuronNode>();
+                for (Neuron neuron : group.getSourceNeurons()) {
+                    incomingNodes.add((NeuronNode) getNetworkPanel()
+                            .getObjectNodeMap().get(neuron));
+
+                }
+                getNetworkPanel().clearSelection();
+                getNetworkPanel().setSelection(incomingNodes);
+            }
+        };
+        menu.add(selectIncomingNodes);
+        Action selectOutgoingNodes = new AbstractAction(
+                "Select outgoing neurons") {
+            public void actionPerformed(final ActionEvent event) {
+                List<NeuronNode> outgoingNodes = new ArrayList<NeuronNode>();
+                for (Neuron neuron : group.getTargetNeurons()) {
+                    outgoingNodes.add((NeuronNode) getNetworkPanel()
+                            .getObjectNodeMap().get(neuron));
+
+                }
+                getNetworkPanel().clearSelection();
+                getNetworkPanel().setSelection(outgoingNodes);
+            }
+        };
+        menu.add(selectOutgoingNodes);
+
+        // TODO: Add coupling stuff at higher desktop level...
+
+        // Add the menu...
         setContextMenu(menu);
+    }
+
+    /**
+     * Select the synapses in this group.
+     */
+    private void selectSynapses() {
+        List<SynapseNode> nodes = new ArrayList<SynapseNode>();
+        for (Synapse synapse : group.getSynapseList()) {
+            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(
+                    synapse));
+
+        }
+        getNetworkPanel().clearSelection();
+        getNetworkPanel().setSelection(nodes);
     }
 
     /**

@@ -146,13 +146,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 //            };
 //           ret.add(editGroup);
 //        }
-        Action editGroupName = new AbstractAction("Edit group name...") {
-            public void actionPerformed(final ActionEvent event) {
-                String newName = JOptionPane.showInputDialog("Name:",
-                        group.getLabel());
-                group.setLabel(newName);
-            }
-        };
+
         ret.add(editGroupName);
         ret.add(removeGroupAction);
         if (group instanceof Trainable) {
@@ -315,6 +309,15 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         return ret;
     }
 
+    /** Action for editing the group name. */
+    protected Action editGroupName = new AbstractAction("Rename...") {
+        public void actionPerformed(final ActionEvent event) {
+            String newName = JOptionPane.showInputDialog("Name:",
+                    group.getLabel());
+            group.setLabel(newName);
+        }
+    };
+
     /**
      * Action for removing this group
      */
@@ -331,6 +334,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
             getNetworkPanel().getNetwork().removeGroup(group);
         }
     };
+
     /**
      * Action for testing inputs to trainable networks.
      */

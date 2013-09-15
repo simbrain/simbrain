@@ -50,33 +50,22 @@ public class BasicNeuronInfoPanel extends JPanel {
     public static final String NULL_STRING = "...";
 	
     /** Activation field. */
-    private JTextField tfActivation = new JTextField();
-
-    /** Increment field. */
-    private JTextField tfIncrement = new JTextField();
-
-    /** Upper bound field. */
-    private JTextField tfUpBound = new JTextField();
-
-    /** Lower bound field. */
-    private JTextField tfLowBound = new JTextField();
-
-    /** Label Field. */
-    private JTextField tfNeuronLabel = new JTextField();
-
-    /** Priority Field. */
-    private JTextField tfPriority = new JTextField();
+    private JTextField tfActivation = new JTextField(); 
 	
     /** The neuron Id. */
     private JLabel idLabel = new JLabel();
     
+    /**
+     *  Displays More/Less depending on whether or not extra data panel
+     *  is displayed.
+     */
     private JLabel detailLabel = new JLabel();
     
     /** 
      * The extra data panel. Includes: increment, upper bound, lower bound,
      * and priority.
      */
-    private JPanel extraDataPanel;
+    private ExtendedNeuronInfoPanel extraDataPanel;
 
     /** The neurons being modified. */
     private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
@@ -153,20 +142,7 @@ public class BasicNeuronInfoPanel extends JPanel {
         
         this.add(basicsPanel, BorderLayout.NORTH);
         
-        GridLayout gl = new GridLayout(0, 2);
-        gl.setVgap(5);
-        extraDataPanel = new JPanel(gl);
-        extraDataPanel.add(new JLabel("Upper Bound:"));
-        extraDataPanel.add(tfUpBound);
-        extraDataPanel.add(new JLabel("Lower Bound"));
-        extraDataPanel.add(tfLowBound);
-        extraDataPanel.add(new JLabel("Increment: "));
-        extraDataPanel.add(tfIncrement);
-        extraDataPanel.add(new JLabel("Label: "));
-        extraDataPanel.add(tfNeuronLabel);
-        extraDataPanel.add(new JLabel("Priority:"));
-        extraDataPanel.add(tfPriority);
-        extraDataPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        extraDataPanel = new ExtendedNeuronInfoPanel(neuronList);
         
         extraDataPanel.setVisible(detailTriangle.isDown());
         
@@ -246,41 +222,6 @@ public class BasicNeuronInfoPanel extends JPanel {
             tfActivation.setText(NULL_STRING);
         else
         	tfActivation.setText(Double.toString(neuronRef.getActivation()));
-
-        // Handle Increment
-        if (!NetworkUtils
-                .isConsistent(neuronList, Neuron.class, "getIncrement")) 
-            tfIncrement.setText(NULL_STRING);
-        else
-        	tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
-
-        // Handle Label
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLabel"))
-            tfNeuronLabel.setText(NULL_STRING);
-        else
-        	tfNeuronLabel.setText(neuronRef.getLabel());
-
-        // Handle Priority
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getUpdatePriority"))
-            tfPriority.setText(NULL_STRING);
-        else
-        	tfPriority.setText(Integer.toString(neuronRef
-        			.getUpdatePriority()));
-
-        // Handle Lower Bound
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getLowerBound"))
-            tfLowBound.setText(NULL_STRING);
-        else
-        	tfLowBound.setText(Double.toString(neuronRef.getLowerBound()));
-
-        // Handle Upper Bound
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getUpperBound"))
-            tfUpBound.setText(NULL_STRING);
-        else
-        	tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
         
     }
     
@@ -296,32 +237,11 @@ public class BasicNeuronInfoPanel extends JPanel {
             if (!tfActivation.getText().equals(NULL_STRING))
                 neuronRef.setActivation(Double.parseDouble(tfActivation
                         .getText()));
-            
-            // Increment
-            if (!tfIncrement.getText().equals(NULL_STRING))
-                neuronRef
-                        .setIncrement(Double.parseDouble(tfIncrement.getText()));
-            
-            // Label
-            if (!tfNeuronLabel.getText().equals(NULL_STRING))
-                neuronRef.setLabel(tfNeuronLabel.getText());
-            
-            // Priority
-            if (!tfPriority.getText().equals(NULL_STRING))
-                neuronRef.setUpdatePriority(Integer.parseInt(tfPriority
-                        .getText()));
-            
-            // Upper Bound
-            if (!tfUpBound.getText().equals(NULL_STRING))
-                neuronRef
-                        .setUpperBound(Double.parseDouble(tfUpBound.getText()));
-            
-            // Lower Bound
-            if (!tfLowBound.getText().equals(NULL_STRING))
-                neuronRef
-                        .setLowerBound(Double.parseDouble(tfLowBound.getText()));
 
         }
+        
+        extraDataPanel.commitChanges();
+        
     }
     
 

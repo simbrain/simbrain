@@ -21,11 +21,16 @@ package org.simbrain.network.gui.actions;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -55,6 +60,29 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         putValue(ACCELERATOR_KEY, keyStroke);
 
         this.networkPanel = networkPanel;
+        updateAction();
+
+        // Add a selection listener to update state based on selection
+        networkPanel.addSelectionListener(new NetworkSelectionListener() {
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
+
+    }
+
+    /**
+     * Only enable the action if there is at least one synapse selected.
+     */
+    private void updateAction() {
+        boolean atLeastOneSynapseSelected = (networkPanel
+                .getSelectedModelSynapses().size() > 0);
+        if (atLeastOneSynapseSelected) {
+            setEnabled(true);
+        } else {
+            setEnabled(false);
+        }
     }
 
     /** @see AbstractAction */
@@ -62,6 +90,16 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
 
         final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
                 networkPanel);
-        networkPanel.displayPanel(synapsePanel, "Adjust selected synapses");
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Adjust selected synapses");
+        dialog.setContentPane(synapsePanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                synapsePanel.removeListeners();
+            }
+        });
     }
 }

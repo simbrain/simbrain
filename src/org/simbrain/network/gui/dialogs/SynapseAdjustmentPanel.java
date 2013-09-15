@@ -150,7 +150,9 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * A collection of the selected synaptic weights, such that the first row
      * represents excitatory weights and the 2nd row represents inhibitory
-     * weights. All inhibitory weights are stored as their absolute value.
+     * weights. All inhibitory weights are stored as their absolute value. Note
+     * that this array is only used internally, to display stats and the
+     * histogram.
      */
     private double[][] weights = new double[2][];
 
@@ -161,15 +163,31 @@ public class SynapseAdjustmentPanel extends JPanel {
      * @param networkPanel reference to parent
      */
     public SynapseAdjustmentPanel(final NetworkPanel networkPanel) {
+        this(networkPanel, networkPanel.getSelectedModelSynapses());
+    }
+
+    /**
+     * Create a synapse adjustment panel with a specified list of synapses.
+     *
+     * @param networkPanel parent network panel
+     * @param synapses synapses to represent in this panel
+     */
+    public SynapseAdjustmentPanel(final NetworkPanel networkPanel,
+            final List<Synapse> synapses) {
 
         // Establish the parent panel.
         this.networkPanel = networkPanel;
+
+        // Don't open if no synapses! */
+        if (synapses.size() == 0) {
+            return;
+        }
 
         // Set Layout
         setLayout(new GridBagLayout());
 
         // Extract weight values in usable form by internal methods
-        weights = extractWeightValues();
+        extractWeightValues(synapses);
 
         // Update the stats in the stats panel.
         updateStats();
@@ -183,8 +201,8 @@ public class SynapseAdjustmentPanel extends JPanel {
         // Add all action listeners for buttons unique to this panel.
         addActionListeners();
 
-        // Add all change listeners, currently only a network change listener.
-        addChangeListeners();
+        // Add network listener
+        networkPanel.getNetwork().addNetworkListener(networkListener);
 
     }
 
@@ -330,51 +348,48 @@ public class SynapseAdjustmentPanel extends JPanel {
     }
 
     /**
-     * Adds all the change listeners, currently this is only a network change
-     * listener.
+     * Clean up after removing this panel.
      */
-    private void addChangeListeners() {
-
-        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
-
-            @Override
-            public void networkChanged() {
-                weights = extractWeightValues();
-                updateHistogram();
-                updateStats();
-                getParent().revalidate();
-                getParent().repaint();
-
-            }
-
-            @Override
-            public void neuronClampToggled() {
-            }
-
-            @Override
-            public void synapseClampToggled() {
-            }
-
-        });
-
+    public void removeListeners() {
+        networkPanel.getNetwork().removeNetworkListener(networkListener);
     }
+
+
+    /**
+     * Updates synapse adjustment panel when network is updated.
+     */
+    private NetworkListener networkListener = new NetworkListener() {
+
+        @Override
+        public void networkChanged() {
+            extractWeightValues(networkPanel.getSelectedModelSynapses());
+            updateHistogram();
+            updateStats();
+            getParent().revalidate();
+            getParent().repaint();
+        }
+
+        @Override
+        public void neuronClampToggled() {
+        }
+
+        @Override
+        public void synapseClampToggled() {
+        }
+    };
 
     /**
      * Extracts weight values and organizes them by synapse type (inhibitory or
      * excitatory). Inhibitory values are represented by their absolute value.
-     *
-     * @return an array of weights such that the first row contains all
-     *         excitatory weight values and the second row contains all the
-     *         inhibitory weight (absolute) values.
      */
-    public double[][] extractWeightValues() {
+    private void extractWeightValues(List<Synapse> synapses) {
 
         int exWeights = 0;
         int inWeights = 0;
 
         // Inefficient but necessary due to lack of support for collections of
         // primitive types.
-        for (Synapse s : networkPanel.getSelectedModelSynapses()) {
+        for (Synapse s : synapses) {
             double w = s.getStrength();
             if (w > 0) {
                 exWeights++;
@@ -383,7 +398,6 @@ public class SynapseAdjustmentPanel extends JPanel {
             }
         }
 
-        double weights[][] = new double[2][];
         weights[0] = new double[exWeights];
         weights[1] = new double[inWeights];
         exWeights = 0;
@@ -391,7 +405,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         // Inefficient but necessary due to lack of support for collections of
         // primitive types.
-        for (Synapse s : networkPanel.getSelectedModelSynapses()) {
+        for (Synapse s : synapses) {
             double w = s.getStrength();
             if (w > 0) {
                 weights[0][exWeights++] = w;
@@ -399,8 +413,6 @@ public class SynapseAdjustmentPanel extends JPanel {
                 weights[1][inWeights++] = Math.abs(w);
             }
         }
-
-        return weights;
 
     }
 
@@ -411,7 +423,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      * Histogram must be initialized prior to invocation. Red is used to
      * represent excitatory values, blue is used for inhibitory.
      */
-    public void updateHistogram() {
+    private void updateHistogram() {
 
         List<double[]> data = new ArrayList<double[]>();
         List<String> names = new ArrayList<String>();
@@ -524,7 +536,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      * synapses, inhibitory synapses, and mean, median and standard deviation of
      * selected synapses. Extract data should be used prior to this.
      */
-    public void updateStats() {
+    private void updateStats() {
 
         // TODO: Error checking: ensure stats never has any length other than 3.
 
@@ -555,7 +567,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      * @return an An array where the first element is the mean, the 2nd element
      *         is the median, and the 3rd element is the standard deviation.
      */
-    public double[] getStats() {
+    private double[] getStats() {
 
         double[] stats = new double[3];
         int tot = 0;
@@ -626,7 +638,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Panel for scaling synapses.
      */
-    public class ScalerPanel extends LabelledItemPanel {
+    private class ScalerPanel extends LabelledItemPanel {
 
         /** Percentage to increase or decrease indicated synapses. */
         private JTextField tfIncreaseDecrease = new JTextField(".1");
@@ -686,7 +698,7 @@ public class SynapseAdjustmentPanel extends JPanel {
     /**
      * Panel for pruning synapses.
      */
-    public class PrunerPanel extends LabelledItemPanel {
+    private class PrunerPanel extends LabelledItemPanel {
 
         /**
          * Threshold. If synapse strength above absolute value of this value

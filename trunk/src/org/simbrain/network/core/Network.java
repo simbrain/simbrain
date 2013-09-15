@@ -1594,6 +1594,15 @@ public class Network {
     }
 
     /**
+     * Remove a network listener.
+     *
+     * @param networkListener the observer to remove
+     */
+    public void removeNetworkListener(NetworkListener networkListener) {
+        networkListeners.remove(networkListener);
+    }
+
+    /**
      * Register a neuron listener.
      *
      * @param listener the observer to register

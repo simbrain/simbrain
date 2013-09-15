@@ -20,6 +20,8 @@ package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,8 +143,17 @@ public class SynapseGroupNode extends GroupNode {
                 selectSynapses();
                 final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
                         getNetworkPanel(), group.getSynapseList());
-                getNetworkPanel().displayPanel(synapsePanel,
-                        "Adjust selected synapses");
+                JDialog dialog = new JDialog();
+                dialog.setTitle("Adjust selected synapses");
+                dialog.setContentPane(synapsePanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                dialog.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e) {
+                        synapsePanel.removeListeners();
+                    }
+                });
             }
         };
         menu.add(adjustSynapses);

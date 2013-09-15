@@ -1,0 +1,95 @@
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.workspace.*;
+import org.simbrain.util.*;
+import javax.swing.JInternalFrame;
+import java.util.*;
+
+{
+
+    // Braitenberg Simulation
+    
+    // Clear workspace
+	workspace.clearWorkspace();
+
+    // Parameters 
+    int NUM_NEURONS = 35;
+    double GRID_SPACE = 40;
+
+    // Open workspace
+	String FS = System.getProperty("file.separator");
+    workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "braitenberg.zip"));
+	Network vehicle1 = ((NetworkComponent) workspace.getComponent("vehicle1.xml")).getNetwork();
+	
+	Network vehicle2 = ((NetworkComponent) workspace.getComponent("vehicle2.xml")).getNetwork();
+
+    // Start making the buttons!
+    JInternalFrame internalFrame = new JInternalFrame("Set weights", true, true);
+    LabelledItemPanel panel = new LabelledItemPanel();
+    
+    JButton button1 = new JButton("Make");
+    button1.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_7").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_10").setStrength(-1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_6").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+
+        }});
+    panel.addItem("Avoiders", button1);
+
+    JButton button2 = new JButton("Make");
+    button2.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_7").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_10").setStrength(1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_6").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+        }});
+    panel.addItem("Pursuers", button2);
+
+    JButton button3 = new JButton("Make");
+    button3.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_7").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_10").setStrength(-1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_6").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+        }});
+    panel.addItem("Avoider-Pursuer", button3);
+
+    JButton button4 = new JButton("Do it!");
+    button4.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle2.getSynapse("Synapse_6").setStrength(vehicle1.getSynapse("Synapse_10").getStrength());
+            vehicle2.getSynapse("Synapse_2").setStrength(vehicle1.getSynapse("Synapse_7").getStrength());
+            
+            workspace.iterate();
+        }});
+    panel.addItem("Reverse weights", button4);
+    
+    JTextField weightl = new JTextField("1");
+    panel.addItem("Left weight", weightl);
+    JTextField weightr = new JTextField("1");
+    panel.addItem("Right weight", weightr);
+
+    // Set up Frame
+    internalFrame.setLocation(10,10);
+    internalFrame.getContentPane().add(panel);
+    internalFrame.setVisible(true);
+    internalFrame.pack();
+    desktop.addInternalFrame(internalFrame);
+
+}

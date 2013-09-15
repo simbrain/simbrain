@@ -22,8 +22,8 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.simbrain.network.core.Network.TimeType;
@@ -131,7 +131,7 @@ public class Neuron {
     /**
      * 
      */
-    public static final HashMap<String, AbstractNeuronPanel> RULE_MAP = new HashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
 
     {
 	RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel(

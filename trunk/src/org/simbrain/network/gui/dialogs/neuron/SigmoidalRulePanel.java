@@ -43,7 +43,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
     /** Implementation combo box. */
     private JComboBox cbImplementation = new JComboBox(new SigmoidType[] {
-            SigmoidType.ARCTAN, SigmoidType.LOGISTIC, SigmoidType.TANH });
+	    SigmoidType.ARCTAN, SigmoidType.LOGISTIC, SigmoidType.TANH });
 
     /** Bias field. */
     private JTextField tfBias = new JTextField();
@@ -65,156 +65,154 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
-     *
+     * 
      */
     public SigmoidalRulePanel(Network network) {
-        super(network);
-        this.add(tabbedPane);
-        mainTab.addItem("Implementation", cbImplementation);
-        mainTab.addItem("Bias", tfBias);
-        mainTab.addItem("Slope", tfSlope);
-        mainTab.addItem("Add noise", isAddNoise);
-        tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
+	super(network);
+	this.add(tabbedPane);
+	mainTab.addItem("Implementation", cbImplementation);
+	mainTab.addItem("Bias", tfBias);
+	mainTab.addItem("Slope", tfSlope);
+	mainTab.addItem("Add noise", isAddNoise);
+	tabbedPane.add(mainTab, "Main");
+	tabbedPane.add(randTab, "Noise");
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        
-    	SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(0);
 
-        //(Below) Handle consistency of multiple selections
-        
-        // Handle Implementation/Type
-        if (!NetworkUtils
-                .isConsistent(ruleList, SigmoidalRule.class, "getType")) {
-            if ((cbImplementation.getItemCount() == SigmoidType.values().length)) {
-                cbImplementation.addItem(NULL_STRING);
-            }
-            cbImplementation.setSelectedIndex(SigmoidType.values().length);
-        } else 
-        	cbImplementation.setSelectedItem(neuronRef.getType());
+	SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(0);
 
-        // Handle Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        else
-        	tfBias.setText(Double.toString(neuronRef.getBias()));
+	// (Below) Handle consistency of multiple selections
 
-        // Handle Slope
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getSlope"))
-            tfSlope.setText(NULL_STRING);
-        else
-        	tfSlope.setText(Double.toString(neuronRef.getSlope()));
+	// Handle Implementation/Type
+	if (!NetworkUtils
+		.isConsistent(ruleList, SigmoidalRule.class, "getType")) {
+	    if ((cbImplementation.getItemCount() == SigmoidType.values().length)) {
+		cbImplementation.addItem(NULL_STRING);
+	    }
+	    cbImplementation.setSelectedIndex(SigmoidType.values().length);
+	} else
+	    cbImplementation.setSelectedItem(neuronRef.getType());
 
-        // Handle Noise
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getAddNoise"))
-            isAddNoise.setNull();
-        else
-        	isAddNoise.setSelected(neuronRef.getAddNoise());
+	// Handle Bias
+	if (!NetworkUtils
+		.isConsistent(ruleList, SigmoidalRule.class, "getBias"))
+	    tfBias.setText(NULL_STRING);
+	else
+	    tfBias.setText(Double.toString(neuronRef.getBias()));
 
-        randTab.fillFieldValues(getRandomizers(ruleList));
-        
+	// Handle Slope
+	if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
+		"getSlope"))
+	    tfSlope.setText(NULL_STRING);
+	else
+	    tfSlope.setText(Double.toString(neuronRef.getSlope()));
+
+	// Handle Noise
+	if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
+		"getAddNoise"))
+	    isAddNoise.setNull();
+	else
+	    isAddNoise.setSelected(neuronRef.getAddNoise());
+
+	randTab.fillFieldValues(getRandomizers(ruleList));
+
     }
 
     /**
      * @return List of randomizers.
      */
-    private ArrayList<Randomizer> getRandomizers(
-    		List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+	ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((SigmoidalRule) ruleList.get(i)).getNoiseGenerator());
-        }
+	for (int i = 0; i < ruleList.size(); i++) {
+	    ret.add(((SigmoidalRule) ruleList.get(i)).getNoiseGenerator());
+	}
 
-        return ret;
+	return ret;
     }
 
     /**
      * Fill field values to default values for sigmoidal neuron.
      */
     public void fillDefaultValues() {
-        SigmoidalRule neuronRef = new SigmoidalRule();
+	SigmoidalRule neuronRef = new SigmoidalRule();
 
-        cbImplementation.setSelectedItem(neuronRef.getType());
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfSlope.setText(Double.toString(neuronRef.getSlope()));
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-        randTab.fillDefaultValues();
+	cbImplementation.setSelectedItem(neuronRef.getType());
+	tfBias.setText(Double.toString(neuronRef.getBias()));
+	tfSlope.setText(Double.toString(neuronRef.getSlope()));
+	isAddNoise.setSelected(neuronRef.getAddNoise());
+	randTab.fillDefaultValues();
     }
 
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(Neuron neuron) {
-		
-		SigmoidalRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof SigmoidalRule) {
-			neuronRef = (SigmoidalRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new SigmoidalRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
-		// Implementation: Logistic/Tanh/ArcTan
-        if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
-            neuronRef.setType((SigmoidType) cbImplementation
-                    .getSelectedItem());
-        
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Slope
-        if (!tfSlope.getText().equals(NULL_STRING))
-            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
-        
-        // Noise
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
+    @Override
+    public void commitChanges(Neuron neuron) {
 
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-		
+	SigmoidalRule neuronRef;
+
+	if (neuron.getUpdateRule() instanceof SigmoidalRule) {
+	    neuronRef = (SigmoidalRule) neuron.getUpdateRule();
+	} else {
+	    neuronRef = new SigmoidalRule();
+	    neuron.setUpdateRule(neuronRef);
 	}
+
+	// Implementation: Logistic/Tanh/ArcTan
+	if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
+	    neuronRef.setType((SigmoidType) cbImplementation.getSelectedItem());
+
+	// Bias
+	if (!tfBias.getText().equals(NULL_STRING))
+	    neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+	// Slope
+	if (!tfSlope.getText().equals(NULL_STRING))
+	    neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
+
+	// Noise
+	if (!isAddNoise.isNull())
+	    neuronRef.setAddNoise(isAddNoise.isSelected());
+
+	randTab.commitRandom(neuronRef.getNoiseGenerator());
+
+    }
 
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
-		
-		SigmoidalRule neuronRef = new SigmoidalRule();
-		
-		// Implementation: Logistic/Tanh/ArcTan
-        if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
-            neuronRef.setType((SigmoidType) cbImplementation
-                    .getSelectedItem());
-        
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Slope
-        if (!tfSlope.getText().equals(NULL_STRING))
-            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
-        
-        // Noise
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
+    @Override
+    public void commitChanges(List<Neuron> neurons) {
 
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        
-        for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-		
+	SigmoidalRule neuronRef = new SigmoidalRule();
+
+	// Implementation: Logistic/Tanh/ArcTan
+	if (!cbImplementation.getSelectedItem().equals(NULL_STRING))
+	    neuronRef.setType((SigmoidType) cbImplementation.getSelectedItem());
+
+	// Bias
+	if (!tfBias.getText().equals(NULL_STRING))
+	    neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+	// Slope
+	if (!tfSlope.getText().equals(NULL_STRING))
+	    neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
+
+	// Noise
+	if (!isAddNoise.isNull())
+	    neuronRef.setAddNoise(isAddNoise.isSelected());
+
+	randTab.commitRandom(neuronRef.getNoiseGenerator());
+
+	for (Neuron n : neurons) {
+	    n.setUpdateRule(neuronRef);
 	}
+
+    }
 
 }

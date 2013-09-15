@@ -60,7 +60,7 @@ public class NeuronDialog extends StandardDialog {
     /** 
      * Bottom panel. Contains fields for displaying/editing neuron update
      * rule parameters.
-     * @see org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettings.java
+     * @see org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel.java
      */
     private NeuronUpdateSettingsPanel bottomPanel;
     
@@ -186,11 +186,11 @@ public class NeuronDialog extends StandardDialog {
     	
     	topPanel.commitChanges();
     	
-        // Notify the network that changes have been made
-        neuronList.get(0).getNetwork().fireNetworkChanged();
-
         // Now commit changes specific to the neuron type
         bottomPanel.getNeuronPanel().commitChanges(neuronList);
+    	
+        // Notify the network that changes have been made
+        neuronList.get(0).getNetwork().fireNetworkChanged();
         
     }
 

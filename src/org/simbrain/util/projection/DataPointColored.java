@@ -31,13 +31,18 @@ public class DataPointColored extends DataPoint {
     /** Color of this datapoint. */
     private Color color = Color.gray;
 
+    /** Default activation level. */
+    public static final double DEFAULT_ACTIVATION = .15;
+
     /**
      * An activation associated with this point that is used to determine the
-     * color of the point.
+     * color of the point.  Frequency increments this when the point is active.
+     * Decay decrements it at every time step but spikes the activate point to a
+     * max value.
      *
      * @see DataColoringManager
      */
-    private double activation = 0;
+    private double activation = DEFAULT_ACTIVATION;
 
     /**
      * Default constructor for adding datasets.
@@ -63,14 +68,20 @@ public class DataPointColored extends DataPoint {
     }
 
     /**
+     * Reset activation value.
+     */
+    public void resetActivation() {
+        activation = DEFAULT_ACTIVATION;
+    }
+
+    /**
      * Set the color of this point based on the activation value.
      *
      * @param baseColor the base color whose saturation should be modified.
-     * @param ceiling the highest possible activation.
      */
-    void setColorBasedOnVal(float baseColor, double ceiling) {
-        float saturation = checkValid((float) Math.abs(activation / ceiling));
-        // System.out.println(val + "  " + saturation);
+    public void setColorBasedOnVal(float baseColor) {
+        float saturation = clip((float) Math.abs(activation));
+        //System.out.println(activation + "  " + saturation);
         setColor(Color.getHSBColor(baseColor, saturation, 1));
     }
 
@@ -79,7 +90,7 @@ public class DataPointColored extends DataPoint {
      *
      * @param ceiling max value
      */
-    void spikeActivation(double ceiling) {
+    public void spikeActivation(double ceiling) {
         activation = ceiling;
     }
 
@@ -89,7 +100,7 @@ public class DataPointColored extends DataPoint {
      * @param base lower bound of activation
      * @param decrementAmount amount by which to decrement
      */
-    void decrementActivation(double base, double decrementAmount) {
+    public void decrementActivation(double base, double decrementAmount) {
         activation -= decrementAmount;
         // in case of an overshoot
         if (activation < base) {
@@ -103,8 +114,9 @@ public class DataPointColored extends DataPoint {
      * @param ceiling upper bound of activation
      * @param incrementAmount amount to increment
      */
-    void incrementActivation(double ceiling, double incrementAmount) {
+    public void incrementActivation(double ceiling, double incrementAmount) {
         activation += incrementAmount;
+        //System.out.println("activation:" + activation);
         // in case of an overshoot
         if (activation > ceiling) {
             activation = ceiling;
@@ -117,7 +129,7 @@ public class DataPointColored extends DataPoint {
      * @param val the saturation value to check.
      * @return whether it is valid or not.
      */
-    private float checkValid(final float val) {
+    private float clip(final float val) {
         float tempval = val;
 
         if (val > 1) {

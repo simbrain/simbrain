@@ -22,10 +22,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.ClassDescriptionPair;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -57,6 +58,11 @@ public class Projector {
     protected Dataset downstairs;
 
     /**
+     * Reference to current "hot" point.
+     */
+    private DataPoint currentPoint;
+
+    /**
      * Default number of sources. This is the dimensionality of the hi D
      * projectionModel
      */
@@ -72,22 +78,28 @@ public class Projector {
     private ProjectionMethod projectionMethod;
 
     /** List of Neuron update rules; used in Gui Combo boxes. */
-    private static final ClassDescriptionPair[] PROJECTION_METHOD_LIST = {
-            new ClassDescriptionPair(ProjectCoordinate.class,
-                    "Coordinate Projection"),
-            new ClassDescriptionPair(ProjectNNSubspace.class, "NN Subspace"),
-            new ClassDescriptionPair(ProjectPCA.class, "PCA"),
-            new ClassDescriptionPair(ProjectTriangulate.class, "Triangulation"),
-            new ClassDescriptionPair(ProjectSammon.class, "Sammon Map") };
+    private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
+
+    // Initialization
+    {
+        listeners = new ArrayList<ProjectorListener>();
+        colorManager = new DataColoringManager(this);
+
+        projectionMethods.put(ProjectCoordinate.class,
+                    "Coordinate Projection");
+        projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
+        projectionMethods.put(ProjectPCA.class, "PCA");
+        projectionMethods.put(ProjectTriangulate.class, "Triangulation");
+        projectionMethods.put(ProjectSammon.class, "Sammon Map");
+    }
 
     /** Manages coloring the datapoints. */
-    private final DataColoringManager colorManager = new DataColoringManager();
+    private final DataColoringManager colorManager;
 
     /**
      * Default constructor for projector.
      */
     public Projector() {
-        listeners = new ArrayList<ProjectorListener>();
         this.setProjectionMethod(ProjectorPreferences
                 .getDefaultProjectionMethod());
         init(DEFAULT_NUMBER_OF_DIMENSIONS);
@@ -99,7 +111,6 @@ public class Projector {
      * @param dimension dimensionality of data to be projected
      */
     public Projector(int dimension) {
-        listeners = new ArrayList<ProjectorListener>();
         this.setProjectionMethod(ProjectorPreferences
                 .getDefaultProjectionMethod());
         init(dimension);
@@ -141,7 +152,7 @@ public class Projector {
     /**
      * Add a new point to the dataset, using the currently selected add method.
      *
-     * @param point the point to add
+     * @param point the upstairs point to add
      */
     public void addDatapoint(final DataPointColored point) {
 
@@ -160,14 +171,11 @@ public class Projector {
         // exists just change colors and return. If the point is new. add a
         // point downstairs, and call the projection algorithm.
         DataPoint existingPoint = upstairs.addPoint(point, tolerance);
-        colorManager.updateDataPointColors(upstairs);
         if (existingPoint != null) {
-            colorManager
-                    .updateColorOfCurrentPoint((DataPointColored) existingPoint);
-            this.fireProjectorColorsChanged();
-            return;
+            currentPoint = existingPoint;
         } else {
-            colorManager.updateColorOfCurrentPoint(point);
+            currentPoint = point;
+            //colorManager.updateColorOfPoint(point); TODO: Seems to be needed so that  hot stays hot.  But then hot color "doubling"
             DataPoint newPoint;
             if (point.getDimension() == 1) {
                 // For 1-d datasets plot points on a horizontal line
@@ -180,6 +188,7 @@ public class Projector {
             projectionMethod.project();
             fireDataPointAdded();
         }
+        colorManager.updateDataPointColors(upstairs);
     }
 
 
@@ -203,15 +212,14 @@ public class Projector {
         if (projName == null) {
             return;
         }
-
-        for (ClassDescriptionPair pair : PROJECTION_METHOD_LIST) {
-            if (pair.getDescription() == projName) {
-                ProjectionMethod method;
+        for (Class<?> method: projectionMethods.keySet()) {
+            if (projName.equalsIgnoreCase(projectionMethods.get(method))) {
                 try {
-                    method = (ProjectionMethod) pair.getTheClass()
-                            .getConstructor(new Class[] { Projector.class })
-                            .newInstance(new Object[] { this });
-                    setProjectionMethod(method);
+                    ProjectionMethod projMethod;
+                    projMethod = (ProjectionMethod) method.getConstructor(
+                            new Class[] { Projector.class }).newInstance(
+                            new Object[] { this });
+                    setProjectionMethod(projMethod);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -256,26 +264,13 @@ public class Projector {
     }
 
     /**
-     * @return list of projector types, by name
-     */
-    public static ClassDescriptionPair[] getProjectorList() {
-        return PROJECTION_METHOD_LIST;
-    }
-
-    /**
-     * Used to get the class associated with the current projection method. Used
-     * by a combo box in the gui.
+     * Used to get the String associated with the current projection method.
+     * Used by a combo box in the gui.
      *
-     * @return the class description pair (which contains a reference to the
-     *         class) associated with the current projection method.
+     * @return the String associated with current projection method.
      */
-    public ClassDescriptionPair getCurrentMethod() {
-        for (ClassDescriptionPair pair : PROJECTION_METHOD_LIST) {
-            if (pair.getTheClass() == projectionMethod.getClass()) {
-                return pair;
-            }
-        }
-        return null;
+    public String getCurrentMethodString() {
+        return projectionMethods.get(projectionMethod.getClass());
     }
 
     /**
@@ -300,7 +295,7 @@ public class Projector {
     }
 
     /**
-     * Notify listeners that the projecttion method has been changed.
+     * Notify listeners that the projection method has been changed.
      */
     public void fireProjectionMethodChanged() {
         for (ProjectorListener listener : listeners) {
@@ -372,6 +367,18 @@ public class Projector {
         this.fireProjectorDataChanged();
         // getCurrentProjectionMethod().resetColorIndices();
     }
+
+    /**
+     * Reset the colors of all colored data points.
+     */
+    public void resetColors() {
+        for (int i = 0; i < upstairs.getNumPoints(); i++) {
+            DataPointColored point = (DataPointColored) upstairs.getPoint(i);
+            point.resetActivation();
+        }
+        colorManager.updateDataPointColors(upstairs);
+    }
+
 
     /**
      * Returns the size of the dataset.
@@ -462,6 +469,20 @@ public class Projector {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the projectionMethods
+     */
+    public HashMap<Class<?>, String> getProjectionMethods() {
+        return projectionMethods;
+    }
+
+    /**
+     * @return the currentPoint
+     */
+    public DataPoint getCurrentPoint() {
+        return currentPoint;
     }
 
 }

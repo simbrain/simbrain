@@ -98,23 +98,27 @@ public class ProjectionModel extends ChartModel {
 
             @Override
             public void projectionMethodChanged() {
+                //System.out.println("ProjectionModel: In method changed");
                 resetData();
             }
 
             @Override
             public void projectorDataChanged() {
-                setRunning(false);
+                //System.out.println("ProjectionModel: In data changed");
                 resetData();
             }
 
             @Override
             public void datapointAdded() {
+                //System.out.println("ProjectionModel: In data added");
+                // TODO: For some projection methods full data reset is not
+                // really required...
                 resetData();
             }
 
             @Override
             public void projectorColorsChanged() {
-                resetData();
+                //System.out.println("ProjectionModel: In color changed");
             }
 
         });

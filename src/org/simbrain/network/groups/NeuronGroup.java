@@ -18,6 +18,7 @@
 package org.simbrain.network.groups;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +29,9 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
 /**
@@ -162,6 +165,43 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanIn();
         }
+        getParentNetwork().fireNetworkChanged();
+    }
+
+    /**
+     * Randomize fan-out for all neurons in group.
+     */
+    public void randomizeOutgoingWeights() {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.randomizeFanOut();
+        }
+        getParentNetwork().fireNetworkChanged();
+    }
+
+    /**
+     * Return flat list of fanins for all neurons in group.
+     *
+     * @return incoming weights
+     */
+    public List<Synapse> getIncomingWeights() {
+        List<Synapse> retList = new ArrayList<Synapse>();
+        for (Neuron neuron : this.getNeuronList()) {
+            retList.addAll(neuron.getFanIn());
+        }
+        return retList;
+    }
+
+    /**
+     * Return flat list of fanouts for all neurons in group.
+     *
+     * @return outgoing weights
+     */
+    public List<Synapse> getOutgoingWeights() {
+        List<Synapse> retList = new ArrayList<Synapse>();
+        for (Neuron neuron : this.getNeuronList()) {
+            retList.addAll(neuron.getFanOut());
+        }
+        return retList;
     }
 
     /**
@@ -192,11 +232,13 @@ public class NeuronGroup extends Group {
      * @param fireEvent whether to fire a neuron added event
      */
     public void addNeuron(Neuron neuron, boolean fireEvent) {
-        neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
         neuronList.add(neuron);
         neuron.setParentGroup(this);
-        if (fireEvent) {
-            getParentNetwork().fireNeuronAdded(neuron);
+        if (getParentNetwork() != null) {
+            neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
+            if (fireEvent) {
+                getParentNetwork().fireNeuronAdded(neuron);
+            }
         }
     }
 
@@ -270,6 +312,18 @@ public class NeuronGroup extends Group {
         }
         return retArray;
     }
+
+    public double[] getBiases() {
+        double[] retArray = SimbrainMath.zeroVector(neuronList.size());
+        int i = 0;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
+                retArray[i++] = ((BiasedUpdateRule)neuron.getUpdateRule()).getBias();
+            }
+        }
+        return retArray;
+    }
+
 
     /**
      * True if the group contains the specified neuron.
@@ -358,7 +412,7 @@ public class NeuronGroup extends Group {
         }
         return max;
     }
-    
+
     /**
      * Returns the minimum X position of this group based on the neurons that
      * comprise it.
@@ -373,7 +427,7 @@ public class NeuronGroup extends Group {
         }
         return min;
     }
-    
+
     /**
      * Returns the maximum Y position of this group based on the neurons that
      * comprise it.
@@ -388,7 +442,7 @@ public class NeuronGroup extends Group {
           }
           return max;
     }
-    
+
     /**
      * Returns the minimum Y position of this group based on the neurons that
      * comprise it.
@@ -403,7 +457,7 @@ public class NeuronGroup extends Group {
         }
         return min;
     }
-    
+
     /**
      * Return the height of this group, based on the positions of the neurons
      * that comprise it.
@@ -467,7 +521,7 @@ public class NeuronGroup extends Group {
         int i = 0;
         for (Neuron neuron : toCopy.getNeuronList()) {
             if (i < neuronList.size()) {
-                neuronList.get(i++).setActivation(neuron.getActivation());
+                neuronList.get(i++).setActivation(neuron.getInputValue() + neuron.getActivation());
             }
         }
     }
@@ -494,5 +548,9 @@ public class NeuronGroup extends Group {
                     + neuron.getInputValue());
         }
     }
+
+
+
+
 
 }

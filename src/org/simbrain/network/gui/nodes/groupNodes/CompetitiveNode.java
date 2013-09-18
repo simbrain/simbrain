@@ -106,7 +106,7 @@ public class CompetitiveNode extends NeuronGroupNode {
     /**
      * Sets custom menu for competitive node.
      */
-    private void setContextMenu() {
+    protected void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         Action editNet = new AbstractAction("Set Competitive Network Properties...") {

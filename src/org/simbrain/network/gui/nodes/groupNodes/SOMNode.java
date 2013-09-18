@@ -107,7 +107,7 @@ public class SOMNode extends NeuronGroupNode {
     /**
      * Sets custom menu for SOM node.
      */
-    private void setContextMenu() {
+    protected void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(new AbstractAction("Reset Network") {

@@ -67,37 +67,34 @@ public class DataColoringManager {
     /**
      * The lower bound for "activation" of a point in frequency and decay trail.
      */
-    private double floor = 1;
+    private double floor = DataPointColored.DEFAULT_ACTIVATION;
 
     /**
      * The upper bound for "activation" of a point in frequency and decay trail.
+     * Max is 1
      */
-    private double ceiling = 10;
+    private double ceiling = 1;
 
     /**
      * How much to increment activation at each time step (used in frequency
      * coloring method).
      */
-    private double incrementAmount = .5;
+    private double incrementAmount = .1;
 
     /**
      * How much to decrement activation at each time step (used in decay trail
      * coloring method).
      */
-    private double decrementAmount = .2;
+    private double decrementAmount = .02;
 
-    /**
-     * Helper variable holding the float representation of the current base
-     * color.
-     *
-     * TODO: Test persistence.
-     */
-    private float floatColor = Utils.colorToFloat(baseColor);
+    /** Reference to parent projector. */
+    private final Projector projector;
 
     /**
      * Construct a data coloring manager.
      */
-    public DataColoringManager() {
+    public DataColoringManager(Projector projector) {
+        this.projector = projector;
     }
 
     /**
@@ -105,38 +102,44 @@ public class DataColoringManager {
      *
      * @param data the dataset whose points should be colored.
      */
-    void updateDataPointColors(Dataset data) {
+    public void updateDataPointColors(Dataset data) {
         for (int i = 0; i < data.getNumPoints(); i++) {
             DataPointColored point = (DataPointColored) data.getPoint(i);
-            if (coloringMethod == ColoringMethod.None) {
-                point.setColor(baseColor);
-            } else if (coloringMethod == ColoringMethod.HotPoint) {
-                point.setColor(baseColor);
-            } else if (coloringMethod == ColoringMethod.DecayTrail) {
-                point.decrementActivation(floor, decrementAmount);
-                point.setColorBasedOnVal(floatColor, ceiling);
-            } else if (coloringMethod == ColoringMethod.Frequency) {
-                // TODO: Add slight decay
-                point.setColorBasedOnVal(floatColor, ceiling);
-            }
+            updateColorOfPoint(point);
         }
     }
 
     /**
-     * Update the color of the current poin the dataset.
+     * Update the color of the specified point in the dataset.
      *
      * @param point the point to update.
      */
-    public void updateColorOfCurrentPoint(DataPointColored point) {
+    private void updateColorOfPoint(DataPointColored point) {
         if (coloringMethod == ColoringMethod.None) {
-            return;
+            point.setColor(baseColor);
         } else if (coloringMethod == ColoringMethod.HotPoint) {
-            point.setColor(hotColor);
+            if (point == projector.getCurrentPoint()) {
+                point.setColor(hotColor);
+            } else {
+                point.setColor(baseColor);
+            }
         } else if (coloringMethod == ColoringMethod.DecayTrail) {
-            point.spikeActivation(ceiling);
+            if (point == projector.getCurrentPoint()) {
+                point.setColor(hotColor);
+                point.spikeActivation(ceiling);
+            } else {
+                point.decrementActivation(floor, decrementAmount);
+                point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
+            }
         } else if (coloringMethod == ColoringMethod.Frequency) {
-            point.incrementActivation(ceiling, incrementAmount);
+            if (point == projector.getCurrentPoint()) {
+                point.setColor(hotColor);
+                point.incrementActivation(ceiling, incrementAmount);
+            } else {
+                point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
+            }
         }
+
     }
 
     /**
@@ -231,7 +234,6 @@ public class DataColoringManager {
      */
     public void setBaseColor(Color baseColor) {
         this.baseColor = baseColor;
-        floatColor = Utils.colorToFloat(baseColor);
     }
 
     /**

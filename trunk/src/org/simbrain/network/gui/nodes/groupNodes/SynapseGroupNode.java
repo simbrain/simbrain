@@ -139,7 +139,7 @@ public class SynapseGroupNode extends GroupNode {
 
         // Weight adjustment stuff
         menu.addSeparator();
-        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
+        Action adjustSynapses = new AbstractAction("Adjust synapses...") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
                 final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
@@ -163,7 +163,7 @@ public class SynapseGroupNode extends GroupNode {
 
         // Selection stuff
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select Synapses") {
+        Action selectSynapses = new AbstractAction("Select synapses") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
             }

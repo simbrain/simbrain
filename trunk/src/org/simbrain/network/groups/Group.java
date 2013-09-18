@@ -127,7 +127,9 @@ public abstract class Group {
      */
     public void setLabel(String label) {
         this.label = label;
-        parentNetwork.fireGroupParametersChanged(this);
+        if (parentNetwork != null) {
+            parentNetwork.fireGroupParametersChanged(this);            
+        }
     }
 
     /**

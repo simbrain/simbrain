@@ -124,9 +124,11 @@ public class SynapseGroup extends Group {
         if (conflictsWithExistingSynapse(synapse)) {
             return false;
         }
-        synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
-        synapse.setParentGroup(this);
+        if (getParentNetwork() != null) {
+            synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
+            synapse.setParentGroup(this);
+        }
         return true;
     }
 

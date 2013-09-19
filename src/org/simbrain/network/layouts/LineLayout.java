@@ -25,27 +25,36 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a line.
- *
+ * 
  * @author jyoshimi
  */
 public class LineLayout implements Layout {
 
     /** Orientation of the line. */
     public enum LineOrientation {
-        VERTICAL {
-            public String toString() {
-                return "Vertical";
-            }
-        },
-        HORIZONTAL {
-            public String toString() {
-                return "Horizontal";
-            }
-        }
+	VERTICAL {
+	    public String toString() {
+		return "Vertical";
+	    }
+	},
+	HORIZONTAL {
+	    public String toString() {
+		return "Horizontal";
+	    }
+	}
     };
 
+    /** The default orientation of the line. */
+    public static final LineOrientation DEFAULT_LINE_ORIENTATION = LineOrientation.HORIZONTAL;
+
+    /** The default spacing between neurons when laid out. */
+    public static final double DEFAULT_SPACING = 40;
+
     /** Current line orientation. */
-    private LineOrientation orientation = LineOrientation.HORIZONTAL;
+    private LineOrientation orientation = DEFAULT_LINE_ORIENTATION;
+
+    /** Spacing between neurons. */
+    private double spacing = DEFAULT_SPACING;
 
     /** Initial x position of line of neurons. */
     private double initialX;
@@ -53,34 +62,37 @@ public class LineLayout implements Layout {
     /** Initial y position of line of neurons. */
     private double initialY;
 
-    /** Spacing between neurons. */
-    private double spacing = 40;
-
     /**
      * Create a layout.
-     *
-     * @param initialx initial x position
-     * @param initialy initial y position
-     * @param spacing spacing between neurons
-     * @param orientation of the neurons
+     * 
+     * @param initialx
+     *            initial x position
+     * @param initialy
+     *            initial y position
+     * @param spacing
+     *            spacing between neurons
+     * @param orientation
+     *            of the neurons
      */
     public LineLayout(final double initialx, final double initialy,
-            final double spacing, final LineOrientation orientation) {
-        initialX = initialx;
-        initialY = initialy;
-        this.spacing = spacing;
-        this.orientation = orientation;
+	    final double spacing, final LineOrientation orientation) {
+	initialX = initialx;
+	initialY = initialy;
+	this.spacing = spacing;
+	this.orientation = orientation;
     }
 
     /**
      * Create a layout.
-     *
-     * @param spacing spacing between neurons
-     * @param orientation of the neurons
+     * 
+     * @param spacing
+     *            spacing between neurons
+     * @param orientation
+     *            of the neurons
      */
     public LineLayout(final double spacing, final LineOrientation orientation) {
-        this.spacing = spacing;
-        this.orientation = orientation;
+	this.spacing = spacing;
+	this.orientation = orientation;
     }
 
     /**
@@ -93,65 +105,67 @@ public class LineLayout implements Layout {
      * {@inheritDoc}
      */
     public void layoutNeurons(final List<Neuron> neurons) {
-        if (orientation == LineOrientation.VERTICAL) {
-            double ypos = initialY;
-            for (Neuron neuron : neurons) {
-                neuron.setX(initialX);
-                neuron.setY(ypos);
-                ypos += spacing;
-            }
-        } else if (orientation == LineOrientation.HORIZONTAL) {
-            double xpos = initialX;
-            for (Neuron neuron : neurons) {
-                neuron.setX(xpos);
-                neuron.setY(initialY);
-                xpos += spacing;
-            }
-        }
+	if (orientation == LineOrientation.VERTICAL) {
+	    double ypos = initialY;
+	    for (Neuron neuron : neurons) {
+		neuron.setX(initialX);
+		neuron.setY(ypos);
+		ypos += spacing;
+	    }
+	} else if (orientation == LineOrientation.HORIZONTAL) {
+	    double xpos = initialX;
+	    for (Neuron neuron : neurons) {
+		neuron.setX(xpos);
+		neuron.setY(initialY);
+		xpos += spacing;
+	    }
+	}
     }
 
     /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {
-        initialX = initialPoint.getX();
-        initialY = initialPoint.getY();
+	initialX = initialPoint.getX();
+	initialY = initialPoint.getY();
     }
 
     /** @see Layout */
-    public String getLayoutName() {
-        return "Line";
+    public String getDescription() {
+	return "Line";
     }
 
     /**
      * @return the orientation
      */
     public LineOrientation getOrientation() {
-        return orientation;
+	return orientation;
     }
 
     /**
-     * @param orientation the orientation to set
+     * @param orientation
+     *            the orientation to set
      */
     public void setOrientation(final LineOrientation orientation) {
-        this.orientation = orientation;
-        // System.out.println("LineLayout orientation: " + this.orientation);
+	this.orientation = orientation;
+	// System.out.println("LineLayout orientation: " + this.orientation);
     }
 
     /**
      * @return the spacing
      */
     public double getSpacing() {
-        return spacing;
+	return spacing;
     }
 
     /**
-     * @param spacing the spacing to set
+     * @param spacing
+     *            the spacing to set
      */
     public void setSpacing(final double spacing) {
-        this.spacing = spacing;
+	this.spacing = spacing;
     }
 
     /** @override */
     public String toString() {
-        return "Line Layout";
+	return "Line Layout";
     }
 }

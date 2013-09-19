@@ -51,136 +51,142 @@ public class ThreeValueRule extends NeuronUpdateRule {
      * {@inheritDoc}
      */
     public TimeType getTimeType() {
-        return TimeType.DISCRETE;
+	return TimeType.DISCRETE;
     }
 
     /**
      * {@inheritDoc}
      */
     public void init(Neuron neuron) {
-        upperValue = neuron.getUpperBound();
-        lowerValue = neuron.getLowerBound();
-        middleValue = upperValue / lowerValue;
-        lowerThreshold = (lowerValue + middleValue) / 2;
-        upperThreshold = (middleValue + upperValue) / 2;
+	upperValue = neuron.getUpperBound();
+	lowerValue = neuron.getLowerBound();
+	middleValue = upperValue / lowerValue;
+	lowerThreshold = (lowerValue + middleValue) / 2;
+	upperThreshold = (middleValue + upperValue) / 2;
     }
 
     /**
      * {@inheritDoc}
      */
     public ThreeValueRule deepCopy() {
-        ThreeValueRule tv = new ThreeValueRule();
-        tv.setBias(getBias());
-        tv.setLowerThreshold(getLowerThreshold());
-        tv.setUpperThreshold(getUpperThreshold());
-        tv.setLowerValue(getLowerValue());
-        tv.setMiddleValue(getMiddleValue());
-        tv.setUpperValue(getUpperValue());
+	ThreeValueRule tv = new ThreeValueRule();
+	tv.setBias(getBias());
+	tv.setLowerThreshold(getLowerThreshold());
+	tv.setUpperThreshold(getUpperThreshold());
+	tv.setLowerValue(getLowerValue());
+	tv.setMiddleValue(getMiddleValue());
+	tv.setUpperValue(getUpperValue());
 
-        return tv;
+	return tv;
     }
 
     /**
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = neuron.getWeightedInputs();
+	double wtdInput = neuron.getWeightedInputs();
 
-        if (wtdInput < lowerThreshold) {
-            neuron.setBuffer(lowerValue);
-        } else if (wtdInput > upperThreshold) {
-            neuron.setBuffer(upperValue);
-        } else {
-            neuron.setBuffer(middleValue);
-        }
+	if (wtdInput < lowerThreshold) {
+	    neuron.setBuffer(lowerValue);
+	} else if (wtdInput > upperThreshold) {
+	    neuron.setBuffer(upperValue);
+	} else {
+	    neuron.setBuffer(middleValue);
+	}
     }
 
     /**
      * @return the bias.
      */
     public double getBias() {
-        return bias;
+	return bias;
     }
 
     /**
-     * @param bias The bias to set.
+     * @param bias
+     *            The bias to set.
      */
     public void setBias(final double bias) {
-        this.bias = bias;
+	this.bias = bias;
     }
 
     /**
      * @return the lower threshold.
      */
     public double getLowerThreshold() {
-        return lowerThreshold;
+	return lowerThreshold;
     }
 
     /**
-     * @param lowerThreshold The lower threshold to set.
+     * @param lowerThreshold
+     *            The lower threshold to set.
      */
     public void setLowerThreshold(final double lowerThreshold) {
-        this.lowerThreshold = lowerThreshold;
+	this.lowerThreshold = lowerThreshold;
     }
 
     /**
      * @return the lower value.
      */
     public double getLowerValue() {
-        return lowerValue;
+	return lowerValue;
     }
 
     /**
-     * @param lowerValue The lower value to set.
+     * @param lowerValue
+     *            The lower value to set.
      */
     public void setLowerValue(final double lowerValue) {
-        this.lowerValue = lowerValue;
+	this.lowerValue = lowerValue;
     }
 
     /**
      * @return the middle value.
      */
     public double getMiddleValue() {
-        return middleValue;
+	return middleValue;
     }
 
     /**
-     * @param middleValue The middle value to set.
+     * @param middleValue
+     *            The middle value to set.
      */
     public void setMiddleValue(final double middleValue) {
-        this.middleValue = middleValue;
+	this.middleValue = middleValue;
     }
 
     /**
      * @return the upper threshold.
      */
     public double getUpperThreshold() {
-        return upperThreshold;
+	return upperThreshold;
     }
 
     /**
-     * @param upperThreshold The upper threshold to set.
+     * @param upperThreshold
+     *            The upper threshold to set.
      */
     public void setUpperThreshold(final double upperThreshold) {
-        this.upperThreshold = upperThreshold;
+	this.upperThreshold = upperThreshold;
     }
 
     /**
      * @return the upper value.
      */
     public double getUpperValue() {
-        return upperValue;
+	return upperValue;
     }
 
     /**
-     * @param upperValue The upper value to set.
+     * @param upperValue
+     *            The upper value to set.
      */
     public void setUpperValue(final double upperValue) {
-        this.upperValue = upperValue;
+	this.upperValue = upperValue;
     }
 
     @Override
     public String getDescription() {
-        return "Three valued";
+	return "Three Value";
     }
 }

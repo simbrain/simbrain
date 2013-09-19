@@ -23,7 +23,6 @@ import java.util.Random;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
@@ -54,165 +53,171 @@ public class WinnerTakeAll extends NeuronGroup {
 
     /**
      * Copy constructor.
-     *
-     * @param newRoot new root net
-     * @param oldNet old network
+     * 
+     * @param newRoot
+     *            new root net
+     * @param oldNet
+     *            old network
      */
     public WinnerTakeAll(Network newRoot, WinnerTakeAll oldNet) {
-        super(newRoot, oldNet);
-        setLoseValue(oldNet.getLoseValue());
-        setWinValue(oldNet.getWinValue());
-        setUseRandom(oldNet.isUseRandom());
-        setRandomProb(oldNet.getRandomProb());
-        setLabel("Winner take all network");
+	super(newRoot, oldNet);
+	setLoseValue(oldNet.getLoseValue());
+	setWinValue(oldNet.getWinValue());
+	setUseRandom(oldNet.isUseRandom());
+	setRandomProb(oldNet.getRandomProb());
+	setLabel("Winner take all network");
     }
 
     /**
      * Creates a new winner take all network.
-     *
-     * @param numNeurons Number of neurons in new network
-     * @param layout the way to layout the network
+     * 
+     * @param root
+     *            the network containing this subnetwork
+     * @param numNeurons
+     *            Number of neurons in new network
      */
-    public WinnerTakeAll(final Network root, final int numNeurons,
-            final Layout layout) {
-        super(root);
-        for (int i = 0; i < numNeurons; i++) {
-            // TODO: Prevent invalid states like this?
-            this.addNeuron(new Neuron(root, new LinearRule()));
-        }
-        layout.layoutNeurons(this.getNeuronList());
-        setLabel("Winner take all network");
+    public WinnerTakeAll(final Network root, final int numNeurons) {
+	super(root);
+	for (int i = 0; i < numNeurons; i++) {
+	    // TODO: Prevent invalid states like this?
+	    this.addNeuron(new Neuron(root, new LinearRule()));
+	}
+	setLabel("Winner take all network");
     }
 
     @Override
     public void update() {
 
-        if (getParentNetwork().getClampNeurons()) {
-            return;
-        }
+	if (getParentNetwork().getClampNeurons()) {
+	    return;
+	}
 
-        // Determine the winning neuron
-        int winnerIndex;
-        if (useRandom) {
-            if (Math.random() < randomProb) {
-                winnerIndex = getRandomWinnerIndex();
-            } else {
-                winnerIndex = getWinningIndex();
-            }
-        } else {
-            winnerIndex = getWinningIndex();
-        }
+	// Determine the winning neuron
+	int winnerIndex;
+	if (useRandom) {
+	    if (Math.random() < randomProb) {
+		winnerIndex = getRandomWinnerIndex();
+	    } else {
+		winnerIndex = getWinningIndex();
+	    }
+	} else {
+	    winnerIndex = getWinningIndex();
+	}
 
-        // Set neuron values
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            if (i == winnerIndex) {
-                getNeuronList().get(i).setActivation(winValue);
-            } else {
-                getNeuronList().get(i).setActivation(loseValue);
-            }
-        }
+	// Set neuron values
+	for (int i = 0; i < getNeuronList().size(); i++) {
+	    if (i == winnerIndex) {
+		getNeuronList().get(i).setActivation(winValue);
+	    } else {
+		getNeuronList().get(i).setActivation(loseValue);
+	    }
+	}
     }
 
     /**
-     *
+     * 
      * Returns index of random winning neuron.
-     *
+     * 
      * @return index of random winner
      */
     private int getRandomWinnerIndex() {
-        return new Random().nextInt(getNeuronList().size());
+	return new Random().nextInt(getNeuronList().size());
     }
 
     /**
      * Returns the index of the input node with the greatest net input.
-     *
+     * 
      * @return winning node's index
      */
     private int getWinningIndex() {
-        int winnerIndex = 0;
-        double max = Double.NEGATIVE_INFINITY;
-        double lastVal = getNeuronList().get(0).getWeightedInputs();
-        boolean tie = true;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            double val = n.getWeightedInputs();
-            if (val != lastVal) {
-                tie = false;
-            }
-            lastVal = val;
-            if (val > max) {
-                winnerIndex = i;
-                max = n.getWeightedInputs();
-            }
-        }
-        // Break ties randomly
-        // (TODO: Add a field so use can decide if they want this)
-        if (tie) {
-            winnerIndex = getRandomWinnerIndex();
-        }
-        return winnerIndex;
+	int winnerIndex = 0;
+	double max = Double.NEGATIVE_INFINITY;
+	double lastVal = getNeuronList().get(0).getWeightedInputs();
+	boolean tie = true;
+	for (int i = 0; i < getNeuronList().size(); i++) {
+	    Neuron n = getNeuronList().get(i);
+	    double val = n.getWeightedInputs();
+	    if (val != lastVal) {
+		tie = false;
+	    }
+	    lastVal = val;
+	    if (val > max) {
+		winnerIndex = i;
+		max = n.getWeightedInputs();
+	    }
+	}
+	// Break ties randomly
+	// (TODO: Add a field so use can decide if they want this)
+	if (tie) {
+	    winnerIndex = getRandomWinnerIndex();
+	}
+	return winnerIndex;
     }
 
     /**
      * @return Returns the loseValue.
      */
     public double getLoseValue() {
-        return loseValue;
+	return loseValue;
     }
 
     /**
-     * @param loseValue The loseValue to set.
+     * @param loseValue
+     *            The loseValue to set.
      */
     public void setLoseValue(final double loseValue) {
-        this.loseValue = loseValue;
+	this.loseValue = loseValue;
     }
 
     /**
      * @return Returns the winValue.
      */
     public double getWinValue() {
-        return winValue;
+	return winValue;
     }
 
     /**
-     * @param winValue The winValue to set.
+     * @param winValue
+     *            The winValue to set.
      */
     public void setWinValue(final double winValue) {
-        this.winValue = winValue;
+	this.winValue = winValue;
     }
 
     /**
      * @return Number of neurons.
      */
     public int getNumUnits() {
-        return numUnits;
+	return numUnits;
     }
 
     /**
      * @return the useRandom
      */
     public boolean isUseRandom() {
-        return useRandom;
+	return useRandom;
     }
 
     /**
-     * @param useRandom the useRandom to set
+     * @param useRandom
+     *            the useRandom to set
      */
     public void setUseRandom(boolean useRandom) {
-        this.useRandom = useRandom;
+	this.useRandom = useRandom;
     }
 
     /**
      * @return the randomProb
      */
     public double getRandomProb() {
-        return randomProb;
+	return randomProb;
     }
 
     /**
-     * @param randomProb the randomProb to set
+     * @param randomProb
+     *            the randomProb to set
      */
     public void setRandomProb(double randomProb) {
-        this.randomProb = randomProb;
+	this.randomProb = randomProb;
     }
 }

@@ -18,14 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.LabelledItemPanel;
@@ -37,114 +33,114 @@ import org.simbrain.util.StandardDialog;
  */
 public class HopfieldCreationDialog extends StandardDialog {
 
-    /** File system separator. */
-    private static final String FS = System.getProperty("file.separator");
+	// /** File system separator. */
+	// private static final String FS = System.getProperty("file.separator");
 
-    /** Sequential network update order. */
-    public static final int SEQUENTIAL = 0;
+	/** Sequential network update order. */
+	public static final int SEQUENTIAL = 0;
 
-    /** Random network update order. */
-    public static final int RANDOM = 1;
+	/** Random network update order. */
+	public static final int RANDOM = 1;
 
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+	// /** Tabbed pane. */
+	// private JTabbedPane tabbedPane = new JTabbedPane();
+	//
+	// /** Logic tab panel. */
+	// private JPanel tabLogic = new JPanel();
+	//
+	// /** Layout tab panel. */
+	// private JPanel tabLayout = new JPanel();
 
-    /** Logic tab panel. */
-    private JPanel tabLogic = new JPanel();
+	/** Logic panel. */
+	private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-    /** Layout tab panel. */
-    private JPanel tabLayout = new JPanel();
+	/** Number of units field. */
+	private JTextField numberOfUnits = new JTextField();
 
-    /** Logic panel. */
-    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+	/** Network type combo box. */
+	private JComboBox<String> cbUpdateOrder = new JComboBox<String>(
+			new String[] { "Sequential", "Random" });
 
-    /** Layout panel. */
-    private LayoutPanel layoutPanel;
+	// /** Open training file button. */
+	// private JButton trainingFile = new JButton("Set");
 
-    /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField();
+	/** Network panel. */
+	private NetworkPanel networkPanel;
 
-    /** Network type combo box. */
-    private JComboBox cbUpdateOrder = new JComboBox(new String[] {
-            "Sequential", "Random" });
+	/**
+	 * Default constructor.
+	 * 
+	 * @param net
+	 *            Network panel
+	 */
+	public HopfieldCreationDialog(final NetworkPanel net) {
+		networkPanel = net;
+		// layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
+		// new GridLayoutPanel(), new HexagonalGridLayoutPanel(),
+		// new LineLayoutPanel() });
+		init();
+	}
 
-    /** Open training file button. */
-    private JButton trainingFile = new JButton("Set");
+	/**
+	 * Called when dialog closes.
+	 */
+	protected void closeDialogOk() {
 
-    /** Network panel. */
-    private NetworkPanel networkPanel;
+		int numUnits = Integer.parseInt(numberOfUnits.getText());
+		// Layout layout = layoutPanel.getNeuronLayout();
+		GridLayout layout =
+				new GridLayout(50, 50, (int) Math.sqrt(numUnits));
+		layout.setInitialLocation(networkPanel.getLastClickedPosition());
+		Hopfield hop = new Hopfield(networkPanel.getNetwork(), numUnits);
+		hop.setUpdateOrder(getUpdateType());
+		layout.layoutNeurons(hop.getFlatNeuronList());
+		networkPanel.getNetwork().addGroup(hop);
+		networkPanel.repaint();
+		super.closeDialogOk();
+	}
 
-    /**
-     * Default constructor.
-     *
-     * @param net Network panel
-     */
-    public HopfieldCreationDialog(final NetworkPanel net) {
-        networkPanel = net;
-        // layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
-        // new GridLayoutPanel(), new HexagonalGridLayoutPanel(),
-        // new LineLayoutPanel() });
-        init();
-    }
+	/**
+	 * @return the update order.
+	 */
+	public int getUpdateType() {
+		if (cbUpdateOrder.getSelectedIndex() == 0) {
+			return SEQUENTIAL;
+		} else {
+			return RANDOM;
+		}
+	}
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
+	/**
+	 * Initializes the panel.
+	 */
+	private void init() {
+		// Initialize Dialog
+		setTitle("New Hopfield Network");
 
-        int numUnits = Integer.parseInt(numberOfUnits.getText());
-        // Layout layout = layoutPanel.getNeuronLayout();
-        GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numUnits));
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Hopfield hop = new Hopfield(networkPanel.getNetwork(), numUnits, layout);
-        hop.setUpdateOrder(getUpdateType());
-        networkPanel.getNetwork().addGroup(hop);
-        networkPanel.repaint();
-        super.closeDialogOk();
-    }
+		fillFieldValues();
 
-    /**
-     * @return the update order.
-     */
-    public int getUpdateType() {
-        if (cbUpdateOrder.getSelectedIndex() == 0) {
-            return SEQUENTIAL;
-        } else {
-            return RANDOM;
-        }
-    }
+		// Set up graphics panel
+		logicPanel.addItem("Update order", cbUpdateOrder);
+		logicPanel.addItem("Number of Units", numberOfUnits);
+		// logicPanel.addItem("Set training file", trainingFile);
 
-    /**
-     * Initializes the panel.
-     */
-    private void init() {
-        // Initialize Dialog
-        setTitle("New Hopfield Network");
+		// Set up tab panel
+		// tabLogic.add(logicPanel);
+		// tabLayout.add(layoutPanel);
+		// tabbedPane.addTab("Logic", logicPanel);
+		// tabbedPane.addTab("Layout", layoutPanel);
+		setContentPane(logicPanel);
 
-        fillFieldValues();
+	}
 
-        // Set up graphics panel
-        logicPanel.addItem("Update order", cbUpdateOrder);
-        logicPanel.addItem("Number of Units", numberOfUnits);
-        // logicPanel.addItem("Set training file", trainingFile);
-
-        // Set up tab panel
-        // tabLogic.add(logicPanel);
-        // tabLayout.add(layoutPanel);
-        // tabbedPane.addTab("Logic", logicPanel);
-        // tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(logicPanel);
-
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-        // REDO: Pull default values
-        numberOfUnits.setText("" + 9);
-        // Hopfield dh = new Hopfield();
-        // numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
-    }
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues() {
+		// REDO: Pull default values
+		numberOfUnits.setText("" + 9);
+		// Hopfield dh = new Hopfield();
+		// numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
+	}
 
 }

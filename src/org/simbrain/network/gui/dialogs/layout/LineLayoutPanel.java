@@ -16,6 +16,7 @@ package org.simbrain.network.gui.dialogs.layout;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 
@@ -24,35 +25,53 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
  */
 public class LineLayoutPanel extends AbstractLayoutPanel {
 
-    /** Spacing field. */
-    private JTextField tfSpacing = new JTextField();
+	/** Spacing field. */
+	private JTextField tfSpacing = new JTextField();
 
-    /** Layout style selected. */
-    private JComboBox cbLayouts = new JComboBox(new LineOrientation[] {
-            LineOrientation.HORIZONTAL, LineOrientation.VERTICAL });
+	/** Layout style selected. */
+	private JComboBox<LineOrientation> cbLayouts =
+			new JComboBox<LineOrientation>(
+					new LineOrientation[] { LineOrientation.HORIZONTAL,
+							LineOrientation.VERTICAL });
 
-    /** Reference to the underlying layout. */
-    private final LineLayout layout;
+	/** Reference to the underlying layout. */
+	private final LineLayout layout;
 
-    /**
-     * Default constructor.
-     */
-    public LineLayoutPanel(LineLayout layout) {
-        this.layout = layout;
-        this.addItem("Layout Style", cbLayouts);
-        this.addItem("Spacing between neurons", tfSpacing);
-    }
+	/**
+	 * Default constructor.
+	 */
+	public LineLayoutPanel(LineLayout layout) {
+		this.layout = layout;
+		fillFieldValues();
+		this.addItem("Layout Style", cbLayouts);
+		this.addItem("Spacing:", tfSpacing);
+	}
 
-    @Override
-    public void commitChanges() {
-        layout.setOrientation((LineOrientation) cbLayouts.getSelectedItem());
-        layout.setSpacing(Double.parseDouble(tfSpacing.getText()));
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges() {
+		layout.setOrientation((LineOrientation) cbLayouts
+				.getSelectedItem());
+		layout.setSpacing(Double.parseDouble(tfSpacing.getText()));
+	}
 
-    @Override
-    public void fillFieldValues() {
-        cbLayouts.setSelectedItem(layout.getOrientation());
-        tfSpacing.setText(Double.toString(layout.getSpacing()));
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void fillFieldValues() {
+		cbLayouts.setSelectedItem(layout.getOrientation());
+		tfSpacing.setText(Double.toString(layout.getSpacing()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Layout getNeuronLayout() {
+		return layout;
+	}
 
 }

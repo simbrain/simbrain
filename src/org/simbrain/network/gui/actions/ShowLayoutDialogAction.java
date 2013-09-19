@@ -26,34 +26,36 @@ import org.simbrain.network.layouts.Layout;
  */
 public class ShowLayoutDialogAction extends AbstractAction {
 
-    /** Serial UID. */
-    private static final long serialVersionUID = -3355422356278099294L;
+	/** Serial UID. */
+	private static final long serialVersionUID = -3355422356278099294L;
 
-    /** The layout. */
-    private Layout layout;
+	/** The layout. */
+	private Layout layout;
 
-    /** Parent network Panel. */
-    private NetworkPanel networkPanel;
+	/** Parent network Panel. */
+	private NetworkPanel networkPanel;
 
-    /**
-     * Show layout dialog action.
-     *
-     * @param layout the layout type
-     * @param networkPanel parent panel
-     */
-    public ShowLayoutDialogAction(Layout layout, NetworkPanel networkPanel) {
-        super(layout.getLayoutName());
-        this.layout = layout;
-        this.networkPanel = networkPanel;
-    }
+	/**
+	 * Show layout dialog action.
+	 * 
+	 * @param layout
+	 *            the layout type
+	 * @param networkPanel
+	 *            parent panel
+	 */
+	public ShowLayoutDialogAction(Layout layout, NetworkPanel networkPanel) {
+		super(layout.getDescription());
+		this.layout = layout;
+		this.networkPanel = networkPanel;
+	}
 
-    /** @see ActionEvent. */
-    public void actionPerformed(ActionEvent e) {
-        LayoutDialog dialog;
-        dialog = new LayoutDialog(layout, networkPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-    }
+	/** @see ActionEvent. */
+	public void actionPerformed(ActionEvent e) {
+		LayoutDialog dialog;
+		dialog = new LayoutDialog(layout, networkPanel);
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
 
 }

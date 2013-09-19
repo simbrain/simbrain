@@ -56,86 +56,90 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
 
     @Override
     public String getDescription() {
-        return "Hebbian threshold";
+	return "Hebbian Threshold";
     }
 
     @Override
     public SynapseUpdateRule deepCopy() {
-        HebbianThresholdRule h = new HebbianThresholdRule();
-        h.setLearningRate(getLearningRate());
-        h.setOutputThreshold(this.getOutputThreshold());
-        h.setOutputThresholdMomentum(this.getOutputThresholdMomentum());
-        h.setUseSlidingOutputThreshold(this.getUseSlidingOutputThreshold());
-        return h;
+	HebbianThresholdRule h = new HebbianThresholdRule();
+	h.setLearningRate(getLearningRate());
+	h.setOutputThreshold(this.getOutputThreshold());
+	h.setOutputThresholdMomentum(this.getOutputThresholdMomentum());
+	h.setUseSlidingOutputThreshold(this.getUseSlidingOutputThreshold());
+	return h;
     }
 
     @Override
     public void update(Synapse synapse) {
-        double input = synapse.getSource().getActivation();
-        double output = synapse.getTarget().getActivation();
+	double input = synapse.getSource().getActivation();
+	double output = synapse.getTarget().getActivation();
 
-        if (useSlidingOutputThreshold) {
-            outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold));
-        }
-        double strength = synapse.getStrength()
-                + (learningRate * input * output * (output - outputThreshold));
-        synapse.setStrength(synapse.clip(strength));
+	if (useSlidingOutputThreshold) {
+	    outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold));
+	}
+	double strength = synapse.getStrength()
+		+ (learningRate * input * output * (output - outputThreshold));
+	synapse.setStrength(synapse.clip(strength));
     }
 
     /**
      * @return Returns the momentum.
      */
     public double getLearningRate() {
-        return learningRate;
+	return learningRate;
     }
 
     /**
-     * @param momentum The momentum to set.
+     * @param momentum
+     *            The momentum to set.
      */
     public void setLearningRate(final double momentum) {
-        this.learningRate = momentum;
+	this.learningRate = momentum;
     }
 
     /**
      * @return Returns the outputThreshold.
      */
     public double getOutputThreshold() {
-        return outputThreshold;
+	return outputThreshold;
     }
 
     /**
-     * @param outputThreshold The outputThreshold to set.
+     * @param outputThreshold
+     *            The outputThreshold to set.
      */
     public void setOutputThreshold(final double outputThreshold) {
-        this.outputThreshold = outputThreshold;
+	this.outputThreshold = outputThreshold;
     }
 
     /**
      * @return Returns the useSlidingOutputThreshold.
      */
     public boolean getUseSlidingOutputThreshold() {
-        return useSlidingOutputThreshold;
+	return useSlidingOutputThreshold;
     }
 
     /**
-     * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
+     * @param useSlidingOutputThreshold
+     *            The useSlidingOutputThreshold to set.
      */
     public void setUseSlidingOutputThreshold(
-            final boolean useSlidingOutputThreshold) {
-        this.useSlidingOutputThreshold = useSlidingOutputThreshold;
+	    final boolean useSlidingOutputThreshold) {
+	this.useSlidingOutputThreshold = useSlidingOutputThreshold;
     }
 
     /**
      * @return Returns the outputThresholdMomentum.
      */
     public double getOutputThresholdMomentum() {
-        return outputThresholdMomentum;
+	return outputThresholdMomentum;
     }
 
     /**
-     * @param outputThresholdMomentum The outputThresholdMomentum to set.
+     * @param outputThresholdMomentum
+     *            The outputThresholdMomentum to set.
      */
     public void setOutputThresholdMomentum(final double outputThresholdMomentum) {
-        this.outputThresholdMomentum = outputThresholdMomentum;
+	this.outputThresholdMomentum = outputThresholdMomentum;
     }
 }

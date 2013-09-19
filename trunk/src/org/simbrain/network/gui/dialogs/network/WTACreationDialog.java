@@ -27,11 +27,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
+import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
@@ -43,114 +39,117 @@ import org.simbrain.util.StandardDialog;
  */
 public class WTACreationDialog extends StandardDialog {
 
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+	/** Tabbed pane. */
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
-    private JPanel tabLogic = new JPanel();
+	/** Logic tab panel. */
+	private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
-    private JPanel tabLayout = new JPanel();
+	/** Layout tab panel. */
+	private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
-    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+	/** Logic panel. */
+	private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-    /** Layout panel. */
-    private LayoutPanel layoutPanel;
+	/** Layout panel. */
+	private MainLayoutPanel layoutPanel;
 
-    /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField();
+	/** Number of units field. */
+	private JTextField numberOfUnits = new JTextField();
 
-    /** Winner value field. */
-    private JTextField winnerValue = new JTextField();
+	/** Winner value field. */
+	private JTextField winnerValue = new JTextField();
 
-    /** Loser value field. */
-    private JTextField loserValue = new JTextField();
+	/** Loser value field. */
+	private JTextField loserValue = new JTextField();
 
-    /** Checkbox for using random method. */
-    private JCheckBox useRandomBox = new JCheckBox();
+	/** Checkbox for using random method. */
+	private JCheckBox useRandomBox = new JCheckBox();
 
-    /** Probability of using random field. */
-    private JTextField randomProb = new JTextField();
+	/** Probability of using random field. */
+	private JTextField randomProb = new JTextField();
 
-    /** Network panel. */
-    private NetworkPanel networkPanel;
+	/** Network panel. */
+	private NetworkPanel networkPanel;
 
-    /**
-     * This method is the default constructor.
-     *
-     * @param np Network panel
-     */
-    public WTACreationDialog(final NetworkPanel np) {
-        networkPanel = np;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
-                new LineLayoutPanel(), new HexagonalGridLayoutPanel(),
-                new GridLayoutPanel() });
-        init();
-    }
+	/**
+	 * This method is the default constructor.
+	 * 
+	 * @param np
+	 *            Network panel
+	 */
+	public WTACreationDialog(final NetworkPanel np) {
+		networkPanel = np;
+		layoutPanel = new MainLayoutPanel(false, this);
+		init();
+	}
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
-        Layout layout = layoutPanel.getNeuronLayout();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        WinnerTakeAll wta = new WinnerTakeAll(networkPanel.getNetwork(),
-                Integer.parseInt(numberOfUnits.getText()), layout);
-        wta.setWinValue(Double.parseDouble(winnerValue.getText()));
-        wta.setLoseValue(Double.parseDouble(loserValue.getText()));
-        wta.setUseRandom(useRandomBox.isSelected());
-        wta.setRandomProb(Double.parseDouble(randomProb.getText()));
+	/**
+	 * Called when dialog closes.
+	 */
+	protected void closeDialogOk() {
 
-        networkPanel.getNetwork().addGroup(wta);
-        networkPanel.repaint();
-        super.closeDialogOk();
-    }
+		WinnerTakeAll wta =
+				new WinnerTakeAll(networkPanel.getNetwork(),
+						Integer.parseInt(numberOfUnits.getText()));
+		wta.setWinValue(Double.parseDouble(winnerValue.getText()));
+		wta.setLoseValue(Double.parseDouble(loserValue.getText()));
+		wta.setUseRandom(useRandomBox.isSelected());
+		wta.setRandomProb(Double.parseDouble(randomProb.getText()));
 
-    /**
-     * This method initialises the components on the panel.
-     */
-    private void init() {
-        // Initialize Dialog
-        setTitle("New WTA Network");
+		layoutPanel.commitChanges();
+		Layout layout = layoutPanel.getCurrentLayout();
+		layout.setInitialLocation(networkPanel.getLastClickedPosition());
+		layout.layoutNeurons(wta.getNeuronList());
+		networkPanel.getNetwork().addGroup(wta);
+		networkPanel.repaint();
+		super.closeDialogOk();
+	}
 
-        fillFieldValues();
+	/**
+	 * This method initialises the components on the panel.
+	 */
+	private void init() {
+		// Initialize Dialog
+		setTitle("New WTA Network");
 
-        // Set up logic panel
-        logicPanel.addItem("Number of Units", numberOfUnits);
-        logicPanel.addItem("Winner Value", winnerValue);
-        logicPanel.addItem("Loser Value", loserValue);
-        logicPanel.addItem("Set winner randomly (with some probability)",
-                useRandomBox);
-        logicPanel.addItem("Probability of choosing a random winner",
-                randomProb);
-        // Enable / disable random prob box based on state of use random
-        // checkbox
-        randomProb.setEnabled(useRandomBox.isSelected());
-        useRandomBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                randomProb.setEnabled(useRandomBox.isSelected());
-            }
-        });
+		fillFieldValues();
 
-        // Set up tab panels
-        tabLogic.add(logicPanel);
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", logicPanel);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
-    }
+		// Set up logic panel
+		logicPanel.addItem("Number of Units", numberOfUnits);
+		logicPanel.addItem("Winner Value", winnerValue);
+		logicPanel.addItem("Loser Value", loserValue);
+		logicPanel.addItem("Set winner randomly (with some probability)",
+				useRandomBox);
+		logicPanel.addItem("Probability of choosing a random winner",
+				randomProb);
+		// Enable / disable random prob box based on state of use random
+		// checkbox
+		randomProb.setEnabled(useRandomBox.isSelected());
+		useRandomBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				randomProb.setEnabled(useRandomBox.isSelected());
+			}
+		});
 
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
+		// Set up tab panels
+		tabLogic.add(logicPanel);
+		tabLayout.add(layoutPanel);
+		tabbedPane.addTab("Logic", logicPanel);
+		tabbedPane.addTab("Layout", layoutPanel);
+		setContentPane(tabbedPane);
+	}
 
-        // REDO: Pull default values
-        loserValue.setText("" + 0);
-        numberOfUnits.setText("" + 5);
-        winnerValue.setText("" + 1);
-        useRandomBox.setSelected(false);
-        randomProb.setText("" + .01);
-    }
+	/**
+	 * Populate fields with current data.
+	 */
+	private void fillFieldValues() {
+
+		// REDO: Pull default values
+		loserValue.setText("" + 0);
+		numberOfUnits.setText("" + 5);
+		winnerValue.setText("" + 1);
+		useRandomBox.setSelected(false);
+		randomProb.setText("" + .01);
+	}
 }

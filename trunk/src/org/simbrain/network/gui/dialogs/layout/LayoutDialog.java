@@ -13,19 +13,9 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -33,138 +23,60 @@ import org.simbrain.util.StandardDialog;
  */
 public class LayoutDialog extends StandardDialog {
 
-    /** serialVersionUID */
-    private static final long serialVersionUID = 1L;
+	/** serialVersionUID */
+	private static final long serialVersionUID = 1L;
 
-    /** The current layout panel. */
-    private AbstractLayoutPanel layoutPanel;
+	/** The default initial layout. */
+	private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
-    /** Top panel. */
-    private LabelledItemPanel topPanel = new LabelledItemPanel();
+	/** Main panel. */
+	private MainLayoutPanel mainPanel;
 
-    /** Main panel. */
-    private JPanel mainPanel = new JPanel();
+	/** The network panel where layout will occur. */
+	private final NetworkPanel networkPanel;
 
-    /** Array of layout panels available to a given network type. */
-    private Layout[] layouts = { new LineLayout(), new GridLayout(),
-            new HexagonalGridLayout() };
+	/**
+	 * Constructor for creating dialog.
+	 * 
+	 * @param networkPanel
+	 *            the networkPanel where layout will occur
+	 */
+	public LayoutDialog(final NetworkPanel networkPanel) {
+		this(DEFAULT_LAYOUT, networkPanel);
+	}
 
-    /** Layouts combo box. */
-    private JComboBox cbLayouts;
+	/**
+	 * Constructor for creating independent dialog.
+	 * 
+	 * @param layout
+	 *            the layout to show
+	 * @param networkPanel
+	 *            the networkPanel where layout will occur
+	 */
+	public LayoutDialog(final Layout layout,
+			final NetworkPanel networkPanel) {
+		this.networkPanel = networkPanel;
+		mainPanel =
+				new MainLayoutPanel(layout.getDescription(), false, this);
+		setContentPane(mainPanel);
+	}
 
-    /** The current Layout. */
-    private static Layout currentLayout = new GridLayout();
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void closeDialogOk() {
+		super.closeDialogOk();
+		commitChanges();
+		mainPanel.getCurrentLayout().setInitialLocation(
+				networkPanel.getLastClickedPosition());
+		mainPanel.getCurrentLayout().layoutNeurons(
+				networkPanel.getSelectedModelNeurons());
+		networkPanel.repaint();
+	}
 
-    /** The network panel where layout will occur. */
-    private final NetworkPanel networkPanel;
-
-    /**
-     * Constructor for creating dialog.
-     *
-     * @param networkPanel the networkPanel where layout will occur
-     */
-    public LayoutDialog(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
-        initPanel();
-    }
-
-    /**
-     * Constructor for creating independent dialog.
-     *
-     * @param layout the layout to show
-     * @param networkPanel the networkPanel where layout will occur
-     */
-    public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
-        currentLayout = layout;
-        initPanel();
-    }
-
-    /**
-     * Initialize the layout panel based upon the current layout type.
-     */
-    private void initPanel() {
-        JPanel panel = new JPanel();
-        setTitle("Set Layout Properties");
-        panel.setLayout(new BorderLayout());
-        cbLayouts = new JComboBox(layouts);
-        if (currentLayout instanceof LineLayout) {
-            cbLayouts.setSelectedIndex(0);
-        } else if (currentLayout instanceof GridLayout) {
-            cbLayouts.setSelectedIndex(1);
-        } else if (currentLayout instanceof HexagonalGridLayout) {
-            cbLayouts.setSelectedIndex(2);
-        }
-        cbLayouts.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                initLayoutTypePanel();
-            }
-        });
-        topPanel.addItem("Layout Style", cbLayouts);
-        panel.add("North", topPanel);
-        panel.add("Center", mainPanel);
-        initLayoutTypePanel();
-
-        setContentPane(panel);
-        pack();
-        setLocationRelativeTo(null);
-    }
-
-    /**
-     * Initialize the layout type panel.
-     */
-    private void initLayoutTypePanel() {
-        if (layoutPanel != null) {
-            mainPanel.remove(layoutPanel);
-        }
-        currentLayout = (Layout) cbLayouts.getSelectedItem();
-        if (currentLayout instanceof LineLayout) {
-            layoutPanel = new LineLayoutPanel((LineLayout) currentLayout);
-            layoutPanel.fillFieldValues();
-            mainPanel.add(layoutPanel);
-        } else if (currentLayout instanceof GridLayout) {
-            layoutPanel = new GridLayoutPanel((GridLayout) currentLayout);
-            layoutPanel.fillFieldValues();
-            mainPanel.add(layoutPanel);
-        } else if (currentLayout instanceof HexagonalGridLayout) {
-            layoutPanel = new HexagonalGridLayoutPanel(
-                    (HexagonalGridLayout) currentLayout);
-            layoutPanel.fillFieldValues();
-            mainPanel.add(layoutPanel);
-        }
-        pack();
-    }
-
-    /** @see StandardDialog */
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        commitChanges();
-        currentLayout.setInitialLocation(networkPanel.getLastClickedPosition());
-        currentLayout.layoutNeurons(networkPanel.getSelectedModelNeurons());
-        networkPanel.repaint();
-    }
-
-    /** @see AbstractLayoutPanel */
-    public void commitChanges() {
-        layoutPanel.commitChanges();
-    }
-
-    /**
-     * Get the current layout.
-     *
-     * @return the current layout
-     */
-    public static Layout getCurrentLayout() {
-        return currentLayout;
-    }
-
-    /**
-     * Set the current layout.
-     *
-     * @param layout the new layout
-     */
-    public static void setCurrentLayout(Layout layout) {
-        currentLayout = layout;
-    }
+	/** @see AbstractLayoutPanel */
+	public void commitChanges() {
+		mainPanel.commitChanges();
+	}
 
 }

@@ -24,15 +24,14 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
- *
+ * 
  * @author William B. St. Clair
- *
- * TODO: Move all "training" functions over to trainer
+ * 
+ *         TODO: Move all "training" functions over to trainer
  */
 public class SOM extends NeuronGroup {
 
@@ -119,81 +118,79 @@ public class SOM extends NeuronGroup {
 
     /**
      * Constructs an SOM network with specified number of neurons.
-     *
-     * @param numNeurons size of this network in neurons
-     * @param layout Defines how neurons are to be layed out
-     * @param root reference to Network.
+     * 
+     * @param numNeurons
+     *            size of this network in neurons
+     * @param root
+     *            reference to Network.
      */
-    public SOM(final Network root, final int numNeurons, final Layout layout) {
-        super(root);
-        for (int i = 0; i < numNeurons; i++) {
-            addNeuron(
-                    new Neuron(getParentNetwork(), new LinearRule()));
-        }
-        layout.layoutNeurons(getNeuronList());
-        setLabel("SOM");
+    public SOM(final Network root, final int numNeurons) {
+	super(root);
+	for (int i = 0; i < numNeurons; i++) {
+	    addNeuron(new Neuron(getParentNetwork(), new LinearRule()));
+	}
+	setLabel("SOM");
     }
 
     /**
      * Iterates the network based on training inputs. Does not respect superior
      * networks.
-     *
+     * 
      * TODO: Integrate this code with train and update.
      */
     public void iterate() {
-        for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
+	for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
-            winDistance = Double.POSITIVE_INFINITY;
-            int counter;
-            double physicalDistance;
-            Neuron winner = null;
+	    winDistance = Double.POSITIVE_INFINITY;
+	    int counter;
+	    double physicalDistance;
+	    Neuron winner = null;
 
-            // Determine Winner: The SOM Neuron with the lowest distance between
-            // it's weight vector and the input neurons's weight vector.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron n = getNeuronList().get(i);
-                distance = 0;
-                counter = 0;
-                for (Synapse incoming : n.getFanIn()) {
-                    distance += Math.pow(incoming.getStrength()
-                            - trainingInputs[vectorNumber][counter], 2);
-                    counter++;
-                }
-                if (distance < winDistance) {
-                    winDistance = distance;
-                    winner = n;
-                }
-            }
+	    // Determine Winner: The SOM Neuron with the lowest distance between
+	    // it's weight vector and the input neurons's weight vector.
+	    for (int i = 0; i < getNeuronList().size(); i++) {
+		Neuron n = getNeuronList().get(i);
+		distance = 0;
+		counter = 0;
+		for (Synapse incoming : n.getFanIn()) {
+		    distance += Math.pow(incoming.getStrength()
+			    - trainingInputs[vectorNumber][counter], 2);
+		    counter++;
+		}
+		if (distance < winDistance) {
+		    winDistance = distance;
+		    winner = n;
+		}
+	    }
 
-            // Update Weights of the neurons within the radius of the winning
-            // neuron.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronList().get(
-                        i);
-                physicalDistance = findPhysicalDistance(neuron, winner);
+	    // Update Weights of the neurons within the radius of the winning
+	    // neuron.
+	    for (int i = 0; i < getNeuronList().size(); i++) {
+		Neuron neuron = getNeuronList().get(i);
+		physicalDistance = findPhysicalDistance(neuron, winner);
 
-                // The center of the neuron is within the update region.
-                if (physicalDistance <= neighborhoodSize) {
-                    counter = 0;
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        val = incoming.getStrength()
-                                + alpha
-                                * (trainingInputs[vectorNumber][counter] - incoming
-                                        .getStrength());
-                        incoming.setStrength(val);
-                        counter++;
-                    }
-                }
-            }
-        } // end this training vector
+		// The center of the neuron is within the update region.
+		if (physicalDistance <= neighborhoodSize) {
+		    counter = 0;
+		    for (Synapse incoming : neuron.getFanIn()) {
+			val = incoming.getStrength()
+				+ alpha
+				* (trainingInputs[vectorNumber][counter] - incoming
+					.getStrength());
+			incoming.setStrength(val);
+			counter++;
+		    }
+		}
+	    }
+	} // end this training vector
 
-        alpha = (alpha - alphaDecayRate * alpha);
-        if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-            neighborhoodSize -= neighborhoodDecayAmount;
-        } else {
-            neighborhoodSize = 0;
-        }
-        epochs++;
+	alpha = (alpha - alphaDecayRate * alpha);
+	if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+	    neighborhoodSize -= neighborhoodDecayAmount;
+	} else {
+	    neighborhoodSize = 0;
+	}
+	epochs++;
     }
 
     /**
@@ -201,29 +198,29 @@ public class SOM extends NeuronGroup {
      * between 0 and the upper bound of each synapse.
      */
     public void randomizeIncomingWeights() {
-        for (Neuron n : getNeuronList()) {
-            for (Synapse s : n.getFanIn()) {
-                s.setStrength(s.getUpperBound() * Math.random());
-            }
-        }
+	for (Neuron n : getNeuronList()) {
+	    for (Synapse s : n.getFanIn()) {
+		s.setStrength(s.getUpperBound() * Math.random());
+	    }
+	}
     }
 
     /**
      * Pushes the weight values of an SOM neuron onto the input neurons.
      */
     public void recall() {
-        winDistance = 0;
-        Neuron winner = null;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            if (n.getActivation() > winDistance) {
-                winDistance = n.getActivation();
-                winner = n;
-            }
-        }
-        for (Synapse incoming : winner.getFanIn()) {
-            incoming.getSource().setActivation(incoming.getStrength());
-        }
+	winDistance = 0;
+	Neuron winner = null;
+	for (int i = 0; i < getNeuronList().size(); i++) {
+	    Neuron n = getNeuronList().get(i);
+	    if (n.getActivation() > winDistance) {
+		winDistance = n.getActivation();
+		winner = n;
+	    }
+	}
+	for (Synapse incoming : winner.getFanIn()) {
+	    incoming.getSource().setActivation(incoming.getStrength());
+	}
 
     }
 
@@ -231,75 +228,74 @@ public class SOM extends NeuronGroup {
      * Resets SOM Network to initial values.
      */
     public void reset() {
-        alpha = initAlpha;
-        neighborhoodSize = initNeighborhoodSize;
-        vectorNumber = 0;
-        epochs = 0;
+	alpha = initAlpha;
+	neighborhoodSize = initNeighborhoodSize;
+	vectorNumber = 0;
+	epochs = 0;
     }
 
     /**
      * Trains the network in batches based on trainingInputs. Does not respect
      * superior networks.
-     *
+     * 
      * TODO: Integrate this code with train and update
      */
     public void train() {
-        int epochNumber;
-        for (epochNumber = 0; epochNumber < batchSize; epochNumber++) {
-            for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
+	int epochNumber;
+	for (epochNumber = 0; epochNumber < batchSize; epochNumber++) {
+	    for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
-                winDistance = Double.POSITIVE_INFINITY;
-                Neuron winner = null;
-                int counter;
-                double physicalDistance;
+		winDistance = Double.POSITIVE_INFINITY;
+		Neuron winner = null;
+		int counter;
+		double physicalDistance;
 
-                // Determine Winner: The SOM Neuron with the lowest distance
-                // between
-                // it's weight vector and the input neurons's weight vector.
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = getNeuronList().get(i);
-                    distance = 0;
-                    counter = 0;
-                    for (Synapse incoming : n.getFanIn()) {
-                        distance += Math.pow(incoming.getStrength()
-                                - trainingInputs[vectorNumber][counter], 2);
-                        counter++;
-                    }
-                    if (distance < winDistance) {
-                        winDistance = distance;
-                        winner = n;
-                    }
-                }
+		// Determine Winner: The SOM Neuron with the lowest distance
+		// between
+		// it's weight vector and the input neurons's weight vector.
+		for (int i = 0; i < getNeuronList().size(); i++) {
+		    Neuron n = getNeuronList().get(i);
+		    distance = 0;
+		    counter = 0;
+		    for (Synapse incoming : n.getFanIn()) {
+			distance += Math.pow(incoming.getStrength()
+				- trainingInputs[vectorNumber][counter], 2);
+			counter++;
+		    }
+		    if (distance < winDistance) {
+			winDistance = distance;
+			winner = n;
+		    }
+		}
 
-                // Update Weights of the neurons within the radius of the
-                // winning neuron.
-                for (Neuron neuron : getNeuronList()) {
-                    physicalDistance = findPhysicalDistance(neuron,
-                            winner);
+		// Update Weights of the neurons within the radius of the
+		// winning neuron.
+		for (Neuron neuron : getNeuronList()) {
+		    physicalDistance = findPhysicalDistance(neuron, winner);
 
-                    // The center of the neuron is within the update region.
-                    if (physicalDistance <= neighborhoodSize) {
-                        counter = 0;
-                        for (Synapse incoming : neuron.getFanIn()) {
-                            val = incoming.getStrength()
-                                    + alpha
-                                    * (trainingInputs[vectorNumber][counter] - incoming
-                                            .getStrength());
-                            incoming.setStrength(val);
-                            counter++;
-                        }
-                    }
-                }
-            } // end this training vector
+		    // The center of the neuron is within the update region.
+		    if (physicalDistance <= neighborhoodSize) {
+			counter = 0;
+			for (Synapse incoming : neuron.getFanIn()) {
+			    val = incoming.getStrength()
+				    + alpha
+				    * (trainingInputs[vectorNumber][counter] - incoming
+					    .getStrength());
+			    incoming.setStrength(val);
+			    counter++;
+			}
+		    }
+		}
+	    } // end this training vector
 
-            alpha = (alpha - alphaDecayRate * alpha);
-            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                neighborhoodSize -= neighborhoodDecayAmount;
-            } else {
-                neighborhoodSize = 0;
-            }
-            epochs++;
-        } // end epoch
+	    alpha = (alpha - alphaDecayRate * alpha);
+	    if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+		neighborhoodSize -= neighborhoodDecayAmount;
+	    } else {
+		neighborhoodSize = 0;
+	    }
+	    epochs++;
+	} // end epoch
     }
 
     /**
@@ -319,327 +315,338 @@ public class SOM extends NeuronGroup {
     @Override
     public void update() {
 
-        winDistance = Double.POSITIVE_INFINITY;
-        // winner = 0;
-        double physicalDistance;
+	winDistance = Double.POSITIVE_INFINITY;
+	// winner = 0;
+	double physicalDistance;
 
-        // Determine Winner: The SOM Neuron with the lowest distance between
-        // its weight vector and the input neurons's weight vector.
-        Neuron winner = calculateWinner();
+	// Determine Winner: The SOM Neuron with the lowest distance between
+	// its weight vector and the input neurons's weight vector.
+	Neuron winner = calculateWinner();
 
-        // Neuron update
-        if (!getParentNetwork().getClampNeurons()) {
-            if (updateMethod == STANDARD) {
-               super.update();
-            } else {
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = getNeuronList().get(i);
-                    if (n == winner) {
-                        n.setActivation(1);
-                    } else {
-                        n.setActivation(0);
-                    }
-                }
-            }
-        }
+	// Neuron update
+	if (!getParentNetwork().getClampNeurons()) {
+	    if (updateMethod == STANDARD) {
+		super.update();
+	    } else {
+		for (int i = 0; i < getNeuronList().size(); i++) {
+		    Neuron n = getNeuronList().get(i);
+		    if (n == winner) {
+			n.setActivation(1);
+		    } else {
+			n.setActivation(0);
+		    }
+		}
+	    }
+	}
 
-        // Update Synapses of the neurons within the radius of the winning
-        // neuron.
-        if (!getParentNetwork().getClampWeights()) {
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronList().get(
-                        i);
-                physicalDistance = findPhysicalDistance(neuron, winner);
-                // The center of the neuron is within the update region.
-                if (physicalDistance <= neighborhoodSize) {
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        val = incoming.getStrength()
-                                + alpha
-                                * (incoming.getSource().getActivation() - incoming
-                                        .getStrength());
-                        incoming.setStrength(val);
-                    }
-                }
-            }
-            // TODO: Now reducing decay rate as
-            // percentage. Document and make
-            // others consistent with this.
-            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                neighborhoodSize -= neighborhoodDecayAmount;
-            } else {
-                neighborhoodSize = 0;
-            }
-        }
+	// Update Synapses of the neurons within the radius of the winning
+	// neuron.
+	if (!getParentNetwork().getClampWeights()) {
+	    for (int i = 0; i < getNeuronList().size(); i++) {
+		Neuron neuron = getNeuronList().get(i);
+		physicalDistance = findPhysicalDistance(neuron, winner);
+		// The center of the neuron is within the update region.
+		if (physicalDistance <= neighborhoodSize) {
+		    for (Synapse incoming : neuron.getFanIn()) {
+			val = incoming.getStrength()
+				+ alpha
+				* (incoming.getSource().getActivation() - incoming
+					.getStrength());
+			incoming.setStrength(val);
+		    }
+		}
+	    }
+	    // TODO: Now reducing decay rate as
+	    // percentage. Document and make
+	    // others consistent with this.
+	    if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+		neighborhoodSize -= neighborhoodDecayAmount;
+	    } else {
+		neighborhoodSize = 0;
+	    }
+	}
     }
 
-
     /**
-     * Find the SOM neuron which is closest to the
-     * input vector.  TODO: Reuse this more.
-     *
+     * Find the SOM neuron which is closest to the input vector. TODO: Reuse
+     * this more.
+     * 
      * @return winner
      */
     private Neuron calculateWinner() {
-        Neuron winner = null;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            distance = findDistance(n);
-            if (distance < winDistance) {
-                winDistance = distance;
-                winner = n;
-            }
-        }
-        return winner;
+	Neuron winner = null;
+	for (int i = 0; i < getNeuronList().size(); i++) {
+	    Neuron n = getNeuronList().get(i);
+	    distance = findDistance(n);
+	    if (distance < winDistance) {
+		winDistance = distance;
+		winner = n;
+	    }
+	}
+	return winner;
     }
 
     /**
      * Calculates the Euclidian distance between the SOM neuron's weight vector
      * and the input vector.
-     *
-     * @param n The SOM neuron one wishes to find the for.
+     * 
+     * @param n
+     *            The SOM neuron one wishes to find the for.
      * @return distance.
      */
     private double findDistance(final Neuron n) {
-        double ret = 0;
-        for (Synapse incoming : n.getFanIn()) {
-            ret += Math.pow(incoming.getStrength()
-                    - incoming.getSource().getActivation(), 2);
-        }
-        return ret;
+	double ret = 0;
+	for (Synapse incoming : n.getFanIn()) {
+	    ret += Math.pow(incoming.getStrength()
+		    - incoming.getSource().getActivation(), 2);
+	}
+	return ret;
     }
 
     /**
      * Finds the physical Euclidian Distance between two neurons.
-     *
-     * @param neuron1 First neuron.
-     * @param neuron2 Second neuron.
+     * 
+     * @param neuron1
+     *            First neuron.
+     * @param neuron2
+     *            Second neuron.
      * @return physical distance between two neurons in Simbrain.
      */
     private double findPhysicalDistance(final Neuron neuron1,
-            final Neuron neuron2) {
-        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
-                + Math.pow(neuron2.getY() - neuron1.getY(), 2));
-        return ret;
+	    final Neuron neuron2) {
+	double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
+		+ Math.pow(neuron2.getY() - neuron1.getY(), 2));
+	return ret;
     }
 
     /**
      * get Alpha.
-     *
+     * 
      * @return alpha
      */
     public double getAlpha() {
-        return alpha;
+	return alpha;
     }
 
     /**
      * Get alphaDecayRate.
-     *
+     * 
      * @return alphaDecayRate
      */
     public double getAlphaDecayRate() {
-        return alphaDecayRate;
+	return alphaDecayRate;
     }
 
     /**
      * Get the Batch Size.
-     *
+     * 
      * @return batchSize
      */
     public int getBatchSize() {
-        return batchSize;
+	return batchSize;
     }
 
     /**
      * Returns the default SOM neuron.
-     *
+     * 
      * @return ret default som neuron
      */
     private Neuron getDefaultSOMNeuron() {
-        Neuron ret = new Neuron(getParentNetwork(), new LinearRule());
-        ret.setIncrement(1);
-        ret.setLowerBound(0);
-        return ret;
+	Neuron ret = new Neuron(getParentNetwork(), new LinearRule());
+	ret.setIncrement(1);
+	ret.setLowerBound(0);
+	return ret;
     }
 
     /**
      * get Epochs.
-     *
+     * 
      * @return epochs
      */
     public int getEpochs() {
-        return epochs;
+	return epochs;
     }
 
     /**
      * get Initial Alpha.
-     *
+     * 
      * @return initAlpha
      */
     public double getInitAlpha() {
-        return initAlpha;
+	return initAlpha;
     }
 
     /**
      * Get the initial neighborhoodsize.
-     *
+     * 
      * @return initNeighborhoodSize
      */
     public double getInitNeighborhoodSize() {
-        return initNeighborhoodSize;
+	return initNeighborhoodSize;
     }
 
     /**
      * Get neighborhoodDecayAmount.
-     *
+     * 
      * @return neighborhoodDecayAmount
      */
     public double getNeighborhoodDecayAmount() {
-        return neighborhoodDecayAmount;
+	return neighborhoodDecayAmount;
     }
 
     /**
      * Get the current neighborhoodsize.
-     *
+     * 
      * @return neighborhoodSize
      */
     public double getNeighborhoodSize() {
-        return neighborhoodSize;
+	return neighborhoodSize;
     }
 
     /**
      * Get the total number of input vectors.
-     *
+     * 
      * @return numInputVectors
      */
     public int getNumInputVectors() {
-        return numInputVectors;
+	return numInputVectors;
     }
 
     /**
      * Get the number of neurons.
-     *
+     * 
      * @return numNeurons
      */
     public int getNumNeurons() {
-        return numNeurons;
+	return numNeurons;
     }
 
     /**
      * Get the input training File.
-     *
+     * 
      * @return trainingINFile
      */
     public File getTrainingINFile() {
-        return trainingINFile;
+	return trainingINFile;
     }
 
     /**
      * Get the training inputs.
-     *
+     * 
      * @return trainingInputs
      */
     public double[][] getTrainingInputs() {
-        return trainingInputs;
+	return trainingInputs;
     }
 
     /**
      * Get the current vector number.
-     *
+     * 
      * @return vectorNumber
      */
     public int getVectorNumber() {
-        return vectorNumber;
+	return vectorNumber;
     }
 
     /**
      * Set alphaDecayRate.
-     *
-     * @param alphaDecayRate decay rate
+     * 
+     * @param alphaDecayRate
+     *            decay rate
      */
     public void setAlphaDecayRate(final double alphaDecayRate) {
-        this.alphaDecayRate = alphaDecayRate;
+	this.alphaDecayRate = alphaDecayRate;
     }
 
     /**
      * Set the Batch Size.
-     *
-     * @param batchSize Batch Size
+     * 
+     * @param batchSize
+     *            Batch Size
      */
     public void setBatchSize(final int batchSize) {
-        this.batchSize = batchSize;
+	this.batchSize = batchSize;
     }
 
     /**
      * Set Epochs.
-     *
-     * @param epochs epochs
+     * 
+     * @param epochs
+     *            epochs
      */
     public void setEpochs(final int epochs) {
-        this.epochs = epochs;
+	this.epochs = epochs;
     }
 
     /**
      * Set the initial value for alpha. Resets SOM if new.
-     *
-     * @param initAlpha initial alpha
+     * 
+     * @param initAlpha
+     *            initial alpha
      */
     public void setInitAlpha(final double initAlpha) {
-        this.initAlpha = initAlpha;
+	this.initAlpha = initAlpha;
     }
 
     /**
      * Set the initial neighborhoodsize.
-     *
-     * @param initNeighborhoodSize initial neighborhood size Resets SOM if new.
+     * 
+     * @param initNeighborhoodSize
+     *            initial neighborhood size Resets SOM if new.
      */
     public void setInitNeighborhoodSize(final double initNeighborhoodSize) {
-        this.initNeighborhoodSize = initNeighborhoodSize;
-        // TODO: make it possibly to directly set n-hood size
-        neighborhoodSize = initNeighborhoodSize;
+	this.initNeighborhoodSize = initNeighborhoodSize;
+	// TODO: make it possibly to directly set n-hood size
+	neighborhoodSize = initNeighborhoodSize;
     }
 
     /**
      * Set neighborhoodDecayAmount.
-     *
-     * @param neighborhoodDecayAmount decay amount
+     * 
+     * @param neighborhoodDecayAmount
+     *            decay amount
      */
     public void setNeighborhoodDecayAmount(final double neighborhoodDecayAmount) {
-        this.neighborhoodDecayAmount = neighborhoodDecayAmount;
+	this.neighborhoodDecayAmount = neighborhoodDecayAmount;
     }
 
     /**
      * Set the total number of input vectors. Resets SOM if new.
-     *
-     * @param numInputVectors total input vectors
+     * 
+     * @param numInputVectors
+     *            total input vectors
      */
     public void setNumInputVectors(final int numInputVectors) {
-        this.numInputVectors = numInputVectors;
+	this.numInputVectors = numInputVectors;
     }
 
     /**
      * Set the number of neurons.
-     *
-     * @param numNeurons number of neurons.
+     * 
+     * @param numNeurons
+     *            number of neurons.
      */
     public void setNumNeurons(final int numNeurons) {
-        this.numNeurons = numNeurons;
+	this.numNeurons = numNeurons;
     }
 
     /**
      * Set the training input File.
-     *
-     * @param trainingINFile input file
+     * 
+     * @param trainingINFile
+     *            input file
      */
     public void setTrainingINFile(final File trainingINFile) {
-        this.trainingINFile = trainingINFile;
+	this.trainingINFile = trainingINFile;
     }
 
     /**
      * Set the training inputs.
-     *
-     * @param trainingInputs inputs
+     * 
+     * @param trainingInputs
+     *            inputs
      */
     public void setTrainingInputs(final double[][] trainingInputs) {
-        this.trainingInputs = trainingInputs;
+	this.trainingInputs = trainingInputs;
     }
 }

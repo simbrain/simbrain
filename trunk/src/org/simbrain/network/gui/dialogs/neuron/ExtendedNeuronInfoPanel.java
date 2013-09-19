@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.GridLayout;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -44,137 +44,141 @@ import org.simbrain.network.gui.NetworkUtils;
  */
 public class ExtendedNeuronInfoPanel extends JPanel {
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
+	/** Null string. */
+	public static final String NULL_STRING = "...";
 
-    /** Increment field. */
-    private final JTextField tfIncrement = new JTextField();
+	/** Increment field. */
+	private final JTextField tfIncrement = new JTextField();
 
-    /** Upper bound field. */
-    private final JTextField tfUpBound = new JTextField();
+	/** Upper bound field. */
+	private final JTextField tfUpBound = new JTextField();
 
-    /** Lower bound field. */
-    private final JTextField tfLowBound = new JTextField();
+	/** Lower bound field. */
+	private final JTextField tfLowBound = new JTextField();
 
-    /** Label Field. */
-    private final JTextField tfNeuronLabel = new JTextField();
+	/** Label Field. */
+	private final JTextField tfNeuronLabel = new JTextField();
 
-    /** Priority Field. */
-    private final JTextField tfPriority = new JTextField();
+	/** Priority Field. */
+	private final JTextField tfPriority = new JTextField();
 
-    /** The neurons being modified. */
-    private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
+	/** The neurons being modified. */
+	private List<Neuron> neuronList;
 
-    /**
-     * 
-     * @param neuronList
-     */
-    public ExtendedNeuronInfoPanel(ArrayList<Neuron> neuronList) {
-	this.neuronList = neuronList;
-	fillFieldValues();
-	initializeLayout();
-    }
+	/**
+	 * 
+	 * @param neuronList
+	 */
+	public ExtendedNeuronInfoPanel(List<Neuron> neuronList) {
+		this.neuronList = neuronList;
+		fillFieldValues();
+		initializeLayout();
+	}
 
-    /**
-     * Lays out the panel
-     */
-    private void initializeLayout() {
-	GridLayout gl = new GridLayout(0, 2);
-	gl.setVgap(5);
-	setLayout(gl);
-	add(new JLabel("Upper Bound:"));
-	add(tfUpBound);
-	add(new JLabel("Lower Bound"));
-	add(tfLowBound);
-	add(new JLabel("Increment: "));
-	add(tfIncrement);
-	add(new JLabel("Label: "));
-	add(tfNeuronLabel);
-	add(new JLabel("Priority:"));
-	add(tfPriority);
-	setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    }
+	/**
+	 * Lays out the panel
+	 */
+	private void initializeLayout() {
+		GridLayout gl = new GridLayout(0, 2);
+		gl.setVgap(5);
+		setLayout(gl);
+		add(new JLabel("Upper Bound:"));
+		add(tfUpBound);
+		add(new JLabel("Lower Bound"));
+		add(tfLowBound);
+		add(new JLabel("Increment: "));
+		add(tfIncrement);
+		add(new JLabel("Label: "));
+		add(tfNeuronLabel);
+		add(new JLabel("Priority:"));
+		add(tfPriority);
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	}
 
-    /**
-     * Fills the values of the text fields based on the corresponding values of
-     * the neurons to be edited.
-     */
-    public void fillFieldValues() {
+	/**
+	 * Fills the values of the text fields based on the corresponding values of
+	 * the neurons to be edited.
+	 */
+	public void fillFieldValues() {
 
-	Neuron neuronRef = neuronList.get(0);
+		Neuron neuronRef = neuronList.get(0);
 
-	// Handle Increment
-	if (!NetworkUtils
-		.isConsistent(neuronList, Neuron.class, "getIncrement"))
-	    tfIncrement.setText(NULL_STRING);
-	else
-	    tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
+		// Handle Increment
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getIncrement"))
+			tfIncrement.setText(NULL_STRING);
+		else
+			tfIncrement
+					.setText(Double.toString(neuronRef.getIncrement()));
 
-	// Handle Label
-	if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLabel"))
-	    tfNeuronLabel.setText(NULL_STRING);
-	else
-	    tfNeuronLabel.setText(neuronRef.getLabel());
+		// Handle Label
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getLabel"))
+			tfNeuronLabel.setText(NULL_STRING);
+		else
+			tfNeuronLabel.setText(neuronRef.getLabel());
 
-	// Handle Priority
-	if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-		"getUpdatePriority"))
-	    tfPriority.setText(NULL_STRING);
-	else
-	    tfPriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
+		// Handle Priority
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getUpdatePriority"))
+			tfPriority.setText(NULL_STRING);
+		else
+			tfPriority.setText(Integer.toString(neuronRef
+					.getUpdatePriority()));
 
-	// Handle Lower Bound
-	if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-		"getLowerBound"))
-	    tfLowBound.setText(NULL_STRING);
-	else
-	    tfLowBound.setText(Double.toString(neuronRef.getLowerBound()));
+		// Handle Lower Bound
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getLowerBound"))
+			tfLowBound.setText(NULL_STRING);
+		else
+			tfLowBound
+					.setText(Double.toString(neuronRef.getLowerBound()));
 
-	// Handle Upper Bound
-	if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-		"getUpperBound"))
-	    tfUpBound.setText(NULL_STRING);
-	else
-	    tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
-
-    }
-
-    /**
-     * Uses the values from text fields to alter corresponding values in the
-     * neuron(s) being edited. Called externally to apply changes.
-     */
-    public void commitChanges() {
-
-	for (int i = 0; i < neuronList.size(); i++) {
-
-	    Neuron neuronRef = neuronList.get(i);
-
-	    // Increment
-	    if (!tfIncrement.getText().equals(NULL_STRING))
-		neuronRef
-			.setIncrement(Double.parseDouble(tfIncrement.getText()));
-
-	    // Label
-	    if (!tfNeuronLabel.getText().equals(NULL_STRING))
-		neuronRef.setLabel(tfNeuronLabel.getText());
-
-	    // Priority
-	    if (!tfPriority.getText().equals(NULL_STRING))
-		neuronRef.setUpdatePriority(Integer.parseInt(tfPriority
-			.getText()));
-
-	    // Upper Bound
-	    if (!tfUpBound.getText().equals(NULL_STRING))
-		neuronRef
-			.setUpperBound(Double.parseDouble(tfUpBound.getText()));
-
-	    // Lower Bound
-	    if (!tfLowBound.getText().equals(NULL_STRING))
-		neuronRef
-			.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+		// Handle Upper Bound
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getUpperBound"))
+			tfUpBound.setText(NULL_STRING);
+		else
+			tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
 
 	}
 
-    }
+	/**
+	 * Uses the values from text fields to alter corresponding values in the
+	 * neuron(s) being edited. Called externally to apply changes.
+	 */
+	public void commitChanges() {
+
+		for (int i = 0; i < neuronList.size(); i++) {
+
+			Neuron neuronRef = neuronList.get(i);
+
+			// Increment
+			if (!tfIncrement.getText().equals(NULL_STRING))
+				neuronRef.setIncrement(Double.parseDouble(tfIncrement
+						.getText()));
+
+			// Label
+			if (!tfNeuronLabel.getText().equals(NULL_STRING))
+				neuronRef.setLabel(tfNeuronLabel.getText());
+
+			// Priority
+			if (!tfPriority.getText().equals(NULL_STRING))
+				neuronRef.setUpdatePriority(Integer.parseInt(tfPriority
+						.getText()));
+
+			// Upper Bound
+			if (!tfUpBound.getText().equals(NULL_STRING))
+				neuronRef.setUpperBound(Double.parseDouble(tfUpBound
+						.getText()));
+
+			// Lower Bound
+			if (!tfLowBound.getText().equals(NULL_STRING))
+				neuronRef.setLowerBound(Double.parseDouble(tfLowBound
+						.getText()));
+
+		}
+
+	}
 
 }

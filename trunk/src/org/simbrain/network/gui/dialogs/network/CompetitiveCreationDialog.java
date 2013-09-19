@@ -27,11 +27,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
-import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -39,149 +35,156 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>CompetitiveDialog</b> is used as an assistant to create competitive
  * networks.
- *
+ * 
  */
 public class CompetitiveCreationDialog extends StandardDialog implements
-        ActionListener {
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+		ActionListener {
+	/** Tabbed pane. */
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
-    private JPanel tabLogic = new JPanel();
+	/** Logic tab panel. */
+	private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
-    private JPanel tabLayout = new JPanel();
+	/** Layout tab panel. */
+	private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
-    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+	/** Logic panel. */
+	private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-    /** Layout panel. */
-    private LayoutPanel layoutPanel;
+	/** Layout panel. */
+	private MainLayoutPanel layoutPanel;
 
-    /** Number of neurons field. */
-    private JTextField tfNumNeurons = new JTextField();
+	/** Number of neurons field. */
+	private JTextField tfNumNeurons = new JTextField();
 
-    /** Epsilon field. */
-    private JTextField tfEpsilon = new JTextField();
+	/** Epsilon field. */
+	private JTextField tfEpsilon = new JTextField();
 
-    /** Winner value field. */
-    private JTextField tfWinnerValue = new JTextField();
+	/** Winner value field. */
+	private JTextField tfWinnerValue = new JTextField();
 
-    /** Loser value field. */
-    private JTextField tfLoserValue = new JTextField();
+	/** Loser value field. */
+	private JTextField tfLoserValue = new JTextField();
 
-    /** Leaky learning check box. */
-    private JCheckBox cbUseLeakyLearning = new JCheckBox();
+	/** Leaky learning check box. */
+	private JCheckBox cbUseLeakyLearning = new JCheckBox();
 
-    /** Normalize inputs check box. */
-    private JCheckBox cbNormalizeInputs = new JCheckBox();
+	/** Normalize inputs check box. */
+	private JCheckBox cbNormalizeInputs = new JCheckBox();
 
-    /** Leaky epsilon. */
-    private JTextField tfLeakyEpsilon = new JTextField();
+	/** Leaky epsilon. */
+	private JTextField tfLeakyEpsilon = new JTextField();
 
-    /** Network Panel. */
-    private NetworkPanel networkPanel;
+	/** Network Panel. */
+	private NetworkPanel networkPanel;
 
-    /**
-     * This method is the default constructor.
-     *
-     * @param networkPanel Network panel
-     */
-    public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
-                new LineLayoutPanel(), new GridLayoutPanel() });
-        init();
-    }
+	/**
+	 * This method is the default constructor.
+	 * 
+	 * @param networkPanel
+	 *            Network panel
+	 */
+	public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
+		this.networkPanel = networkPanel;
+		layoutPanel = new MainLayoutPanel(false, this);
+		init();
+	}
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
-        Layout layout = layoutPanel.getNeuronLayout();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Competitive competitive = new Competitive(networkPanel.getNetwork(),
-                Integer.parseInt(tfNumNeurons.getText()), layout);
-        competitive.setLearningRate(Double.parseDouble(tfEpsilon.getText()));
-        competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
-        competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
-        competitive
-                .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
-        competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
-        competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
-        networkPanel.getNetwork().addGroup(competitive);
-        networkPanel.repaint();
-        super.closeDialogOk();
-    }
+	/**
+	 * Called when dialog closes.
+	 */
+	protected void closeDialogOk() {
+		Competitive competitive =
+				new Competitive(networkPanel.getNetwork(),
+						Integer.parseInt(tfNumNeurons.getText()));
+		competitive.setLearningRate(Double.parseDouble(tfEpsilon
+				.getText()));
+		competitive.setWinValue(Double.parseDouble(tfWinnerValue
+				.getText()));
+		competitive.setLoseValue(Double.parseDouble(tfLoserValue
+				.getText()));
+		competitive.setLeakyLearningRate(Double
+				.parseDouble(tfLeakyEpsilon.getText()));
+		competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
+		competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
+		networkPanel.getNetwork().addGroup(competitive);
+		layoutPanel.commitChanges();
+		layoutPanel.getCurrentLayout().setInitialLocation(
+				networkPanel.getLastClickedPosition());
+		layoutPanel.getCurrentLayout().layoutNeurons(
+				competitive.getNeuronList());
+		networkPanel.repaint();
+		super.closeDialogOk();
+	}
 
-    /**
-     * Initializes all components used in dialog.
-     */
-    private void init() {
-        // Initializes dialog
-        setTitle("New Competitive Network");
+	/**
+	 * Initializes all components used in dialog.
+	 */
+	private void init() {
+		// Initializes dialog
+		setTitle("New Competitive Network");
 
-        cbUseLeakyLearning.addActionListener(this);
-        cbUseLeakyLearning.setActionCommand("useLeakyLearning");
+		cbUseLeakyLearning.addActionListener(this);
+		cbUseLeakyLearning.setActionCommand("useLeakyLearning");
 
-        fillFieldValues();
-        checkLeakyEpsilon();
+		fillFieldValues();
+		checkLeakyEpsilon();
 
-        tfNumNeurons.setColumns(5);
+		tfNumNeurons.setColumns(5);
 
-        // Set up logic panel
-        logicPanel.addItem("Number of Neurons", tfNumNeurons);
-        logicPanel.addItem("Winner Value", tfWinnerValue);
-        logicPanel.addItem("Loser Value", tfLoserValue);
-        logicPanel.addItem("Epsilon", tfEpsilon);
-        logicPanel.addItem("Use leaky learning", cbUseLeakyLearning);
-        logicPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
-        logicPanel.addItem("Normalize inputs", cbNormalizeInputs);
+		// Set up logic panel
+		logicPanel.addItem("Number of Neurons", tfNumNeurons);
+		logicPanel.addItem("Winner Value", tfWinnerValue);
+		logicPanel.addItem("Loser Value", tfLoserValue);
+		logicPanel.addItem("Epsilon", tfEpsilon);
+		logicPanel.addItem("Use leaky learning", cbUseLeakyLearning);
+		logicPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
+		logicPanel.addItem("Normalize inputs", cbNormalizeInputs);
 
-        // Set up tab panels
-        tabLogic.add(logicPanel);
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", tabLogic);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
-    }
+		// Set up tab panels
+		tabLogic.add(logicPanel);
+		tabLayout.add(layoutPanel);
+		tabbedPane.addTab("Logic", tabLogic);
+		tabbedPane.addTab("Layout", layoutPanel);
+		setContentPane(tabbedPane);
+	}
 
-    /**
-     * @see java.awt.event.ActionListener
-     */
-    public void actionPerformed(final ActionEvent e) {
-        String cmd = e.getActionCommand();
+	/**
+	 * @see java.awt.event.ActionListener
+	 */
+	public void actionPerformed(final ActionEvent e) {
+		String cmd = e.getActionCommand();
 
-        if (cmd.equals("useLeakyLearning")) {
-            checkLeakyEpsilon();
-        }
+		if (cmd.equals("useLeakyLearning")) {
+			checkLeakyEpsilon();
+		}
 
-    }
+	}
 
-    /**
-     * Checks whether or not to enable leaky epsilon.
-     */
-    private void checkLeakyEpsilon() {
-        if (cbUseLeakyLearning.isSelected()) {
-            tfLeakyEpsilon.setEnabled(true);
-        } else {
-            tfLeakyEpsilon.setEnabled(false);
-        }
-    }
+	/**
+	 * Checks whether or not to enable leaky epsilon.
+	 */
+	private void checkLeakyEpsilon() {
+		if (cbUseLeakyLearning.isSelected()) {
+			tfLeakyEpsilon.setEnabled(true);
+		} else {
+			tfLeakyEpsilon.setEnabled(false);
+		}
+	}
 
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        // REDO
-        // Competitive ct = new Competitive();
-        tfEpsilon.setText(Double.toString(.1));
-        tfLoserValue.setText(Double.toString(0));
-        tfNumNeurons.setText(Integer.toString(5));
-        tfWinnerValue.setText(Double.toString(1));
-        tfLeakyEpsilon.setText(Double.toString(.1 / 4));
-        cbUseLeakyLearning.setSelected(false);
-        cbNormalizeInputs.setSelected(true);
-    }
+	/**
+	 * Populate fields with current data.
+	 */
+	private void fillFieldValues() {
+		// REDO
+		// Competitive ct = new Competitive();
+		tfEpsilon.setText(Double.toString(.1));
+		tfLoserValue.setText(Double.toString(0));
+		tfNumNeurons.setText(Integer.toString(5));
+		tfWinnerValue.setText(Double.toString(1));
+		tfLeakyEpsilon.setText(Double.toString(.1 / 4));
+		cbUseLeakyLearning.setSelected(false);
+		cbNormalizeInputs.setSelected(true);
+	}
 
 }

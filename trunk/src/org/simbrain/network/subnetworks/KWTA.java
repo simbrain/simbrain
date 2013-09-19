@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.Collections;
 import java.util.Comparator;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 
 /**
@@ -57,55 +55,56 @@ public class KWTA extends NeuronGroup {
 
     /**
      * Default constructor.
-     *
-     * @param layout for layout of Neurons.
-     * @param k for the number of Neurons in the Kwta Network.
-     * @param root reference to Network.
+     * 
+     * @param layout
+     *            for layout of Neurons.
+     * @param k
+     *            for the number of Neurons in the Kwta Network.
+     * @param root
+     *            reference to Network.
      */
-    public KWTA(final Network root, final int k, final Layout layout) {
-        super(root);
-        for (int i = 0; i < k; i++) {
-            addNeuron(
-                    new Neuron(getParentNetwork(), new PointNeuronRule()));
-        }
-        layout.layoutNeurons(getNeuronList());
-        setLabel("K-Winner Take All");
+    public KWTA(final Network root, final int k) {
+	super(root);
+	for (int i = 0; i < k; i++) {
+	    addNeuron(new Neuron(getParentNetwork(), new PointNeuronRule()));
+	}
+	setLabel("K-Winner Take All");
     }
 
     @Override
     public void update() {
-        sortNeurons();
-        super.update();
+	sortNeurons();
+	super.update();
     }
 
     /**
-     * See p. 101, equation 3.3.
+     * See p. 101, equation 3.3. TODO: Unused, use or delete
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuronRule) getNeuronList().get(k)
-                .getUpdateRule()).getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuronRule) getNeuronList().get(k - 1)
-                .getUpdateRule()).getInhibitoryThresholdConductance();
+	double highest = ((PointNeuronRule) getNeuronList().get(k)
+		.getUpdateRule()).getInhibitoryThresholdConductance();
+	double secondHighest = ((PointNeuronRule) getNeuronList().get(k - 1)
+		.getUpdateRule()).getInhibitoryThresholdConductance();
 
-        inhibitoryConductance = secondHighest + q * (highest - secondHighest);
+	inhibitoryConductance = secondHighest + q * (highest - secondHighest);
 
-        // System.out.println("highest " + highest + "  secondHighest "
-        // + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
+	// System.out.println("highest " + highest + "  secondHighest "
+	// + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
 
-        // Set inhibitory conductances in the layer
-        for (Neuron neuron : getNeuronList()) {
-            ((PointNeuronRule) neuron.getUpdateRule())
-                    .setInhibitoryConductance(inhibitoryConductance);
-        }
+	// Set inhibitory conductances in the layer
+	for (Neuron neuron : getNeuronList()) {
+	    ((PointNeuronRule) neuron.getUpdateRule())
+		    .setInhibitoryConductance(inhibitoryConductance);
+	}
     }
 
     /**
      * Sort neurons by their excitatory conductance. See p. 101.
      */
     private void sortNeurons() {
-        // REDO
-        //Collections.sort(this.getNeuronList(), new PointNeuronComparator());
+	// REDO
+	// Collections.sort(this.getNeuronList(), new PointNeuronComparator());
     }
 
     /**
@@ -113,36 +112,37 @@ public class KWTA extends NeuronGroup {
      */
     class PointNeuronComparator implements Comparator<Neuron> {
 
-        /**
-         * {@inheritDoc}
-         */
-        public int compare(Neuron neuron1, Neuron neuron2) {
-            return (int) ((PointNeuronRule) neuron1.getUpdateRule())
-                    .getExcitatoryConductance()
-                    - (int) ((PointNeuronRule) neuron1.getUpdateRule())
-                            .getExcitatoryConductance();
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public int compare(Neuron neuron1, Neuron neuron2) {
+	    return (int) ((PointNeuronRule) neuron1.getUpdateRule())
+		    .getExcitatoryConductance()
+		    - (int) ((PointNeuronRule) neuron1.getUpdateRule())
+			    .getExcitatoryConductance();
+	}
     }
 
     /**
      * Returns the initial number of neurons.
-     *
+     * 
      * @return the initial number of neurons
      */
     public int getK() {
-        return k;
+	return k;
     }
 
     /**
-     * @param k The k to set.
+     * @param k
+     *            The k to set.
      */
     public void setK(final int k) {
-        if (k < 1) {
-            this.k = 1;
-        } else if (k >= getNeuronList().size()) {
-            this.k = getNeuronList().size() - 1;
-        } else {
-            this.k = k;
-        }
+	if (k < 1) {
+	    this.k = 1;
+	} else if (k >= getNeuronList().size()) {
+	    this.k = getNeuronList().size() - 1;
+	} else {
+	    this.k = k;
+	}
     }
 }

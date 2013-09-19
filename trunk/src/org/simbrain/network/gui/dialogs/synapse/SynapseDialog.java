@@ -18,25 +18,25 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
@@ -44,331 +44,208 @@ import org.simbrain.util.StandardDialog;
  * The <b>SynapseDialog</b> is initialized with a list of synapses. When the
  * dialog is closed the synapses are changed based on the state of the dialog.
  */
-public class SynapseDialog extends StandardDialog implements ActionListener {
+public class SynapseDialog extends StandardDialog {
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
+	/** The default serial version id. */
+	private static final long serialVersionUID = 1L;
 
-    /** Tabbed pane (only used if a spike responder pane is needed) */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+	/** Null string. */
+	public static final String NULL_STRING = "...";
 
-    /** Main panel. */
-    private Box mainPanel = Box.createVerticalBox();
+	/** Main panel. */
+	private Box mainPanel = Box.createVerticalBox();
 
-    /** Spike response panel. */
-    private SpikeResponsePanel spikeResponsePanel;
+	/**
+	 * Top panel. Contains fields for displaying/editing basic synapse
+	 * information.
+	 * 
+	 * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
+	 */
+	private BasicSynapseInfoPanel topPanel;
 
-    /** Top panel. */
-    private LabelledItemPanel topPanel = new LabelledItemPanel();
+	/**
+	 * Bottom panel. Contains fields for displaying/editing synapse update rule
+	 * parameters.
+	 * 
+	 * @see org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel.java
+	 */
+	private SynapseUpdateSettingsPanel bottomPanel;
 
-    /** Synapse panel. */
-    private AbstractSynapsePanel synapsePanel = new ClampedSynapseRulePanel();
+	/**
+	 * Help Button. Links to information about the currently selected synapse
+	 * update rule.
+	 */
+	private JButton helpButton = new JButton("Help");
 
-    /** Scrollpane for synapse panel. */
-    private JScrollPane scrollPane;
+	/** Show Help Action. The action executed by the help button */
+	private ShowHelpAction helpAction;
 
-    /** Id Label. */
-    private JLabel idLabel = new JLabel();
+	/** The synapses being modified. */
+	private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
 
-    /** Strength field. */
-    private JTextField tfStrength = new JTextField();
+	/** The pnodes which refer to them. */
+	private ArrayList<SynapseNode> selectionList;
 
-    /** Increment field. */
-    private JTextField tfIncrement = new JTextField();
+	/**
+	 * @param selectedSynapses
+	 *            the pnode_synapses being adjusted
+	 */
+	public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
+		selectionList = new ArrayList<SynapseNode>(selectedSynapses);
+		setSynapseList();
+		init();
+		addListeners();
+		updateHelp();
+	}
 
-    /** Upper bound field. */
-    private JTextField tfUpBound = new JTextField();
+	/**
+	 * @param selectedSynapses
+	 *            the pnode_synapses being adjusted
+	 */
+	public SynapseDialog(final List<Synapse> synapseList) {
+		this.synapseList = (ArrayList<Synapse>) synapseList;
+		init();
+		addListeners();
+		updateHelp();
+	}
 
-    /** Lower bound field. */
-    private JTextField tfLowBound = new JTextField();
+	/**
+	 * Get the logical synapses from the SynapseNodes.
+	 */
+	private void setSynapseList() {
+		synapseList.clear();
 
-    /** Delay field. */
-    private JTextField tfDelay = new JTextField();
+		for (SynapseNode s : selectionList) {
+			synapseList.add(s.getSynapse());
+		}
+	}
 
-    /** Upper label. */
-    private JLabel upperLabel = new JLabel("Upper bound");
+	/**
+	 * Initializes the components on the panel.
+	 */
+	private void init() {
 
-    /** Lower label. */
-    private JLabel lowerLabel = new JLabel("Lower bound");
+		setTitle("Synapse Dialog");
+		mainPanel = Box.createVerticalBox();
 
-    /** Synapse type combo box. */
-    private JComboBox<String> cbSynapseType =
-    		new JComboBox<String>(Synapse.getRuleList());
+		// Initialize the two main panels
+		topPanel = new BasicSynapseInfoPanel(synapseList); // Basic Synapse Info
+		bottomPanel = new SynapseUpdateSettingsPanel(synapseList); // Update
+																   // info
 
-    /** The synapses being modified. */
-    private List<Synapse> synapseList = new ArrayList<Synapse>();
+		mainPanel.add(topPanel);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		mainPanel.add(bottomPanel);
+		setContentPane(mainPanel);
 
-    /** Help Button. */
-    private JButton helpButton = new JButton("Help");
+		this.addButton(helpButton);
 
-    /** Show Help Action. */
-    private ShowHelpAction helpAction;
-    
-    /**
-     * Constructor for a list of SynapseNodes.
-     *
-     * @param synapseList list of synapses to modify
-     */
-    public SynapseDialog(final List<Synapse> synapseList) {
-        this.synapseList = synapseList;
-        init();
-    }
+	}
 
-    @Override
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        commitChanges();
-    }
+	/**
+	 * Add listeners to the components of the dialog
+	 */
+	private void addListeners() {
 
-    /**
-     * Initializes the components on the panel.
-     */
-    private void init() {
-        setTitle("Synapse Dialog");
+		// Alert the dialog if the top panel changes, resize accordingly
+		topPanel.addPropertyChangeListener(new PropertyChangeListener() {
 
-        initSynapseType();
-        fillFieldValues();
-        updateHelp();
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				pack();
+			}
 
-        helpButton.setAction(helpAction);
-        this.addButton(helpButton);
-        cbSynapseType.addActionListener(this);
-        topPanel.addItem("Id:", idLabel);
-        topPanel.addItem("Strength", tfStrength);
-        topPanel.addItem("Increment", tfIncrement);
+		});
 
-        String toolTipText = "<html>If text is grayed out, "
-                + "this field is only used for graphics purposes <p> "
-                + "(to determine what size this synapse should be).</html>";
-        upperLabel.setToolTipText(toolTipText);
-        lowerLabel.setToolTipText(toolTipText);
-        topPanel.addItemLabel(upperLabel, tfUpBound);
-        topPanel.addItemLabel(lowerLabel, tfLowBound);
-        topPanel.addItem("Delay", tfDelay);
-        topPanel.addItem("Learning rule", cbSynapseType);
+		// Alert the dialog if the bottom panel changes, resize accordingly
+		bottomPanel
+				.addPropertyChangeListener(new PropertyChangeListener() {
 
-        mainPanel.add(topPanel);
-        initScrollPane(synapsePanel);
-        mainPanel.add(scrollPane);
+					@Override
+					public void propertyChange(PropertyChangeEvent evt) {
+						pack();
+					}
 
-        // Add tab for setting spike responders, if needed
-        ArrayList<Synapse> spikeRespondingSynapses = getSpikeRespondingSynapses();
-        if (spikeRespondingSynapses.size() > 0) {
-            spikeResponsePanel = new SpikeResponsePanel(
-                    spikeRespondingSynapses, this);
-            tabbedPane.addTab("Synaptic Efficacy", mainPanel);
-            tabbedPane.addTab("Spike Response", spikeResponsePanel);
-            setContentPane(tabbedPane);
-            updateHelp();
-        } else {
-            setContentPane(mainPanel);
-        }
+				});
 
-    }
+		bottomPanel.getCbSynapseType().addActionListener(
+				new ActionListener() {
 
-    /**
-     * Retrieve those synapses which are spike responders.
-     *
-     * @return the list of synapses which are spike responders
-     */
-    private ArrayList<Synapse> getSpikeRespondingSynapses() {
-        ArrayList<Synapse> ret = new ArrayList<Synapse>();
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
 
-        for (Synapse synapse : synapseList) {
-            Neuron source = synapse.getSource();
-            if (source != null) {
-                if ((source.getUpdateRule() instanceof SpikingNeuronUpdateRule)
-                        && (source != null)) {
-                    ret.add(synapse);
-                }
-            }
-        }
-        return ret;
-    }
+						updateHelp();
 
-    /**
-     * Initialize the main synapse panel based on the type of the selected
-     * synapses.
-     */
-    public void initSynapseType() {
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
-            cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
-            cbSynapseType.setSelectedIndex(Synapse.getRuleList().length);
-        } else {
-        	String synName =
-        			synapseList.get(0).getLearningRule().getDescription();
-            cbSynapseType.setSelectedItem(synName);
-            synapsePanel = Synapse.RULE_MAP.get(synName);
-            synapsePanel.fillFieldValues(Synapse.getRuleList(synapseList));
-        }
-    }
+					}
 
-    /**
-     * Respond to synapse type changes.
-     *
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
+				});
 
-        updateHelp();
-        String selected = (String) cbSynapseType.getSelectedItem();
-        if (selected != NULL_STRING) {
-            mainPanel.remove(scrollPane);
-            synapsePanel = Synapse.RULE_MAP.get(selected);
-            synapsePanel.fillDefaultValues();
-            initScrollPane(synapsePanel);
-            mainPanel.add(scrollPane);
-            scrollPane.revalidate();
-            pack();
-            centerDialog();
-        }
+	}
 
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void closeDialogOk() {
+		super.closeDialogOk();
+		commitChanges();
+	}
 
-    /**
-     * Set the initial values of dialog components.
-     */
-    private void fillFieldValues() {
-        Synapse synapseRef = synapseList.get(0);
+	/**
+	 * Set the help page based on the currently selected synapse type.
+	 */
+	public void updateHelp() {
+		if (bottomPanel.getCbSynapseType().getSelectedItem() == NULL_STRING) {
+			helpAction = new ShowHelpAction("Pages/Network/synapse.html");
+		} else {
+			String name =
+					(String) bottomPanel.getCbSynapseType()
+							.getSelectedItem();
+			helpAction =
+					new ShowHelpAction("Pages/Network/synapse/" + name
+							+ ".html");
+		}
+		helpButton.setAction(helpAction);
+	}
 
-        if (synapseList.size() == 1) {
-            idLabel.setText(synapseRef.getId());
-        } else {
-            idLabel.setText(NULL_STRING);
-        }
-        tfStrength.setText(Double.toString(synapseRef.getStrength()));
-        tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
-        tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
-        tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
-        tfDelay.setText(Integer.toString(synapseRef.getDelay()));
+	/**
+	 * Called externally when the dialog is closed, to commit any changes made.
+	 */
+	public void commitChanges() {
 
-        synapsePanel.fillFieldValues(Synapse.getRuleList(synapseList));
+		topPanel.commitChanges();
 
-        if (spikeResponsePanel != null) {
-            spikeResponsePanel.fillFieldValues();
-        }
+		// Now commit changes specific to the synapse type
+		bottomPanel.getSynapsePanel().commitChanges(synapseList);
 
-        // Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getStrength")) {
-            tfStrength.setText(NULL_STRING);
-        }
+		// Notify the network that changes have been made
+		synapseList.get(0).getNetwork().fireNetworkChanged();
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getIncrement")) {
-            tfIncrement.setText(NULL_STRING);
-        }
+	}
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getLowerBound")) {
-            tfLowBound.setText(NULL_STRING);
-        }
+	public ArrayList<Synapse> getSynapseList() {
+		return synapseList;
+	}
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getUpperBound")) {
-            tfUpBound.setText(NULL_STRING);
-        }
+	/**
+	 * Test Main: For fast prototyping
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Network net = new Network();
+		NetworkPanel np = new NetworkPanel(net);
+		Neuron n = new Neuron(net, new LinearRule());
+		NeuronNode nn = new NeuronNode(np, n);
 
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
-            tfDelay.setText(NULL_STRING);
-        }
+		Synapse s = new Synapse(n, n);
+		ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
+		arr.add(new SynapseNode(np, nn, nn, s));
+		SynapseDialog nd = new SynapseDialog(arr);
 
-    }
+		nd.pack();
+		nd.setVisible(true);
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            Synapse synapseRef = synapseList.get(i);
+	}
 
-            if (!tfStrength.getText().equals(NULL_STRING)) {
-                synapseRef
-                        .setStrength(Double.parseDouble(tfStrength.getText()));
-            }
-
-            if (!tfIncrement.getText().equals(NULL_STRING)) {
-                synapseRef.setIncrement(Double.parseDouble(tfIncrement
-                        .getText()));
-            }
-
-            if (!tfUpBound.getText().equals(NULL_STRING)) {
-                synapseRef
-                        .setUpperBound(Double.parseDouble(tfUpBound.getText()));
-            }
-
-            if (!tfLowBound.getText().equals(NULL_STRING)) {
-                synapseRef.setLowerBound(Double.parseDouble(tfLowBound
-                        .getText()));
-            }
-
-            if (!tfDelay.getText().equals(NULL_STRING)) {
-                synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
-            }
-        }
-
-        if (spikeResponsePanel != null) {
-            spikeResponsePanel.commitChanges();
-        }
-
-        // Notify the network that changes have been made
-        Synapse firstSynapse = synapseList.get(0);
-        if (firstSynapse.getParentNetwork() != null) {
-            firstSynapse.getParentNetwork().fireNetworkChanged();
-        }
-
-        // Now commit changes specific to the synapse type
-        synapsePanel.commitChanges(synapseList);
-    }
-
-    /**
-     * Set the help page based on the currently selected synapse type.
-     */
-    public void updateHelp() {
-        if (cbSynapseType.getSelectedItem() == NULL_STRING) {
-            helpAction = new ShowHelpAction("Pages/Network/synapse.html");
-        } else if (spikeResponsePanel != null) {
-            String spacelessString = spikeResponsePanel.getResponseFunction()
-                    .replace(" ", "");
-            spacelessString = spacelessString.substring(0, 1).toLowerCase()
-                    .concat(spacelessString.substring(1));
-            helpAction = new ShowHelpAction(
-                    "Pages/Network/synapse/spikeresponders/" + spacelessString
-                            + ".html");
-        } else {
-        	//TODO:Check Me
-            String name = (String)cbSynapseType.getSelectedItem();
-            name.replaceAll(" ", "");
-            name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
-            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
-                    + ".html");
-        }
-        helpButton.setAction(helpAction);
-    }
-
-    /**
-     * @return the synapseList
-     */
-    public List<Synapse> getSynapseList() {
-        return synapseList;
-    }
-
-    /**
-     * @param synapseList the synapseList to set
-     */
-    public void setSynapseList(List<Synapse> synapseList) {
-        this.synapseList = synapseList;
-    }
-    /**
-     * Initialize the scroll panel: set its properties and re-init the scrollbar
-     * policy. This is called every time a new neuron type is selected, so that
-     * the panel can be laid out again.
-     *
-     * @param npanel
-     */
-    private void initScrollPane(JPanel panel) {
-        scrollPane = new JScrollPane(panel);
-        scrollPane.setBorder(null);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    }
 }

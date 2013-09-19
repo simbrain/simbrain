@@ -26,11 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
+import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.util.LabelledItemPanel;
@@ -38,124 +34,136 @@ import org.simbrain.util.StandardDialog;
 
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
- *
+ * 
  */
-public class SOMCreationDialog extends StandardDialog implements ActionListener {
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+public class SOMCreationDialog extends StandardDialog implements
+		ActionListener {
+	/** Tabbed pane. */
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Logic tab panel. */
-    private JPanel tabLogic = new JPanel();
+	/** Logic tab panel. */
+	private JPanel tabLogic = new JPanel();
 
-    /** Layout tab panel. */
-    private JPanel tabLayout = new JPanel();
+	/** Layout tab panel. */
+	private JPanel tabLayout = new JPanel();
 
-    /** Logic panel. */
-    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+	/** Logic panel. */
+	private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-    /** Layout panel. */
-    private LayoutPanel layoutPanel;
+	/** Layout panel. */
+	private MainLayoutPanel layoutPanel;
 
-    /** Number of neurons field. */
-    private JTextField tfNumNeurons = new JTextField();
+	/** Number of neurons field. */
+	private JTextField tfNumNeurons = new JTextField();
 
-    /** Alpha field. */
-    private JTextField tfAlpha = new JTextField();
+	/** Alpha field. */
+	private JTextField tfAlpha = new JTextField();
 
-    /** NeighborhoodSize value field. */
-    private JTextField tfNeighborhoodSize = new JTextField();
+	/** NeighborhoodSize value field. */
+	private JTextField tfNeighborhoodSize = new JTextField();
 
-    /** NumInputVectors value field. */
-    private JTextField tfNumInputVectors = new JTextField();
+	/** NumInputVectors value field. */
+	private JTextField tfNumInputVectors = new JTextField();
 
-    /** AlphaDecayRate value field. */
-    private JTextField tfAlphaDecayRate = new JTextField();
+	/** AlphaDecayRate value field. */
+	private JTextField tfAlphaDecayRate = new JTextField();
 
-    /** NeighborhoodDecayAmount value field. */
-    private JTextField tfNeigborhoodDecayAmount = new JTextField();
+	/** NeighborhoodDecayAmount value field. */
+	private JTextField tfNeigborhoodDecayAmount = new JTextField();
 
-    /** Network Panel. */
-    private NetworkPanel networkPanel;
+	/** Network Panel. */
+	private NetworkPanel networkPanel;
 
-    /**
-     * This method is the default constructor.
-     *
-     * @param networkPanel Network panel
-     */
-    public SOMCreationDialog(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
-                new HexagonalGridLayoutPanel(), new GridLayoutPanel(),
-                new LineLayoutPanel() });
-        init();
-    }
+	/**
+	 * This method is the default constructor.
+	 * 
+	 * @param networkPanel
+	 *            Network panel
+	 */
+	public SOMCreationDialog(final NetworkPanel networkPanel) {
+		this.networkPanel = networkPanel;
+		layoutPanel = new MainLayoutPanel(false, this);
+		init();
+	}
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
-        Layout layout = layoutPanel.getNeuronLayout();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        SOM som = new SOM(networkPanel.getNetwork(),
-                Integer.parseInt(tfNumNeurons.getText()), layout);
-        som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
-                .getText()));
-        som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
-        som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Double
-                .parseDouble(tfNeigborhoodDecayAmount.getText()));
-        networkPanel.getNetwork().addGroup(som);
-        networkPanel.getNetwork().fireNetworkChanged(); // Force interaction box to update
-        super.closeDialogOk();
-    }
+	/**
+	 * Called when dialog closes.
+	 */
+	protected void closeDialogOk() {
 
-    /**
-     * Initializes all components used in dialog.
-     */
-    private void init() {
-        // Initializes dialog
-        setTitle("New SOM Network");
+		SOM som =
+				new SOM(networkPanel.getNetwork(),
+						Integer.parseInt(tfNumNeurons.getText()));
+		som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
+		som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
+				.getText()));
+		som.setNumInputVectors(Integer.parseInt(tfNumInputVectors
+				.getText()));
+		som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate
+				.getText()));
+		som.setNeighborhoodDecayAmount(Double
+				.parseDouble(tfNeigborhoodDecayAmount.getText()));
 
-        fillFieldValues();
+		layoutPanel.commitChanges();
+		Layout layout = layoutPanel.getCurrentLayout();
+		layout.setInitialLocation(networkPanel.getLastClickedPosition());
+		layout.layoutNeurons(som.getNeuronList());
+		networkPanel.getNetwork().addGroup(som);
+		networkPanel.getNetwork().fireNetworkChanged(); // Force interaction box
+		// to update
+		networkPanel.repaint();
+		super.closeDialogOk();
 
-        tfNumNeurons.setColumns(5);
+	}
 
-        // Set up logic panel
-        logicPanel.addItem("Number of Neurons", tfNumNeurons);
-        logicPanel.addItem("Initial Learning Rate", tfAlpha);
-        logicPanel.addItem("Initial Neighborhood Size", tfNeighborhoodSize);
-        //logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
-        logicPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
-        logicPanel.addItem("Neighborhood Decay Amount",
-                tfNeigborhoodDecayAmount);
+	/**
+	 * Initializes all components used in dialog.
+	 */
+	private void init() {
+		// Initializes dialog
+		setTitle("New SOM Network");
 
-        // Set up tab panels
-        tabLogic.add(logicPanel);
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", tabLogic);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
-    }
+		fillFieldValues();
 
-    /**
-     * @see java.awt.event.ActionListener
-     */
-    public void actionPerformed(final ActionEvent e) {
-        /* no implementation */
-    }
+		tfNumNeurons.setColumns(5);
 
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        tfAlpha.setText("" + SOM.DEFAULT_ALPHA);
-        tfNeighborhoodSize.setText("" + SOM.DEFAULT_INIT_NSIZE);
-        tfNumNeurons.setText("" + 25);
-        tfNumInputVectors.setText("" + 10);
-        tfAlphaDecayRate.setText("" + SOM.DEFAULT_DECAY_RATE);
-        tfNeigborhoodDecayAmount.setText(""
-                + SOM.DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT);
-    }
+		// Set up logic panel
+		logicPanel.addItem("Number of Neurons", tfNumNeurons);
+		logicPanel.addItem("Initial Learning Rate", tfAlpha);
+		logicPanel.addItem("Initial Neighborhood Size",
+				tfNeighborhoodSize);
+		// logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
+		logicPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
+		logicPanel.addItem("Neighborhood Decay Amount",
+				tfNeigborhoodDecayAmount);
+
+		// Set up tab panels
+		tabLogic.add(logicPanel);
+		tabLayout.add(layoutPanel);
+		tabbedPane.addTab("Logic", tabLogic);
+		tabbedPane.addTab("Layout", layoutPanel);
+		setContentPane(tabbedPane);
+
+	}
+
+	/**
+	 * @see java.awt.event.ActionListener
+	 */
+	public void actionPerformed(final ActionEvent e) {
+		/* no implementation */
+	}
+
+	/**
+	 * Populate fields with current data.
+	 */
+	private void fillFieldValues() {
+		tfAlpha.setText("" + SOM.DEFAULT_ALPHA);
+		tfNeighborhoodSize.setText("" + SOM.DEFAULT_INIT_NSIZE);
+		tfNumNeurons.setText("" + 25);
+		tfNumInputVectors.setText("" + 10);
+		tfAlphaDecayRate.setText("" + SOM.DEFAULT_DECAY_RATE);
+		tfNeigborhoodDecayAmount.setText(""
+				+ SOM.DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT);
+	}
 
 }

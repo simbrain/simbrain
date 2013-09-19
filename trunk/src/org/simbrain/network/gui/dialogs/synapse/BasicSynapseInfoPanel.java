@@ -1,22 +1,4 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-package org.simbrain.network.gui.dialogs.neuron;
+package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -33,62 +15,52 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.DropDownTriangle;
 
-/**
- * 
- * @author ztosi
- * @author jyoshimi
- * 
- */
-public class BasicNeuronInfoPanel extends JPanel {
+public class BasicSynapseInfoPanel extends JPanel {
 
 	/** Null string. */
 	public static final String NULL_STRING = "...";
 
-	/** Activation field. */
-	private JTextField tfActivation = new JTextField();
-
-	/** The neuron Id. */
+	/** Id Label. */
 	private JLabel idLabel = new JLabel();
 
-	/**
-	 * Displays More/Less depending on whether or not extra data panel is
-	 * displayed.
-	 */
 	private JLabel detailLabel = new JLabel();
 
-	/**
-	 * The extra data panel. Includes: increment, upper bound, lower bound, and
-	 * priority.
-	 */
-	private ExtendedNeuronInfoPanel extraDataPanel;
-
-	/** The neurons being modified. */
-	private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
+	/** Strength field. */
+	private JTextField tfStrength = new JTextField();
 
 	/**
 	 * A triangle that switches between an up (left) and a down state Used for
-	 * showing/hiding extra neuron data.
+	 * showing/hiding extra synapse data.
 	 */
 	private DropDownTriangle detailTriangle = new DropDownTriangle(
 			DropDownTriangle.LEFT, false);
 
 	/**
-	 * @param selectedNeurons
-	 *            the pnode_neurons being adjusted
+	 * The extra data panel. Includes: increment, upper bound, lower bound, and
+	 * priority.
 	 */
-	public BasicNeuronInfoPanel(final Collection<Neuron> neuronList) {
-		this.neuronList = (ArrayList<Neuron>) neuronList;
+	private ExtendedSynapseInfoPanel extraDataPanel;
+
+	/** The synapses being modified. */
+	private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
+
+	/**
+	 * @param selectedSynapses
+	 *            the pnode_synapses being adjusted
+	 */
+	public BasicSynapseInfoPanel(final Collection<Synapse> synapseList) {
+		this.synapseList = (ArrayList<Synapse>) synapseList;
 		initializeLayout();
 		fillFieldValues();
 		addListeners();
 	}
 
 	/**
-	 * Initialize the basic info panel (generic neuron parameters)
+	 * Initialize the basic info panel (generic synapse parameters)
 	 * 
 	 * @return the basic info panel
 	 */
@@ -107,7 +79,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(5, 0, 0, 0);
-		basicsPanel.add(new JLabel("Neuron Id:"), gbc);
+		basicsPanel.add(new JLabel("Synapse Id:"), gbc);
 
 		gbc.gridwidth = 2;
 		gbc.gridx = 1;
@@ -117,14 +89,14 @@ public class BasicNeuronInfoPanel extends JPanel {
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		basicsPanel.add(new JLabel("Activation:"), gbc);
+		basicsPanel.add(new JLabel("Strength:"), gbc);
 
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(5, 3, 0, 0);
 		gbc.gridwidth = 2;
 		gbc.weightx = 0.2;
 		gbc.gridx = 1;
-		basicsPanel.add(tfActivation, gbc);
+		basicsPanel.add(tfStrength, gbc);
 
 		gbc.gridwidth = 1;
 		int lgap = detailTriangle.isDown() ? 5 : 0;
@@ -143,7 +115,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 
 		this.add(basicsPanel, BorderLayout.NORTH);
 
-		extraDataPanel = new ExtendedNeuronInfoPanel(neuronList);
+		extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
 
 		extraDataPanel.setVisible(detailTriangle.isDown());
 
@@ -170,7 +142,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 	 */
 	private void addListeners() {
 
-		// Add a listener to display/hide extra editable neuron data
+		// Add a listener to display/hide extra editable synapse data
 		detailTriangle.addMouseListener(new MouseListener() {
 
 			@Override
@@ -210,22 +182,21 @@ public class BasicNeuronInfoPanel extends JPanel {
 	 */
 	public void fillFieldValues() {
 
-		Neuron neuronRef = neuronList.get(0);
-		if (neuronList.size() == 1) {
-			idLabel.setText(neuronRef.getId());
+		Synapse synapseRef = synapseList.get(0);
+		if (synapseList.size() == 1) {
+			idLabel.setText(synapseRef.getId());
 		} else {
 			idLabel.setText(NULL_STRING);
 		}
 
 		// (Below) Handle consistency of multiple selections
 
-		// Handle Activation
-		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getActivation"))
-			tfActivation.setText(NULL_STRING);
+		// Handle Strength
+		if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+				"getStrength"))
+			tfStrength.setText(NULL_STRING);
 		else
-			tfActivation.setText(Double.toString(neuronRef
-					.getActivation()));
+			tfStrength.setText(Double.toString(synapseRef.getStrength()));
 
 	}
 
@@ -233,13 +204,13 @@ public class BasicNeuronInfoPanel extends JPanel {
      * 
      */
 	public void commitChanges() {
-		for (int i = 0; i < neuronList.size(); i++) {
+		for (int i = 0; i < synapseList.size(); i++) {
 
-			Neuron neuronRef = neuronList.get(i);
+			Synapse synapseRef = synapseList.get(i);
 
-			// Activation
-			if (!tfActivation.getText().equals(NULL_STRING))
-				neuronRef.setActivation(Double.parseDouble(tfActivation
+			// Strength
+			if (!tfStrength.getText().equals(NULL_STRING))
+				synapseRef.setStrength(Double.parseDouble(tfStrength
 						.getText()));
 
 		}

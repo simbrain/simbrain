@@ -22,11 +22,16 @@ import java.util.List;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.HebbianRule;
 
 /**
  * <b>ClampedSynapsePanel</b>.
  */
 public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
+
+    /** Synapse reference. */
+    private ClampedSynapseRule synapseRef;
 
     /**
      * This method is the default constructor.
@@ -46,12 +51,16 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
     public void fillDefaultValues() {
     }
 
+    public void commitChanges(List<Synapse> commitSynapses) {
+        synapseRef = new ClampedSynapseRule();
+        for (Synapse s : commitSynapses) {
+            s.setLearningRule(synapseRef);
+        }
+    }
 
-	public void commitChanges(List<Synapse> commitSynapses) {
-	}
+    public void commitChanges(Synapse templateSynapse) {
+        synapseRef = new ClampedSynapseRule();
+        templateSynapse.setLearningRule(synapseRef);
+    }
 
-	public void commitChanges(Synapse templateSynapse) {	
-	}
-    
-   
 }

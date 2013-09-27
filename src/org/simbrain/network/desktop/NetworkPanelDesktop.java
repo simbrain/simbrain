@@ -180,7 +180,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowPrioritiesAction());
-        viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
+        //viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
         viewMenu.add(actionManager.getShowWeightsAction());
 
         return viewMenu;

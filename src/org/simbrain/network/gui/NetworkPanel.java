@@ -329,7 +329,7 @@ public class NetworkPanel extends JPanel {
             showNetworkHierarchyPanel = Boolean.parseBoolean(properties
                     .getProperty("showNetworkHierarchyPanel"));
         }
-        networkHierarchyPanel = new NetworkHierarchyPanel(this);
+        //networkHierarchyPanel = new NetworkHierarchyPanel(this);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(.2);
         splitPane.setLeftComponent(networkHierarchyPanel);
@@ -337,7 +337,7 @@ public class NetworkPanel extends JPanel {
         this.add("Center", splitPane);
 
         setPrioritiesVisible(prioritiesVisible);
-        setHierarchyPanelVisible(showNetworkHierarchyPanel);
+        //setHierarchyPanelVisible(showNetworkHierarchyPanel);
 
         // Event listeners
         removeDefaultEventListeners();

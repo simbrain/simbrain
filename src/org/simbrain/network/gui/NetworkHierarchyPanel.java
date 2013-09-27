@@ -102,7 +102,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
         setViewportView(panel);
 
         // Add all listeners
-        addListeners();
+        //addListeners();  // Note this causes a major performance slowdown
 
     }
 

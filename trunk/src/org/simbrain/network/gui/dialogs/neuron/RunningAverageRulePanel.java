@@ -22,10 +22,8 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.RunningAverageRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -45,8 +43,8 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
     /**
      * This method is the default constructor.
      */
-    public RunningAverageRulePanel(Network network) {
-        super(network);
+    public RunningAverageRulePanel() {
+        super();
         add(mainTab);
         mainTab.addItem("Rate Constant", tfRateConstant);
     }

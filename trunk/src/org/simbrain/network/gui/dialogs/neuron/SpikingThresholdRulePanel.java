@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -30,7 +29,6 @@ import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>.
- * TODO: Deactivated until discussion about "SpikingNeuronUpdateRule".
  */
 public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 
@@ -42,8 +40,8 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
      *
      * @param net Network
      */
-    public SpikingThresholdRulePanel(Network network) {
-        super(network);
+    public SpikingThresholdRulePanel() {
+        super();
         addItem("Threshold", tfThreshold);
     }
 
@@ -78,20 +76,15 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		SpikingThresholdRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof SpikingThresholdRule) {
-			neuronRef = (SpikingThresholdRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new SpikingThresholdRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
+		SpikingThresholdRule neuronRef = new SpikingThresholdRule();
+					
 		// Threshold
         if (!tfThreshold.getText().equals(NULL_STRING))
             neuronRef
                     .setThreshold(Double.parseDouble(tfThreshold.getText()));
 		
+        neuron.setUpdateRule(neuronRef);
+        
 	}
 
     /**
@@ -99,18 +92,9 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
      */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		
-		SpikingThresholdRule neuronRef = new SpikingThresholdRule();
-		
-		// Threshold
-        if (!tfThreshold.getText().equals(NULL_STRING))
-            neuronRef
-                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
-		
-        for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-        
+		for(Neuron n : neurons) {
+			commitChanges(n);
+		}
 	}
 
 }

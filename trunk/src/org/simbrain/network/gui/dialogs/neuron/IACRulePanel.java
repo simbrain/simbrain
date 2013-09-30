@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -64,8 +63,8 @@ public class IACRulePanel extends AbstractNeuronPanel {
      * This method is the default constructor.
      *
      */
-    public IACRulePanel(Network network) {
-        super(network);
+    public IACRulePanel() {
+        super();
         this.add(tabbedPane);
         mainPanel.addItem("Decay", tfDecay);
         mainPanel.addItem("Rest", tfRest);
@@ -144,15 +143,8 @@ public class IACRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		IACRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof IACRule) {
-			neuronRef = (IACRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new IACRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
+		IACRule neuronRef = new IACRule();
+					
 		// Decay
 		if (!tfDecay.getText().equals(NULL_STRING)) 
             neuronRef.setDecay(Double.parseDouble(tfDecay.getText()));
@@ -170,6 +162,8 @@ public class IACRulePanel extends AbstractNeuronPanel {
             neuronRef.setAddNoise(isAddNoise.isSelected());
 
         randTab.commitRandom(neuronRef.getNoiseGenerator());
+        
+        neuron.setUpdateRule(neuronRef);
         
 	}
 
@@ -177,31 +171,9 @@ public class IACRulePanel extends AbstractNeuronPanel {
      * {@inheritDoc}
      */
 	@Override
-	public void commitChanges(List<Neuron> neurons) {
-		
-		IACRule neuronRef = new IACRule();
-		
-		// Decay
-		if (!tfDecay.getText().equals(NULL_STRING)) 
-            neuronRef.setDecay(Double.parseDouble(tfDecay.getText()));
-        
-		// Rest
-        if (!tfRest.getText().equals(NULL_STRING))
-            neuronRef.setRest(Double.parseDouble(tfRest.getText()));
-        
-        // Clipping?
-        if (!isClipping.isNull())
-            neuronRef.setClipping(isClipping.isSelected());
-        
-        // Noise?
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        
-        for(Neuron n: neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-		
+	public void commitChanges(List<Neuron> neurons) {		
+        for(Neuron n : neurons) {
+        	commitChanges(n);
+        }  
 	}
 }

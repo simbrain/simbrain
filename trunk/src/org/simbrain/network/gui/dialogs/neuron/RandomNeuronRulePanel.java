@@ -18,15 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
-import org.simbrain.network.neuron_update_rules.RandomNeuronRule;
-import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>RandomNeuronPanel</b> Currently unimplemented pending decisions about
@@ -41,8 +38,8 @@ public class RandomNeuronRulePanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public RandomNeuronRulePanel(Network network) {
-        super(network);
+    public RandomNeuronRulePanel() {
+        super();
         this.add(rp);
     }
 

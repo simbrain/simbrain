@@ -24,7 +24,6 @@ import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -52,10 +51,16 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     private JTextField tfLC = new JTextField();
 
     /** Output function. */
-    private JComboBox cbOutputFunction = new JComboBox(new OutputFunction[] {
-            OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR,
-            OutputFunction.NOISY_RATE_CODE, OutputFunction.NONE,
-            OutputFunction.RATE_CODE, });
+    private JComboBox<OutputFunction> cbOutputFunction =
+    		new JComboBox<OutputFunction>();
+    
+    {
+    	cbOutputFunction.addItem(OutputFunction.DISCRETE_SPIKING);
+    	cbOutputFunction.addItem(OutputFunction.LINEAR);
+    	cbOutputFunction.addItem(OutputFunction.NOISY_RATE_CODE);
+    	cbOutputFunction.addItem(OutputFunction.NONE);
+    	cbOutputFunction.addItem(OutputFunction.RATE_CODE);
+    }
 
     /** Threshold for output function. */
     private JTextField tfThreshold = new JTextField();
@@ -74,9 +79,6 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
      */
     private JTextField tfTimeAveraging = new JTextField();
 
-    /** Time step field. */
-    private JTextField tfTimeStep = new JTextField();
-
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -92,10 +94,9 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public PointNeuronRulePanel(Network network) {
-        super(network);
+    public PointNeuronRulePanel() {
+        super();
         this.add(tabbedPane);
-        mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Excitatory reversal", tfER);
         mainTab.addItem("Inhibitory reversal", tfIR);
         mainTab.addItem("Leak reversal", tfLR);
@@ -116,8 +117,6 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
         
     	PointNeuronRule neuronRef = (PointNeuronRule) ruleList.get(0);
-
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
         //(Below) Handle consistency of multiple selections
         
@@ -153,7 +152,7 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handle Output Function
         if(!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
         		"getOutputFunction")) {
-        	cbOutputFunction.addItem(NULL_STRING);
+        	cbOutputFunction.addItem(OutputFunction.NULL_STRING);
         	cbOutputFunction.setSelectedIndex(cbOutputFunction.getItemCount());
         } else 
         	cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
@@ -195,7 +194,6 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         PointNeuronRule neuronRef = new PointNeuronRule();
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
@@ -215,15 +213,8 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		PointNeuronRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof PointNeuronRule) {
-			neuronRef = (PointNeuronRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new PointNeuronRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
+		PointNeuronRule neuronRef = new PointNeuronRule();
+	
 		// Excitatory Reversal	
         if (!tfER.getText().equals(NULL_STRING))
             neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
@@ -265,6 +256,8 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         if (!tfTimeAveraging.getText().equals(NULL_STRING))
             neuronRef.setNetTimeConstant((Double
                     .parseDouble(tfTimeAveraging.getText())));
+        
+        neuron.setUpdateRule(neuronRef);
 		
 	}
 
@@ -273,55 +266,9 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
      */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		
-		PointNeuronRule neuronRef = new PointNeuronRule();
-		
-		// Excitatory Reversal	
-        if (!tfER.getText().equals(NULL_STRING))
-            neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
-                    .getText()));
-        
-        // Inhibitory Reversal
-        if (!tfIR.getText().equals(NULL_STRING))
-            neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR
-                    .getText()));
-        
-        // Leak Reversal
-        if (!tfLR.getText().equals(NULL_STRING))
-            neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
-        
-        // Leak Conductance
-        if (!tfLC.getText().equals(NULL_STRING))
-            neuronRef
-                    .setLeakConductance(Double.parseDouble(tfLC.getText()));
-        
-        // Output Function
-        if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING))
-        	neuronRef.setOutputFunction((OutputFunction) cbOutputFunction
-                .getSelectedItem());
-        
-        // Threshold Potential
-        if (!tfThreshold.getText().equals(NULL_STRING))
-            neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold
-                    .getText()));
-        
-        // Gain
-        if (!tfGain.getText().equals(NULL_STRING))
-            neuronRef.setGain(Double.parseDouble(tfGain.getText()));
-        
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Time Averaging
-        if (!tfTimeAveraging.getText().equals(NULL_STRING))
-            neuronRef.setNetTimeConstant((Double
-                    .parseDouble(tfTimeAveraging.getText())));
-        
         for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
+        	commitChanges(n);
         }
-		
 	}
 
 }

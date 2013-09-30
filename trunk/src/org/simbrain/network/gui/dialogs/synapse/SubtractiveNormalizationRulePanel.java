@@ -33,7 +33,7 @@ import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
 
     /** Learning rate field. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
     private SubtractiveNormalizationRule synapseRef;
@@ -74,31 +74,28 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
                 .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new SubtractiveNormalizationRule();
-		
-		if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-        }
-		
+	public void commitChanges(final List<Synapse> commitSynapses) {
 		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}
-		
+			commitChanges(s);
+		}  
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(Synapse templateSynapse) {
 		
 		synapseRef = new SubtractiveNormalizationRule();
 		
-		if (!tfLearningRate.getText().equals(NULL_STRING)) {
+		// Learning Rate
+		if (!tfLearningRate.getText().equals(NULL_STRING))
             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
                     .getText()));
-        }
 		
 		templateSynapse.setLearningRule(synapseRef);
 		

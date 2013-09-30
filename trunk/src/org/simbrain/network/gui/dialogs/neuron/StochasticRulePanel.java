@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -40,8 +39,8 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public StochasticRulePanel(Network network) {
-        super(network);
+    public StochasticRulePanel() {
+        super();
         this.addItem("Firing probability", tfFiringProbability);
         this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"
                 + " state taking on the upper bound value.</html>");

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.List;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 
@@ -32,8 +31,8 @@ public class ClampedNeuronRulePanel extends AbstractNeuronPanel {
     /**
      * This method is the default constructor.
      */
-    public ClampedNeuronRulePanel(Network network) {
-        super(network);
+    public ClampedNeuronRulePanel() {
+        super();
     }
 
     /**

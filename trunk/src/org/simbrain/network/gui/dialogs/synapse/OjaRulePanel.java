@@ -33,10 +33,10 @@ import org.simbrain.network.synapse_update_rules.OjaRule;
 public class OjaRulePanel extends AbstractSynapsePanel {
 
     /** Learning rate field. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Normalize field. */
-    private JTextField tfNormalize = new JTextField();
+    private final JTextField tfNormalize = new JTextField();
 
     /** Synapse reference. */
     private OjaRule synapseRef;
@@ -86,29 +86,21 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		 OjaRule synapseRef = new OjaRule();
-
-         if (!tfNormalize.getText().equals(NULL_STRING)) {
-             synapseRef.setNormalizationFactor(Double
-                     .parseDouble(tfNormalize.getText()));
-         }
-
-         if (!tfLearningRate.getText().equals(NULL_STRING)) {
-             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                     .getText()));
-         }
-		
- 		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}
-         
+	public void commitChanges(final List<Synapse> commitSynapses) {
+		for(Synapse s : commitSynapses) {
+			commitChanges(s);
+		}              
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		 OjaRule synapseRef = new OjaRule();
 
          if (!tfNormalize.getText().equals(NULL_STRING)) {

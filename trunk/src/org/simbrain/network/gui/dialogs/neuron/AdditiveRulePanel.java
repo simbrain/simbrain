@@ -69,7 +69,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
      * @param net Network
      */
     public AdditiveRulePanel(Network network) {
-        super(network);
+        super();
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Lambda", tfLambda);
@@ -89,7 +89,6 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
@@ -137,50 +136,16 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
         AdditiveRule neuronRef = new AdditiveRule();
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
 	public void commitChanges(Neuron neuron) {
-		
-		parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
-		
-		AdditiveRule neuronRef;
-		if(neuron.getUpdateRule() instanceof AdditiveRule) {
-			neuronRef = (AdditiveRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new AdditiveRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
-		//Lambda
-		if (!tfLambda.getText().equals(NULL_STRING)) 
-			neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));		
-
-		//Resistance
-		if (!tfResistance.getText().equals(NULL_STRING)) 
-			neuronRef.setResistance(Double.parseDouble(tfResistance
-					.getText()));		
-
-		//Noise On/Of
-		if (!isAddNoise.isNull()) 
-			neuronRef.setClipping(isClipping.isSelected());		
-
-		//Noise
-		if (!isAddNoise.isNull()) 
-			neuronRef.setAddNoise(isAddNoise.isSelected());
-		
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        		
-	}
-
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
-		
-		parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 		
 		AdditiveRule neuronRef = new AdditiveRule();
 		
@@ -203,10 +168,18 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		
         randTab.commitRandom(neuronRef.getNoiseGenerator());
         
+        neuron.setUpdateRule(neuronRef);
+        		
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {        
         for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-        
+        	commitChanges(n);
+        }        
 	}
 	
 }

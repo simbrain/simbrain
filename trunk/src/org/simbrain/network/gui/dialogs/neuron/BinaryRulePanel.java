@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -47,8 +46,8 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
     /**
      * Creates binary neuron preferences panel.
      */
-    public BinaryRulePanel(Network network) {
-        super(network);
+    public BinaryRulePanel() {
+        super();
         this.add(mainTab);
         mainTab.addItem("Threshold", tfThreshold);
         mainTab.addItem("Bias", tfBias);
@@ -87,16 +86,13 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
         tfBias.setText(Double.toString(neuronRef.getBias()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		BinaryRule neuronRef;
-		if(neuron.getUpdateRule() instanceof BinaryRule) {
-			neuronRef = (BinaryRule)neuron.getUpdateRule();
-		} else {
-			neuronRef = new BinaryRule();
-			neuron.setUpdateRule(neuronRef);
-		}
+		BinaryRule neuronRef = new BinaryRule();
 		
 		// Threshold
 		if (!tfThreshold.getText().equals(NULL_STRING)) 
@@ -107,28 +103,18 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 		if (!tfBias.getText().equals(NULL_STRING)) 
 			neuronRef.setBias(Double.parseDouble(tfBias.getText()));  
 		
+		neuron.setUpdateRule(neuronRef);
+		
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		
-		BinaryRule neuronRef = new BinaryRule();
-		
-		// Threshold
-		if (!tfThreshold.getText().equals(NULL_STRING))
-			neuronRef
-			.setThreshold(Double.parseDouble(tfThreshold.getText()));
-		
-		// Bias
-		if (!tfBias.getText().equals(NULL_STRING))
-			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-		
-		for(Neuron n : neurons) {
-			n.setUpdateRule(neuronRef);
-		}
-		
+        for(Neuron n : neurons) {
+        	commitChanges(n);
+        }
 	}
-    
-    
-    
+   
 }

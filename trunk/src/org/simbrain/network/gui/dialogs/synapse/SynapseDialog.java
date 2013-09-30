@@ -21,8 +21,6 @@ package org.simbrain.network.gui.dialogs.synapse;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,7 +51,7 @@ public class SynapseDialog extends StandardDialog {
 	public static final String NULL_STRING = "...";
 
 	/** Main panel. */
-	private Box mainPanel = Box.createVerticalBox();
+	private final Box mainPanel = Box.createVerticalBox();
 
 	/**
 	 * Top panel. Contains fields for displaying/editing basic synapse
@@ -61,7 +59,7 @@ public class SynapseDialog extends StandardDialog {
 	 * 
 	 * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
 	 */
-	private BasicSynapseInfoPanel topPanel;
+	private final BasicSynapseInfoPanel topPanel;
 
 	/**
 	 * Bottom panel. Contains fields for displaying/editing synapse update rule
@@ -69,41 +67,36 @@ public class SynapseDialog extends StandardDialog {
 	 * 
 	 * @see org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel.java
 	 */
-	private SynapseUpdateSettingsPanel bottomPanel;
+	private final SynapseUpdateSettingsPanel bottomPanel;
 
 	/**
 	 * Help Button. Links to information about the currently selected synapse
 	 * update rule.
 	 */
-	private JButton helpButton = new JButton("Help");
+	private final JButton helpButton = new JButton("Help");
 
 	/** Show Help Action. The action executed by the help button */
 	private ShowHelpAction helpAction;
 
 	/** The synapses being modified. */
-	private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
-
-	/** The pnodes which refer to them. */
-	private ArrayList<SynapseNode> selectionList;
+	private final ArrayList<Synapse> synapseList;
 
 	/**
 	 * @param selectedSynapses
 	 *            the pnode_synapses being adjusted
 	 */
 	public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
-		selectionList = new ArrayList<SynapseNode>(selectedSynapses);
-		setSynapseList();
-		init();
-		addListeners();
-		updateHelp();
+		this(getSynapses(selectedSynapses));
 	}
 
 	/**
-	 * @param selectedSynapses
-	 *            the pnode_synapses being adjusted
+	 * @param synapseList
+	 *            the logical synapses being adjusted
 	 */
 	public SynapseDialog(final List<Synapse> synapseList) {
 		this.synapseList = (ArrayList<Synapse>) synapseList;
+		topPanel = new BasicSynapseInfoPanel(synapseList, this);
+		bottomPanel = new SynapseUpdateSettingsPanel(synapseList, this);
 		init();
 		addListeners();
 		updateHelp();
@@ -112,62 +105,31 @@ public class SynapseDialog extends StandardDialog {
 	/**
 	 * Get the logical synapses from the SynapseNodes.
 	 */
-	private void setSynapseList() {
-		synapseList.clear();
-
-		for (SynapseNode s : selectionList) {
-			synapseList.add(s.getSynapse());
+	private static ArrayList<Synapse> getSynapses(
+			final Collection<SynapseNode> selectedSynapses) {
+		ArrayList<Synapse> sl = new ArrayList<Synapse>();
+		for (SynapseNode s : selectedSynapses) {
+			sl.add(s.getSynapse());
 		}
+		return sl;
 	}
 
 	/**
 	 * Initializes the components on the panel.
 	 */
 	private void init() {
-
 		setTitle("Synapse Dialog");
-		mainPanel = Box.createVerticalBox();
-
-		// Initialize the two main panels
-		topPanel = new BasicSynapseInfoPanel(synapseList); // Basic Synapse Info
-		bottomPanel = new SynapseUpdateSettingsPanel(synapseList); // Update
-																   // info
-
 		mainPanel.add(topPanel);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		mainPanel.add(bottomPanel);
 		setContentPane(mainPanel);
-
 		this.addButton(helpButton);
-
 	}
 
 	/**
 	 * Add listeners to the components of the dialog
 	 */
 	private void addListeners() {
-
-		// Alert the dialog if the top panel changes, resize accordingly
-		topPanel.addPropertyChangeListener(new PropertyChangeListener() {
-
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				pack();
-			}
-
-		});
-
-		// Alert the dialog if the bottom panel changes, resize accordingly
-		bottomPanel
-				.addPropertyChangeListener(new PropertyChangeListener() {
-
-					@Override
-					public void propertyChange(PropertyChangeEvent evt) {
-						pack();
-					}
-
-				});
-
 		bottomPanel.getCbSynapseType().addActionListener(
 				new ActionListener() {
 
@@ -179,7 +141,6 @@ public class SynapseDialog extends StandardDialog {
 					}
 
 				});
-
 	}
 
 	/**

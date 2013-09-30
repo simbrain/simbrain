@@ -34,19 +34,19 @@ import org.simbrain.util.TristateDropDown;
 public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
 
     /** Baseline strength field. */
-    private JTextField tfBaseLineStrength = new JTextField();
+    private final JTextField tfBaseLineStrength = new JTextField();
 
     /** Firing threshold field. */
-    private JTextField tfFiringThreshold = new JTextField();
+    private final JTextField tfFiringThreshold = new JTextField();
 
     /** Bump rate field. */
-    private JTextField tfBumpRate = new JTextField();
+    private final JTextField tfBumpRate = new JTextField();
 
     /** Decay rate field. */
-    private JTextField tfDecayRate = new JTextField();
+    private final JTextField tfDecayRate = new JTextField();
 
     /** Plasticity type combo box. */
-    private TristateDropDown cbPlasticityType = new TristateDropDown(
+    private final TristateDropDown cbPlasticityType = new TristateDropDown(
             "Depression", "Facilitation");
 
     /** Synapse reference. */
@@ -130,44 +130,21 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new ShortTermPlasticityRule();
-		
-		  if (!cbPlasticityType.isNull()) {
-              synapseRef.setPlasticityType(cbPlasticityType
-                      .getSelectedIndex());
-          }
-
-          if (!tfBaseLineStrength.getText().equals(NULL_STRING)) {
-              synapseRef.setBaseLineStrength(Double
-                      .parseDouble(tfBaseLineStrength.getText()));
-          }
-
-          if (!tfFiringThreshold.getText().equals(NULL_STRING)) {
-              synapseRef.setFiringThreshold(Double
-                      .parseDouble(tfFiringThreshold.getText()));
-          }
-
-          if (!tfBumpRate.getText().equals(NULL_STRING)) {
-              synapseRef
-                      .setBumpRate(Double.parseDouble(tfBumpRate.getText()));
-          }
-
-          if (!tfDecayRate.getText().equals(NULL_STRING)) {
-              synapseRef.setDecayRate(Double.parseDouble(tfDecayRate
-                      .getText()));
-          }
-          
-  		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}      
-		
+	public void commitChanges(final List<Synapse> commitSynapses) {		
+		for(Synapse s : commitSynapses) {
+			commitChanges(s);
+		}   		
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		
 		synapseRef = new ShortTermPlasticityRule();
 		

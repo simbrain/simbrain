@@ -34,16 +34,16 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
     private static final long serialVersionUID = 1L;
 
     /** Learning rate field. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
-    private JTextField tfM = new JTextField();
+    private final JTextField tfM = new JTextField();
 
     /** Weight offset. */
-    private JTextField tfTheta = new JTextField();
+    private final JTextField tfTheta = new JTextField();
 
     /** Sigmoidal function. */
-    private JTextField tfLambda = new JTextField();
+    private final JTextField tfLambda = new JTextField();
 
     /** Synapse reference. */
     private HebbianCPCARule synapseRef;
@@ -108,33 +108,21 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
         tfLambda.setText(Double.toString(HebbianCPCARule.DEFAULT_LAMBDA));
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new HebbianCPCARule();		
-		
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-        }
-        if (!tfM.getText().equals(NULL_STRING)) {
-            synapseRef.setM(Double.parseDouble(tfM.getText()));
-        }
-        if (!tfTheta.getText().equals(NULL_STRING)) {
-            synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
-        }
-        if (!tfLambda.getText().equals(NULL_STRING)) {
-            synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
-        }
-        
+	public void commitChanges(final List<Synapse> commitSynapses) {      
 		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}
-        
+			commitChanges(s);
+		}      
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		synapseRef = new HebbianCPCARule();		
 		
         if (!tfLearningRate.getText().equals(NULL_STRING)) {

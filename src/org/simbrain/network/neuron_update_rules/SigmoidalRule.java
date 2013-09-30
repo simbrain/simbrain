@@ -57,6 +57,12 @@ public class SigmoidalRule extends NeuronUpdateRule implements
             public String toString() {
                 return "Tanh";
             }
+        },
+        NULL_STRING{
+        	@Override
+        	public String toString() {
+        		return "...";
+        	}
         }
     };
 

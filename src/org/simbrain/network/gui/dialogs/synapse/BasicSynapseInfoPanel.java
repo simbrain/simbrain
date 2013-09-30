@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 
 public class BasicSynapseInfoPanel extends JPanel {
 
@@ -25,35 +27,44 @@ public class BasicSynapseInfoPanel extends JPanel {
 	public static final String NULL_STRING = "...";
 
 	/** Id Label. */
-	private JLabel idLabel = new JLabel();
-
-	private JLabel detailLabel = new JLabel();
+	private final JLabel idLabel = new JLabel();
 
 	/** Strength field. */
-	private JTextField tfStrength = new JTextField();
+	private final JTextField tfStrength = new JTextField();
 
 	/**
 	 * A triangle that switches between an up (left) and a down state Used for
 	 * showing/hiding extra synapse data.
 	 */
-	private DropDownTriangle detailTriangle = new DropDownTriangle(
-			DropDownTriangle.LEFT, false);
+	private final DropDownTriangle detailTriangle;
 
 	/**
 	 * The extra data panel. Includes: increment, upper bound, lower bound, and
 	 * priority.
 	 */
-	private ExtendedSynapseInfoPanel extraDataPanel;
+	private final ExtendedSynapseInfoPanel extraDataPanel;
 
 	/** The synapses being modified. */
 	private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
 
 	/**
+	 * A reference to the parent window, for resizing after panel content
+	 * changes.
+	 */
+	private final Window parent;
+
+	/**
 	 * @param selectedSynapses
 	 *            the pnode_synapses being adjusted
 	 */
-	public BasicSynapseInfoPanel(final Collection<Synapse> synapseList) {
+	public BasicSynapseInfoPanel(final Collection<Synapse> synapseList,
+			final Window parent) {
 		this.synapseList = (ArrayList<Synapse>) synapseList;
+		this.parent = parent;
+		detailTriangle =
+				new DropDownTriangle(UpDirection.LEFT, false, "More",
+						"Less", parent);
+		extraDataPanel = new ExtendedSynapseInfoPanel(this.synapseList);
 		initializeLayout();
 		fillFieldValues();
 		addListeners();
@@ -106,16 +117,9 @@ public class BasicSynapseInfoPanel extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		gbc.weightx = 0.2;
-		String details = detailTriangle.isDown() ? "Less" : "More";
-		detailLabel.setText(details);
-		basicsPanel.add(detailLabel, gbc);
-		gbc.weightx = 0.0;
-		gbc.gridx = 2;
 		basicsPanel.add(detailTriangle, gbc);
 
 		this.add(basicsPanel, BorderLayout.NORTH);
-
-		extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
 
 		extraDataPanel.setVisible(detailTriangle.isDown());
 
@@ -124,17 +128,6 @@ public class BasicSynapseInfoPanel extends JPanel {
 		TitledBorder tb = BorderFactory.createTitledBorder("Basic Data");
 		this.setBorder(tb);
 
-	}
-
-	/**
-	 * Called Externally to repaint this panel based on whether or not extra
-	 * data is displayed.
-	 */
-	public void repaintPanel() {
-		extraDataPanel.setVisible(detailTriangle.isDown());
-		String details = detailTriangle.isDown() ? "Less" : "More";
-		detailLabel.setText(details);
-		repaint();
 	}
 
 	/**
@@ -149,13 +142,8 @@ public class BasicSynapseInfoPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				// Repaint to show/hide extra data
 				extraDataPanel.setVisible(detailTriangle.isDown());
-				String details =
-						detailTriangle.isDown() ? "Less" : "More";
-				detailLabel.setText(details);
-				// Alert the panel/dialog/frame this is embedded in to
-				// resize itself accordingly
-				firePropertyChange("Extra Data",
-						!detailTriangle.isDown(), detailTriangle.isDown());
+				// Resize the parent window accordingly...
+				parent.pack();
 			}
 
 			@Override

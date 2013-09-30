@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -64,8 +63,8 @@ public class LinearRulePanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public LinearRulePanel(Network network) {
-        super(network);
+    public LinearRulePanel() {
+        super();
         this.add(tabbedPane);
         mainTab.addItem("Slope", tfSlope);
         mainTab.addItem("Bias", tfBias);
@@ -146,42 +145,6 @@ public class LinearRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		LinearRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof LinearRule) {
-			neuronRef = (LinearRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new LinearRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
-		// Slope
-        if (!tfSlope.getText().equals(NULL_STRING))
-            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));      
-
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Clipping?
-        if (!isClipping.isNull())
-            neuronRef.setClipping(isClipping.isSelected());
-        
-        // Noise
-        if (!isAddNoise.isNull()) {
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-        }
-
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
-		
 		LinearRule neuronRef = new LinearRule();
 		
 		// Slope
@@ -203,10 +166,18 @@ public class LinearRulePanel extends AbstractNeuronPanel {
 
         randTab.commitRandom(neuronRef.getNoiseGenerator());
         
+        neuron.setUpdateRule(neuronRef);
+        
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
         for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
+        	commitChanges(n);
         }
-		
 	}
 
 }

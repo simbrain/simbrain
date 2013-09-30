@@ -21,8 +21,6 @@ package org.simbrain.network.gui.dialogs.neuron;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -43,182 +41,151 @@ import org.simbrain.util.StandardDialog;
  */
 public class NeuronDialog extends StandardDialog {
 
-    /** The default serial version id. */
-    private static final long serialVersionUID = 1L;
+	/** The default serial version id. */
+	private static final long serialVersionUID = 1L;
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
+	/** Null string. */
+	public static final String NULL_STRING = "...";
 
-    /** Main panel. */
-    private Box mainPanel = Box.createVerticalBox();
+	/** Main panel. */
+	private final Box mainPanel = Box.createVerticalBox();
 
-    /**
-     * Top panel. Contains fields for displaying/editing basic neuron
-     * information.
-     * 
-     * @see org.simbrain.network.gui.dialogs.neuron.BasicNeuronInfoPanel.java
-     */
-    private BasicNeuronInfoPanel topPanel;
+	/**
+	 * Top panel. Contains fields for displaying/editing basic neuron
+	 * information.
+	 * 
+	 * @see org.simbrain.network.gui.dialogs.neuron.BasicNeuronInfoPanel.java
+	 */
+	private final BasicNeuronInfoPanel topPanel;
 
-    /**
-     * Bottom panel. Contains fields for displaying/editing neuron update rule
-     * parameters.
-     * 
-     * @see org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel.java
-     */
-    private NeuronUpdateSettingsPanel bottomPanel;
+	/**
+	 * Bottom panel. Contains fields for displaying/editing neuron update rule
+	 * parameters.
+	 * 
+	 * @see org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel.java
+	 */
+	private final NeuronUpdateSettingsPanel bottomPanel;
 
-    /**
-     * Help Button. Links to information about the currently selected neuron
-     * update rule.
-     */
-    private JButton helpButton = new JButton("Help");
+	/**
+	 * Help Button. Links to information about the currently selected neuron
+	 * update rule.
+	 */
+	private final JButton helpButton = new JButton("Help");
 
-    /** Show Help Action. The action executed by the help button */
-    private ShowHelpAction helpAction;
+	/** Show Help Action. The action executed by the help button */
+	private ShowHelpAction helpAction;
 
-    /** The neurons being modified. */
-    private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
+	/** The neurons being modified. */
+	private final ArrayList<Neuron> neuronList;
 
-    /** The pnodes which refer to them. */
-    private ArrayList<NeuronNode> selectionList;
-
-    /**
-     * @param selectedNeurons
-     *            the pnode_neurons being adjusted
-     */
-    public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
-	selectionList = new ArrayList<NeuronNode>(selectedNeurons);
-	setNeuronList();
-	init();
-	addListeners();
-	updateHelp();
-    }
-
-    /**
-     * Get the logical neurons from the NeuronNodes.
-     */
-    private void setNeuronList() {
-	neuronList.clear();
-
-	for (NeuronNode n : selectionList) {
-	    neuronList.add(n.getNeuron());
-	}
-    }
-
-    /**
-     * Initializes the components on the panel.
-     */
-    private void init() {
-
-	setTitle("Neuron Dialog");
-	mainPanel = Box.createVerticalBox();
-
-	// Initialize the two main panels
-	topPanel = new BasicNeuronInfoPanel(neuronList); // Basic Neuron Info
-	bottomPanel = new NeuronUpdateSettingsPanel(neuronList); // Update info
-
-	mainPanel.add(topPanel);
-	mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-	mainPanel.add(bottomPanel);
-	setContentPane(mainPanel);
-
-	this.addButton(helpButton);
-
-    }
-
-    /**
-     * Add listeners to the components of the dialog
-     */
-    private void addListeners() {
-
-	// Alert the dialog if the top panel changes, resize accordingly
-	topPanel.addPropertyChangeListener(new PropertyChangeListener() {
-
-	    @Override
-	    public void propertyChange(PropertyChangeEvent evt) {
-		pack();
-	    }
-
-	});
-
-	// Alert the dialog if the bottom panel changes, resize accordingly
-	bottomPanel.addPropertyChangeListener(new PropertyChangeListener() {
-
-	    @Override
-	    public void propertyChange(PropertyChangeEvent evt) {
-		pack();
-	    }
-
-	});
-
-	bottomPanel.getCbNeuronType().addActionListener(new ActionListener() {
-
-	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
-
+	/**
+	 * @param selectedNeurons
+	 *            the pnode_neurons being adjusted
+	 */
+	public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
+		neuronList = getNeuronList(selectedNeurons);
+		topPanel = new BasicNeuronInfoPanel(neuronList, this);
+		bottomPanel = new NeuronUpdateSettingsPanel(neuronList, this);
+		init();
+		addListeners();
 		updateHelp();
-
-	    }
-
-	});
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void closeDialogOk() {
-	super.closeDialogOk();
-	commitChanges();
-    }
-
-    /**
-     * Set the help page based on the currently selected neuron type.
-     */
-    private void updateHelp() {
-	if (bottomPanel.getCbNeuronType().getSelectedItem() == NULL_STRING) {
-	    helpAction = new ShowHelpAction("Pages/Network/neuron.html");
-	} else {
-	    String name = (String) bottomPanel.getCbNeuronType()
-		    .getSelectedItem();
-	    helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
-		    + ".html");
 	}
-	helpButton.setAction(helpAction);
-    }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
+	/**
+	 * Get the logical neurons from the NeuronNodes.
+	 */
+	private static ArrayList<Neuron> getNeuronList(
+			final Collection<NeuronNode> selectedNeurons) {
+		ArrayList<Neuron> nl = new ArrayList<Neuron>();
+		for (NeuronNode n : selectedNeurons) {
+			nl.add(n.getNeuron());
+		}
+		return nl;
+	}
 
-	topPanel.commitChanges();
+	/**
+	 * Initializes the components on the panel.
+	 */
+	private void init() {
+		setTitle("Neuron Dialog");
+		mainPanel.add(topPanel);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		mainPanel.add(bottomPanel);
+		setContentPane(mainPanel);
+		this.addButton(helpButton);
+	}
 
-	// Now commit changes specific to the neuron type
-	bottomPanel.getNeuronPanel().commitChanges(neuronList);
+	/**
+	 * Add listeners to the components of the dialog
+	 */
+	private void addListeners() {
+		bottomPanel.getCbNeuronType().addActionListener(
+				new ActionListener() {
 
-	// Notify the network that changes have been made
-	neuronList.get(0).getNetwork().fireNetworkChanged();
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						updateHelp();
+					}
 
-    }
+				});
+	}
 
-    /**
-     * Test Main: For fast prototyping
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void closeDialogOk() {
+		super.closeDialogOk();
+		commitChanges();
+	}
 
-	Neuron n = new Neuron(new Network(), new LinearRule());
-	ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
-	arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
-	NeuronDialog nd = new NeuronDialog(arr);
+	/**
+	 * Set the help page based on the currently selected neuron type.
+	 */
+	private void updateHelp() {
+		if (bottomPanel.getCbNeuronType().getSelectedItem() == NULL_STRING) {
+			helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+		} else {
+			String name =
+					(String) bottomPanel.getCbNeuronType()
+							.getSelectedItem();
+			helpAction =
+					new ShowHelpAction("Pages/Network/neuron/" + name
+							+ ".html");
+		}
+		helpButton.setAction(helpAction);
+	}
 
-	nd.pack();
-	nd.setVisible(true);
+	/**
+	 * Called externally when the dialog is closed, to commit any changes made.
+	 */
+	public void commitChanges() {
 
-    }
+		topPanel.commitChanges();
+
+		// Now commit changes specific to the neuron type
+		bottomPanel.getNeuronPanel().commitChanges(neuronList);
+
+		// Notify the network that changes have been made
+		neuronList.get(0).getNetwork().fireNetworkChanged();
+
+	}
+
+	/**
+	 * Test Main: For fast prototyping
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Neuron n = new Neuron(new Network(), new LinearRule());
+		ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
+		arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
+		NeuronDialog nd = new NeuronDialog(arr);
+
+		nd.pack();
+		nd.setVisible(true);
+
+	}
 
 }

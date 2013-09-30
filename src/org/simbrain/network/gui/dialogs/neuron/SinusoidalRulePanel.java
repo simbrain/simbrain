@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
@@ -61,8 +60,8 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public SinusoidalRulePanel(Network network) {
-        super(network);
+    public SinusoidalRulePanel() {
+        super();
         this.add(tabbedPanel);
         mainPanel.addItem("Phase", tfPhase);
         mainPanel.addItem("Frequency", tfFrequency);

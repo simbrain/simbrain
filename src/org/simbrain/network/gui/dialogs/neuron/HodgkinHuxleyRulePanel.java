@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.HodgkinHuxleyRule;
@@ -52,8 +51,8 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
     /**
      * Creates HodgkinHuxley preferences panel.
      */
-    public HodgkinHuxleyRulePanel(Network network) {
-        super(network);
+    public HodgkinHuxleyRulePanel() {
+        super();
         this.add(mainTab);
         mainTab.addItem("Sodium Channels", perNaChannels);
         mainTab.addItem("Potassium Channels", perKChannels);

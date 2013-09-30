@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 
 /**
  * 
@@ -52,39 +54,44 @@ public class BasicNeuronInfoPanel extends JPanel {
 	private JTextField tfActivation = new JTextField();
 
 	/** The neuron Id. */
-	private JLabel idLabel = new JLabel();
-
-	/**
-	 * Displays More/Less depending on whether or not extra data panel is
-	 * displayed.
-	 */
-	private JLabel detailLabel = new JLabel();
+	private final JLabel idLabel = new JLabel();
 
 	/**
 	 * The extra data panel. Includes: increment, upper bound, lower bound, and
 	 * priority.
 	 */
-	private ExtendedNeuronInfoPanel extraDataPanel;
+	private final ExtendedNeuronInfoPanel extraDataPanel;
 
 	/** The neurons being modified. */
-	private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
+	private final ArrayList<Neuron> neuronList;
 
 	/**
 	 * A triangle that switches between an up (left) and a down state Used for
 	 * showing/hiding extra neuron data.
 	 */
-	private DropDownTriangle detailTriangle = new DropDownTriangle(
-			DropDownTriangle.LEFT, false);
+	private final DropDownTriangle detailTriangle;
+
+	/**
+	 * A reference to the parent window for resizing.
+	 */
+	private final Window parent;
 
 	/**
 	 * @param selectedNeurons
 	 *            the pnode_neurons being adjusted
 	 */
-	public BasicNeuronInfoPanel(final Collection<Neuron> neuronList) {
+	public BasicNeuronInfoPanel(final Collection<Neuron> neuronList,
+			Window parent) {
 		this.neuronList = (ArrayList<Neuron>) neuronList;
+		this.parent = parent;
+		detailTriangle =
+				new DropDownTriangle(UpDirection.LEFT, false, "More",
+						"Less", parent);
+		extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList);
+		addListeners();
 		initializeLayout();
 		fillFieldValues();
-		addListeners();
+
 	}
 
 	/**
@@ -134,16 +141,9 @@ public class BasicNeuronInfoPanel extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		gbc.weightx = 0.2;
-		String details = detailTriangle.isDown() ? "Less" : "More";
-		detailLabel.setText(details);
-		basicsPanel.add(detailLabel, gbc);
-		gbc.weightx = 0.0;
-		gbc.gridx = 2;
 		basicsPanel.add(detailTriangle, gbc);
 
 		this.add(basicsPanel, BorderLayout.NORTH);
-
-		extraDataPanel = new ExtendedNeuronInfoPanel(neuronList);
 
 		extraDataPanel.setVisible(detailTriangle.isDown());
 
@@ -160,8 +160,6 @@ public class BasicNeuronInfoPanel extends JPanel {
 	 */
 	public void repaintPanel() {
 		extraDataPanel.setVisible(detailTriangle.isDown());
-		String details = detailTriangle.isDown() ? "Less" : "More";
-		detailLabel.setText(details);
 		repaint();
 	}
 
@@ -176,14 +174,10 @@ public class BasicNeuronInfoPanel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// Repaint to show/hide extra data
-				extraDataPanel.setVisible(detailTriangle.isDown());
-				String details =
-						detailTriangle.isDown() ? "Less" : "More";
-				detailLabel.setText(details);
+				repaintPanel();
 				// Alert the panel/dialog/frame this is embedded in to
 				// resize itself accordingly
-				firePropertyChange("Extra Data",
-						!detailTriangle.isDown(), detailTriangle.isDown());
+				parent.pack();
 			}
 
 			@Override

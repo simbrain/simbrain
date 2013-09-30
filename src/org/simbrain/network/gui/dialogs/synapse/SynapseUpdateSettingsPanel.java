@@ -3,6 +3,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -21,6 +22,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 
 public class SynapseUpdateSettingsPanel extends JPanel {
 
@@ -35,11 +37,11 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 	private static final boolean DEFAULT_SP_DISPLAY_STATE = true;
 
 	/** Synapse type combo box. */
-	private JComboBox<String> cbSynapseType = new JComboBox<String>(
-			Synapse.getRuleList());
+	private final JComboBox<String> cbSynapseType =
+			new JComboBox<String>(Synapse.getRuleList());
 
 	/** The synapses being modified. */
-	private List<Synapse> synapseList;
+	private final List<Synapse> synapseList;
 
 	/** Synapse panel. */
 	private AbstractSynapsePanel synapsePanel;
@@ -48,11 +50,18 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 	private final DropDownTriangle displaySPTriangle;
 
 	/**
+	 * A reference to the parent window, for resizing after panel content
+	 * changes.
+	 */
+	private final Window parent;
+
+	/**
 	 * 
 	 * @param synapseList
 	 */
-	public SynapseUpdateSettingsPanel(List<Synapse> synapseList) {
-		this(synapseList, DEFAULT_SP_DISPLAY_STATE);
+	public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
+			final Window parent) {
+		this(synapseList, DEFAULT_SP_DISPLAY_STATE, parent);
 	}
 
 	/**
@@ -61,10 +70,12 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 	 * @param startingState
 	 */
 	public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
-			boolean startingState) {
+			boolean startingState, final Window parent) {
 		this.synapseList = synapseList;
+		this.parent = parent;
 		displaySPTriangle =
-				new DropDownTriangle(DropDownTriangle.LEFT, startingState);
+				new DropDownTriangle(UpDirection.LEFT, startingState,
+						parent);
 		initSynapseType();
 		initializeLayout();
 		addListeners();
@@ -119,9 +130,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 
 				synapsePanel.setVisible(displaySPTriangle.isDown());
 				repaint();
-				firePropertyChange("Display",
-						!displaySPTriangle.isDown(),
-						displaySPTriangle.isDown());
+				parent.pack();
 
 			}
 
@@ -158,6 +167,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 					synapsePanel.fillDefaultValues();
 				}
 				repaintPanel();
+				parent.pack();
 			}
 
 		});
@@ -200,10 +210,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 
 	public JComboBox<String> getCbSynapseType() {
 		return cbSynapseType;
-	}
-
-	public void setCbSynapseType(JComboBox<String> cbSynapseType) {
-		this.cbSynapseType = cbSynapseType;
 	}
 
 	public AbstractSynapsePanel getSynapsePanel() {

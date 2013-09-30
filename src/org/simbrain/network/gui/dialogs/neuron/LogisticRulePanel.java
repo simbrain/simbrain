@@ -22,10 +22,8 @@ import java.util.List;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.LogisticRule;
 
 /**
@@ -40,8 +38,8 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public LogisticRulePanel(Network network) {
-        super(network);
+    public LogisticRulePanel() {
+        super();
         addItem("Growth rate", tfGrowthRate);
         this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"
                 + "For that, set update rule to sigmoidal.<p> "

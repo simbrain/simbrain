@@ -74,7 +74,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
      * This method is the default constructor.
      */
     public DecayRulePanel(Network network) {
-        super(network);
+        super();
         cbRelAbs.addActionListener(this);
         cbRelAbs.setActionCommand("relAbs");
 
@@ -199,15 +199,8 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 	@Override
 	public void commitChanges(Neuron neuron) {
 		
-		DecayRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof DecayRule) {
-			neuronRef = (DecayRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new DecayRule();
-			neuron.setUpdateRule(neuronRef);
-		}		
-		
+		DecayRule neuronRef = new DecayRule();
+					
 		// Relative/Absolute
 		if (!cbRelAbs.isNull())
             neuronRef.setRelAbs(cbRelAbs.getSelectedIndex());
@@ -236,45 +229,18 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 
         randTab.commitRandom(neuronRef.getNoiseGenerator());
 		
+        neuron.setUpdateRule(neuronRef);
+        
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(List<Neuron> neurons) {
-		
-		DecayRule neuronRef = new DecayRule();
-		
-		// Relative/Absolute
-		if (!cbRelAbs.isNull())
-            neuronRef.setRelAbs(cbRelAbs.getSelectedIndex());
-
-		// Decay Amount
-        if (!tfDecayAmount.getText().equals(NULL_STRING))
-            neuronRef.setDecayAmount(Double.parseDouble(tfDecayAmount
-                    .getText()));
-
-        // Baseline
-        if (!tfBaseLine.getText().equals(NULL_STRING))
-            neuronRef.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
-
-        // Decay Fraction
-        if (!tfDecayFraction.getText().equals(NULL_STRING))
-            neuronRef.setDecayFraction(Double.parseDouble(tfDecayFraction
-                    .getText()));
-
-        // Clipping?
-        if (!isClipping.isNull())
-            neuronRef.setClipping(isClipping.isSelected());
-
-        // Noise
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-		
+	public void commitChanges(List<Neuron> neurons) {	
         for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-        
+        	commitChanges(n);
+        }    
 	}
 
 }

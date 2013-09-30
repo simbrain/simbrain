@@ -53,6 +53,7 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -91,7 +92,7 @@ public class AddNeuronsDialog extends StandardDialog {
 			+ DEFAULT_NUM_NEURONS);
 
 	private DropDownTriangle extraDataTriangle = new DropDownTriangle(
-			DropDownTriangle.LEFT, false);
+			UpDirection.LEFT, false, this);
 
 	private JLabel extraDataLabel = new JLabel("Settings");
 
@@ -181,7 +182,8 @@ public class AddNeuronsDialog extends StandardDialog {
 
 		addNeuronsPanel.add(Box.createVerticalStrut(10));
 
-		selectNeuronType = new NeuronUpdateSettingsPanel(neurons, false);
+		selectNeuronType =
+				new NeuronUpdateSettingsPanel(neurons, this, false);
 		selectNeuronType.setAlignmentX(CENTER_ALIGNMENT);
 		addNeuronsPanel.add(selectNeuronType);
 
@@ -231,26 +233,6 @@ public class AddNeuronsDialog extends StandardDialog {
 			}
 
 		});
-
-		selectNeuronType
-				.addPropertyChangeListener(new PropertyChangeListener() {
-
-					@Override
-					public void propertyChange(PropertyChangeEvent arg0) {
-						pack();
-					}
-
-				});
-
-		groupPanel
-				.addPropertyChangeListener(new PropertyChangeListener() {
-
-					@Override
-					public void propertyChange(PropertyChangeEvent arg0) {
-						pack();
-					}
-
-				});
 
 	}
 

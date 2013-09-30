@@ -39,7 +39,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Main panel. */
-    protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+    protected final LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /**
      * Adds an item.
@@ -72,17 +72,32 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Populate fields with current data.
      */
-    public abstract void fillFieldValues(List<SynapseUpdateRule> ruleList);
+    public abstract void fillFieldValues(final List<SynapseUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
      */
     public abstract void fillDefaultValues();
     
+    /**
+     * Commit changes to the panel to the synapse update rules of the synapses
+     * being edited. Generally this method is used in the synapse editing 
+     * process rather than the synapse creation process, but there is no
+     * reason outside convention for this to be the case. 
+     * @param commitSynapses the synapses being edited
+     */
+    public abstract void commitChanges(final List<Synapse> commitSynapses);
     
-    public abstract void commitChanges(List<Synapse> commitSynapses);
-    
-    public abstract void commitChanges(Synapse templateSynapse);
+    /**
+     * Commit changes to the panel to the synapse update rule of a template
+     * synapse. Generally this method is used in the synapse creation process
+     * rather than the synapse editing process (not counting calls within this
+     * class). In the creation case, the template synapse including the rule
+     * edited by this panel is copied. There is no reason outside convention
+     * for this to be the case.
+     * @param templateSynapse the synapse being edited.
+     */
+    public abstract void commitChanges(final Synapse templateSynapse);
     
 
     /**

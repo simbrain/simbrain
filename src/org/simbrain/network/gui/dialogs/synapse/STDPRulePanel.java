@@ -33,19 +33,19 @@ import org.simbrain.network.synapse_update_rules.STDPRule;
 public class STDPRulePanel extends AbstractSynapsePanel {
 
     /** Tau minus. */
-    private JTextField tfTauMinus = new JTextField();
+    private final JTextField tfTauMinus = new JTextField();
 
     /** Tau plus. */
-    private JTextField tfTauPlus = new JTextField();
+    private final JTextField tfTauPlus = new JTextField();
 
     /** W minus. */
-    private JTextField tfWMinus = new JTextField();
+    private final JTextField tfWMinus = new JTextField();
 
     /** W plus. */
-    private JTextField tfWPlus = new JTextField();
+    private final JTextField tfWPlus = new JTextField();
 
     /** Learning rate. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
     private STDPRule synapseRef;
@@ -118,57 +118,45 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         tfLearningRate.setText("" + template.getLearningRate());
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new STDPRule();
-		
-		if (!tfTauMinus.getText().equals(NULL_STRING)) {
-            synapseRef
-                    .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
-        }
-        if (!tfTauPlus.getText().equals(NULL_STRING)) {
-            synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
-        }
-        if (!tfWMinus.getText().equals(NULL_STRING)) {
-            synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
-        }
-        if (!tfWPlus.getText().equals(NULL_STRING)) {
-            synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
-        }
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-        }
-		
-  		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}    
-		
+	public void commitChanges(final List<Synapse> commitSynapses) {
+		for(Synapse s : commitSynapses) {
+			commitChanges(s);
+		}    	
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		
 		synapseRef = new STDPRule();
 		
-		if (!tfTauMinus.getText().equals(NULL_STRING)) {
+		// Tau minus
+		if (!tfTauMinus.getText().equals(NULL_STRING))
             synapseRef
                     .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
-        }
-        if (!tfTauPlus.getText().equals(NULL_STRING)) {
+        
+		// Tau plus
+        if (!tfTauPlus.getText().equals(NULL_STRING))
             synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
-        }
-        if (!tfWMinus.getText().equals(NULL_STRING)) {
+        
+        // W minus
+        if (!tfWMinus.getText().equals(NULL_STRING))
             synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
-        }
-        if (!tfWPlus.getText().equals(NULL_STRING)) {
+        
+        // W plus
+        if (!tfWPlus.getText().equals(NULL_STRING))
             synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
-        }
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
+        
+        // Learning rate
+        if (!tfLearningRate.getText().equals(NULL_STRING))
             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
                     .getText()));
-        }
         
 		templateSynapse.setLearningRule(synapseRef);
 		

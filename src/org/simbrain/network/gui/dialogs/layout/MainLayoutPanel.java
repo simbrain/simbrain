@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -23,8 +24,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -33,6 +32,7 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 
 /**
  * All the functions of a layout selector in one panel. MainLayoutPanel lets the
@@ -53,13 +53,11 @@ public class MainLayoutPanel extends JPanel {
 	private static final String DEFAULT_INITIAL_LAYOUT = new GridLayout()
 			.getDescription();
 
-	private JDialog parent;
-
 	/** A holder for the currently displayed panel. */
 	private AbstractLayoutPanel layoutPanel;
 
 	/** A map tying layout panels to their names for use in a combo box . */
-	LinkedHashMap<String, AbstractLayoutPanel> panel_map =
+	private final LinkedHashMap<String, AbstractLayoutPanel> panel_map =
 			new LinkedHashMap<String, AbstractLayoutPanel>();
 
 	{
@@ -73,15 +71,14 @@ public class MainLayoutPanel extends JPanel {
 	}
 
 	/** A combo box for selecting the type of layout. */
-	private JComboBox<String> layoutCb = new JComboBox<String>(panel_map
-			.keySet().toArray(new String[panel_map.size()]));
+	private final JComboBox<String> layoutCb = new JComboBox<String>(
+			panel_map.keySet().toArray(new String[panel_map.size()]));
 
 	/**
 	 * A drop-down triangle for showing or hiding the layout parameters.
 	 * Parameters are hidden by default
 	 */
-	private DropDownTriangle layoutParameterReveal =
-			new DropDownTriangle(DropDownTriangle.LEFT, false);
+	private final DropDownTriangle layoutParameterReveal;
 
 	/**
 	 * A boolean value for setting whether or not the panel has a drop-down
@@ -89,12 +86,17 @@ public class MainLayoutPanel extends JPanel {
 	 * is for cases where a layout panel is necessary, but where even the option
 	 * to hide the parameters would be inappropriate or aesthetically poor.
 	 */
-	private boolean revealOption;
+	private final boolean revealOption;
+
+	/**
+	 * A reference to the parent window for resizing.
+	 */
+	private final Window parent;
 
 	/**
 	 * Creates the main layout panel with default values
 	 */
-	public MainLayoutPanel(JDialog parent) {
+	public MainLayoutPanel(Window parent) {
 		this(DEFAULT_DP_TRIANGLE_VISIBILITY, parent);
 	}
 
@@ -105,7 +107,7 @@ public class MainLayoutPanel extends JPanel {
 	 * @param revealOption
 	 *            the desired reveal option
 	 */
-	public MainLayoutPanel(boolean revealOption, JDialog parent) {
+	public MainLayoutPanel(boolean revealOption, Window parent) {
 		this(DEFAULT_INITIAL_LAYOUT, revealOption, parent);
 	}
 
@@ -118,11 +120,15 @@ public class MainLayoutPanel extends JPanel {
 	 *            whether or not displaying layout parameters is optional
 	 */
 	public MainLayoutPanel(String initialLayout, boolean revealOption,
-			JDialog parent) {
-		layoutCb.setSelectedItem(initialLayout);
-		layoutPanel = panel_map.get(initialLayout);
+			Window parent) {
 		this.revealOption = revealOption;
 		this.parent = parent;
+		layoutParameterReveal =
+				new DropDownTriangle(UpDirection.LEFT, false, "Settings",
+						"Settings", parent);
+		layoutCb.setSelectedItem(initialLayout);
+		layoutPanel = panel_map.get(initialLayout);
+
 		initializeLayout();
 		addListeners();
 	}
@@ -138,10 +144,8 @@ public class MainLayoutPanel extends JPanel {
 		if (revealOption) { // Lay out the panel with a drop-down triangle.
 			JPanel topPanel = new JPanel();
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-			topPanel.add(layoutCb);
+			topPanel.add(layoutCb);		
 			topPanel.add(Box.createHorizontalStrut(100));
-			topPanel.add(new JLabel("Settings"));
-			topPanel.add(Box.createHorizontalStrut(10));
 			topPanel.add(layoutParameterReveal);
 			topPanel.setAlignmentX(CENTER_ALIGNMENT);
 			topPanel.setBorder(padding);

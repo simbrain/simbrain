@@ -33,7 +33,7 @@ import org.simbrain.network.synapse_update_rules.HebbianRule;
 public class HebbianRulePanel extends AbstractSynapsePanel {
 
     /** Learning rate field. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
     private HebbianRule synapseRef;
@@ -72,24 +72,21 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
                 .toString(HebbianRule.DEFAULT_LEARNING_RATE));
     }
     
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new HebbianRule();		
-		
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-        }
-        
+	public void commitChanges(final List<Synapse> commitSynapses) {	
 		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}
-        
+			commitChanges(s);
+		}              
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		synapseRef = new HebbianRule();		
 		
         if (!tfLearningRate.getText().equals(NULL_STRING)) {

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -31,15 +32,14 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.DropDownTriangle;
+import org.simbrain.util.DropDownTriangle.UpDirection;
 
 /**
  * 
@@ -62,15 +62,12 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	 */
 	private static final boolean DEFAULT_NP_DISPLAY_STATE = true;
 
-	/** The network housing the neurons being edited. */
-	private final Network network;
-
 	/** Neuron type combo box. */
-	private JComboBox<String> cbNeuronType = new JComboBox<String>(
+	private final JComboBox<String> cbNeuronType = new JComboBox<String>(
 			Neuron.getRulelist());
 
 	/** The neurons being modified. */
-	private List<Neuron> neuronList;
+	private final List<Neuron> neuronList;
 
 	/** Neuron panel. */
 	private AbstractNeuronPanel neuronPanel;
@@ -78,12 +75,15 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	/** For showing/hiding the neuron panel. */
 	private final DropDownTriangle displayNPTriangle;
 
+	private final Window parent;
+
 	/**
 	 * 
 	 * @param neuronList
 	 */
-	public NeuronUpdateSettingsPanel(List<Neuron> neuronList) {
-		this(neuronList, DEFAULT_NP_DISPLAY_STATE);
+	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
+			Window parent) {
+		this(neuronList, parent, DEFAULT_NP_DISPLAY_STATE);
 	}
 
 	/**
@@ -91,11 +91,12 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	 * @param neuronList
 	 */
 	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
-			boolean startingState) {
+			Window parent, boolean startingState) {
 		this.neuronList = neuronList;
-		network = this.neuronList.get(0).getNetwork();
+		this.parent = parent;
 		displayNPTriangle =
-				new DropDownTriangle(DropDownTriangle.LEFT, startingState);
+				new DropDownTriangle(UpDirection.LEFT, startingState,
+						"Settings", "Settings", parent);
 		initNeuronType();
 		initializeLayout();
 		addListeners();
@@ -115,10 +116,15 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 		JPanel tPanel = new JPanel();
 		tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
 		tPanel.add(cbNeuronType);
-		tPanel.add(Box.createHorizontalStrut(20));
+		int horzStrut =
+				neuronPanel.getPreferredSize().width
+						- cbNeuronType.getPreferredSize().width
+						- displayNPTriangle.getPreferredSize().width;
+		horzStrut = (horzStrut > 30 && displayNPTriangle.isDown()) ?
+				horzStrut : 30;
+		tPanel.add(Box.createHorizontalStrut(horzStrut));
 
 		JPanel supP = new JPanel(new FlowLayout());
-		supP.add(new JLabel("Settings  "));
 		supP.add(displayNPTriangle);
 
 		tPanel.add(supP);
@@ -149,10 +155,9 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 			public void mouseClicked(MouseEvent arg0) {
 
 				neuronPanel.setVisible(displayNPTriangle.isDown());
-				repaint();
-				firePropertyChange("Display",
-						!displayNPTriangle.isDown(),
-						displayNPTriangle.isDown());
+				repaintPanel();
+				firePropertyChange("", null, null);
+				parent.pack();
 
 			}
 
@@ -181,7 +186,6 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 				neuronPanel =
 						Neuron.RULE_MAP.get(cbNeuronType
 								.getSelectedItem());
-				neuronPanel.setParentNet(network);
 				try {
 					neuronPanel.fillFieldValues(Neuron
 							.getRuleList(neuronList));
@@ -189,6 +193,7 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 					neuronPanel.fillDefaultValues();
 				}
 				repaintPanel();
+				parent.pack();
 			}
 
 		});
@@ -211,19 +216,17 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	 */
 	private void initNeuronType() {
 
-		Network parentNetwork = neuronList.get(0).getNetwork();
 		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
 				"getType")) {
 			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
 			cbNeuronType
 					.setSelectedIndex(cbNeuronType.getItemCount() - 1);
 			// Simply to serve as an empty panel
-			neuronPanel = new ClampedNeuronRulePanel(parentNetwork);
+			neuronPanel = new ClampedNeuronRulePanel();
 		} else {
 			String neuronName =
 					neuronList.get(0).getUpdateRule().getDescription();
 			neuronPanel = Neuron.RULE_MAP.get(neuronName);
-			neuronPanel.setParentNet(parentNetwork);
 			neuronPanel.fillFieldValues(Neuron.getRuleList(neuronList));
 			cbNeuronType.setSelectedItem(neuronName);
 		}
@@ -231,10 +234,6 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 
 	public JComboBox<String> getCbNeuronType() {
 		return cbNeuronType;
-	}
-
-	public void setCbNeuronType(JComboBox<String> cbNeuronType) {
-		this.cbNeuronType = cbNeuronType;
 	}
 
 	public AbstractNeuronPanel getNeuronPanel() {

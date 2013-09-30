@@ -34,16 +34,16 @@ import org.simbrain.util.TristateDropDown;
 public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
 
     /** Learning rate field. */
-    private JTextField tfLearningRate = new JTextField();
+    private final JTextField tfLearningRate = new JTextField();
 
     /** Output threshold momentum field. */
-    private JTextField tfOutputThresholdMomentum = new JTextField();
+    private final JTextField tfOutputThresholdMomentum = new JTextField();
 
     /** Output threshold. */
-    private JTextField tfOutputThreshold = new JTextField();
+    private final JTextField tfOutputThreshold = new JTextField();
 
     /** Output threshold combo box. */
-    private TristateDropDown isOutputThreshold = new TristateDropDown();
+    private final TristateDropDown isOutputThreshold = new TristateDropDown();
 
     /** Synapse refernece. */
     private HebbianThresholdRule synapseRef;
@@ -117,39 +117,21 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
                 .setSelected(HebbianThresholdRule.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-	public void commitChanges(List<Synapse> commitSynapses) {
-		
-		synapseRef = new HebbianThresholdRule();		
-		
-		  if (!tfLearningRate.getText().equals(NULL_STRING)) {
-              synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                      .getText()));
-          }
-
-          if (!tfOutputThresholdMomentum.getText().equals(NULL_STRING)) {
-              synapseRef.setOutputThresholdMomentum(Double
-                      .parseDouble(tfOutputThresholdMomentum.getText()));
-          }
-
-          if (!tfOutputThreshold.getText().equals(NULL_STRING)) {
-              synapseRef.setOutputThreshold(Double
-                      .parseDouble(tfOutputThreshold.getText()));
-          }
-
-          if (!isOutputThreshold.isNull()) {
-              synapseRef.setUseSlidingOutputThreshold(isOutputThreshold
-                      .isSelected());
-          }
-        
+	public void commitChanges(final List<Synapse> commitSynapses) {
 		for(Synapse s : commitSynapses) {
-			s.setLearningRule(synapseRef);
-		}
-        
+			commitChanges(s);
+		}      
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
-	public void commitChanges(Synapse templateSynapse) {
+	public void commitChanges(final Synapse templateSynapse) {
 		synapseRef = new HebbianThresholdRule();		
 		
 		  if (!tfLearningRate.getText().equals(NULL_STRING)) {

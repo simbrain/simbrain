@@ -44,6 +44,7 @@ import org.simbrain.network.gui.dialogs.neuron.StochasticRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.ThreeValueRulePanel;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
@@ -57,7 +58,6 @@ import org.simbrain.network.neuron_update_rules.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.network.neuron_update_rules.StochasticRule;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
@@ -135,7 +135,7 @@ public class Neuron {
 	 */
 	private void initRuleMap() {
 		RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
-		RULE_MAP.put(new ClampedSynapseRule().getDescription(),
+		RULE_MAP.put(new ClampedNeuronRule().getDescription(),
 				new ClampedNeuronRulePanel());
 		RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel(
 				parent));

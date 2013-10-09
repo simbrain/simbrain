@@ -57,24 +57,24 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-    	
+
         BinaryRule neuronRef = (BinaryRule) ruleList.get(0);
-        
-        //(Below) Handle consistency of multiple selections
-        
+
+        // (Below) Handle consistency of multiple selections
+
         // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
-                "getThreshold")) 
+                "getThreshold"))
             tfThreshold.setText(NULL_STRING);
         else
-        	tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        
+            tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias"))
             tfBias.setText(NULL_STRING);
         else
-        	tfBias.setText(Double.toString(neuronRef.getBias()));
-        
+            tfBias.setText(Double.toString(neuronRef.getBias()));
+
     }
 
     /**
@@ -89,32 +89,31 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(Neuron neuron) {
-		
-		BinaryRule neuronRef = new BinaryRule();
-		
-		// Threshold
-		if (!tfThreshold.getText().equals(NULL_STRING)) 
-			neuronRef
-			.setThreshold(Double.parseDouble(tfThreshold.getText()));	
-		
-		// Bias
-		if (!tfBias.getText().equals(NULL_STRING)) 
-			neuronRef.setBias(Double.parseDouble(tfBias.getText()));  
-		
-		neuron.setUpdateRule(neuronRef);
-		
-	}
+    @Override
+    public void commitChanges(Neuron neuron) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
-        for(Neuron n : neurons) {
-        	commitChanges(n);
+        BinaryRule neuronRef = new BinaryRule();
+
+        // Threshold
+        if (!tfThreshold.getText().equals(NULL_STRING))
+            neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+
+        // Bias
+        if (!tfBias.getText().equals(NULL_STRING))
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+        neuron.setUpdateRule(neuronRef);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Neuron> neurons) {
+        for (Neuron n : neurons) {
+            commitChanges(n);
         }
-	}
-   
+    }
+
 }

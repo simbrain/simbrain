@@ -101,7 +101,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     protected void initializeConsumers() {
         dimensionList.clear();
-        projectionConsumerType = new AttributeType(this, "Single scalars",
+        projectionConsumerType = new AttributeType(this, "Single scalars", "setValue",
                 double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {

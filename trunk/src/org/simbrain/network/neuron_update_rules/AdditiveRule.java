@@ -30,164 +30,162 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class AdditiveRule extends NeuronUpdateRule {
 
-    /** Lambda. */
-    private double lambda = 1.4;
+	/** Lambda. */
+	private double lambda = 1.4;
 
-    /** Resistance. */
-    private double resistance = 1;
+	/** Resistance. */
+	private double resistance = 1;
 
-    /** Clipping. */
-    private boolean clipping = false;
+	/** Clipping. */
+	private boolean clipping = false;
 
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
+	/** Noise dialog. */
+	private Randomizer noiseGenerator = new Randomizer();
 
-    /** For adding noise to the neuron. */
-    private boolean addNoise = false;
+	/** For adding noise to the neuron. */
+	private boolean addNoise = false;
 
-    /**
-     * {@inheritDoc}
-     */
-    public TimeType getTimeType() {
-        return TimeType.CONTINUOUS;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public TimeType getTimeType() {
+		return TimeType.CONTINUOUS;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void init(Neuron neuron) {
-        neuron.setUpperBound(1);
-        neuron.setLowerBound(-1);
-        neuron.setIncrement(.1);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public AdditiveRule deepCopy() {
+		AdditiveRule an = new AdditiveRule();
+		an.setLambda(getLambda());
+		an.setResistance(getResistance());
+		an.setClipping(getClipping());
+		an.setAddNoise(getAddNoise());
+		an.noiseGenerator = new Randomizer(noiseGenerator);
+		return an;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public AdditiveRule deepCopy() {
-        AdditiveRule an = new AdditiveRule();
-        an.setLambda(getLambda());
-        an.setResistance(getResistance());
-        an.setClipping(getClipping());
-        an.setAddNoise(getAddNoise());
-        an.noiseGenerator = new Randomizer(noiseGenerator);
-        return an;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void update(Neuron neuron) {
 
-    /**
-     * {@inheritDoc}
-     */
-    public void update(Neuron neuron) {
+		// Update buffer of additive neuron using Euler's method.
+		double wtdSum = 0;
+		if (neuron.getFanIn().size() > 0) {
+			for (int j = 0; j < neuron.getFanIn().size(); j++) {
+				Synapse w = neuron.getFanIn().get(j);
+				Neuron source = w.getSource();
+				wtdSum += (w.getStrength() * g(source.getActivation()));
+			}
+		}
 
-        // Update buffer of additive neuron using Euler's method.
+		double val =
+				neuron.getActivation()
+						+ neuron.getNetwork().getTimeStep()
+						* (-neuron.getActivation() / resistance + wtdSum);
 
-        double wtdSum = 0;
-        if (neuron.getFanIn().size() > 0) {
-            for (int j = 0; j < neuron.getFanIn().size(); j++) {
-                Synapse w = neuron.getFanIn().get(j);
-                Neuron source = w.getSource();
-                wtdSum += (w.getStrength() * g(source.getActivation()));
-            }
-        }
+		if (addNoise) {
+			val += noiseGenerator.getRandom();
+		}
 
-        double val = neuron.getActivation()
-                + neuron.getNetwork().getTimeStep()
-                * (-neuron.getActivation() / resistance + wtdSum);
+		if (clipping) {
+			val = neuron.clip(val);
+		}
 
-        if (addNoise) {
-            val += noiseGenerator.getRandom();
-        }
+		neuron.setBuffer(val);
+		neuron.setInputValue(0);
+	}
 
-        if (clipping) {
-            val = neuron.clip(val);
-        }
+	/**
+	 * Implements a Hopfield type sigmoidal function.
+	 * 
+	 * @param x
+	 *            input to function
+	 * @return output of function
+	 */
+	private double g(final double x) {
+		return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
+	}
 
-        neuron.setBuffer(val);
-        neuron.setInputValue(0);
-    }
+	/**
+	 * @return Returns the lambda.
+	 */
+	public double getLambda() {
+		return lambda;
+	}
 
-    /**
-     * Implements a Hopfield type sigmoidal function.
-     *
-     * @param x input to function
-     * @return output of function
-     */
-    private double g(final double x) {
-        return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
-    }
+	/**
+	 * @param lambda
+	 *            The lambda to set.
+	 */
+	public void setLambda(final double lambda) {
+		this.lambda = lambda;
+	}
 
-    /**
-     * @return Returns the lambda.
-     */
-    public double getLambda() {
-        return lambda;
-    }
+	/**
+	 * @return Returns the resistance.
+	 */
+	public double getResistance() {
+		return resistance;
+	}
 
-    /**
-     * @param lambda The lambda to set.
-     */
-    public void setLambda(final double lambda) {
-        this.lambda = lambda;
-    }
+	/**
+	 * @param resistance
+	 *            The resistance to set.
+	 */
+	public void setResistance(final double resistance) {
+		this.resistance = resistance;
+	}
 
-    /**
-     * @return Returns the resistance.
-     */
-    public double getResistance() {
-        return resistance;
-    }
+	/**
+	 * @return Noise generator dialog.
+	 */
+	public Randomizer getNoiseGenerator() {
+		return noiseGenerator;
+	}
 
-    /**
-     * @param resistance The resistance to set.
-     */
-    public void setResistance(final double resistance) {
-        this.resistance = resistance;
-    }
+	/**
+	 * @param noise
+	 *            The noise to set.
+	 */
+	public void setNoiseGenerator(final Randomizer noise) {
+		this.noiseGenerator = noise;
+	}
 
-    /**
-     * @return Noise generator dialog.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
+	/**
+	 * @return Returns the addNoise.
+	 */
+	public boolean getAddNoise() {
+		return addNoise;
+	}
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
-        this.noiseGenerator = noise;
-    }
+	/**
+	 * @param addNoise
+	 *            The addNoise to set.
+	 */
+	public void setAddNoise(final boolean addNoise) {
+		this.addNoise = addNoise;
+	}
 
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean getClipping() {
+		return clipping;
+	}
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
+	/**
+	 * @param clipping
+	 *            The clipping to set.
+	 */
+	public void setClipping(final boolean clipping) {
+		this.clipping = clipping;
+	}
 
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
+	@Override
+	public String getDescription() {
+		return "Additive (Continuous Hopfield)";
+	}
 
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Additive (Continuous Hopfield)";
-    }
 }

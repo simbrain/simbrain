@@ -38,136 +38,127 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class LinearRulePanel extends AbstractNeuronPanel {
 
-    /** Slope field. */
-    private JTextField tfSlope = new JTextField();
+	/** Slope field. */
+	private JTextField tfSlope = new JTextField();
 
-    /** Bias field. */
-    private JTextField tfBias = new JTextField();
+	/** Bias field. */
+	private JTextField tfBias = new JTextField();
 
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+	/** Tabbed pane. */
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
+	/** Main tab. */
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+	/** Random tab. */
+	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-    /** Clipping combo box. */
-    private TristateDropDown isClipping = new TristateDropDown();
+	/** Clipping combo box. */
+	private TristateDropDown isClipping = new TristateDropDown();
 
-    /** Add noise combo box. */
-    private TristateDropDown isAddNoise = new TristateDropDown();
+	/** Add noise combo box. */
+	private TristateDropDown isAddNoise = new TristateDropDown();
 
-    /**
-     * Creates an instance of this panel.
-     *
-     */
-    public LinearRulePanel() {
-        super();
-        this.add(tabbedPane);
-        mainTab.addItem("Slope", tfSlope);
-        mainTab.addItem("Bias", tfBias);
-        mainTab.addItem("Use clipping", isClipping);
-        mainTab.addItem("Add noise", isAddNoise);
-        tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
-    }
+	/** A reference to the neuron update rule being edited. */
+	private static final LinearRule prototypeRule = new LinearRule();
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        
-    	LinearRule neuronRef = (LinearRule) ruleList.get(0);
+	/**
+	 * Creates an instance of this panel.
+	 * 
+	 */
+	public LinearRulePanel() {
+		this.add(tabbedPane);
+		mainTab.addItem("Slope", tfSlope);
+		mainTab.addItem("Bias", tfBias);
+		mainTab.addItem("Use clipping", isClipping);
+		mainTab.addItem("Add noise", isAddNoise);
+		tabbedPane.add(mainTab, "Main");
+		tabbedPane.add(randTab, "Noise");
+	}
 
-        //(Below) Handle consistency of multiple selections
-        
-        // Handle Slope
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getSlope")) 
-            tfSlope.setText(NULL_STRING);
-        else
-        	tfSlope.setText(Double.toString(neuronRef.getSlope()));
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-        // Handle Bias
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getBias"))
-            tfBias.setText(NULL_STRING);
-        else
-        	tfBias.setText(Double.toString(neuronRef.getBias()));
+		LinearRule neuronRef = (LinearRule) ruleList.get(0);
 
-        // Handle Clipping
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
-                "getClipping")) 
-            isClipping.setNull();
-        else
-        	isClipping.setSelected(neuronRef.getClipping());
+		// (Below) Handle consistency of multiple selections
 
-        // Handle Noise
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
-                "getAddNoise")) 
-            isAddNoise.setNull();
-        else
-        	isAddNoise.setSelected(neuronRef.getAddNoise());
+		// Handle Slope
+		if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+				"getSlope"))
+			tfSlope.setText(NULL_STRING);
+		else
+			tfSlope.setText(Double.toString(neuronRef.getSlope()));
 
-        randTab.fillFieldValues(getRandomizers(ruleList));
-        
-    }
+		// Handle Bias
+		if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+				"getBias"))
+			tfBias.setText(NULL_STRING);
+		else
+			tfBias.setText(Double.toString(neuronRef.getBias()));
 
-    /**
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(
-    		List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+		// Handle Clipping
+		if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+				"getClipping"))
+			isClipping.setNull();
+		else
+			isClipping.setSelected(neuronRef.getClipping());
 
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((LinearRule) ruleList.get(i)).getNoiseGenerator());
-        }
+		// Handle Noise
+		if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+				"getAddNoise"))
+			isAddNoise.setNull();
+		else
+			isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        return ret;
-    }
+		randTab.fillFieldValues(getRandomizers(ruleList));
 
-    /**
-     * Fill field values to default values for linear neuron.
-     */
-    public void fillDefaultValues() {
-        LinearRule neuronRef = new LinearRule();
-        tfSlope.setText(Double.toString(neuronRef.getSlope()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        isClipping.setSelected(neuronRef.getClipping());
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-        randTab.fillDefaultValues();
-    }
+	}
+
+	/**
+	 * @return List of randomizers.
+	 */
+	private ArrayList<Randomizer> getRandomizers(
+			List<NeuronUpdateRule> ruleList) {
+		ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+
+		for (int i = 0; i < ruleList.size(); i++) {
+			ret.add(((LinearRule) ruleList.get(i)).getNoiseGenerator());
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Fill field values to default values for linear neuron.
+	 */
+	public void fillDefaultValues() {
+		tfSlope.setText(Double.toString(prototypeRule.getSlope()));
+		tfBias.setText(Double.toString(prototypeRule.getBias()));
+		isClipping.setSelected(prototypeRule.getClipping());
+		isAddNoise.setSelected(prototypeRule.getAddNoise());
+		randTab.fillDefaultValues();
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void commitChanges(Neuron neuron) {
-		
-		LinearRule neuronRef = new LinearRule();
-		
-		// Slope
-        if (!tfSlope.getText().equals(NULL_STRING))
-            neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));      
 
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Clipping?
-        if (!isClipping.isNull())
-            neuronRef.setClipping(isClipping.isSelected());
-        
-        // Noise
-        if (!isAddNoise.isNull()) {
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-        }
+		LinearRule neuronRef;
 
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        
-        neuron.setUpdateRule(neuronRef);
-        
+		if (neuron.getUpdateRule() instanceof LinearRule) {
+			neuronRef = (LinearRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = prototypeRule.deepCopy();
+			neuron.setUpdateRule(neuronRef);
+		}
+
+		writeValuesToRule(neuronRef);
+
 	}
 
 	/**
@@ -175,9 +166,65 @@ public class LinearRulePanel extends AbstractNeuronPanel {
 	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-        for(Neuron n : neurons) {
-        	commitChanges(n);
-        }
+
+		if (isReplace()) {
+
+			LinearRule neuronRef = new LinearRule();
+
+			writeValuesToRule(neuronRef);
+
+			for (Neuron n : neurons) {
+				n.setUpdateRule(neuronRef.deepCopy());
+			}
+
+		} else {
+
+			for (Neuron n : neurons) {
+				writeValuesToRule(n.getUpdateRule());
+			}
+
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+
+		LinearRule neuronRef = (LinearRule) rule;
+
+		// Slope
+		if (!tfSlope.getText().equals(NULL_STRING))
+			neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
+
+		// Bias
+		if (!tfBias.getText().equals(NULL_STRING))
+			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+		// Clipping?
+		if (!isClipping.isNull())
+			neuronRef
+					.setClipping(isClipping.getSelectedIndex() == TristateDropDown
+							.getTRUE());
+
+		// Noise?
+		if (!isAddNoise.isNull()) {
+			neuronRef.setAddNoise(isAddNoise.isSelected());
+			if (isAddNoise.getSelectedIndex() == TristateDropDown
+					.getTRUE())
+				randTab.commitRandom(neuronRef.getNoiseGenerator());
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		return prototypeRule.deepCopy();
 	}
 
 }

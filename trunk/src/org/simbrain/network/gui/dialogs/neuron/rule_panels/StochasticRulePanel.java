@@ -32,87 +32,98 @@ import org.simbrain.network.neuron_update_rules.StochasticRule;
  */
 public class StochasticRulePanel extends AbstractNeuronPanel {
 
-    /** Firing probability field. */
-    private JTextField tfFiringProbability = new JTextField();
+	/** Firing probability field. */
+	private JTextField tfFiringProbability = new JTextField();
 
-    /**
-     * Creates an instance of this panel.
-     *
-     */
-    public StochasticRulePanel() {
-        super();
-        this.addItem("Firing probability", tfFiringProbability);
-        this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"
-                + " state taking on the upper bound value.</html>");
-    }
+	/** A reference to the neuron rule being edited. */
+	private StochasticRule neuronRef = new StochasticRule();
 
-    /**
-     * Populates the fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        
-    	StochasticRule neuronRef = (StochasticRule) ruleList.get(0);
-
-        //(Below) Handle consistency of multiple selections
-        
-        // Handle Firing Probability
-        if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class,
-                "getFiringProbability"))
-            tfFiringProbability.setText(NULL_STRING);
-        else
-        	tfFiringProbability.setText(Double.toString(neuronRef
-                    .getFiringProbability()));
-        
-    }
-
-    /**
-     * Populates the fields with default data.
-     */
-    public void fillDefaultValues() {
-        StochasticRule neuronRef = new StochasticRule();
-        tfFiringProbability.setText(Double.toString(neuronRef
-                .getFiringProbability()));
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void commitChanges(Neuron neuron) {
-		
-		StochasticRule neuronRef;
-		
-		if(neuron.getUpdateRule() instanceof StochasticRule) {
-			neuronRef = (StochasticRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = new StochasticRule();
-			neuron.setUpdateRule(neuronRef);
-		}
-		
-		// Firing Probability
-        if (!tfFiringProbability.getText().equals(NULL_STRING))
-            neuronRef.setFiringProbability(Double
-                    .parseDouble(tfFiringProbability.getText()));
-	
+	/**
+	 * Creates an instance of this panel.
+	 * 
+	 */
+	public StochasticRulePanel() {
+		super();
+		this.addItem("Firing probability", tfFiringProbability);
+		this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"
+				+ " state taking on the upper bound value.</html>");
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * Populates the fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+
+		neuronRef = (StochasticRule) ruleList.get(0);
+
+		// (Below) Handle consistency of multiple selections
+
+		// Handle Firing Probability
+		if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class,
+				"getFiringProbability"))
+			tfFiringProbability.setText(NULL_STRING);
+		else
+			tfFiringProbability.setText(Double.toString(neuronRef
+					.getFiringProbability()));
+
+	}
+
+	/**
+	 * Populates the fields with default data.
+	 */
+	public void fillDefaultValues() {
+		StochasticRule neuronRef = new StochasticRule();
+		tfFiringProbability.setText(Double.toString(neuronRef
+				.getFiringProbability()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(Neuron neuron) {
+
+		if (neuron.getUpdateRule() instanceof StochasticRule) {
+			neuronRef = (StochasticRule) neuron.getUpdateRule();
+		} else {
+			neuron.setUpdateRule(neuronRef);
+		}
+
+		// Firing Probability
+		if (!tfFiringProbability.getText().equals(NULL_STRING))
+			neuronRef.setFiringProbability(Double
+					.parseDouble(tfFiringProbability.getText()));
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		
-		StochasticRule neuronRef = new StochasticRule();
-		
+
 		// Firing Probability
-        if (!tfFiringProbability.getText().equals(NULL_STRING))
-            neuronRef.setFiringProbability(Double
-                    .parseDouble(tfFiringProbability.getText()));
-        
-        for(Neuron n : neurons) {
-        	n.setUpdateRule(neuronRef);
-        }
-		
+		if (!tfFiringProbability.getText().equals(NULL_STRING))
+			neuronRef.setFiringProbability(Double
+					.parseDouble(tfFiringProbability.getText()));
+
+		for (Neuron n : neurons) {
+			n.setUpdateRule(neuronRef);
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		return neuronRef;
+	}
+
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+		// TODO Auto-generated method stub
+
 	}
 }

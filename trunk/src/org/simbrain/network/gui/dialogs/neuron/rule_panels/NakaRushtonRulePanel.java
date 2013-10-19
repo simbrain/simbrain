@@ -39,241 +39,290 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>NakaRushtonNeuronPanel</b>.
  */
 public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
-        ActionListener {
+		ActionListener {
 
-    /** Steepness field. */
-    private JTextField tfSteepness = new JTextField();
+	/** Steepness field. */
+	private JTextField tfSteepness = new JTextField();
 
-    /** Semi saturation field. */
-    private JTextField tfSemiSaturation = new JTextField();
+	/** Semi saturation field. */
+	private JTextField tfSemiSaturation = new JTextField();
 
-    /** Time constant field. */
-    private JTextField tfTimeConstant = new JTextField();
+	/** Time constant field. */
+	private JTextField tfTimeConstant = new JTextField();
 
-    /** Noise combo box. */
-    private TristateDropDown tsNoise = new TristateDropDown();
+	/** Noise combo box. */
+	private TristateDropDown tsNoise = new TristateDropDown();
 
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+	/** Tabbed pane. */
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Use adaptation combo box. */
-    private TristateDropDown tsUseAdaptation = new TristateDropDown();
+	/** Use adaptation combo box. */
+	private TristateDropDown tsUseAdaptation = new TristateDropDown();
 
-    /** Adaptation time constant. */
-    private JTextField tfAdaptationTime = new JTextField();
+	/** Adaptation time constant. */
+	private JTextField tfAdaptationTime = new JTextField();
 
-    /** Adaptation parameter. */
-    private JTextField tfAdaptationParam = new JTextField();
+	/** Adaptation parameter. */
+	private JTextField tfAdaptationParam = new JTextField();
 
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
+	/** Main tab. */
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+	/** Random tab. */
+	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-    /**
-     * Creates a new Naka-Rushton neuron panel.
-     */
-    public NakaRushtonRulePanel() {
-        super();
-        tsUseAdaptation.addActionListener(this);
+	/** A reference to the neuron update rule being edited. */
+	private static final NakaRushtonRule prototypeRule =
+			new NakaRushtonRule();
 
-        this.add(tabbedPane);
-        mainTab.addItem("Steepness", tfSteepness);
-        mainTab.addItem("Semi-saturation constant", tfSemiSaturation);
-        mainTab.addItem("Time constant", tfTimeConstant);
-        mainTab.addItem("Add noise", tsNoise);
-        mainTab.addItem("Use Adaptation", tsUseAdaptation);
-        mainTab.addItem("Adaptation parameter", tfAdaptationParam);
-        mainTab.addItem("Adaptation time constant", tfAdaptationTime);
-        tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
-    }
+	/**
+	 * Creates a new Naka-Rushton neuron panel.
+	 */
+	public NakaRushtonRulePanel() {
+		super();
+		tsUseAdaptation.addActionListener(this);
 
-    /**
-     * Checks for using adaptation and enables or disables adaptation field
-     * accordingly.
-     */
-    private void checkUsingAdaptation() {
-        if (tsUseAdaptation.isSelected()) {
-            tfAdaptationTime.setEnabled(true);
-            tfAdaptationParam.setEnabled(true);
-        } else {
-            tfAdaptationTime.setEnabled(false);
-            tfAdaptationParam.setEnabled(false);
-        }
-    }
+		this.add(tabbedPane);
+		mainTab.addItem("Steepness", tfSteepness);
+		mainTab.addItem("Semi-saturation constant", tfSemiSaturation);
+		mainTab.addItem("Time constant", tfTimeConstant);
+		mainTab.addItem("Add noise", tsNoise);
+		mainTab.addItem("Use Adaptation", tsUseAdaptation);
+		mainTab.addItem("Adaptation parameter", tfAdaptationParam);
+		mainTab.addItem("Adaptation time constant", tfAdaptationTime);
+		tabbedPane.add(mainTab, "Main");
+		tabbedPane.add(randTab, "Noise");
+	}
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        
-    	NakaRushtonRule neuronRef = (NakaRushtonRule) ruleList.get(0);
-        
-        //(Below) Handle consistency of multiple selections
-        
-        // Handle Time Constant
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getTimeConstant"))
-            tfTimeConstant.setText(NULL_STRING);
-        else
-        	tfTimeConstant.setText(Double.toString(
-        			neuronRef.getTimeConstant()));
+	/**
+	 * Checks for using adaptation and enables or disables adaptation field
+	 * accordingly.
+	 */
+	private void checkUsingAdaptation() {
+		if (tsUseAdaptation.isSelected()) {
+			tfAdaptationTime.setEnabled(true);
+			tfAdaptationParam.setEnabled(true);
+		} else {
+			tfAdaptationTime.setEnabled(false);
+			tfAdaptationParam.setEnabled(false);
+		}
+	}
 
-        // Handle Semi-Saturation Constant
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getSemiSaturationConstant"))
-            tfSemiSaturation.setText(NULL_STRING);
-        else
-        	tfSemiSaturation.setText(Double.toString(neuronRef
-                    .getSemiSaturationConstant()));
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-        // Handle Steepness
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getSteepness"))
-            tfSteepness.setText(NULL_STRING);
-        else
-        	tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
+		NakaRushtonRule neuronRef = (NakaRushtonRule) ruleList.get(0);
 
-        // Handle Noise
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getAddNoise"))
-            tsNoise.setNull();
-        else
-        	tsNoise.setSelected(neuronRef.getAddNoise());
+		// (Below) Handle consistency of multiple selections
 
-        // Handle Use Adaptation
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getUseAdaptation"))
-            tsUseAdaptation.setNull();
-        else
-        	tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
-        
-        // Handle Adaptation Time
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getAdaptationTimeConstant"))
-            tfAdaptationTime.setText(NULL_STRING);
-        else
-        	tfAdaptationTime.setText(Double.toString(neuronRef
-                    .getAdaptationTimeConstant()));
-        
-        // Handle Adaptation Parameter
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getAdaptationParameter"))
-            tfAdaptationParam.setText(NULL_STRING);
-        else
-        	tfAdaptationParam.setText(Double.toString(neuronRef
-                    .getAdaptationParameter()));
-        
-        // Use Adaptation
-        checkUsingAdaptation();        
-        
-        randTab.fillFieldValues(getRandomizers(ruleList));
-        
-    }
+		// Handle Time Constant
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getTimeConstant"))
+			tfTimeConstant.setText(NULL_STRING);
+		else
+			tfTimeConstant.setText(Double.toString(neuronRef
+					.getTimeConstant()));
 
-    /**
-     * @return an arraylist of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(
-    		List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-        for (NeuronUpdateRule rule : ruleList) {
-            if (rule instanceof NakaRushtonRule) {
-                ret.add(((NakaRushtonRule) rule).getNoiseGenerator());
-            }
-        }
-        return ret;
-    }
+		// Handle Semi-Saturation Constant
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getSemiSaturationConstant"))
+			tfSemiSaturation.setText(NULL_STRING);
+		else
+			tfSemiSaturation.setText(Double.toString(neuronRef
+					.getSemiSaturationConstant()));
 
-    /**
-     * Fill field values to default values for this synapse type.
-     */
-    public void fillDefaultValues() {
-        NakaRushtonRule neuronRef = new NakaRushtonRule();
-        checkUsingAdaptation();
-        tfSemiSaturation.setText(Double.toString(neuronRef
-                .getSemiSaturationConstant()));
-        tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
-        tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
-        tsNoise.setSelected(neuronRef.getAddNoise());
-        tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
-        tfAdaptationTime.setText(Double.toString(neuronRef
-                .getAdaptationTimeConstant()));
-        tfAdaptationParam.setText(Double.toString(neuronRef
-                .getAdaptationParameter()));
-        randTab.fillDefaultValues();
-    }
+		// Handle Steepness
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getSteepness"))
+			tfSteepness.setText(NULL_STRING);
+		else
+			tfSteepness
+					.setText(Double.toString(neuronRef.getSteepness()));
 
-    /**
-     * {@inheritDoc}
-     */
+		// Handle Noise
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getAddNoise"))
+			tsNoise.setNull();
+		else
+			tsNoise.setSelected(neuronRef.getAddNoise());
+
+		// Handle Use Adaptation
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getUseAdaptation"))
+			tsUseAdaptation.setNull();
+		else
+			tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
+
+		// Handle Adaptation Time
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getAdaptationTimeConstant"))
+			tfAdaptationTime.setText(NULL_STRING);
+		else
+			tfAdaptationTime.setText(Double.toString(neuronRef
+					.getAdaptationTimeConstant()));
+
+		// Handle Adaptation Parameter
+		if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
+				"getAdaptationParameter"))
+			tfAdaptationParam.setText(NULL_STRING);
+		else
+			tfAdaptationParam.setText(Double.toString(neuronRef
+					.getAdaptationParameter()));
+
+		// Use Adaptation
+		checkUsingAdaptation();
+
+		randTab.fillFieldValues(getRandomizers(ruleList));
+
+	}
+
+	/**
+	 * @return an arraylist of randomizers.
+	 */
+	private ArrayList<Randomizer> getRandomizers(
+			List<NeuronUpdateRule> ruleList) {
+		ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+		for (NeuronUpdateRule rule : ruleList) {
+			if (rule instanceof NakaRushtonRule) {
+				ret.add(((NakaRushtonRule) rule).getNoiseGenerator());
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Fill field values to default values for this synapse type.
+	 */
+	public void fillDefaultValues() {
+		checkUsingAdaptation();
+		tfSemiSaturation.setText(Double.toString(prototypeRule
+				.getSemiSaturationConstant()));
+		tfSteepness
+				.setText(Double.toString(prototypeRule.getSteepness()));
+		tfTimeConstant.setText(Double.toString(prototypeRule
+				.getTimeConstant()));
+		tsNoise.setSelected(prototypeRule.getAddNoise());
+		tsUseAdaptation.setSelected(prototypeRule.getUseAdaptation());
+		tfAdaptationTime.setText(Double.toString(prototypeRule
+				.getAdaptationTimeConstant()));
+		tfAdaptationParam.setText(Double.toString(prototypeRule
+				.getAdaptationParameter()));
+		randTab.fillDefaultValues();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(Neuron neuron) {
-		
-		NakaRushtonRule neuronRef = new NakaRushtonRule();
 
-		// Time Constant
-        if (!tfTimeConstant.getText().equals(NULL_STRING))
-            neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
-                    .getText()));
+		NakaRushtonRule neuronRef;
 
-        // Semi-Saturation
-        if (!tfSemiSaturation.getText().equals(NULL_STRING))
-            neuronRef.setSemiSaturationConstant(Double
-                    .parseDouble(tfSemiSaturation.getText()));
-        
-        // Steepness
-        if (!tfSteepness.getText().equals(NULL_STRING))
-            neuronRef
-                    .setSteepness(Double.parseDouble(tfSteepness.getText()));
-        
-        // Noise
-        if (!tsNoise.isNull())
-            neuronRef.setAddNoise(tsNoise.isSelected());
-        
-        // Use Adaptation
-        if (!tsUseAdaptation.isNull())
-            neuronRef.setUseAdaptation(tsUseAdaptation.isSelected());
-        
-        // Adaptation Time
-        if (!tfAdaptationTime.getText().equals(NULL_STRING))
-            neuronRef.setAdaptationTimeConstant(Double
-                    .parseDouble(tfAdaptationTime.getText()));
-        
-        // Adaptation Parameter
-        if (!tfAdaptationParam.getText().equals(NULL_STRING))
-            neuronRef.setAdaptationParameter(Double
-                    .parseDouble(tfAdaptationParam.getText()));     
+		if (neuron.getUpdateRule() instanceof NakaRushtonRule) {
+			neuronRef = (NakaRushtonRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = prototypeRule.deepCopy();
+			neuron.setUpdateRule(neuronRef);
+		}
 
-        randTab.commitRandom(neuronRef.getNoiseGenerator());
-        
-        neuron.setUpdateRule(neuronRef);
-		
+		writeValuesToRule(neuronRef);
+
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-        for(Neuron n : neurons) {
-        	commitChanges(n);
-        }     
+
+		if (isReplace()) {
+
+			NakaRushtonRule neuronRef = prototypeRule.deepCopy();
+
+			writeValuesToRule(neuronRef);
+
+			for (Neuron n : neurons) {
+				n.setUpdateRule(neuronRef.deepCopy());
+			}
+
+		} else {
+
+			for (Neuron n : neurons) {
+				writeValuesToRule(n.getUpdateRule());
+			}
+
+		}
+
 	}
 
-    /**
-     * Responds to actions performed.
-     *
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        Object o = e.getSource();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
 
-        if (o == tsUseAdaptation) {
-            checkUsingAdaptation();
-        }
-    }
-    
+		NakaRushtonRule neuronRef = (NakaRushtonRule) rule;
+
+		// Time Constant
+		if (!tfTimeConstant.getText().equals(NULL_STRING))
+			neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
+					.getText()));
+
+		// Semi-Saturation
+		if (!tfSemiSaturation.getText().equals(NULL_STRING))
+			neuronRef.setSemiSaturationConstant(Double
+					.parseDouble(tfSemiSaturation.getText()));
+
+		// Steepness
+		if (!tfSteepness.getText().equals(NULL_STRING))
+			neuronRef.setSteepness(Double.parseDouble(tfSteepness
+					.getText()));
+
+		// Use Adaptation
+		if (!tsUseAdaptation.isNull())
+			neuronRef.setUseAdaptation(tsUseAdaptation.isSelected());
+
+		// Adaptation Time
+		if (!tfAdaptationTime.getText().equals(NULL_STRING))
+			neuronRef.setAdaptationTimeConstant(Double
+					.parseDouble(tfAdaptationTime.getText()));
+
+		// Adaptation Parameter
+		if (!tfAdaptationParam.getText().equals(NULL_STRING))
+			neuronRef.setAdaptationParameter(Double
+					.parseDouble(tfAdaptationParam.getText()));
+
+		// Noise?
+		if (!tsNoise.isNull()) {
+			neuronRef.setAddNoise(tsNoise.isSelected());
+			if (tsNoise.getSelectedIndex() == TristateDropDown.getTRUE())
+				randTab.commitRandom(neuronRef.getNoiseGenerator());
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		return prototypeRule.deepCopy();
+	}
+
+	/**
+	 * Responds to actions performed.
+	 * 
+	 * @param e
+	 *            Action event
+	 */
+	public void actionPerformed(final ActionEvent e) {
+		Object o = e.getSource();
+
+		if (o == tsUseAdaptation) {
+			checkUsingAdaptation();
+		}
+	}
+
 }

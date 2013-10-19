@@ -27,79 +27,74 @@ import org.simbrain.network.core.NeuronUpdateRule;
  */
 public class BinaryRule extends NeuronUpdateRule {
 
-    /** Threshold for binary neurons. */
-    private double threshold = .5;
+	/** Threshold for binary neurons. */
+	private double threshold = .5;
 
-    /** Bias for binary neurons. */
-    private double bias = 0;
+	/** Bias for binary neurons. */
+	private double bias = 0;
 
-    /**
-     * {@inheritDoc}
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public TimeType getTimeType() {
+		return TimeType.DISCRETE;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void init(Neuron neuron) {
-        // No implementation
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public BinaryRule deepCopy() {
+		BinaryRule bn = new BinaryRule();
+		bn.setThreshold(getThreshold());
+		return bn;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public BinaryRule deepCopy() {
-        BinaryRule bn = new BinaryRule();
-        bn.setThreshold(getThreshold());
-        return bn;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void update(Neuron neuron) {
+		double wtdInput = neuron.getWeightedInputs() + bias;
 
-    /**
-     * {@inheritDoc}
-     */
-    public void update(Neuron neuron) {
-        double wtdInput = neuron.getWeightedInputs() + bias;
+		if (wtdInput > threshold) {
+			neuron.setBuffer(neuron.getUpperBound());
+		} else {
+			neuron.setBuffer(neuron.getLowerBound());
+		}
+	}
 
-        if (wtdInput > threshold) {
-            neuron.setBuffer(neuron.getUpperBound());
-        } else {
-            neuron.setBuffer(neuron.getLowerBound());
-        }
-    }
+	/**
+	 * @return Returns the threshold.
+	 */
+	public double getThreshold() {
+		return threshold;
+	}
 
-    /**
-     * @return Returns the threshold.
-     */
-    public double getThreshold() {
-        return threshold;
-    }
+	/**
+	 * @param threshold
+	 *            The threshold to set.
+	 */
+	public void setThreshold(final double threshold) {
+		this.threshold = threshold;
+	}
 
-    /**
-     * @param threshold The threshold to set.
-     */
-    public void setThreshold(final double threshold) {
-        this.threshold = threshold;
-    }
+	/**
+	 * @return the bias of the neuron.
+	 */
+	public double getBias() {
+		return bias;
+	}
 
-    /**
-     * @return the bias of the neuron.
-     */
-    public double getBias() {
-        return bias;
-    }
+	/**
+	 * @param bias
+	 *            sets the bias of the neuron.
+	 */
+	public void setBias(final double bias) {
+		this.bias = bias;
+	}
 
-    /**
-     * @param bias sets the bias of the neuron.
-     */
-    public void setBias(final double bias) {
-        this.bias = bias;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Binary";
-    }
+	@Override
+	public String getDescription() {
+		return "Binary";
+	}
 
 }

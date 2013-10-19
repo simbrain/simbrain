@@ -53,6 +53,9 @@ public class BasicNeuronInfoPanel extends JPanel {
 	/** Activation field. */
 	private JTextField tfActivation = new JTextField();
 
+	/** Label Field. */
+	private final JTextField tfNeuronLabel = new JTextField();
+
 	/** The neuron Id. */
 	private final JLabel idLabel = new JLabel();
 
@@ -133,13 +136,26 @@ public class BasicNeuronInfoPanel extends JPanel {
 		gbc.gridx = 1;
 		basicsPanel.add(tfActivation, gbc);
 
+		gbc.weightx = 0.8;
+		gbc.gridwidth = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		basicsPanel.add(new JLabel("Label:"), gbc);
+
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(5, 3, 0, 0);
+		gbc.gridwidth = 2;
+		gbc.weightx = 0.2;
+		gbc.gridx = 1;
+		basicsPanel.add(tfNeuronLabel, gbc);
+
 		gbc.gridwidth = 1;
 		int lgap = detailTriangle.isDown() ? 5 : 0;
 		gbc.insets = new Insets(10, 5, lgap, 5);
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
 		gbc.weightx = 0.2;
 		basicsPanel.add(detailTriangle, gbc);
 
@@ -221,6 +237,13 @@ public class BasicNeuronInfoPanel extends JPanel {
 			tfActivation.setText(Double.toString(neuronRef
 					.getActivation()));
 
+		// Handle Label
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"getLabel"))
+			tfNeuronLabel.setText(NULL_STRING);
+		else
+			tfNeuronLabel.setText(neuronRef.getLabel());
+
 	}
 
 	/**
@@ -233,8 +256,12 @@ public class BasicNeuronInfoPanel extends JPanel {
 
 			// Activation
 			if (!tfActivation.getText().equals(NULL_STRING))
-				neuronRef.setActivation(Double.parseDouble(tfActivation
-						.getText()));
+				neuronRef.forceSetActivation(Double
+						.parseDouble(tfActivation.getText()));
+
+			// Label
+			if (!tfNeuronLabel.getText().equals(NULL_STRING))
+				neuronRef.setLabel(tfNeuronLabel.getText());
 
 		}
 

@@ -23,163 +23,188 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking".
+ * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking". TODO:
+ * Store a bunch of useful parameters, and add a combo box to switch between the
+ * different types. Students could just look it up, but this would be
+ * faster/cooler. Just a thought.
  */
 public class IzhikevichRule extends SpikingNeuronUpdateRule {
 
-    /** Recovery. */
-    private double recovery = 0;
+	public static final double DEFAULT_CEILING = 30;
 
-    /** A. */
-    private double a = .02;
+	public static final double DEFAULT_FLOOR = -65;
 
-    /** B. */
-    private double b = .2;
+	/** Recovery. */
+	private double recovery = 0;
 
-    /** C. */
-    private double c = -65;
+	/** A. */
+	private double a = .02;
 
-    /** D. */
-    private double d = 6;
+	/** B. */
+	private double b = .2;
 
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
+	/** C. */
+	private double c = DEFAULT_FLOOR;
 
-    /** Add noise to the neuron. */
-    private boolean addNoise = false;
+	/** D. */
+	private double d = 6;
 
-    /**
-     * {@inheritDoc}
-     */
-    public IzhikevichRule deepCopy() {
-        IzhikevichRule in = new IzhikevichRule();
-        in.setA(getA());
-        in.setB(getB());
-        in.setC(getC());
-        in.setD(getD());
-        in.setAddNoise(getAddNoise());
-        in.noiseGenerator = new Randomizer(noiseGenerator);
+	/** Threshold value to signal a spike. */
+	private double threshold = DEFAULT_CEILING;
 
-        return in;
-    }
+	/** Noise dialog. */
+	private Randomizer noiseGenerator = new Randomizer();
 
-    /**
-     * Updates the neuron.
-     */
-    public void update(Neuron neuron) {
-        double timeStep = neuron.getNetwork().getTimeStep();
-        double inputs = neuron.getWeightedInputs();
-        double activation = neuron.getActivation();
+	/** Add noise to the neuron. */
+	private boolean addNoise = false;
 
-        if (addNoise) {
-            inputs += noiseGenerator.getRandom();
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public IzhikevichRule deepCopy() {
+		IzhikevichRule in = new IzhikevichRule();
+		in.setA(getA());
+		in.setB(getB());
+		in.setC(getC());
+		in.setD(getD());
+		in.setAddNoise(getAddNoise());
+		in.noiseGenerator = new Randomizer(noiseGenerator);
 
-        recovery += (timeStep * (a * ((b * activation) - recovery)));
+		return in;
+	}
 
-        double val = activation
-                + (timeStep * (((.04 * (activation * activation))
-                        + (5 * activation) + 140)
-                        - recovery + inputs));
+	/**
+	 * Updates the neuron.
+	 */
+	public void update(Neuron neuron) {
+		double timeStep = neuron.getNetwork().getTimeStep();
+		double inputs = neuron.getWeightedInputs();
+		double activation = neuron.getActivation();
 
-        if (val > 30) {
-            val = c;
-            recovery += d;
-            setHasSpiked(true);
-        } else {
-            setHasSpiked(false);
-        }
+		if (addNoise) {
+			inputs += noiseGenerator.getRandom();
+		}
 
-        neuron.setBuffer(val);
-    }
+		recovery += (timeStep * (a * ((b * activation) - recovery)));
 
-    /**
-     * @return Returns the a.
-     */
-    public double getA() {
-        return a;
-    }
+		double val =
+				activation
+						+ (timeStep * (((.04 * (activation * activation))
+								+ (5 * activation) + 140)
+								- recovery + inputs));
 
-    /**
-     * @param a The a to set.
-     */
-    public void setA(final double a) {
-        this.a = a;
-    }
+		if (val > threshold) {
+			val = c;
+			recovery += d;
+			setHasSpiked(true, neuron);
+		} else {
+			setHasSpiked(false, neuron);
+		}
 
-    /**
-     * @return Returns the b.
-     */
-    public double getB() {
-        return b;
-    }
+		neuron.setBuffer(val);
+	}
 
-    /**
-     * @param b The b to set.
-     */
-    public void setB(final double b) {
-        this.b = b;
-    }
+	/**
+	 * @return Returns the a.
+	 */
+	public double getA() {
+		return a;
+	}
 
-    /**
-     * @return Returns the c.
-     */
-    public double getC() {
-        return c;
-    }
+	/**
+	 * @param a
+	 *            The a to set.
+	 */
+	public void setA(final double a) {
+		this.a = a;
+	}
 
-    /**
-     * @param c The c to set.
-     */
-    public void setC(final double c) {
-        this.c = c;
-    }
+	/**
+	 * @return Returns the b.
+	 */
+	public double getB() {
+		return b;
+	}
 
-    /**
-     * @return Returns the d.
-     */
-    public double getD() {
-        return d;
-    }
+	/**
+	 * @param b
+	 *            The b to set.
+	 */
+	public void setB(final double b) {
+		this.b = b;
+	}
 
-    /**
-     * @param d The d to set.
-     */
-    public void setD(final double d) {
-        this.d = d;
-    }
+	/**
+	 * @return Returns the c.
+	 */
+	public double getC() {
+		return c;
+	}
 
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+	/**
+	 * @param c
+	 *            The c to set.
+	 */
+	public void setC(final double c) {
+		this.c = c;
+	}
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
+	/**
+	 * @return Returns the d.
+	 */
+	public double getD() {
+		return d;
+	}
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
+	/**
+	 * @param d
+	 *            The d to set.
+	 */
+	public void setD(final double d) {
+		this.d = d;
+	}
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
-    }
+	/**
+	 * @return Returns the addNoise.
+	 */
+	public boolean getAddNoise() {
+		return addNoise;
+	}
 
-    @Override
-    public String getDescription() {
-        return "Izhikevich";
-    }
+	/**
+	 * @param addNoise
+	 *            The addNoise to set.
+	 */
+	public void setAddNoise(final boolean addNoise) {
+		this.addNoise = addNoise;
+	}
+
+	/**
+	 * @return Returns the noiseGenerator.
+	 */
+	public Randomizer getNoiseGenerator() {
+		return noiseGenerator;
+	}
+
+	/**
+	 * @param noiseGenerator
+	 *            The noiseGenerator to set.
+	 */
+	public void setNoiseGenerator(final Randomizer noiseGenerator) {
+		this.noiseGenerator = noiseGenerator;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Izhikevich";
+	}
+
+	public double getDefaultCeiling() {
+		return threshold;
+	}
+
+	public double getDefaultFloor() {
+		return Double.NEGATIVE_INFINITY;
+	}
 
 }

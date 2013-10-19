@@ -26,155 +26,160 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
-        DifferentiableUpdateRule {
+public class LinearRule extends NeuronUpdateRule implements
+		BiasedUpdateRule, DifferentiableUpdateRule {
 
-    /** Slope. */
-    private double slope = 1;
+	/** Slope. */
+	private double slope = 1;
 
-    /** Bias. */
-    private double bias = 0;
+	/** Bias. */
+	private double bias = 0;
 
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
+	/** Noise dialog. */
+	private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
-    private boolean addNoise = false;
+	/** Add noise to the neuron. */
+	private boolean addNoise = false;
 
-    /** Clipping. */
-    private boolean clipping = true;
+	/** Clipping. */
+	private boolean clipping = true;
 
-    /**
-     * @{inheritDoc
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public TimeType getTimeType() {
+		return TimeType.DISCRETE;
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public void init(Neuron neuron) {
-        // No implementation
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public void init(Neuron neuron) {
+		// No implementation
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public LinearRule deepCopy() {
-        LinearRule ln = new LinearRule();
-        ln.setBias(getBias());
-        ln.setSlope(getSlope());
-        ln.setClipping(getClipping());
-        ln.setAddNoise(getAddNoise());
-        ln.noiseGenerator = new Randomizer(noiseGenerator);
-        return ln;
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public LinearRule deepCopy() {
+		LinearRule ln = new LinearRule();
+		ln.setBias(getBias());
+		ln.setSlope(getSlope());
+		ln.setClipping(getClipping());
+		ln.setAddNoise(getAddNoise());
+		ln.noiseGenerator = new Randomizer(noiseGenerator);
+		return ln;
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public void update(Neuron neuron) {
-        double wtdInput = neuron.getWeightedInputs();
-        double val = slope * wtdInput;
+	/**
+	 * @{inheritDoc
+	 */
+	public void update(Neuron neuron) {
+		double wtdInput = neuron.getWeightedInputs();
+		double val = slope * wtdInput;
 
-        if (addNoise) {
-            val += noiseGenerator.getRandom();
-        }
+		if (addNoise) {
+			val += noiseGenerator.getRandom();
+		}
 
-        if (clipping) {
-            val = neuron.clip(val);
-        }
+		if (clipping) {
+			val = neuron.clip(val);
+		}
 
-        neuron.setBuffer(val);
-    }
+		neuron.setBuffer(val);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public double getDerivative(double val, Neuron neuron) {
-        if (val >= neuron.getUpperBound()) {
-            return 0;
-        } else if (val <= neuron.getLowerBound()) {
-            return 0;
-        } else {
-            return slope;
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public double getDerivative(double val, Neuron neuron) {
+		if (val >= neuron.getUpperBound()) {
+			return 0;
+		} else if (val <= neuron.getLowerBound()) {
+			return 0;
+		} else {
+			return slope;
+		}
+	}
 
-    /**
-     * @return Returns the bias.
-     */
-    public double getBias() {
-        return bias;
-    }
+	/**
+	 * @return Returns the bias.
+	 */
+	public double getBias() {
+		return bias;
+	}
 
-    /**
-     * @param bias The bias to set.
-     */
-    public void setBias(final double bias) {
-        this.bias = bias;
-    }
+	/**
+	 * @param bias
+	 *            The bias to set.
+	 */
+	public void setBias(final double bias) {
+		this.bias = bias;
+	}
 
-    /**
-     * @return Returns the slope.
-     */
-    public double getSlope() {
-        return slope;
-    }
+	/**
+	 * @return Returns the slope.
+	 */
+	public double getSlope() {
+		return slope;
+	}
 
-    /**
-     * @param slope The slope to set.
-     */
-    public void setSlope(final double slope) {
-        this.slope = slope;
-    }
+	/**
+	 * @param slope
+	 *            The slope to set.
+	 */
+	public void setSlope(final double slope) {
+		this.slope = slope;
+	}
 
-    /**
-     * @return Returns the noise generator.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
+	/**
+	 * @return Returns the noise generator.
+	 */
+	public Randomizer getNoiseGenerator() {
+		return noiseGenerator;
+	}
 
-    /**
-     * @param noise The noise generator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
-        this.noiseGenerator = noise;
-    }
+	/**
+	 * @param noise
+	 *            The noise generator to set.
+	 */
+	public void setNoiseGenerator(final Randomizer noise) {
+		this.noiseGenerator = noise;
+	}
 
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+	/**
+	 * @return Returns the addNoise.
+	 */
+	public boolean getAddNoise() {
+		return addNoise;
+	}
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
+	/**
+	 * @param addNoise
+	 *            The addNoise to set.
+	 */
+	public void setAddNoise(final boolean addNoise) {
+		this.addNoise = addNoise;
+	}
 
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean getClipping() {
+		return clipping;
+	}
 
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
+	/**
+	 * @param clipping
+	 *            The clipping to set.
+	 */
+	public void setClipping(final boolean clipping) {
+		this.clipping = clipping;
+	}
 
-    @Override
-    public String getDescription() {
-        return "Linear";
-    }
+	@Override
+	public String getDescription() {
+		return "Linear";
+	}
 
 }

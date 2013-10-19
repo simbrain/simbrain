@@ -56,9 +56,6 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	/** Lower bound field. */
 	private final JTextField tfLowBound = new JTextField();
 
-	/** Label Field. */
-	private final JTextField tfNeuronLabel = new JTextField();
-
 	/** Priority Field. */
 	private final JTextField tfPriority = new JTextField();
 
@@ -84,12 +81,10 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		setLayout(gl);
 		add(new JLabel("Upper Bound:"));
 		add(tfUpBound);
-		add(new JLabel("Lower Bound"));
+		add(new JLabel("Lower Bound:"));
 		add(tfLowBound);
 		add(new JLabel("Increment: "));
 		add(tfIncrement);
-		add(new JLabel("Label: "));
-		add(tfNeuronLabel);
 		add(new JLabel("Priority:"));
 		add(tfPriority);
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -110,13 +105,6 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		else
 			tfIncrement
 					.setText(Double.toString(neuronRef.getIncrement()));
-
-		// Handle Label
-		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getLabel"))
-			tfNeuronLabel.setText(NULL_STRING);
-		else
-			tfNeuronLabel.setText(neuronRef.getLabel());
 
 		// Handle Priority
 		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
@@ -157,10 +145,6 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 			if (!tfIncrement.getText().equals(NULL_STRING))
 				neuronRef.setIncrement(Double.parseDouble(tfIncrement
 						.getText()));
-
-			// Label
-			if (!tfNeuronLabel.getText().equals(NULL_STRING))
-				neuronRef.setLabel(tfNeuronLabel.getText());
 
 			// Priority
 			if (!tfPriority.getText().equals(NULL_STRING))

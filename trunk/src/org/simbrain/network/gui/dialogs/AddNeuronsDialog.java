@@ -21,18 +21,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -42,19 +38,16 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.neuron.ExtendedNeuronInfoPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel;
-import org.simbrain.network.gui.nodes.GroupNode;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.DropDownTriangle;
 import org.simbrain.util.DropDownTriangle.UpDirection;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.TristateDropDown;
 
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
@@ -91,11 +84,11 @@ public class AddNeuronsDialog extends StandardDialog {
 	private JTextField numNeurons = new JTextField(""
 			+ DEFAULT_NUM_NEURONS);
 
+	/** A triangle widget for displaying/hiding extra neuron settings. */
 	private DropDownTriangle extraDataTriangle = new DropDownTriangle(
-			UpDirection.LEFT, false, this);
+			UpDirection.LEFT, false, "More", "Less", this);
 
-	private JLabel extraDataLabel = new JLabel("Settings");
-
+	/** A panel for editing more neuron variables. */
 	private ExtendedNeuronInfoPanel moreSettingsPanel;
 
 	/** Button allowing selection of type of neuron to add. **/
@@ -104,14 +97,13 @@ public class AddNeuronsDialog extends StandardDialog {
 	/** A panel where layout settings can be edited. */
 	private MainLayoutPanel selectLayout;
 
+	/**
+	 * A panel for editing whether or not the neurons will be added as a group.
+	 */
 	private NeuronGroupPanel groupPanel;
 
-	/** An ArrayList containing the GUI neurons. */
-	private final ArrayList<NeuronNode> nodes =
-			new ArrayList<NeuronNode>();
-
-	/** An ArrayList containing the neurons. */
-	private final List<Neuron> neurons;
+	/** A List of the neurons being added to the network. */
+	private final List<Neuron> addedNeurons = new ArrayList<Neuron>();
 
 	/**
 	 * Constructs the dialog.
@@ -123,7 +115,6 @@ public class AddNeuronsDialog extends StandardDialog {
 		this.networkPanel = networkPanel;
 		baseNeuron =
 				new Neuron(networkPanel.getNetwork(), DEFAULT_NEURON);
-		neurons = Collections.singletonList(baseNeuron);
 		networkPanel.clearSelection();
 		init();
 		addListeners();
@@ -165,13 +156,14 @@ public class AddNeuronsDialog extends StandardDialog {
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		gbc.weightx = 0.2;
-		basicsPanel.add(extraDataLabel, gbc);
-		gbc.weightx = 0.0;
-		gbc.gridx = 2;
+		gbc.gridwidth = 2;
 		basicsPanel.add(extraDataTriangle, gbc);
 		topPanel.add(basicsPanel, BorderLayout.NORTH);
+		gbc.gridwidth = 1;
 
-		moreSettingsPanel = new ExtendedNeuronInfoPanel(neurons);
+		moreSettingsPanel =
+				new ExtendedNeuronInfoPanel(
+						Collections.singletonList(baseNeuron));
 		moreSettingsPanel.setAlignmentX(CENTER_ALIGNMENT);
 		moreSettingsPanel.setVisible(extraDataTriangle.isDown());
 		topPanel.add(moreSettingsPanel, BorderLayout.SOUTH);
@@ -183,7 +175,8 @@ public class AddNeuronsDialog extends StandardDialog {
 		addNeuronsPanel.add(Box.createVerticalStrut(10));
 
 		selectNeuronType =
-				new NeuronUpdateSettingsPanel(neurons, this, false);
+				new NeuronUpdateSettingsPanel(
+						Collections.singletonList(baseNeuron), this, true);
 		selectNeuronType.setAlignmentX(CENTER_ALIGNMENT);
 		addNeuronsPanel.add(selectNeuronType);
 
@@ -239,79 +232,31 @@ public class AddNeuronsDialog extends StandardDialog {
 	/**
 	 * Adds the neurons to the panel.
 	 */
-	private void addNeuronsToPanel(NeuronGroup ng) {
-		// TODO: Move to networkPanel?
+	private void addNeurons() {
 		int number = Integer.parseInt(numNeurons.getText());
-		final List<Neuron> addedNeurons = new ArrayList<Neuron>();
+
 		Network net = networkPanel.getNetwork();
 		for (int i = 0; i < number; i++) {
-			Neuron neuron = new Neuron(net, baseNeuron);
-			nodes.add(new NeuronNode(networkPanel, neuron));
-			net.addNeuron(neuron);
-			addedNeurons.add(neuron);
+			addedNeurons.add(new Neuron(net, baseNeuron));
 		}
 
-		networkPanel.setSelection(nodes);
-		Layout layout = selectLayout.getCurrentLayout();
+		networkPanel.addNeuronsToPanel(addedNeurons,
+				selectLayout.getCurrentLayout());
 
-		layout.setInitialLocation(networkPanel.getLastClickedPosition());
+	}
 
-		layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
-
+	/**
+	 * Adds the neurons to the panel as a group.
+	 */
+	private void addGroup() {
+		addNeurons();
+		NeuronGroup ng = groupPanel.generateNeuronGroup();
 		if (ng != null) {
-
-			if (!networkPanel.getNetwork().getFlatNeuronGroupList()
-					.contains(ng)) {
-				net.transferNeuronsToGroup(addedNeurons, ng);
-				net.addGroup(ng);
-
-			} else {
-				for (GroupNode g : networkPanel.getModelGroupNodes()) {
-
-					if (((NeuronGroupNode) g).getNeuronGroup() == ng) {
-						net.transferNeuronsToGroup(addedNeurons, ng);
-
-						for (NeuronNode nn : nodes) {
-							nn.setParent(g);
-							g.addPNode(nn);
-						}
-						g.updateBounds();
-
-						net.addGroup(ng);
-						System.out.println(((NeuronGroupNode) g)
-								.getChildrenNeuronNodes(g).size());
-						System.out
-								.println(((NeuronGroupNode) g).outlinedObjects
-										.size());
-						net.fireGroupChanged(null, ng, "Added Neurons");
-						break;
-					}
-				}
-			}
+			networkPanel.getNetwork().transferNeuronsToGroup(
+					addedNeurons, ng);
+			networkPanel.getNetwork().addGroup(ng);
+			networkPanel.repaint();
 		}
-
-		networkPanel.repaint();
-		networkPanel.getUndoManager().addUndoableAction(
-				new UndoableAction() {
-
-					@Override
-					public void undo() {
-						for (Neuron neuron : addedNeurons) {
-							networkPanel.getNetwork()
-									.removeNeuron(neuron);
-						}
-						// System.out.println("AddNeurons:undo. - Remove List");
-					}
-
-					@Override
-					public void redo() {
-						for (Neuron neuron : addedNeurons) {
-							networkPanel.getNetwork().addNeuron(neuron);
-						}
-						// System.out.println("AddNeurons:red. - Re-add List");
-					}
-
-				});
 	}
 
 	/**
@@ -321,7 +266,16 @@ public class AddNeuronsDialog extends StandardDialog {
 		super.closeDialogOk();
 		moreSettingsPanel.commitChanges();
 		selectNeuronType.getNeuronPanel().commitChanges(baseNeuron);
-		addNeuronsToPanel(groupPanel.getTargetGroup());
+		boolean clamp =
+				selectNeuronType.getClamped().getSelectedIndex() == TristateDropDown
+						.getTRUE();
+		baseNeuron.setClamped(clamp);
+		selectLayout.commitChanges();
+		if (groupPanel.getAddToGroup().isSelected()) {
+			addGroup();
+		} else {
+			addNeurons();
+		}
 		dispose();
 	}
 
@@ -337,20 +291,15 @@ public class AddNeuronsDialog extends StandardDialog {
 	 * A sub-panel which allows a user to put newly created neurons into a
 	 * neuron group. Options include a new neuron group, already existing neuron
 	 * group, or no neuron group (loose). The user can also change a group's
-	 * name from here. TODO: Currently doesn't work
+	 * name from here.
 	 * 
 	 * @author ztosi
 	 * 
 	 */
 	private class NeuronGroupPanel extends JPanel {
 
-		/** String used to represent the add neurons to a new group option. */
-		private static final String newGroupOption = "<New Group>";
-
-		/**
-		 * A combo box of available neuron groups, a new group, or no group.
-		 */
-		private JComboBox<String> cbGroups;
+		/** Select whether or not to add the neurons in a neuron group. */
+		private JCheckBox addToGroup = new JCheckBox();
 
 		/** A label for the neuron group name. */
 		private JLabel tfNameLabel = new JLabel("Name: ");
@@ -361,27 +310,21 @@ public class AddNeuronsDialog extends StandardDialog {
 		private JTextField tfGroupName = new JTextField();
 
 		/**
-		 * A map between neuron groups and their names. Used in conjunction with
-		 * the combo box.
-		 */
-		private LinkedHashMap<String, NeuronGroup> ngMap;
-
-		/**
 		 * Creates the neuron group sub-panel
 		 * 
 		 * @param np
 		 *            a reference to the network panel.
 		 */
 		public NeuronGroupPanel(NetworkPanel np) {
-			init(np);
 			addListeners();
 			setLayout(new BorderLayout());
 
 			JPanel subPanel = new JPanel();
 			subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.X_AXIS));
-			subPanel.add(cbGroups);
+			subPanel.add(addToGroup);
 			subPanel.add(Box.createHorizontalStrut(20));
 			subPanel.add(tfNameLabel);
+			tfGroupName.setEnabled(addToGroup.isSelected());
 			subPanel.add(tfGroupName);
 			subPanel.setBorder(BorderFactory
 					.createEmptyBorder(5, 5, 5, 5));
@@ -391,56 +334,16 @@ public class AddNeuronsDialog extends StandardDialog {
 		}
 
 		/**
-		 * Initializes the panel and the groups combo box.
-		 * 
-		 * @param np
-		 *            a reference to the network panel
-		 */
-		private void init(NetworkPanel np) {
-			List<NeuronGroup> groups =
-					np.getNetwork().getFlatNeuronGroupList();
-			ngMap = new LinkedHashMap<String, NeuronGroup>();
-			for (NeuronGroup ng : groups) {
-				ngMap.put(ng.getLabel(), ng);
-			}
-			String[] labels =
-					ngMap.keySet().toArray(new String[ngMap.size()]);
-			Arrays.sort(labels);
-			cbGroups = new JComboBox<String>(labels);
-			cbGroups.addItem(newGroupOption);
-			cbGroups.addItem("None");
-			// Default is to add to no group
-			cbGroups.setSelectedIndex(cbGroups.getItemCount() - 1);
-			// Group name text field is disabled if no neuron group is selected
-			tfGroupName.setEnabled(false);
-		}
-
-		/**
 		 * Adds (internal) listeners to the panel.
 		 */
 		private void addListeners() {
-			cbGroups.addActionListener(new ActionListener() {
+			addToGroup.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 
-					boolean tfNameEnabled =
-							!cbGroups.getSelectedItem().equals("None");
+					tfGroupName.setEnabled(addToGroup.isSelected());
 
-					tfGroupName.setEnabled(tfNameEnabled);
-					if (!tfNameEnabled) {
-						tfGroupName.setText("");
-					} else if (cbGroups.getSelectedItem().equals(
-							newGroupOption)) {
-						String label =
-								networkPanel.getNetwork()
-										.getGroupIdGenerator().getId();
-						label = label.replaceAll("_", " ");
-						tfGroupName.setText(label);
-					} else {
-						tfGroupName.setText((String) cbGroups
-								.getSelectedItem());
-					}
 				}
 
 			});
@@ -448,23 +351,28 @@ public class AddNeuronsDialog extends StandardDialog {
 		}
 
 		/**
-		 * Returns the neuron group mapped to the selection in the combo box.
+		 * Generates the neuron group with the attributes from the panel.
+		 * Returns null if the {@link #addToGroup addToGroup} check-box is not
+		 * selected.
 		 * 
-		 * @return the neuron group where these neurons will be added.
+		 * @return
 		 */
-		public NeuronGroup getTargetGroup() {
-			if (cbGroups.getSelectedItem().equals("None")) {
-				return null;
-			} else if (cbGroups.getSelectedItem().equals(newGroupOption)) {
+		public NeuronGroup generateNeuronGroup() {
+			if (addToGroup.isSelected()) {
 				NeuronGroup ng =
 						new NeuronGroup(networkPanel.getNetwork());
 				ng.setLabel(tfGroupName.getText());
 				return ng;
 			} else {
-				NeuronGroup ng = ngMap.get(cbGroups.getSelectedItem());
-				ng.setLabel(tfGroupName.getText());
-				return ng;
+				return null;
 			}
+		}
+
+		/**
+		 * @return the addToGroup check-box
+		 */
+		public JCheckBox getAddToGroup() {
+			return addToGroup;
 		}
 
 	}

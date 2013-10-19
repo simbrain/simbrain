@@ -144,7 +144,7 @@ public class MainLayoutPanel extends JPanel {
 		if (revealOption) { // Lay out the panel with a drop-down triangle.
 			JPanel topPanel = new JPanel();
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-			topPanel.add(layoutCb);		
+			topPanel.add(layoutCb);
 			topPanel.add(Box.createHorizontalStrut(100));
 			topPanel.add(layoutParameterReveal);
 			topPanel.setAlignmentX(CENTER_ALIGNMENT);

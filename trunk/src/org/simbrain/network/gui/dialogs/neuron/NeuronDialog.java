@@ -30,6 +30,7 @@ import javax.swing.JButton;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ShowHelpAction;
@@ -78,6 +79,8 @@ public class NeuronDialog extends StandardDialog {
 	/** The neurons being modified. */
 	private final ArrayList<Neuron> neuronList;
 
+	private final AbstractNeuronPanel startingPanel;
+
 	/**
 	 * @param selectedNeurons
 	 *            the pnode_neurons being adjusted
@@ -85,7 +88,10 @@ public class NeuronDialog extends StandardDialog {
 	public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
 		neuronList = getNeuronList(selectedNeurons);
 		topPanel = new BasicNeuronInfoPanel(neuronList, this);
-		bottomPanel = new NeuronUpdateSettingsPanel(neuronList, this);
+		bottomPanel =
+				new NeuronUpdateSettingsPanel(neuronList, this, false);
+		startingPanel = bottomPanel.getNeuronPanel();
+		bottomPanel.getNeuronPanel().setReplace(false);
 		init();
 		addListeners();
 		updateHelp();
@@ -125,6 +131,9 @@ public class NeuronDialog extends StandardDialog {
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						updateHelp();
+						AbstractNeuronPanel np =
+								bottomPanel.getNeuronPanel();
+						np.setReplace(np != startingPanel);
 					}
 
 				});
@@ -164,7 +173,7 @@ public class NeuronDialog extends StandardDialog {
 		topPanel.commitChanges();
 
 		// Now commit changes specific to the neuron type
-		bottomPanel.getNeuronPanel().commitChanges(neuronList);
+		bottomPanel.commitChanges();
 
 		// Notify the network that changes have been made
 		neuronList.get(0).getNetwork().fireNetworkChanged();

@@ -34,86 +34,132 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class BinaryRulePanel extends AbstractNeuronPanel {
 
-    /** Threshold for this neuron. */
-    private JTextField tfThreshold = new JTextField();
+	/** Threshold for this neuron. */
+	private JTextField tfThreshold = new JTextField();
 
-    /** Bias for this neuron. */
-    private JTextField tfBias = new JTextField();
+	/** Bias for this neuron. */
+	private JTextField tfBias = new JTextField();
 
-    /** Main tab for neuron prefernces. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
+	/** Main tab for neuron prefernces. */
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /**
-     * Creates binary neuron preferences panel.
-     */
-    public BinaryRulePanel() {
-        super();
-        this.add(mainTab);
-        mainTab.addItem("Threshold", tfThreshold);
-        mainTab.addItem("Bias", tfBias);
-    }
+	/** A reference to the neuron rule being edited. */
+	private static final BinaryRule prototypeRule = new BinaryRule();
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+	/**
+	 * Creates binary neuron preferences panel.
+	 */
+	public BinaryRulePanel() {
+		super();
+		this.add(mainTab);
+		mainTab.addItem("Threshold", tfThreshold);
+		mainTab.addItem("Bias", tfBias);
+	}
 
-        BinaryRule neuronRef = (BinaryRule) ruleList.get(0);
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-        // (Below) Handle consistency of multiple selections
+		BinaryRule neuronRef = (BinaryRule) ruleList.get(0);
 
-        // Handle Threshold
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
-                "getThreshold"))
-            tfThreshold.setText(NULL_STRING);
-        else
-            tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+		// (Below) Handle consistency of multiple selections
 
-        // Handle Bias
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias"))
-            tfBias.setText(NULL_STRING);
-        else
-            tfBias.setText(Double.toString(neuronRef.getBias()));
+		// Handle Threshold
+		if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
+				"getThreshold"))
+			tfThreshold.setText(NULL_STRING);
+		else
+			tfThreshold
+					.setText(Double.toString(neuronRef.getThreshold()));
 
-    }
+		// Handle Bias
+		if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
+				"getBias"))
+			tfBias.setText(NULL_STRING);
+		else
+			tfBias.setText(Double.toString(neuronRef.getBias()));
 
-    /**
-     * Fill field values to default values for binary neuron.
-     */
-    public void fillDefaultValues() {
-        BinaryRule neuronRef = new BinaryRule();
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-    }
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(Neuron neuron) {
+	/**
+	 * Fill field values to default values for binary neuron.
+	 */
+	public void fillDefaultValues() {
+		tfThreshold
+				.setText(Double.toString(prototypeRule.getThreshold()));
+		tfBias.setText(Double.toString(prototypeRule.getBias()));
+	}
 
-        BinaryRule neuronRef = new BinaryRule();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(Neuron neuron) {
 
-        // Threshold
-        if (!tfThreshold.getText().equals(NULL_STRING))
-            neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+		BinaryRule neuronRef;
 
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+		if (neuron.getUpdateRule() instanceof BinaryRule) {
+			neuronRef = (BinaryRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = prototypeRule.deepCopy();
+			neuron.setUpdateRule(neuronRef);
+		}
 
-        neuron.setUpdateRule(neuronRef);
+		writeValuesToRule(neuronRef);
 
-    }
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(List<Neuron> neurons) {
-        for (Neuron n : neurons) {
-            commitChanges(n);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(List<Neuron> neurons) {
+
+		if (isReplace()) {
+
+			BinaryRule neuronRef = prototypeRule.deepCopy();
+
+			writeValuesToRule(neuronRef);
+
+			for (Neuron n : neurons) {
+				n.setUpdateRule(neuronRef.deepCopy());
+			}
+
+		} else {
+
+			for (Neuron n : neurons) {
+				writeValuesToRule(n.getUpdateRule());
+			}
+
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+
+		BinaryRule neuronRef = (BinaryRule) rule;
+
+		// Threshold
+		if (!tfThreshold.getText().equals(NULL_STRING))
+			neuronRef.setThreshold(Double.parseDouble(tfThreshold
+					.getText()));
+
+		// Bias
+		if (!tfBias.getText().equals(NULL_STRING))
+			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public BinaryRule getPrototypeRule() {
+		return prototypeRule.deepCopy();
+	}
 
 }

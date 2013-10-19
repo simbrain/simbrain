@@ -28,203 +28,203 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class DecayRule extends NeuronUpdateRule {
 
-    /** Relative. */
-    private static final int RELATIVE = 0;
+	/** Relative. */
+	private static final int RELATIVE = 0;
 
-    /** Absolute. */
-    private static final int ABSOLUTE = 1;
+	/** Absolute. */
+	private static final int ABSOLUTE = 1;
 
-    /** Relative absolute. */
-    private int relAbs = RELATIVE;
+	/** Relative absolute. */
+	private int relAbs = RELATIVE;
 
-    /** Decay amount. */
-    private double decayAmount = .1;
+	/** Decay amount. */
+	private double decayAmount = .1;
 
-    /** Decay fraction. */
-    private double decayFraction = .1;
+	/** Decay fraction. */
+	private double decayFraction = .1;
 
-    /** Base line. */
-    private double baseLine = 0;
+	/** Base line. */
+	private double baseLine = 0;
 
-    /** Clipping. */
-    private boolean clipping = true;
+	/** Clipping. */
+	private boolean clipping = true;
 
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
+	/** Noise dialog. */
+	private Randomizer noiseGenerator = new Randomizer();
 
-    /** Add noise to the neuron. */
-    private boolean addNoise = false;
+	/** Add noise to the neuron. */
+	private boolean addNoise = false;
 
-    /**
-     * @return Time type.
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
+	/**
+	 * @return Time type.
+	 */
+	public TimeType getTimeType() {
+		return TimeType.DISCRETE;
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public void init(Neuron neuron) {
-        // No implementation
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public DecayRule deepCopy() {
+		DecayRule dn = new DecayRule();
+		dn.setRelAbs(getRelAbs());
+		dn.setDecayAmount(getDecayAmount());
+		dn.setDecayFraction(getDecayFraction());
+		dn.setClipping(getClipping());
+		dn.setAddNoise(getAddNoise());
+		dn.noiseGenerator = new Randomizer(noiseGenerator);
+		return dn;
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public DecayRule deepCopy() {
-        DecayRule dn = new DecayRule();
-        dn.setRelAbs(getRelAbs());
-        dn.setDecayAmount(getDecayAmount());
-        dn.setDecayFraction(getDecayFraction());
-        dn.setClipping(getClipping());
-        dn.setAddNoise(getAddNoise());
-        dn.noiseGenerator = new Randomizer(noiseGenerator);
-        return dn;
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public void update(Neuron neuron) {
+		double val = neuron.getActivation() + neuron.getWeightedInputs();
+		double decayVal = 0;
 
-    /**
-     * @{inheritDoc
-     */
-    public void update(Neuron neuron) {
-        double val = neuron.getActivation() + neuron.getWeightedInputs();
-        double decayVal = 0;
+		if (relAbs == RELATIVE) {
+			decayVal = decayFraction * Math.abs(val - baseLine);
+		} else if (relAbs == ABSOLUTE) {
+			decayVal = decayAmount;
+		}
 
-        if (relAbs == RELATIVE) {
-            decayVal = decayFraction * Math.abs(val - baseLine);
-        } else if (relAbs == ABSOLUTE) {
-            decayVal = decayAmount;
-        }
+		// Here's where the action happens
+		if (val < baseLine) {
+			val += decayVal;
 
-        // Here's where the action happens
-        if (val < baseLine) {
-            val += decayVal;
+			// in case of an overshoot
+			if (val > baseLine) {
+				val = baseLine;
+			}
+		} else if (val > baseLine) {
+			val -= decayVal;
 
-            // in case of an overshoot
-            if (val > baseLine) {
-                val = baseLine;
-            }
-        } else if (val > baseLine) {
-            val -= decayVal;
+			// in case of an overshoot
+			if (val < baseLine) {
+				val = baseLine;
+			}
+		}
 
-            // in case of an overshoot
-            if (val < baseLine) {
-                val = baseLine;
-            }
-        }
+		if (addNoise) {
+			val += noiseGenerator.getRandom();
+		}
 
-        if (addNoise) {
-            val += noiseGenerator.getRandom();
-        }
+		if (clipping) {
+			val = neuron.clip(val);
+		}
 
-        if (clipping) {
-            val = neuron.clip(val);
-        }
+		neuron.setBuffer(val);
+	}
 
-        neuron.setBuffer(val);
-    }
+	/**
+	 * @return Returns the decayAmount.
+	 */
+	public double getDecayAmount() {
+		return decayAmount;
+	}
 
-    /**
-     * @return Returns the decayAmount.
-     */
-    public double getDecayAmount() {
-        return decayAmount;
-    }
+	/**
+	 * @param decayAmount
+	 *            The decayAmount to set.
+	 */
+	public void setDecayAmount(final double decayAmount) {
+		this.decayAmount = decayAmount;
+	}
 
-    /**
-     * @param decayAmount The decayAmount to set.
-     */
-    public void setDecayAmount(final double decayAmount) {
-        this.decayAmount = decayAmount;
-    }
+	/**
+	 * @return Returns the dedayPercentage.
+	 */
+	public double getDecayFraction() {
+		return decayFraction;
+	}
 
-    /**
-     * @return Returns the dedayPercentage.
-     */
-    public double getDecayFraction() {
-        return decayFraction;
-    }
+	/**
+	 * @param decayFraction
+	 *            The decayFraction to set.
+	 */
+	public void setDecayFraction(final double decayFraction) {
+		this.decayFraction = decayFraction;
+	}
 
-    /**
-     * @param decayFraction The decayFraction to set.
-     */
-    public void setDecayFraction(final double decayFraction) {
-        this.decayFraction = decayFraction;
-    }
+	/**
+	 * @return Returns the relAbs.
+	 */
+	public int getRelAbs() {
+		return relAbs;
+	}
 
-    /**
-     * @return Returns the relAbs.
-     */
-    public int getRelAbs() {
-        return relAbs;
-    }
+	/**
+	 * @param relAbs
+	 *            The relAbs to set.
+	 */
+	public void setRelAbs(final int relAbs) {
+		this.relAbs = relAbs;
+	}
 
-    /**
-     * @param relAbs The relAbs to set.
-     */
-    public void setRelAbs(final int relAbs) {
-        this.relAbs = relAbs;
-    }
+	/**
+	 * @return Returns the addNoise.
+	 */
+	public boolean getAddNoise() {
+		return addNoise;
+	}
 
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+	/**
+	 * @param addNoise
+	 *            The addNoise to set.
+	 */
+	public void setAddNoise(final boolean addNoise) {
+		this.addNoise = addNoise;
+	}
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean getClipping() {
+		return clipping;
+	}
 
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
+	/**
+	 * @param clipping
+	 *            The clipping to set.
+	 */
+	public void setClipping(final boolean clipping) {
+		this.clipping = clipping;
+	}
 
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
+	/**
+	 * @return Returns the noiseGenerator.
+	 */
+	public Randomizer getNoiseGenerator() {
+		return noiseGenerator;
+	}
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
+	/**
+	 * @param noiseGenerator
+	 *            The noiseGenerator to set.
+	 */
+	public void setNoiseGenerator(final Randomizer noiseGenerator) {
+		this.noiseGenerator = noiseGenerator;
+	}
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
-    }
+	/**
+	 * @return Returns the baseLine.
+	 */
+	public double getBaseLine() {
+		return baseLine;
+	}
 
-    /**
-     * @return Returns the baseLine.
-     */
-    public double getBaseLine() {
-        return baseLine;
-    }
+	/**
+	 * @param baseLine
+	 *            The baseLine to set.
+	 */
+	public void setBaseLine(final double baseLine) {
+		this.baseLine = baseLine;
+	}
 
-    /**
-     * @param baseLine The baseLine to set.
-     */
-    public void setBaseLine(final double baseLine) {
-        this.baseLine = baseLine;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Decay";
-    }
+	@Override
+	public String getDescription() {
+		return "Decay";
+	}
 
 }

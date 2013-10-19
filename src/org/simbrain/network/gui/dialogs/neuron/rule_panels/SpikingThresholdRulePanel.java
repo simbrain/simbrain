@@ -28,73 +28,121 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 
 /**
- * <b>ProbabilisticSpikingNeuronPanel</b>.
+ * <b>ProbabilisticSpikingNeuronPanel</b>. TODO: Deactivated until discussion
+ * about "SpikingNeuronUpdateRule".
  */
 public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 
-    /** Time step field. */
-    private JTextField tfThreshold = new JTextField();
+	/** Time step field. */
+	private JTextField tfThreshold = new JTextField();
 
-    /**
-     * Creates a new instance of the probabilistic spiking neuron panel.
-     *
-     * @param net Network
-     */
-    public SpikingThresholdRulePanel() {
-        super();
-        addItem("Threshold", tfThreshold);
-    }
+	/** A reference to the neuron rule being edited. */
+	private static final SpikingThresholdRule prototypeRule =
+			new SpikingThresholdRule();
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList.get(0);
-
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-
-        //(Below) Handle consistency of multiple selections
-        
-        // Handle Threshold
-        if (!NetworkUtils.isConsistent(ruleList, SpikingThresholdRule.class,
-                "getThreshold")) {
-            tfThreshold.setText(NULL_STRING);
-        }
-    }
-
-    /**
-     * Populate fields with default data.
-     */
-    public void fillDefaultValues() {
-        SpikingThresholdRule neuronRef = new SpikingThresholdRule();
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void commitChanges(Neuron neuron) {
-		
-		SpikingThresholdRule neuronRef = new SpikingThresholdRule();
-					
-		// Threshold
-        if (!tfThreshold.getText().equals(NULL_STRING))
-            neuronRef
-                    .setThreshold(Double.parseDouble(tfThreshold.getText()));
-		
-        neuron.setUpdateRule(neuronRef);
-        
+	/**
+	 * Creates a new instance of the probabilistic spiking neuron panel.
+	 * 
+	 * @param net
+	 *            Network
+	 */
+	public SpikingThresholdRulePanel() {
+		super();
+		addItem("Threshold", tfThreshold);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		SpikingThresholdRule neuronRef =
+				(SpikingThresholdRule) ruleList.get(0);
+
+		tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+
+		// (Below) Handle consistency of multiple selections
+
+		// Handle Threshold
+		if (!NetworkUtils.isConsistent(ruleList,
+				SpikingThresholdRule.class, "getThreshold")) {
+			tfThreshold.setText(NULL_STRING);
+		}
+	}
+
+	/**
+	 * Populate fields with default data.
+	 */
+	public void fillDefaultValues() {
+		tfThreshold
+				.setText(Double.toString(prototypeRule.getThreshold()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(Neuron neuron) {
+
+		SpikingThresholdRule neuronRef;
+
+		if (neuron.getUpdateRule() instanceof SpikingThresholdRule) {
+			neuronRef = (SpikingThresholdRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = prototypeRule.deepCopy();
+			neuron.setUpdateRule(neuronRef);
+		}
+
+		writeValuesToRule(neuronRef);
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		for(Neuron n : neurons) {
-			commitChanges(n);
+
+		if (isReplace()) {
+
+			SpikingThresholdRule neuronRef = prototypeRule.deepCopy();
+
+			writeValuesToRule(neuronRef);
+
+			for (Neuron n : neurons) {
+				n.setUpdateRule(neuronRef.deepCopy());
+			}
+
+		} else {
+
+			for (Neuron n : neurons) {
+				writeValuesToRule(n.getUpdateRule());
+			}
+
 		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+
+		SpikingThresholdRule neuronRef = (SpikingThresholdRule) rule;
+
+		// Threshold
+		if (!tfThreshold.getText().equals(NULL_STRING))
+			neuronRef.setThreshold(Double.parseDouble(tfThreshold
+					.getText()));
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		return prototypeRule.deepCopy();
 	}
 
 }

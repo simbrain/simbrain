@@ -34,161 +34,210 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class ThreeValueRulePanel extends AbstractNeuronPanel {
 
-    /** Threshold for this neuron. */
-    private JTextField tfLowerThreshold = new JTextField();
+	/** Threshold for this neuron. */
+	private JTextField tfLowerThreshold = new JTextField();
 
-    /** Bias for this neuron. */
-    private JTextField tfBias = new JTextField();
+	/** Bias for this neuron. */
+	private JTextField tfBias = new JTextField();
 
-    /** Upper threshold field. */
-    private JTextField tfUpperThreshold = new JTextField();
+	/** Upper threshold field. */
+	private JTextField tfUpperThreshold = new JTextField();
 
-    /** Lower value field. */
-    private JTextField tfLowerValue = new JTextField();
+	/** Lower value field. */
+	private JTextField tfLowerValue = new JTextField();
 
-    /** Middle value field. */
-    private JTextField tfMiddleValue = new JTextField();
+	/** Middle value field. */
+	private JTextField tfMiddleValue = new JTextField();
 
-    /** Upper value field. */
-    private JTextField tfUpperValue = new JTextField();
+	/** Upper value field. */
+	private JTextField tfUpperValue = new JTextField();
 
-    /** Main tab for neuron prefernces. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
+	/** Main tab for neuron prefernces. */
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /**
-     * Creates binary neuron preferences panel.
-     */
-    public ThreeValueRulePanel() {
-        super();
-        this.add(mainTab);
-        mainTab.addItem("Bias", tfBias);
-        mainTab.addItem("Lower threshold", tfLowerThreshold);
-        mainTab.addItem("Upper threshold", tfUpperThreshold);
-        mainTab.addItem("Lower value", tfLowerValue);
-        mainTab.addItem("Middle value", tfMiddleValue);
-        mainTab.addItem("Upper value", tfUpperValue);
-    }
+	/** A reference to the neuron rule being edited. */
+	private static final ThreeValueRule prototypeRule =
+			new ThreeValueRule();
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        
-    	ThreeValueRule neuronRef = (ThreeValueRule) ruleList.get(0);
-
-        //(Below) Handle consistency of multiple selections
-            
-        // Handle Lower Threshold
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getLowerThreshold")) 
-            tfLowerThreshold.setText(NULL_STRING);
-        else
-        	tfLowerThreshold
-            	.setText(Double.toString(neuronRef.getLowerThreshold()));
-        
-        // Handle Upper Threshold
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getUpperThreshold"))
-            tfUpperThreshold.setText(NULL_STRING);
-        else
-        	tfUpperThreshold
-            	.setText(Double.toString(neuronRef.getUpperThreshold()));
-        
-        // Handle Bias
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getBias"))
-            tfBias.setText(NULL_STRING);
-        else
-        	tfBias.setText(Double.toString(neuronRef.getBias()));
-        
-        // Handle Lower Value
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getLowerValue"))
-            tfLowerValue.setText(NULL_STRING);
-        else
-        	tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
-        
-        // Handle Middle Value
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getMiddleValue"))
-            tfMiddleValue.setText(NULL_STRING);
-        else
-        	tfMiddleValue.setText(Double.toString(neuronRef.getMiddleValue()));
-        
-        // Handle Upper Value
-        if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
-                "getUpperValue"))
-            tfUpperValue.setText(NULL_STRING);
-        else
-        	tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
-        
-    }
-
-    /**
-     * Fill field values to default values for binary neuron.
-     */
-    public void fillDefaultValues() {
-        ThreeValueRule neuronRef = new ThreeValueRule();
-        tfLowerThreshold
-                .setText(Double.toString(neuronRef.getLowerThreshold()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfUpperThreshold
-                .setText(Double.toString(neuronRef.getUpperThreshold()));
-        tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
-        tfMiddleValue.setText(Double.toString(neuronRef.getMiddleValue()));
-        tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void commitChanges(Neuron neuron) {
-		
-		ThreeValueRule neuronRef = new ThreeValueRule();
-
-		// Lower Threshold
-        if (!tfLowerThreshold.getText().equals(NULL_STRING))
-            neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold
-                    .getText()));
-        
-        // Upper Threshold
-        if (!tfUpperThreshold.getText().equals(NULL_STRING))
-            neuronRef.setUpperThreshold(Double.parseDouble(tfUpperThreshold
-                    .getText()));
-        
-        // Bias
-        if (!tfBias.getText().equals(NULL_STRING))
-            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-        
-        // Lower Value
-        if (!tfLowerValue.getText().equals(NULL_STRING))
-            neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
-                    .getText()));
-        
-        // Middle Value
-        if (!tfMiddleValue.getText().equals(NULL_STRING))
-            neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
-                    .getText()));
-        
-        // Upper Value
-        if (!tfUpperValue.getText().equals(NULL_STRING))
-            neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
-                    .getText()));
-        
-        neuron.setUpdateRule(neuronRef);
-        
+	/**
+	 * Creates binary neuron preferences panel.
+	 */
+	public ThreeValueRulePanel() {
+		super();
+		this.add(mainTab);
+		mainTab.addItem("Bias", tfBias);
+		mainTab.addItem("Lower threshold", tfLowerThreshold);
+		mainTab.addItem("Upper threshold", tfUpperThreshold);
+		mainTab.addItem("Lower value", tfLowerValue);
+		mainTab.addItem("Middle value", tfMiddleValue);
+		mainTab.addItem("Upper value", tfUpperValue);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+
+		ThreeValueRule neuronRef = (ThreeValueRule) ruleList.get(0);
+
+		// (Below) Handle consistency of multiple selections
+
+		// Handle Lower Threshold
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getLowerThreshold"))
+			tfLowerThreshold.setText(NULL_STRING);
+		else
+			tfLowerThreshold.setText(Double.toString(neuronRef
+					.getLowerThreshold()));
+
+		// Handle Upper Threshold
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getUpperThreshold"))
+			tfUpperThreshold.setText(NULL_STRING);
+		else
+			tfUpperThreshold.setText(Double.toString(neuronRef
+					.getUpperThreshold()));
+
+		// Handle Bias
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getBias"))
+			tfBias.setText(NULL_STRING);
+		else
+			tfBias.setText(Double.toString(neuronRef.getBias()));
+
+		// Handle Lower Value
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getLowerValue"))
+			tfLowerValue.setText(NULL_STRING);
+		else
+			tfLowerValue.setText(Double.toString(neuronRef
+					.getLowerValue()));
+
+		// Handle Middle Value
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getMiddleValue"))
+			tfMiddleValue.setText(NULL_STRING);
+		else
+			tfMiddleValue.setText(Double.toString(neuronRef
+					.getMiddleValue()));
+
+		// Handle Upper Value
+		if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
+				"getUpperValue"))
+			tfUpperValue.setText(NULL_STRING);
+		else
+			tfUpperValue.setText(Double.toString(neuronRef
+					.getUpperValue()));
+
+	}
+
+	/**
+	 * Fill field values to default values for binary neuron.
+	 */
+	public void fillDefaultValues() {
+		tfLowerThreshold.setText(Double.toString(prototypeRule
+				.getLowerThreshold()));
+		tfBias.setText(Double.toString(prototypeRule.getBias()));
+		tfUpperThreshold.setText(Double.toString(prototypeRule
+				.getUpperThreshold()));
+		tfLowerValue.setText(Double.toString(prototypeRule
+				.getLowerValue()));
+		tfMiddleValue.setText(Double.toString(prototypeRule
+				.getMiddleValue()));
+		tfUpperValue.setText(Double.toString(prototypeRule
+				.getUpperValue()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(Neuron neuron) {
+
+		ThreeValueRule neuronRef;
+
+		if (neuron.getUpdateRule() instanceof ThreeValueRule) {
+			neuronRef = (ThreeValueRule) neuron.getUpdateRule();
+		} else {
+			neuronRef = prototypeRule.deepCopy();
+			neuron.setUpdateRule(neuronRef);
+		}
+
+		writeValuesToRule(neuronRef);
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void commitChanges(List<Neuron> neurons) {
-		for(Neuron n : neurons) {
-			commitChanges(n);
+
+		if (isReplace()) {
+
+			ThreeValueRule neuronRef = prototypeRule.deepCopy();
+
+			writeValuesToRule(neuronRef);
+
+			for (Neuron n : neurons) {
+				n.setUpdateRule(neuronRef.deepCopy());
+			}
+
+		} else {
+
+			for (Neuron n : neurons) {
+				writeValuesToRule(n.getUpdateRule());
+			}
+
 		}
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+
+		ThreeValueRule neuronRef = (ThreeValueRule) rule;
+
+		// Lower Threshold
+		if (!tfLowerThreshold.getText().equals(NULL_STRING))
+			neuronRef.setLowerThreshold(Double
+					.parseDouble(tfLowerThreshold.getText()));
+
+		// Upper Threshold
+		if (!tfUpperThreshold.getText().equals(NULL_STRING))
+			neuronRef.setUpperThreshold(Double
+					.parseDouble(tfUpperThreshold.getText()));
+
+		// Bias
+		if (!tfBias.getText().equals(NULL_STRING))
+			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+
+		// Lower Value
+		if (!tfLowerValue.getText().equals(NULL_STRING))
+			neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
+					.getText()));
+
+		// Middle Value
+		if (!tfMiddleValue.getText().equals(NULL_STRING))
+			neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
+					.getText()));
+
+		// Upper Value
+		if (!tfUpperValue.getText().equals(NULL_STRING))
+			neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
+					.getText()));
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		return prototypeRule.deepCopy();
 	}
 
 }

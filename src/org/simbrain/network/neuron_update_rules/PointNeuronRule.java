@@ -35,13 +35,15 @@ import org.simbrain.util.SimbrainMath;
  * book.
  */
 public class PointNeuronRule extends NeuronUpdateRule implements
-SynapseListener, BiasedUpdateRule {
+		SynapseListener, BiasedUpdateRule {
 
 	/** Excitatory inputs for connected Synapses. */
-	private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
+	private ArrayList<Synapse> excitatoryInputs =
+			new ArrayList<Synapse>();
 
 	/** Inhibitory inputs for connected Synapses. */
-	private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
+	private ArrayList<Synapse> inhibitoryInputs =
+			new ArrayList<Synapse>();
 
 	/** Time average constant for updating the net current field. (p. 43-44) */
 	private double netTimeConstant = 0.7;
@@ -103,7 +105,8 @@ SynapseListener, BiasedUpdateRule {
 	private double inhibitoryReversal = 0.15;
 
 	/** Current output function. */
-	private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
+	private OutputFunction outputFunction =
+			OutputFunction.DISCRETE_SPIKING;
 
 	/** Gain factor for output function. (p. 46) */
 	private double gain = 600;
@@ -150,13 +153,8 @@ SynapseListener, BiasedUpdateRule {
 		},
 		NONE {
 			public String toString() {
-				return "None (membrane potential)";
+				return "Membrane Potential";
 			}
-		},
-		NULL_STRING {
-			public String toString() {
-				return "...";
-			}	
 		}
 	};
 
@@ -244,24 +242,29 @@ SynapseListener, BiasedUpdateRule {
 	public void update(Neuron neuron) {
 
 		// Calculate the excitatory conductance (p. 44, eq. 2.16)
-		excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
-				+ netTimeConstant * (getExcitatoryInputs());
+		excitatoryConductance =
+				(1 - netTimeConstant) * excitatoryConductance
+						+ netTimeConstant * (getExcitatoryInputs());
 
 		// Calculate the excitatory current (p. 37 equation 2.5)
-		excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
-				* (membranePotential - excitatoryReversal);
+		excitatoryCurrent =
+				excitatoryConductance * excitatoryMaxConductance
+						* (membranePotential - excitatoryReversal);
 
 		// Calculate the excitatory conductance using time averaging constant.
-		inhibitoryConductance = (1 - netTimeConstant) * inhibitoryConductance
-				+ netTimeConstant * (getInhibitoryInputs());
+		inhibitoryConductance =
+				(1 - netTimeConstant) * inhibitoryConductance
+						+ netTimeConstant * (getInhibitoryInputs());
 
 		// Calculate the inhibitory current.
-		inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance
-				* (membranePotential - inhibitoryReversal);
+		inhibitoryCurrent =
+				inhibitoryConductance * inhibitoryMaxConductance
+						* (membranePotential - inhibitoryReversal);
 
 		// Calculate the leak current (p. 37 eq. 2.5)
-		leakCurrent = leakConductance * leakMaxConductance
-				* (membranePotential - leakReversal);
+		leakCurrent =
+				leakConductance * leakMaxConductance
+						* (membranePotential - leakReversal);
 
 		// Calculate the net current (p. 37 eq. 2.6)
 		netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent;
@@ -278,16 +281,18 @@ SynapseListener, BiasedUpdateRule {
 				neuron.setBuffer(0);
 			}
 		} else if (outputFunction == OutputFunction.RATE_CODE) {
-			double val = (gain * getPositiveComponent(membranePotential
-					- thresholdPotential))
-					/ (gain
-							* getPositiveComponent(membranePotential
-									- thresholdPotential) + 1);
+			double val =
+					(gain * getPositiveComponent(membranePotential
+							- thresholdPotential))
+							/ (gain
+									* getPositiveComponent(membranePotential
+											- thresholdPotential) + 1);
 			neuron.setBuffer(neuron.clip(val));
 		} else if (outputFunction == OutputFunction.LINEAR) {
-			double val = gain
-					* getPositiveComponent(membranePotential
-							- thresholdPotential);
+			double val =
+					gain
+							* getPositiveComponent(membranePotential
+									- thresholdPotential);
 			neuron.setBuffer(neuron.clip(val));
 		} else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
 			neuron.setBuffer(1); // TODO: Complete this implementation
@@ -306,11 +311,12 @@ SynapseListener, BiasedUpdateRule {
 	 * @return the value of that equation
 	 */
 	public double getInhibitoryThresholdConductance() {
-		double excitatoryTerm = excitatoryConductance
-				* excitatoryMaxConductance
-				* (excitatoryReversal - thresholdPotential);
-		double leakTerm = leakConductance * leakMaxConductance
-				* (leakReversal - thresholdPotential);
+		double excitatoryTerm =
+				excitatoryConductance * excitatoryMaxConductance
+						* (excitatoryReversal - thresholdPotential);
+		double leakTerm =
+				leakConductance * leakMaxConductance
+						* (leakReversal - thresholdPotential);
 
 		return (excitatoryTerm + leakTerm)
 				/ (thresholdPotential - inhibitoryReversal);
@@ -321,7 +327,8 @@ SynapseListener, BiasedUpdateRule {
 		return "Activation: " + neuron.getActivation()
 				+ "\n\nMembrane Potential: "
 				+ SimbrainMath.roundDouble(membranePotential, 2)
-				+ "\n\nNet Current: " + SimbrainMath.roundDouble(netCurrent, 2)
+				+ "\n\nNet Current: "
+				+ SimbrainMath.roundDouble(netCurrent, 2)
 				+ "\n\nExcitatory current:  "
 				+ SimbrainMath.roundDouble(excitatoryCurrent, 2)
 				+ "\n \nLeak current: "
@@ -429,7 +436,8 @@ SynapseListener, BiasedUpdateRule {
 	 * @param excitatoryMaxConductance
 	 *            the excitatoryMaxConductance to set
 	 */
-	public void setExcitatoryMaxConductance(double excitatoryMaxConductance) {
+	public void setExcitatoryMaxConductance(
+			double excitatoryMaxConductance) {
 		this.excitatoryMaxConductance = excitatoryMaxConductance;
 	}
 
@@ -677,7 +685,8 @@ SynapseListener, BiasedUpdateRule {
 	 * @param inhibitoryMaxConductance
 	 *            the inhibitoryMaxConductance to set
 	 */
-	public void setInhibitoryMaxConductance(double inhibitoryMaxConductance) {
+	public void setInhibitoryMaxConductance(
+			double inhibitoryMaxConductance) {
 		this.inhibitoryMaxConductance = inhibitoryMaxConductance;
 	}
 
@@ -734,13 +743,14 @@ SynapseListener, BiasedUpdateRule {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
+	public void synapseTypeChanged(
+			NetworkEvent<SynapseUpdateRule> networkEvent) {
 		// No implementation
 	}
 
 	@Override
 	public String getDescription() {
-		return "Point Neuron (Leabra)";
+		return "Point Neuron";
 	}
 
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.util.List;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
@@ -31,64 +30,80 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
  */
 public class RandomNeuronRulePanel extends AbstractNeuronPanel {
 
-    /** Random pane. */
-    private RandomPanelNetwork rp = new RandomPanelNetwork(false);
+	/** Random pane. */
+	private RandomPanelNetwork rp = new RandomPanelNetwork(false);
 
-    /**
-     * Creates an instance of this panel.
-     *
-     */
-    public RandomNeuronRulePanel() {
-        super();
-        this.add(rp);
-    }
+	/**
+	 * Creates an instance of this panel.
+	 * 
+	 */
+	public RandomNeuronRulePanel() {
+		super();
+		this.add(rp);
+	}
 
-//    /**
-//     * Populate fields with current data.
-//     */
-//    public void fillFieldValues() {
-//        ArrayList<Randomizer> randomPanels = new ArrayList<Randomizer>();
-//
-//        for (int i = 0; i < ruleList.size(); i++) {
-//            randomPanels.add(((RandomNeuronRule) ruleList.get(i))
-//                    .getRandomizer());
-//        }
-//
-//        rp.fillFieldValues(randomPanels);
-//    }
+	// /**
+	// * Populate fields with current data.
+	// */
+	// public void fillFieldValues() {
+	// ArrayList<Randomizer> randomPanels = new ArrayList<Randomizer>();
+	//
+	// for (int i = 0; i < ruleList.size(); i++) {
+	// randomPanels.add(((RandomNeuronRule) ruleList.get(i))
+	// .getRandomizer());
+	// }
+	//
+	// rp.fillFieldValues(randomPanels);
+	// }
 
-    /**
-     * Fill field values to default values for random neuron.
-     */
-    public void fillDefaultValues() {
-        rp.fillDefaultValues();
-    }
+	/**
+	 * Fill field values to default values for random neuron.
+	 */
+	public void fillDefaultValues() {
+		rp.fillDefaultValues();
+	}
 
-//    /**
-//     * Called externally when the dialog is closed, to commit any changes made.
-//     */
-//    public void commitChanges() {
-//        for (int i = 0; i < ruleList.size(); i++) {
-//            RandomNeuronRule neuronRef = (RandomNeuronRule) ruleList.get(i);
-//            rp.commitRandom(neuronRef.getRandomizer());
-//        }
-//    }
+	// /**
+	// * Called externally when the dialog is closed, to commit any changes
+	// made.
+	// */
+	// public void commitChanges() {
+	// for (int i = 0; i < ruleList.size(); i++) {
+	// RandomNeuronRule neuronRef = (RandomNeuronRule) ruleList.get(i);
+	// rp.commitRandom(neuronRef.getRandomizer());
+	// }
+	// }
 
 	@Override
 	public void commitChanges(Neuron neuron) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void commitChanges(List<Neuron> neuron) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+		// TODO Auto-generated method stub
+
 	}
 }

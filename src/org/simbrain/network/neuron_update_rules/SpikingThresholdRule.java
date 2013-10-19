@@ -27,52 +27,46 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
  */
 public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
 
-    /** Threshold. */
-    private double threshold = .5;
+	/** Threshold. */
+	private double threshold = .5;
 
-    @Override
-    public SpikingThresholdRule deepCopy() {
-	SpikingThresholdRule neuron = new SpikingThresholdRule();
-	neuron.setThreshold(getThreshold());
-	return neuron;
-    }
-
-    @Override
-    public void init(Neuron neuron) {
-	super.init(neuron);
-	neuron.setLowerBound(0);
-    }
-
-    @Override
-    public void update(Neuron neuron) {
-
-	if (neuron.getWeightedInputs() >= threshold) {
-	    setHasSpiked(true);
-	    neuron.setBuffer(neuron.getUpperBound());
-	} else {
-	    setHasSpiked(false);
-	    neuron.setBuffer(0); // Make this a separate variable?
+	@Override
+	public SpikingThresholdRule deepCopy() {
+		SpikingThresholdRule neuron = new SpikingThresholdRule();
+		neuron.setThreshold(getThreshold());
+		return neuron;
 	}
 
-    }
+	@Override
+	public void update(Neuron neuron) {
 
-    /**
-     * @return the threshold
-     */
-    public double getThreshold() {
-	return threshold;
-    }
+		if (neuron.getWeightedInputs() >= threshold) {
+			setHasSpiked(true, neuron);
+			neuron.setBuffer(neuron.getUpperBound());
+		} else {
+			setHasSpiked(false, neuron);
+			neuron.setBuffer(0); // Make this a separate variable?
+		}
 
-    /**
-     * @param threshold
-     *            the threshold to set
-     */
-    public void setThreshold(double threshold) {
-	this.threshold = threshold;
-    }
+	}
 
-    @Override
-    public String getDescription() {
-	return "Spiking Threshold";
-    }
+	/**
+	 * @return the threshold
+	 */
+	public double getThreshold() {
+		return threshold;
+	}
+
+	/**
+	 * @param threshold
+	 *            the threshold to set
+	 */
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Spiking Threshold";
+	}
 }

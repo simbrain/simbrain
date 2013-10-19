@@ -28,68 +28,79 @@ import org.simbrain.network.core.NeuronUpdateRule;
  */
 public class LogisticRule extends NeuronUpdateRule {
 
-    /** Growth rate. */
-    private double growthRate = 3.9;
+	public static final double DEFAULT_FLOOR = 0.0;
 
-    /**
-     * @{inheritDoc
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
+	/** Growth rate. */
+	private double growthRate = 3.9;
 
-    /**
-     * @{inheritDoc
-     */
-    public void init(Neuron neuron) {
-        // No implementation
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public TimeType getTimeType() {
+		return TimeType.DISCRETE;
+	}
 
-    /**
-     * @{inheritDoc
-     */
-    public LogisticRule deepCopy() {
-        LogisticRule ln = new LogisticRule();
-        ln.setGrowthRate(getGrowthRate());
+	/**
+	 * @{inheritDoc
+	 */
+	public void init(Neuron neuron) {
+		// No implementation
+	}
 
-        return ln;
-    }
+	/**
+	 * @{inheritDoc
+	 */
+	public LogisticRule deepCopy() {
+		LogisticRule ln = new LogisticRule();
+		ln.setGrowthRate(getGrowthRate());
 
-    /**
-     * @{inheritDoc
-     */
-    public void update(Neuron neuron) {
+		return ln;
+	}
 
-        // TODO: Note that the inputs have to be within the neuron's bounds for
-        // behavior to be reasonable.
+	/**
+	 * @{inheritDoc
+	 */
+	public void update(Neuron neuron) {
 
-        double x = neuron.getActivation();
+		// TODO: Note that the inputs have to be within the neuron's bounds for
+		// behavior to be reasonable.
 
-        double y = (x - neuron.getLowerBound())
-                / (neuron.getUpperBound() - neuron.getLowerBound());
-        y = growthRate * y * (1 - y);
-        x = ((neuron.getUpperBound() - neuron.getLowerBound()) * y)
-                + neuron.getLowerBound();
+		double x = neuron.getActivation();
 
-        neuron.setBuffer(neuron.clip(x));
-    }
+		double y =
+				(x - neuron.getLowerBound())
+						/ (neuron.getUpperBound() - neuron
+								.getLowerBound());
+		y = growthRate * y * (1 - y);
+		x =
+				((neuron.getUpperBound() - neuron.getLowerBound()) * y)
+						+ neuron.getLowerBound();
 
-    /**
-     * @return Returns the firingProbability.
-     */
-    public double getGrowthRate() {
-        return growthRate;
-    }
+		neuron.setBuffer(neuron.clip(x));
+	}
 
-    /**
-     * @param growthRate The growthRate to set.
-     */
-    public void setGrowthRate(final double growthRate) {
-        this.growthRate = growthRate;
-    }
+	/**
+	 * @return Returns the firingProbability.
+	 */
+	public double getGrowthRate() {
+		return growthRate;
+	}
 
-    @Override
-    public String getDescription() {
-        return "Logistic";
-    }
+	/**
+	 * @param growthRate
+	 *            The growthRate to set.
+	 */
+	public void setGrowthRate(final double growthRate) {
+		this.growthRate = growthRate;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Logistic";
+	}
+
+	public double getDefaultFloor() {
+		return DEFAULT_FLOOR;
+	}
+
 }

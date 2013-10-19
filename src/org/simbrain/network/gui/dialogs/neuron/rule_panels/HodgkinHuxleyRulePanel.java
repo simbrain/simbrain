@@ -28,91 +28,107 @@ import org.simbrain.network.neuron_update_rules.HodgkinHuxleyRule;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
- * <b>Hodgkin-Huxley Rule Panel</b>
- * TODO: No Implementation.
+ * <b>Hodgkin-Huxley Rule Panel</b> TODO: No Implementation.
  */
 public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 
-    private JTextField perNaChannels = new JTextField();
+	private JTextField perNaChannels = new JTextField();
 
-    private JTextField perKChannels = new JTextField();
+	private JTextField perKChannels = new JTextField();
 
-    private JTextField getEna = new JTextField();
+	private JTextField getEna = new JTextField();
 
-    private JTextField getEk = new JTextField();
+	private JTextField getEk = new JTextField();
 
-    // private JTextField ENA = new JTextField();
-    //
-    // private JTextField Ek = new JTextField();
+	// private JTextField ENA = new JTextField();
+	//
+	// private JTextField Ek = new JTextField();
 
-    /** Main tab for neuron prefernces. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
+	/** Main tab for neuron prefernces. */
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /**
-     * Creates HodgkinHuxley preferences panel.
-     */
-    public HodgkinHuxleyRulePanel() {
-        super();
-        this.add(mainTab);
-        mainTab.addItem("Sodium Channels", perNaChannels);
-        mainTab.addItem("Potassium Channels", perKChannels);
-        mainTab.addItem("Equilibrium Potential", getEna);
-        mainTab.addItem("Equilibrium Potential", getEk);
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-	@Override
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-	      HodgkinHuxleyRule neuronRef = (HodgkinHuxleyRule) ruleList.get(0);
-
-	        perNaChannels.setText(Double.toString(neuronRef.getPerNaChannels()));
-	        perKChannels.setText(Double.toString(neuronRef.getPerKChannels()));
-	        // ENA.setText(Double.toString(neuronRef.getENA()));
-
-	        // //Handle consistency of multiple selections
-	        // if (!NetworkUtils.isConsistent(ruleList, HodgkinHuxleyNeuron.class,
-	        // "getTemp")) {
-	        // tfTemp.setText(NULL_STRING);
-	        // }
-		
+	/**
+	 * Creates HodgkinHuxley preferences panel.
+	 */
+	public HodgkinHuxleyRulePanel() {
+		super();
+		this.add(mainTab);
+		mainTab.addItem("Sodium Channels", perNaChannels);
+		mainTab.addItem("Potassium Channels", perKChannels);
+		mainTab.addItem("Equilibrium Potential", getEna);
+		mainTab.addItem("Equilibrium Potential", getEk);
 	}
 
-    /**
-     * Fill field values to default values for binary neuron.
-     */
-    public void fillDefaultValues() {
-        //HodgkinHuxleyRule neuronRef = new HodgkinHuxleyRule();
-        // tfTemp.setText(Double.toString(neuronRef.getTemp()));
+	/**
+	 * Populate fields with current data.
+	 */
+	@Override
+	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		HodgkinHuxleyRule neuronRef = (HodgkinHuxleyRule) ruleList.get(0);
 
-    }
+		perNaChannels.setText(Double.toString(neuronRef
+				.getPerNaChannels()));
+		perKChannels
+				.setText(Double.toString(neuronRef.getPerKChannels()));
+		// ENA.setText(Double.toString(neuronRef.getENA()));
 
-//    /**
-//     * Called externally when the dialog is closed, to commit any changes made.
-//     */
-//    public void commitChanges() {
-//        for (int i = 0; i < ruleList.size(); i++) {
-//            HodgkinHuxleyRule neuronRef = (HodgkinHuxleyRule) ruleList.get(i);
-//
-//            // if (!tfTemp.getText().equals(NULL_STRING)) {
-//            // neuronRef.setTemp(Double.parseDouble(tfTemp.getText()));
-//            // }
-//
-//        }
-//    }
+		// //Handle consistency of multiple selections
+		// if (!NetworkUtils.isConsistent(ruleList, HodgkinHuxleyNeuron.class,
+		// "getTemp")) {
+		// tfTemp.setText(NULL_STRING);
+		// }
+
+	}
+
+	/**
+	 * Fill field values to default values for binary neuron.
+	 */
+	public void fillDefaultValues() {
+		// HodgkinHuxleyRule neuronRef = new HodgkinHuxleyRule();
+		// tfTemp.setText(Double.toString(neuronRef.getTemp()));
+
+	}
+
+	// /**
+	// * Called externally when the dialog is closed, to commit any changes
+	// made.
+	// */
+	// public void commitChanges() {
+	// for (int i = 0; i < ruleList.size(); i++) {
+	// HodgkinHuxleyRule neuronRef = (HodgkinHuxleyRule) ruleList.get(i);
+	//
+	// // if (!tfTemp.getText().equals(NULL_STRING)) {
+	// // neuronRef.setTemp(Double.parseDouble(tfTemp.getText()));
+	// // }
+	//
+	// }
+	// }
 
 	@Override
 	public void commitChanges(Neuron neuron) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void commitChanges(List<Neuron> neuron) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public NeuronUpdateRule getPrototypeRule() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void writeValuesToRule(NeuronUpdateRule rule) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,16 +31,18 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ClampedNeuronRulePanel;
 import org.simbrain.util.DropDownTriangle;
 import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.TristateDropDown;
 
 /**
  * 
@@ -74,14 +75,32 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	/** Neuron panel. */
 	private AbstractNeuronPanel neuronPanel;
 
+	/**
+	 * Whether or not the neuron is clamped (i.e. will not update/change its
+	 * activation once set).
+	 */
+	private final TristateDropDown clamped = new TristateDropDown();
+
+	private final JPanel clampPanel = new JPanel();
+
+	{
+		clampPanel.setLayout(new BoxLayout(clampPanel, BoxLayout.X_AXIS));
+	}
+
 	/** For showing/hiding the neuron panel. */
 	private final DropDownTriangle displayNPTriangle;
 
+	/**
+	 * A reference to the parent window containing this panel for the purpose of
+	 * adjusting to different sized neuron update rule dialogs.
+	 */
 	private final Window parent;
 
 	/**
-	 * 
-	 * @param neuronList
+	 * Create a the panel with the default starting visibility (visible)
+	 * for the neuron panel.
+	 * @param neuronList the list of neurons being edited
+	 * @param parent the parent window referenced for resizing purposes
 	 */
 	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
 			Window parent) {
@@ -89,25 +108,28 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	}
 
 	/**
-	 * 
-	 * @param neuronList
+	 * Create the panel with specified starting visibility.
+	 * @param neuronList the list of neurons being edited
+	 * @param parent the parent window referenced for resizing purposes
+	 * @param startingState
 	 */
 	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
 			Window parent, boolean startingState) {
 		this.neuronList = neuronList;
 		this.parent = parent;
 		displayNPTriangle =
-				new DropDownTriangle(UpDirection.LEFT, startingState,
+				new DropDownTriangle(UpDirection.LEFT, !startingState,
 						"Settings", "Settings", parent);
 		initNeuronType();
+		initClamped();
+		layoutClampedPanel();
 		initializeLayout();
 		addListeners();
 	}
 
 	/**
-	 * Lays out this panel.
+	 * Lays out the components of the panel.
 	 * 
-	 * @return
 	 */
 	private void initializeLayout() {
 
@@ -118,21 +140,22 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 		JPanel tPanel = new JPanel();
 		tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
 		tPanel.add(cbNeuronType);
-		int horzStrut =
-				neuronPanel.getPreferredSize().width
-						- cbNeuronType.getPreferredSize().width
-						- displayNPTriangle.getPreferredSize().width;
-		horzStrut = (horzStrut > 30 && displayNPTriangle.isDown()) ?
-				horzStrut : 30;
+		int horzStrut = 30;
+
+		// Create a minimum spacing
 		tPanel.add(Box.createHorizontalStrut(horzStrut));
 
-		JPanel supP = new JPanel(new FlowLayout());
-		supP.add(displayNPTriangle);
+		// Give all extra space to the space between the components
+		tPanel.add(Box.createHorizontalGlue());
 
-		tPanel.add(supP);
+		tPanel.add(displayNPTriangle);
 		tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		tPanel.setBorder(padding);
 		this.add(tPanel);
+
+		this.add(Box.createRigidArea(new Dimension(0, 5)));
+		clampPanel.setVisible(displayNPTriangle.isDown());
+		this.add(clampPanel);
 
 		this.add(Box.createRigidArea(new Dimension(0, 5)));
 
@@ -157,8 +180,8 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 			public void mouseClicked(MouseEvent arg0) {
 
 				neuronPanel.setVisible(displayNPTriangle.isDown());
-				repaintPanel();
-				firePropertyChange("", null, null);
+				clampPanel.setVisible(displayNPTriangle.isDown());
+				repaint();
 				parent.pack();
 
 			}
@@ -203,13 +226,49 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 	}
 
 	/**
+	 * Called on exit to write changes in the dialog to the underlying model.
+	 */
+	public void commitChanges() {
+		if (!clamped.isNull()) {
+			for (Neuron n : neuronList) {
+				n.setClamped(clamped.getSelectedIndex() == TristateDropDown
+						.getTRUE());
+			}
+		}
+		neuronPanel.commitChanges(neuronList);
+	}
+
+	/**
 	 * Called to repaint the panel based on changes in the to the selected
 	 * neuron type.
 	 */
 	public void repaintPanel() {
 		removeAll();
+		repaintClampedPanel();
 		initializeLayout();
 		repaint();
+	}
+
+	/**
+	 * Repaints the sub-panel containing the interface to clamp the neuron(s).
+	 */
+	private void repaintClampedPanel() {
+		clampPanel.removeAll();
+		layoutClampedPanel();
+	}
+
+	/**
+	 * Lays out the components of the sub-panel containing the interface to
+	 * clamp the neuron(s).
+	 */
+	private void layoutClampedPanel() {
+		Border padding2 = BorderFactory.createEmptyBorder(0, 5, 5, 0);
+		JLabel cLabel = new JLabel("Clamp: ");
+		clampPanel.add(cLabel);
+		clampPanel.add(clamped);
+		clampPanel.add(Box.createHorizontalGlue());
+		clampPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		clampPanel.setBorder(padding2);
 	}
 
 	/**
@@ -223,8 +282,7 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
 			cbNeuronType
 					.setSelectedIndex(cbNeuronType.getItemCount() - 1);
-			// Simply to serve as an empty panel
-			neuronPanel = new ClampedNeuronRulePanel();
+			neuronPanel = new EmptyRulePanel();
 		} else {
 			String neuronName =
 					neuronList.get(0).getUpdateRule().getDescription();
@@ -233,17 +291,77 @@ public class NeuronUpdateSettingsPanel extends JPanel {
 			cbNeuronType.setSelectedItem(neuronName);
 		}
 	}
-
-	public JComboBox<String> getCbNeuronType() {
-		return cbNeuronType;
+	
+	/**
+	 * Initialize the box showing whether or not the neuron(s) are clamped.
+	 */
+	private void initClamped() {
+		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+				"isClamped")) {
+			clamped.setNull();
+		} else {
+			clamped.setSelected(neuronList.get(0).isClamped());
+		}
 	}
 
+
+	/**
+	 * Directly access the neuron panel to utilize its methods without using
+	 * this class as an intermediary. An example of this can be seen in
+	 * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
+	 * @return the currently displayed neuron update rule panel
+	 */
 	public AbstractNeuronPanel getNeuronPanel() {
 		return neuronPanel;
 	}
 
 	public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
 		this.neuronPanel = neuronPanel;
+	}
+
+	public JComboBox<String> getCbNeuronType() {
+		return cbNeuronType;
+	}
+	
+	public TristateDropDown getClamped() {
+		return clamped;
+	}
+
+	/**
+	 * 
+	 * An empty panel displayed in cases where the selected neurons have more
+	 * than one type of update rule. 
+	 * 
+	 * @author ztosi
+	 * 
+	 */
+	private class EmptyRulePanel extends AbstractNeuronPanel {
+
+		@Override
+		public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+		}
+
+		@Override
+		public void fillDefaultValues() {
+		}
+
+		@Override
+		public void commitChanges(Neuron neuron) {
+		}
+
+		@Override
+		public void commitChanges(List<Neuron> neuron) {
+		}
+
+		@Override
+		protected void writeValuesToRule(NeuronUpdateRule rule) {
+		}
+
+		@Override
+		public NeuronUpdateRule getPrototypeRule() {
+			return null;
+		}
+
 	}
 
 }

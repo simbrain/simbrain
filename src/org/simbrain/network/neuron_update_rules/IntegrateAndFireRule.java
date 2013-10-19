@@ -24,201 +24,269 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
- *
+ * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
+ * Computing Without Stable States: A new framework for neural computations
+ * based on perturbations.
+ * 
  * TODO: Add custom tooltip
  */
 public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 
-    /** Resistance. */
-    private double resistance = 1;
+	/** Resistance (MΩ). */
+	private double resistance = 1;
 
-    /** Time constant. */
-    private double timeConstant = 1;
+	/** Time constant (ms) */
+	private double timeConstant = 30;
 
-    /** Threshold. */
-    private double threshold = .8;
+	/** Threshold (mV) */
+	private double threshold = 15;
 
-    /** Reset potential. */
-    private double resetPotential = .1;
+	/** Reset potential (mV) */
+	private double resetPotential = 13.5;
 
-    /** Resting potential. */
-    private double restingPotential = .5;
+	/** Resting potential (mV) */
+	private double restingPotential = 0.0;
 
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
+	/** Background Current (nA) . */
+	private double backgroundCurrent = 13.5;
 
-    /** Add noise to neuron. */
-    private boolean addNoise = false;
+	/** Noise dialog. */
+	private Randomizer noiseGenerator = new Randomizer();
 
-    /** Clipping. */
-    private boolean clipping = false;
+	/** Add noise to neuron. */
+	private boolean addNoise = false;
 
-    /**
-     * {@inheritDoc}
-     */
-    public IntegrateAndFireRule deepCopy() {
-        IntegrateAndFireRule ifn = new IntegrateAndFireRule();
-        ifn.setRestingPotential(getRestingPotential());
-        ifn.setResetPotential(getResetPotential());
-        ifn.setThreshold(getThreshold());
-        ifn.setTimeConstant(getTimeConstant());
-        ifn.setResistance(getResistance());
-        ifn.setClipping(getClipping());
-        ifn.setAddNoise(getAddNoise());
-        ifn.noiseGenerator = new Randomizer(noiseGenerator);
+	/** Clipping. */
+	private boolean clipping = false;
 
-        return ifn;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public IntegrateAndFireRule deepCopy() {
+		IntegrateAndFireRule ifn = new IntegrateAndFireRule();
+		ifn.setRestingPotential(getRestingPotential());
+		ifn.setResetPotential(getResetPotential());
+		ifn.setThreshold(getThreshold());
+		ifn.setTimeConstant(getTimeConstant());
+		ifn.setResistance(getResistance());
+		ifn.setClipping(getClipping());
+		ifn.setAddNoise(getAddNoise());
+		ifn.noiseGenerator = new Randomizer(noiseGenerator);
 
-    /**
-     * {@inheritDoc}
-     */
-    public void update(Neuron neuron) {
-        double inputs = neuron.getWeightedInputs();
+		return ifn;
+	}
 
-        if (addNoise) {
-            inputs += noiseGenerator.getRandom();
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void update(Neuron neuron) {
+		double Isyn = neuron.getWeightedInputs();
 
-        double val = neuron.getActivation()
-                + (neuron.getNetwork().getTimeStep() / timeConstant * (restingPotential
-                        - neuron.getActivation() + (resistance * inputs)));
+		if (addNoise) {
+			Isyn += noiseGenerator.getRandom();
+		}
 
-        if (val > threshold) {
-            setHasSpiked(true);
-            val = resetPotential;
-        } else {
-            setHasSpiked(false);
-        }
+		double timeStep = neuron.getNetwork().getTimeStep();
 
-        if (clipping) {
-            val = neuron.clip(val);
-        }
+		double memPotential = neuron.getActivation();
 
-        neuron.setBuffer(val);
-    }
+		/*
+		 * Formula:
+		 * 
+		 * dV/dt = ( -(Vm - Vr) + Rm * (Isyn + Ibg) ) / tau
+		 * 
+		 * Vm > theta ? Vm <- Vreset ; spike
+		 * 
+		 * Vm: membrane potential Vr: resting potential* Rm: membrane resistance
+		 * Isyn: synaptic input current Ibg: background input current tau: time
+		 * constant Vreset: reset potential theta: threshold
+		 */
 
-    /**
-     * @return Returns the lowerValue.
-     */
-    public double getRestingPotential() {
-        return restingPotential;
-    }
+		double dVm =
+				timeStep
+						* (-(memPotential - restingPotential) + resistance
+								* (Isyn + backgroundCurrent))
+						/ timeConstant;
 
-    /**
-     * @param restingPotential The restingPotential to set.
-     */
-    public void setRestingPotential(final double restingPotential) {
-        this.restingPotential = restingPotential;
-    }
+		memPotential += dVm;
 
-    /**
-     * @return Returns the upperValue.
-     */
-    public double getResistance() {
-        return resistance;
-    }
+		if (memPotential > threshold) {
+			setHasSpiked(true, neuron);
+			memPotential = resetPotential;
+		} else {
+			setHasSpiked(false, neuron);
+		}
 
-    /**
-     * @param resistance The resistance to set.
-     */
-    public void setResistance(final double resistance) {
-        this.resistance = resistance;
-    }
+		if (clipping) {
+			memPotential = neuron.clip(memPotential);
+		}
 
-    /**
-     * @return Returns the lowerValue.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+		neuron.setBuffer(memPotential);
+	}
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
+	/**
+	 * @return Returns the lowerValue.
+	 */
+	public double getRestingPotential() {
+		return restingPotential;
+	}
 
-    /**
-     * @param noise The noise to set.
-     */
-    public void setAddNoise(final Randomizer noise) {
-        this.noiseGenerator = noise;
-    }
+	/**
+	 * @param restingPotential
+	 *            The restingPotential to set.
+	 */
+	public void setRestingPotential(final double restingPotential) {
+		this.restingPotential = restingPotential;
+	}
 
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
+	/**
+	 * @return Returns the upperValue.
+	 */
+	public double getResistance() {
+		return resistance;
+	}
 
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
+	/**
+	 * @param resistance
+	 *            The resistance to set.
+	 */
+	public void setResistance(final double resistance) {
+		this.resistance = resistance;
+	}
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
+	/**
+	 * @return Returns the lowerValue.
+	 */
+	public boolean getAddNoise() {
+		return addNoise;
+	}
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
-    public void setNoiseGenerator(final Randomizer noiseGenerator) {
-        this.noiseGenerator = noiseGenerator;
-    }
+	/**
+	 * @param addNoise
+	 *            The addNoise to set.
+	 */
+	public void setAddNoise(final boolean addNoise) {
+		this.addNoise = addNoise;
+	}
 
-    /**
-     * @return Returns the resetPotential.
-     */
-    public double getResetPotential() {
-        return resetPotential;
-    }
+	/**
+	 * @param noise
+	 *            The noise to set.
+	 */
+	public void setAddNoise(final Randomizer noise) {
+		this.noiseGenerator = noise;
+	}
 
-    /**
-     * @param resetPotential The resetPotential to set.
-     */
-    public void setResetPotential(final double resetPotential) {
-        this.resetPotential = resetPotential;
-    }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean getClipping() {
+		return clipping;
+	}
 
-    /**
-     * @return Returns the threshold.
-     */
-    public double getThreshold() {
-        return threshold;
-    }
+	/**
+	 * @param clipping
+	 *            The clipping to set.
+	 */
+	public void setClipping(final boolean clipping) {
+		this.clipping = clipping;
+	}
 
-    /**
-     * @param threshold The threshold to set.
-     */
-    public void setThreshold(final double threshold) {
-        this.threshold = threshold;
-    }
+	/**
+	 * @return Returns the noiseGenerator.
+	 */
+	public Randomizer getNoiseGenerator() {
+		return noiseGenerator;
+	}
 
-    /**
-     * @return Returns the timeConstant.
-     */
-    public double getTimeConstant() {
-        return timeConstant;
-    }
+	/**
+	 * @param noiseGenerator
+	 *            The noiseGenerator to set.
+	 */
+	public void setNoiseGenerator(final Randomizer noiseGenerator) {
+		this.noiseGenerator = noiseGenerator;
+	}
 
-    /**
-     * @param timeConstant The timeConstant to set.
-     */
-    public void setTimeConstant(final double timeConstant) {
-        this.timeConstant = timeConstant;
-    }
+	/**
+	 * @return Returns the resetPotential.
+	 */
+	public double getResetPotential() {
+		return resetPotential;
+	}
 
-    @Override
-    public String getDescription() {
-        return "Integrate and Fire";
-    }
+	/**
+	 * @param resetPotential
+	 *            The resetPotential to set.
+	 */
+	public void setResetPotential(final double resetPotential) {
+		this.resetPotential = resetPotential;
+	}
+
+	/**
+	 * @return Returns the background current
+	 */
+	public double getBackgroundCurrent() {
+		return backgroundCurrent;
+	}
+
+	/**
+	 * @param backgroundCurrent
+	 *            The background current to set
+	 */
+	public void setBackgroundCurrent(double backgroundCurrent) {
+		this.backgroundCurrent = backgroundCurrent;
+	}
+
+	/**
+	 * @return Returns the threshold.
+	 */
+	public double getThreshold() {
+		return threshold;
+	}
+
+	/**
+	 * @param threshold
+	 *            The threshold to set.
+	 */
+	public void setThreshold(final double threshold) {
+		this.threshold = threshold;
+	}
+
+	/**
+	 * @return Returns the timeConstant.
+	 */
+	public double getTimeConstant() {
+		return timeConstant;
+	}
+
+	/**
+	 * @param timeConstant
+	 *            The timeConstant to set.
+	 */
+	public void setTimeConstant(final double timeConstant) {
+		this.timeConstant = timeConstant;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Integrate and Fire";
+	}
+
+	/**
+	 * Default floor for I&F neurons is 0 {@inheritDoc}
+	 */
+	public void setDefaultParameters(Neuron n) {
+		n.setUpperBound(DEFAULT_CEILING);
+		n.setLowerBound(DEFAULT_FLOOR);
+		n.setIncrement(DEFAULT_INCREMENT);
+	}
+
+	public double getDefaultCeiling() {
+		return threshold;
+	}
+
+	public double getDefaultFloor() {
+		return Double.NEGATIVE_INFINITY;
+	}
+
 }

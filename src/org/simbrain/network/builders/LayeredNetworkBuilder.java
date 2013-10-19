@@ -31,7 +31,7 @@ import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
@@ -39,203 +39,214 @@ import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
  * Adds a layered object to a network. The topology is specified by an array of
  * integers I1...In which correspond to the number of nodes in layers L1...Ln,
  * and where L1 is the input layer and Ln is the output layer.
- *
+ * 
  * @author jeff yoshimi
  */
 public final class LayeredNetworkBuilder {
 
-    // TODO: Possibly abstract core concepts to a superclass
-    // TODO: Default neurons, synapses (input / output special?). upper /lower
-    // bounds
-    // TODO: Possibly add "justification" (right, left, center) field
-    // TODO: Allow Horizontal vs. vertical layout
-    // TODO: Option: within layer recurrence?
+	// TODO: Possibly abstract core concepts to a superclass
+	// TODO: Default neurons, synapses (input / output special?). upper /lower
+	// bounds
+	// TODO: Possibly add "justification" (right, left, center) field
+	// TODO: Allow Horizontal vs. vertical layout
+	// TODO: Option: within layer recurrence?
 
-    /**
-     * Array of integers which determines the number of layers and nodes in each
-     * layer. Integers 1...n in the array correspond to the number of nodes in
-     * layers L1...Ln, and where L1 is the input layer and Ln is the output
-     * layer.
-     */
-    private int[] nodesPerLayer = { 5, 3, 5 };
+	/**
+	 * Array of integers which determines the number of layers and nodes in each
+	 * layer. Integers 1...n in the array correspond to the number of nodes in
+	 * layers L1...Ln, and where L1 is the input layer and Ln is the output
+	 * layer.
+	 */
+	private int[] nodesPerLayer = { 5, 3, 5 };
 
-    /** Space to put between layers. */
-    private int betweenLayerInterval = 100;
+	/** Space to put between layers. */
+	private int betweenLayerInterval = 100;
 
-    /** Space between neurons within a layer. */
-    private int betweenNeuronInterval = 50;
+	/** Space between neurons within a layer. */
+	private int betweenNeuronInterval = 50;
 
-    /** Initial position of network (from bottom left). */
-    Point2D.Double initialPosition = new Point2D.Double(0, 0);
+	/** Initial position of network (from bottom left). */
+	Point2D.Double initialPosition = new Point2D.Double(0, 0);
 
-    /** Whether to put each layer in a neuron group. */
-    private boolean addGroups = true;
+	/** Whether to put each layer in a neuron group. */
+	private boolean addGroups = true;
 
-    /**
-     * Construct the builder.
-     */
-    public LayeredNetworkBuilder() {
-    }
+	/**
+	 * Construct the builder.
+	 */
+	public LayeredNetworkBuilder() {
+	}
 
-    /**
-     * Add the layered network to the specified network.
-     *
-     * @param network the parent network to which the layered network is being
-     *            added
-     */
-    public void buildNetwork(final Network network) {
+	/**
+	 * Add the layered network to the specified network.
+	 * 
+	 * @param network
+	 *            the parent network to which the layered network is being added
+	 */
+	public void buildNetwork(final Network network) {
 
-        // Layout
-        LineLayout layout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
+		// Layout
+		LineLayout layout =
+				new LineLayout(betweenNeuronInterval,
+						LineOrientation.HORIZONTAL);
 
-        // Set up input layer
-        List<Neuron> inputLayer = new ArrayList<Neuron>();
-        for (int i = 0; i < nodesPerLayer[0]; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
-            neuron.setIncrement(1); // For easier testing
-            neuron.setLowerBound(0);
-            network.addNeuron(neuron);
-            inputLayer.add(neuron);
-        }
-        layout.setInitialLocation(new Point((int) initialPosition.getX()
-                - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
-        layout.layoutNeurons(inputLayer);
-        if (addGroups) {
-            NeuronLayer group = new NeuronLayer(network, inputLayer,
-                    LayerType.Input);
-            network.addGroup(group);
-        }
+		// Set up input layer
+		List<Neuron> inputLayer = new ArrayList<Neuron>();
+		for (int i = 0; i < nodesPerLayer[0]; i++) {
+			Neuron neuron = new Neuron(network, new LinearRule());
+			neuron.setIncrement(1); // For easier testing
+			neuron.setLowerBound(0);
+			network.addNeuron(neuron);
+			inputLayer.add(neuron);
+		}
+		layout.setInitialLocation(new Point((int) initialPosition.getX()
+				- getWidth(inputLayer) / 2, (int) initialPosition.getY()));
+		layout.layoutNeurons(inputLayer);
+		if (addGroups) {
+			NeuronLayer group =
+					new NeuronLayer(network, inputLayer, LayerType.Input);
+			network.addGroup(group);
+		}
 
-        // Prepare base synapse for connecting layers
-        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapseRule());
-        synapse.setLowerBound(-10);
-        synapse.setUpperBound(10);
+		// Prepare base synapse for connecting layers
+		Synapse synapse =
+				Synapse.getTemplateSynapse(new ClampedSynapseRule());
+		synapse.setLowerBound(-10);
+		synapse.setUpperBound(10);
 
-        // Memory of last layer created
-        List<Neuron> lastLayer = inputLayer;
+		// Memory of last layer created
+		List<Neuron> lastLayer = inputLayer;
 
-        // Make hidden layers and output layer
-        for (int i = 1; i < nodesPerLayer.length; i++) {
-            List<Neuron> hiddenLayer = new ArrayList<Neuron>();
-            for (int j = 0; j < nodesPerLayer[i]; j++) {
-                Neuron neuron = new Neuron(network, new SigmoidalRule());
-                neuron.setLowerBound(0);
-                neuron.setUpdatePriority(i);
-                network.addNeuron(neuron);
-                hiddenLayer.add(neuron);
-            }
+		// Make hidden layers and output layer
+		for (int i = 1; i < nodesPerLayer.length; i++) {
+			List<Neuron> hiddenLayer = new ArrayList<Neuron>();
+			for (int j = 0; j < nodesPerLayer[i]; j++) {
+				Neuron neuron = new Neuron(network, new SigmoidalRule());
+				neuron.setLowerBound(0);
+				neuron.setUpdatePriority(i);
+				network.addNeuron(neuron);
+				hiddenLayer.add(neuron);
+			}
 
-            int layerWidth = getWidth(hiddenLayer);
-            layout.setInitialLocation(new Point((int) initialPosition.getX()
-                    - layerWidth / 2, (int) initialPosition.getY()
-                    - (betweenLayerInterval * i)));
-            layout.layoutNeurons(hiddenLayer);
-            if (addGroups) {
-                if (i == nodesPerLayer.length - 1) {
-                    NeuronLayer group = new NeuronLayer(network, hiddenLayer,
-                            LayerType.Output);
-                    network.addGroup(group);
-                } else {
-                    NeuronLayer group = new NeuronLayer(network, hiddenLayer,
-                            LayerType.Hidden);
-                    network.addGroup(group);
-                }
-            }
+			int layerWidth = getWidth(hiddenLayer);
+			layout.setInitialLocation(new Point((int) initialPosition
+					.getX() - layerWidth / 2, (int) initialPosition
+					.getY() - (betweenLayerInterval * i)));
+			layout.layoutNeurons(hiddenLayer);
+			if (addGroups) {
+				if (i == nodesPerLayer.length - 1) {
+					NeuronLayer group =
+							new NeuronLayer(network, hiddenLayer,
+									LayerType.Output);
+					network.addGroup(group);
+				} else {
+					NeuronLayer group =
+							new NeuronLayer(network, hiddenLayer,
+									LayerType.Hidden);
+					network.addGroup(group);
+				}
+			}
 
-            // Connect input layer to hidden layer
-            AllToAll connection = new AllToAll(network, lastLayer, hiddenLayer);
-            connection.setBaseExcitatorySynapse(synapse);
-            connection.setBaseInhibitorySynapse(synapse);
-            connection.connectNeurons(false);
+			// Connect input layer to hidden layer
+			AllToAll connection =
+					new AllToAll(network, lastLayer, hiddenLayer);
+			connection.setBaseExcitatorySynapse(synapse);
+			connection.setBaseInhibitorySynapse(synapse);
+			connection.connectNeurons(false);
 
-            // Reset last layer
-            lastLayer = hiddenLayer;
-        }
+			// Reset last layer
+			lastLayer = hiddenLayer;
+		}
 
-        // Randomize weights
-        network.randomizeWeights();
+		// Randomize weights
+		network.randomizeWeights();
 
-    }
+	}
 
-    /**
-     * Return the width of the specified layer, in pixels.
-     *
-     * @param layer layer to "measure"
-     * @return width of layer
-     */
-    private int getWidth(List<Neuron> layer) {
-        return layer.size() * betweenNeuronInterval;
-    }
+	/**
+	 * Return the width of the specified layer, in pixels.
+	 * 
+	 * @param layer
+	 *            layer to "measure"
+	 * @return width of layer
+	 */
+	private int getWidth(List<Neuron> layer) {
+		return layer.size() * betweenNeuronInterval;
+	}
 
-    /**
-     * @return the nodesPerLayer
-     */
-    public int[] getNodesPerLayer() {
-        return nodesPerLayer;
-    }
+	/**
+	 * @return the nodesPerLayer
+	 */
+	public int[] getNodesPerLayer() {
+		return nodesPerLayer;
+	}
 
-    /**
-     * @param nodesPerLayer the nodesPerLayer to set
-     */
-    public void setNodesPerLayer(int[] nodesPerLayer) {
-        this.nodesPerLayer = nodesPerLayer;
-    }
+	/**
+	 * @param nodesPerLayer
+	 *            the nodesPerLayer to set
+	 */
+	public void setNodesPerLayer(int[] nodesPerLayer) {
+		this.nodesPerLayer = nodesPerLayer;
+	}
 
-    /**
-     * @return the betweenLayerInterval
-     */
-    public int getBetweenLayerInterval() {
-        return betweenLayerInterval;
-    }
+	/**
+	 * @return the betweenLayerInterval
+	 */
+	public int getBetweenLayerInterval() {
+		return betweenLayerInterval;
+	}
 
-    /**
-     * @param betweenLayerInterval the betweenLayerInterval to set
-     */
-    public void setBetweenLayerInterval(int betweenLayerInterval) {
-        this.betweenLayerInterval = betweenLayerInterval;
-    }
+	/**
+	 * @param betweenLayerInterval
+	 *            the betweenLayerInterval to set
+	 */
+	public void setBetweenLayerInterval(int betweenLayerInterval) {
+		this.betweenLayerInterval = betweenLayerInterval;
+	}
 
-    /**
-     * @return the betweenNeuronInterval
-     */
-    public int getBetweenNeuronInterval() {
-        return betweenNeuronInterval;
-    }
+	/**
+	 * @return the betweenNeuronInterval
+	 */
+	public int getBetweenNeuronInterval() {
+		return betweenNeuronInterval;
+	}
 
-    /**
-     * @param betweenNeuronInterval the betweenNeuronInterval to set
-     */
-    public void setBetweenNeuronInterval(int betweenNeuronInterval) {
-        this.betweenNeuronInterval = betweenNeuronInterval;
-    }
+	/**
+	 * @param betweenNeuronInterval
+	 *            the betweenNeuronInterval to set
+	 */
+	public void setBetweenNeuronInterval(int betweenNeuronInterval) {
+		this.betweenNeuronInterval = betweenNeuronInterval;
+	}
 
-    /**
-     * @return the initialPosition
-     */
-    public Point2D.Double getInitialPosition() {
-        return initialPosition;
-    }
+	/**
+	 * @return the initialPosition
+	 */
+	public Point2D.Double getInitialPosition() {
+		return initialPosition;
+	}
 
-    /**
-     * @param initialPosition the initialPosition to set
-     */
-    public void setInitialPosition(Point2D.Double initialPosition) {
-        this.initialPosition = initialPosition;
-    }
+	/**
+	 * @param initialPosition
+	 *            the initialPosition to set
+	 */
+	public void setInitialPosition(Point2D.Double initialPosition) {
+		this.initialPosition = initialPosition;
+	}
 
-    /**
-     * @return the addGroups
-     */
-    public boolean isAddGroups() {
-        return addGroups;
-    }
+	/**
+	 * @return the addGroups
+	 */
+	public boolean isAddGroups() {
+		return addGroups;
+	}
 
-    /**
-     * @param addGroups the addGroups to set
-     */
-    public void setAddGroups(boolean addGroups) {
-        this.addGroups = addGroups;
-    }
+	/**
+	 * @param addGroups
+	 *            the addGroups to set
+	 */
+	public void setAddGroups(boolean addGroups) {
+		this.addGroups = addGroups;
+	}
 
 }

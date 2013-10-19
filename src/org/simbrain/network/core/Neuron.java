@@ -28,7 +28,6 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.BinaryRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ClampedNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.DecayRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.IACRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.IntegrateAndFireRulePanel;
@@ -36,15 +35,11 @@ import org.simbrain.network.gui.dialogs.neuron.rule_panels.IzhikevichRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.LinearRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.NakaRushtonRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.PointNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.RandomNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SinusoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.StochasticRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
@@ -52,11 +47,8 @@ import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
-import org.simbrain.network.neuron_update_rules.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.neuron_update_rules.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
-import org.simbrain.network.neuron_update_rules.StochasticRule;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 
 /**
@@ -127,79 +119,79 @@ public class Neuron {
 	 */
 	private int updatePriority = 0;
 
-	/** Associated between names of rules and panels for editing them. */
-	public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
+	/** Associations between names of rules and panels for editing them. */
+	public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
+			new LinkedHashMap<String, AbstractNeuronPanel>();
 
-	/**
-	 * Initializes the rule map.
+	/*
+	 * Populate the Rule Map
 	 */
-	private void initRuleMap() {
-		RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
-		RULE_MAP.put(new ClampedNeuronRule().getDescription(),
-				new ClampedNeuronRulePanel());
-		RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel(
-				parent));
+	static {
+		RULE_MAP.put(new BinaryRule().getDescription(),
+				new BinaryRulePanel());
+		RULE_MAP.put(new DecayRule().getDescription(),
+				new DecayRulePanel());
 		RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
 		RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
 				new IntegrateAndFireRulePanel());
 		RULE_MAP.put(new IzhikevichRule().getDescription(),
 				new IzhikevichRulePanel());
-		RULE_MAP.put(new LinearRule().getDescription(), new LinearRulePanel());
+		RULE_MAP.put(new LinearRule().getDescription(),
+				new LinearRulePanel());
 		RULE_MAP.put(new NakaRushtonRule().getDescription(),
 				new NakaRushtonRulePanel());
 		RULE_MAP.put(new PointNeuronRule().getDescription(),
 				new PointNeuronRulePanel());
-		RULE_MAP.put(new RandomNeuronRule().getDescription(),
-				new RandomNeuronRulePanel());
 		RULE_MAP.put(new SigmoidalRule().getDescription(),
 				new SigmoidalRulePanel());
-		RULE_MAP.put(new SinusoidalRule().getDescription(),
-				new SinusoidalRulePanel());
 		RULE_MAP.put(new SpikingThresholdRule().getDescription(),
 				new SpikingThresholdRulePanel());
-		RULE_MAP.put(new StochasticRule().getDescription(),
-				new StochasticRulePanel());
 		RULE_MAP.put(new ThreeValueRule().getDescription(),
 				new ThreeValueRulePanel());
 	}
 
 	/**
 	 * Construct a specific type of neuron from a string description.
-	 *
-	 * @param parent The parent network. Be careful not to set this to root
-	 *            network if the root network is not the parent.
-	 * @param updateRule the update method
+	 * 
+	 * @param parent
+	 *            The parent network. Be careful not to set this to root network
+	 *            if the root network is not the parent.
+	 * @param updateRule
+	 *            the update method
 	 */
 	public Neuron(final Network parent, final String updateRule) {
 		this.parent = parent;
 		setUpdateRule(updateRule);
-		initRuleMap();
 	}
 
 	/**
 	 * Construct a specific type of neuron.
-	 *
-	 * @param parent The parent network. Be careful not to set this to root
-	 *            network if the root network is not the parent.
-	 * @param updateRule the update method
+	 * 
+	 * @param parent
+	 *            The parent network. Be careful not to set this to root network
+	 *            if the root network is not the parent.
+	 * @param updateRule
+	 *            the update method
 	 */
 	public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
 		this.parent = parent;
 		setUpdateRule(updateRule);
-		initRuleMap();
 	}
 
 	/**
 	 * Copy constructor.
-	 *
-	 * @param parent The parent network. Be careful not to set this to root
-	 *            network if the root network is not the parent.
-	 * @param n Neuron
+	 * 
+	 * @param parent
+	 *            The parent network. Be careful not to set this to root network
+	 *            if the root network is not the parent.
+	 * @param n
+	 *            Neuron
 	 */
 	public Neuron(final Network parent, final Neuron n) {
 		this.parent = parent;
+		setClamped(n.isClamped());
 		setUpdateRule(n.getUpdateRule().deepCopy());
-		setActivation(n.getActivation());
+		forceSetActivation(n.getActivation());
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
 		setIncrement(n.getIncrement());
@@ -208,7 +200,6 @@ public class Neuron {
 		setY(n.getY());
 		setUpdatePriority(n.getUpdatePriority());
 		setLabel(n.getLabel());
-		initRuleMap();
 	}
 
 	/**
@@ -219,12 +210,11 @@ public class Neuron {
 		// TODO: Add checks?
 		fanOut = new ArrayList<Synapse>();
 		fanIn = new ArrayList<Synapse>();
-		initRuleMap();
 	}
 
 	/**
 	 * Returns the time type of this neuron's update rule.
-	 *
+	 * 
 	 * @return the time type.
 	 */
 	public TimeType getTimeType() {
@@ -233,7 +223,7 @@ public class Neuron {
 
 	/**
 	 * Returns the current update rule.
-	 *
+	 * 
 	 * @return the neuronUpdateRule
 	 */
 	public NeuronUpdateRule getUpdateRule() {
@@ -243,21 +233,24 @@ public class Neuron {
 	/**
 	 * Sets the update rule using a String description. The provided description
 	 * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-	 *
-	 * @param name the "simple name" of the class associated with the neuron
-	 *            rule to set.
+	 * 
+	 * @param name
+	 *            the "simple name" of the class associated with the neuron rule
+	 *            to set.
 	 */
 	public void setUpdateRule(String name) {
 		try {
-			NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName(
-					"org.simbrain.network.neuron_update_rules." + name)
-					.newInstance();
+			NeuronUpdateRule newRule =
+					(NeuronUpdateRule) Class.forName(
+							"org.simbrain.network.neuron_update_rules."
+									+ name).newInstance();
 			setUpdateRule(newRule);
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(
-					"The provided neuron rule name, \"" + name
-					+ "\", does not correspond to a known neuron type."
-					+ "\n Could not find " + e.getMessage());
+					"The provided neuron rule name, \""
+							+ name
+							+ "\", does not correspond to a known neuron type."
+							+ "\n Could not find " + e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -265,8 +258,9 @@ public class Neuron {
 
 	/**
 	 * Set a new update rule. Essentially like changing the type of the network.
-	 *
-	 * @param updateRule the neuronUpdateRule to set
+	 * 
+	 * @param updateRule
+	 *            the neuronUpdateRule to set
 	 */
 	public void setUpdateRule(final NeuronUpdateRule updateRule) {
 		NeuronUpdateRule oldRule = updateRule;
@@ -278,32 +272,45 @@ public class Neuron {
 			getNetwork().updateTimeType();
 			getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
 		}
-		updateRule.init(this);
 	}
 
 	/**
 	 * Updates neuron.
 	 */
 	public void update() {
+		if (isClamped())
+			return;
 		updateRule.update(this);
 	}
 
 	/**
-	 * Initialize when changing update method.
+	 * Sets the activation of the neuron if it is not clamped. To unequivocally
+	 * set the activation use {@link #forceSetActivation(double)
+	 * forceSetActivation(double)}. Under normal circumstances model classes
+	 * usually exclusively, and GUI classes should never use this method to set
+	 * neuron activations.
+	 * 
+	 * @param act
+	 *            Activation
 	 */
-	public void init() {
-		updateRule.init(this);
+	public void setActivation(final double act) {
+		if (isClamped()) {
+			setBuffer(act);
+			return;
+		}
+		activation = act;
 	}
 
 	/**
-	 * Sets the activation of the neuron.
-	 *
-	 * @param act Activation
+	 * Sets the activation of the neuron regardless of the state of the neuron.
+	 * Under normal circumstances GUI classes should exclusively, and model
+	 * classes usually shouldn't use this method to set neuron activations.
+	 * Notable exceptions to this include copy constructors and randomizers.
+	 * 
+	 * @param act
 	 */
-	public void setActivation(final double act) {
-		if (!clamped) {
-			activation = act;
-		}
+	public void forceSetActivation(final double act) {
+		activation = act;
 	}
 
 	/**
@@ -322,8 +329,9 @@ public class Neuron {
 
 	/**
 	 * Sets the id of the neuron.
-	 *
-	 * @param theName Neuron id
+	 * 
+	 * @param theName
+	 *            Neuron id
 	 */
 	public void setId(final String theName) {
 		id = theName;
@@ -338,8 +346,9 @@ public class Neuron {
 
 	/**
 	 * Sets the upper bound of the neuron.
-	 *
-	 * @param d Value to set upper bound
+	 * 
+	 * @param d
+	 *            Value to set upper bound
 	 */
 	public void setUpperBound(final double d) {
 		upperBound = d;
@@ -354,8 +363,9 @@ public class Neuron {
 
 	/**
 	 * Sets the lower bound of the neuron.
-	 *
-	 * @param d Value to set lower bound
+	 * 
+	 * @param d
+	 *            Value to set lower bound
 	 */
 	public void setLowerBound(final double d) {
 		lowerBound = d;
@@ -370,8 +380,9 @@ public class Neuron {
 
 	/**
 	 * Sets the neuron increment.
-	 *
-	 * @param d Value to set increment
+	 * 
+	 * @param d
+	 *            Value to set increment
 	 */
 	public void setIncrement(final double d) {
 		increment = d;
@@ -413,8 +424,9 @@ public class Neuron {
 
 	/**
 	 * Connect this neuron to target neuron via a weight.
-	 *
-	 * @param target the connection between this neuron and a target neuron
+	 * 
+	 * @param target
+	 *            the connection between this neuron and a target neuron
 	 */
 	void addTarget(final Synapse target) {
 		if (fanOut != null) {
@@ -424,8 +436,9 @@ public class Neuron {
 
 	/**
 	 * Remove this neuron from target neuron via a weight.
-	 *
-	 * @param target the connection between this neuron and a target neuron
+	 * 
+	 * @param target
+	 *            the connection between this neuron and a target neuron
 	 */
 	void removeTarget(final Synapse target) {
 		if (fanOut != null) {
@@ -435,8 +448,9 @@ public class Neuron {
 
 	/**
 	 * Connect this neuron to source neuron via a weight.
-	 *
-	 * @param source the connection between this neuron and a source neuron
+	 * 
+	 * @param source
+	 *            the connection between this neuron and a source neuron
 	 */
 	void addSource(final Synapse source) {
 		if (fanIn != null) {
@@ -446,8 +460,9 @@ public class Neuron {
 
 	/**
 	 * Remove this neuron from source neuron via a weight.
-	 *
-	 * @param source the connection between this neuron and a source neuron
+	 * 
+	 * @param source
+	 *            the connection between this neuron and a source neuron
 	 */
 	void removeSource(final Synapse source) {
 		if (fanIn != null) {
@@ -457,7 +472,7 @@ public class Neuron {
 
 	/**
 	 * Sums the weighted signals that are sent to this node.
-	 *
+	 * 
 	 * @return weighted input to this node
 	 */
 	public double getWeightedInputs() {
@@ -481,13 +496,13 @@ public class Neuron {
 	 * Randomize this neuron to a value between upperBound and lowerBound.
 	 */
 	public void randomize() {
-		setActivation(getRandomValue());
+		forceSetActivation(getRandomValue());
 		getNetwork().fireNeuronChanged(this);
 	}
 
 	/**
 	 * Returns a random value between the upper and lower bounds of this neuron.
-	 *
+	 * 
 	 * @return the random value.
 	 */
 	public double getRandomValue() {
@@ -503,11 +518,12 @@ public class Neuron {
 
 	/**
 	 * Round the activation level of this neuron off to a specified precision.
-	 *
-	 * @param precision precision to round this neuron's activation off to
+	 * 
+	 * @param precision
+	 *            precision to round this neuron's activation off to
 	 */
 	public void round(final int precision) {
-		setActivation(Network.round(getActivation(), precision));
+		forceSetActivation(Network.round(getActivation(), precision));
 	}
 
 	/**
@@ -519,8 +535,9 @@ public class Neuron {
 
 	/**
 	 * If value is above or below its bounds set it to those bounds.
-	 *
-	 * @param value Value to check
+	 * 
+	 * @param value
+	 *            Value to check
 	 * @return clip
 	 */
 	public double clip(final double value) {
@@ -558,7 +575,7 @@ public class Neuron {
 
 	/**
 	 * Returns the root network this neuron is embedded in.
-	 *
+	 * 
 	 * @return root network.
 	 */
 	public Network getNetwork() {
@@ -568,8 +585,9 @@ public class Neuron {
 	/**
 	 * Temporary buffer which can be used for algorithms which should not depend
 	 * on the order in which neurons are updated.
-	 *
-	 * @param d temporary value
+	 * 
+	 * @param d
+	 *            temporary value
 	 */
 	public void setBuffer(final double d) {
 		buffer = d;
@@ -590,7 +608,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param inputValue The inputValue to set.
+	 * @param inputValue
+	 *            The inputValue to set.
 	 */
 	public void setInputValue(final double inputValue) {
 		this.inputValue = inputValue;
@@ -600,7 +619,7 @@ public class Neuron {
 	 * The name of the update rule of this neuron; it's "type". Used via
 	 * reflection for consistency checking in the gui. (Open multiple neurons
 	 * and if they are of the different types the dialog is different).
-	 *
+	 * 
 	 * @return the name of the class of this network.
 	 */
 	public String getType() {
@@ -609,7 +628,7 @@ public class Neuron {
 
 	/**
 	 * Returns the sum of the strengths of the weights attaching to this neuron.
-	 *
+	 * 
 	 * @return the sum of the incoming weights to this neuron.
 	 */
 	public double getSummedIncomingWeights() {
@@ -626,8 +645,9 @@ public class Neuron {
 	/**
 	 * Returns the number of neurons attaching to this one which have activity
 	 * above a specified threshold.
-	 *
-	 * @param threshold value above which neurons are considered "active."
+	 * 
+	 * @param threshold
+	 *            value above which neurons are considered "active."
 	 * @return number of "active" neurons
 	 */
 	public int getNumberOfActiveInputs(final int threshold) {
@@ -663,8 +683,9 @@ public class Neuron {
 
 	/**
 	 * True if the synapse is connected to this neuron, false otherwise.
-	 *
-	 * @param s the synapse to check.
+	 * 
+	 * @param s
+	 *            the synapse to check.
 	 * @return true if synapse is connected, false otherwise.
 	 */
 	public boolean isConnected(final Synapse s) {
@@ -686,7 +707,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param x The x coordinate to set.
+	 * @param x
+	 *            The x coordinate to set.
 	 */
 	public void setX(final double x) {
 		this.x = x;
@@ -698,7 +720,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param y The y coordinate to set.
+	 * @param y
+	 *            The y coordinate to set.
 	 */
 	public void setY(final double y) {
 		this.y = y;
@@ -709,9 +732,11 @@ public class Neuron {
 
 	/**
 	 * Set position.
-	 *
-	 * @param x x coordinate
-	 * @param y y coordinate
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
 	 */
 	public void setLocation(final double x, final double y) {
 		setX(x);
@@ -746,9 +771,9 @@ public class Neuron {
 
 	@Override
 	public String toString() {
-		return "Neuron [" + getId() + "] " + getType() + "  Activation = "
-				+ this.getActivation() + "  Location = (" + this.x + ","
-				+ this.y + ")";
+		return "Neuron [" + getId() + "] " + getType()
+				+ "  Activation = " + this.getActivation()
+				+ "  Location = (" + this.x + "," + this.y + ")";
 	}
 
 	/**
@@ -761,7 +786,7 @@ public class Neuron {
 	/**
 	 * Forward to update rule's tool tip method, which returns string for tool
 	 * tip or short description.
-	 *
+	 * 
 	 * @return tool tip text
 	 */
 	public String getToolTipText() {
@@ -777,8 +802,9 @@ public class Neuron {
 
 	/**
 	 * Set target value.
-	 *
-	 * @param targetValue value to set.
+	 * 
+	 * @param targetValue
+	 *            value to set.
 	 */
 	public void setTargetValue(final double targetValue) {
 		this.targetValue = targetValue;
@@ -792,7 +818,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param updatePriority to set.
+	 * @param updatePriority
+	 *            to set.
 	 */
 	public void setUpdatePriority(final int updatePriority) {
 		this.updatePriority = updatePriority;
@@ -812,8 +839,9 @@ public class Neuron {
 
 	/**
 	 * Toggles whether this neuron is clamped.
-	 *
-	 * @param clamped Whether this neuron is to be clamped.
+	 * 
+	 * @param clamped
+	 *            Whether this neuron is to be clamped.
 	 */
 	public void setClamped(final boolean clamped) {
 		this.clamped = clamped;
@@ -827,7 +855,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param label the label to set
+	 * @param label
+	 *            the label to set
 	 */
 	public void setLabel(final String label) {
 		this.label = label;
@@ -836,7 +865,7 @@ public class Neuron {
 
 	/**
 	 * Returns position as a 2-d point.
-	 *
+	 * 
 	 * @return point representation of neuron position.
 	 */
 	public Point2D getPosition() {
@@ -845,8 +874,9 @@ public class Neuron {
 
 	/**
 	 * Set position of neuron using a point object.
-	 *
-	 * @param position point location of neuron
+	 * 
+	 * @param position
+	 *            point location of neuron
 	 */
 	public void setPosition(Point2D position) {
 		this.setX(position.getX());
@@ -856,14 +886,16 @@ public class Neuron {
 	/**
 	 * If this neuron has a bias field, randomize it within the specified
 	 * bounds.
-	 *
-	 * @param lower lower bound for randomization.
-	 * @param upper upper bound for randomization.
+	 * 
+	 * @param lower
+	 *            lower bound for randomization.
+	 * @param upper
+	 *            upper bound for randomization.
 	 * */
 	public void randomizeBias(double lower, double upper) {
 		if (this.getUpdateRule() instanceof BiasedUpdateRule) {
-			((BiasedUpdateRule) this.getUpdateRule()).setBias((upper - lower)
-					* Math.random() + lower);
+			((BiasedUpdateRule) this.getUpdateRule())
+					.setBias((upper - lower) * Math.random() + lower);
 		}
 	}
 
@@ -893,16 +925,18 @@ public class Neuron {
 	}
 
 	/**
-	 * A method that returns a list of all the neuron update rules
-	 * associated with a list of neurons.
-	 *
-	 * @param neuronList The list of neurons whose update rules we want to
-	 *            query.
-	 * @return Returns a list of neuron update rules associated with a
-	 *         group of neurons
+	 * A method that returns a list of all the neuron update rules associated
+	 * with a list of neurons.
+	 * 
+	 * @param neuronList
+	 *            The list of neurons whose update rules we want to query.
+	 * @return Returns a list of neuron update rules associated with a group of
+	 *         neurons
 	 */
-	public static List<NeuronUpdateRule> getRuleList(List<Neuron> neuronList) {
-		List<NeuronUpdateRule> ruleSet = new ArrayList<NeuronUpdateRule>();
+	public static List<NeuronUpdateRule> getRuleList(
+			List<Neuron> neuronList) {
+		List<NeuronUpdateRule> ruleSet =
+				new ArrayList<NeuronUpdateRule>();
 
 		for (Neuron n : neuronList) {
 			ruleSet.add(n.getUpdateRule());
@@ -912,7 +946,7 @@ public class Neuron {
 
 	/**
 	 * TODO: Possibly make this be a NeuronGroup. See design notes.
-	 *
+	 * 
 	 * @return the parentGroup
 	 */
 	public Group getParentGroup() {
@@ -920,7 +954,8 @@ public class Neuron {
 	}
 
 	/**
-	 * @param parentGroup the parentGroup to set
+	 * @param parentGroup
+	 *            the parentGroup to set
 	 */
 	public void setParentGroup(Group parentGroup) {
 		this.parentGroup = parentGroup;

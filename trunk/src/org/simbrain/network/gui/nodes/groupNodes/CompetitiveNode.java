@@ -21,17 +21,11 @@ package org.simbrain.network.gui.nodes.groupNodes;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesDialog;
-import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
-import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.subnetworks.Competitive;
-import org.simbrain.network.subnetworks.Hopfield;
 
 /**
  * PNode representation of Competitive network.
@@ -48,7 +42,6 @@ public class CompetitiveNode extends NeuronGroupNode {
      */
     public CompetitiveNode(final NetworkPanel networkPanel, final Competitive group) {
         super(networkPanel, group);
-        setInteractionBox(new CompetitiveInteractionBox(networkPanel));
         setContextMenu();
         //setOutlinePadding(15f);
 //        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
@@ -72,52 +65,11 @@ public class CompetitiveNode extends NeuronGroupNode {
     }
 
     /**
-     * Custom interaction box for Competitive network node.
-     */
-    private class CompetitiveInteractionBox extends InteractionBox {
-        public CompetitiveInteractionBox(NetworkPanel net) {
-            super(net, CompetitiveNode.this);
-        }
-
-//        @Override
-//        protected String getToolTipText() {
-//            return "Current learning rate: "
-//                    + Utils.round(((Competitive) getGroup()).getAlpha(), 2)
-//                    + "  Current neighborhood size: "
-//                    + Utils.round(((SOM) getGroup()).getNeighborhoodSize(), 2);
-//        }
-
-        @Override
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
-        @Override
-        protected JDialog getPropertyDialog() {
-            return new CompetitivePropertiesDialog((Competitive) getGroup());
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return false;
-        }
-    };
-
-    /**
      * Sets custom menu for competitive node.
      */
     protected void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
-        Action editNet = new AbstractAction("Set Competitive Network Properties...") {
-            public void actionPerformed(final ActionEvent event) {
-                CompetitivePropertiesDialog dialog = new CompetitivePropertiesDialog((Competitive) getGroup());
-                dialog.setLocationRelativeTo(null);
-                dialog.pack();
-                dialog.setVisible(true);
-            }
-        };
-        menu.add(new JMenuItem(editNet));
         menu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
                 ((Competitive) getGroup()).randomize();
@@ -125,17 +77,6 @@ public class CompetitiveNode extends NeuronGroupNode {
                         .fireNetworkChanged();
             }
         }));
-//        menu.add(new JMenuItem(new AbstractAction("Train SOM Network...") {
-//            // TODO: Integrate below in to training framework?
-//            public void actionPerformed(final ActionEvent event) {
-//                JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
-//                propertyDialog.pack();
-//                propertyDialog.setLocationRelativeTo(null);
-//                propertyDialog.setVisible(true);
-//                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
-//            }
-//        }));
-
         setContextMenu(menu);
     }
 

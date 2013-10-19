@@ -50,39 +50,9 @@ public class HopfieldNode extends SubnetworkNode {
     public HopfieldNode(NetworkPanel networkPanel, Hopfield group) {
         super(networkPanel, group);
         // setStrokePaint(Color.green);
-        setInteractionBox(new HopfieldInteractionBox(networkPanel));
         setContextMenu();
-        //setOutlinePadding(15f);
+        // setOutlinePadding(15f);
     }
-
-    /**
-     * Custom interaction box for Hopfield group node.
-     */
-    private class HopfieldInteractionBox extends InteractionBox {
-        public HopfieldInteractionBox(NetworkPanel net) {
-            super(net, HopfieldNode.this);
-        }
-
-        @Override
-        protected JDialog getPropertyDialog() {
-            return new HopfieldPropertiesDialog((Hopfield) getGroup());
-        }
-
-        @Override
-        protected String getToolTipText() {
-            return "Hopfield network.";
-        }
-
-        @Override
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-    };
 
     /**
      * Sets custom menu for Hopfield node.
@@ -90,9 +60,11 @@ public class HopfieldNode extends SubnetworkNode {
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
-        Action editNet = new AbstractAction("Set Hopfield Network Properties...") {
+        Action editNet = new AbstractAction(
+                "Set Hopfield Network Properties...") {
             public void actionPerformed(final ActionEvent event) {
-                HopfieldPropertiesDialog dialog = new HopfieldPropertiesDialog((Hopfield) getGroup());
+                HopfieldPropertiesDialog dialog = new HopfieldPropertiesDialog(
+                        (Hopfield) getGroup());
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -112,7 +84,6 @@ public class HopfieldNode extends SubnetworkNode {
         };
         menu.add(new JMenuItem(randWeights));
         setContextMenu(menu);
-    }    
-
+    }
 
 }

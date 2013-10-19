@@ -54,29 +54,8 @@ public class LMSNetworkNode extends SubnetworkNode {
      */
     public LMSNetworkNode(NetworkPanel networkPanel, LMSNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new LMSInteractionBox(networkPanel));
         setContextMenu();
     }
-
-    /**
-     * Custom interaction box for LMS group node.
-     */
-    private class LMSInteractionBox extends InteractionBox {
-        public LMSInteractionBox(NetworkPanel net) {
-            super(net, LMSNetworkNode.this);
-        }
-
-        @Override
-        protected String getToolTipText() {
-            return "LMS...";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-    };
 
     /**
      * Sets custom menu.

@@ -24,21 +24,28 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
-import org.simbrain.util.StandardDialog;
 
 /**
- * <b>CompetitivePropertiesDialog</b> is a dialog box for setting the properties
+ * <b>CompetitivePropertiesDialog</b> is a panel box for setting the properties
  * of a competitive network.
- *
  */
-public class CompetitivePropertiesDialog extends StandardDialog implements
-        ActionListener {
+public class CompetitivePropertiesPanel extends JPanel implements
+        ActionListener, GroupPropertiesPanel {
+
+    /** Default number of neurons. */
+    private static final int DEFAULT_NUM_NEURONS = 5;
+
+    /** Parent Network Panel. */
+    private NetworkPanel networkPanel;
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -46,6 +53,9 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
     /** Update method. */
     private JComboBox updateMethod = new JComboBox(
             Competitive.UpdateMethod.values());
+
+    /** Number of neurons field. */
+    private JTextField tfNumNeurons = new JTextField();
 
     /** Epsilon value field. */
     private JTextField tfEpsilon = new JTextField();
@@ -77,16 +87,27 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
     /** Show Help Action. */
     private ShowHelpAction helpAction;
 
+    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
+
     /**
      * Default constructor.
      *
+     * @param isCreationPanel if true this is being used to create a new
+     *            competitive network
      * @param competitive Competitive network being modified.
      */
-    public CompetitivePropertiesDialog(final Competitive competitive) {
-        this.competitive = competitive;
-        setTitle("Set Competitive Properties");
+    public CompetitivePropertiesPanel(final NetworkPanel np, final boolean isCreationPanel,
+            final Competitive competitive) {
 
-        this.addButton(helpButton);
+        this.networkPanel = np;
+        this.competitive = competitive;
+        this.isCreationPanel = isCreationPanel;
+
+        if (isCreationPanel) {
+            mainPanel.addItem("Number of neurons", tfNumNeurons);
+        }
+
         mainPanel.addItem("UpdateMethod", updateMethod);
         mainPanel.addItem("Epsilon", tfEpsilon);
         mainPanel.addItem("Winner Value", tfWinnerValue);
@@ -95,6 +116,7 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
         mainPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
         mainPanel.addItem("Normalize Inputs", cbNormalizeInputs);
         mainPanel.addItem("Synapse Decay Percent", tfSynpaseDecayPercent);
+        //this.addButton(helpButton); //TODO
 
         updateMethod.addActionListener(new ActionListener() {
             @Override
@@ -114,13 +136,15 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
 
         fillFieldValues();
 
-        setContentPane(mainPanel);
+        add(mainPanel);
     }
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
+    @Override
+    public void commitChanges() {
+        if (isCreationPanel) {
+            competitive = new Competitive(networkPanel.getNetwork(),
+                    Integer.parseInt(tfNumNeurons.getText()));
+        }
         competitive.setUpdateMethod((UpdateMethod) updateMethod
                 .getSelectedItem());
         competitive.setLearningRate(Double.parseDouble(tfEpsilon.getText()));
@@ -132,18 +156,20 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
                 .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
-        super.closeDialogOk();
     }
 
-    /**
-     * Populate fields with current data.
-     */
+    @Override
     public void fillFieldValues() {
+        if (isCreationPanel) {
+            competitive = new Competitive(null, 1);
+            tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
+        }
         updateMethod.setSelectedItem(competitive.getUpdateMethod());
         tfEpsilon.setText(Double.toString(competitive.getLearningRate()));
         tfLoserValue.setText(Double.toString(competitive.getLoseValue()));
         tfWinnerValue.setText(Double.toString(competitive.getWinValue()));
-        tfLeakyEpsilon.setText(Double.toString(competitive.getLeakyLearningRate()));
+        tfLeakyEpsilon.setText(Double.toString(competitive
+                .getLeakyLearningRate()));
         tfSynpaseDecayPercent.setText(Double.toString(competitive
                 .getSynpaseDecayPercent()));
         cbUseLeakyLearning.setSelected(competitive.getUseLeakyLearning());
@@ -183,4 +209,16 @@ public class CompetitivePropertiesDialog extends StandardDialog implements
             tfLeakyEpsilon.setEnabled(false);
         }
     }
+
+    /**
+     * For use in creation.
+     */
+    public Competitive getNetwork() {
+        if (!isCreationPanel) {
+            return null; // Should not be called in that case!
+        } else {
+            return competitive;
+        }
+    }
+
 }

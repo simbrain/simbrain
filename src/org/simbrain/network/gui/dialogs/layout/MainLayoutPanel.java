@@ -39,207 +39,202 @@ import org.simbrain.util.DropDownTriangle.UpDirection;
  * user switch between layout types and optionally displays the layout panels
  * accordingly. Designed to be a complete panel for setting layouts which can
  * easily be added to any panel/dialog in Simbrain.
- * 
- * 
+ *
  * @author ztosi
- * 
+ *
  */
 public class MainLayoutPanel extends JPanel {
 
-	/** Default Visibility of layout parameters. */
-	private static final boolean DEFAULT_DP_TRIANGLE_VISIBILITY = true;
+    /** Default Visibility of layout parameters. */
+    private static final boolean DEFAULT_DP_TRIANGLE_VISIBILITY = true;
 
-	/** Default starting layout (Grid Layout). */
-	private static final String DEFAULT_INITIAL_LAYOUT = new GridLayout()
-			.getDescription();
+    /** Default starting layout (Grid Layout). */
+    private static final String DEFAULT_INITIAL_LAYOUT = new GridLayout()
+            .getDescription();
 
-	/** A holder for the currently displayed panel. */
-	private AbstractLayoutPanel layoutPanel;
+    /** A holder for the currently displayed panel. */
+    private AbstractLayoutPanel layoutPanel;
 
-	/** A map tying layout panels to their names for use in a combo box . */
-	private final LinkedHashMap<String, AbstractLayoutPanel> panel_map =
-			new LinkedHashMap<String, AbstractLayoutPanel>();
+    /** A map tying layout panels to their names for use in a combo box . */
+    private final LinkedHashMap<String, AbstractLayoutPanel> panel_map = new LinkedHashMap<String, AbstractLayoutPanel>();
 
-	{
-		// Populate the panel map
-		panel_map.put(new GridLayout().getDescription(),
-				new GridLayoutPanel(new GridLayout()));
-		panel_map.put(new LineLayout().getDescription(),
-				new LineLayoutPanel(new LineLayout()));
-		panel_map.put(new HexagonalGridLayout().getDescription(),
-				new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
-	}
+    {
+        // Populate the panel map
+        panel_map.put(new GridLayout().getDescription(), new GridLayoutPanel(
+                new GridLayout()));
+        panel_map.put(new LineLayout().getDescription(), new LineLayoutPanel(
+                new LineLayout()));
+        panel_map.put(new HexagonalGridLayout().getDescription(),
+                new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
+    }
 
-	/** A combo box for selecting the type of layout. */
-	private final JComboBox<String> layoutCb = new JComboBox<String>(
-			panel_map.keySet().toArray(new String[panel_map.size()]));
+    /** A combo box for selecting the type of layout. */
+    private final JComboBox<String> layoutCb = new JComboBox<String>(panel_map
+            .keySet().toArray(new String[panel_map.size()]));
 
-	/**
-	 * A drop-down triangle for showing or hiding the layout parameters.
-	 * Parameters are hidden by default
-	 */
-	private final DropDownTriangle layoutParameterReveal;
+    /**
+     * A drop-down triangle for showing or hiding the layout parameters.
+     * Parameters are hidden by default
+     */
+    private final DropDownTriangle layoutParameterReveal;
 
-	/**
-	 * A boolean value for setting whether or not the panel has a drop-down
-	 * triangle.If no, then by default the layout parameters are visible. This
-	 * is for cases where a layout panel is necessary, but where even the option
-	 * to hide the parameters would be inappropriate or aesthetically poor.
-	 */
-	private final boolean revealOption;
+    /**
+     * A boolean value for setting whether or not the panel has a drop-down
+     * triangle.If no, then by default the layout parameters are visible. This
+     * is for cases where a layout panel is necessary, but where even the option
+     * to hide the parameters would be inappropriate or aesthetically poor.
+     */
+    private final boolean revealOption;
 
-	/**
-	 * A reference to the parent window for resizing.
-	 */
-	private final Window parent;
+    /**
+     * A reference to the parent window for resizing.
+     */
+    private final Window parent;
 
-	/**
-	 * Creates the main layout panel with default values
-	 */
-	public MainLayoutPanel(Window parent) {
-		this(DEFAULT_DP_TRIANGLE_VISIBILITY, parent);
-	}
+    /**
+     * Creates the main layout panel with default values.
+     */
+    public MainLayoutPanel(Window parent) {
+        this(DEFAULT_DP_TRIANGLE_VISIBILITY, parent);
+    }
 
-	/**
-	 * Creates the main layout panel with default initially selected layout, but
-	 * where the reveal option can be set.
-	 * 
-	 * @param revealOption
-	 *            the desired reveal option
-	 */
-	public MainLayoutPanel(boolean revealOption, Window parent) {
-		this(DEFAULT_INITIAL_LAYOUT, revealOption, parent);
-	}
+    /**
+     * Creates the main layout panel with default initially selected layout, but
+     * where the reveal option can be set.
+     *
+     * @param revealOption if false, then everything shows up; if true then it's
+     *            hidden with a drop-down triangle to reveal
+     */
+    public MainLayoutPanel(boolean revealOption, Window parent) {
+        this(DEFAULT_INITIAL_LAYOUT, revealOption, parent);
+    }
 
-	/**
-	 * Creates the main layout panel.
-	 * 
-	 * @param initialLayout
-	 *            the initially selected layout
-	 * @param revealOption
-	 *            whether or not displaying layout parameters is optional
-	 */
-	public MainLayoutPanel(String initialLayout, boolean revealOption,
-			Window parent) {
-		this.revealOption = revealOption;
-		this.parent = parent;
-		layoutParameterReveal =
-				new DropDownTriangle(UpDirection.LEFT, false, "Settings",
-						"Settings", parent);
-		layoutCb.setSelectedItem(initialLayout);
-		layoutPanel = panel_map.get(initialLayout);
+    /**
+     * Creates the main layout panel.
+     *
+     * @param initialLayout the initially selected layout
+     * @param revealOption whether or not displaying layout parameters is
+     *            optional
+     */
+    public MainLayoutPanel(String initialLayout, boolean revealOption,
+            Window parent) {
+        this.revealOption = revealOption;
+        this.parent = parent;
+        layoutParameterReveal = new DropDownTriangle(UpDirection.LEFT, false,
+                "Settings", "Settings", parent);
+        layoutCb.setSelectedItem(initialLayout);
+        layoutPanel = panel_map.get(initialLayout);
 
-		initializeLayout();
-		addListeners();
-	}
+        initializeLayout();
+        addListeners();
+    }
 
-	/**
-	 * Lays out the contents of the panel.
-	 */
-	private void initializeLayout() {
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    /**
+     * Lays out the contents of the panel.
+     */
+    private void initializeLayout() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+        Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-		if (revealOption) { // Lay out the panel with a drop-down triangle.
-			JPanel topPanel = new JPanel();
-			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-			topPanel.add(layoutCb);
-			topPanel.add(Box.createHorizontalStrut(100));
-			topPanel.add(layoutParameterReveal);
-			topPanel.setAlignmentX(CENTER_ALIGNMENT);
-			topPanel.setBorder(padding);
-			this.add(topPanel);
-		} else { // Lay out the panel without a drop-down triangle
-			layoutCb.setAlignmentX(RIGHT_ALIGNMENT);
-			layoutCb.setBorder(padding);
-			this.add(layoutCb);
-		}
+        if (revealOption) { // Lay out the panel with a drop-down triangle.
+            JPanel topPanel = new JPanel();
+            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+            topPanel.add(layoutCb);
+            topPanel.add(Box.createHorizontalStrut(100));
+            topPanel.add(layoutParameterReveal);
+            topPanel.setAlignmentX(CENTER_ALIGNMENT);
+            topPanel.setBorder(padding);
+            this.add(topPanel);
+        } else { // Lay out the panel without a drop-down triangle
+            layoutCb.setAlignmentX(RIGHT_ALIGNMENT);
+            layoutCb.setBorder(padding);
+            this.add(layoutCb);
+        }
 
-		// Layout panel is visible regardless of triangle state if the reveal
-		// option is false. Otherwise display the layout panel based on the
-		// state of the drop-down triangle.
-		layoutPanel.setVisible(layoutParameterReveal.isDown()
-				|| !revealOption);
-		layoutPanel.setAlignmentX(CENTER_ALIGNMENT);
-		this.add(layoutPanel);
-		if (revealOption)
-			this.setBorder(BorderFactory.createTitledBorder("Layout"));
+        // Layout panel is visible regardless of triangle state if the reveal
+        // option is false. Otherwise display the layout panel based on the
+        // state of the drop-down triangle.
+        layoutPanel.setVisible(layoutParameterReveal.isDown() || !revealOption);
+        layoutPanel.setAlignmentX(CENTER_ALIGNMENT);
+        this.add(layoutPanel);
+        if (revealOption)
+            this.setBorder(BorderFactory.createTitledBorder("Layout"));
 
-	}
+    }
 
-	/**
-	 * Adds listeners to the dialog
-	 */
-	private void addListeners() {
+    /**
+     * Adds listeners to the dialog
+     */
+    private void addListeners() {
 
-		// Change the layout panel based on the selection in the combo box
-		layoutCb.addActionListener(new ActionListener() {
+        // Change the layout panel based on the selection in the combo box
+        layoutCb.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				layoutPanel = panel_map.get(layoutCb.getSelectedItem());
-				repaintPanel();
-				parent.pack();
-			}
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                layoutPanel = panel_map.get(layoutCb.getSelectedItem());
+                repaintPanel();
+                parent.pack();
+            }
 
-		});
+        });
 
-		// Reveal or hide the layout panel
-		layoutParameterReveal.addMouseListener(new MouseListener() {
+        // Reveal or hide the layout panel
+        layoutParameterReveal.addMouseListener(new MouseListener() {
 
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
 
-				layoutPanel.setVisible(layoutParameterReveal.isDown());
-				repaint();
-				parent.pack();
+                layoutPanel.setVisible(layoutParameterReveal.isDown());
+                repaint();
+                parent.pack();
 
-			}
+            }
 
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
+            @Override
+            public void mousePressed(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+            }
 
-		});
+        });
 
-	}
+    }
 
-	/**
-	 * Called to repaint the panel based on changes in the to the selected
-	 * neuron type.
-	 */
-	public void repaintPanel() {
-		removeAll();
-		initializeLayout();
-		repaint();
-	}
+    /**
+     * Called to repaint the panel based on changes in the to the selected
+     * neuron type.
+     */
+    public void repaintPanel() {
+        removeAll();
+        initializeLayout();
+        repaint();
+    }
 
-	/**
-	 * Called externally to change values in the layout reflecting changes in
-	 * the dialog.
-	 */
-	public void commitChanges() {
-		layoutPanel.commitChanges();
-	}
+    /**
+     * Called externally to change values in the layout reflecting changes in
+     * the dialog.
+     */
+    public void commitChanges() {
+        layoutPanel.commitChanges();
+    }
 
-	public void setCurrentLayout(String layName) {
-		layoutCb.setSelectedItem(layName);
-	}
+    public void setCurrentLayout(String layName) {
+        layoutCb.setSelectedItem(layName);
+    }
 
-	public Layout getCurrentLayout() {
-		return layoutPanel.getNeuronLayout();
-	}
+    public Layout getCurrentLayout() {
+        return layoutPanel.getNeuronLayout();
+    }
 }

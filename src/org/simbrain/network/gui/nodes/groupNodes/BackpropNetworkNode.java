@@ -53,44 +53,9 @@ public class BackpropNetworkNode extends SubnetworkNode {
     public BackpropNetworkNode(final NetworkPanel networkPanel,
             final BackpropNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new BackpropInteractionBox(networkPanel));
         setContextMenu();
 
     }
-
-    /**
-     * Custom interaction box for Synapse group node.
-     */
-    private class BackpropInteractionBox extends InteractionBox {
-        public BackpropInteractionBox(NetworkPanel net) {
-            super(net, BackpropNetworkNode.this);
-        }
-
-        // @Override
-        // protected JDialog getPropertyDialog() {
-        // TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-        // getTrainer());
-        // JDialog dialog = new JDialog();
-        // dialog.setContentPane(panel);
-        // return dialog;
-        // }
-        //
-        // @Override
-        // protected boolean hasPropertyDialog() {
-        // return true;
-        // }
-
-        @Override
-        protected String getToolTipText() {
-            return "Backprop...";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-    };
 
     /**
      * Sets custom menu.

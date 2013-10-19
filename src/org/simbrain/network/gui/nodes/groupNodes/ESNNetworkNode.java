@@ -55,43 +55,8 @@ public class ESNNetworkNode extends SubnetworkNode {
      */
     public ESNNetworkNode(NetworkPanel networkPanel, EchoStateNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new ESNInteractionBox(networkPanel));
         setContextMenu();
     }
-
-    /**
-     * Custom interaction box for ESN group node.
-     */
-    private class ESNInteractionBox extends InteractionBox {
-        public ESNInteractionBox(NetworkPanel net) {
-            super(net, ESNNetworkNode.this);
-        }
-
-        @Override
-        protected JDialog getPropertyDialog() {
-            ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-            editor.setUseSuperclass(false);
-            editor.setObject(getGroup());
-            JDialog dialog = editor.getDialog();
-            return dialog;
-        }
-
-        @Override
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
-        @Override
-        protected String getToolTipText() {
-            return "ESN...";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-    };
 
     /**
      * Sets custom menu.

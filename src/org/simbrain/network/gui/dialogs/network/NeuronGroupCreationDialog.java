@@ -20,20 +20,40 @@ package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.geom.Point2D;
 
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.GroupPropertiesPanel;
+import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>NeuronGroupCreationDialog</b> is a dialog box for creating a neuron group.
+ * <b>NeuronGroupCreationDialog</b> is a dialog box for creating a bare neuron
+ * group.
  */
 public class NeuronGroupCreationDialog extends StandardDialog {
 
+    /** Default number of neurons. */
+    private static final int DEFAULT_NUM_NEURONS = 10;
+
     /** Network Topology. */
     private JTextField numNeurons = new JTextField();
+
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
+    /** Main tab panel. */
+    private JPanel tabMain = new JPanel();
+
+    /** Layout tab panel. */
+    private JPanel tabLayout = new JPanel();
+
+    /** Layout panel. */
+    private MainLayoutPanel layoutPanel;
 
     /** Network panel. */
     private NetworkPanel networkPanel;
@@ -52,21 +72,24 @@ public class NeuronGroupCreationDialog extends StandardDialog {
      * This method initializes the components on the panel.
      */
     private void init() {
+
         // Initialize Dialog
         setTitle("New Neuron Group");
+        setContentPane(tabbedPane);
 
-        fillFieldValues();
+        // Main edit tab
+        LabelledItemPanel mainPanel = new LabelledItemPanel();
+        numNeurons.setText("" + DEFAULT_NUM_NEURONS);
+        mainPanel.addItem("Number of neurons", numNeurons);
+        tabMain.add(mainPanel);
+        tabbedPane.addTab("Neurons", tabMain);
+        // TOOD: Add neuron type, etc?  See add neurons...
 
-        LabelledItemPanel panel = new LabelledItemPanel();
-        panel.addItem("Number of neurons", numNeurons);
-        setContentPane(panel);
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        numNeurons.setText("5");
+        // Layout
+        layoutPanel = new MainLayoutPanel(false, this);
+        tabLayout.add(layoutPanel);
+        tabbedPane.addTab("Layout", layoutPanel);
+        layoutPanel.setCurrentLayout("Line");
     }
 
     /**
@@ -77,10 +100,15 @@ public class NeuronGroupCreationDialog extends StandardDialog {
         // Get last clicked position in the panel
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
-        // Create the layered network
-        networkPanel.getNetwork().addGroup(
-                new NeuronGroup(networkPanel.getNetwork(), lastClicked, Integer
-                        .parseInt(numNeurons.getText())));
+        // Create the group
+        NeuronGroup group = new NeuronGroup(networkPanel.getNetwork(),
+                lastClicked, Integer.parseInt(numNeurons.getText()));
+
+        networkPanel.getNetwork().addGroup(group);
+
+        // Layout
+        layoutPanel.commitChanges();
+        layoutPanel.getCurrentLayout().layoutNeurons(group.getNeuronList());
 
         networkPanel.repaint();
         super.closeDialogOk();

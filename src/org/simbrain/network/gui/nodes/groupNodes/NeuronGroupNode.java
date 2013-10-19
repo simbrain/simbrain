@@ -1,5 +1,5 @@
 /*
- * Part of Simbrain--a java-based neural network kit
+` * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,10 +34,11 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.NeuronGroupDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
+import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 /**
  * PNode representation of a group of neurons.
@@ -75,6 +76,7 @@ public class NeuronGroupNode extends GroupNode {
             setStroke(LAYER_OUTLINE_STROKE);
             setStrokePaint(Color.gray);
         }
+        setInteractionBox(new NeuronGroupNodenteractionBox(networkPanel));
 
     }
 
@@ -87,6 +89,28 @@ public class NeuronGroupNode extends GroupNode {
         return (NeuronGroup) getGroup();
     }
 
+
+    /**
+     * Custom interaction box for Neuron Group node.
+     */
+    private class NeuronGroupNodenteractionBox extends InteractionBox {
+
+        public NeuronGroupNodenteractionBox(NetworkPanel net) {
+            super(net, NeuronGroupNode.this);
+        }
+
+        @Override
+        protected JDialog getPropertyDialog() {
+            return new NeuronGroupDialog(getNetworkPanel(), group);
+        }
+
+        @Override
+        protected boolean hasPropertyDialog() {
+            return true;
+        }
+
+    };
+
     /**
      * Returns default actions for a context menu.
      *
@@ -96,22 +120,15 @@ public class NeuronGroupNode extends GroupNode {
         JPopupMenu menu = new JPopupMenu();
 
         // Edit Submenu
-        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        editor.setUseSuperclass(false);
-        editor.setObject(getGroup());
-        // Only add edit properties action if there are properties to edit
-        if (editor.getFieldCount() > 0) {
-            Action editGroup = new AbstractAction("Edit...") {
-                public void actionPerformed(final ActionEvent event) {
-                    JDialog dialog = editor.getDialog();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            };
-            menu.add(editGroup);
-        }
-        menu.add(editGroupName);
+        Action editGroup = new AbstractAction("Edit...") {
+            public void actionPerformed(final ActionEvent event) {
+                JDialog dialog = new NeuronGroupDialog(getNetworkPanel(), group);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        };
+        menu.add(editGroup);
         menu.add(removeGroupAction);
 
         // Randomizers

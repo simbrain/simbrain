@@ -62,7 +62,6 @@ import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.ShowAdjustConnectivityDialog;
 import org.simbrain.network.gui.actions.ShowAdjustSynapsesDialog;
-import org.simbrain.network.gui.actions.ShowClampToolBarAction;
 import org.simbrain.network.gui.actions.ShowDebugAction;
 import org.simbrain.network.gui.actions.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.ShowGUIAction;
@@ -181,12 +180,6 @@ public final class NetworkActionManager {
     /** Space horizontal action. */
     private final Action spaceHorizontalAction;
 
-    /** Clamp weights action. */
-    private final Action clampWeightsAction;
-
-    /** Clamp neurons action. */
-    private final Action clampNeuronsAction;
-
     /** Show IO information action. */
     private final Action showIOInfoAction;
 
@@ -228,9 +221,6 @@ public final class NetworkActionManager {
 
     /** Determines if run tool bar is to be shown. */
     private final Action showRunToolBarAction;
-
-    /** Determines if clamp tool bar is to be shown. */
-    private final Action showClampToolBarAction;
 
     /** Clears the source neurons for neuron connections. */
     private Action clearSourceNeuronsAction;
@@ -348,12 +338,8 @@ public final class NetworkActionManager {
         spaceVerticalAction = new SpaceVerticalAction(networkPanel);
         spaceHorizontalAction = new SpaceHorizontalAction(networkPanel);
 
-        clampNeuronsAction = new ClampNeuronsAction(networkPanel);
-        clampWeightsAction = new ClampWeightsAction(networkPanel);
-
         showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
-        showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
         showRunToolBarAction = new ShowRunToolBarAction(networkPanel);
 
         showGUIAction = new JCheckBoxMenuItem(new ShowGUIAction(networkPanel));
@@ -630,11 +616,6 @@ public final class NetworkActionManager {
         return ret;
     }
 
-    // public List<JToggleButton> getClampBarActions() {
-    // return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(),
-    // getClampWeightsBarItem()});
-    // }
-
     /**
      * Return the new neuron action.
      *
@@ -786,14 +767,6 @@ public final class NetworkActionManager {
         return spaceVerticalAction;
     }
 
-    /**
-     * Return the clamp weight action.
-     *
-     * @return the clamp weight action
-     */
-    public Action getClampWeightsAction() {
-        return clampWeightsAction;
-    }
 
     /**
      * Return the show IO information check box menu item.
@@ -894,15 +867,6 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Return the clamp neurons action.
-     *
-     * @return the clamp neurons action
-     */
-    public Action getClampNeuronsAction() {
-        return clampNeuronsAction;
-    }
-
-    /**
      * Return the K Winner Take All network action.
      *
      * @return the K Winner Take All network action
@@ -932,18 +896,6 @@ public final class NetworkActionManager {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
                 showMainToolBarAction);
         actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
-        return actionWrapper;
-    }
-
-    /**
-     * Return the show clamp tool bar menu item.
-     *
-     * @return the show clamp tool bar menu item
-     */
-    public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                showClampToolBarAction);
-        actionWrapper.setSelected(networkPanel.getClampToolBar().isVisible());
         return actionWrapper;
     }
 

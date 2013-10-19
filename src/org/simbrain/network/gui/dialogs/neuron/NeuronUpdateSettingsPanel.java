@@ -38,6 +38,8 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.ClampedNeuronRulePanel;
 import org.simbrain.util.DropDownTriangle;
 import org.simbrain.util.DropDownTriangle.UpDirection;
 

@@ -113,8 +113,6 @@ public class NetworkMenuBar {
         editMenu.add(networkPanel.createAlignMenu());
         editMenu.add(networkPanel.createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(networkPanel.createClampMenu());
-        editMenu.addSeparator();
         // editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
@@ -133,7 +131,6 @@ public class NetworkMenuBar {
         toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());

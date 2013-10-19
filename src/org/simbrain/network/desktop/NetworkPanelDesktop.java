@@ -129,8 +129,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(createClampMenu());
-        editMenu.addSeparator();
         editMenu.add(actionManager.getTestInputAction());
         editMenu.addSeparator();
         // editMenu.add(actionManager.getShowIOInfoMenuItem());
@@ -175,7 +173,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
         toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());

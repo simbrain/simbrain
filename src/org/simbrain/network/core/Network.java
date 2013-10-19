@@ -133,6 +133,9 @@ public class Network {
 	/** Whether network has been updated yet; used by thread. */
 	private boolean updateCompleted;
 
+	//TODO: These fields are no longer supported in the gui, and are slated for removal.
+	//     Because this will require rebuilding workspaces, I am waiting until more changes
+	//     have been made for 3.0 before removing them... (JY 2013)
 	/** Used to temporarily turn off all learning. */
 	private boolean clampWeights = false;
 

@@ -27,6 +27,9 @@ import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * Clamps neurons action.
+ *
+ * TODO: This is no longer used. In case the code is useful to consult it is
+ * being left here for now but should eventually be removed (JY 2013).
  */
 public final class ShowClampToolBarAction extends AbstractAction {
 
@@ -57,7 +60,21 @@ public final class ShowClampToolBarAction extends AbstractAction {
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        networkPanel.getClampToolBar().setVisible(cb.isSelected());
+        //networkPanel.getClampToolBar().setVisible(cb.isSelected());
 
     }
+
+    // For reference: From NetworkActionManager.  See r2805
+//    /**
+//     * Return the show clamp tool bar menu item.
+//     *
+//     * @return the show clamp tool bar menu item
+//     */
+//    public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
+//        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
+//                showClampToolBarAction);
+//        actionWrapper.setSelected(networkPanel.getClampToolBar().isVisible());
+//        return actionWrapper;
+//    }
+
 }

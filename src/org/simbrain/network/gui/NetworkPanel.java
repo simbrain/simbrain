@@ -314,7 +314,6 @@ public class NetworkPanel extends JPanel {
 		mainToolBar = this.createMainToolBar();
 		runToolBar = this.createRunToolBar();
 		editToolBar = this.createEditToolBar();
-		clampToolBar = this.createClampToolBar();
 		FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
 		flow.setHgap(0);
 		flow.setVgap(0);
@@ -322,7 +321,6 @@ public class NetworkPanel extends JPanel {
 		internalToolbar.add(getMainToolBar());
 		internalToolbar.add(getRunToolBar());
 		internalToolbar.add(getEditToolBar());
-		internalToolbar.add(getClampToolBar());
 		toolbars.add("Center", internalToolbar);
 		super.setLayout(new BorderLayout());
 		this.add("North", toolbars);
@@ -1114,43 +1112,6 @@ public class NetworkPanel extends JPanel {
 		editTools.add(actionManager.getRandomizeObjectsAction());
 
 		return editTools;
-	}
-
-	/**
-	 * Create the clamp tool bar.
-	 * 
-	 * @return the tool bar
-	 */
-	protected CustomToolBar createClampToolBar() {
-		CustomToolBar clampTools = new CustomToolBar();
-		clampTools.getInputMap(
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-				KeyStroke.getKeyStroke("pressed UP"), "none");
-		neuronClampButton
-				.setAction(actionManager.getClampNeuronsAction());
-		neuronClampButton.setText("");
-		clampTools.add(neuronClampButton);
-		synapseClampButton.setAction(actionManager
-				.getClampWeightsAction());
-		synapseClampButton.setText("");
-		clampTools.add(synapseClampButton);
-		return clampTools;
-	}
-
-	/**
-	 * Creates a new Network JMenu.
-	 * 
-	 * @return the new Network menu
-	 */
-	protected JMenu createClampMenu() {
-		JMenu clampMenu = new JMenu("Clamp");
-		neuronClampMenuItem.setAction(actionManager
-				.getClampNeuronsAction());
-		clampMenu.add(neuronClampMenuItem);
-		synapseClampMenuItem.setAction(actionManager
-				.getClampWeightsAction());
-		clampMenu.add(synapseClampMenuItem);
-		return clampMenu;
 	}
 
 	/**
@@ -2263,13 +2224,6 @@ public class NetworkPanel extends JPanel {
 	 */
 	public CustomToolBar getMainToolBar() {
 		return mainToolBar;
-	}
-
-	/**
-	 * @return the clamp tool bar.
-	 */
-	public CustomToolBar getClampToolBar() {
-		return clampToolBar;
 	}
 
 	/**

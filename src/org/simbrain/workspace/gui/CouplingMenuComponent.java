@@ -34,6 +34,13 @@ import org.simbrain.workspace.WorkspaceListener;
  * A menu for creating a set of couplings from one component to another. The
  * menu shows components. Selecting a menu items couples each visible attribute
  * in the source component to a visible attribute in the target component.
+ *
+ * NOTE: This method is no longer being used. The basic idea is that it just
+ * goes through all possible couplings between two components and makes them
+ * all, but there are many complications. In particular it's not at all obvious
+ * to the user what will happen when this is used. Vector couplings handle most
+ * of what is was built for. However in case a use is found for this later it
+ * has not been deleted yet. (JY 10/13)
  */
 public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
 

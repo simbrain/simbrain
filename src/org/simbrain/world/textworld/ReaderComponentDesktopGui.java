@@ -132,11 +132,6 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         edit.add(preferences);
         menuBar.add(edit);
 
-        // Coupling menu
-        menuBar.add(new CouplingMenuComponent("Couple", this
-                .getWorkspaceComponent().getWorkspace(), this
-                .getWorkspaceComponent()));
-
         // Help Menu
         menuBar.add(help);
 

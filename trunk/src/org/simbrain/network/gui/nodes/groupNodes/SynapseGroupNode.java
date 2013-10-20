@@ -38,12 +38,12 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
+import org.simbrain.network.gui.dialogs.SynapseGroupDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -71,7 +71,8 @@ public class SynapseGroupNode extends GroupNode {
         // getInteractionBox().setPaint(Color.white);
         // setOutlinePadding(-30);
         setPickable(false);
-        setContextMenu();
+        setInteractionBox(new SynapseGroupNodeInteractionBox(networkPanel));
+        setContextMenu(getDefaultContextMenu());
     }
 
     @Override
@@ -112,34 +113,64 @@ public class SynapseGroupNode extends GroupNode {
     }
 
     /**
-     * Sets custom menu for SynapseGroup nodes. To add new menu items to context
-     * menu add them here.
+     * Custom interaction box for Synapse Group node.
      */
-    protected void setContextMenu() {
+    private class SynapseGroupNodeInteractionBox extends InteractionBox {
+
+        /**
+         * Construct the custom interaction box
+         *
+         * @param net parent network panel
+         */
+        public SynapseGroupNodeInteractionBox(NetworkPanel net) {
+            super(net, SynapseGroupNode.this);
+        }
+
+        @Override
+        protected JDialog getPropertyDialog() {
+            selectSynapses(); // TODO: Adjust synapses should not rely on this
+            return new SynapseGroupDialog(getNetworkPanel(),
+                    group);
+        }
+
+        @Override
+        protected boolean hasPropertyDialog() {
+            return true;
+        }
+
+        @Override
+        protected JPopupMenu getContextMenu() {
+            return getDefaultContextMenu();
+        }
+
+    };
+
+    /**
+     * Returns default actions for a context menu.
+     *
+     * @return the default context menu
+     */
+    @Override
+    public JPopupMenu getDefaultContextMenu() {
         JPopupMenu menu = new JPopupMenu();
 
         // Edit
-        final ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        editor.setUseSuperclass(false);
-        editor.setObject(getGroup());
-        // Only add edit properties action if there are properties to edit
-        if (editor.getFieldCount() > 0) {
-            Action editGroup = new AbstractAction("Edit...") {
-                public void actionPerformed(final ActionEvent event) {
-                    JDialog dialog = editor.getDialog();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            };
-            menu.add(editGroup);
-        }
-        menu.add(editGroupName);
+        Action editGroup = new AbstractAction("Edit...") {
+            public void actionPerformed(final ActionEvent event) {
+                selectSynapses(); // TODO: Adjust synapses should not rely on this
+                JDialog dialog = new SynapseGroupDialog(getNetworkPanel(),
+                        group);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        };
+        menu.add(editGroup);
         menu.add(removeGroupAction);
 
         // Weight adjustment stuff
         menu.addSeparator();
-        Action adjustSynapses = new AbstractAction("Adjust synapses...") {
+        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
                 final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
@@ -163,14 +194,14 @@ public class SynapseGroupNode extends GroupNode {
 
         // Selection stuff
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select synapses") {
+        Action selectSynapses = new AbstractAction("Select Synapses") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
             }
         };
         menu.add(selectSynapses);
         Action selectIncomingNodes = new AbstractAction(
-                "Select incoming neurons") {
+                "Select Incoming Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> incomingNodes = new ArrayList<NeuronNode>();
                 for (Neuron neuron : group.getSourceNeurons()) {
@@ -184,7 +215,7 @@ public class SynapseGroupNode extends GroupNode {
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction(
-                "Select outgoing neurons") {
+                "Select Outgoing Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> outgoingNodes = new ArrayList<NeuronNode>();
                 for (Neuron neuron : group.getTargetNeurons()) {
@@ -198,10 +229,14 @@ public class SynapseGroupNode extends GroupNode {
         };
         menu.add(selectOutgoingNodes);
 
-        // TODO: Add coupling stuff at higher desktop level...
+        // Coupling menu
+        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
+            menu.addSeparator();
+            menu.add(getProducerMenu());
+            menu.add(getConsumerMenu());
+        }
 
-        // Add the menu...
-        setContextMenu(menu);
+        return menu;
     }
 
     /**
@@ -226,8 +261,8 @@ public class SynapseGroupNode extends GroupNode {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
-            putValue(NAME, "Show weight matrix");
-            putValue(SHORT_DESCRIPTION, "Show weight matrix");
+            putValue(NAME, "Show Weight Matrix");
+            putValue(SHORT_DESCRIPTION, "Show Weight Matrix");
         }
 
         @Override

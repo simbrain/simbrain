@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.util.ArrayList;
+import java.awt.geom.Point2D;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,7 +30,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -154,9 +153,10 @@ public class NeuronGroupDialog extends StandardDialog {
             ((GroupPropertiesPanel) specificNeuronGroupPanel).commitChanges();
         }
         layoutPanel.commitChanges();
+        // TODO: Bug. In feed-forward nets, neuronGroup.getMinY() returns 0
+        // and the next line crashes the piccolo canvas
         layoutPanel.getCurrentLayout().setInitialLocation(
-                SimnetUtils.getUpperLeft(new ArrayList<Object>(neuronGroup
-                        .getNeuronList()))); // TODO: Wasteful?
+                new Point2D.Double(neuronGroup.getMinX(), neuronGroup.getMinY()));
         layoutPanel.getCurrentLayout().layoutNeurons(
                 neuronGroup.getNeuronList());
         networkPanel.repaint();

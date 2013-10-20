@@ -91,9 +91,6 @@ public final class NetworkDesktopComponent extends
         menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this
                 .getNetworkPanel()));
         // menuBar.add(createAttributeMenu());
-        menuBar.add(new CouplingMenuComponent("Couple", this
-                .getWorkspaceComponent().getWorkspace(), this
-                .getWorkspaceComponent()));
         menuBar.add(networkPanel.createHelpMenu());
         getParentFrame().setJMenuBar(menuBar);
     }

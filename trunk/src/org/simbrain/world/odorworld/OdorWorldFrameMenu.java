@@ -91,10 +91,6 @@ public class OdorWorldFrameMenu extends JMenuBar {
         setUpFileMenu();
         setUpEditMenu();
 
-        // Coupling Menu
-        add(new CouplingMenuComponent("Couple", parent.getWorkspaceComponent()
-                .getWorkspace(), parent.getWorkspaceComponent()));
-
         // Help Menu
         add(helpMenu);
         ShowHelpAction helpAction = new ShowHelpAction(

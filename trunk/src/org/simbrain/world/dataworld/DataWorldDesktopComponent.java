@@ -142,10 +142,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         mb.add(editMenu);
 
-        // Add coupling menu
-        mb.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
-                .getWorkspace(), this.getWorkspaceComponent()));
-
         getParentFrame().setJMenuBar(mb);
     }
 

@@ -84,10 +84,6 @@ public final class VisionWorldDesktopComponent extends
         menuBar.add(edit);
         menuBar.add(view);
 
-        menuBar.add(new CouplingMenuComponent("Couple", this
-                .getWorkspaceComponent().getWorkspace(), this
-                .getWorkspaceComponent()));
-
         getParentFrame().setJMenuBar(menuBar);
 
         setLayout(new BorderLayout());

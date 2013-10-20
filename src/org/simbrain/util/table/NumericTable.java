@@ -127,7 +127,9 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     public void setVectorCurrentRow(double[] data) {
         int i = getCurrentRow();
         for (int j = 0; j < data.length; j++) {
-            this.setValue(i, j, data[j], false);
+            if (j < this.getColumnCount()) {
+                this.setValue(i, j, data[j], false);
+            }
         }
         fireTableDataChanged();
     }

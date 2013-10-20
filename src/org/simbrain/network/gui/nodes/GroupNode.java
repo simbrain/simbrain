@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
@@ -46,13 +47,20 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * Represents a {@link org.simbrain.network.groups.Group}. This class can be
  * used for default behavior.
- * 
- * Subclasses can provide custom behavior: - Context menu - Tooltips, etc. -
- * Formatting for interaction box - Formatting for outline - Insets for outline
+ *
+ * Subclasses can provide custom behavior: Context menus, Tooltips, etc.
+ *
+ * A custom interaction can be can be created by extending InteractionBox and
+ * calling setInteractoinBox.
+ *
+ * A custom context menu can be provided by calling setContextMenu. If the
+ * context menu must be updated on each call, set a customInteractionBox and
+ * override getContextMenu.
+ *
  */
 public class GroupNode extends PPath implements PropertyChangeListener {
 
-	/** References to outlined objects. */
+    /** References to outlined objects. */
 	public List<PNode> outlinedObjects = new ArrayList<PNode>();
 
 	/** Default stroke. Light gray line. */
@@ -75,7 +83,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Create a PNode representation of a model group.
-	 * 
+	 *
 	 * @param networkPanel
 	 *            networkPanel for this subnetwork node, must not be null.
 	 * @param group
@@ -94,7 +102,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Set the interaction box.
-	 * 
+	 *
 	 * @param interactionBox
 	 */
 	protected final void setInteractionBox(InteractionBox newBox) {
@@ -109,7 +117,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Returns a reference to the interaction box.
-	 * 
+	 *
 	 * @return the interactionBox.
 	 */
 	public InteractionBox getInteractionBox() {
@@ -125,29 +133,14 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 		// }
 	}
 
+
 	/**
 	 * Creates default actions for all model group nodes.
-	 * 
+	 *
 	 * @return context menu populated with default actions.
 	 */
 	protected JPopupMenu getDefaultContextMenu() {
 		JPopupMenu ret = new JPopupMenu();
-		// final ReflectivePropertyEditor editor = new
-		// ReflectivePropertyEditor();
-		// editor.setUseSuperclass(false);
-		// editor.setObject(getGroup());
-		// // Only add edit properties action if there are properties to edit
-		// if (editor.getFieldCount() > 0) {
-		// Action editGroup = new AbstractAction("Group properties...") {
-		// public void actionPerformed(final ActionEvent event) {
-		// JDialog dialog = editor.getDialog();
-		// dialog.setLocationRelativeTo(null);
-		// dialog.pack();
-		// dialog.setVisible(true);
-		// }
-		// };
-		// ret.add(editGroup);
-		// }
 
 		ret.add(editGroupName);
 		ret.add(removeGroupAction);
@@ -155,12 +148,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 			ret.addSeparator();
 			ret.add(testInputAction);
 		}
-		return ret;
+ 		return ret;
 	}
 
 	/**
 	 * Add a node for reference.
-	 * 
+	 *
 	 * @param node
 	 *            node to add.
 	 */
@@ -176,7 +169,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Remove a reference node.
-	 * 
+	 *
 	 * @param node
 	 *            node to remove.
 	 */
@@ -236,7 +229,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Set the context menu on the interaction box.
-	 * 
+	 *
 	 * @param menu
 	 *            the new menu.
 	 */
@@ -246,7 +239,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
 	/**
 	 * Set a text label on the interaction box.
-	 * 
+	 *
 	 * @param text
 	 *            the text to set.
 	 */
@@ -300,7 +293,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 	/**
 	 * Helper method to get all children neuron nodes. Recursively finds all
 	 * children neuron nodes.
-	 * 
+	 *
 	 * @param parentNode
 	 *            the node whose children are being sought
 	 * @return the list of children neuron nodes.
@@ -374,4 +367,25 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 			}
 		}
 	};
+
+
+    /**
+     * Overridden (for example by NeuronGroupNodeDesktop) to return a coupling
+     * menu.
+     *
+     * @return a producer menu if one exists
+     */
+    public JMenu getProducerMenu() {
+        return null;
+    }
+
+    /**
+     * Overridden by NeuronGroupNodeDesktop to return a coupling menu.
+     *
+     * @return a consumer menu if one exists
+     */
+    public JMenu getConsumerMenu() {
+        return null;
+    }
+
 }

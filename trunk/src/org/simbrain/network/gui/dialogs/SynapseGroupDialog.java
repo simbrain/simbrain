@@ -26,6 +26,8 @@ import javax.swing.JTextField;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
+import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
+import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -54,11 +56,11 @@ public class SynapseGroupDialog extends StandardDialog {
     /** Weight Matrix tab. */
     private JPanel tabMatrix = new JPanel();
 
-    /** Panel for specific group types. Null for bare Synapse group. */
-    private JPanel specificSynapseGroupPanel;
-
     /** Label Field. */
     private final JTextField tfSynapseLabel = new JTextField();
+
+    /** Rate Field. */
+    private final JTextField tfRateLabel = new JTextField();
 
     /** Main properties panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -74,7 +76,6 @@ public class SynapseGroupDialog extends StandardDialog {
         synapseGroup = sg;
         setTitle("Edit Synapse Group");
 
-        // setSpecificGroup();
         fillFieldValues();
         setContentPane(tabbedPane);
 
@@ -83,10 +84,10 @@ public class SynapseGroupDialog extends StandardDialog {
         tabMain.add(mainPanel);
         mainPanel.addItem("Id:", new JLabel(synapseGroup.getId()));
         mainPanel.addItem("Label:", tfSynapseLabel);
-
-        // If this is a subclass of Synapse group, add a tab for editing those
-        // properties
-        // initializeSpecificGroupTab();
+        //TODO: As more synapse group types are added generalize
+        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
+            mainPanel.addItem("Learning Rate:", tfRateLabel);
+        }
 
         // Adjust weights
         tabbedPane.addTab("Adjust weights", tabAdjust);
@@ -102,39 +103,17 @@ public class SynapseGroupDialog extends StandardDialog {
 
     }
 
-    // /**
-    // * Setes the specificSynapseGroupPanel based on the underlying group.
-    // */
-    // private void setSpecificGroup() {
-    // if (SynapseGroup instanceof Competitive) {
-    // specificSynapseGroupPanel = new CompetitivePropertiesPanel(networkPanel,
-    // false,
-    // (Competitive) SynapseGroup);
-    // }
-    // }
-
-    /**
-     * Add a tab for specific Synapse group rules.
-     */
-    private void initializeSpecificGroupTab() {
-        if (specificSynapseGroupPanel == null) {
-            return;
-        } else {
-            tabbedPane.addTab("" + synapseGroup.getClass().getSimpleName()
-                    + " properties", specificSynapseGroupPanel);
-        }
-    }
 
     /**
      * Set the initial values of dialog components.
      */
     public void fillFieldValues() {
-
         tfSynapseLabel.setText(synapseGroup.getLabel());
-
-        // if (specificSynapseGroupPanel != null) {
-        // ((GroupPropertiesPanel) specificSynapseGroupPanel).fillFieldValues();
-        // }
+        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
+            tfRateLabel.setText(""
+                    + ((SynapseGroupWithLearningRate) synapseGroup)
+                            .getLearningRate());
+        }
     }
 
     /**
@@ -142,8 +121,9 @@ public class SynapseGroupDialog extends StandardDialog {
      */
     public void commitChanges() {
         synapseGroup.setLabel(tfSynapseLabel.getText());
-        if (specificSynapseGroupPanel != null) {
-            ((GroupPropertiesPanel) specificSynapseGroupPanel).commitChanges();
+        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
+            ((SynapseGroupWithLearningRate) synapseGroup)
+                    .setLearningRate(Double.parseDouble(tfRateLabel.getText()));
         }
         networkPanel.repaint();
     }
@@ -153,5 +133,6 @@ public class SynapseGroupDialog extends StandardDialog {
         super.closeDialogOk();
         commitChanges();
     }
+    
 
 }

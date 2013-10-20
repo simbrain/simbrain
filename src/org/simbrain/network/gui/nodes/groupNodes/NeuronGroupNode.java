@@ -22,6 +22,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -139,23 +140,16 @@ public class NeuronGroupNode extends GroupNode {
         menu.add(editGroup);
         menu.add(removeGroupAction);
 
-        // Coupling menu
-        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
-            menu.addSeparator();
-            menu.add(getProducerMenu());
-            menu.add(getConsumerMenu());
-        }
-
         // Selection submenu
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select neurons") {
+        Action selectSynapses = new AbstractAction("Select Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 selectNeurons();
             }
         };
         menu.add(selectSynapses);
         Action selectIncomingNodes = new AbstractAction(
-                "Select incoming synapses") {
+                "Select Incoming Synapses") {
             public void actionPerformed(final ActionEvent event) {
                 List<SynapseNode> incomingNodes = new ArrayList<SynapseNode>();
                 for (Synapse synapse : group.getIncomingWeights()) {
@@ -169,7 +163,7 @@ public class NeuronGroupNode extends GroupNode {
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction(
-                "Select outgoing synapses") {
+                "Select Outgoing Synapses") {
             public void actionPerformed(final ActionEvent event) {
                 List<SynapseNode> outgoingNodes = new ArrayList<SynapseNode>();
                 for (Synapse synapse : group.getOutgoingWeights()) {
@@ -182,6 +176,45 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(selectOutgoingNodes);
+
+        // Connect neuron groups
+        menu.addSeparator();
+        Action setSource  = new AbstractAction(
+                "Set Group as Source") {
+            public void actionPerformed(final ActionEvent event) {
+                getNetworkPanel().clearSelection();
+                getNetworkPanel().setSelection(
+                        Collections.singleton(NeuronGroupNode.this
+                                .getInteractionBox()));
+                getNetworkPanel().setSourceElements();
+            }
+        };
+        menu.add(setSource);
+        Action clearSource  = new AbstractAction(
+                "Clear Source Neuron Groups") {
+            public void actionPerformed(final ActionEvent event) {
+                getNetworkPanel().clearSourceElements();
+            }
+        };
+        menu.add(clearSource);
+        Action makeConnection  = new AbstractAction(
+                "Connect Neuron Groups with Synapse Group(s)") {
+            public void actionPerformed(final ActionEvent event) {
+                getNetworkPanel().clearSelection();
+                getNetworkPanel().setSelection(
+                        Collections.singleton(NeuronGroupNode.this
+                                .getInteractionBox()));
+                getNetworkPanel().connectSourceToTargetElements();
+            }
+        };
+        menu.add(makeConnection);
+
+        // Coupling menu
+        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
+            menu.addSeparator();
+            menu.add(getProducerMenu());
+            menu.add(getConsumerMenu());
+        }
 
         // Add the menu...
         return menu;

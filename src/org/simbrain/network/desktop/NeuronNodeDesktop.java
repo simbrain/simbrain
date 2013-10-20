@@ -68,10 +68,10 @@ public class NeuronNodeDesktop extends NeuronNode {
                     .createPotentialConsumer(neuron, "setInputValue",
                             double.class);
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send scalar coupling to", workspace, producer);
+                    "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
             JMenu consumerMenu = new CouplingMenuConsumer(
-                    "Receive scalar coupling from", workspace, consumer);
+                    "Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;

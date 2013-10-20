@@ -43,7 +43,7 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 /**
  * PNode representation of a group of neurons.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
 public class NeuronGroupNode extends GroupNode {
 
@@ -77,6 +77,7 @@ public class NeuronGroupNode extends GroupNode {
             setStrokePaint(Color.gray);
         }
         setInteractionBox(new NeuronGroupNodenteractionBox(networkPanel));
+        setContextMenu(getDefaultContextMenu());
 
     }
 
@@ -109,13 +110,20 @@ public class NeuronGroupNode extends GroupNode {
             return true;
         }
 
+        @Override
+        protected JPopupMenu getContextMenu() {
+            return getDefaultContextMenu();
+        }
+
     };
+
 
     /**
      * Returns default actions for a context menu.
      *
      * @return the default context menu
      */
+    @Override
     public JPopupMenu getDefaultContextMenu() {
         JPopupMenu menu = new JPopupMenu();
 
@@ -131,34 +139,12 @@ public class NeuronGroupNode extends GroupNode {
         menu.add(editGroup);
         menu.add(removeGroupAction);
 
-        // Randomizers
-        menu.addSeparator();
-        Action randomizeNeurons = new AbstractAction("Randomize neurons") {
-            public void actionPerformed(final ActionEvent event) {
-                group.randomize();
-            }
-        };
-        menu.add(randomizeNeurons);
-        //Action randomizeBiases = new AbstractAction("Randomize biases") {
-        //    public void actionPerformed(final ActionEvent event) {
-        //        group.randomizeBiases(-1, 1);
-        //    }
-        //};
-        //menu.add(randomizeBiases);
-        Action randomizeIncomingWeights = new AbstractAction(
-                "Ranodmize incoming synapses") {
-            public void actionPerformed(final ActionEvent event) {
-                group.randomizeIncomingWeights();
-            }
-        };
-        menu.add(randomizeIncomingWeights);
-        Action randomizeOutgoingWeights = new AbstractAction(
-                "Ranodmize outgoing synapses") {
-            public void actionPerformed(final ActionEvent event) {
-                group.randomizeOutgoingWeights();
-            }
-        };
-        menu.add(randomizeOutgoingWeights);
+        // Coupling menu
+        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
+            menu.addSeparator();
+            menu.add(getProducerMenu());
+            menu.add(getConsumerMenu());
+        }
 
         // Selection submenu
         menu.addSeparator();
@@ -196,8 +182,6 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(selectOutgoingNodes);
-
-        // TODO: Add coupling stuff at higher desktop level...
 
         // Add the menu...
         return menu;

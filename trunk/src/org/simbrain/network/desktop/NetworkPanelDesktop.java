@@ -28,11 +28,14 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -41,13 +44,19 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 /**
  * Extension of Network Panel with functions used in a desktop setting.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
 public class NetworkPanelDesktop extends NetworkPanel {
 
     /** Reference to Desktop Component. */
     NetworkDesktopComponent component;
 
+    /**
+     * Construct the desktop extension of network panel.
+     *
+     * @param component the component level representation of the desktop
+     * @param Network the neural network model
+     */
     public NetworkPanelDesktop(final NetworkDesktopComponent component,
             final Network Network) {
         super(Network);
@@ -210,7 +219,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         return helpMenu;
     }
 
-    /*
+    /**
      * This version of network dialog allows user to set User Preferences.
      *
      * @param networkPanel
@@ -224,15 +233,36 @@ public class NetworkPanelDesktop extends NetworkPanel {
     /**
      * This version of a NeuronNode has a coupling context menu.
      *
-     * @param networkPanel network panel
+     * @param net network panel
      * @param neuron neuron to show in Gui
      * @return desktop version of NeuronNode, with context menu
      */
+    @Override
     public NeuronNode createNeuronNode(final NetworkPanel net,
             final Neuron neuron) {
         return new NeuronNodeDesktop(component.getWorkspaceComponent(), net,
                 neuron);
     }
+
+    /**
+     * Creates group nodes with coupling menus.
+     *
+     * @param group the group node to extend
+     */
+    @Override
+    protected GroupNode createGroupNode(Group group) {
+        GroupNode groupNode  = super.createGroupNode(group);
+
+        // Returns a special neuron group node with coupling menus set
+        if (groupNode.getGroup() instanceof NeuronGroup) {
+            return new NeuronGroupNodeDesktop(
+                    component.getWorkspaceComponent(),
+                    groupNode.getNetworkPanel(), (NeuronGroup) group);
+        }
+
+        return groupNode;
+    }
+
 
     /**
      * This version adds the script menu.
@@ -246,29 +276,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         return contextMenu;
     }
-
-    // /* (non-Javadoc)
-    // * @see org.simbrain.network.gui.NetworkPanel#showTrainer()
-    // */
-    // @Override
-    // public void showTrainer() {
-    // // Show trainer within Simbrain desktop
-    // Backprop trainer = new Backprop(getNetwork(),
-    // getSourceModelNeurons(),
-    // getSelectedModelNeurons());
-    // GenericJInternalFrame frame = new GenericJInternalFrame();
-    // TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
-    // frame.setContentPane(trainerPanel);
-    // component.getDesktop().addInternalFrame(frame);
-    // frame.pack();
-    // frame.setMaximizable(true);
-    // frame.setIconifiable(true);
-    // frame.setClosable(true);
-    // frame.setLocation(component.getX() + component.getWidth() + 5,
-    // component.getY());
-    // frame.setVisible(true);
-    // }
-    //
 
     @Override
     public GenericFrame displayPanel(JPanel panel, String title) {
@@ -284,5 +291,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
         frame.setVisible(true);
         return frame;
     }
+
 
 }

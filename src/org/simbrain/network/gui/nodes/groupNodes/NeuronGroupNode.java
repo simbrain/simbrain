@@ -77,7 +77,7 @@ public class NeuronGroupNode extends GroupNode {
             setStroke(LAYER_OUTLINE_STROKE);
             setStrokePaint(Color.gray);
         }
-        setInteractionBox(new NeuronGroupNodenteractionBox(networkPanel));
+        setInteractionBox(new NeuronGroupNodeInteractionBox(networkPanel));
         setContextMenu(getDefaultContextMenu());
 
     }
@@ -95,9 +95,9 @@ public class NeuronGroupNode extends GroupNode {
     /**
      * Custom interaction box for Neuron Group node.
      */
-    private class NeuronGroupNodenteractionBox extends InteractionBox {
+    private class NeuronGroupNodeInteractionBox extends InteractionBox {
 
-        public NeuronGroupNodenteractionBox(NetworkPanel net) {
+        public NeuronGroupNodeInteractionBox(NetworkPanel net) {
             super(net, NeuronGroupNode.this);
         }
 

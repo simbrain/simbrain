@@ -37,6 +37,7 @@ import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
@@ -259,9 +260,22 @@ public class NetworkPanelDesktop extends NetworkPanel {
                     component.getWorkspaceComponent(),
                     groupNode.getNetworkPanel(), (NeuronGroup) group);
         }
-
         return groupNode;
     }
+
+    /**
+     * Adorn synpasegroup node with coupling menus.
+     *
+     * @param node the group node to extend
+     *
+     */
+    @Override
+    public SynapseGroupNode addMenuToSynapseGroupNode(SynapseGroupNode node) {
+        return new SynapseGroupNodeDesktop(
+                component.getWorkspaceComponent(),
+                node.getNetworkPanel(), node.getSynapseGroup());
+    }
+
 
 
     /**

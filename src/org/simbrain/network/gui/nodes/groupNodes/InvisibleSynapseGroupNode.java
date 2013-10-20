@@ -52,7 +52,6 @@ public class InvisibleSynapseGroupNode extends SynapseGroupNode {
         // getInteractionBox().setPaint(Color.white);
         // setOutlinePadding(-30);
         setPickable(false);
-        setContextMenu();
         updateBounds();
     }
 

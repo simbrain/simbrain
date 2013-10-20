@@ -947,6 +947,7 @@ public class NetworkPanel extends JPanel {
 				SynapseGroupNode synapseGroupNode =
 						new SynapseGroupNode(NetworkPanel.this,
 								(SynapseGroup) group);
+				synapseGroupNode = addMenuToSynapseGroupNode(synapseGroupNode);
 				for (PNode node : nodes) {
 					synapseGroupNode.addPNode(node);
 					node.moveToBack();
@@ -2522,6 +2523,16 @@ public class NetworkPanel extends JPanel {
 	public NetworkDialog
 			getNetworkDialog(final NetworkPanel networkPanel) {
 		return new NetworkDialog(networkPanel);
+	}
+
+	/**
+	 * Overriden by NetworkPanelDesktop to adorn node with coupling menus.
+	 *
+	 * @param node the SynapseGroupNode.
+	 * @return the node.  Does nothing here obviously.
+	 */
+	public SynapseGroupNode addMenuToSynapseGroupNode(SynapseGroupNode node) {
+	    return node;
 	}
 
 	/**

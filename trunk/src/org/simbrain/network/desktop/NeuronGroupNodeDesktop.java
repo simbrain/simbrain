@@ -61,7 +61,7 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
             producer.setCustomDescription("Neuron Group: "
                     + getGroup().getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send vector coupling to", component
+                    "Send Vector Coupling to", component
                             .getWorkspace(), producer);
             return producerMenu;
         }
@@ -79,7 +79,7 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
             consumer.setCustomDescription("Neuron Group: "
                     + getGroup().getLabel());
             JMenu menu = new CouplingMenuConsumer(
-                    "Receive vector coupling from", component.getWorkspace(),
+                    "Receive Vector Coupling from", component.getWorkspace(),
                     consumer);
             return menu;
         }

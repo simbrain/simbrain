@@ -333,11 +333,11 @@ public class NetworkPanel extends JPanel {
 							.getProperty("showNetworkHierarchyPanel"));
 		}
 		// networkHierarchyPanel = new NetworkHierarchyPanel(this);
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.setDividerLocation(.2);
-		splitPane.setLeftComponent(networkHierarchyPanel);
-		splitPane.setRightComponent(canvas);
-		this.add("Center", splitPane);
+		//splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		//splitPane.setDividerLocation(.2);
+		//splitPane.setLeftComponent(networkHierarchyPanel);
+		//splitPane.setRightComponent(canvas);
+		this.add("Center", canvas);
 
 		setPrioritiesVisible(prioritiesVisible);
 		// setHierarchyPanelVisible(showNetworkHierarchyPanel);
@@ -382,7 +382,7 @@ public class NetworkPanel extends JPanel {
 		// Register key support
 		KeyBindings.addBindings(this);
 		// Must pass action map to splitpane or some key bindings lost
-		splitPane.setActionMap(this.getActionMap());
+		//splitPane.setActionMap(this.getActionMap());
 
 		// Repaint whenever window is opened or changed.
 		this.addComponentListener(new ComponentAdapter() {

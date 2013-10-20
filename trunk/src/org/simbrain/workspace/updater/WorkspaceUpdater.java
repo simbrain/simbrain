@@ -503,6 +503,34 @@ public class WorkspaceUpdater {
         });
     }
 
+    /**
+     * Iterate a set number of iterations against a latch.
+     *
+     * See {@link Workspace#iterate(CountDownLatch, int)}
+     *
+     * @param latch the latch to count down
+     * @param numIterations the number of iteration to update
+     */
+    public void iterate(final CountDownLatch latch, final int numIterations) {
+        workspaceUpdates.submit(new Runnable() {
+            public void run() {
+                notifyWorkspaceUpdateStarted();
+                for (int i = 0; i < numIterations; i++) {
+                    synchManager.queueTasks();
+                    try {
+                        doUpdate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    synchManager.releaseTasks();
+                    synchManager.runTasks();
+                }
+                latch.countDown();
+            }
+        });
+        notifyWorkspaceUpdateCompleted();
+    }
+
     /** A synch-manager where the methods do nothing. */
     private static final TaskSynchronizationManager NO_ACTION_SYNCH_MANAGER = new TaskSynchronizationManager() {
         public void queueTasks() {

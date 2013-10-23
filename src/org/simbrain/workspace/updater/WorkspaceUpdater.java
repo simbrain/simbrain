@@ -526,9 +526,9 @@ public class WorkspaceUpdater {
                     synchManager.runTasks();
                 }
                 latch.countDown();
+                notifyWorkspaceUpdateCompleted();
             }
         });
-        notifyWorkspaceUpdateCompleted();
     }
 
     /** A synch-manager where the methods do nothing. */

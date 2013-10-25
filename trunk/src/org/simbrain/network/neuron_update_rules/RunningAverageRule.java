@@ -88,4 +88,22 @@ public class RunningAverageRule extends NeuronUpdateRule {
     public String getDescription() {
         return "Running average";
     }
+
+	@Override
+	public double getRandomValue() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getCeiling() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getFloor() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

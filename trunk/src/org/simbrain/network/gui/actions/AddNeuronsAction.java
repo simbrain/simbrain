@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.AddNeuronsDialog;
+import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog;
 
 /**
  * Creates a group of neurons.

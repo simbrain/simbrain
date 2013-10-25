@@ -37,7 +37,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
-import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
@@ -133,9 +133,11 @@ public class Network {
 	/** Whether network has been updated yet; used by thread. */
 	private boolean updateCompleted;
 
-	//TODO: These fields are no longer supported in the gui, and are slated for removal.
-	//     Because this will require rebuilding workspaces, I am waiting until more changes
-	//     have been made for 3.0 before removing them... (JY 2013)
+	// TODO: These fields are no longer supported in the gui, and are slated for
+	// removal.
+	// Because this will require rebuilding workspaces, I am waiting until more
+	// changes
+	// have been made for 3.0 before removing them... (JY 2013)
 	/** Used to temporarily turn off all learning. */
 	private boolean clampWeights = false;
 
@@ -553,11 +555,18 @@ public class Network {
 	/**
 	 * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the
 	 * neuron has not exceeded its upper bound or gone below its lower bound.
-	 * TODO: Add or replace with normalization within bounds?
+	 * TODO: Add or replace with normalization within bounds? TODO: Does this
+	 * make sense anymore after the "clipping" interface change
 	 */
 	public void checkAllBounds() {
 		for (Neuron n : neuronList) {
-			n.checkBounds();
+			double act = n.getActivation();
+			if (act > n.getUpdateRule().getCeiling()) {
+				n.forceSetActivation(n.getUpdateRule().getCeiling());
+			}
+			if (act < n.getUpdateRule().getFloor()) {
+				n.forceSetActivation(n.getUpdateRule().getFloor());
+			}
 		}
 
 		for (int i = 0; i < synapseList.size(); i++) {
@@ -868,30 +877,6 @@ public class Network {
 	protected void addNeuronList(final ArrayList<Neuron> neurons) {
 		for (Neuron n : neurons) {
 			addNeuron(n);
-		}
-	}
-
-	/**
-	 * Sets the upper bounds.
-	 * 
-	 * @param u
-	 *            Upper bound
-	 */
-	public void setUpperBounds(final double u) {
-		for (int i = 0; i < getNeuronCount(); i++) {
-			getNeuron(i).setUpperBound(u);
-		}
-	}
-
-	/**
-	 * Sets the lower bounds.
-	 * 
-	 * @param l
-	 *            Lower bound
-	 */
-	public void setLowerBounds(final double l) {
-		for (int i = 0; i < getNeuronCount(); i++) {
-			getNeuron(i).setUpperBound(l);
 		}
 	}
 

@@ -27,7 +27,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.dialogs.ConnectivityAdjustmentPanel;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Show dialog for adjusting connectivity.

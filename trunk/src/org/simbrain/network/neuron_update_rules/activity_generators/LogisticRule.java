@@ -16,22 +16,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.neuron_update_rules;
+package org.simbrain.network.neuron_update_rules.activity_generators;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 
 /**
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticRule extends NeuronUpdateRule {
+public class LogisticRule extends NeuronUpdateRule implements
+		BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
 
 	public static final double DEFAULT_FLOOR = 0.0;
 
 	/** Growth rate. */
 	private double growthRate = 3.9;
+
+	private double ceiling = 1.0;
+
+	private double floor = -1.0;
+
+	public LogisticRule(LogisticRule lr, Neuron n) {
+		super();
+		this.ceiling = lr.getCeiling();
+		this.floor = lr.getFloor();
+		this.growthRate = lr.getGrowthRate();
+		init(n);
+	}
+
+	public LogisticRule() {
+		super();
+	}
 
 	/**
 	 * @{inheritDoc
@@ -43,17 +63,25 @@ public class LogisticRule extends NeuronUpdateRule {
 	/**
 	 * @{inheritDoc
 	 */
+	@Override
 	public void init(Neuron neuron) {
-		// No implementation
+		neuron.setGenerator(true);
 	}
 
 	/**
-	 * @{inheritDoc
+	 * @{inheritDoc <b>Unsafe for activity generators</b>. If copied across a
+	 *              set of neurons, {@link #init(Neuron) init} must be called to
+	 *              ensure rational behavior for an activity generator. The
+	 *              {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy
+	 *              constructor} is the preferred method of copying because
+	 *              {@link #init(Neuron) init} is called on the neuron parameter
+	 *              automatically.
 	 */
 	public LogisticRule deepCopy() {
 		LogisticRule ln = new LogisticRule();
 		ln.setGrowthRate(getGrowthRate());
-
+		ln.setCeiling(ceiling);
+		ln.setFloor(floor);
 		return ln;
 	}
 
@@ -67,16 +95,16 @@ public class LogisticRule extends NeuronUpdateRule {
 
 		double x = neuron.getActivation();
 
-		double y =
-				(x - neuron.getLowerBound())
-						/ (neuron.getUpperBound() - neuron
-								.getLowerBound());
+		double y = (x - getFloor()) / (getCeiling() - getFloor());
 		y = growthRate * y * (1 - y);
-		x =
-				((neuron.getUpperBound() - neuron.getLowerBound()) * y)
-						+ neuron.getLowerBound();
+		x = ((getCeiling() - getFloor()) * y) + getFloor();
 
-		neuron.setBuffer(neuron.clip(x));
+		neuron.setBuffer(clip(x));
+	}
+
+	@Override
+	public double getRandomValue() {
+		return (ceiling - floor) * Math.random() + floor;
 	}
 
 	/**
@@ -99,8 +127,44 @@ public class LogisticRule extends NeuronUpdateRule {
 		return "Logistic";
 	}
 
-	public double getDefaultFloor() {
-		return DEFAULT_FLOOR;
+	@Override
+	public double clip(double val) {
+		if (val < getFloor()) {
+			return getFloor();
+		}
+		if (val > getCeiling()) {
+			return getCeiling();
+		}
+		return val;
+	}
+
+	@Override
+	public boolean isClipped() {
+		return true;
+	}
+
+	@Override
+	public void setClipped(boolean clipping) {
+	}
+
+	@Override
+	public void setCeiling(double ceiling) {
+		this.ceiling = ceiling;
+	}
+
+	@Override
+	public void setFloor(double floor) {
+		this.floor = floor;
+	}
+
+	@Override
+	public double getCeiling() {
+		return ceiling;
+	}
+
+	@Override
+	public double getFloor() {
+		return floor;
 	}
 
 }

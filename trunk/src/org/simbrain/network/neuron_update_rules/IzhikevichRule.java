@@ -30,10 +30,6 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class IzhikevichRule extends SpikingNeuronUpdateRule {
 
-	public static final double DEFAULT_CEILING = 30;
-
-	public static final double DEFAULT_FLOOR = -65;
-
 	/** Recovery. */
 	private double recovery = 0;
 
@@ -44,13 +40,13 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
 	private double b = .2;
 
 	/** C. */
-	private double c = DEFAULT_FLOOR;
+	private double c = -65;
 
 	/** D. */
 	private double d = 6;
 
 	/** Threshold value to signal a spike. */
-	private double threshold = DEFAULT_CEILING;
+	private double threshold = 30;
 
 	/** Noise dialog. */
 	private Randomizer noiseGenerator = new Randomizer();
@@ -104,6 +100,17 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
 		neuron.setBuffer(val);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		// Equal chance of spiking or not spiking, taking on any value between
+		// the resting potential and the threshold if not.
+		return 2 * (threshold - c) * Math.random()
+				+ c;
+	}
+	
 	/**
 	 * @return Returns the a.
 	 */
@@ -199,12 +206,16 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
 		return "Izhikevich";
 	}
 
-	public double getDefaultCeiling() {
+	@Override
+	public double getCeiling() {
 		return threshold;
 	}
 
-	public double getDefaultFloor() {
-		return Double.NEGATIVE_INFINITY;
+	@Override
+	public double getFloor() {
+		return c;
 	}
+
+
 
 }

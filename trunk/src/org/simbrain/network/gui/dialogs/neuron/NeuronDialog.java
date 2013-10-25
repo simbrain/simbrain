@@ -26,11 +26,11 @@ import java.util.Collection;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ShowHelpAction;
@@ -79,8 +79,6 @@ public class NeuronDialog extends StandardDialog {
 	/** The neurons being modified. */
 	private final ArrayList<Neuron> neuronList;
 
-	private final AbstractNeuronPanel startingPanel;
-
 	/**
 	 * @param selectedNeurons
 	 *            the pnode_neurons being adjusted
@@ -90,7 +88,6 @@ public class NeuronDialog extends StandardDialog {
 		topPanel = new BasicNeuronInfoPanel(neuronList, this);
 		bottomPanel =
 				new NeuronUpdateSettingsPanel(neuronList, this, false);
-		startingPanel = bottomPanel.getNeuronPanel();
 		bottomPanel.getNeuronPanel().setReplace(false);
 		init();
 		addListeners();
@@ -130,13 +127,21 @@ public class NeuronDialog extends StandardDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						updateHelp();
-						AbstractNeuronPanel np =
-								bottomPanel.getNeuronPanel();
-						np.setReplace(np != startingPanel);
-					}
 
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								updateHelp();
+								AbstractNeuronPanel np =
+										bottomPanel.getNeuronPanel();
+								topPanel.getExtraDataPanel()
+										.fillDefaultValues(
+												np.getPrototypeRule());
+							}
+						});
+					}
 				});
+
 	}
 
 	/**
@@ -170,10 +175,13 @@ public class NeuronDialog extends StandardDialog {
 	 */
 	public void commitChanges() {
 
-		topPanel.commitChanges();
-
-		// Now commit changes specific to the neuron type
+		// Commit changes specific to the neuron type
+		// This must be the first change committed, as other neuron panels
+		// make assumptions about the type of the neuron update rule being
+		// edited that can result in ClassCastExceptions otherwise.
 		bottomPanel.commitChanges();
+
+		topPanel.commitChanges();
 
 		// Notify the network that changes have been made
 		neuronList.get(0).getNetwork().fireNetworkChanged();

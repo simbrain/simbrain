@@ -36,9 +36,6 @@ public class AdditiveRule extends NeuronUpdateRule {
 	/** Resistance. */
 	private double resistance = 1;
 
-	/** Clipping. */
-	private boolean clipping = false;
-
 	/** Noise dialog. */
 	private Randomizer noiseGenerator = new Randomizer();
 
@@ -59,9 +56,9 @@ public class AdditiveRule extends NeuronUpdateRule {
 		AdditiveRule an = new AdditiveRule();
 		an.setLambda(getLambda());
 		an.setResistance(getResistance());
-		an.setClipping(getClipping());
 		an.setAddNoise(getAddNoise());
 		an.noiseGenerator = new Randomizer(noiseGenerator);
+		an.setIncrement(getIncrement());
 		return an;
 	}
 
@@ -87,10 +84,6 @@ public class AdditiveRule extends NeuronUpdateRule {
 
 		if (addNoise) {
 			val += noiseGenerator.getRandom();
-		}
-
-		if (clipping) {
-			val = neuron.clip(val);
 		}
 
 		neuron.setBuffer(val);
@@ -168,24 +161,24 @@ public class AdditiveRule extends NeuronUpdateRule {
 		this.addNoise = addNoise;
 	}
 
-	/**
-	 * @return Returns the clipping.
-	 */
-	public boolean getClipping() {
-		return clipping;
-	}
-
-	/**
-	 * @param clipping
-	 *            The clipping to set.
-	 */
-	public void setClipping(final boolean clipping) {
-		this.clipping = clipping;
-	}
-
 	@Override
 	public String getDescription() {
 		return "Additive (Continuous Hopfield)";
+	}
+
+	@Override
+	public double getRandomValue() {
+		return (getCeiling() - getFloor()) * Math.random() + getFloor();
+	}
+
+	@Override
+	public double getCeiling() {
+		return 1.0;
+	}
+
+	@Override
+	public double getFloor() {
+		return -1.0;
 	}
 
 }

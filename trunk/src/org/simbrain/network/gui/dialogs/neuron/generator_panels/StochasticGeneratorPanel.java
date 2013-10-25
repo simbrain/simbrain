@@ -16,21 +16,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.neuron.rule_panels;
+package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
+import java.awt.GridLayout;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.neuron_update_rules.StochasticRule;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 
 /**
  * <b>StochasticNeuronPanel</b>.
  */
-public class StochasticRulePanel extends AbstractNeuronPanel {
+public class StochasticGeneratorPanel extends AbstractNeuronPanel {
 
 	/** Firing probability field. */
 	private JTextField tfFiringProbability = new JTextField();
@@ -42,9 +45,11 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
 	 * Creates an instance of this panel.
 	 * 
 	 */
-	public StochasticRulePanel() {
+	public StochasticGeneratorPanel() {
 		super();
-		this.addItem("Firing probability", tfFiringProbability);
+		setLayout(new GridLayout(1, 2));
+		add(new JLabel("Firing Probability: "));
+		add(tfFiringProbability);
 		this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"
 				+ " state taking on the upper bound value.</html>");
 	}
@@ -122,8 +127,8 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
 	}
 
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
+	protected void writeValuesToRules(List<Neuron> neurons) {
 		// TODO Auto-generated method stub
-
+		
 	}
 }

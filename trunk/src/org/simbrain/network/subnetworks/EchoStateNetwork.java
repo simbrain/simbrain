@@ -289,7 +289,7 @@ public class EchoStateNetwork extends Subnetwork {
 		ArrayList<Neuron> layer = new ArrayList<Neuron>();
 		for (int i = 0; i < nodes; i++) {
 			Neuron node = new Neuron(getParentNetwork(), nodeType);
-			node.setIncrement(1); // TODO: Reasonable?
+			nodeType.setIncrement(1); // TODO: Reasonable?
 			layer.add(node);
 		}
 		return layer;

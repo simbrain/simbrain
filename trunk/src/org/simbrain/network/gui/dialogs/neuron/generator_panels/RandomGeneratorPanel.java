@@ -16,57 +16,52 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.neuron.rule_panels;
+package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
 import java.util.List;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.LogisticRule;
+import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 
 /**
- * <b>LogisticNeuronPanel</b> TODO: Work into new Input Generator Framework,
- * currently no implementation.
+ * <b>RandomNeuronPanel</b> Currently unimplemented pending decisions about
+ * changing random neurons into "input generators".
  */
-public class LogisticRulePanel extends AbstractNeuronPanel {
+public class RandomGeneratorPanel extends AbstractNeuronPanel {
 
-	/** Growth rate field. */
-	private JTextField tfGrowthRate = new JTextField();
+	/** Random pane. */
+	private RandomPanelNetwork rp = new RandomPanelNetwork(false);
 
 	/**
 	 * Creates an instance of this panel.
+	 * 
 	 */
-	public LogisticRulePanel() {
+	public RandomGeneratorPanel() {
 		super();
-		addItem("Growth rate", tfGrowthRate);
-		this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"
-				+ "For that, set update rule to sigmoidal.<p> "
-				+ " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
+		this.add(rp);
 	}
 
 	// /**
 	// * Populate fields with current data.
 	// */
 	// public void fillFieldValues() {
-	// LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
+	// ArrayList<Randomizer> randomPanels = new ArrayList<Randomizer>();
 	//
-	// tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-	//
-	// // Handle consistency of multiple selections
-	// if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
-	// "getGrowthRate")) {
-	// tfGrowthRate.setText(NULL_STRING);
+	// for (int i = 0; i < ruleList.size(); i++) {
+	// randomPanels.add(((RandomNeuronRule) ruleList.get(i))
+	// .getRandomizer());
 	// }
+	//
+	// rp.fillFieldValues(randomPanels);
 	// }
 
 	/**
-	 * Populate fields with default data.
+	 * Fill field values to default values for random neuron.
 	 */
 	public void fillDefaultValues() {
-		LogisticRule neuronRef = new LogisticRule();
-		tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
+		rp.fillDefaultValues();
 	}
 
 	// /**
@@ -75,12 +70,8 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
 	// */
 	// public void commitChanges() {
 	// for (int i = 0; i < ruleList.size(); i++) {
-	// LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
-	//
-	// if (!tfGrowthRate.getText().equals(NULL_STRING)) {
-	// neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
-	// .getText()));
-	// }
+	// RandomNeuronRule neuronRef = (RandomNeuronRule) ruleList.get(i);
+	// rp.commitRandom(neuronRef.getRandomizer());
 	// }
 	// }
 
@@ -112,8 +103,8 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
 	}
 
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
+	protected void writeValuesToRules(List<Neuron> neurons) {
 		// TODO Auto-generated method stub
-
+		
 	}
 }

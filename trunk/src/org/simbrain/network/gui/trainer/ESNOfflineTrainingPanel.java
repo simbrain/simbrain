@@ -31,7 +31,6 @@ import javax.swing.JPanel;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
 

@@ -19,15 +19,24 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.util.TristateDropDown;
 
 /**
  * 
@@ -47,17 +56,60 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	/** Null string. */
 	public static final String NULL_STRING = "...";
 
+	/** Upper bound field. */
+	private final JTextField tfCeiling = new JTextField();
+
+	/** Lower bound field. */
+	private final JTextField tfFloor = new JTextField();
+
+	private final TristateDropDown clipping = new TristateDropDown();
+
+	{
+		clipping.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setBoundsEnabled(clipping.getSelectedIndex() == TristateDropDown
+						.getTRUE());
+			}
+
+		});
+	}
+
+	/**
+	 * Label for ceiling text field. Is a class variable so that its visibility
+	 * can be set alongside the visibility of the text field.
+	 */
+	private final JLabel ceilL = new JLabel("Ceiling: ");
+
+	/**
+	 * Label for floor text field. Is a class variable so that its visibility
+	 * can be set alongside the visibility of the text field.
+	 */
+	private final JLabel floorL = new JLabel("Floor: ");
+
+	private final JLabel clipL = new JLabel("Clipping: ");
+
 	/** Increment field. */
 	private final JTextField tfIncrement = new JTextField();
 
-	/** Upper bound field. */
-	private final JTextField tfUpBound = new JTextField();
-
-	/** Lower bound field. */
-	private final JTextField tfLowBound = new JTextField();
-
 	/** Priority Field. */
 	private final JTextField tfPriority = new JTextField();
+
+	/** Are upper and lower bounds visible? */
+	private boolean boundsVisible;
+
+	/** Are upper and lower bounds enabled? */
+	private boolean boundsEnabled;
+
+	private final JPanel boundsPanel = new JPanel();
+
+	/**
+	 * Whether or not the neuron is clamped (i.e. will not update/change its
+	 * activation once set).
+	 */
+	private final TristateDropDown clamped = new TristateDropDown();
+
+	private final Window parent;
 
 	/** The neurons being modified. */
 	private List<Neuron> neuronList;
@@ -66,8 +118,9 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	 * 
 	 * @param neuronList
 	 */
-	public ExtendedNeuronInfoPanel(List<Neuron> neuronList) {
+	public ExtendedNeuronInfoPanel(List<Neuron> neuronList, Window parent) {
 		this.neuronList = neuronList;
+		this.parent = parent;
 		fillFieldValues();
 		initializeLayout();
 	}
@@ -76,35 +129,110 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	 * Lays out the panel
 	 */
 	private void initializeLayout() {
+
+		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+		setLayout(layout);
+
 		GridLayout gl = new GridLayout(0, 2);
 		gl.setVgap(5);
-		setLayout(gl);
-		add(new JLabel("Upper Bound:"));
-		add(tfUpBound);
-		add(new JLabel("Lower Bound:"));
-		add(tfLowBound);
-		add(new JLabel("Increment: "));
-		add(tfIncrement);
-		add(new JLabel("Priority:"));
-		add(tfPriority);
+
+		JPanel clampP = new JPanel(gl);
+		clampP.add(new JLabel("Clamped: "));
+		clampP.add(clamped);
+		clampP.setAlignmentX(CENTER_ALIGNMENT);
+		this.add(clampP);
+
+		this.add(Box.createVerticalStrut(5));
+
+		boundsPanel
+				.setLayout(new BoxLayout(boundsPanel, BoxLayout.Y_AXIS));
+		JPanel sbp1 = new JPanel(gl);
+		sbp1.add(clipL);
+		sbp1.add(clipping);
+		sbp1.setAlignmentX(CENTER_ALIGNMENT);
+		boundsPanel.add(sbp1);
+		boundsPanel.add(Box.createVerticalStrut(5));
+		JPanel sbp2 = new JPanel(gl);
+		sbp2.add(ceilL);
+		sbp2.add(tfCeiling);
+		sbp2.add(floorL);
+		sbp2.add(tfFloor);
+		sbp2.setAlignmentX(CENTER_ALIGNMENT);
+		boundsPanel.add(sbp2);
+		boundsPanel.add(Box.createVerticalStrut(5));
+		boundsPanel.setAlignmentX(CENTER_ALIGNMENT);
+		this.add(boundsPanel);
+
+		JPanel subP = new JPanel(gl);
+		subP.add(new JLabel("Increment: "));
+		subP.add(tfIncrement);
+		subP.add(new JLabel("Priority:"));
+		subP.add(tfPriority);
+		subP.setAlignmentX(CENTER_ALIGNMENT);
+		this.add(subP);
+
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
 	}
 
 	/**
 	 * Fills the values of the text fields based on the corresponding values of
-	 * the neurons to be edited.
+	 * the neurons to be edited. Called before {@link #initializeLayout()}.
 	 */
 	public void fillFieldValues() {
 
 		Neuron neuronRef = neuronList.get(0);
+		List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
+		boolean h = true;
+		for (NeuronUpdateRule r : ruleList) {
+			if (!(r instanceof ClippableUpdateRule)) {
+				h = false;
+				break;
+			}
+		}
+
+		setBoundsVisible(h);
+
+		if (boundsVisible) {
+
+			// Clipping
+			if (NetworkUtils.isConsistent(ruleList,
+					ClippableUpdateRule.class, "isClipped")) {
+
+				setBoundsEnabled(((ClippableUpdateRule) neuronRef
+						.getUpdateRule()).isClipped());
+
+				// Handle Ceiling
+				if (!NetworkUtils.isConsistent(ruleList,
+						NeuronUpdateRule.class, "getCeiling"))
+					tfCeiling.setText(NULL_STRING);
+				else
+					tfCeiling.setText(Double.toString(neuronRef
+							.getUpdateRule().getCeiling()));
+
+				// Handle Floor
+				if (!NetworkUtils.isConsistent(ruleList,
+						NeuronUpdateRule.class, "getFloor"))
+					tfFloor.setText(NULL_STRING);
+				else
+					tfFloor.setText(Double.toString(neuronRef
+							.getUpdateRule().getFloor()));
+
+			} else {
+				clipping.setNull();
+				setBoundsEnabled(false);
+				tfCeiling.setText(NULL_STRING);
+				tfFloor.setText(NULL_STRING);
+			}
+		}
 
 		// Handle Increment
-		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getIncrement"))
+		if (!NetworkUtils.isConsistent(Neuron.getRuleList(neuronList),
+				NeuronUpdateRule.class, "getIncrement"))
 			tfIncrement.setText(NULL_STRING);
 		else
-			tfIncrement
-					.setText(Double.toString(neuronRef.getIncrement()));
+			tfIncrement.setText(Double.toString(neuronRef.getUpdateRule()
+					.getIncrement()));
 
 		// Handle Priority
 		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
@@ -114,21 +242,25 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 			tfPriority.setText(Integer.toString(neuronRef
 					.getUpdatePriority()));
 
-		// Handle Lower Bound
+		// Handle Clamped
 		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getLowerBound"))
-			tfLowBound.setText(NULL_STRING);
+				"isClamped"))
+			clamped.setNull();
 		else
-			tfLowBound
-					.setText(Double.toString(neuronRef.getLowerBound()));
+			clamped.setSelected(neuronList.get(0).isClamped());
 
-		// Handle Upper Bound
-		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getUpperBound"))
-			tfUpBound.setText(NULL_STRING);
-		else
-			tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
+	}
 
+	public void fillDefaultValues(NeuronUpdateRule rule) {
+		setBoundsVisible(rule instanceof BoundedUpdateRule
+				&& rule instanceof ClippableUpdateRule);
+		if (boundsVisible) {
+			tfCeiling.setText(Double.toString(rule.getCeiling()));
+			tfFloor.setText(Double.toString(rule.getFloor()));
+			setBoundsEnabled(((ClippableUpdateRule) rule).isClipped());
+		}
+		tfIncrement.setText(Double.toString(rule.getIncrement()));
+		tfPriority.setText(Integer.toString(0));
 	}
 
 	/**
@@ -136,33 +268,105 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	 * neuron(s) being edited. Called externally to apply changes.
 	 */
 	public void commitChanges() {
+		int numNeurons = neuronList.size();
 
-		for (int i = 0; i < neuronList.size(); i++) {
+		if (boundsVisible) {
+			// Clipping?
+			if (!clipping.isNull()) {
+				boolean clip =
+						clipping.getSelectedIndex() == TristateDropDown
+								.getTRUE();
+				for (int i = 0; i < numNeurons; i++) {
+					((ClippableUpdateRule) neuronList.get(i)
+							.getUpdateRule()).setClipped(clip);
+				}
 
-			Neuron neuronRef = neuronList.get(i);
+				if (clip) {
+					// Upper Bound
+					double ceiling =
+							AbstractNeuronPanel.doubleParsable(tfCeiling);
+					if (!Double.isNaN(ceiling)) {
+						for (int i = 0; i < numNeurons; i++) {
+							((BoundedUpdateRule) neuronList.get(i)
+									.getUpdateRule()).setCeiling(ceiling);
+						}
+					}
+					// Lower Bound
+					double floor =
+							AbstractNeuronPanel.doubleParsable(tfFloor);
+					if (!Double.isNaN(floor)) {
+						for (int i = 0; i < numNeurons; i++) {
+							((BoundedUpdateRule) neuronList.get(i)
+									.getUpdateRule()).setFloor(floor);
+						}
+					}
+				}
 
-			// Increment
-			if (!tfIncrement.getText().equals(NULL_STRING))
-				neuronRef.setIncrement(Double.parseDouble(tfIncrement
-						.getText()));
-
-			// Priority
-			if (!tfPriority.getText().equals(NULL_STRING))
-				neuronRef.setUpdatePriority(Integer.parseInt(tfPriority
-						.getText()));
-
-			// Upper Bound
-			if (!tfUpBound.getText().equals(NULL_STRING))
-				neuronRef.setUpperBound(Double.parseDouble(tfUpBound
-						.getText()));
-
-			// Lower Bound
-			if (!tfLowBound.getText().equals(NULL_STRING))
-				neuronRef.setLowerBound(Double.parseDouble(tfLowBound
-						.getText()));
-
+			}
 		}
 
+		// Increment
+		double increment =
+				AbstractNeuronPanel.doubleParsable(tfIncrement);
+		if (!Double.isNaN(increment)) {
+			for (int i = 0; i < numNeurons; i++) {
+				neuronList.get(i).getUpdateRule().setIncrement(increment);
+			}
+		}
+
+		// Priority
+		double priority = AbstractNeuronPanel.doubleParsable(tfPriority);
+		if (!Double.isNaN(priority)) {
+			int p = (int) priority; // Cast to integer (there is no NaN value
+			// for integers to use as a flag).
+			for (int i = 0; i < numNeurons; i++) {
+				neuronList.get(i).setUpdatePriority(p);
+			}
+		}
+
+		// Clamped
+		if (!clamped.isNull()) {
+			boolean clamp =
+					clamped.getSelectedIndex() == TristateDropDown
+							.getTRUE();
+			for (int i = 0; i < numNeurons; i++) {
+				neuronList.get(i).setClamped(clamp);
+			}
+		}
+
+	}
+
+	/**
+	 * @return the TristateDropDown menu controlling whether or not the neurons'
+	 *         activation(s) are clamped
+	 */
+	public TristateDropDown getClamped() {
+		return clamped;
+	}
+
+	public void setBoundsEnabled(boolean enabled) {
+		boundsEnabled = enabled;
+		int t = TristateDropDown.getTRUE();
+		int f = TristateDropDown.getFALSE();
+		clipping.setSelectedIndex(isBoundsEnabled() ? t : f);
+		tfCeiling.setEnabled(enabled);
+		tfFloor.setEnabled(enabled);
+		repaint();
+	}
+
+	public void setBoundsVisible(boolean visible) {
+		boundsVisible = visible;
+		boundsPanel.setVisible(visible);
+		repaint();
+		parent.pack();
+	}
+
+	public boolean isBoundsVisible() {
+		return boundsVisible;
+	}
+
+	public boolean isBoundsEnabled() {
+		return boundsEnabled;
 	}
 
 }

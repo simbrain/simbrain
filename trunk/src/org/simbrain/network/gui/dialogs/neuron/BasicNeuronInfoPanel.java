@@ -90,7 +90,8 @@ public class BasicNeuronInfoPanel extends JPanel {
 		detailTriangle =
 				new DropDownTriangle(UpDirection.LEFT, false, "More",
 						"Less", parent);
-		extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList);
+		extraDataPanel =
+				new ExtendedNeuronInfoPanel(this.neuronList, parent);
 		addListeners();
 		initializeLayout();
 		fillFieldValues();
@@ -250,19 +251,22 @@ public class BasicNeuronInfoPanel extends JPanel {
      * 
      */
 	public void commitChanges() {
-		for (int i = 0; i < neuronList.size(); i++) {
 
-			Neuron neuronRef = neuronList.get(i);
+		// Activation
+		double act = AbstractNeuronPanel.doubleParsable(tfActivation);
+		if (!Double.isNaN(act)) {
+			for (int i = 0; i < neuronList.size(); i++) {
+				neuronList.get(i).forceSetActivation(
+						Double.parseDouble(tfActivation.getText()));
+			}
+		}
 
-			// Activation
-			if (!tfActivation.getText().equals(NULL_STRING))
-				neuronRef.forceSetActivation(Double
-						.parseDouble(tfActivation.getText()));
+		// Label
+		if (!tfNeuronLabel.getText().equals(NULL_STRING)) {
+			for (int i = 0; i < neuronList.size(); i++) {
+				neuronList.get(i).setLabel(tfNeuronLabel.getText());
 
-			// Label
-			if (!tfNeuronLabel.getText().equals(NULL_STRING))
-				neuronRef.setLabel(tfNeuronLabel.getText());
-
+			}
 		}
 
 		extraDataPanel.commitChanges();
@@ -275,6 +279,10 @@ public class BasicNeuronInfoPanel extends JPanel {
 	 */
 	public DropDownTriangle getDetailTriangle() {
 		return detailTriangle;
+	}
+
+	public ExtendedNeuronInfoPanel getExtraDataPanel() {
+		return extraDataPanel;
 	}
 
 }

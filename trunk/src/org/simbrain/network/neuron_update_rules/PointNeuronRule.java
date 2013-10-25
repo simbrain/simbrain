@@ -19,6 +19,7 @@
 package org.simbrain.network.neuron_update_rules;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
@@ -27,6 +28,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainMath;
 
 /**
@@ -162,7 +164,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements
 	 * {@inheritDoc}
 	 */
 	public void init(Neuron neuron) {
-		neuron.setLowerBound(0);
 		setInputLists(neuron);
 		if (neuron.getNetwork() != null) {
 			neuron.getNetwork().addSynapseListener(this);
@@ -287,13 +288,13 @@ public class PointNeuronRule extends NeuronUpdateRule implements
 							/ (gain
 									* getPositiveComponent(membranePotential
 											- thresholdPotential) + 1);
-			neuron.setBuffer(neuron.clip(val));
+			neuron.setBuffer(val);
 		} else if (outputFunction == OutputFunction.LINEAR) {
 			double val =
 					gain
 							* getPositiveComponent(membranePotential
 									- thresholdPotential);
-			neuron.setBuffer(neuron.clip(val));
+			neuron.setBuffer(val);
 		} else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
 			neuron.setBuffer(1); // TODO: Complete this implementation
 		} else if (outputFunction == OutputFunction.NONE) {
@@ -302,6 +303,25 @@ public class PointNeuronRule extends NeuronUpdateRule implements
 
 		// Display current values of variables for diagnostics.
 		// printState(neuron);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		Random rand = new Random();
+		if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
+			return rand.nextBoolean() ? 1.0 : 0.0;
+		} else if (outputFunction == OutputFunction.RATE_CODE) {
+			return rand.nextDouble();
+		} else if (outputFunction == OutputFunction.LINEAR) {
+			return gain * thresholdPotential * rand.nextDouble(); //TODO: better value for this?
+		} else if (outputFunction == OutputFunction.NOISY_RATE_CODE){
+			return 0; // TODO: COmplete implementation
+		} else {
+			return rand.nextDouble(); //TODO: Better value for this?
+		}
 	}
 
 	/**
@@ -751,6 +771,26 @@ public class PointNeuronRule extends NeuronUpdateRule implements
 	@Override
 	public String getDescription() {
 		return "Point Neuron";
+	}
+
+	@Override
+	public double getCeiling() {
+		if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
+			return 1.0;
+		} else if (outputFunction == OutputFunction.RATE_CODE) {
+			return 1.0;
+		} else if (outputFunction == OutputFunction.LINEAR) {
+			return gain; //TODO: better value for this?
+		} else if (outputFunction == OutputFunction.NOISY_RATE_CODE){
+			return 0; // TODO: COmplete implementation
+		} else {
+			return 1.0;
+		}
+	}
+
+	@Override
+	public double getFloor() {
+		return 0;
 	}
 
 }

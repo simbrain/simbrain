@@ -20,18 +20,11 @@ package org.simbrain.network.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
-
-import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.QuickConnectPreferences;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings

@@ -125,7 +125,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 	 */
 	private void modifyNode(NeuronNode node) {
 		Neuron neuron = node.getNeuron();
-		neuron.forceSetActivation(neuron.getUpperBound());
+		neuron.forceSetActivation(neuron.getUpdateRule().getCeiling());
 		node.update();
 	}
 

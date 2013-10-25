@@ -16,22 +16,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.neuron_update_rules;
+package org.simbrain.network.neuron_update_rules.interfaces;
+
+import org.simbrain.network.core.Neuron;
 
 /**
- * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
- * neurons.
+ * Indicates that an update rule is invertible.
  *
- * TODO: Add upper and lower bound parameters? Add randomize option?
+ * Required for LMSOffline training
+ *
+ * @author ztosi
+ *
  */
-public interface BiasedUpdateRule {
-    /**
-     * @return the neuron's bias
-     */
-    double getBias();
+public interface InvertibleUpdateRule {
 
     /**
-     * @param bias the bias to set.
+     * The inverse of the activation function.
+     *
+     * @param val the value being sent through the neuron's inverse activation
+     *            function
+     * @param neuron the neuron this inverse value is being mapped from
+     * @return the inverse activation of parameter val
      */
-    void setBias(double bias);
+    double getInverse(double val, Neuron neuron);
+
 }

@@ -56,9 +56,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 	/** Add noise to neuron. */
 	private boolean addNoise = false;
 
-	/** Clipping. */
-	private boolean clipping = false;
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -69,7 +66,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 		ifn.setThreshold(getThreshold());
 		ifn.setTimeConstant(getTimeConstant());
 		ifn.setResistance(getResistance());
-		ifn.setClipping(getClipping());
+		ifn.setIncrement(getIncrement());
 		ifn.setAddNoise(getAddNoise());
 		ifn.noiseGenerator = new Randomizer(noiseGenerator);
 
@@ -117,13 +114,20 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 			setHasSpiked(false, neuron);
 		}
 
-		if (clipping) {
-			memPotential = neuron.clip(memPotential);
-		}
-
 		neuron.setBuffer(memPotential);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		// Equal chance of spiking or not spiking, taking on any value between
+		// the resting potential and the threshold if not.
+		return 2 * (threshold - restingPotential) * Math.random()
+				+ restingPotential;
+	}
+	
 	/**
 	 * @return Returns the lowerValue.
 	 */
@@ -175,21 +179,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 	 */
 	public void setAddNoise(final Randomizer noise) {
 		this.noiseGenerator = noise;
-	}
-
-	/**
-	 * @return Returns the clipping.
-	 */
-	public boolean getClipping() {
-		return clipping;
-	}
-
-	/**
-	 * @param clipping
-	 *            The clipping to set.
-	 */
-	public void setClipping(final boolean clipping) {
-		this.clipping = clipping;
 	}
 
 	/**
@@ -272,21 +261,14 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
 		return "Integrate and Fire";
 	}
 
-	/**
-	 * Default floor for I&F neurons is 0 {@inheritDoc}
-	 */
-	public void setDefaultParameters(Neuron n) {
-		n.setUpperBound(DEFAULT_CEILING);
-		n.setLowerBound(DEFAULT_FLOOR);
-		n.setIncrement(DEFAULT_INCREMENT);
-	}
-
-	public double getDefaultCeiling() {
+	@Override
+	public double getCeiling() {
 		return threshold;
 	}
 
-	public double getDefaultFloor() {
-		return Double.NEGATIVE_INFINITY;
+	@Override
+	public double getFloor() {
+		return restingPotential;
 	}
 
 }

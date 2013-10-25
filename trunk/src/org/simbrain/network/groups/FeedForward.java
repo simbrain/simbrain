@@ -79,9 +79,10 @@ public class FeedForward extends Subnetwork {
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
         super(network);
-        Neuron neuron = new Neuron(network, new LinearRule());
-        neuron.setIncrement(1); // For easier testing
-        neuron.setLowerBound(0);
+        LinearRule rule = new LinearRule();
+        Neuron neuron = new Neuron(network, rule);
+        rule.setIncrement(1); // For easier testing
+        rule.setFloor(0);
         buildNetwork(network, nodesPerLayer, initialPosition, neuron);
     }
 
@@ -132,8 +133,9 @@ public class FeedForward extends Subnetwork {
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
-                Neuron neuron = new Neuron(network, new SigmoidalRule());
-                neuron.setLowerBound(0);
+            	SigmoidalRule rule = new SigmoidalRule();
+                Neuron neuron = new Neuron(network, rule);
+                rule.setFloor(0);
                 neuron.setUpdatePriority(i);
                 hiddenLayerNeurons.add(neuron);
             }

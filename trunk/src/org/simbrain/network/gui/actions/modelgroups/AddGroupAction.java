@@ -21,7 +21,6 @@ package org.simbrain.network.gui.actions.modelgroups;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;

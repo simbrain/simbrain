@@ -18,12 +18,14 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -275,9 +277,27 @@ public abstract class ConnectNeurons {
         return targetNeurons;
     }
 
+    /**
+     * Sets the target neurons to the neurons specified in the list. If any 
+     * neurons in the list implements the ActivityGenerator interface (which
+     * should never have incoming connections), they are automatically
+     * excluded from the list.
+     * @param targetNeurons the target neurons
+     */
     public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
-        this.targetNeurons = targetNeurons;
+    	ArrayList<Neuron> realTargets = new ArrayList<Neuron>();
+    	
+    	for (Neuron n : targetNeurons) {
+    		// If n not an activity generator, add it.
+    		if (!n.isGenerator()) {
+    			realTargets.add(n);
+    		}
+    	}
+    	
+        this.targetNeurons = realTargets;
+          
         recurrent = testRecurrence();
+        
     }
 
     /**

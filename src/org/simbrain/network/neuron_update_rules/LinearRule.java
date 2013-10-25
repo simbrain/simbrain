@@ -37,8 +37,11 @@ public class LinearRule extends NeuronUpdateRule implements
 	/** The Default upper bound. */
 	private static final double DEFAULT_UPPER_BOUND = 1.0;
 
-	/** The Default lower bound. */
-	private static final double DEFAULT_LOWER_BOUND = -1.0;
+    /** The Default lower bound. */
+    private static final double DEFAULT_LOWER_BOUND = -1.0;
+
+    /** Default clipping setting. */
+    private static final boolean DEFAULT_CLIPPING = true;
 
 	/** Slope. */
 	private double slope = 1;
@@ -53,7 +56,7 @@ public class LinearRule extends NeuronUpdateRule implements
 	private boolean addNoise = false;
 
 	/** Clipping. */
-	private boolean clipping = false;
+	private boolean clipping = DEFAULT_CLIPPING;
 
 	/** The upper bound of the activity if clipping is used. */
 	private double upperBound = DEFAULT_UPPER_BOUND;

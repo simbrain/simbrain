@@ -2,6 +2,7 @@ package org.simbrain.network.neuron_update_rules.interfaces;
 
 import org.simbrain.network.core.Neuron;
 
+// TODO: Document
 public interface ActivityGenerator {
 	
 	/**

@@ -92,7 +92,7 @@ public class AdditiveRule extends NeuronUpdateRule {
 
 	/**
 	 * Implements a Hopfield type sigmoidal function.
-	 * 
+	 *
 	 * @param x
 	 *            input to function
 	 * @return output of function

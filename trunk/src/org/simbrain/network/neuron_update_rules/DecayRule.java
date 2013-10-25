@@ -33,10 +33,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
 	/** The Default upper bound. */
 	private static final double DEFAULT_CEILING = 1.0;
-	
+
 	/** The Default lower bound. */
 	private static final double DEFAULT_FLOOR = -1.0;
-	
+
 	/** Relative. */
 	private static final int RELATIVE = 0;
 
@@ -63,10 +63,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
 	/** Add noise to the neuron. */
 	private boolean addNoise = false;
-	
+
 	/** The upper bound of the activity if clipping is used. */
 	private double ceiling = DEFAULT_CEILING;
-	
+
 	/** The lower bound of the activity if clipping is used. */
 	private double floor = DEFAULT_FLOOR;
 
@@ -148,7 +148,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 			return val;
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -167,7 +167,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 			n.getNetwork().fireNeuronChanged(n);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -186,7 +186,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 			n.getNetwork().fireNeuronChanged(n);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -195,7 +195,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 		return (getCeiling() - getFloor()) * Math.random()
 				- getFloor();
 	}
-	
+
 	/**
 	 * @return Returns the decayAmount.
 	 */

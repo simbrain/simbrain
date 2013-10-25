@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -28,10 +29,13 @@ import org.simbrain.util.randomizer.Randomizer;
  * model spike rates of real neurons. It is used extensively in Hugh Wilson's
  * Spikes, Decisions, and Action.
  */
-public class NakaRushtonRule extends NeuronUpdateRule {
+public class NakaRushtonRule extends NeuronUpdateRule implements
+		BoundedUpdateRule {
 
+	/** The default activation ceiling. */
 	public static final int DEFAULT_CEILING = 100;
 
+	/** The default activation floor. */
 	public static final int DEFAULT_FLOOR = 0;
 
 	/** Steepness. */
@@ -64,6 +68,12 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 	/** Local variable. */
 	private double a = 0;
 
+	/** The upper bound of the activity. */
+	private double ceiling = DEFAULT_CEILING;
+
+	/** The lower bound of the activity. */
+	private double floor = DEFAULT_FLOOR;
+
 	/**
 	 * Default constructor.
 	 */
@@ -84,6 +94,7 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 		NakaRushtonRule rn = new NakaRushtonRule();
 		rn.setSteepness(getSteepness());
 		rn.setSemiSaturationConstant(getSemiSaturationConstant());
+		rn.setCeiling(getCeiling());
 		rn.setAddNoise(getAddNoise());
 		rn.setUseAdaptation(getUseAdaptation());
 		rn.setAdaptationParameter(getAdaptationParameter());
@@ -113,7 +124,7 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 
 		if (p > 0) {
 			s =
-					(neuron.getUpperBound() * Math.pow(p, steepness))
+					(getCeiling() * Math.pow(p, steepness))
 							/ (Math.pow(semiSaturationConstant + a,
 									steepness) + Math.pow(p, steepness));
 		} else {
@@ -129,7 +140,37 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 					(neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
 		}
 
+		if (val < floor) {
+			val = floor;
+		}
+		if (val > ceiling) {
+			val = ceiling;
+		}
+
 		neuron.setBuffer(val);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void incrementActivation(Neuron n) {
+		double act = n.getActivation();
+		if (act <= getCeiling()) {
+			if (act + increment > getCeiling()) {
+				act = getCeiling();
+			}
+			n.setActivation(act);
+			n.getNetwork().fireNeuronChanged(n);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		return getCeiling() * Math.random();
 	}
 
 	/**
@@ -286,14 +327,24 @@ public class NakaRushtonRule extends NeuronUpdateRule {
 		return "Naka-Rushton";
 	}
 
-	/**
-	 * For Naka-Rushton, default Ceiling is 100, default floor is 0.
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void setDefaultParameters(Neuron n) {
-		n.setUpperBound(DEFAULT_CEILING);
-		n.setLowerBound(DEFAULT_FLOOR);
-		n.setIncrement(DEFAULT_INCREMENT);
+	public double getCeiling() {
+		return ceiling;
 	}
+
+	@Override
+	public void setCeiling(double ceiling) {
+		this.ceiling = ceiling;
+	}
+
+	@Override
+	public double getFloor() {
+		return floor;
+	}
+
+	@Override
+	public void setFloor(double floor) {
+		this.floor = floor;
+	}
+
 }

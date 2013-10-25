@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import java.util.Random;
+
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
@@ -42,7 +44,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
 
 		if (neuron.getWeightedInputs() >= threshold) {
 			setHasSpiked(true, neuron);
-			neuron.setBuffer(neuron.getUpperBound());
+			neuron.setBuffer(1);
 		} else {
 			setHasSpiked(false, neuron);
 			neuron.setBuffer(0); // Make this a separate variable?
@@ -50,6 +52,15 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		Random rand = new Random();
+		return rand.nextBoolean() ? 1 : 0;
+	}
+	
 	/**
 	 * @return the threshold
 	 */
@@ -69,4 +80,16 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
 	public String getDescription() {
 		return "Spiking Threshold";
 	}
+
+	@Override
+	public double getCeiling() {
+		return 1;
+	}
+
+	@Override
+	public double getFloor() {
+		return 0;
+	}
+
+
 }

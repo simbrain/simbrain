@@ -25,7 +25,6 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
-import org.simbrain.util.Predicate;
 
 import edu.umd.cs.piccolo.PNode;
 

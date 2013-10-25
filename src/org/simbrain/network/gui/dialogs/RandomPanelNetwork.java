@@ -22,7 +22,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.RandomizerPanel;
 

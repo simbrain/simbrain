@@ -25,9 +25,9 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.AbstractSynapsePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ClampedSynapseRulePanel;
+import org.simbrain.util.LinkIcon;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwitchableActionListener;
-import org.simbrain.util.LinkIcon;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.randomizer.Randomizer;
 

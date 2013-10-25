@@ -115,13 +115,13 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 		List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
 
 		// TODO: Think about these defaults...
-		initializeLayer(inputLayerNeurons, new LinearRule(), 0,
+		initializeLayer(inputLayerNeurons, new LinearRule(),
 				numInputNodes);
-		initializeLayer(hiddenLayerNeurons, hiddenNeuronType, -1,
+		initializeLayer(hiddenLayerNeurons, hiddenNeuronType,
 				numHiddenNodes);
-		initializeLayer(outputLayerNeurons, outputNeuronType, 0,
+		initializeLayer(outputLayerNeurons, outputNeuronType,
 				numOutputNodes);
-		initializeLayer(contextLayerNeurons, new LinearRule(), -1,
+		initializeLayer(contextLayerNeurons, new LinearRule(),
 				numHiddenNodes);
 
 		// Input Layer
@@ -200,12 +200,11 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 	 *            the desired number of nodes
 	 */
 	private void initializeLayer(List<Neuron> layer,
-			NeuronUpdateRule nodeType, double lowerBound, int nodes) {
+			NeuronUpdateRule nodeType, int nodes) {
 
 		for (int i = 0; i < nodes; i++) {
 			Neuron node = new Neuron(getParentNetwork(), nodeType);
-			node.setIncrement(1);
-			node.setLowerBound(lowerBound);
+			nodeType.setIncrement(1);
 			layer.add(node);
 		}
 	}

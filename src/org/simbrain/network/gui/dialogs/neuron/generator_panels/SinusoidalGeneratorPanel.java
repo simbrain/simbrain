@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.neuron.rule_panels;
+package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
-import org.simbrain.network.neuron_update_rules.SinusoidalRule;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simbrain.util.randomizer.Randomizer;
@@ -36,7 +37,7 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>SinusoidalNeuronPanel</b>.
  */
-public class SinusoidalRulePanel extends AbstractNeuronPanel {
+public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
 
 	/** Phase field. */
 	private JTextField tfPhase = new JTextField();
@@ -63,7 +64,7 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
 	 * Creates an instance of this panel.
 	 * 
 	 */
-	public SinusoidalRulePanel() {
+	public SinusoidalGeneratorPanel() {
 		super();
 		this.add(tabbedPanel);
 		mainPanel.addItem("Phase", tfPhase);
@@ -199,9 +200,9 @@ public class SinusoidalRulePanel extends AbstractNeuronPanel {
 	}
 
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
+	protected void writeValuesToRules(List<Neuron> neurons) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

@@ -42,7 +42,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.network.trainers.TrainerListener;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;

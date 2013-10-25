@@ -31,14 +31,11 @@ public abstract class NeuronUpdateRule {
 	/** The maximum number of digits to display in the tool tip. */
 	private static final int MAX_DIGITS = 9;
 
-	/** The default upper bound of a neuron using this rule. */
-	public static final double DEFAULT_CEILING = 1.0;
-
-	/** The default lower bound of a neuron using this rule. */
-	public static final double DEFAULT_FLOOR = -1.0;
-
 	/** The default increment of a neuron using this rule. */
 	public static final double DEFAULT_INCREMENT = 0.1;
+
+	/** Amount by which to increment or decrement neuron. */
+	protected double increment = DEFAULT_INCREMENT;
 
 	/**
 	 * Returns the type of time update (discrete or continuous) associated with
@@ -64,25 +61,27 @@ public abstract class NeuronUpdateRule {
 	public abstract NeuronUpdateRule deepCopy();
 
 	/**
-	 * Returns a brief description of this update rule. Used in combo boxes in
-	 * the GUI.
-	 * 
-	 * @return the description.
+	 * Increment a neuron by increment.
 	 */
-	public abstract String getDescription();
+	public void incrementActivation(Neuron n) {
+		n.forceSetActivation(n.getActivation() + increment);
+		n.getNetwork().fireNeuronChanged(n);
+	}
 
 	/**
-	 * Sets the default parameters of a neuron based on the default values of
-	 * the implemented update rule.
-	 * 
-	 * @param n
-	 *            the neuron whose bounds are being changed.
+	 * Decrement a neuron by increment.
 	 */
-	public void setDefaultParameters(Neuron n) {
-		n.setUpperBound(DEFAULT_CEILING);
-		n.setLowerBound(DEFAULT_FLOOR);
-		n.setIncrement(DEFAULT_INCREMENT);
+	public void decrementActivation(Neuron n) {
+		n.forceSetActivation(n.getActivation() - increment);
+		n.getNetwork().fireNeuronChanged(n);
 	}
+
+	/**
+	 * Returns a random value between the upper and lower bounds of this neuron.
+	 * 
+	 * @return the random value.
+	 */
+	public abstract double getRandomValue();
 
 	/**
 	 * Set activation to 0; override for other "clearing" behavior (e.g. setting
@@ -94,6 +93,18 @@ public abstract class NeuronUpdateRule {
 	public void clear(final Neuron neuron) {
 		neuron.setActivation(0);
 	}
+
+	public abstract double getCeiling();
+
+	public abstract double getFloor();
+
+	/**
+	 * Returns a brief description of this update rule. Used in combo boxes in
+	 * the GUI.
+	 * 
+	 * @return the description.
+	 */
+	public abstract String getDescription();
 
 	/**
 	 * Returns string for tool tip or short description. Override to provide
@@ -108,12 +119,12 @@ public abstract class NeuronUpdateRule {
 				+ Utils.round(neuron.getActivation(), MAX_DIGITS);
 	}
 
-	public double getDefaultCeiling() {
-		return DEFAULT_CEILING;
+	public double getIncrement() {
+		return increment;
 	}
 
-	public double getDefaultFloor() {
-		return DEFAULT_FLOOR;
+	public void setIncrement(double increment) {
+		this.increment = increment;
 	}
 
 	public double getDefaultIncrement() {

@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.HodgkinHuxleyRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -105,12 +106,6 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 	// }
 
 	@Override
-	public void commitChanges(Neuron neuron) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void commitChanges(List<Neuron> neuron) {
 		// TODO Auto-generated method stub
 
@@ -126,9 +121,15 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 	}
 
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
+	public void commitChanges(Neuron neuron) {
 		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

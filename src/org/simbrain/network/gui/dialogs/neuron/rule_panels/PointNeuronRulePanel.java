@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -27,6 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
@@ -95,16 +97,16 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
 	public PointNeuronRulePanel() {
 		super();
 		this.add(tabbedPane);
-		mainTab.addItem("Excitatory reversal", tfER);
-		mainTab.addItem("Inhibitory reversal", tfIR);
-		mainTab.addItem("Leak reversal", tfLR);
-		mainTab.addItem("Leak conductance", tfLC);
-		outputFunctionTab.addItem("Output function", cbOutputFunction);
+		mainTab.addItem("Excitatory Reversal", tfER);
+		mainTab.addItem("Inhibitory Reversal", tfIR);
+		mainTab.addItem("Leak Reversal", tfLR);
+		mainTab.addItem("Leak Conductance", tfLC);
+		outputFunctionTab.addItem("Output Function", cbOutputFunction);
 		outputFunctionTab.addItem("Threshold", tfThreshold);
 		outputFunctionTab.addItem("Gain", tfGain);
-		inputsTab.addItem("Bias", tfBias);
 		inputsTab
-				.addItem("Time averaging time constant", tfTimeAveraging);
+				.addItem("Net Time Constant", tfTimeAveraging);
+		inputsTab.addItem("Bias", tfBias);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(inputsTab, "Inputs");
 		tabbedPane.add(outputFunctionTab, "Output Function");
@@ -219,17 +221,12 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 
-		PointNeuronRule neuronRef;
-
-		if (neuron.getUpdateRule() instanceof PointNeuronRule) {
-			neuronRef = (PointNeuronRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = prototypeRule.deepCopy();
-			neuron.setUpdateRule(neuronRef);
+		if (!(neuron.getUpdateRule() instanceof PointNeuronRule)) {
+			neuron.setUpdateRule(prototypeRule.deepCopy());
 		}
-
-		writeValuesToRule(neuronRef);
-
+		
+		writeValuesToRules(Collections.singletonList(neuron));
+		
 	}
 
 	/**
@@ -239,76 +236,103 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
 	public void commitChanges(List<Neuron> neurons) {
 
 		if (isReplace()) {
-
 			PointNeuronRule neuronRef = prototypeRule.deepCopy();
-
-			writeValuesToRule(neuronRef);
-
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-
-		} else {
-
-			for (Neuron n : neurons) {
-				writeValuesToRule(n.getUpdateRule());
-			}
-
-		}
-
+		} 
+		
+		writeValuesToRules(neurons);
+		
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
-
-		PointNeuronRule neuronRef = (PointNeuronRule) rule;
-
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		int numNeurons = neurons.size();
+		
 		// Excitatory Reversal
-		if (!tfER.getText().equals(NULL_STRING))
-			neuronRef.setExcitatoryReversal(Double.parseDouble(tfER
-					.getText()));
-
+		double er = doubleParsable(tfER);
+		if (!Double.isNaN(er)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setExcitatoryReversal(er);
+			}
+		}
+		
 		// Inhibitory Reversal
-		if (!tfIR.getText().equals(NULL_STRING))
-			neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR
-					.getText()));
-
+		double ir = doubleParsable(tfIR);
+		if (!Double.isNaN(ir)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setInhibitoryReversal(ir);
+			}
+		}
+		
 		// Leak Reversal
-		if (!tfLR.getText().equals(NULL_STRING))
-			neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
-
+		double lr = doubleParsable(tfLR);
+		if (!Double.isNaN(lr)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setLeakReversal(lr);
+			}
+		}
+		
 		// Leak Conductance
-		if (!tfLC.getText().equals(NULL_STRING))
-			neuronRef.setLeakConductance(Double.parseDouble(tfLC
-					.getText()));
-
-		// Output Function
-		if (!cbOutputFunction.getSelectedItem().toString()
-				.equals(NULL_STRING))
-			neuronRef.setOutputFunction((OutputFunction) cbOutputFunction
-					.getSelectedItem());
-
-		// Threshold Potential
-		if (!tfThreshold.getText().equals(NULL_STRING))
-			neuronRef.setThresholdPotential(Double
-					.parseDouble(tfThreshold.getText()));
-
+		double lc = doubleParsable(tfLC);
+		if (!Double.isNaN(lc)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setLeakConductance(lc);
+			}
+		}
+		
+		// Output function
+		if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setOutputFunction((OutputFunction) cbOutputFunction
+						.getSelectedItem());
+			}
+		}
+		
+		// Threshold
+		double threshold = doubleParsable(tfThreshold);
+		if (!Double.isNaN(threshold)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setThresholdPotential(threshold);
+			}
+		}
+		
 		// Gain
-		if (!tfGain.getText().equals(NULL_STRING))
-			neuronRef.setGain(Double.parseDouble(tfGain.getText()));
-
+		double gain = doubleParsable(tfGain);
+		if (!Double.isNaN(gain)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setGain(gain);
+			}
+		}
+		
 		// Bias
-		if (!tfBias.getText().equals(NULL_STRING))
-			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-
-		// Time Averaging
-		if (!tfTimeAveraging.getText().equals(NULL_STRING))
-			neuronRef.setNetTimeConstant((Double
-					.parseDouble(tfTimeAveraging.getText())));
-
+		double bias = doubleParsable(tfBias);
+		if (!Double.isNaN(bias)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setBias(bias);
+			}
+		}
+		
+		// Time Averaging Time Constant
+		double tatc = doubleParsable(tfTimeAveraging);
+		if (!Double.isNaN(tatc)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((PointNeuronRule) neurons.get(i).getUpdateRule())
+				.setNetTimeConstant(tatc);
+			}
+		}
 	}
 
 	/**

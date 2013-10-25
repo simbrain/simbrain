@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
@@ -28,6 +29,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
@@ -62,9 +64,6 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 	/** Random tab. */
 	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-	/** Clipping combo box. */
-	private TristateDropDown isClipping = new TristateDropDown();
-
 	/** Add noise combo box. */
 	private TristateDropDown isAddNoise = new TristateDropDown();
 
@@ -83,7 +82,6 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 		mainTab.addItem("Reset potential", tfReset);
 		mainTab.addItem("Threshold", tfThreshold);
 		mainTab.addItem("Time constant", tfTimeConstant);
-		mainTab.addItem("Use clipping", isClipping);
 		mainTab.addItem("Add noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(randTab, "Noise");
@@ -114,13 +112,6 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 		else
 			tfResistance.setText(Double.toString(neuronRef
 					.getResistance()));
-
-		// Handle Clipping
-		if (!NetworkUtils.isConsistent(ruleList,
-				IntegrateAndFireRule.class, "getClipping"))
-			isClipping.setNull();
-		else
-			isClipping.setSelected(neuronRef.getClipping());
 
 		// Handle Add Noise
 		if (!NetworkUtils.isConsistent(ruleList,
@@ -182,7 +173,6 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 				.setText(Double.toString(prototypeRule.getThreshold()));
 		tfTimeConstant.setText(Double.toString(prototypeRule
 				.getTimeConstant()));
-		isClipping.setSelected(prototypeRule.getClipping());
 		isAddNoise.setSelected(prototypeRule.getAddNoise());
 		randTab.fillDefaultValues();
 	}
@@ -193,16 +183,11 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 
-		IntegrateAndFireRule neuronRef;
+		if (!(neuron.getUpdateRule() instanceof IntegrateAndFireRule)) {
+			neuron.setUpdateRule(prototypeRule.deepCopy());
+		} 
 
-		if (neuron.getUpdateRule() instanceof IntegrateAndFireRule) {
-			neuronRef = (IntegrateAndFireRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = prototypeRule.deepCopy();
-			neuron.setUpdateRule(neuronRef);
-		}
-
-		writeValuesToRule(neuronRef);
+		writeValuesToRules(Collections.singletonList(neuron));
 
 	}
 
@@ -213,71 +198,83 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 	public void commitChanges(List<Neuron> neurons) {
 
 		if (isReplace()) {
-
 			IntegrateAndFireRule neuronRef = prototypeRule.deepCopy();
-
-			writeValuesToRule(neuronRef);
-
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-
-		} else {
-
-			for (Neuron n : neurons) {
-				writeValuesToRule(n.getUpdateRule());
-			}
-
-		}
-
+		} 
+		writeValuesToRules(neurons);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
-
-		IntegrateAndFireRule neuronRef = (IntegrateAndFireRule) rule;
-
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		int numNeurons = neurons.size();
+		
+		// Time Constant
+		double timeConstant = doubleParsable(tfTimeConstant);
+		if (!Double.isNaN(timeConstant)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setTimeConstant(timeConstant);
+			}
+		}
+		
+		// Threshold
+		double threshold = doubleParsable(tfThreshold);
+		if (!Double.isNaN(threshold)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setThreshold(threshold);
+			}
+		}
+		
+		// Reset
+		double reset = doubleParsable(tfReset);
+		if (!Double.isNaN(reset)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setResetPotential(reset);
+			}
+		}
+		
 		// Resistance
-		if (!tfResistance.getText().equals(NULL_STRING))
-			neuronRef.setResistance(Double.parseDouble(tfResistance
-					.getText()));
+		double resistance = doubleParsable(tfResistance);
+		if (!Double.isNaN(resistance)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setResistance(resistance);
+			}
+		}
 
 		// Resting Potential
-		if (!tfRestingPotential.getText().equals(NULL_STRING))
-			neuronRef.setRestingPotential(Double
-					.parseDouble(tfRestingPotential.getText()));
-
-		// Reset Potential
-		if (!tfReset.getText().equals(NULL_STRING))
-			neuronRef.setResetPotential(Double.parseDouble(tfReset
-					.getText()));
-
-		// Threshold
-		if (!tfThreshold.getText().equals(NULL_STRING))
-			neuronRef.setThreshold(Double.parseDouble(tfThreshold
-					.getText()));
-
-		// Time Constant
-		if (!tfTimeConstant.getText().equals(NULL_STRING))
-			neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant
-					.getText()));
-
-		// Clipping?
-		if (!isClipping.isNull())
-			neuronRef
-					.setClipping(isClipping.getSelectedIndex() == TristateDropDown
-							.getTRUE());
-
-		// Noise?
-		if (!isAddNoise.isNull()) {
-			neuronRef.setAddNoise(isAddNoise.isSelected());
-			if (isAddNoise.getSelectedIndex() == TristateDropDown
-					.getTRUE())
-				randTab.commitRandom(neuronRef.getNoiseGenerator());
+		double restingPotential = doubleParsable(tfRestingPotential);
+		if (!Double.isNaN(restingPotential)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setRestingPotential(restingPotential);
+			}
 		}
+
+		// Add Noise?
+		if(!isAddNoise.isNull()) {
+			boolean addNoise = isAddNoise.getSelectedIndex()
+					== TristateDropDown.getTRUE();
+			for (int i = 0; i < numNeurons; i++) {
+				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
+				.setAddNoise(addNoise);
+
+
+			}  		
+			if (addNoise) {
+				for (int i = 0; i < numNeurons; i++) {
+					randTab.commitRandom(((IntegrateAndFireRule) neurons.get(i)
+							.getUpdateRule()).getNoiseGenerator());
+				}
+			}
+		}	
 
 	}
 
@@ -287,5 +284,5 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 	public IntegrateAndFireRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
-
+	
 }

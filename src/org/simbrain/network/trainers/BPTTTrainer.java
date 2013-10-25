@@ -23,10 +23,9 @@ import java.util.List;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.subnetworks.BPTTNetwork;
-import org.simbrain.util.Utils;
 
 /**
  * Trainer for backprop through time Networks. As a test use the "Walker" tables.

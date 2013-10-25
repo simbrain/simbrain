@@ -12,6 +12,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
  *
  * Adapted from software written by Anthony Fodor, with help from Jonathan
  * Vickrey.
+ * TODO: No implementation.
  */
 public class HodgkinHuxleyRule extends NeuronUpdateRule {
 
@@ -295,5 +296,23 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule {
     public String getDescription() {
         return "Hodgkin-Huxley";
     }
+
+	@Override
+	public double getRandomValue() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getCeiling() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getFloor() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

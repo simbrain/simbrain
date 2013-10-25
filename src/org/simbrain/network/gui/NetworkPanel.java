@@ -38,7 +38,6 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -46,7 +45,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
-import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.connections.ConnectNeurons;
@@ -2148,7 +2146,8 @@ public class NetworkPanel extends JPanel {
 			PNode node = (PNode) i.next();
 			if (node instanceof NeuronNode) {
 				NeuronNode neuronNode = (NeuronNode) node;
-				neuronNode.getNeuron().incrementActivation();
+				neuronNode.getNeuron().getUpdateRule()
+				.decrementActivation(neuronNode.getNeuron());
 			} else if (node instanceof SynapseNode) {
 				SynapseNode synapseNode = (SynapseNode) node;
 				synapseNode.getSynapse().incrementWeight();
@@ -2166,7 +2165,8 @@ public class NetworkPanel extends JPanel {
 			PNode node = (PNode) i.next();
 			if (node instanceof NeuronNode) {
 				NeuronNode neuronNode = (NeuronNode) node;
-				neuronNode.getNeuron().decrementActivation();
+				neuronNode.getNeuron().getUpdateRule()
+				.decrementActivation(neuronNode.getNeuron());
 				neuronNode.update();
 			} else if (node instanceof SynapseNode) {
 				SynapseNode synapseNode = (SynapseNode) node;

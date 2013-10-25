@@ -21,6 +21,10 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -33,7 +37,8 @@ import org.simbrain.util.randomizer.Randomizer;
  *
  */
 public class SigmoidalRule extends NeuronUpdateRule implements
-        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule {
+        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
+        BoundedUpdateRule {
 
     /** Implementations of the Sigmoidal activation function. */
     public static enum SigmoidType {
@@ -66,6 +71,12 @@ public class SigmoidalRule extends NeuronUpdateRule implements
         }
     };
 
+	/** The Default upper bound. */
+	private static final double DEFAULT_CEILING = 1.0;
+	
+	/** The Default lower bound. */
+	private static final double DEFAULT_FLOOR = 0.0;
+    
     /** Current implementation. */
     private SigmoidType type = SigmoidType.LOGISTIC;
 
@@ -81,6 +92,12 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     /** Adds noise to neuron. */
     private boolean addNoise = false;
 
+	/** The upper bound of the activity if clipping is used. */
+	private double ceiling = DEFAULT_CEILING;
+	
+	/** The lower bound of the activity if clipping is used. */
+	private double floor = DEFAULT_FLOOR;
+    
     /**
      * Default sigmoidal.
      */
@@ -140,6 +157,45 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         neuron.setBuffer(val);
     }
+    
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void incrementActivation(Neuron n) {
+		double act = n.getActivation();
+		if (act < getCeiling()){
+			act += getIncrement();
+			if (act > getCeiling())
+				act = getCeiling();
+			n.setActivation(act);
+			n.getNetwork().fireNeuronChanged(n);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void decrementActivation(Neuron n) {
+		double act = n.getActivation();
+		if (act > getFloor()){
+			act -= getIncrement();
+			if (act < getFloor())
+				act = getFloor();
+			n.setActivation(act);
+			n.getNetwork().fireNeuronChanged(n);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		return (getCeiling() - getFloor()) * Math.random()
+				- getFloor();
+	}
 
     /**
      * Return the derivative of the activation function.
@@ -150,9 +206,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     public double getDerivative(final double x, final Neuron neuron) {
         double retVal = 0;
-        double u = neuron.getUpperBound();
-        double l = neuron.getLowerBound();
-        double diff = u - l;
+        double up = getCeiling();
+        double lw = getFloor();
+        double diff = up - lw;
 
         switch (type) {
         case TANH:
@@ -186,18 +242,14 @@ public class SigmoidalRule extends NeuronUpdateRule implements
             val = invAtan(val, neuron);
             break;
         case LOGISTIC:
-            val = invSigm(val, neuron);
+            val = invLogistic(val, neuron);
             break;
         default:
-            val = invSigm(val, neuron);
+            val = invLogistic(val, neuron);
             break;
         }
         return val;
     }
-
-    // TODO Move variables like diff and a to init, and make sure init is called
-    // when
-    // upper bound, lower bound, or slope are changed.
 
     /**
      * Returns the results of the hyperbolic tangent function.
@@ -207,11 +259,11 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @return results of tanh
      */
     private double tanh(final double input, Neuron neuron) {
-        double u = neuron.getUpperBound();
-        double l = neuron.getLowerBound();
-        double diff = u - l;
+        double up = getCeiling();
+        double lw = getFloor();
+        double diff = up - lw;
         double a = (2 * slope) / diff;
-        return (diff / 2) * Math.tanh(a * input) + ((u + l) / 2);
+        return (diff / 2) * Math.tanh(a * input) + ((up + lw) / 2);
     }
 
     /**
@@ -222,9 +274,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @return arctanh
      */
     private double invTanh(final double input, Neuron neuron) {
-        double u = neuron.getUpperBound();
-        double l = neuron.getLowerBound();
-        double z = 0.5 * (((input - l) / (u - l)) - 0.5);
+        double up = getCeiling();
+        double lw = getFloor();
+        double z = 0.5 * (((input - lw) / (up - lw)) - 0.5);
         return (Math.log((1 + z)) / (1 - z));
     }
 
@@ -236,10 +288,10 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @return results of sigm
      */
     private double logistic(final double input, Neuron neuron) {
-        double u = neuron.getUpperBound();
-        double l = neuron.getLowerBound();
-        double diff = u - l;
-        return diff * logistic(slope * input / diff) + l;
+        double up = getCeiling();
+        double lw = getFloor();
+        double diff = up - lw;
+        return diff * logistic(slope * input / diff) + lw;
     }
 
     /**
@@ -259,11 +311,11 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @param neuron from which the value is being mapped
      * @return the inverse sigmoid
      */
-    private double invSigm(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        double diff = upperBound - lowerBound;
-        return diff * -Math.log(diff / (input - lowerBound) - 1) / slope;
+    private double invLogistic(final double input, Neuron neuron) {
+        double up = getCeiling();
+        double lw = getFloor();
+        double diff = up - lw;
+        return diff * -Math.log(diff / (input - lw) - 1) / slope;
     }
 
     /**
@@ -274,11 +326,11 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @return results of atan
      */
     private double atan(final double input, Neuron neuron) {
-        double u = neuron.getUpperBound();
-        double l = neuron.getLowerBound();
-        double diff = u - l;
+        double up = getCeiling();
+        double lw = getFloor();
+        double diff = up - lw;
         double a = (Math.PI * slope) / diff;
-        return (diff / Math.PI) * Math.atan(a * input) + ((u + l) / 2);
+        return (diff / Math.PI) * Math.atan(a * input) + ((up + lw) / 2);
     }
 
     /**
@@ -289,11 +341,11 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * @return the inverse of the atan activation function
      */
     private double invAtan(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        double a = (Math.PI * slope) / (upperBound - lowerBound);
-        double diff = upperBound - lowerBound;
-        double z = ((input - ((upperBound + lowerBound) / 2)) * (Math.PI / diff));
+        double up = getCeiling();
+        double lw = getFloor();
+        double a = (Math.PI * slope) / (up - lw);
+        double diff = up - lw;
+        double z = ((input - ((up + lw) / 2)) * (Math.PI / diff));
         return Math.tan(z) / a;
     }
 
@@ -387,5 +439,25 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     public void setType(SigmoidType type) {
         this.type = type;
     }
+
+    @Override
+	public double getCeiling() {
+		return ceiling;
+	}
+
+	@Override
+	public double getFloor() {
+		return floor;
+	}
+
+	@Override
+	public void setCeiling(double ceiling) {
+		this.ceiling = ceiling;	
+	}
+
+	@Override
+	public void setFloor(double floor) {
+		this.floor = floor;
+	}
 
 }

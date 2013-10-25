@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
@@ -28,13 +29,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>AdditiveNeuronPanel</b>.
+ * <b>AdditiveNeuronPanel</b>. TODO: No implementation... why?
  */
 public class AdditiveRulePanel extends AbstractNeuronPanel {
 
@@ -53,9 +55,6 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 	/** Random tab. */
 	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-	/** Clipping combo box. */
-	private TristateDropDown isClipping = new TristateDropDown();
-
 	/** Add noise combo box. */
 	private TristateDropDown isAddNoise = new TristateDropDown();
 
@@ -73,7 +72,6 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		this.add(tabbedPane);
 		mainTab.addItem("Lambda", tfLambda);
 		mainTab.addItem("Resistance", tfResistance);
-		mainTab.addItem("Use clipping", isClipping);
 		mainTab.addItem("Add noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(randTab, "Noise");
@@ -89,7 +87,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 
 		tfLambda.setText(Double.toString(neuronRef.getLambda()));
 		tfResistance.setText(Double.toString(neuronRef.getResistance()));
-		isClipping.setSelected(neuronRef.getClipping());
+		// isClipping.setSelected(neuronRef.getClipping());
 		isAddNoise.setSelected(neuronRef.getAddNoise());
 
 		// Handle consistency of multiple selections
@@ -101,11 +99,6 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
 				"getResistance")) {
 			tfResistance.setText(NULL_STRING);
-		}
-
-		if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
-				"getClipping")) {
-			isClipping.setNull();
 		}
 
 		if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
@@ -137,27 +130,22 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(prototypeRule.getLambda()));
 		tfResistance.setText(Double.toString(prototypeRule
 				.getResistance()));
-		isClipping.setSelected(prototypeRule.getClipping());
+		// isClipping.setSelected(prototypeRule.getClipping());
 		isAddNoise.setSelected(prototypeRule.getAddNoise());
 		randTab.fillDefaultValues();
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * 
 	 */
 	@Override
-	public void commitChanges(Neuron neuron) {
+	public void commitChanges(final Neuron neuron) {
 
-		AdditiveRule neuronRef;
-
-		if (neuron.getUpdateRule() instanceof AdditiveRule) {
-			neuronRef = (AdditiveRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = prototypeRule.deepCopy();
-			neuron.setUpdateRule(neuronRef);
+		if (!(neuron.getUpdateRule() instanceof AdditiveRule)) {
+			neuron.setUpdateRule(prototypeRule.deepCopy());
 		}
 
-		writeValuesToRule(neuronRef);
+		writeValuesToRules(Collections.singletonList(neuron));
 
 	}
 
@@ -165,25 +153,16 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void commitChanges(List<Neuron> neurons) {
+	public void commitChanges(final List<Neuron> neurons) {
 
 		if (isReplace()) {
-
 			AdditiveRule neuronRef = prototypeRule.deepCopy();
-
-			writeValuesToRule(neuronRef);
-
 			for (Neuron n : neurons) {
-				n.setUpdateRule(neuronRef.deepCopy());
+				n.setUpdateRule(neuronRef);
 			}
-
-		} else {
-
-			for (Neuron n : neurons) {
-				writeValuesToRule(n.getUpdateRule());
-			}
-
 		}
+
+		writeValuesToRules(neurons);
 
 	}
 
@@ -191,33 +170,44 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
-
-		AdditiveRule neuronRef = (AdditiveRule) rule;
+	protected void writeValuesToRules(final List<Neuron> neurons) {
+		int numNeurons = neurons.size();
 
 		// Lambda
-		if (!tfLambda.getText().equals(NULL_STRING))
-			neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));
-
-		// Resistance
-		if (!tfResistance.getText().equals(NULL_STRING))
-			neuronRef.setResistance(Double.parseDouble(tfResistance
-					.getText()));
-
-		// Noise On/Of
-		if (!isAddNoise.isNull())
-			neuronRef
-					.setClipping(isClipping.getSelectedIndex() == TristateDropDown
-							.getTRUE());
-
-		// Noise
-		if (!isAddNoise.isNull()) {
-			neuronRef.setAddNoise(isAddNoise.isSelected());
-			if (isAddNoise.getSelectedIndex() == TristateDropDown
-					.getTRUE())
-				randTab.commitRandom(neuronRef.getNoiseGenerator());
+		double lambda = doubleParsable(tfLambda);
+		if (!Double.isNaN(lambda)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((AdditiveRule) neurons.get(i).getUpdateRule())
+						.setLambda(lambda);
+			}
 		}
 
+		// Resistance
+		double resistance = doubleParsable(tfResistance);
+		if (!Double.isNaN(resistance)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((AdditiveRule) neurons.get(i).getUpdateRule())
+						.setResistance(resistance);
+			}
+		}
+
+		// Add Noise?
+		if (!isAddNoise.isNull()) {
+			boolean addNoise =
+					isAddNoise.getSelectedIndex() == TristateDropDown
+							.getTRUE();
+			for (int i = 0; i < numNeurons; i++) {
+				((AdditiveRule) neurons.get(i).getUpdateRule())
+						.setAddNoise(addNoise);
+
+			}
+			if (addNoise) {
+				for (int i = 0; i < numNeurons; i++) {
+					randTab.commitRandom(((AdditiveRule) neurons.get(i)
+							.getUpdateRule()).getNoiseGenerator());
+				}
+			}
+		}
 	}
 
 	/**

@@ -18,29 +18,20 @@
 package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.ESNOfflineTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
 /**
  * PNode representation of an Echo State Network.

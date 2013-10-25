@@ -29,10 +29,10 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 
 /**
  * Backprop trainer. An implementation of the backpropagation learning
@@ -325,8 +325,7 @@ public class BackpropTrainer extends IterableTrainer {
 		List<Neuron> inputLayer = new ArrayList<Neuron>();
 		for (int i = 0; i < 2; i++) {
 			Neuron neuron = new Neuron(network, new LinearRule());
-			neuron.setIncrement(1); // For easier testing
-			neuron.setLowerBound(0);
+			neuron.getUpdateRule().setIncrement(1); // For easier testing
 			network.addNeuron(neuron);
 			inputLayer.add(neuron);
 		}
@@ -337,7 +336,6 @@ public class BackpropTrainer extends IterableTrainer {
 		List<Neuron> hiddenLayer = new ArrayList<Neuron>();
 		for (int i = 0; i < 5; i++) {
 			Neuron neuron = new Neuron(network, new SigmoidalRule());
-			neuron.setLowerBound(0);
 			network.addNeuron(neuron);
 			hiddenLayer.add(neuron);
 		}
@@ -349,7 +347,6 @@ public class BackpropTrainer extends IterableTrainer {
 		List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
 		for (int i = 0; i < 5; i++) {
 			Neuron neuron = new Neuron(network, new SigmoidalRule());
-			neuron.setLowerBound(0);
 			network.addNeuron(neuron);
 			hiddenLayer2.add(neuron);
 			// System.out.println("Hidden2-" + i + " = " + neuron.getId());
@@ -362,7 +359,6 @@ public class BackpropTrainer extends IterableTrainer {
 		List<Neuron> outputLayer = new ArrayList<Neuron>();
 		for (int i = 0; i < 1; i++) {
 			Neuron neuron = new Neuron(network, new SigmoidalRule());
-			neuron.setLowerBound(0);
 			network.addNeuron(neuron);
 			outputLayer.add(neuron);
 		}

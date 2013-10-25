@@ -27,9 +27,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.TestInputAction;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;

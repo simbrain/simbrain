@@ -21,35 +21,12 @@ package org.simbrain.network.core;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractNeuronPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.BinaryRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.DecayRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IACRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IntegrateAndFireRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IzhikevichRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.LinearRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.NakaRushtonRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.PointNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
-import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.neuron_update_rules.DecayRule;
-import org.simbrain.network.neuron_update_rules.IACRule;
-import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.neuron_update_rules.IzhikevichRule;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
-import org.simbrain.network.neuron_update_rules.PointNeuronRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
-import org.simbrain.network.neuron_update_rules.ThreeValueRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
@@ -73,15 +50,6 @@ public class Neuron {
 	/** Activation value of the neuron. The main state variable. */
 	private double activation = 0;
 
-	/** Minimum value this neuron can take. */
-	private double lowerBound = -1;
-
-	/** Maximum value this neuron can take. */
-	private double upperBound = 1;
-
-	/** Amount by which to increment or decrement neuron. */
-	private double increment = .1;
-
 	/** Temporary activation value. */
 	private double buffer = 0;
 
@@ -96,6 +64,9 @@ public class Neuron {
 
 	/** List of synapses attaching to this neuron. */
 	private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
+	
+	/** A marker for whether or not the update rule is an input generator. */
+	private boolean generator = false;
 
 	/** x-coordinate of this neuron in 2-space. */
 	private double x;
@@ -118,37 +89,6 @@ public class Neuron {
 	 * neurons to fire before other neurons, assign it a smaller priority value.
 	 */
 	private int updatePriority = 0;
-
-	/** Associations between names of rules and panels for editing them. */
-	public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
-			new LinkedHashMap<String, AbstractNeuronPanel>();
-
-	/*
-	 * Populate the Rule Map
-	 */
-	static {
-		RULE_MAP.put(new BinaryRule().getDescription(),
-				new BinaryRulePanel());
-		RULE_MAP.put(new DecayRule().getDescription(),
-				new DecayRulePanel());
-		RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
-		RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
-				new IntegrateAndFireRulePanel());
-		RULE_MAP.put(new IzhikevichRule().getDescription(),
-				new IzhikevichRulePanel());
-		RULE_MAP.put(new LinearRule().getDescription(),
-				new LinearRulePanel());
-		RULE_MAP.put(new NakaRushtonRule().getDescription(),
-				new NakaRushtonRulePanel());
-		RULE_MAP.put(new PointNeuronRule().getDescription(),
-				new PointNeuronRulePanel());
-		RULE_MAP.put(new SigmoidalRule().getDescription(),
-				new SigmoidalRulePanel());
-		RULE_MAP.put(new SpikingThresholdRule().getDescription(),
-				new SpikingThresholdRulePanel());
-		RULE_MAP.put(new ThreeValueRule().getDescription(),
-				new ThreeValueRulePanel());
-	}
 
 	/**
 	 * Construct a specific type of neuron from a string description.
@@ -192,9 +132,6 @@ public class Neuron {
 		setClamped(n.isClamped());
 		setUpdateRule(n.getUpdateRule().deepCopy());
 		forceSetActivation(n.getActivation());
-		setUpperBound(n.getUpperBound());
-		setLowerBound(n.getLowerBound());
-		setIncrement(n.getIncrement());
 		setInputValue(n.getInputValue());
 		setX(n.getX());
 		setY(n.getY());
@@ -272,6 +209,7 @@ public class Neuron {
 			getNetwork().updateTimeType();
 			getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
 		}
+		setGenerator(updateRule instanceof ActivityGenerator);
 	}
 
 	/**
@@ -338,57 +276,6 @@ public class Neuron {
 	}
 
 	/**
-	 * @return upper bound of the neuron.
-	 */
-	public double getUpperBound() {
-		return upperBound;
-	}
-
-	/**
-	 * Sets the upper bound of the neuron.
-	 * 
-	 * @param d
-	 *            Value to set upper bound
-	 */
-	public void setUpperBound(final double d) {
-		upperBound = d;
-	}
-
-	/**
-	 * @return lower bound of the neuron.
-	 */
-	public double getLowerBound() {
-		return lowerBound;
-	}
-
-	/**
-	 * Sets the lower bound of the neuron.
-	 * 
-	 * @param d
-	 *            Value to set lower bound
-	 */
-	public void setLowerBound(final double d) {
-		lowerBound = d;
-	}
-
-	/**
-	 * @return the neuron increment.
-	 */
-	public double getIncrement() {
-		return increment;
-	}
-
-	/**
-	 * Sets the neuron increment.
-	 * 
-	 * @param d
-	 *            Value to set increment
-	 */
-	public void setIncrement(final double d) {
-		increment = d;
-	}
-
-	/**
 	 * @return the fan in array list.
 	 */
 	public List<Synapse> getFanIn() {
@@ -402,25 +289,7 @@ public class Neuron {
 		return fanOut;
 	}
 
-	/**
-	 * Increment this neuron by increment.
-	 */
-	public void incrementActivation() {
-		if (activation < upperBound) {
-			activation += increment;
-		}
-		this.getNetwork().fireNeuronChanged(this);
-	}
 
-	/**
-	 * Decrement this neuron by increment.
-	 */
-	public void decrementActivation() {
-		if (activation > lowerBound) {
-			activation -= increment;
-		}
-		this.getNetwork().fireNeuronChanged(this);
-	}
 
 	/**
 	 * Connect this neuron to target neuron via a weight.
@@ -496,24 +365,15 @@ public class Neuron {
 	 * Randomize this neuron to a value between upperBound and lowerBound.
 	 */
 	public void randomize() {
-		forceSetActivation(getRandomValue());
+		forceSetActivation(getUpdateRule().getRandomValue());
 		getNetwork().fireNeuronChanged(this);
-	}
-
-	/**
-	 * Returns a random value between the upper and lower bounds of this neuron.
-	 * 
-	 * @return the random value.
-	 */
-	public double getRandomValue() {
-		return (upperBound - lowerBound) * Math.random() + lowerBound;
 	}
 
 	/**
 	 * Randomize this neuron to a value between upperBound and lowerBound.
 	 */
 	public void randomizeBuffer() {
-		setBuffer(getRandomValue());
+		setBuffer(getUpdateRule().getRandomValue());
 	}
 
 	/**
@@ -524,33 +384,6 @@ public class Neuron {
 	 */
 	public void round(final int precision) {
 		forceSetActivation(Network.round(getActivation(), precision));
-	}
-
-	/**
-	 * If activation is above or below its bounds set it to those bounds.
-	 */
-	public void checkBounds() {
-		activation = clip(activation);
-	}
-
-	/**
-	 * If value is above or below its bounds set it to those bounds.
-	 * 
-	 * @param value
-	 *            Value to check
-	 * @return clip
-	 */
-	public double clip(final double value) {
-		double val = value;
-		if (val > upperBound) {
-			val = upperBound;
-		}
-
-		if (val < lowerBound) {
-			val = lowerBound;
-		}
-
-		return val;
 	}
 
 	/**
@@ -918,13 +751,6 @@ public class Neuron {
 	}
 
 	/**
-	 * @return the rulelist
-	 */
-	public static String[] getRulelist() {
-		return RULE_MAP.keySet().toArray(new String[RULE_MAP.size()]);
-	}
-
-	/**
 	 * A method that returns a list of all the neuron update rules associated
 	 * with a list of neurons.
 	 * 
@@ -960,4 +786,26 @@ public class Neuron {
 	public void setParentGroup(Group parentGroup) {
 		this.parentGroup = parentGroup;
 	}
+
+	/**
+	 * @return 
+	 * 		Whether or not this is an input generator.
+	 */
+	public boolean isGenerator() {
+		return generator;
+	}
+
+	/**
+	 * Mark this neuron as an input generator. Automatically sets the
+	 * {@link #fanIn fan-in list} to null if true.
+	 * @param generator
+	 * 				Whether or not this is being set as an input generator.
+	 */
+	public void setGenerator(boolean generator) {
+		this.generator = generator;
+		if (generator) {
+			fanIn = null;
+		}
+	}
+
 }

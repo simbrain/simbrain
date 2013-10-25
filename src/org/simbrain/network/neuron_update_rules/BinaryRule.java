@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import java.util.Random;
+
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -27,9 +29,17 @@ import org.simbrain.network.core.NeuronUpdateRule;
  */
 public class BinaryRule extends NeuronUpdateRule {
 
+	private static final double DEFAULT_CEILING = 1.0;
+	
+	private static final double DEFAULT_FLOOR = -1.0;
+	
 	/** Threshold for binary neurons. */
 	private double threshold = .5;
 
+	private double ceiling = DEFAULT_CEILING;
+	
+	private double floor = DEFAULT_FLOOR;
+	
 	/** Bias for binary neurons. */
 	private double bias = 0;
 
@@ -46,6 +56,9 @@ public class BinaryRule extends NeuronUpdateRule {
 	public BinaryRule deepCopy() {
 		BinaryRule bn = new BinaryRule();
 		bn.setThreshold(getThreshold());
+		bn.setCeiling(getCeiling());
+		bn.setFloor(getFloor());
+		bn.setIncrement(getIncrement());
 		return bn;
 	}
 
@@ -56,12 +69,21 @@ public class BinaryRule extends NeuronUpdateRule {
 		double wtdInput = neuron.getWeightedInputs() + bias;
 
 		if (wtdInput > threshold) {
-			neuron.setBuffer(neuron.getUpperBound());
+			neuron.setBuffer(getCeiling());
 		} else {
-			neuron.setBuffer(neuron.getLowerBound());
+			neuron.setBuffer(getFloor());
 		}
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getRandomValue() {
+		Random rand = new Random();
+		return rand.nextBoolean() ? getCeiling() : getFloor();
+	}
+	
 	/**
 	 * @return Returns the threshold.
 	 */
@@ -95,6 +117,24 @@ public class BinaryRule extends NeuronUpdateRule {
 	@Override
 	public String getDescription() {
 		return "Binary";
+	}
+
+
+	public double getCeiling() {
+		return ceiling;
+	}
+
+	public void setCeiling(double ceiling) {
+		this.ceiling = ceiling;
+	}
+
+
+	public double getFloor() {
+		return floor;
+	}
+
+	public void setFloor(double floor) {
+		this.floor = floor;
 	}
 
 }

@@ -24,16 +24,14 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JFormattedTextField;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer object.
@@ -79,8 +77,9 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      */
     public RandomizerPanel(final boolean useLocalBounds) {
     	
-    	JPanel center = new JPanel(new GridLayout(0, 2));
-    	
+    	GridLayout gl = new GridLayout(0,2);
+    	gl.setVgap(5);
+    	JPanel center = new JPanel(gl);
     	
     	this.setLayout(new GridBagLayout());
     	GridBagConstraints gbc = new GridBagConstraints();

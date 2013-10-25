@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs;
+package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -39,8 +39,6 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
-import org.simbrain.network.gui.dialogs.neuron.ExtendedNeuronInfoPanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -52,7 +50,7 @@ import org.simbrain.util.TristateDropDown;
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
  * neuron type and a layout.
- *
+ * 
  * @author ztosi
  * @author jyoshimi
  */
@@ -107,7 +105,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
 	/**
 	 * Constructs the dialog.
-	 *
+	 * 
 	 * @param networkPanel
 	 *            the panel the neurons are being added to.
 	 */
@@ -163,7 +161,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
 		moreSettingsPanel =
 				new ExtendedNeuronInfoPanel(
-						Collections.singletonList(baseNeuron));
+						Collections.singletonList(baseNeuron), this);
 		moreSettingsPanel.setAlignmentX(CENTER_ALIGNMENT);
 		moreSettingsPanel.setVisible(extraDataTriangle.isDown());
 		topPanel.add(moreSettingsPanel, BorderLayout.SOUTH);
@@ -267,7 +265,7 @@ public class AddNeuronsDialog extends StandardDialog {
 		moreSettingsPanel.commitChanges();
 		selectNeuronType.getNeuronPanel().commitChanges(baseNeuron);
 		boolean clamp =
-				selectNeuronType.getClamped().getSelectedIndex() == TristateDropDown
+				moreSettingsPanel.getClamped().getSelectedIndex() == TristateDropDown
 						.getTRUE();
 		baseNeuron.setClamped(clamp);
 		selectLayout.commitChanges();
@@ -292,9 +290,9 @@ public class AddNeuronsDialog extends StandardDialog {
 	 * neuron group. Options include a new neuron group, already existing neuron
 	 * group, or no neuron group (loose). The user can also change a group's
 	 * name from here.
-	 *
+	 * 
 	 * @author ztosi
-	 *
+	 * 
 	 */
 	private class NeuronGroupPanel extends JPanel {
 
@@ -311,7 +309,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
 		/**
 		 * Creates the neuron group sub-panel
-		 *
+		 * 
 		 * @param np
 		 *            a reference to the network panel.
 		 */
@@ -343,6 +341,10 @@ public class AddNeuronsDialog extends StandardDialog {
 				public void actionPerformed(ActionEvent arg0) {
 
 					tfGroupName.setEnabled(addToGroup.isSelected());
+					String dName =
+							networkPanel.getNetwork()
+									.getGroupIdGenerator().getId();
+					tfGroupName.setText(dName);
 
 				}
 
@@ -354,7 +356,7 @@ public class AddNeuronsDialog extends StandardDialog {
 		 * Generates the neuron group with the attributes from the panel.
 		 * Returns null if the {@link #addToGroup addToGroup} check-box is not
 		 * selected.
-		 *
+		 * 
 		 * @return
 		 */
 		public NeuronGroup generateNeuronGroup() {

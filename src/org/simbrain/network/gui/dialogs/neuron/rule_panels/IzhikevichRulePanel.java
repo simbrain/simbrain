@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
@@ -28,6 +29,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
@@ -162,16 +164,11 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 
-		IzhikevichRule neuronRef;
-
-		if (neuron.getUpdateRule() instanceof IzhikevichRule) {
-			neuronRef = (IzhikevichRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = prototypeRule.deepCopy();
-			neuron.setUpdateRule(neuronRef);
+		if (!(neuron.getUpdateRule() instanceof IzhikevichRule)) {
+			neuron.setUpdateRule(prototypeRule.deepCopy());
 		}
-
-		writeValuesToRule(neuronRef);
+		
+		writeValuesToRules(Collections.singletonList(neuron));
 
 	}
 
@@ -182,56 +179,72 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 	public void commitChanges(List<Neuron> neurons) {
 
 		if (isReplace()) {
-
 			IzhikevichRule neuronRef = prototypeRule.deepCopy();
-
-			writeValuesToRule(neuronRef);
-
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-
-		} else {
-
-			for (Neuron n : neurons) {
-				writeValuesToRule(n.getUpdateRule());
-			}
-
-		}
+		} 
+		
+		writeValuesToRules(neurons);
 
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * 
 	 */
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
-
-		IzhikevichRule neuronRef = (IzhikevichRule) rule;
-
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		int numNeurons = neurons.size();
+		
 		// A
-		if (!tfA.getText().equals(NULL_STRING))
-			neuronRef.setA(Double.parseDouble(tfA.getText()));
-
-		// B
-		if (!tfB.getText().equals(NULL_STRING))
-			neuronRef.setB(Double.parseDouble(tfB.getText()));
-
-		// C
-		if (!tfC.getText().equals(NULL_STRING))
-			neuronRef.setC(Double.parseDouble(tfC.getText()));
-
-		// D
-		if (!tfD.getText().equals(NULL_STRING))
-			neuronRef.setD(Double.parseDouble(tfD.getText()));
-
-		// Noise?
-		if (!tsNoise.isNull()) {
-			neuronRef.setAddNoise(tsNoise.isSelected());
-			if (tsNoise.getSelectedIndex() == TristateDropDown.getTRUE())
-				randTab.commitRandom(neuronRef.getNoiseGenerator());
+		double a = doubleParsable(tfA);
+		if (!Double.isNaN(a)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IzhikevichRule) neurons.get(i).getUpdateRule()).setA(a);
+			}
 		}
+		
+		// B
+		double b = doubleParsable(tfB);
+		if (!Double.isNaN(b)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IzhikevichRule) neurons.get(i).getUpdateRule()).setB(b);
+			}
+		}
+		
+		// C
+		double c = doubleParsable(tfC);
+		if (!Double.isNaN(c)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IzhikevichRule) neurons.get(i).getUpdateRule()).setC(c);
+			}
+		}
+		
+		// D
+		double d = doubleParsable(tfD);
+		if (!Double.isNaN(d)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((IzhikevichRule) neurons.get(i).getUpdateRule()).setD(d);
+			}
+		}
+		
+		// Add Noise?
+		if(!tsNoise.isNull()) {
+			boolean addNoise = tsNoise.getSelectedIndex()
+					== TristateDropDown.getTRUE();
+			for (int i = 0; i < numNeurons; i++) {
+				((IzhikevichRule) neurons.get(i).getUpdateRule())
+				.setAddNoise(addNoise);
 
+
+			}  		
+			if (addNoise) {
+				for (int i = 0; i < numNeurons; i++) {
+					randTab.commitRandom(((IzhikevichRule) neurons.get(i)
+							.getUpdateRule()).getNoiseGenerator());
+				}
+			}
+		}
 	}
 
 	/**
@@ -240,5 +253,5 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 	public IzhikevichRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
-
+	
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,6 +26,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -37,11 +39,11 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 	/** Threshold for this neuron. */
 	private JTextField tfLowerThreshold = new JTextField();
 
-	/** Bias for this neuron. */
-	private JTextField tfBias = new JTextField();
-
 	/** Upper threshold field. */
 	private JTextField tfUpperThreshold = new JTextField();
+	
+	/** Bias for this neuron. */
+	private JTextField tfBias = new JTextField();
 
 	/** Lower value field. */
 	private JTextField tfLowerValue = new JTextField();
@@ -153,18 +155,13 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 	 */
 	@Override
 	public void commitChanges(Neuron neuron) {
-
-		ThreeValueRule neuronRef;
-
-		if (neuron.getUpdateRule() instanceof ThreeValueRule) {
-			neuronRef = (ThreeValueRule) neuron.getUpdateRule();
-		} else {
-			neuronRef = prototypeRule.deepCopy();
-			neuron.setUpdateRule(neuronRef);
-		}
-
-		writeValuesToRule(neuronRef);
-
+		
+		if (!(neuron.getUpdateRule() instanceof ThreeValueRule)) {
+			neuron.setUpdateRule(prototypeRule.deepCopy());
+		} 
+		
+		writeValuesToRules(Collections.singletonList(neuron));
+		
 	}
 
 	/**
@@ -174,64 +171,78 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 	public void commitChanges(List<Neuron> neurons) {
 
 		if (isReplace()) {
-
 			ThreeValueRule neuronRef = prototypeRule.deepCopy();
-
-			writeValuesToRule(neuronRef);
-
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-
-		} else {
-
-			for (Neuron n : neurons) {
-				writeValuesToRule(n.getUpdateRule());
-			}
-
 		}
-
+		
+		writeValuesToRules(neurons);
+		
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc} 
 	 */
 	@Override
-	protected void writeValuesToRule(NeuronUpdateRule rule) {
-
-		ThreeValueRule neuronRef = (ThreeValueRule) rule;
-
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		int numNeurons = neurons.size();
+		
 		// Lower Threshold
-		if (!tfLowerThreshold.getText().equals(NULL_STRING))
-			neuronRef.setLowerThreshold(Double
-					.parseDouble(tfLowerThreshold.getText()));
-
+		double lt = doubleParsable(tfLowerThreshold);
+		if (!Double.isNaN(lt)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setLowerThreshold(lt);
+			}
+		}
+		
 		// Upper Threshold
-		if (!tfUpperThreshold.getText().equals(NULL_STRING))
-			neuronRef.setUpperThreshold(Double
-					.parseDouble(tfUpperThreshold.getText()));
-
+		double ut = doubleParsable(tfUpperThreshold);
+		if (!Double.isNaN(ut)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setUpperThreshold(ut);
+			}
+		}
+		
 		// Bias
-		if (!tfBias.getText().equals(NULL_STRING))
-			neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-
+		double bias = doubleParsable(tfBias);
+		if (!Double.isNaN(bias)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setBias(bias);
+			}
+		}
+		
 		// Lower Value
-		if (!tfLowerValue.getText().equals(NULL_STRING))
-			neuronRef.setLowerValue(Double.parseDouble(tfLowerValue
-					.getText()));
-
+		double lv = doubleParsable(tfLowerValue);
+		if (!Double.isNaN(lv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setLowerValue(lv);
+			}
+		}
+		
 		// Middle Value
-		if (!tfMiddleValue.getText().equals(NULL_STRING))
-			neuronRef.setMiddleValue(Double.parseDouble(tfMiddleValue
-					.getText()));
-
+		double mv = doubleParsable(tfMiddleValue);
+		if (!Double.isNaN(mv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setMiddleValue(mv);
+			}
+		}
+		
 		// Upper Value
-		if (!tfUpperValue.getText().equals(NULL_STRING))
-			neuronRef.setUpperValue(Double.parseDouble(tfUpperValue
-					.getText()));
-
+		double uv = doubleParsable(tfUpperValue);
+		if (!Double.isNaN(uv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+				.setUpperValue(uv);
+			}
+		}
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

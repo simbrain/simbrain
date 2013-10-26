@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs;
+package org.simbrain.network.gui.dialogs.group;
 
 /**
  * Interface for property panels that have fill field and commit change methods.

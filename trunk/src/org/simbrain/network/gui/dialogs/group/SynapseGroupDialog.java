@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs;
+package org.simbrain.network.gui.dialogs.group;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,7 +26,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
-import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;

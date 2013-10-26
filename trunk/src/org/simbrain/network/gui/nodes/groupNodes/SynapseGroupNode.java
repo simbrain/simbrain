@@ -38,7 +38,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
-import org.simbrain.network.gui.dialogs.SynapseGroupDialog;
+import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;

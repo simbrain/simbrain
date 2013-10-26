@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.GroupPropertiesPanel;
+import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.util.StandardDialog;

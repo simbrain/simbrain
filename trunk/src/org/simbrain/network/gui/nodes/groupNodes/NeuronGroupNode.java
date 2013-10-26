@@ -35,7 +35,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.NeuronGroupDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;

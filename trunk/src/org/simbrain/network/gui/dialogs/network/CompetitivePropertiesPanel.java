@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.GroupPropertiesPanel;
+import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;

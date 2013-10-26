@@ -31,7 +31,8 @@ import org.simbrain.util.StandardDialog;
 
 /**
  * <b>KwtaDialog</b> is used as an assistant to create Kwta networks.
- * 
+ *
+ * TODO: When this is re-implemented, use new property panel format.
  */
 public class KwtaCreationDialog extends StandardDialog {
 

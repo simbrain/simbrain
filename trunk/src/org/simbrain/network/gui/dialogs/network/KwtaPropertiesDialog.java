@@ -29,6 +29,8 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * k-winner take all network.
+ *
+ * TODO: When this is re-implemented, use new property panel format.
  */
 public class KwtaPropertiesDialog extends StandardDialog {
 

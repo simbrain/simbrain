@@ -580,8 +580,6 @@ public final class NetworkActionManager {
                         networkPanel), "(Bare) Neuron Group"),
                 new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
                         networkPanel), "Competitive"),
-                new AddGroupAction(networkPanel, new KwtaCreationDialog(
-                        networkPanel), "KWTA"),
                 new AddGroupAction(networkPanel, new SOMCreationDialog(
                         networkPanel), "SOM (Self organizing map)"),
                 new AddGroupAction(networkPanel, new WTACreationDialog(
@@ -862,15 +860,6 @@ public final class NetworkActionManager {
      */
     public Action getNewSOMNetworkAction() {
         return newSOMNetworkAction;
-    }
-
-    /**
-     * Return the K Winner Take All network action.
-     *
-     * @return the K Winner Take All network action
-     */
-    public Action getNewKwtaNetworkAction() {
-        return newKwtaNetworkAction;
     }
 
     /**

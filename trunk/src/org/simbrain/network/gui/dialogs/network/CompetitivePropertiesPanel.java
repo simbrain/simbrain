@@ -134,7 +134,6 @@ public class CompetitivePropertiesPanel extends JPanel implements
         mainPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
         mainPanel.addItem("Normalize Inputs", cbNormalizeInputs);
         mainPanel.addItem("Synapse Decay Percent", tfSynpaseDecayPercent);
-        //this.addButton(helpButton); //TODO
 
         updateMethod.addActionListener(new ActionListener() {
             @Override
@@ -230,6 +229,11 @@ public class CompetitivePropertiesPanel extends JPanel implements
         } else {
             tfLeakyEpsilon.setEnabled(false);
         }
+    }
+
+    @Override
+    public String getHelpPath() {
+        return "Pages/Network/network/competitivenetwork.html";
     }
 
 }

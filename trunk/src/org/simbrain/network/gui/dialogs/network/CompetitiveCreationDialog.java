@@ -18,13 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -69,7 +71,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         setTitle("New Competitive Network");
 
         compPropertiesPanel = new CompetitivePropertiesPanel(networkPanel);
-        ((GroupPropertiesPanel) compPropertiesPanel).fillFieldValues();
+        compPropertiesPanel.fillFieldValues();
 
         // Set up tab panels
         tabLogic.add(compPropertiesPanel);
@@ -78,13 +80,19 @@ public class CompetitiveCreationDialog extends StandardDialog {
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
+
+        // Help action
+        Action helpAction = new ShowHelpAction(
+                compPropertiesPanel.getHelpPath());
+        addButton(new JButton(helpAction));
+
     }
 
     /**
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        Competitive competitive = (Competitive) ((GroupPropertiesPanel) compPropertiesPanel)
+        Competitive competitive = (Competitive) compPropertiesPanel
                 .commitChanges();
         networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();

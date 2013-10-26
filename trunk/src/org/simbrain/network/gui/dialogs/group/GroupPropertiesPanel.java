@@ -37,4 +37,12 @@ public interface GroupPropertiesPanel {
      */
     Group commitChanges();
 
+    /**
+     * Returns a string path to the documentation page for this group, relative
+     * to the top level Simbrain/doc directory.
+     *
+     * @return the path to the docs
+     */
+    String getHelpPath();
+
 }

@@ -22,12 +22,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
+import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
+import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesPanel;
 import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.util.ShowHelpAction;
+import org.simbrain.util.StandardDialog;
 
 /**
  * PNode representation of Hopfield Network.
@@ -60,8 +64,19 @@ public class HopfieldNode extends SubnetworkNode {
         Action editNet = new AbstractAction(
                 "Set Hopfield Network Properties...") {
             public void actionPerformed(final ActionEvent event) {
-                HopfieldPropertiesDialog dialog = new HopfieldPropertiesDialog(
-                        (Hopfield) getGroup());
+                final HopfieldPropertiesPanel panel = new HopfieldPropertiesPanel(
+                        getNetworkPanel(), (Hopfield) getGroup());
+                StandardDialog dialog = new StandardDialog() {
+                    @Override
+                    protected void closeDialogOk() {
+                        super.closeDialogOk();
+                        panel.commitChanges();
+                    }
+                };
+                dialog.setContentPane(panel);
+                Action helpAction = new ShowHelpAction(
+                        panel.getHelpPath());
+                dialog.addButton(new JButton(helpAction));
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);

@@ -20,6 +20,8 @@ package org.simbrain.network.gui.dialogs.group;
 
 import java.awt.geom.Point2D;
 
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -31,6 +33,7 @@ import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -105,8 +108,13 @@ public class NeuronGroupDialog extends StandardDialog {
         layoutPanel = new MainLayoutPanel(false, this);
         tabLayout.add(layoutPanel);
 
-        // TODO: Help button
-
+        // Set up help button
+        if (specificNeuronGroupPanel != null) {
+            Action helpAction = new ShowHelpAction(
+                    ((GroupPropertiesPanel) specificNeuronGroupPanel)
+                            .getHelpPath());
+            this.addButton(new JButton(helpAction));
+        }
     }
 
     /**

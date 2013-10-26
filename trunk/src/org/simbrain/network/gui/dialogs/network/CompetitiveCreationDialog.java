@@ -28,9 +28,7 @@ import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>CompetitiveDialog</b> is used as an assistant to create competitive
- * networks.
- *
+ * <b>CompetitiveDialog</b>.  Create competitive networks.
  */
 public class CompetitiveCreationDialog extends StandardDialog {
 
@@ -70,7 +68,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         // Initializes dialog
         setTitle("New Competitive Network");
 
-        compPropertiesPanel = new CompetitivePropertiesPanel(networkPanel, true, null);
+        compPropertiesPanel = new CompetitivePropertiesPanel(networkPanel);
         ((GroupPropertiesPanel) compPropertiesPanel).fillFieldValues();
 
         // Set up tab panels
@@ -86,8 +84,8 @@ public class CompetitiveCreationDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        ((GroupPropertiesPanel) compPropertiesPanel).commitChanges();
-        Competitive competitive =  compPropertiesPanel.getNetwork();
+        Competitive competitive = (Competitive) ((GroupPropertiesPanel) compPropertiesPanel)
+                .commitChanges();
         networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();
         layoutPanel.getCurrentLayout().setInitialLocation(

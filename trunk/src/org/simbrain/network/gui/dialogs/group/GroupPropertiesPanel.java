@@ -13,8 +13,12 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import org.simbrain.network.groups.Group;
+
 /**
  * Interface for property panels that have fill field and commit change methods.
+ * These must often be shared between dialogs for creation and editing of a
+ * group, hence the interface.
  *
  * @author Jeff Yoshimi
  *
@@ -27,6 +31,10 @@ public interface GroupPropertiesPanel {
     /**
      * Take all field values from the panel and use it to create or edit
      * relevant object.
+     *
+     * @return a reference to the group, used to get a reference when the panel
+     * is used for group creation.
      */
-    void commitChanges();
+    Group commitChanges();
+
 }

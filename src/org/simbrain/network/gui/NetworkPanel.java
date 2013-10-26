@@ -2147,7 +2147,7 @@ public class NetworkPanel extends JPanel {
 			if (node instanceof NeuronNode) {
 				NeuronNode neuronNode = (NeuronNode) node;
 				neuronNode.getNeuron().getUpdateRule()
-				.decrementActivation(neuronNode.getNeuron());
+				.incrementActivation(neuronNode.getNeuron());
 			} else if (node instanceof SynapseNode) {
 				SynapseNode synapseNode = (SynapseNode) node;
 				synapseNode.getSynapse().incrementWeight();

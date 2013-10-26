@@ -110,12 +110,12 @@ public class NeuronGroupDialog extends StandardDialog {
     }
 
     /**
-     * Setes the specificNeuronGroupPanel based on the underlying group.
+     * Sets the specificNeuronGroupPanel based on the underlying group.
      */
     private void setSpecificGroup() {
         if (neuronGroup instanceof Competitive) {
-            specificNeuronGroupPanel = new CompetitivePropertiesPanel(networkPanel, false,
-                    (Competitive) neuronGroup);
+            specificNeuronGroupPanel = new CompetitivePropertiesPanel(
+                    networkPanel, (Competitive) neuronGroup);
         }
     }
 

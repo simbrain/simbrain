@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
@@ -36,7 +37,9 @@ import org.simbrain.util.ShowHelpAction;
 
 /**
  * <b>CompetitivePropertiesDialog</b> is a panel box for setting the properties
- * of a competitive network.
+ * of a competitive network. Can either be used to create a new
+ * competitive network or to edit an existing competitive
+ * network.
  */
 public class CompetitivePropertiesPanel extends JPanel implements
         ActionListener, GroupPropertiesPanel {
@@ -91,22 +94,37 @@ public class CompetitivePropertiesPanel extends JPanel implements
     private boolean isCreationPanel;
 
     /**
-     * Default constructor.
+     * Constructor for case where an existing competitive network is being
+     * edited.
      *
-     * @param isCreationPanel if true this is being used to create a new
-     *            competitive network
+     * @param np parent network panel
+     */
+    public CompetitivePropertiesPanel(final NetworkPanel np) {
+        this.networkPanel = np;
+        isCreationPanel = true;
+        mainPanel.addItem("Number of neurons", tfNumNeurons);
+        initPanel();
+    }
+
+    /**
+     * Constructor for case where an existing competitive network is being
+     * edited.
+     *
+     * @param np parent network panel
      * @param competitive Competitive network being modified.
      */
-    public CompetitivePropertiesPanel(final NetworkPanel np, final boolean isCreationPanel,
+    public CompetitivePropertiesPanel(final NetworkPanel np,
             final Competitive competitive) {
-
         this.networkPanel = np;
         this.competitive = competitive;
-        this.isCreationPanel = isCreationPanel;
+        isCreationPanel = false;
+        initPanel();
+    }
 
-        if (isCreationPanel) {
-            mainPanel.addItem("Number of neurons", tfNumNeurons);
-        }
+    /**
+     * Initialize the panel.
+     */
+    private void initPanel() {
 
         mainPanel.addItem("UpdateMethod", updateMethod);
         mainPanel.addItem("Epsilon", tfEpsilon);
@@ -140,7 +158,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     }
 
     @Override
-    public void commitChanges() {
+    public Group commitChanges() {
         if (isCreationPanel) {
             competitive = new Competitive(networkPanel.getNetwork(),
                     Integer.parseInt(tfNumNeurons.getText()));
@@ -156,10 +174,14 @@ public class CompetitivePropertiesPanel extends JPanel implements
                 .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
+        return competitive;
     }
 
     @Override
     public void fillFieldValues() {
+
+        // For creation panels use an "empty" competitive network to harvest
+        // default values
         if (isCreationPanel) {
             competitive = new Competitive(null, 1);
             tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
@@ -207,17 +229,6 @@ public class CompetitivePropertiesPanel extends JPanel implements
             tfLeakyEpsilon.setEnabled(true);
         } else {
             tfLeakyEpsilon.setEnabled(false);
-        }
-    }
-
-    /**
-     * For use in creation.
-     */
-    public Competitive getNetwork() {
-        if (!isCreationPanel) {
-            return null; // Should not be called in that case!
-        } else {
-            return competitive;
         }
     }
 

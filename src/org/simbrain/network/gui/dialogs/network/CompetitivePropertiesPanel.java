@@ -84,12 +84,6 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /** The model subnetwork. */
     private Competitive competitive;
 
-    /** Help Button. */
-    private JButton helpButton = new JButton("Help");
-
-    /** Show Help Action. */
-    private ShowHelpAction helpAction;
-
     /** If true this is a creation panel.  Otherwise it is an edit panel. */
     private boolean isCreationPanel;
 
@@ -126,6 +120,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
      */
     private void initPanel() {
 
+        fillFieldValues();
+
         mainPanel.addItem("UpdateMethod", updateMethod);
         mainPanel.addItem("Epsilon", tfEpsilon);
         mainPanel.addItem("Winner Value", tfWinnerValue);
@@ -144,14 +140,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
         cbUseLeakyLearning.addActionListener(this);
         cbUseLeakyLearning.setActionCommand("useLeakyLearning");
 
-        helpAction = new ShowHelpAction(
-                "Pages/Network/network/competitivenetwork.html");
-        helpButton.setAction(helpAction);
-
         checkLeakyEpsilon();
         enableFieldBasedOnUpdateMethod();
-
-        fillFieldValues();
 
         add(mainPanel);
     }

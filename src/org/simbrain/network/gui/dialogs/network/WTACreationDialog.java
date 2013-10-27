@@ -18,9 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -30,7 +29,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -39,7 +38,7 @@ import org.simbrain.util.StandardDialog;
  */
 public class WTACreationDialog extends StandardDialog {
 
-	/** Tabbed pane. */
+    /** Tabbed pane. */
 	private JTabbedPane tabbedPane = new JTabbedPane();
 
 	/** Logic tab panel. */
@@ -49,7 +48,7 @@ public class WTACreationDialog extends StandardDialog {
 	private JPanel tabLayout = new JPanel();
 
 	/** Logic panel. */
-	private LabelledItemPanel logicPanel = new LabelledItemPanel();
+	private WTAPropertiesPanel wtaPanel;
 
 	/** Layout panel. */
 	private MainLayoutPanel layoutPanel;
@@ -74,7 +73,7 @@ public class WTACreationDialog extends StandardDialog {
 
 	/**
 	 * This method is the default constructor.
-	 * 
+	 *
 	 * @param np
 	 *            Network panel
 	 */
@@ -85,71 +84,39 @@ public class WTACreationDialog extends StandardDialog {
 	}
 
 	/**
-	 * Called when dialog closes.
-	 */
-	protected void closeDialogOk() {
-
-		WinnerTakeAll wta =
-				new WinnerTakeAll(networkPanel.getNetwork(),
-						Integer.parseInt(numberOfUnits.getText()));
-		wta.setWinValue(Double.parseDouble(winnerValue.getText()));
-		wta.setLoseValue(Double.parseDouble(loserValue.getText()));
-		wta.setUseRandom(useRandomBox.isSelected());
-		wta.setRandomProb(Double.parseDouble(randomProb.getText()));
-
-		layoutPanel.commitChanges();
-		Layout layout = layoutPanel.getCurrentLayout();
-		layout.setInitialLocation(networkPanel.getLastClickedPosition());
-		layout.layoutNeurons(wta.getNeuronList());
-		networkPanel.getNetwork().addGroup(wta);
-		networkPanel.repaint();
-		super.closeDialogOk();
-	}
-
-	/**
-	 * This method initialises the components on the panel.
+	 * This method initializes the components on the panel.
 	 */
 	private void init() {
 		// Initialize Dialog
 		setTitle("New WTA Network");
 
-		fillFieldValues();
-
-		// Set up logic panel
-		logicPanel.addItem("Number of Units", numberOfUnits);
-		logicPanel.addItem("Winner Value", winnerValue);
-		logicPanel.addItem("Loser Value", loserValue);
-		logicPanel.addItem("Set winner randomly (with some probability)",
-				useRandomBox);
-		logicPanel.addItem("Probability of choosing a random winner",
-				randomProb);
-		// Enable / disable random prob box based on state of use random
-		// checkbox
-		randomProb.setEnabled(useRandomBox.isSelected());
-		useRandomBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				randomProb.setEnabled(useRandomBox.isSelected());
-			}
-		});
-
 		// Set up tab panels
-		tabLogic.add(logicPanel);
+        wtaPanel = new WTAPropertiesPanel(networkPanel);
+		tabLogic.add(wtaPanel);
 		tabLayout.add(layoutPanel);
-		tabbedPane.addTab("Logic", logicPanel);
-		tabbedPane.addTab("Layout", layoutPanel);
+		tabbedPane.addTab("Logic", tabLogic);
+		tabbedPane.addTab("Layout", tabLayout);
 		setContentPane(tabbedPane);
+
+        // Help action
+        Action helpAction = new ShowHelpAction(
+                wtaPanel.getHelpPath());
+        addButton(new JButton(helpAction));
 	}
 
-	/**
-	 * Populate fields with current data.
-	 */
-	private void fillFieldValues() {
 
-		// REDO: Pull default values
-		loserValue.setText("" + 0);
-		numberOfUnits.setText("" + 5);
-		winnerValue.setText("" + 1);
-		useRandomBox.setSelected(false);
-		randomProb.setText("" + .01);
-	}
+    /**
+     * Called when dialog closes.
+     */
+    protected void closeDialogOk() {
+
+        WinnerTakeAll wta = (WinnerTakeAll) wtaPanel.commitChanges();
+        Layout layout = layoutPanel.getCurrentLayout();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        layout.layoutNeurons(wta.getNeuronList());
+        networkPanel.getNetwork().addGroup(wta);
+        networkPanel.repaint();
+        super.closeDialogOk();
+    }
+
 }

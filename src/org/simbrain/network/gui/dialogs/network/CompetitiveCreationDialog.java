@@ -67,11 +67,9 @@ public class CompetitiveCreationDialog extends StandardDialog {
      * Initializes all components used in dialog.
      */
     private void init() {
-        // Initializes dialog
-        setTitle("New Competitive Network");
 
+        setTitle("New Competitive Network");
         compPropertiesPanel = new CompetitivePropertiesPanel(networkPanel);
-        compPropertiesPanel.fillFieldValues();
 
         // Set up tab panels
         tabLogic.add(compPropertiesPanel);
@@ -94,7 +92,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         Competitive competitive = (Competitive) compPropertiesPanel
                 .commitChanges();
-        networkPanel.getNetwork().addGroup(competitive);
+        networkPanel.getNetwork().addGroup(competitive); // Two made here
         layoutPanel.commitChanges();
         layoutPanel.getCurrentLayout().setInitialLocation(
                 networkPanel.getLastClickedPosition());

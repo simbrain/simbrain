@@ -22,11 +22,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMPropertiesDialog;
 import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.listeners.NetworkListener;
@@ -49,8 +48,8 @@ public class SOMNode extends NeuronGroupNode {
     public SOMNode(final NetworkPanel networkPanel, final SOM group) {
         super(networkPanel, group);
         // setStrokePaint(Color.green);
+        setCustomMenu();
         setInteractionBox(new SOMInteractionBox(networkPanel));
-        setContextMenu();
         setOutlinePadding(15f);
         networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
 
@@ -58,9 +57,6 @@ public class SOMNode extends NeuronGroupNode {
                 group.setLabel("SOM - Learning rate:"
                         + Utils.round(group.getAlpha(), 2) + " N-size:"
                         + Utils.round(group.getNeighborhoodSize(), 2));
-            }
-
-            public void networkUpdateMethodChanged() {
             }
 
             public void neuronClampToggled() {
@@ -90,12 +86,12 @@ public class SOMNode extends NeuronGroupNode {
 
         @Override
         protected boolean hasPropertyDialog() {
-            return true;
+            return false;
         }
 
         @Override
         protected JDialog getPropertyDialog() {
-            return new SOMPropertiesDialog((SOM) getGroup());
+            return null;
         }
 
         @Override
@@ -107,28 +103,29 @@ public class SOMNode extends NeuronGroupNode {
     /**
      * Sets custom menu for SOM node.
      */
-    protected void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
-        menu.addSeparator();
-        menu.add(new JMenuItem(new AbstractAction("Reset Network") {
+    protected void setCustomMenu() {
+        JMenu customMenuItems = new JMenu("SOM Actions");
+        customMenuItems.add(new JMenuItem(new AbstractAction("Reset Network") {
             public void actionPerformed(final ActionEvent event) {
                 ((SOM) getGroup()).reset();
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
-        menu.add(new JMenuItem(new AbstractAction("Recall") {
+        customMenuItems.add(new JMenuItem(new AbstractAction("Recall") {
             public void actionPerformed(final ActionEvent event) {
                 ((SOM) getGroup()).recall();
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
-        menu.add(new JMenuItem(new AbstractAction("Randomize SOM Weights") {
+        customMenuItems.add(new JMenuItem(new AbstractAction(
+                "Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 ((SOM) getGroup()).randomizeIncomingWeights();
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
-        menu.add(new JMenuItem(new AbstractAction("Train SOM Network...") {
+        customMenuItems.add(new JMenuItem(new AbstractAction(
+                "Train SOM Network...") {
             // TODO: Integrate below in to training framework?
             public void actionPerformed(final ActionEvent event) {
                 JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
@@ -138,8 +135,7 @@ public class SOMNode extends NeuronGroupNode {
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
-
-        setContextMenu(menu);
+        setCustomMenu(customMenuItems);
     }
 
 }

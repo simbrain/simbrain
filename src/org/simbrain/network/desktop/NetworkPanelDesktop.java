@@ -37,6 +37,7 @@ import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -252,13 +253,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     @Override
     protected GroupNode createGroupNode(Group group) {
-        GroupNode groupNode  = super.createGroupNode(group);
-
+        GroupNode groupNode = super.createGroupNode(group);
         // Returns a special neuron group node with coupling menus set
         if (groupNode.getGroup() instanceof NeuronGroup) {
             return new NeuronGroupNodeDesktop(
                     component.getWorkspaceComponent(),
-                    groupNode.getNetworkPanel(), (NeuronGroup) group);
+                    (NeuronGroupNode) groupNode);
         }
         return groupNode;
     }

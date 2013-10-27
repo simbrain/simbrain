@@ -21,20 +21,31 @@ package org.simbrain.network.gui.dialogs.network;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
-import org.simbrain.util.StandardDialog;
 
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * winner take all network.
  */
-public class WTAPropertiesDialog extends StandardDialog {
+public class WTAPropertiesPanel extends JPanel implements
+    GroupPropertiesPanel {
+
+    /** Default number of neurons. */
+    private static final int DEFAULT_NUM_NEURONS = 5;
+
+    /** Parent Network Panel. */
+    private NetworkPanel networkPanel;
+
+    /** Number of neurons field. */
+    private JTextField tfNumNeurons = new JTextField();
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -54,34 +65,47 @@ public class WTAPropertiesDialog extends StandardDialog {
     /** The model subnetwork. */
     private WinnerTakeAll wta;
 
-    /** Help Button. */
-    private JButton helpButton = new JButton("Help");
-
-    /** Show Help Action. */
-    private ShowHelpAction helpAction;
+    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
 
     /**
      * Default constructor.
      *
+     * @param np parent network panel
+     */
+    public WTAPropertiesPanel(final NetworkPanel np) {
+        this.networkPanel = np;
+        isCreationPanel = true;
+        mainPanel.addItem("Number of neurons", tfNumNeurons);
+        initPanel();
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param np parent network panel
      * @param wta WinnerTakeAll network being modified.
      */
-    public WTAPropertiesDialog(final WinnerTakeAll wta) {
+    public WTAPropertiesPanel(final NetworkPanel np, final WinnerTakeAll wta) {
         this.wta = wta;
-        setTitle("Set WTA Properties");
-        fillFieldValues();
-        this.setLocation(500, 0); // Sets location of network dialog
-        helpAction = new ShowHelpAction(
-                "Pages/Network/network/winnerTakeAll.html");
-        helpButton.setAction(helpAction);
+        isCreationPanel = false;
+        initPanel();
+    }
 
-        this.addButton(helpButton);
+
+    /**
+     * Initialize the panel.
+     */
+    private void initPanel() {
+
+        fillFieldValues();
+
         mainPanel.addItem("Winner Value", winnerValue);
         mainPanel.addItem("Loser Value", loserValue);
         mainPanel.addItem("Set winner randomly (with some probability)",
                 useRandomBox);
         mainPanel
                 .addItem("Probability of choosing a random winner", randomProb);
-        setContentPane(mainPanel);
 
         // Enable / disable random prob box based on state of use random
         // checkbox
@@ -91,27 +115,39 @@ public class WTAPropertiesDialog extends StandardDialog {
                 randomProb.setEnabled(useRandomBox.isSelected());
             }
         });
+        add(mainPanel);
     }
 
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
+    @Override
+    public Group commitChanges() {
+        if (isCreationPanel) {
+            wta = new WinnerTakeAll(networkPanel.getNetwork(),
+                    Integer.parseInt(tfNumNeurons.getText()));
+        }
         wta.setWinValue(Double.parseDouble(winnerValue.getText()));
         wta.setLoseValue(Double.parseDouble(loserValue.getText()));
         wta.setUseRandom(useRandomBox.isSelected());
         wta.setRandomProb(Double.parseDouble(randomProb.getText()));
-        super.closeDialogOk();
+        return wta;
     }
 
-    /**
-     * Populate fields with current data.
-     */
+    @Override
     public void fillFieldValues() {
+        // For creation panels use an "empty" competitive network to harvest
+        // default values
+        if (isCreationPanel) {
+            wta = new WinnerTakeAll(null, 1);
+            tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
+        }
         loserValue.setText("" + wta.getLoseValue());
         winnerValue.setText("" + wta.getWinValue());
         useRandomBox.setSelected(wta.isUseRandom());
         randomProb.setText("" + wta.getRandomProb());
+    }
+
+    @Override
+    public String getHelpPath() {
+        return "Pages/Network/network/winnerTakeAll.html";
     }
 
 }

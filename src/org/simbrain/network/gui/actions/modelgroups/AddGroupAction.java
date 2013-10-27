@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.actions.modelgroups;
 
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
 
@@ -34,19 +35,21 @@ public final class AddGroupAction extends AbstractAction {
     private final NetworkPanel networkPanel;
 
     /** Parent dialog. */
-    private StandardDialog dialog;
+    private Class<? extends StandardDialog> dialogClass;
 
     /**
      * Create a new set synapse properties action with the specified network
      * panel.
      *
      * @param networkPanel networkPanel, must not be null
+     * @param dialogClass the class to be instantiated when this action invoked
+     * @param name string description of this action
      */
     public AddGroupAction(final NetworkPanel networkPanel,
-            StandardDialog dialog, String name) {
+            Class<? extends StandardDialog> dialogClass, final String name) {
 
         super(name);
-        this.dialog = dialog;
+        this.dialogClass = dialogClass;
         this.networkPanel = networkPanel;
 
         if (networkPanel == null) {
@@ -60,12 +63,26 @@ public final class AddGroupAction extends AbstractAction {
      */
     public void actionPerformed(ActionEvent arg0) {
         networkPanel.repaint();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        // Not sure why call below needed, but for some reason the ok button
-        // sometimes goes out of focus when creating a new dialog.
-        dialog.getRootPane().setDefaultButton(dialog.getOkButton());
+        StandardDialog dialog;
+        try {
+            dialog = dialogClass.getDeclaredConstructor(
+                    new Class[] { NetworkPanel.class }).newInstance(
+                    networkPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            // Not sure why call below needed, but for some reason the ok button
+            // sometimes goes out of focus when creating a new dialog.
+            dialog.getRootPane().setDefaultButton(dialog.getOkButton());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -28,9 +28,9 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
- * 
+ *
  * @author William B. St. Clair
- * 
+ *
  *         TODO: Move all "training" functions over to trainer
  */
 public class SOM extends NeuronGroup {
@@ -118,7 +118,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Constructs an SOM network with specified number of neurons.
-	 * 
+	 *
 	 * @param numNeurons
 	 *            size of this network in neurons
 	 * @param root
@@ -135,7 +135,7 @@ public class SOM extends NeuronGroup {
 	/**
 	 * Iterates the network based on training inputs. Does not respect superior
 	 * networks.
-	 * 
+	 *
 	 * TODO: Integrate this code with train and update.
 	 */
 	public void iterate() {
@@ -237,7 +237,7 @@ public class SOM extends NeuronGroup {
 	/**
 	 * Trains the network in batches based on trainingInputs. Does not respect
 	 * superior networks.
-	 * 
+	 *
 	 * TODO: Integrate this code with train and update
 	 */
 	public void train() {
@@ -370,7 +370,7 @@ public class SOM extends NeuronGroup {
 	/**
 	 * Find the SOM neuron which is closest to the input vector. TODO: Reuse
 	 * this more.
-	 * 
+	 *
 	 * @return winner
 	 */
 	private Neuron calculateWinner() {
@@ -389,7 +389,7 @@ public class SOM extends NeuronGroup {
 	/**
 	 * Calculates the Euclidian distance between the SOM neuron's weight vector
 	 * and the input vector.
-	 * 
+	 *
 	 * @param n
 	 *            The SOM neuron one wishes to find the for.
 	 * @return distance.
@@ -405,7 +405,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Finds the physical Euclidian Distance between two neurons.
-	 * 
+	 *
 	 * @param neuron1
 	 *            First neuron.
 	 * @param neuron2
@@ -421,7 +421,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * get Alpha.
-	 * 
+	 *
 	 * @return alpha
 	 */
 	public double getAlpha() {
@@ -430,7 +430,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get alphaDecayRate.
-	 * 
+	 *
 	 * @return alphaDecayRate
 	 */
 	public double getAlphaDecayRate() {
@@ -439,7 +439,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the Batch Size.
-	 * 
+	 *
 	 * @return batchSize
 	 */
 	public int getBatchSize() {
@@ -448,7 +448,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Returns the default SOM neuron.
-	 * 
+	 *
 	 * @return ret default som neuron
 	 */
 	private Neuron getDefaultSOMNeuron() {
@@ -461,7 +461,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * get Epochs.
-	 * 
+	 *
 	 * @return epochs
 	 */
 	public int getEpochs() {
@@ -470,7 +470,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * get Initial Alpha.
-	 * 
+	 *
 	 * @return initAlpha
 	 */
 	public double getInitAlpha() {
@@ -479,7 +479,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the initial neighborhoodsize.
-	 * 
+	 *
 	 * @return initNeighborhoodSize
 	 */
 	public double getInitNeighborhoodSize() {
@@ -488,7 +488,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get neighborhoodDecayAmount.
-	 * 
+	 *
 	 * @return neighborhoodDecayAmount
 	 */
 	public double getNeighborhoodDecayAmount() {
@@ -497,7 +497,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the current neighborhoodsize.
-	 * 
+	 *
 	 * @return neighborhoodSize
 	 */
 	public double getNeighborhoodSize() {
@@ -506,7 +506,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the total number of input vectors.
-	 * 
+	 *
 	 * @return numInputVectors
 	 */
 	public int getNumInputVectors() {
@@ -515,7 +515,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the number of neurons.
-	 * 
+	 *
 	 * @return numNeurons
 	 */
 	public int getNumNeurons() {
@@ -524,7 +524,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the input training File.
-	 * 
+	 *
 	 * @return trainingINFile
 	 */
 	public File getTrainingINFile() {
@@ -533,7 +533,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the training inputs.
-	 * 
+	 *
 	 * @return trainingInputs
 	 */
 	public double[][] getTrainingInputs() {
@@ -542,7 +542,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Get the current vector number.
-	 * 
+	 *
 	 * @return vectorNumber
 	 */
 	public int getVectorNumber() {
@@ -551,7 +551,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set alphaDecayRate.
-	 * 
+	 *
 	 * @param alphaDecayRate
 	 *            decay rate
 	 */
@@ -561,7 +561,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the Batch Size.
-	 * 
+	 *
 	 * @param batchSize
 	 *            Batch Size
 	 */
@@ -571,7 +571,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set Epochs.
-	 * 
+	 *
 	 * @param epochs
 	 *            epochs
 	 */
@@ -581,7 +581,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the initial value for alpha. Resets SOM if new.
-	 * 
+	 *
 	 * @param initAlpha
 	 *            initial alpha
 	 */
@@ -591,7 +591,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the initial neighborhoodsize.
-	 * 
+	 *
 	 * @param initNeighborhoodSize
 	 *            initial neighborhood size Resets SOM if new.
 	 */
@@ -603,7 +603,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set neighborhoodDecayAmount.
-	 * 
+	 *
 	 * @param neighborhoodDecayAmount
 	 *            decay amount
 	 */
@@ -613,7 +613,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the total number of input vectors. Resets SOM if new.
-	 * 
+	 *
 	 * @param numInputVectors
 	 *            total input vectors
 	 */
@@ -623,7 +623,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the number of neurons.
-	 * 
+	 *
 	 * @param numNeurons
 	 *            number of neurons.
 	 */
@@ -633,7 +633,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the training input File.
-	 * 
+	 *
 	 * @param trainingINFile
 	 *            input file
 	 */
@@ -643,7 +643,7 @@ public class SOM extends NeuronGroup {
 
 	/**
 	 * Set the training inputs.
-	 * 
+	 *
 	 * @param trainingInputs
 	 *            inputs
 	 */

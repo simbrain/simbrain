@@ -54,9 +54,9 @@ public class SOMNode extends NeuronGroupNode {
         networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
-                group.setLabel("SOM - Learning rate:"
-                        + Utils.round(group.getAlpha(), 2) + " N-size:"
-                        + Utils.round(group.getNeighborhoodSize(), 2));
+                group.setStateInfo("Learning rate ("
+                        + Utils.round(group.getAlpha(), 2) + ") N-size ("
+                        + Utils.round(group.getNeighborhoodSize(), 2) + ")");
             }
 
             public void neuronClampToggled() {

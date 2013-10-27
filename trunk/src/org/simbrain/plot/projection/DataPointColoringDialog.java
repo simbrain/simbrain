@@ -14,12 +14,14 @@
 package org.simbrain.plot.projection;
 
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -42,7 +44,7 @@ public class DataPointColoringDialog extends StandardDialog implements
         ActionListener {
 
     /** String of coloring methods. */
-    private String[] projectionMethod = { "None", "HotPoint", "DecayTrail", "Frequency" };
+    private String[] projectionMethod = { "None", "DecayTrail", "Frequency" };
 
     /** Projection coloring manager. */
     private DataColoringManager colorManager;
@@ -67,6 +69,9 @@ public class DataPointColoringDialog extends StandardDialog implements
 
     /** Hot color indicator. */
     private JPanel hotColorIndicator = new JPanel();
+
+    /** Hot color on/off toggle. */
+    private JCheckBox hotPointCheckBox = new JCheckBox("Hot Point Mode");
 
     /** Text field to edit floor. */
     private JTextField floor = new JTextField("" + 1);
@@ -95,7 +100,8 @@ public class DataPointColoringDialog extends StandardDialog implements
     /**
      * Dialog constructor.
      *
-     * @param projectionModel the projection model
+     * @param projectionModel
+     *            the projection model
      */
     public DataPointColoringDialog(ProjectionModel projectionModel) {
         this.projectionModel = projectionModel;
@@ -118,12 +124,34 @@ public class DataPointColoringDialog extends StandardDialog implements
         hotColorIndicator.setSize(50, 50);
         baseColorIndicator.setBorder(BorderFactory
                 .createLineBorder(Color.black));
-        hotColorIndicator.setBorder(BorderFactory
-                .createLineBorder(Color.black));
+        hotColorIndicator
+                .setBorder(BorderFactory.createLineBorder(Color.black));
+        if (colorManager.getHotPointMode() == true) {
+            hotPointCheckBox.setSelected(true);
+            hotColorButton.setEnabled(true);
+            hotColorIndicator.setEnabled(true);
+        } else {
+            hotPointCheckBox.setSelected(false);
+            hotColorButton.setEnabled(false);
+            hotColorIndicator.setEnabled(false);
+        }
+        hotPointCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (hotPointCheckBox.isSelected() == true) {
+                    hotColorButton.setEnabled(true);
+                    hotColorIndicator.setEnabled(true);
+                } else {
+                    hotColorButton.setEnabled(false);
+                    hotColorIndicator.setEnabled(false);
+                }
+            }
+        });
         floor.setText("" + Double.toString(colorManager.getFloor()));
         ceiling.setText("" + Double.toString(colorManager.getCeiling()));
-        incrementAmount.setText("" + Double.toString(colorManager.getIncrementAmount()));
-        decrementAmount.setText("" + Double.toString(colorManager.getDecrementAmount()));
+        incrementAmount.setText(""
+                + Double.toString(colorManager.getIncrementAmount()));
+        decrementAmount.setText(""
+                + Double.toString(colorManager.getDecrementAmount()));
         methodPanel.addItem("Coloring Method", coloringMethod);
         ShowHelpAction helpAction = new ShowHelpAction(
                 "Pages/Plot/projection.html");
@@ -136,8 +164,7 @@ public class DataPointColoringDialog extends StandardDialog implements
             public void actionPerformed(ActionEvent arg0) {
                 Color newColor = JColorChooser.showDialog(null,
                         "Choose base color", colorManager.getBaseColor());
-                if (newColor == null)
-                {
+                if (newColor == null) {
                     newColor = baseColorIndicator.getBackground();
                 }
                 baseColor = newColor;
@@ -149,8 +176,7 @@ public class DataPointColoringDialog extends StandardDialog implements
             public void actionPerformed(ActionEvent arg0) {
                 Color newColor = JColorChooser.showDialog(null,
                         "Choose hot color", colorManager.getHotColor());
-                if (newColor == null)
-                {
+                if (newColor == null) {
                     newColor = hotColorIndicator.getBackground();
                 }
                 hotColor = newColor;
@@ -168,6 +194,7 @@ public class DataPointColoringDialog extends StandardDialog implements
         hotColorPanel.add(hotColorIndicator);
 
         mainPanel.add(methodPanel);
+        mainPanel.add(hotPointCheckBox);
         mainPanel.add(baseColorPanel);
         mainPanel.add(hotColorPanel);
         mainPanel.add(currentColoringPanel);
@@ -183,32 +210,18 @@ public class DataPointColoringDialog extends StandardDialog implements
             currentColoringPanel = getNonePanel();
             baseColorButton.setVisible(true);
             baseColorIndicator.setVisible(true);
-            hotColorButton.setVisible(false);
-            hotColorIndicator.setVisible(false);
-            mainPanel.add(currentColoringPanel);
-        } else if (coloringMethod.getSelectedItem() == "HotPoint") {
-            clearColoringPanel();
-            currentColoringPanel = getHotPointPanel();
-            baseColorButton.setVisible(true);
-            baseColorIndicator.setVisible(true);
-            hotColorButton.setVisible(true);
-            hotColorIndicator.setVisible(true);
             mainPanel.add(currentColoringPanel);
         } else if (coloringMethod.getSelectedItem() == "DecayTrail") {
             clearColoringPanel();
             currentColoringPanel = getDecayTrailPanel();
             baseColorButton.setVisible(true);
             baseColorIndicator.setVisible(true);
-            hotColorButton.setVisible(false);
-            hotColorIndicator.setVisible(false);
             mainPanel.add(currentColoringPanel);
         } else if (coloringMethod.getSelectedItem() == "Frequency") {
             clearColoringPanel();
             currentColoringPanel = getFrequencyPanel();
             baseColorButton.setVisible(true);
             baseColorIndicator.setVisible(true);
-            hotColorButton.setVisible(false);
-            hotColorIndicator.setVisible(false);
             mainPanel.add(currentColoringPanel);
         }
         pack();
@@ -222,16 +235,6 @@ public class DataPointColoringDialog extends StandardDialog implements
      * @return coloringPanel the coloringPanel
      */
     private LabelledItemPanel getNonePanel() {
-        LabelledItemPanel coloringPanel = new LabelledItemPanel();
-        return coloringPanel;
-    }
-
-    /**
-     * Create panel for "HotPoint" coloring method.
-     *
-     * @return coloringPanel the coloringPanel
-     */
-    private LabelledItemPanel getHotPointPanel() {
         LabelledItemPanel coloringPanel = new LabelledItemPanel();
         return coloringPanel;
     }
@@ -265,8 +268,7 @@ public class DataPointColoringDialog extends StandardDialog implements
      * Clear the current coloring panel if null.
      */
     private void clearColoringPanel() {
-        if (currentColoringPanel != null)
-        {
+        if (currentColoringPanel != null) {
             mainPanel.remove(currentColoringPanel);
         }
     }
@@ -282,14 +284,15 @@ public class DataPointColoringDialog extends StandardDialog implements
      * Commit changes to coloringManager based on selected coloring method.
      */
     private void commitChanges() {
+        if (hotPointCheckBox.isSelected()) {
+            colorManager.setHotPointMode(true);
+            colorManager.setHotColor(hotColor);
+        } else {
+            colorManager.setHotPointMode(false);
+        }
         if (coloringMethod.getSelectedItem() == "None") {
             colorManager.setColoringMethod("None");
             colorManager.setBaseColor(baseColor);
-        }
-        if (coloringMethod.getSelectedItem() == "HotPoint") {
-            colorManager.setColoringMethod("HotPoint");
-            colorManager.setBaseColor(baseColor);
-            colorManager.setHotColor(hotColor);
         }
         if (coloringMethod.getSelectedItem() == "DecayTrail") {
             colorManager.setColoringMethod("DecayTrail");
@@ -310,6 +313,7 @@ public class DataPointColoringDialog extends StandardDialog implements
 
     /**
      * Reinitialize current coloring panel.
+     *
      * @param e the ActionEvent
      */
     public void actionPerformed(final ActionEvent e) {

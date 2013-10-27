@@ -38,11 +38,6 @@ public class DataColoringManager {
         None,
 
         /**
-         * Color the current point a "hot color" and the rest a "base color".
-         */
-        HotPoint,
-
-        /**
          * The current point gets the greatest saturation and it trails off in a
          * decaying saturation after. Decays based on decay increment.
          */
@@ -56,7 +51,7 @@ public class DataColoringManager {
     };
 
     /** How to color points. */
-    private ColoringMethod coloringMethod = ColoringMethod.HotPoint;
+    private ColoringMethod coloringMethod = ColoringMethod.None;
 
     /** The "hot color" to be used for the current point. */
     private Color hotColor = Color.red;
@@ -64,6 +59,9 @@ public class DataColoringManager {
     /** The base color to be used for all points besides the current point. */
     private Color baseColor = Color.green;
 
+    /** Toggle for hot point coloring mode. The current point is colored hotColor when this is true. */
+    private boolean hotPointMode = false;
+     
     /**
      * The lower bound for "activation" of a point in frequency and decay trail.
      */
@@ -116,16 +114,18 @@ public class DataColoringManager {
      */
     private void updateColorOfPoint(DataPointColored point) {
         if (coloringMethod == ColoringMethod.None) {
-            point.setColor(baseColor);
-        } else if (coloringMethod == ColoringMethod.HotPoint) {
-            if (point == projector.getCurrentPoint()) {
-                point.setColor(hotColor);
-            } else {
-                point.setColor(baseColor);
-            }
+        	if (point == projector.getCurrentPoint() && hotPointMode == true) {
+        		point.setColor(hotColor);
+        	} else {
+        		point.setColor(baseColor);
+        	}
         } else if (coloringMethod == ColoringMethod.DecayTrail) {
             if (point == projector.getCurrentPoint()) {
-                point.setColor(hotColor);
+            	if (point == projector.getCurrentPoint() && hotPointMode == true) {
+            		point.setColor(hotColor);
+            	} else {
+            		point.setColor(baseColor);
+            	}
                 point.spikeActivation(ceiling);
             } else {
                 point.decrementActivation(floor, decrementAmount);
@@ -133,7 +133,11 @@ public class DataColoringManager {
             }
         } else if (coloringMethod == ColoringMethod.Frequency) {
             if (point == projector.getCurrentPoint()) {
-                point.setColor(hotColor);
+            	if (point == projector.getCurrentPoint() && hotPointMode == true) {
+            		point.setColor(hotColor);
+            	} else {
+            		point.setColor(baseColor);
+            	}
                 point.incrementActivation(ceiling, incrementAmount);
             } else {
                 point.setColorBasedOnVal(Utils.colorToFloat(baseColor));
@@ -148,9 +152,7 @@ public class DataColoringManager {
      * @return coloringMethodString the coloring method
      */
     public String getColoringMethodString() {
-        if (coloringMethod == ColoringMethod.HotPoint) {
-            return "HotPoint";
-        } else if (coloringMethod == ColoringMethod.DecayTrail) {
+        if (coloringMethod == ColoringMethod.DecayTrail) {
             return "DecayTrail";
         } else if (coloringMethod == ColoringMethod.Frequency) {
             return "Frequency";
@@ -165,8 +167,6 @@ public class DataColoringManager {
     public void setColoringMethod(String selectedMethod) {
         if (selectedMethod == "None") {
             coloringMethod = ColoringMethod.None;
-        } else if (selectedMethod == "HotPoint") {
-            coloringMethod = ColoringMethod.HotPoint;
         } else if (selectedMethod == "DecayTrail") {
             coloringMethod = ColoringMethod.DecayTrail;
         } else if (selectedMethod == "Frequency") {
@@ -264,4 +264,17 @@ public class DataColoringManager {
         this.decrementAmount = decrementAmount;
     }
 
+    /**
+     * Set hot point coloring mode to on (true) or off (false).
+     */
+    public void setHotPointMode(boolean hotPointMode) {
+        this.hotPointMode = hotPointMode;
+    }
+    
+    /**
+     * @return the hotPointMode
+     */
+    public boolean getHotPointMode() {
+        return hotPointMode;
+    }
 }

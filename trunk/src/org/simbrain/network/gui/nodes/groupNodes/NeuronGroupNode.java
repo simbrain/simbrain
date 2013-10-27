@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
@@ -78,8 +79,6 @@ public class NeuronGroupNode extends GroupNode {
             setStrokePaint(Color.gray);
         }
         setInteractionBox(new NeuronGroupNodeInteractionBox(networkPanel));
-        setContextMenu(getDefaultContextMenu());
-
     }
 
     /**
@@ -208,6 +207,12 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(makeConnection);
+
+        // Add any custom menus for this type
+        if (this.getCustomMenu() != null) {
+            menu.addSeparator();
+            menu.add(getCustomMenu());
+        }
 
         // Coupling menu
         if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {

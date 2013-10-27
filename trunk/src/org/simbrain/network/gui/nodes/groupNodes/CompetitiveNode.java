@@ -21,8 +21,8 @@ package org.simbrain.network.gui.nodes.groupNodes;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.Competitive;
@@ -40,44 +40,45 @@ public class CompetitiveNode extends NeuronGroupNode {
      * @param networkPanel parent panel
      * @param group the competitive network
      */
-    public CompetitiveNode(final NetworkPanel networkPanel, final Competitive group) {
+    public CompetitiveNode(final NetworkPanel networkPanel,
+            final Competitive group) {
         super(networkPanel, group);
-        setContextMenu();
-        //setOutlinePadding(15f);
-//        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
-//
-//            public void networkChanged() {
-//                group.setLabel("SOM - Learning rate:"
-//                        + Utils.round(group.getAlpha(), 2) + " N-size:"
-//                        + Utils.round(group.getNeighborhoodSize(), 2));
-//            }
-//
-//            public void networkUpdateMethodChanged() {
-//            }
-//
-//            public void neuronClampToggled() {
-//            }
-//
-//            public void synapseClampToggled() {
-//            }
-//
-//        });
+        setCustomMenu();
+
+        // setOutlinePadding(15f);
+        // networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
+        //
+        // public void networkChanged() {
+        // group.setLabel("SOM - Learning rate:"
+        // + Utils.round(group.getAlpha(), 2) + " N-size:"
+        // + Utils.round(group.getNeighborhoodSize(), 2));
+        // }
+        //
+        // public void networkUpdateMethodChanged() {
+        // }
+        //
+        // public void neuronClampToggled() {
+        // }
+        //
+        // public void synapseClampToggled() {
+        // }
+        //
+        // });
     }
 
     /**
-     * Sets custom menu for competitive node.
+     * Sets the custom menu for competitive networks.
      */
-    protected void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
-        menu.addSeparator();
-        menu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
+    private void setCustomMenu() {
+        JMenu customMenu = new JMenu("Competitive Net");
+        customMenu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
                 ((Competitive) getGroup()).randomize();
                 ((Competitive) getGroup()).getParentNetwork()
                         .fireNetworkChanged();
             }
         }));
-        setContextMenu(menu);
+        setCustomMenu(customMenu);
     }
 
 }

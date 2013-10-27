@@ -31,7 +31,11 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
+import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
+import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -124,6 +128,12 @@ public class NeuronGroupDialog extends StandardDialog {
         if (neuronGroup instanceof Competitive) {
             specificNeuronGroupPanel = new CompetitivePropertiesPanel(
                     networkPanel, (Competitive) neuronGroup);
+        } else if (neuronGroup instanceof WinnerTakeAll) {
+            specificNeuronGroupPanel = new WTAPropertiesPanel(
+                    networkPanel, (WinnerTakeAll) neuronGroup);
+        } else if (neuronGroup instanceof SOM) {
+            specificNeuronGroupPanel = new SOMPropertiesPanel(
+                    networkPanel, (SOM) neuronGroup);
         }
     }
 

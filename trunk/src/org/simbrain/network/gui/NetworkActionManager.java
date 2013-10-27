@@ -96,7 +96,6 @@ import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
-import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
 import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
 import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
 import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
@@ -554,21 +553,26 @@ public final class NetworkActionManager {
      * @return a list of new networks that can be inserted
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] {
-                new AddGroupAction(networkPanel, new BackpropCreationDialog(
-                        networkPanel), "Backprop"),
-                new AddGroupAction(networkPanel, new BPTTCreationDialog(
-                        networkPanel), "Backprop Through Time"),
-                new AddGroupAction(networkPanel, new ESNCreationDialog(
-                        networkPanel), "Echo State Network"),
-                new AddGroupAction(networkPanel, new FeedForwardCreationDialog(
-                        networkPanel), "Feed Forward Network"),
-                new AddGroupAction(networkPanel, new HopfieldCreationDialog(
-                        networkPanel), "Hopfield"),
-                new AddGroupAction(networkPanel, new LMSCreationDialog(
-                        networkPanel), "LMS (Least Mean Squares)"),
-                new AddGroupAction(networkPanel, new SRNCreationDialog(
-                        networkPanel), "SRN (Simple Recurrent Network)") });
+        return Arrays
+                .asList(new Action[] {
+                        new AddGroupAction(networkPanel,
+                                BackpropCreationDialog.class, "Backprop"),
+                        new AddGroupAction(networkPanel,
+                                BPTTCreationDialog.class,
+                                "Backprop Through Time"),
+                        new AddGroupAction(networkPanel,
+                                ESNCreationDialog.class, "Echo State Network"),
+                        new AddGroupAction(networkPanel,
+                                FeedForwardCreationDialog.class,
+                                "Feed Forward Network"),
+                        new AddGroupAction(networkPanel,
+                                HopfieldCreationDialog.class, "Hopfield"),
+                        new AddGroupAction(networkPanel,
+                                LMSCreationDialog.class,
+                                "LMS (Least Mean Squares)"),
+                        new AddGroupAction(networkPanel,
+                                SRNCreationDialog.class,
+                                "SRN (Simple Recurrent Network)") });
     }
 
     /**
@@ -576,14 +580,17 @@ public final class NetworkActionManager {
      */
     public List<Action> getNewGroupActions() {
         return Arrays.asList(new Action[] {
-                new AddGroupAction(networkPanel, new NeuronGroupCreationDialog(
-                        networkPanel), "(Bare) Neuron Group"),
-                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(
-                        networkPanel), "Competitive"),
-                new AddGroupAction(networkPanel, new SOMCreationDialog(
-                        networkPanel), "SOM (Self organizing map)"),
-                new AddGroupAction(networkPanel, new WTACreationDialog(
-                        networkPanel), "WTA (Winner take all)") });
+                        new AddGroupAction(networkPanel,
+                                NeuronGroupCreationDialog.class,
+                                "(Bare) Neuron Group"),
+                        new AddGroupAction(networkPanel,
+                                CompetitiveCreationDialog.class, "Competitive"),
+                        new AddGroupAction(networkPanel,
+                                SOMCreationDialog.class,
+                                "SOM (Self organizing map)"),
+                        new AddGroupAction(networkPanel,
+                                WTACreationDialog.class,
+                                "WTA (Winner take all)") });
     }
 
     /**

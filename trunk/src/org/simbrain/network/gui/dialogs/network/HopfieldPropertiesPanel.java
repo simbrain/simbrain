@@ -101,8 +101,8 @@ public class HopfieldPropertiesPanel extends JPanel implements
      * Initialize the panel.
      */
     private void initPanel() {
-        mainPanel.addItem("Update order", cbUpdateOrder);
         fillFieldValues();
+        mainPanel.addItem("Update order", cbUpdateOrder);
         add(mainPanel);
     }
 

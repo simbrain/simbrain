@@ -20,8 +20,6 @@ package org.simbrain.network.desktop;
 
 import javax.swing.JMenu;
 
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
@@ -43,13 +41,17 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
      * Construct the special node.
      *
      * @param component workspace component reference
-     * @param networkPanel network panel reference
-     * @param group the neuron group being represented by this node
+     * @param node reference to NeuronGroupNode being wrapped
      */
-    public NeuronGroupNodeDesktop(WorkspaceComponent component,
-            NetworkPanel networkPanel, NeuronGroup group) {
-        super(networkPanel, group);
+    public NeuronGroupNodeDesktop(final WorkspaceComponent component,
+            final NeuronGroupNode node) {
+        super(node.getNetworkPanel(), node.getNeuronGroup());
         this.component = component;
+        // TODO: Confusing design...
+        //  A subclass of NeuronGroupNode comes in, but is converted in to this
+        //  different subclass at the same level.   The main thing lost in the process
+        //  is a custom menu, which is passed along here.
+        this.setCustomMenu(node.getCustomMenu());
     }
 
     @Override

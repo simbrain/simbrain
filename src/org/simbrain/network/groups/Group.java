@@ -36,6 +36,12 @@ public abstract class Group {
     private String label;
 
     /**
+     * Optional information about the current state of the group. For display in
+     * GUI.
+     */
+    private String stateInfo = "";
+
+    /**
      * Whether this group should be deleted when all its components are deleted.
      */
 
@@ -75,13 +81,12 @@ public abstract class Group {
     public abstract void delete();
 
     /**
-     * Returns a description of this group's update method, which
-     * is displayed in the update manager panel.
+     * Returns a description of this group's update method, which is displayed
+     * in the update manager panel.
      *
      * @return a description of the update method.
      */
     public abstract String getUpdateMethodDesecription();
-
 
     @Override
     public String toString() {
@@ -128,7 +133,24 @@ public abstract class Group {
     public void setLabel(String label) {
         this.label = label;
         if (parentNetwork != null) {
-            parentNetwork.fireGroupParametersChanged(this);            
+            parentNetwork.fireGroupParametersChanged(this);
+        }
+    }
+
+    /**
+     * @return the stateInfo
+     */
+    public String getStateInfo() {
+        return stateInfo;
+    }
+
+    /**
+     * @param stateInfo the stateInfo to set
+     */
+    public void setStateInfo(String stateInfo) {
+        this.stateInfo = stateInfo;
+        if (parentNetwork != null) {
+            parentNetwork.fireGroupParametersChanged(this);
         }
     }
 

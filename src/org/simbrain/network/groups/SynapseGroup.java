@@ -306,7 +306,7 @@ public class SynapseGroup extends Group {
     /**
      * Set all weight strengths to a specified value.
      *
-     * @value the value to set the synapses to
+     * @param value the value to set the synapses to
      */
     public void setStrengths(final double value) {
         for (Synapse s : getSynapseList()) {

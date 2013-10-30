@@ -504,7 +504,7 @@ public class NeuronGroup extends Group {
     /**
      * Set all activations to a specified value.
      *
-     * @value the value to set the neurons to
+     * @param value the value to set the neurons to
      */
     public void setActivationLevels(final double value) {
         for (Neuron n : getNeuronList()) {

@@ -303,6 +303,17 @@ public class SynapseGroup extends Group {
         }
     }
 
+    /**
+     * Set all weight strengths to a specified value.
+     *
+     * @value the value to set the synapses to
+     */
+    public void setStrengths(final double value) {
+        for (Synapse s : getSynapseList()) {
+            s.setStrength(value);
+        }
+    }
+
     @Override
     public String getUpdateMethodDesecription() {
         return "Update synapses";

@@ -319,7 +319,7 @@ public class Network {
 
 	/**
 	 * Returns distance between centers of two neurons.
-	 * 
+	 *
 	 * @param neuron1
 	 *            first neuron
 	 * @param neuron2
@@ -343,7 +343,7 @@ public class Network {
 
 	/**
 	 * Return a list of neurons in a specific radius of a specified neuron.
-	 * 
+	 *
 	 * @param source
 	 *            the source neuron.
 	 * @param radius
@@ -363,7 +363,7 @@ public class Network {
 
 	/**
 	 * Find a neuron with a given string id.
-	 * 
+	 *
 	 * @param id
 	 *            id to search for.
 	 * @return neuron with that id, null otherwise
@@ -379,7 +379,7 @@ public class Network {
 
 	/**
 	 * Find a group with a given string id.
-	 * 
+	 *
 	 * @param id
 	 *            id to search for.
 	 * @return group with that id, null otherwise
@@ -395,7 +395,7 @@ public class Network {
 
 	/**
 	 * Find groups with a given label, or null if none found.
-	 * 
+	 *
 	 * @param label
 	 *            label to search for.
 	 * @return list of groups with that label found, null otherwise
@@ -416,7 +416,7 @@ public class Network {
 
 	/**
 	 * Find group with a given label, or null if none found.
-	 * 
+	 *
 	 * @param label
 	 *            label to search for.
 	 * @return list of groups with that label found, null otherwise
@@ -432,7 +432,7 @@ public class Network {
 
 	/**
 	 * Returns the group list.
-	 * 
+	 *
 	 * @return the groupList
 	 */
 	public List<? extends Group> getGroupList() {
@@ -441,7 +441,7 @@ public class Network {
 
 	/**
 	 * Returns a list of all neuron groups.
-	 * 
+	 *
 	 * @return a neuron group list
 	 */
 	public List<NeuronGroup> getFlatNeuronGroupList() {
@@ -459,7 +459,7 @@ public class Network {
 	/**
 	 * Returns the synapse group between some source neuron group and some
 	 * target neuron group, if it exists. Returns null otherwise.
-	 * 
+	 *
 	 * @param src
 	 *            the source neuron group
 	 * @param targ
@@ -486,7 +486,7 @@ public class Network {
 
 	/**
 	 * Find a synapse with a given string id.
-	 * 
+	 *
 	 * @param id
 	 *            id to search for.
 	 * @return synapse with that id, null otherwise
@@ -502,7 +502,7 @@ public class Network {
 
 	/**
 	 * Adds a new neuron.
-	 * 
+	 *
 	 * @param neuron
 	 *            Type of neuron to add
 	 */
@@ -525,7 +525,7 @@ public class Network {
 	/**
 	 * Adds a weight to the neuron network, where that weight already has
 	 * designated source and target neurons.
-	 * 
+	 *
 	 * @param synapse
 	 *            the weight object to add
 	 */
@@ -586,7 +586,7 @@ public class Network {
 
 	/**
 	 * Deletes a neuron from the network.
-	 * 
+	 *
 	 * @param toDelete
 	 *            neuron to delete
 	 */
@@ -630,7 +630,7 @@ public class Network {
 
 	/**
 	 * Delete a specified weight.
-	 * 
+	 *
 	 * @param toDelete
 	 *            the weight to delete
 	 */
@@ -665,7 +665,7 @@ public class Network {
 	/**
 	 * Remove the given neurons from the neuron list (without firing an event)
 	 * and add them to the provided group.
-	 * 
+	 *
 	 * @param list
 	 *            the list of neurons to transfer
 	 * @param group
@@ -700,7 +700,7 @@ public class Network {
 
 	/**
 	 * Sets all neurons to a specified value.
-	 * 
+	 *
 	 * @param value
 	 *            value to set
 	 */
@@ -715,7 +715,7 @@ public class Network {
 	 * Sets neuron activations using values in an array of doubles. Currently
 	 * these activations are applied to the network in whatever order the
 	 * neurons were added.
-	 * 
+	 *
 	 * @param activationArray
 	 *            array of values to apply to network
 	 */
@@ -732,7 +732,7 @@ public class Network {
 
 	/**
 	 * Sets all weights to a specified value.
-	 * 
+	 *
 	 * @param value
 	 *            value to set
 	 */
@@ -744,7 +744,7 @@ public class Network {
 
 	/**
 	 * Returns the "state" of the network--the activation level of its neurons.
-	 * 
+	 *
 	 * @return an array representing the activation levels of all the neurons in
 	 *         this network
 	 */
@@ -790,7 +790,7 @@ public class Network {
 
 	/**
 	 * Randomize all biased neurons.
-	 * 
+	 *
 	 * @param lower
 	 *            lower bound for randomization.
 	 * @param upper
@@ -804,12 +804,12 @@ public class Network {
 
 	/**
 	 * Round a value off to indicated number of decimal places.
-	 * 
+	 *
 	 * @param value
 	 *            value to round off
 	 * @param decimalPlace
 	 *            degree of precision
-	 * 
+	 *
 	 * @return rounded number
 	 */
 	public static double
@@ -834,7 +834,7 @@ public class Network {
 
 	/**
 	 * Sets the degree to which to round off values.
-	 * 
+	 *
 	 * @param i
 	 *            Degeree to round off values
 	 */
@@ -844,7 +844,7 @@ public class Network {
 
 	/**
 	 * Whether to round off neuron values.
-	 * 
+	 *
 	 * @param b
 	 *            Round off
 	 */
@@ -870,7 +870,7 @@ public class Network {
 
 	/**
 	 * Add an array of neurons and set their parents to this.
-	 * 
+	 *
 	 * @param neurons
 	 *            list of neurons to add
 	 */
@@ -883,12 +883,12 @@ public class Network {
 	/**
 	 * Returns a reference to the synapse connecting two neurons, or null if
 	 * there is none.
-	 * 
+	 *
 	 * @param src
 	 *            source neuron
 	 * @param tar
 	 *            target neuron
-	 * 
+	 *
 	 * @return synapse from source to target
 	 */
 	public static Synapse getSynapse(final Neuron src, final Neuron tar) {
@@ -903,7 +903,7 @@ public class Network {
 
 	/**
 	 * Gets the synapse at particular point.
-	 * 
+	 *
 	 * @param i
 	 *            Neuron number
 	 * @param j
@@ -917,7 +917,7 @@ public class Network {
 
 	/**
 	 * Add a group to the network.
-	 * 
+	 *
 	 * @param group
 	 *            group of network elements
 	 */
@@ -949,7 +949,7 @@ public class Network {
 
 	/**
 	 * Remove the specified group.
-	 * 
+	 *
 	 * @param toDelete
 	 *            the group to delete.
 	 */
@@ -967,7 +967,7 @@ public class Network {
 
 	/**
 	 * Returns true if all objects are gone from this network.
-	 * 
+	 *
 	 * @return true if everything's gone.
 	 */
 	public boolean isEmpty() {
@@ -982,7 +982,7 @@ public class Network {
 	/**
 	 * Create "flat" list of neurons, which includes the top-level neurons plus
 	 * all group neurons.
-	 * 
+	 *
 	 * @return the flat list
 	 */
 	public List<Neuron> getFlatNeuronList() {
@@ -1007,7 +1007,7 @@ public class Network {
 	/**
 	 * Create "flat" list of synapses, which includes the top-level synapses
 	 * plus all subnet synapses.
-	 * 
+	 *
 	 * @return the flat list
 	 */
 	public List<Synapse> getFlatSynapseList() {
@@ -1028,7 +1028,7 @@ public class Network {
 	/**
 	 * Create a "flat" list of groups, which includes the top-level groups plus
 	 * all subgroups.
-	 * 
+	 *
 	 * @return the flat list
 	 */
 	public List<Group> getFlatGroupList() {
@@ -1045,7 +1045,7 @@ public class Network {
 
 	/**
 	 * Returns the precision of the current time step.
-	 * 
+	 *
 	 * @return the precision of the current time step.
 	 */
 	private int getTimeStepPrecision() {
@@ -1069,7 +1069,7 @@ public class Network {
 	 * Convenience method for asynchronously updating a set of neurons, by
 	 * calling each neuron's update function (which sets a buffer), and then
 	 * setting each neuron's activation to the buffer state.
-	 * 
+	 *
 	 * @param neuronList
 	 *            the list of neurons to be updated
 	 */
@@ -1085,7 +1085,7 @@ public class Network {
 
 	/**
 	 * Get the activations associated with a list of neurons.
-	 * 
+	 *
 	 * @param neuronList
 	 *            the neurons whose activations to get.
 	 * @return vector of activations
@@ -1103,7 +1103,7 @@ public class Network {
 
 	/**
 	 * Returns a properly initialized xstream object.
-	 * 
+	 *
 	 * @return the XStream object
 	 */
 	public static XStream getXStream() {
@@ -1141,7 +1141,7 @@ public class Network {
 	 * Standard method call made to objects after they are deserialized. See:
 	 * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
 	 * http://xstream.codehaus.org/faq.html
-	 * 
+	 *
 	 * @return Initialized object.
 	 */
 	private Object readResolve() {
@@ -1200,7 +1200,7 @@ public class Network {
 
 	/**
 	 * Returns the current time.
-	 * 
+	 *
 	 * @return the current time
 	 */
 	public double getTime() {
@@ -1209,7 +1209,7 @@ public class Network {
 
 	/**
 	 * Set the current time.
-	 * 
+	 *
 	 * @param i
 	 *            the current time
 	 */
@@ -1284,7 +1284,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron deleted event to all registered model listeners.
-	 * 
+	 *
 	 * @param deleted
 	 *            neuron which has been deleted
 	 */
@@ -1325,7 +1325,7 @@ public class Network {
 
 	/**
 	 * Fire a network changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param moved
 	 *            Neuron that has been moved
 	 */
@@ -1337,7 +1337,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron added event to all registered model listeners.
-	 * 
+	 *
 	 * @param added
 	 *            neuron which was added
 	 */
@@ -1349,7 +1349,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron type changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param old
 	 *            the old update rule
 	 * @param changed
@@ -1365,7 +1365,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param changed
 	 *            neuron
 	 */
@@ -1377,7 +1377,7 @@ public class Network {
 
 	/**
 	 * Fire a label changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param changed
 	 *            neuron
 	 */
@@ -1389,7 +1389,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron added event to all registered model listeners.
-	 * 
+	 *
 	 * @param added
 	 *            synapse which was added
 	 */
@@ -1401,7 +1401,7 @@ public class Network {
 
 	/**
 	 * Fire a neuron deleted event to all registered model listeners.
-	 * 
+	 *
 	 * @param deleted
 	 *            synapse which was deleted
 	 */
@@ -1414,7 +1414,7 @@ public class Network {
 
 	/**
 	 * Fire a synapse changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param changed
 	 *            new, changed synapse
 	 */
@@ -1427,7 +1427,7 @@ public class Network {
 
 	/**
 	 * Fire a synapse type changed event to all registered model listeners.
-	 * 
+	 *
 	 * @param oldRule
 	 *            old synapse, before the change
 	 * @param learningRule
@@ -1443,7 +1443,7 @@ public class Network {
 
 	/**
 	 * Fire a text added event to all registered model listeners.
-	 * 
+	 *
 	 * @param added
 	 *            text which was deleted
 	 */
@@ -1455,7 +1455,7 @@ public class Network {
 
 	/**
 	 * Fire a text deleted event to all registered model listeners.
-	 * 
+	 *
 	 * @param deleted
 	 *            text which was deleted
 	 */
@@ -1467,9 +1467,9 @@ public class Network {
 
 	/**
 	 * Fire a text changed event to all registered model listeners.
-	 * 
+	 *
 	 * TODO: Not currently used.
-	 * 
+	 *
 	 * @param changed
 	 *            text which was changed
 	 */
@@ -1482,7 +1482,7 @@ public class Network {
 	/**
 	 * Used by Network thread to ensure that an update cycle is complete before
 	 * updating again.
-	 * 
+	 *
 	 * @return whether the network has been updated or not
 	 */
 	public boolean isUpdateCompleted() {
@@ -1492,7 +1492,7 @@ public class Network {
 	/**
 	 * Used by Network thread to ensure that an update cycle is complete before
 	 * updating again.
-	 * 
+	 *
 	 * @param b
 	 *            whether the network has been updated or not.
 	 */
@@ -1502,7 +1502,7 @@ public class Network {
 
 	/**
 	 * Fire a group added event to all registered model listeners.
-	 * 
+	 *
 	 * @param added
 	 *            Group that has been added
 	 */
@@ -1514,7 +1514,7 @@ public class Network {
 
 	/**
 	 * Fire a group deleted event to all registered model listeners.
-	 * 
+	 *
 	 * @param deleted
 	 *            Group to be deleted
 	 */
@@ -1528,7 +1528,7 @@ public class Network {
 	 * Fire a group changed event to all registered model listeners. A string
 	 * desription describes the change and is used by listeners to handle the
 	 * event. Old group is not currently used but may be in the future.
-	 * 
+	 *
 	 * @param old
 	 *            Old group
 	 * @param changed
@@ -1548,7 +1548,7 @@ public class Network {
 	/**
 	 * This version of fireGroupChanged fires a pre-set event, which may have an
 	 * auxiliary object set.
-	 * 
+	 *
 	 * @param event
 	 *            the network changed event.
 	 * @param changeDescription
@@ -1564,7 +1564,7 @@ public class Network {
 
 	/**
 	 * Fire a group parameters changed event.
-	 * 
+	 *
 	 * @param group
 	 *            reference to group whose parameters changed
 	 */
@@ -1584,7 +1584,7 @@ public class Network {
 
 	/**
 	 * Sets weights to clamped values.
-	 * 
+	 *
 	 * @param clampWeights
 	 *            Weights to set
 	 */
@@ -1602,7 +1602,7 @@ public class Network {
 
 	/**
 	 * Sets neurons to clamped values.
-	 * 
+	 *
 	 * @param clampNeurons
 	 *            Neurons to set
 	 */
@@ -1641,7 +1641,7 @@ public class Network {
 
 	/**
 	 * Return the generator for neuron ids.
-	 * 
+	 *
 	 * @return the generator
 	 */
 	public SimpleId getNeuronIdGenerator() {
@@ -1650,7 +1650,7 @@ public class Network {
 
 	/**
 	 * Return the generator for synapse ids.
-	 * 
+	 *
 	 * @return the generator.
 	 */
 	public SimpleId getSynapseIdGenerator() {
@@ -1659,7 +1659,7 @@ public class Network {
 
 	/**
 	 * Register a network listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to register
 	 */
@@ -1669,7 +1669,7 @@ public class Network {
 
 	/**
 	 * Remove a network listener.
-	 * 
+	 *
 	 * @param networkListener
 	 *            the observer to remove
 	 */
@@ -1679,7 +1679,7 @@ public class Network {
 
 	/**
 	 * Register a neuron listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to register
 	 */
@@ -1689,7 +1689,7 @@ public class Network {
 
 	/**
 	 * Register a synapse listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to register
 	 */
@@ -1699,7 +1699,7 @@ public class Network {
 
 	/**
 	 * Register a text listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to register
 	 */
@@ -1709,7 +1709,7 @@ public class Network {
 
 	/**
 	 * Remove a synapse listener.
-	 * 
+	 *
 	 * @param synapseListener
 	 *            the observer to remove
 	 */
@@ -1719,7 +1719,7 @@ public class Network {
 
 	/**
 	 * Register a group listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to register
 	 */
@@ -1729,7 +1729,7 @@ public class Network {
 
 	/**
 	 * Remove a group listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the observer to remove
 	 */
@@ -1740,7 +1740,7 @@ public class Network {
 	/**
 	 * Search for a neuron by label. If there are more than one with the same
 	 * label only the first one found is returned.
-	 * 
+	 *
 	 * @param inputString
 	 *            label of neuron to search for
 	 * @return list of matched neurons, or null if none are found
@@ -1761,7 +1761,7 @@ public class Network {
 
 	/**
 	 * Returns the first neuron in the array returned by getNeuronsByLabel.
-	 * 
+	 *
 	 * @param inputString
 	 *            label of neuron to search for
 	 * @return matched Neuron, if any
@@ -1784,7 +1784,7 @@ public class Network {
 
 	/**
 	 * Add a network text object.
-	 * 
+	 *
 	 * @param text
 	 *            text object to add.
 	 */
@@ -1795,7 +1795,7 @@ public class Network {
 
 	/**
 	 * Delete a network text object.
-	 * 
+	 *
 	 * @param text
 	 *            text object to add
 	 */
@@ -1817,7 +1817,7 @@ public class Network {
 	/**
 	 * Convenience method for setting an update action. Moves all current
 	 * actions to available list.
-	 * 
+	 *
 	 * @param action
 	 *            new action
 	 */
@@ -1834,7 +1834,7 @@ public class Network {
 
 	/**
 	 * Adds a list of network elements to this network. Used in copy / paste.
-	 * 
+	 *
 	 * @param toAdd
 	 *            list of objects to add.
 	 */
@@ -1856,7 +1856,7 @@ public class Network {
 
 	/**
 	 * Translate all neurons (the only objects with position information).
-	 * 
+	 *
 	 * @param offsetX
 	 *            x offset for translation.
 	 * @param offsetY
@@ -1871,7 +1871,7 @@ public class Network {
 
 	/**
 	 * Returns the weight randomizer for this network.
-	 * 
+	 *
 	 * @return the weight randomizer
 	 */
 	public Randomizer getWeightRandomizer() {
@@ -1900,7 +1900,7 @@ public class Network {
 	/**
 	 * Connect a source neuron group to a target neuron group using a connection
 	 * object.
-	 * 
+	 *
 	 * @param sng
 	 *            source neuron group
 	 * @param tng

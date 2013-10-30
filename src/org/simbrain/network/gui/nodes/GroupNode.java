@@ -181,6 +181,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Update the text label to reflect underlying group label.
      */
     public void updateText() {
+
+        // Hack for backwards compatibility
+        if (group.getStateInfo() == null) {
+            group.setStateInfo("");
+        }
+
         if (group.getStateInfo().isEmpty()) {
             this.setTextLabel(group.getLabel());
         } else {

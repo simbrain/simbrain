@@ -50,7 +50,7 @@ import org.simbrain.util.TristateDropDown;
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
  * neuron type and a layout.
- * 
+ *
  * @author ztosi
  * @author jyoshimi
  */
@@ -105,7 +105,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
 	/**
 	 * Constructs the dialog.
-	 * 
+	 *
 	 * @param networkPanel
 	 *            the panel the neurons are being added to.
 	 */
@@ -290,9 +290,9 @@ public class AddNeuronsDialog extends StandardDialog {
 	 * neuron group. Options include a new neuron group, already existing neuron
 	 * group, or no neuron group (loose). The user can also change a group's
 	 * name from here.
-	 * 
+	 *
 	 * @author ztosi
-	 * 
+	 *
 	 */
 	private class NeuronGroupPanel extends JPanel {
 
@@ -309,7 +309,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
 		/**
 		 * Creates the neuron group sub-panel
-		 * 
+		 *
 		 * @param np
 		 *            a reference to the network panel.
 		 */
@@ -356,7 +356,7 @@ public class AddNeuronsDialog extends StandardDialog {
 		 * Generates the neuron group with the attributes from the panel.
 		 * Returns null if the {@link #addToGroup addToGroup} check-box is not
 		 * selected.
-		 * 
+		 *
 		 * @return
 		 */
 		public NeuronGroup generateNeuronGroup() {

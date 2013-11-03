@@ -134,7 +134,7 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * @return a list of neurons
+     * @return the neurons in this group.
      */
     public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
@@ -310,9 +310,9 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * Return activations as a double vector.
+     * Return activations as a double array.
      *
-     * @return activations
+     * @return the activation array
      */
     public double[] getActivations() {
         double[] retArray = new double[neuronList.size()];
@@ -323,6 +323,11 @@ public class NeuronGroup extends Group {
         return retArray;
     }
 
+    /**
+     * Return biases as a double array.
+     *
+     * @return the bias array
+     */
     public double[] getBiases() {
         double[] retArray = SimbrainMath.zeroVector(neuronList.size());
         int i = 0;

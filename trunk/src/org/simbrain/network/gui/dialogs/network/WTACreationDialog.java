@@ -53,21 +53,6 @@ public class WTACreationDialog extends StandardDialog {
 	/** Layout panel. */
 	private MainLayoutPanel layoutPanel;
 
-	/** Number of units field. */
-	private JTextField numberOfUnits = new JTextField();
-
-	/** Winner value field. */
-	private JTextField winnerValue = new JTextField();
-
-	/** Loser value field. */
-	private JTextField loserValue = new JTextField();
-
-	/** Checkbox for using random method. */
-	private JCheckBox useRandomBox = new JCheckBox();
-
-	/** Probability of using random field. */
-	private JTextField randomProb = new JTextField();
-
 	/** Network panel. */
 	private NetworkPanel networkPanel;
 

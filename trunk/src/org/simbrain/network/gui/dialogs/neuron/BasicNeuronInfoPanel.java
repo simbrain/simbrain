@@ -26,7 +26,7 @@ import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -40,10 +40,11 @@ import org.simbrain.util.DropDownTriangle;
 import org.simbrain.util.DropDownTriangle.UpDirection;
 
 /**
- * 
+ * Panel showing the basic properties common to a set of neurons.
+ *
  * @author ztosi
  * @author jyoshimi
- * 
+ *
  */
 public class BasicNeuronInfoPanel extends JPanel {
 
@@ -66,7 +67,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 	private final ExtendedNeuronInfoPanel extraDataPanel;
 
 	/** The neurons being modified. */
-	private final ArrayList<Neuron> neuronList;
+	private final List<Neuron> neuronList;
 
 	/**
 	 * A triangle that switches between an up (left) and a down state Used for
@@ -80,12 +81,14 @@ public class BasicNeuronInfoPanel extends JPanel {
 	private final Window parent;
 
 	/**
-	 * @param selectedNeurons
-	 *            the pnode_neurons being adjusted
+	 * Construct the panel.
+	 *
+     * @param neuronList the neurons being adjusted
+     * @param parent the parent window
 	 */
-	public BasicNeuronInfoPanel(final Collection<Neuron> neuronList,
+	public BasicNeuronInfoPanel(final List<Neuron> neuronList,
 			Window parent) {
-		this.neuronList = (ArrayList<Neuron>) neuronList;
+		this.neuronList = neuronList;
 		this.parent = parent;
 		detailTriangle =
 				new DropDownTriangle(UpDirection.LEFT, false, "More",
@@ -100,7 +103,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 
 	/**
 	 * Initialize the basic info panel (generic neuron parameters)
-	 * 
+	 *
 	 * @return the basic info panel
 	 */
 	private void initializeLayout() {
@@ -248,7 +251,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 	}
 
 	/**
-     * 
+     *
      */
 	public void commitChanges() {
 
@@ -274,7 +277,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public DropDownTriangle getDetailTriangle() {

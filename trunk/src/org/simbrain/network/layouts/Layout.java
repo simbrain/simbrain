@@ -26,16 +26,15 @@ import org.simbrain.network.core.Neuron;
 /**
  * Interface for all neuron layout managers, which arrange a set of neurons in
  * different ways.
- * 
- * @author jyoshimi
+ *
+ * @author Jeff Yoshimi
  */
 public interface Layout {
 
     /**
      * Layout a list of neurons.
-     * 
-     * @param neurons
-     *            the list of neurons
+     *
+     * @param neurons the list of neurons
      */
     void layoutNeurons(List<Neuron> neurons);
 
@@ -46,9 +45,8 @@ public interface Layout {
 
     /**
      * Set the initial position.
-     * 
-     * @param initialPoint
-     *            initial position
+     *
+     * @param initialPoint initial position
      */
     void setInitialLocation(final Point2D initialPoint);
 

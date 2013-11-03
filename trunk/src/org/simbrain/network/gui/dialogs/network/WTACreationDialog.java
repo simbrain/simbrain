@@ -93,7 +93,9 @@ public class WTACreationDialog extends StandardDialog {
 		// Set up tab panels
         wtaPanel = new WTAPropertiesPanel(networkPanel);
 		tabLogic.add(wtaPanel);
-		tabLayout.add(layoutPanel);
+        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel.setCurrentLayout(WinnerTakeAll.DEFAULT_LAYOUT);
+        tabLayout.add(layoutPanel);
 		tabbedPane.addTab("Logic", tabLogic);
 		tabbedPane.addTab("Layout", tabLayout);
 		setContentPane(tabbedPane);
@@ -111,9 +113,9 @@ public class WTACreationDialog extends StandardDialog {
     protected void closeDialogOk() {
 
         WinnerTakeAll wta = (WinnerTakeAll) wtaPanel.commitChanges();
-        Layout layout = layoutPanel.getCurrentLayout();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        layout.layoutNeurons(wta.getNeuronList());
+        layoutPanel.commitChanges();
+        wta.setLayout(layoutPanel.getCurrentLayout());
+        wta.applyLayout();
         networkPanel.getNetwork().addGroup(wta);
         networkPanel.repaint();
         super.closeDialogOk();

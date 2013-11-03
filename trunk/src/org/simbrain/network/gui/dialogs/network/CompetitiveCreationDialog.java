@@ -59,7 +59,6 @@ public class CompetitiveCreationDialog extends StandardDialog {
      */
     public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new MainLayoutPanel(false, this);
         init();
     }
 
@@ -73,8 +72,9 @@ public class CompetitiveCreationDialog extends StandardDialog {
 
         // Set up tab panels
         tabLogic.add(compPropertiesPanel);
+        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel.setCurrentLayout(Competitive.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
-        layoutPanel.setCurrentLayout("Line");
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
@@ -92,12 +92,10 @@ public class CompetitiveCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         Competitive competitive = (Competitive) compPropertiesPanel
                 .commitChanges();
-        networkPanel.getNetwork().addGroup(competitive); // Two made here
+        networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();
-        layoutPanel.getCurrentLayout().setInitialLocation(
-                networkPanel.getLastClickedPosition());
-        layoutPanel.getCurrentLayout().layoutNeurons(
-                competitive.getNeuronList());
+        competitive.setLayout(layoutPanel.getCurrentLayout());
+        competitive.applyLayout();
         networkPanel.repaint();
         super.closeDialogOk();
     }

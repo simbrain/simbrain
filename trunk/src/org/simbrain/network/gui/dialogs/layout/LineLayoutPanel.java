@@ -34,9 +34,6 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
 					new LineOrientation[] { LineOrientation.HORIZONTAL,
 							LineOrientation.VERTICAL });
 
-	/** Reference to the underlying layout. */
-	private final LineLayout layout;
-
 	/**
 	 * Default constructor.
 	 */
@@ -50,28 +47,21 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void commitChanges() {
-		layout.setOrientation((LineOrientation) cbLayouts
-				.getSelectedItem());
-		layout.setSpacing(Double.parseDouble(tfSpacing.getText()));
-	}
+    @Override
+    public void commitChanges() {
+        ((LineLayout) layout).setOrientation((LineOrientation) cbLayouts
+                .getSelectedItem());
+        ((LineLayout) layout)
+                .setSpacing(Double.parseDouble(tfSpacing.getText()));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void fillFieldValues() {
-		cbLayouts.setSelectedItem(layout.getOrientation());
-		tfSpacing.setText(Double.toString(layout.getSpacing()));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Layout getNeuronLayout() {
-		return layout;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillFieldValues() {
+        cbLayouts.setSelectedItem(((LineLayout) layout).getOrientation());
+        tfSpacing.setText(Double.toString(((LineLayout) layout).getSpacing()));
+    }
 
 }

@@ -40,9 +40,6 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 	/** Manual spacing field. */
 	private JCheckBox manuallySetNumColumns = new JCheckBox();
 
-	/** Reference to the underlying layout. */
-	private final HexagonalGridLayout layout;
-
 	/**
 	 * Default constructor.
 	 */
@@ -72,35 +69,35 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges() {
-		layout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
-		layout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
-		layout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
-		layout.setManualColumns(manuallySetNumColumns.isSelected());
-	}
+	    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges() {
+        ((HexagonalGridLayout) layout).setNumColumns(Integer
+                .parseInt(tfNumColumns.getText()));
+        ((HexagonalGridLayout) layout).setHSpacing(Double
+                .parseDouble(tfHSpacing.getText()));
+        ((HexagonalGridLayout) layout).setVSpacing(Double
+                .parseDouble(tfVSpacing.getText()));
+        ((HexagonalGridLayout) layout).setManualColumns(manuallySetNumColumns
+                .isSelected());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void fillFieldValues() {
-		tfNumColumns.setText(Integer.toString(layout.getNumColumns()));
-		tfHSpacing.setText(Double.toString(layout.getHSpacing()));
-		tfVSpacing.setText(Double.toString(layout.getVSpacing()));
-		manuallySetNumColumns.setSelected(layout.isManualColumns());
-		enableDisableSpacingFields();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Layout getNeuronLayout() {
-		return layout;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillFieldValues() {
+        tfNumColumns.setText(Integer.toString(((HexagonalGridLayout) layout)
+                .getNumColumns()));
+        tfHSpacing.setText(Double.toString(((HexagonalGridLayout) layout)
+                .getHSpacing()));
+        tfVSpacing.setText(Double.toString(((HexagonalGridLayout) layout)
+                .getVSpacing()));
+        manuallySetNumColumns.setSelected(((HexagonalGridLayout) layout)
+                .isManualColumns());
+        enableDisableSpacingFields();
+    }
 
 }

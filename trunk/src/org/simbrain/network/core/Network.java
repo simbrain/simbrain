@@ -1122,7 +1122,9 @@ public class Network {
 		xstream.omitField(Network.class, "networkThread");
 		xstream.omitField(Network.class, "logger");
 
-		xstream.omitField(Group.class, "deleteWhenEmpty");
+        xstream.omitField(Group.class, "deleteWhenEmpty");
+
+        xstream.omitField(NeuronGroup.class, "betweenNeuronInterval");
 
 		xstream.omitField(NetworkUpdateManager.class,
 				"availableActionList");

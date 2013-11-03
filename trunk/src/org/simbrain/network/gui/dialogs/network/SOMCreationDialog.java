@@ -73,8 +73,9 @@ public class SOMCreationDialog extends StandardDialog {
 
         // Set up tab panels
         tabLogic.add(somPanel);
+        layoutPanel = new MainLayoutPanel(false, this);
+        layoutPanel.setCurrentLayout(SOM.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
-        layoutPanel.setCurrentLayout("Hex Grid");
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
@@ -92,9 +93,8 @@ public class SOMCreationDialog extends StandardDialog {
         SOM som = (SOM) somPanel.commitChanges();
         networkPanel.getNetwork().addGroup(som);
         layoutPanel.commitChanges();
-        layoutPanel.getCurrentLayout().setInitialLocation(
-                networkPanel.getLastClickedPosition());
-        layoutPanel.getCurrentLayout().layoutNeurons(som.getNeuronList());
+        som.setLayout(layoutPanel.getCurrentLayout());
+        som.applyLayout();
         networkPanel.getNetwork().fireNetworkChanged(); // Force interaction box
         networkPanel.repaint();
         super.closeDialogOk();

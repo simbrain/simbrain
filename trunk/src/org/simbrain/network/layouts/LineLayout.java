@@ -25,23 +25,23 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a line.
- * 
+ *
  * @author jyoshimi
  */
 public class LineLayout implements Layout {
 
     /** Orientation of the line. */
     public enum LineOrientation {
-	VERTICAL {
-	    public String toString() {
-		return "Vertical";
-	    }
-	},
-	HORIZONTAL {
-	    public String toString() {
-		return "Horizontal";
-	    }
-	}
+        VERTICAL {
+            public String toString() {
+                return "Vertical";
+            }
+        },
+        HORIZONTAL {
+            public String toString() {
+                return "Horizontal";
+            }
+        }
     };
 
     /** The default orientation of the line. */
@@ -64,35 +64,13 @@ public class LineLayout implements Layout {
 
     /**
      * Create a layout.
-     * 
-     * @param initialx
-     *            initial x position
-     * @param initialy
-     *            initial y position
-     * @param spacing
-     *            spacing between neurons
-     * @param orientation
-     *            of the neurons
-     */
-    public LineLayout(final double initialx, final double initialy,
-	    final double spacing, final LineOrientation orientation) {
-	initialX = initialx;
-	initialY = initialy;
-	this.spacing = spacing;
-	this.orientation = orientation;
-    }
-
-    /**
-     * Create a layout.
-     * 
-     * @param spacing
-     *            spacing between neurons
-     * @param orientation
-     *            of the neurons
+     *
+     * @param spacing spacing between neurons
+     * @param orientation of the neurons
      */
     public LineLayout(final double spacing, final LineOrientation orientation) {
-	this.spacing = spacing;
-	this.orientation = orientation;
+        this.spacing = spacing;
+        this.orientation = orientation;
     }
 
     /**
@@ -101,71 +79,67 @@ public class LineLayout implements Layout {
     public LineLayout() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void layoutNeurons(final List<Neuron> neurons) {
-	if (orientation == LineOrientation.VERTICAL) {
-	    double ypos = initialY;
-	    for (Neuron neuron : neurons) {
-		neuron.setX(initialX);
-		neuron.setY(ypos);
-		ypos += spacing;
-	    }
-	} else if (orientation == LineOrientation.HORIZONTAL) {
-	    double xpos = initialX;
-	    for (Neuron neuron : neurons) {
-		neuron.setX(xpos);
-		neuron.setY(initialY);
-		xpos += spacing;
-	    }
-	}
+        if (orientation == LineOrientation.VERTICAL) {
+            double ypos = initialY;
+            for (Neuron neuron : neurons) {
+                neuron.setX(initialX);
+                neuron.setY(ypos);
+                ypos += spacing;
+            }
+        } else if (orientation == LineOrientation.HORIZONTAL) {
+            double xpos = initialX;
+            for (Neuron neuron : neurons) {
+                neuron.setX(xpos);
+                neuron.setY(initialY);
+                xpos += spacing;
+            }
+        }
     }
 
-    /** @see Layout */
+    @Override
     public void setInitialLocation(final Point2D initialPoint) {
-	initialX = initialPoint.getX();
-	initialY = initialPoint.getY();
+        initialX = initialPoint.getX();
+        initialY = initialPoint.getY();
     }
 
-    /** @see Layout */
+    @Override
     public String getDescription() {
-	return "Line";
+        return "Line";
     }
 
     /**
      * @return the orientation
      */
     public LineOrientation getOrientation() {
-	return orientation;
+        return orientation;
     }
 
     /**
-     * @param orientation
-     *            the orientation to set
+     * @param orientation the orientation to set
      */
     public void setOrientation(final LineOrientation orientation) {
-	this.orientation = orientation;
-	// System.out.println("LineLayout orientation: " + this.orientation);
+        this.orientation = orientation;
+        // System.out.println("LineLayout orientation: " + this.orientation);
     }
 
     /**
      * @return the spacing
      */
     public double getSpacing() {
-	return spacing;
+        return spacing;
     }
 
     /**
-     * @param spacing
-     *            the spacing to set
+     * @param spacing the spacing to set
      */
     public void setSpacing(final double spacing) {
-	this.spacing = spacing;
+        this.spacing = spacing;
     }
 
-    /** @override */
+    @Override
     public String toString() {
-	return "Line Layout";
+        return "Line Layout";
     }
 }

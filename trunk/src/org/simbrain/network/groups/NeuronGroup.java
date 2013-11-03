@@ -27,6 +27,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -35,17 +36,28 @@ import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
 /**
- * A group of neurons.
+ * A group of neurons. A primary abstraction for larger network structures.
+ * Layers in feed-forward networks are neuron groups. Self-organizing-maps
+ * subclass this class. Etc.
  */
 public class NeuronGroup extends Group {
-
-    /** Space between neurons within a layer. */
-    private int betweenNeuronInterval = 50;
 
     /** The neurons in this group. */
     private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
 
-    /** @see Group */
+    /** Default layout for neuron groups. */
+    public static final Layout DEFAULT_LAYOUT = new LineLayout(50,
+            LineOrientation.HORIZONTAL);
+
+    /** The layout for the neurons in this group. */
+    private Layout layout = DEFAULT_LAYOUT;
+
+    /**
+     * Construct a new neuron group from a list of neurons.
+     *
+     * @param net the network
+     * @param neurons the neurons
+     */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
@@ -55,20 +67,18 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Construct a new neuron group with a specified number of neurons.
      *
-     * @param net
-     * @param initialPosition
-     * @param numNeurons
+     * @param net parent network
+     * @param initialPosition initial location of the group
+     * @param numNeurons how many neurons it will have
      */
     public NeuronGroup(final Network net, Point2D initialPosition,
             final int numNeurons) {
         super(net);
-        // Layout
-        LineLayout layout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
 
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(net, new LinearRule()));
+            addNeuron(new Neuron(net, new LinearRule()), false);
         }
 
         layout.setInitialLocation(initialPosition);
@@ -79,22 +89,22 @@ public class NeuronGroup extends Group {
     /**
      * Create a neuron group without any initial neurons.
      *
-     * @param root parent network
+     * @param network parent network
      */
-    public NeuronGroup(final Network root) {
-        super(root);
+    public NeuronGroup(final Network network) {
+        super(network);
     }
-    //TODO: Rename root
+
     /**
-     * Copy constructor.
-     * pass in network for cases where a group is pasted from one network to another
+     * Copy constructor. pass in network for cases where a group is pasted from
+     * one network to another
      *
-     * @param root parent network
+     * @param network parent network
      */
-    public NeuronGroup(final Network root, final NeuronGroup toCopy) {
-        super(root);
-        for(Neuron neuron : toCopy.getNeuronList()) {
-            this.addNeuron(new Neuron(root, neuron));
+    public NeuronGroup(final Network network, final NeuronGroup toCopy) {
+        super(network);
+        for (Neuron neuron : toCopy.getNeuronList()) {
+            this.addNeuron(new Neuron(network, neuron));
         }
     }
 
@@ -259,7 +269,7 @@ public class NeuronGroup extends Group {
     public void removeNeuron(Neuron toDelete) {
 
         neuronList.remove(toDelete);
-        //System.out.println("NeuronGroup.removeNeuron" + toDelete);
+        // System.out.println("NeuronGroup.removeNeuron" + toDelete);
         if (isEmpty()) {
             delete();
         }
@@ -284,8 +294,8 @@ public class NeuronGroup extends Group {
      * of the items in the array should match the order of items in the
      * neuronlist.
      *
-     * Does not throw an exception if the provided input array and neuron
-     * list do not match in size.
+     * Does not throw an exception if the provided input array and neuron list
+     * do not match in size.
      *
      * @param inputs the input vector as a double array.
      */
@@ -318,12 +328,12 @@ public class NeuronGroup extends Group {
         int i = 0;
         for (Neuron neuron : neuronList) {
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                retArray[i++] = ((BiasedUpdateRule)neuron.getUpdateRule()).getBias();
+                retArray[i++] = ((BiasedUpdateRule) neuron.getUpdateRule())
+                        .getBias();
             }
         }
         return retArray;
     }
-
 
     /**
      * True if the group contains the specified neuron.
@@ -401,9 +411,10 @@ public class NeuronGroup extends Group {
     /**
      * Returns the maximum X position of this group based on the neurons that
      * comprise it.
+     *
      * @return the x position of the farthest right neuron in the group.
      */
-    public double getMaxX(){
+    public double getMaxX() {
         double max = Double.NEGATIVE_INFINITY;
         for (Neuron neuron : neuronList) {
             if (neuron.getX() > max) {
@@ -416,9 +427,10 @@ public class NeuronGroup extends Group {
     /**
      * Returns the minimum X position of this group based on the neurons that
      * comprise it.
+     *
      * @return the x position of the farthest left neuron in the group.
      */
-    public double getMinX(){
+    public double getMinX() {
         double min = Double.POSITIVE_INFINITY;
         for (Neuron neuron : neuronList) {
             if (neuron.getX() < min) {
@@ -431,24 +443,26 @@ public class NeuronGroup extends Group {
     /**
      * Returns the maximum Y position of this group based on the neurons that
      * comprise it.
+     *
      * @return the y position of the farthest north neuron in the group.
      */
     public double getMaxY() {
-    	  double max = Double.NEGATIVE_INFINITY;
-          for (Neuron neuron : neuronList) {
-              if (neuron.getY() > max) {
-                  max = neuron.getY();
-              }
-          }
-          return max;
+        double max = Double.NEGATIVE_INFINITY;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getY() > max) {
+                max = neuron.getY();
+            }
+        }
+        return max;
     }
 
     /**
      * Returns the minimum Y position of this group based on the neurons that
      * comprise it.
+     *
      * @return the y position of the farthest south neuron in the group.
      */
-    public double getMinY(){
+    public double getMinY() {
         double min = Double.POSITIVE_INFINITY;
         for (Neuron neuron : neuronList) {
             if (neuron.getY() < min) {
@@ -521,7 +535,8 @@ public class NeuronGroup extends Group {
         int i = 0;
         for (Neuron neuron : toCopy.getNeuronList()) {
             if (i < neuronList.size()) {
-                neuronList.get(i++).setActivation(neuron.getInputValue() + neuron.getActivation());
+                neuronList.get(i++).setActivation(
+                        neuron.getInputValue() + neuron.getActivation());
             }
         }
     }
@@ -549,8 +564,26 @@ public class NeuronGroup extends Group {
         }
     }
 
+    /**
+     * @return the layout
+     */
+    public Layout getLayout() {
+        return layout;
+    }
 
+    /**
+     * @param layout the layout to set
+     */
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
 
-
+    /**
+     * Apply this group's layout to its neurons.
+     */
+    public void applyLayout() {
+        layout.setInitialLocation(new Point2D.Double(getMinX(), getMinY()));
+        layout.layoutNeurons(getNeuronList());
+    }
 
 }

@@ -25,7 +25,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
 
 /**
  * <b>GridLayoutPanel</b> allows the user to define the layout of a network.
@@ -43,9 +42,6 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
 
 	/** Manual spacing field. */
 	private JCheckBox manuallySetNumColumns = new JCheckBox();
-
-	/** Reference to the underlying layout. */
-	private final GridLayout layout;
 
 	/**
 	 * Default constructor.
@@ -81,10 +77,14 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
 	 */
 	@Override
 	public void commitChanges() {
-		layout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
-		layout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
-		layout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
-		layout.setManualColumns(manuallySetNumColumns.isSelected());
+        ((GridLayout) layout).setNumColumns(Integer.parseInt(tfNumColumns
+                .getText()));
+        ((GridLayout) layout).setHSpacing(Double.parseDouble(tfHSpacing
+                .getText()));
+        ((GridLayout) layout).setVSpacing(Double.parseDouble(tfVSpacing
+                .getText()));
+        ((GridLayout) layout).setManualColumns(manuallySetNumColumns
+                .isSelected());
 	}
 
 	/**
@@ -92,19 +92,16 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
 	 */
 	@Override
 	public void fillFieldValues() {
-		tfNumColumns.setText(Integer.toString(layout.getNumColumns()));
-		tfHSpacing.setText(Double.toString(layout.getHSpacing()));
-		tfVSpacing.setText(Double.toString(layout.getVSpacing()));
-		manuallySetNumColumns.setSelected(layout.isManualColumns());
-		enableDisableSpacingFields();
+        tfNumColumns.setText(Integer.toString(((GridLayout) layout)
+                .getNumColumns()));
+        tfHSpacing
+                .setText(Double.toString(((GridLayout) layout).getHSpacing()));
+        tfVSpacing
+                .setText(Double.toString(((GridLayout) layout).getVSpacing()));
+        manuallySetNumColumns.setSelected(((GridLayout) layout)
+                .isManualColumns());
+        enableDisableSpacingFields();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Layout getNeuronLayout() {
-		return layout;
-	}
 
 }

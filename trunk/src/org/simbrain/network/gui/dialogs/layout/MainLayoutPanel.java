@@ -62,10 +62,10 @@ public class MainLayoutPanel extends JPanel {
         // Populate the panel map
         panel_map.put(new GridLayout().getDescription(), new GridLayoutPanel(
                 new GridLayout()));
-        panel_map.put(new LineLayout().getDescription(), new LineLayoutPanel(
-                new LineLayout()));
         panel_map.put(new HexagonalGridLayout().getDescription(),
                 new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
+        panel_map.put(new LineLayout().getDescription(), new LineLayoutPanel(
+                new LineLayout()));
     }
 
     /** A combo box for selecting the type of layout. */
@@ -158,9 +158,9 @@ public class MainLayoutPanel extends JPanel {
         layoutPanel.setVisible(layoutParameterReveal.isDown() || !revealOption);
         layoutPanel.setAlignmentX(CENTER_ALIGNMENT);
         this.add(layoutPanel);
-        if (revealOption)
+        if (revealOption) {
             this.setBorder(BorderFactory.createTitledBorder("Layout"));
-
+        }
     }
 
     /**
@@ -230,10 +230,21 @@ public class MainLayoutPanel extends JPanel {
         layoutPanel.commitChanges();
     }
 
-    public void setCurrentLayout(String layName) {
-        layoutCb.setSelectedItem(layName);
+    /**
+     * Sets the neuron layout using a layout object.
+     *
+     * @param layout the layout to set
+     */
+    public void setCurrentLayout(final Layout layout) {
+        layoutCb.setSelectedItem(layout.getDescription());
+        panel_map.get(layoutCb.getSelectedItem()).setNeuronLayout(layout);
     }
 
+    /**
+     * Returns the current layout being edited.
+     *
+     * @return the current layout
+     */
     public Layout getCurrentLayout() {
         return layoutPanel.getNeuronLayout();
     }

@@ -18,15 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
-import java.awt.geom.Point2D;
-
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
@@ -41,16 +41,26 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * Dialog for editing neuron groups.
+ * Main tabbed panel for editing all neuron groups. Specific neuron panels are
+ * included as part of this.
  *
  * @author Jeff Yoshimi
  */
-public class NeuronGroupDialog extends StandardDialog {
+public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
     // TODO
-    // - Move general info to a separate panel?
     // - Change in a way that prepares for possible future where multiple can be
     // edited at once?
+
+    /**
+     * Default number of neurons (Specific neuron group panels specify this in
+     * their property panels, so this is the default for bare neuron panels or
+     * otherwise unspecified cases).
+     */
+    private static final int DEFAULT_NUM_NEURONS = 10;
+
+    /** Network Topology. */
+    private JTextField tfNumNeurons = new JTextField();
 
     /** Parent network panel. */
     private NetworkPanel networkPanel;
@@ -77,48 +87,88 @@ public class NeuronGroupDialog extends StandardDialog {
     private JPanel specificNeuronGroupPanel;
 
     /** Label Field. */
-    private final JTextField tfNeuronLabel = new JTextField();
+    private final JTextField tfNeuronGroupLabel = new JTextField();
 
     /** Main properties panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
+    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
+
     /**
-     * Construct the neuron group dialog.
+     * Constructor for the case where a neuron group is being
+     * created.
+     *
+     * @param np Parent network panel
+     * @param parentDialog parent dialog containing this panel.
+     */
+    public NeuronGroupPanel(final NetworkPanel np,
+            final StandardDialog parentDialog) {
+        networkPanel = np;
+        isCreationPanel = true;
+        mainPanel.addItem("Number of neurons", tfNumNeurons);
+        initPanel(parentDialog);
+    }
+
+    /**
+     * Constructor for case where an existing neuron group is being
+     * edited.
      *
      * @param np Parent network panel
      * @param ng neuron group being edited
+     * @param parentDialog parent dialog containing this panel.
      */
-    public NeuronGroupDialog(final NetworkPanel np, final NeuronGroup ng) {
+    public NeuronGroupPanel(final NetworkPanel np, final NeuronGroup ng,
+            final StandardDialog parentDialog) {
         networkPanel = np;
         neuronGroup = ng;
-        setTitle("Edit Neuron Group");
+        isCreationPanel = false;
+        initPanel(parentDialog);
+    }
 
+    /**
+     * Initialize the panel.
+     *
+     * @param parentDialog the parent window
+     */
+    private void initPanel(final StandardDialog parentDialog) {
+
+        // Set up group specific properties
         setSpecificGroup();
+        add(tabbedPane);
+
+        // Layout properties
+        layoutPanel = new MainLayoutPanel(false, parentDialog);
+        tabLayout.add(layoutPanel);
+
+        // Fill field values
         fillFieldValues();
-        setContentPane(tabbedPane);
 
         // Generic group properties
-        tabbedPane.addTab("Properties", tabMain);
+        if (!isCreationPanel) {
+            mainPanel.addItem("Id:", new JLabel(neuronGroup.getId()));
+        }
+        mainPanel.addItem("Label:", tfNeuronGroupLabel);
         tabMain.add(mainPanel);
-        mainPanel.addItem("Id:", new JLabel(neuronGroup.getId()));
-        mainPanel.addItem("Label:", tfNeuronLabel);
 
         // If this is a subclass of neuron group, add a tab for editing those
         // properties
         initializeSpecificGroupTab();
 
-        // Layout properties
+        // Add  all tabs
+        tabbedPane.addTab("Properties", tabMain);
         tabbedPane.addTab("Layout", tabLayout);
-        layoutPanel = new MainLayoutPanel(false, this);
-        tabLayout.add(layoutPanel);
 
         // Set up help button
+        Action helpAction;
         if (specificNeuronGroupPanel != null) {
-            Action helpAction = new ShowHelpAction(
+            helpAction = new ShowHelpAction(
                     ((GroupPropertiesPanel) specificNeuronGroupPanel)
                             .getHelpPath());
-            this.addButton(new JButton(helpAction));
+        } else {
+            helpAction = new ShowHelpAction(this.getHelpPath());
         }
+        parentDialog.addButton(new JButton(helpAction));
     }
 
     /**
@@ -149,41 +199,56 @@ public class NeuronGroupDialog extends StandardDialog {
         }
     }
 
-    /**
-     * Set the initial values of dialog components.
-     */
+    @Override
     public void fillFieldValues() {
 
-        tfNeuronLabel.setText(neuronGroup.getLabel());
-        // layoutPanel.setLayout(neuronGroup.getLabel()) //TODO How?
-
-        if (specificNeuronGroupPanel != null) {
-            ((GroupPropertiesPanel) specificNeuronGroupPanel).fillFieldValues();
+        if (isCreationPanel) {
+            tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
+            // Temporary. for fill field values....
+            neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
+                    networkPanel.getLastClickedPosition(),
+                    Integer.parseInt(tfNumNeurons.getText()));
         }
-    }
 
-    /**
-     * Commit changes.
-     */
-    public void commitChanges() {
-        neuronGroup.setLabel(tfNeuronLabel.getText());
+        tfNeuronGroupLabel.setText(neuronGroup.getLabel());
         if (specificNeuronGroupPanel != null) {
-            ((GroupPropertiesPanel) specificNeuronGroupPanel).commitChanges();
+            ((GroupPropertiesPanel) specificNeuronGroupPanel)
+                    .fillFieldValues();
         }
-        layoutPanel.commitChanges();
-        // TODO: Bug. In feed-forward nets, neuronGroup.getMinY() returns 0
-        // and the next line crashes the piccolo canvas
-        layoutPanel.getCurrentLayout().setInitialLocation(
-                new Point2D.Double(neuronGroup.getMinX(), neuronGroup.getMinY()));
-        layoutPanel.getCurrentLayout().layoutNeurons(
-                neuronGroup.getNeuronList());
-        networkPanel.repaint();
+
+        // For backwards compatibility
+        if (neuronGroup.getLayout() == null) {
+            neuronGroup.setLayout(NeuronGroup.DEFAULT_LAYOUT);
+        }
+
+        layoutPanel.setCurrentLayout(neuronGroup.getLayout());
     }
 
     @Override
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        commitChanges();
+    public NeuronGroup commitChanges() {
+        if (isCreationPanel) {
+            neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
+                    networkPanel.getLastClickedPosition(),
+                    Integer.parseInt(tfNumNeurons.getText()));
+        }
+        if (!tfNeuronGroupLabel.getText().isEmpty()) {
+            neuronGroup.setLabel(tfNeuronGroupLabel.getText());
+        }
+        if (specificNeuronGroupPanel != null) {
+            ((GroupPropertiesPanel) specificNeuronGroupPanel).commitChanges();
+        }
+
+        layoutPanel.commitChanges();
+        neuronGroup.setLayout(layoutPanel.getCurrentLayout());
+        neuronGroup.applyLayout();
+
+        networkPanel.repaint();
+        return neuronGroup;
+    }
+
+    @Override
+    public String getHelpPath() {
+        return "Pages/Network/groups.html";
     }
 
 }

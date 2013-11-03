@@ -79,7 +79,7 @@ public class HopfieldCreationDialog extends StandardDialog {
 
         // Layout panel
         tabLayout.add(layoutPanel);
-        layoutPanel.setCurrentLayout("Grid");
+        layoutPanel = new MainLayoutPanel(false, this);
 
         // Set it all up
         tabbedPane.addTab("Logic", tabLogic);

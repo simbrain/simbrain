@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
@@ -7,8 +25,8 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a grid.
- * 
- * @author jyoshimi
+ *
+ * @author Jeff Yoshimi
  */
 public class GridLayout implements Layout {
 
@@ -44,19 +62,16 @@ public class GridLayout implements Layout {
 
     /**
      * Create a layout.
-     * 
-     * @param hSpacing
-     *            horizontal spacing between neurons
-     * @param vSpacing
-     *            vertical spacing between neurons
-     * @param numColumns
-     *            number of columns of neurons
+     *
+     * @param hSpacing horizontal spacing between neurons
+     * @param vSpacing vertical spacing between neurons
+     * @param numColumns number of columns of neurons
      */
     public GridLayout(final double hSpacing, final double vSpacing,
-	    final int numColumns) {
-	this.hSpacing = hSpacing;
-	this.vSpacing = vSpacing;
-	this.numColumns = numColumns;
+            final int numColumns) {
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.numColumns = numColumns;
     }
 
     /**
@@ -69,102 +84,91 @@ public class GridLayout implements Layout {
      * {@inheritDoc}
      */
     public void layoutNeurons(final List<Neuron> neurons) {
-	int rowNum = 0;
-	int numCols = numColumns;
-	if (!manualColumns) {
-	    numCols = (int) Math.sqrt(neurons.size());
-	}
+        int numCols = numColumns;
+        if (!manualColumns) {
+            numCols = (int) Math.sqrt(neurons.size());
+        }
 
-	for (int i = 0; i < neurons.size(); i++) {
-	    Neuron neuron = neurons.get(i);
-	    if (i % numCols == 0) {
-		rowNum++;
-	    }
-	    neuron.setX(initialX + (i % numCols) * hSpacing);
-	    neuron.setY(initialY + rowNum * vSpacing);
-	}
+        int rowNum = -1;
+        for (int i = 0; i < neurons.size(); i++) {
+            Neuron neuron = neurons.get(i);
+            if (i % numCols == 0) {
+                rowNum++;
+            }
+            neuron.setX(initialX + (i % numCols) * hSpacing);
+            neuron.setY(initialY + rowNum * vSpacing);
+        }
     }
 
-    /**
-     * @see Layout
-     * @param initialPoint
-     *            Initial point
-     */
+    @Override
     public void setInitialLocation(final Point2D initialPoint) {
-	initialX = initialPoint.getX();
-	initialY = initialPoint.getY();
+        initialX = initialPoint.getX();
+        initialY = initialPoint.getY();
     }
 
-    /**
-     * @see Layout
-     * @return String
-     */
+    @Override
     public String getDescription() {
-	return "Grid";
+        return "Grid";
     }
 
     /**
      * @return the numColumns
      */
     public int getNumColumns() {
-	return numColumns;
+        return numColumns;
     }
 
     /**
-     * @param numColumns
-     *            the numColumns to set
+     * @param numColumns the numColumns to set
      */
     public void setNumColumns(final int numColumns) {
-	this.numColumns = numColumns;
+        this.numColumns = numColumns;
     }
 
     /**
      * @return the hSpacing
      */
     public double getHSpacing() {
-	return hSpacing;
+        return hSpacing;
     }
 
     /**
-     * @param spacing
-     *            the hSpacing to set
+     * @param spacing the hSpacing to set
      */
     public void setHSpacing(final double spacing) {
-	hSpacing = spacing;
+        hSpacing = spacing;
     }
 
     /**
      * @return the vSpacing
      */
     public double getVSpacing() {
-	return vSpacing;
+        return vSpacing;
     }
 
     /**
-     * @param spacing
-     *            the vSpacing to set
+     * @param spacing the vSpacing to set
      */
     public void setVSpacing(final double spacing) {
-	vSpacing = spacing;
+        vSpacing = spacing;
     }
 
-    /** @override */
+    @Override
     public String toString() {
-	return "Grid Layout";
+        return "Grid Layout";
     }
 
     /**
      * @return the manualColumns
      */
     public boolean isManualColumns() {
-	return manualColumns;
+        return manualColumns;
     }
 
     /**
-     * @param manualColumns
-     *            the manualColumns to set
+     * @param manualColumns the manualColumns to set
      */
     public void setManualColumns(boolean manualColumns) {
-	this.manualColumns = manualColumns;
+        this.manualColumns = manualColumns;
     }
 }

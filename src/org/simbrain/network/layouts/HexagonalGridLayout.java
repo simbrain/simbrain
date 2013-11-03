@@ -25,7 +25,7 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * Lay neurons out in a hexagonal grid.
- * 
+ *
  * @author wstclair
  */
 public class HexagonalGridLayout implements Layout {
@@ -62,19 +62,16 @@ public class HexagonalGridLayout implements Layout {
 
     /**
      * Create a layout.
-     * 
-     * @param hSpacing
-     *            horizontal spacing between neurons
-     * @param vSpacing
-     *            vertical spacing between neurons
-     * @param numColumns
-     *            number of columns of neurons
+     *
+     * @param hSpacing horizontal spacing between neurons
+     * @param vSpacing vertical spacing between neurons
+     * @param numColumns number of columns of neurons
      */
     public HexagonalGridLayout(final double hSpacing, final double vSpacing,
-	    final int numColumns) {
-	this.hSpacing = hSpacing;
-	this.vSpacing = vSpacing;
-	this.numColumns = numColumns;
+            final int numColumns) {
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.numColumns = numColumns;
     }
 
     /**
@@ -83,107 +80,97 @@ public class HexagonalGridLayout implements Layout {
     public HexagonalGridLayout() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void layoutNeurons(final List<Neuron> neurons) {
-	int rowNum = 0;
-	int numCols = numColumns;
-	if (!manualColumns) {
-	    numCols = (int) Math.sqrt(neurons.size());
-	}
-	for (int i = 0; i < neurons.size(); i++) {
-	    Neuron neuron = neurons.get(i);
-	    if (i % numCols == 0) {
-		rowNum++;
-	    }
-	    if (rowNum % 2 == 0) {
-		neuron.setX(initialX + hSpacing / 2 + (i % numCols) * hSpacing);
-	    } else {
-		neuron.setX(initialX + (i % numCols) * hSpacing);
-	    }
-	    neuron.setY(initialY + rowNum * vSpacing);
-	}
+        int numCols = numColumns;
+        if (!manualColumns) {
+            numCols = (int) Math.sqrt(neurons.size());
+        }
+        int rowNum = -1;
+        for (int i = 0; i < neurons.size(); i++) {
+            Neuron neuron = neurons.get(i);
+            if (i % numCols == 0) {
+                rowNum++;
+            }
+            if (rowNum % 2 == 0) {
+                neuron.setX(initialX + hSpacing / 2 + (i % numCols) * hSpacing);
+            } else {
+                neuron.setX(initialX + (i % numCols) * hSpacing);
+            }
+            neuron.setY(initialY + rowNum * vSpacing);
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void setInitialLocation(final Point2D initialPoint) {
-	initialX = initialPoint.getX();
-	initialY = initialPoint.getY();
+        initialX = initialPoint.getX();
+        initialY = initialPoint.getY();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription() {
-	return "Hex Grid";
+        return "Hex Grid";
     }
 
     /**
      * @return the numColumns
      */
     public int getNumColumns() {
-	return numColumns;
+        return numColumns;
     }
 
     /**
-     * @param numColumns
-     *            the numColumns to set
+     * @param numColumns the numColumns to set
      */
     public void setNumColumns(final int numColumns) {
-	this.numColumns = numColumns;
+        this.numColumns = numColumns;
     }
 
     /**
      * @return the hSpacing
      */
     public double getHSpacing() {
-	return hSpacing;
+        return hSpacing;
     }
 
     /**
-     * @param spacing
-     *            the hSpacing to set
+     * @param spacing the hSpacing to set
      */
     public void setHSpacing(final double spacing) {
-	hSpacing = spacing;
+        hSpacing = spacing;
     }
 
     /**
      * @return the vSpacing
      */
     public double getVSpacing() {
-	return vSpacing;
+        return vSpacing;
     }
 
     /**
-     * @param spacing
-     *            the vSpacing to set
+     * @param spacing the vSpacing to set
      */
     public void setVSpacing(final double spacing) {
-	vSpacing = spacing;
+        vSpacing = spacing;
     }
 
-    /** @override */
+    @Override
     public String toString() {
-	return "Hexagonal Grid Layout";
+        return "Hexagonal Grid Layout";
     }
 
     /**
      * @return the manualColumns
      */
     public boolean isManualColumns() {
-	return manualColumns;
+        return manualColumns;
     }
 
     /**
-     * @param manualColumns
-     *            the manualColumns to set
+     * @param manualColumns the manualColumns to set
      */
     public void setManualColumns(boolean manualColumns) {
-	this.manualColumns = manualColumns;
+        this.manualColumns = manualColumns;
     }
 
 }

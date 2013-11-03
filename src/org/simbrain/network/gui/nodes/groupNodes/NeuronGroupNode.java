@@ -28,7 +28,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
@@ -36,11 +35,12 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.util.StandardDialog;
 
 /**
  * PNode representation of a group of neurons.
@@ -102,7 +102,7 @@ public class NeuronGroupNode extends GroupNode {
 
         @Override
         protected JDialog getPropertyDialog() {
-            return new NeuronGroupDialog(getNetworkPanel(), group);
+            return NeuronGroupNode.this.getPropertyDialog();
         }
 
         @Override
@@ -117,6 +117,30 @@ public class NeuronGroupNode extends GroupNode {
 
     };
 
+    /**
+     * Helper class to create the neuron group property dialog (since it is
+     * needed in two places.)
+     *
+     * @return the neuron group property dialog.
+     */
+    private StandardDialog getPropertyDialog() {
+        StandardDialog dialog = new StandardDialog() {
+            private final NeuronGroupPanel panel;
+            {
+                panel = new NeuronGroupPanel(
+                        getNetworkPanel(), group, this);
+                setContentPane(panel);
+            }
+
+            @Override
+            protected void closeDialogOk() {
+                super.closeDialogOk();
+                panel.commitChanges();
+            }
+        };
+        return dialog;
+    }
+
 
     /**
      * Returns default actions for a context menu.
@@ -130,9 +154,9 @@ public class NeuronGroupNode extends GroupNode {
         // Edit Submenu
         Action editGroup = new AbstractAction("Edit...") {
             public void actionPerformed(final ActionEvent event) {
-                JDialog dialog = new NeuronGroupDialog(getNetworkPanel(), group);
-                dialog.setLocationRelativeTo(null);
+                StandardDialog dialog = getPropertyDialog();
                 dialog.pack();
+                dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             }
         };

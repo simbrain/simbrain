@@ -88,8 +88,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
     private boolean isCreationPanel;
 
     /**
-     * Constructor for case where an existing competitive network is being
-     * edited.
+     * Constructor for the case where a competitive network is being
+     * created.
      *
      * @param np parent network panel
      */
@@ -101,7 +101,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     }
 
     /**
-     * Constructor for case where an existing competitive network is being
+     * Constructor for the case where an existing competitive network is being
      * edited.
      *
      * @param np parent network panel

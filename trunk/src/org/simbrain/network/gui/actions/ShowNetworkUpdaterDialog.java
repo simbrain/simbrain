@@ -54,9 +54,9 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(
-                networkPanel.getNetwork());
         StandardDialog dialog = new StandardDialog();
+        final NetworkUpdateManagerPanel updatePanel = new NetworkUpdateManagerPanel(
+                networkPanel.getNetwork(), dialog);
         dialog.setContentPane(updatePanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

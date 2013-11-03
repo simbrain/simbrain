@@ -42,8 +42,10 @@ import javax.swing.TransferHandler;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
+import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;
@@ -75,7 +77,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
     /**
      * Creates a new update manager panel.
      */
-    public NetworkUpdateManagerPanel(final Network network) {
+    public NetworkUpdateManagerPanel(final Network network, final StandardDialog parentDialog) {
 
         super(new BorderLayout());
         this.network = network;
@@ -162,6 +164,10 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(downFullButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
+
+        // Help button
+        Action helpAction = new ShowHelpAction("Pages/Network/update.html");
+        parentDialog.addButton(new JButton(helpAction));
 
         // Listen for network updates
         network.getUpdateManager().addListener(listener);

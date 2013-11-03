@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import java.util.Collections;
+
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -26,13 +28,16 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.Group;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
+import org.simbrain.network.gui.dialogs.neuron.BasicNeuronInfoPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
@@ -92,6 +97,12 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     /** Main properties panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
+    /** Panel to edit neuron basic info. */
+    private BasicNeuronInfoPanel editBasicNeuronInfo;
+
+    /** Panel to edit neuron update rule. */
+    private NeuronUpdateSettingsPanel editNeuronType;
+
     /** If true this is a creation panel.  Otherwise it is an edit panel. */
     private boolean isCreationPanel;
 
@@ -135,28 +146,56 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
         // Set up group specific properties
         setSpecificGroup();
-        add(tabbedPane);
 
-        // Layout properties
+        // Layout panel
         layoutPanel = new MainLayoutPanel(false, parentDialog);
         tabLayout.add(layoutPanel);
 
-        // Fill field values
+        // Fill field values and create temp neuron group if needed
         fillFieldValues();
 
-        // Generic group properties
+        // Set title
+        if (!isCreationPanel) {
+            if (specificNeuronGroupPanel == null) {
+                parentDialog.setTitle("Edit Neuron Group");
+            } else {
+                parentDialog.setTitle("Edit "
+                        + neuronGroup.getClass().getSimpleName());
+            }
+        }
+
+        // Set up neuron edit panels
+        Box editNeurons =  Box.createVerticalBox();
+        if (!isCreationPanel) {
+            editBasicNeuronInfo = new BasicNeuronInfoPanel(
+                    neuronGroup.getNeuronList(), parentDialog);
+            editNeuronType = new NeuronUpdateSettingsPanel(
+                    neuronGroup.getNeuronList(), parentDialog);
+        } else {
+            Neuron baseNeuron = new Neuron(networkPanel.getNetwork(),
+                    new LinearRule());
+            editBasicNeuronInfo = new BasicNeuronInfoPanel(
+                    Collections.singletonList(baseNeuron), parentDialog);
+            editNeuronType = new NeuronUpdateSettingsPanel(
+                    Collections.singletonList(baseNeuron), parentDialog);
+        }
+        editNeurons.add(editBasicNeuronInfo);
+        editNeurons.add(editNeuronType);
+
+        // Set up main property panel
         if (!isCreationPanel) {
             mainPanel.addItem("Id:", new JLabel(neuronGroup.getId()));
+            mainPanel.addItem("Neurons:", new JLabel(""
+                    + neuronGroup.getNeuronList().size()));
         }
         mainPanel.addItem("Label:", tfNeuronGroupLabel);
         tabMain.add(mainPanel);
 
-        // If this is a subclass of neuron group, add a tab for editing those
-        // properties
+        // Add all tabs
+        add(tabbedPane);
+        tabbedPane.addTab("Basics", tabMain);
+        tabbedPane.addTab("Neurons", editNeurons);
         initializeSpecificGroupTab();
-
-        // Add  all tabs
-        tabbedPane.addTab("Properties", tabMain);
         tabbedPane.addTab("Layout", tabLayout);
 
         // Set up help button
@@ -230,6 +269,13 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
                     networkPanel.getLastClickedPosition(),
                     Integer.parseInt(tfNumNeurons.getText()));
+            // TODO: editBasicNeuronInfo... no way to apply this to a set of
+            // neurons
+            editNeuronType.getNeuronPanel()
+                    .commitChanges(neuronGroup.getNeuronList());
+        } else {
+            editBasicNeuronInfo.commitChanges();
+            editNeuronType.commitChanges();
         }
         if (!tfNeuronGroupLabel.getText().isEmpty()) {
             neuronGroup.setLabel(tfNeuronGroupLabel.getText());

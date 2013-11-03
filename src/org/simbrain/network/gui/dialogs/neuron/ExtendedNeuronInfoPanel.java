@@ -39,17 +39,17 @@ import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.TristateDropDown;
 
 /**
- * 
+ *
  * A panel containing more detailed generic information about neurons. Generally
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- * 
+ *
  * Values included are: Activation ceiling and floor, label, priority and
  * increment.
- * 
+ *
  * @author ztosi
- * 
+ *
  */
 public class ExtendedNeuronInfoPanel extends JPanel {
 
@@ -87,6 +87,9 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	 */
 	private final JLabel floorL = new JLabel("Floor: ");
 
+	/**
+	 * Label for clipping field.
+	 */
 	private final JLabel clipL = new JLabel("Clipping: ");
 
 	/** Increment field. */
@@ -101,6 +104,7 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	/** Are upper and lower bounds enabled? */
 	private boolean boundsEnabled;
 
+	/** Bounds panel. */
 	private final JPanel boundsPanel = new JPanel();
 
 	/**
@@ -109,21 +113,25 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	 */
 	private final TristateDropDown clamped = new TristateDropDown();
 
+	/** Parent reference so pack can be called. */
 	private final Window parent;
 
 	/** The neurons being modified. */
 	private List<Neuron> neuronList;
 
-	/**
-	 * 
-	 * @param neuronList
-	 */
-	public ExtendedNeuronInfoPanel(List<Neuron> neuronList, Window parent) {
-		this.neuronList = neuronList;
-		this.parent = parent;
-		fillFieldValues();
-		initializeLayout();
-	}
+	    /**
+     * Construct the panel representing the provided neurons.
+     *
+     * @param neuronList list of neurons to represent.
+     * @param parent parent window so pack can be called
+     */
+    public ExtendedNeuronInfoPanel(final List<Neuron> neuronList,
+            final Window parent) {
+        this.neuronList = neuronList;
+        this.parent = parent;
+        fillFieldValues();
+        initializeLayout();
+    }
 
 	/**
 	 * Lays out the panel

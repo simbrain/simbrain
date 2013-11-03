@@ -64,7 +64,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
 /**
  * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
  * parameters of specific neuron rule types.
- * 
+ *
  * Optimization has been emphasized for methods intended for neuron creation
  * rather than editing on the assumption that the former will be far more common
  * for large numbers of neurons.
@@ -176,7 +176,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	/**
 	 * Override to add custom notes or other text to bottom of panel. Can be
 	 * html formatted.
-	 * 
+	 *
 	 * @param text
 	 *            Text to be added
 	 */
@@ -223,7 +223,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	 * thrown by Double.parseDouble(String), so that try/catch fields do not
 	 * have to be repeatedly written, and allows the program to continue in the
 	 * case that the string is not parsable.
-	 * 
+	 *
 	 * @param tField
 	 *            The text field to read from and test if its text can be parsed
 	 *            into a double value

@@ -24,6 +24,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkUpdateManagerPanel;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -41,10 +42,11 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
      */
     public ShowNetworkUpdaterDialog(final NetworkPanel networkPanel) {
 
-        super("Network update preferences...");
+        super("Update sequence...");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Sequence.png"));
 
         this.networkPanel = networkPanel;
     }

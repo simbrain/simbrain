@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +25,7 @@ import java.util.LinkedHashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -87,6 +90,19 @@ public class MainLayoutPanel extends JPanel {
     private final boolean revealOption;
 
     /**
+     * Flag to determine whether the panel should have an apply button that
+     * allows the current layout to be immediately applied to the layout's
+     * neurons.
+     */
+    private boolean useApplyButton;
+
+    /**
+     * The apply button. It's action must be supplied by external users of this
+     * class.
+     */
+    private JButton applyButton = new JButton("Apply");
+
+    /**
      * A reference to the parent window for resizing.
      */
     private final Window parent;
@@ -145,11 +161,11 @@ public class MainLayoutPanel extends JPanel {
             topPanel.add(layoutParameterReveal);
             topPanel.setAlignmentX(CENTER_ALIGNMENT);
             topPanel.setBorder(padding);
-            this.add(topPanel);
+            add(topPanel);
         } else { // Lay out the panel without a drop-down triangle
             layoutCb.setAlignmentX(RIGHT_ALIGNMENT);
             layoutCb.setBorder(padding);
-            this.add(layoutCb);
+            add(layoutCb);
         }
 
         // Layout panel is visible regardless of triangle state if the reveal
@@ -157,10 +173,21 @@ public class MainLayoutPanel extends JPanel {
         // state of the drop-down triangle.
         layoutPanel.setVisible(layoutParameterReveal.isDown() || !revealOption);
         layoutPanel.setAlignmentX(CENTER_ALIGNMENT);
-        this.add(layoutPanel);
+        add(layoutPanel);
         if (revealOption) {
-            this.setBorder(BorderFactory.createTitledBorder("Layout"));
+            setBorder(BorderFactory.createTitledBorder("Layout"));
         }
+
+        // Handle apply button
+        if (useApplyButton) {
+            JPanel applyPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            applyPanel.add(applyButton);
+            add(Box.createRigidArea(new Dimension(0, 10)));
+            // TODO Can't get add(new Box.Filler...) to work to push apply
+            // button to bottom of panel
+            add(applyPanel);
+        }
+
     }
 
     /**
@@ -247,5 +274,29 @@ public class MainLayoutPanel extends JPanel {
      */
     public Layout getCurrentLayout() {
         return layoutPanel.getNeuronLayout();
+    }
+
+    /**
+     * @return the useApplyButton
+     */
+    public boolean isUseApplyButton() {
+        return useApplyButton;
+    }
+
+    /**
+     * Set whether to use the apply button. If true, then an action listener for
+     * the button must also be supplied. If false set the action listener to
+     * null.
+     *
+     * @param useApplyButton the useApplyButton to set
+     * @param action the action to invoke when pressing the button
+     */
+    public void setUseApplyButton(boolean useApplyButton,
+            final ActionListener action) {
+        this.useApplyButton = useApplyButton;
+        if (action != null) {
+            applyButton.addActionListener(action);
+        }
+        repaintPanel();
     }
 }

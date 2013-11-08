@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 
 import javax.swing.Action;
@@ -149,6 +153,15 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
         // Layout panel
         layoutPanel = new MainLayoutPanel(false, parentDialog);
+        if (!isCreationPanel) {
+            ActionListener layoutAction = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    applyLayout();
+                }
+            };
+            layoutPanel.setUseApplyButton(true, layoutAction);
+        }
         tabLayout.add(layoutPanel);
 
         // Fill field values and create temp neuron group if needed
@@ -192,7 +205,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         tabMain.add(mainPanel);
 
         // Add all tabs
-        add(tabbedPane);
+        setLayout(new BorderLayout());
+        add(BorderLayout.CENTER, tabbedPane);
         tabbedPane.addTab("Basics", tabMain);
         tabbedPane.addTab("Neurons", editNeurons);
         initializeSpecificGroupTab();
@@ -273,6 +287,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             // neurons
             editNeuronType.getNeuronPanel()
                     .commitChanges(neuronGroup.getNeuronList());
+            applyLayout();
         } else {
             editBasicNeuronInfo.commitChanges();
             editNeuronType.commitChanges();
@@ -284,10 +299,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             ((GroupPropertiesPanel) specificNeuronGroupPanel).commitChanges();
         }
 
-        layoutPanel.commitChanges();
-        neuronGroup.setLayout(layoutPanel.getCurrentLayout());
-        neuronGroup.applyLayout();
-
         networkPanel.repaint();
         return neuronGroup;
     }
@@ -296,5 +307,15 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     public String getHelpPath() {
         return "Pages/Network/groups.html";
     }
+
+    /**
+     * Helper method to apply layout to neurons in this group.
+     */
+    private void applyLayout() {
+        layoutPanel.commitChanges();
+        neuronGroup.setLayout(layoutPanel.getCurrentLayout());
+        neuronGroup.applyLayout();
+    }
+
 
 }

@@ -42,7 +42,6 @@ import javax.swing.TransferHandler;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
-import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ShowHelpAction;
@@ -106,7 +105,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(customActionButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
+        // TODO: Make movement actions apply to multiple selections
         JButton upButton = new JButton(ResourceManager.getImageIcon("Up.png"));
+        upButton.setToolTipText("Move selected action up in sequence");
         upButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -121,6 +122,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(upButton);
         JButton upFullButton = new JButton(
                 ResourceManager.getImageIcon("UpFull.png"));
+        upFullButton
+            .setToolTipText("Move selected action to top of sequence");
         upFullButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -135,6 +138,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(upFullButton);
         JButton downButton = new JButton(
                 ResourceManager.getImageIcon("Down.png"));
+        downButton.setToolTipText("Move selected action down in sequence");
         downButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -149,6 +153,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(downButton);
         JButton downFullButton = new JButton(
                 ResourceManager.getImageIcon("DownFull.png"));
+        downFullButton
+                .setToolTipText("Move selected action to bottom of sequence");
         downFullButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -272,8 +278,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
-            putValue(NAME, "Remove");
-            putValue(SHORT_DESCRIPTION, "Delete selected actions");
+            putValue(NAME, "Remove action(s)");
+            putValue(SHORT_DESCRIPTION, "Remove selected action(s) from update sequence");
             NetworkUpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("BACK_SPACE"), this);
@@ -299,8 +305,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Custom");
-            putValue(SHORT_DESCRIPTION, "Add custom action");
+            putValue(NAME, "Add custom action");
+            putValue(SHORT_DESCRIPTION,
+                    "Add a custom action to the update sequence");
         }
 
         /**
@@ -334,8 +341,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Preset");
-            putValue(SHORT_DESCRIPTION, "Add selected actions");
+            putValue(NAME, "Add action");
+            putValue(SHORT_DESCRIPTION, "Add an action to the update sequence");
         }
 
         /**

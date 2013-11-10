@@ -26,18 +26,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.Box;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -75,8 +69,6 @@ import org.simbrain.util.projection.ProjectorPreferences;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
-
-import ca.odell.glazedlists.CollectionList.Model;
 
 /**
  * Gui Component to display a high dimensional projection object.
@@ -432,6 +424,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         if (!(proj instanceof ProjectCoordinate)) {
             adjustDimension1.setVisible(false);
             adjustDimension2.setVisible(false);
+        } else {
+            // Set correct dimensions
+            adjustDimension1.setSelectedIndex(((ProjectCoordinate) proj)
+                    .getHiD1());
+            adjustDimension2.setSelectedIndex(((ProjectCoordinate) proj)
+                    .getHiD2());
         }
 
         // Handle error bar
@@ -577,6 +575,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         for (Action action : actionManager.getOpenSavePlotActions()) {
             fileMenu.add(action);
         }
+        fileMenu.addSeparator();
         final JMenu exportImport = new JMenu("Export/Import...");
         fileMenu.add(exportImport);
         exportImport.add(ProjectionPlotActions
@@ -596,38 +595,16 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                 "General Preferences...");
         preferencesGeneral.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
+                ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(
                         getWorkspaceComponent().getProjectionModel()
                                 .getProjector());
-                JDialog dialog = editor.getDialog();
                 dialog.pack();
-                dialog.setContentPane(editor);
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             }
 
         });
         editMenu.add(preferencesGeneral);
-
-        final JMenuItem preferences = new JMenuItem(
-                "Projection Method Preferences...");
-        preferences.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
-                        getWorkspaceComponent().getProjectionModel()
-                                .getProjector().getProjectionMethod());
-                if (editor.getFieldCount() > 0) {
-                    JDialog dialog = editor.getDialog();
-                    dialog.pack();
-                    dialog.setContentPane(editor);
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                }
-            }
-
-        });
-        editMenu.add(preferences);
-        editMenu.addSeparator();
 
         final JMenuItem colorPrefs = new JMenuItem("Datapoint Coloring...");
         colorPrefs.addActionListener(new ActionListener() {

@@ -14,7 +14,7 @@
 package org.simbrain.plot.projection;
 
 import java.awt.Color;
-import java.awt.ComponentOrientation;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,7 +24,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
@@ -71,7 +74,7 @@ public class DataPointColoringDialog extends StandardDialog implements
     private JPanel hotColorIndicator = new JPanel();
 
     /** Hot color on/off toggle. */
-    private JCheckBox hotPointCheckBox = new JCheckBox("Hot Point Mode");
+    private JCheckBox hotPointCheckBox = new JCheckBox();
 
     /** Text field to edit floor. */
     private JTextField floor = new JTextField("" + 1);
@@ -94,14 +97,10 @@ public class DataPointColoringDialog extends StandardDialog implements
     /** Main dialog box. */
     private Box mainPanel = Box.createVerticalBox();
 
-    /** Panel for setting coloring method. */
-    private LabelledItemPanel methodPanel = new LabelledItemPanel();
-
     /**
      * Dialog constructor.
      *
-     * @param projectionModel
-     *            the projection model
+     * @param projectionModel the projection model
      */
     public DataPointColoringDialog(ProjectionModel projectionModel) {
         this.projectionModel = projectionModel;
@@ -110,12 +109,42 @@ public class DataPointColoringDialog extends StandardDialog implements
     }
 
     /**
-     * Initialize the dialog.
+     * Initialize the dialog. Fill field values based on state of coloring
+     * manager.
      */
     private void init() {
         setTitle("Data Point Coloring Settings");
+
+        // Set up coloring method region of panel
         coloringMethod.setSelectedItem(colorManager.getColoringMethodString());
         coloringMethod.addActionListener(this);
+        Box methodPanel = Box.createVerticalBox();
+        Box cbPanel = Box.createHorizontalBox();
+        cbPanel.add(new JLabel("Coloring method:"));
+        cbPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        cbPanel.add(coloringMethod);
+        methodPanel.add(cbPanel);
+        methodPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        methodPanel.add(new JSeparator(JSeparator.HORIZONTAL));
+
+        // Set up hot point check box
+        Box hotPointBox = Box.createHorizontalBox();
+        hotPointBox.add(new JLabel("Hot point mode"));
+        hotPointBox.add(Box.createRigidArea(new Dimension(10, 0)));
+        hotPointBox.add(hotPointCheckBox);
+        hotPointCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (hotPointCheckBox.isSelected() == true) {
+                    hotColorButton.setEnabled(true);
+                    hotColorIndicator.setEnabled(true);
+                } else {
+                    hotColorButton.setEnabled(false);
+                    hotColorIndicator.setEnabled(false);
+                }
+            }
+        });
+
+        // Set up color widgets
         baseColor = colorManager.getBaseColor();
         hotColor = colorManager.getHotColor();
         baseColorIndicator.setBackground(baseColor);
@@ -135,31 +164,15 @@ public class DataPointColoringDialog extends StandardDialog implements
             hotColorButton.setEnabled(false);
             hotColorIndicator.setEnabled(false);
         }
-        hotPointCheckBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (hotPointCheckBox.isSelected() == true) {
-                    hotColorButton.setEnabled(true);
-                    hotColorIndicator.setEnabled(true);
-                } else {
-                    hotColorButton.setEnabled(false);
-                    hotColorIndicator.setEnabled(false);
-                }
-            }
-        });
         floor.setText("" + Double.toString(colorManager.getFloor()));
         ceiling.setText("" + Double.toString(colorManager.getCeiling()));
         incrementAmount.setText(""
                 + Double.toString(colorManager.getIncrementAmount()));
         decrementAmount.setText(""
                 + Double.toString(colorManager.getDecrementAmount()));
-        methodPanel.addItem("Coloring Method", coloringMethod);
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/projection.html");
-        addButton(new JButton(helpAction));
 
         baseColorIndicator.setBackground(colorManager.getBaseColor());
         hotColorIndicator.setBackground(colorManager.getHotColor());
-
         baseColorButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 Color newColor = JColorChooser.showDialog(null,
@@ -171,7 +184,6 @@ public class DataPointColoringDialog extends StandardDialog implements
                 baseColorIndicator.setBackground(newColor);
             }
         });
-
         hotColorButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 Color newColor = JColorChooser.showDialog(null,
@@ -184,8 +196,15 @@ public class DataPointColoringDialog extends StandardDialog implements
             }
         });
 
+        // Initialize based on combo box
         initPanel();
 
+        // Set up help button
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Plot/projection.html");
+        addButton(new JButton(helpAction));
+
+        // Assemble color panel
         JPanel baseColorPanel = new JPanel();
         JPanel hotColorPanel = new JPanel();
         baseColorPanel.add(baseColorButton);
@@ -194,7 +213,7 @@ public class DataPointColoringDialog extends StandardDialog implements
         hotColorPanel.add(hotColorIndicator);
 
         mainPanel.add(methodPanel);
-        mainPanel.add(hotPointCheckBox);
+        mainPanel.add(hotPointBox);
         mainPanel.add(baseColorPanel);
         mainPanel.add(hotColorPanel);
         mainPanel.add(currentColoringPanel);
@@ -280,35 +299,78 @@ public class DataPointColoringDialog extends StandardDialog implements
         super.closeDialogOk();
     }
 
+
+    /**
+     * Helper method to check that a value is between 0 and 1 and display a
+     * warning if not.
+     *
+     * @param paramName parameter name to display in warning dialog
+     * @param val value to check
+     * @return true if the value is in range, false otherwise
+     */
+    private boolean betweenZeroAndOne(final String paramName, final double val) {
+        if ((val < 0) || (val > 1)) {
+            JOptionPane.showMessageDialog(null, paramName
+                    + "should be between 0 and 1", "Warning!",
+                    JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Commit changes to coloringManager based on selected coloring method.
      */
     private void commitChanges() {
-        if (hotPointCheckBox.isSelected()) {
-            colorManager.setHotPointMode(true);
-            colorManager.setHotColor(hotColor);
-        } else {
-            colorManager.setHotPointMode(false);
+        try {
+            double floorVal = Double.parseDouble(floor.getText());
+            double ceilingVal = Double.parseDouble(ceiling.getText());
+            double decAmount = Double.parseDouble(decrementAmount.getText());
+            double incAmount = Double.parseDouble(incrementAmount.getText());
+
+            if (!betweenZeroAndOne("Floor", floorVal)) {
+                return;
+            }
+            if (!betweenZeroAndOne("Ceiling", ceilingVal)) {
+                return;
+            }
+            if (!betweenZeroAndOne("Decrement Amount", decAmount)) {
+                return;
+            }
+            if (!betweenZeroAndOne("Increment Amount", incAmount)) {
+                return;
+            }
+
+            if (hotPointCheckBox.isSelected()) {
+                colorManager.setHotPointMode(true);
+                colorManager.setHotColor(hotColor);
+            } else {
+                colorManager.setHotPointMode(false);
+            }
+            if (coloringMethod.getSelectedItem() == "None") {
+                colorManager.setColoringMethod("None");
+                colorManager.setBaseColor(baseColor);
+            }
+            if (coloringMethod.getSelectedItem() == "DecayTrail") {
+                colorManager.setColoringMethod("DecayTrail");
+                colorManager.setBaseColor(baseColor);
+                colorManager.setDecrementAmount(decAmount);
+                colorManager.setCeiling(ceilingVal);
+                colorManager.setFloor(floorVal);
+            }
+            if (coloringMethod.getSelectedItem() == "Frequency") {
+                colorManager.setColoringMethod("Frequency");
+                colorManager.setBaseColor(baseColor);
+                colorManager.setIncrementAmount(incAmount);
+                colorManager.setCeiling(ceilingVal);
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Non-numeric field values:"
+                    + "\nNetwork construction failed.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            nfe.printStackTrace();
         }
-        if (coloringMethod.getSelectedItem() == "None") {
-            colorManager.setColoringMethod("None");
-            colorManager.setBaseColor(baseColor);
-        }
-        if (coloringMethod.getSelectedItem() == "DecayTrail") {
-            colorManager.setColoringMethod("DecayTrail");
-            colorManager.setBaseColor(baseColor);
-            colorManager.setDecrementAmount(Double.parseDouble(decrementAmount
-                    .getText()));
-            colorManager.setCeiling(Double.parseDouble(ceiling.getText()));
-            colorManager.setFloor(Double.parseDouble(floor.getText()));
-        }
-        if (coloringMethod.getSelectedItem() == "Frequency") {
-            colorManager.setColoringMethod("Frequency");
-            colorManager.setBaseColor(baseColor);
-            colorManager.setIncrementAmount(Double.parseDouble(incrementAmount
-                    .getText()));
-            colorManager.setCeiling(Double.parseDouble(ceiling.getText()));
-        }
+
     }
 
     /**

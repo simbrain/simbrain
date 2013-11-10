@@ -59,9 +59,12 @@ public class DataColoringManager {
     /** The base color to be used for all points besides the current point. */
     private Color baseColor = Color.green;
 
-    /** Toggle for hot point coloring mode. The current point is colored hotColor when this is true. */
-    private boolean hotPointMode = false;
-     
+    /**
+     * Toggle for hot point coloring mode. The current point is colored hotColor
+     * when this is true.
+     */
+    private boolean hotPointMode = true;
+
     /**
      * The lower bound for "activation" of a point in frequency and decay trail.
      */
@@ -270,7 +273,7 @@ public class DataColoringManager {
     public void setHotPointMode(boolean hotPointMode) {
         this.hotPointMode = hotPointMode;
     }
-    
+
     /**
      * @return the hotPointMode
      */

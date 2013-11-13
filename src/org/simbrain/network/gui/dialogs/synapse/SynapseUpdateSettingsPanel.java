@@ -23,8 +23,8 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.AbstractSynapsePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ClampedSynapseRulePanel;
-import org.simbrain.util.DropDownTriangle;
-import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 public class SynapseUpdateSettingsPanel extends JPanel {
 

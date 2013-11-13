@@ -42,10 +42,10 @@ import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.DropDownTriangle;
-import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.TristateDropDown;
 
 /**
  * A dialog for adding multiple neurons to the network. User can specify a

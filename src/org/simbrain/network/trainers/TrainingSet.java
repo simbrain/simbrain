@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.util.NumericMatrix;
+import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Represents input data, target data, a way of iterating through it, a

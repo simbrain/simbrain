@@ -34,8 +34,8 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.util.DropDownTriangle;
-import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  * All the functions of a layout selector in one panel. MainLayoutPanel lets the

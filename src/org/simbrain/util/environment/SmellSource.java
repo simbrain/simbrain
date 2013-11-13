@@ -18,8 +18,8 @@
  */
 package org.simbrain.util.environment;
 
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**

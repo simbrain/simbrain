@@ -32,10 +32,10 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * <b>SigmoidalNeuronPanel</b>.
@@ -43,10 +43,10 @@ import org.simbrain.util.randomizer.Randomizer;
 public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
 	/** Implementation combo box. */
-	private JComboBox<SigmoidType> cbImplementation =
-			new JComboBox<SigmoidType>(new SigmoidType[] {
-					SigmoidType.ARCTAN, SigmoidType.LOGISTIC,
-					SigmoidType.TANH });
+	private JComboBox<SquashingFunction> cbImplementation =
+			new JComboBox<SquashingFunction>(new SquashingFunction[] {
+					SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
+					SquashingFunction.TANH });
 
 	/** Bias field. */
 	private JTextField tfBias = new JTextField();
@@ -105,13 +105,15 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 		// Handle Implementation/Type
 		if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
 				"getType")) {
-			if ((cbImplementation.getItemCount() == SigmoidType.values().length - 1)) {
-				cbImplementation.addItem(SigmoidType.NULL_STRING);
+			if ((cbImplementation.getItemCount() == SquashingFunction
+					.values().length - 1)) {
+				cbImplementation.addItem(SquashingFunction.NULL_STRING);
 			}
 			cbImplementation
-					.setSelectedIndex(SigmoidType.values().length - 1);
+					.setSelectedIndex(SquashingFunction.values().length - 1);
 		} else
-			cbImplementation.setSelectedItem(neuronRef.getType());
+			cbImplementation.setSelectedItem(neuronRef
+					.getSquashFunction());
 
 		// Handle Bias
 		if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
@@ -170,7 +172,8 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 	 * Fill field values to default values for sigmoidal neuron.
 	 */
 	public void fillDefaultValues() {
-		cbImplementation.setSelectedItem(prototypeRule.getType());
+		cbImplementation.setSelectedItem(prototypeRule
+				.getSquashFunction());
 		tfBias.setText(Double.toString(prototypeRule.getBias()));
 		tfSlope.setText(Double.toString(prototypeRule.getSlope()));
 		tfUpbound.setText(Double.toString(prototypeRule.getCeiling()));
@@ -219,10 +222,10 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
 		// Implementation: Logistic/Tanh/Arctan
 		if (!cbImplementation.getSelectedItem().equals(
-				SigmoidType.NULL_STRING)) {
+				SquashingFunction.NULL_STRING)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
-						.setType((SigmoidType) cbImplementation
+						.setSquashFunction((SquashingFunction) cbImplementation
 								.getSelectedItem());
 			}
 		}

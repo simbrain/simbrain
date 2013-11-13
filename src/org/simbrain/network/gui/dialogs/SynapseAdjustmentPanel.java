@@ -43,7 +43,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.plot.histogram.HistogramModel;
 import org.simbrain.plot.histogram.HistogramPanel;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**

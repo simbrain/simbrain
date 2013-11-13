@@ -1,4 +1,4 @@
-package org.simbrain.util;
+package org.simbrain.util.math;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;

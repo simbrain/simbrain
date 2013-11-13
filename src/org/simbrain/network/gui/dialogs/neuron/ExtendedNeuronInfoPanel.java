@@ -36,7 +36,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  *

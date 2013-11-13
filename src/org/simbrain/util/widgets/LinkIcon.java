@@ -1,4 +1,4 @@
-package org.simbrain.util;
+package org.simbrain.util.widgets;
 
 import java.awt.Dimension;
 import java.awt.Graphics;

@@ -29,7 +29,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in

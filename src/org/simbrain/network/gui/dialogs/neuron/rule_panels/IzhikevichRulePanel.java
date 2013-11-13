@@ -32,8 +32,8 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * <b>IzhikevichNeuronPanel</b>.

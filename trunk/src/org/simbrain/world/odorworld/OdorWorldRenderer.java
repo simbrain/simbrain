@@ -121,7 +121,7 @@ public class OdorWorldRenderer {
                         } else if (sensor instanceof Hearing) {
                             if (((Hearing) sensor).isActivated()) {
                                 RotatingEntity rotatingEntity = (RotatingEntity) entity;
-                                g.drawImage(getThoughtBubble((Hearing) sensor), null, getBalloonLocationX(rotatingEntity), (int)(entity.getY() - 60 + entity.getHeight()/3));
+                                g.drawImage(getHearingSensorImage((Hearing) sensor), null, getBalloonLocationX(rotatingEntity), (int)(entity.getY() - 60 + entity.getHeight()/3));
                             }
                         } else if (sensor instanceof SmellSensor) {
 
@@ -189,13 +189,13 @@ public class OdorWorldRenderer {
      *
      * @return the buffered image
      */
-    public BufferedImage getThoughtBubble(Hearing sensor) {
+    public BufferedImage getHearingSensorImage(Hearing sensor) {
         BufferedImage vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
         if (((RotatingEntity)sensor.getParent()).getHeading() > 90 && ((RotatingEntity) sensor.getParent()).getHeading() <= 270) {
-            g.drawImage(OdorWorldResourceManager.getImage("ThoughtBubbleLeft.png"), 0, 0, null);
+            g.drawImage(OdorWorldResourceManager.getImage("HearingSensorLeft.png"), 0, 0, null);
         } else {
-            g.drawImage(OdorWorldResourceManager.getImage("ThoughtBubbleRight.png"), 0, 0, null);
+            g.drawImage(OdorWorldResourceManager.getImage("HearingSensorRight.png"), 0, 0, null);
         }
         g.setColor(Color.black);
         int fontSize = 20; // is there a more elegant way to change font size?

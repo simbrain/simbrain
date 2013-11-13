@@ -32,8 +32,8 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.

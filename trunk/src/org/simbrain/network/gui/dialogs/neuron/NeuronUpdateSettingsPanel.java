@@ -39,8 +39,8 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.DropDownTriangle;
-import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  *

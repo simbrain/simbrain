@@ -23,8 +23,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;

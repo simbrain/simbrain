@@ -23,8 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;

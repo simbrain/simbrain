@@ -64,7 +64,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
 /**
  * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
  * parameters of specific neuron rule types.
- *
+ * 
  * Optimization has been emphasized for methods intended for neuron creation
  * rather than editing on the assumption that the former will be far more common
  * for large numbers of neurons.
@@ -125,12 +125,13 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	}
 
 	/**
-	 * Is this dialog replacing the update rules of the neurons or just writing
-	 * to them? Used as an optimization to act as a flag for situations where
-	 * costly "instanceof" checks, text parsing, and equality checks can be
-	 * minimized. As the name suggests, these optimizations can be performed
-	 * when we are certain that rules are being overwritten rather than written
-	 * to.
+	 * A flag used to indicate whether this panel will be replacing neuron
+	 * update rules or simply writing to them. In cases where the panel
+	 * represents the same rule as the rule (i.e. Linear panel & linear neurons)
+	 * the neurons' update rules are edited, not replaced. However, if the panel
+	 * does not correspond to the currently used neuron update rule, new
+	 * NeuronUpdateRule objects are created, and replace the old rule. This
+	 * optimization prevents multiple "instanceof" checks.
 	 */
 	private boolean replacing = true;
 
@@ -176,7 +177,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	/**
 	 * Override to add custom notes or other text to bottom of panel. Can be
 	 * html formatted.
-	 *
+	 * 
 	 * @param text
 	 *            Text to be added
 	 */
@@ -192,11 +193,11 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	 */
 	public abstract NeuronUpdateRule getPrototypeRule();
 
-	public boolean isReplace() {
+	protected boolean isReplace() {
 		return replacing;
 	}
 
-	public void setReplace(boolean replace) {
+	protected void setReplace(boolean replace) {
 		this.replacing = replace;
 	}
 
@@ -223,7 +224,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	 * thrown by Double.parseDouble(String), so that try/catch fields do not
 	 * have to be repeatedly written, and allows the program to continue in the
 	 * case that the string is not parsable.
-	 *
+	 * 
 	 * @param tField
 	 *            The text field to read from and test if its text can be parsed
 	 *            into a double value

@@ -37,11 +37,11 @@ public class LinearRule extends NeuronUpdateRule implements
 	/** The Default upper bound. */
 	private static final double DEFAULT_UPPER_BOUND = 1.0;
 
-    /** The Default lower bound. */
-    private static final double DEFAULT_LOWER_BOUND = -1.0;
+	/** The Default lower bound. */
+	private static final double DEFAULT_LOWER_BOUND = -1.0;
 
-    /** Default clipping setting. */
-    private static final boolean DEFAULT_CLIPPING = true;
+	/** Default clipping setting. */
+	private static final boolean DEFAULT_CLIPPING = true;
 
 	/** Slope. */
 	private double slope = 1;
@@ -167,7 +167,8 @@ public class LinearRule extends NeuronUpdateRule implements
 	/**
 	 * {@inheritDoc}
 	 */
-	public double getDerivative(double val, Neuron neuron) {
+	@Override
+	public double getDerivative(double val) {
 		if (val >= getCeiling()) {
 			return 0;
 		} else if (val <= getFloor()) {

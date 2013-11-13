@@ -35,8 +35,8 @@ import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.math.NumericMatrix;
 
 /**
  * PNode representation of a group of a LMS network.

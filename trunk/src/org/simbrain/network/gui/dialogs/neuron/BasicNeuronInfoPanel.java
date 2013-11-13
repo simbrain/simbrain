@@ -25,7 +25,6 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -36,15 +35,15 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.DropDownTriangle;
-import org.simbrain.util.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  * Panel showing the basic properties common to a set of neurons.
- *
+ * 
  * @author ztosi
  * @author jyoshimi
- *
+ * 
  */
 public class BasicNeuronInfoPanel extends JPanel {
 
@@ -82,9 +81,11 @@ public class BasicNeuronInfoPanel extends JPanel {
 
 	/**
 	 * Construct the panel.
-	 *
-     * @param neuronList the neurons being adjusted
-     * @param parent the parent window
+	 * 
+	 * @param neuronList
+	 *            the neurons being adjusted
+	 * @param parent
+	 *            the parent window
 	 */
 	public BasicNeuronInfoPanel(final List<Neuron> neuronList,
 			Window parent) {
@@ -103,7 +104,7 @@ public class BasicNeuronInfoPanel extends JPanel {
 
 	/**
 	 * Initialize the basic info panel (generic neuron parameters)
-	 *
+	 * 
 	 * @return the basic info panel
 	 */
 	private void initializeLayout() {
@@ -277,7 +278,33 @@ public class BasicNeuronInfoPanel extends JPanel {
 	}
 
 	/**
-	 *
+    *
+    */
+	public void commitChanges(List<Neuron> neuronList) {
+
+		// Activation
+		double act = AbstractNeuronPanel.doubleParsable(tfActivation);
+		if (!Double.isNaN(act)) {
+			for (int i = 0; i < neuronList.size(); i++) {
+				neuronList.get(i).forceSetActivation(
+						Double.parseDouble(tfActivation.getText()));
+			}
+		}
+
+		// Label
+		if (!tfNeuronLabel.getText().equals(NULL_STRING)) {
+			for (int i = 0; i < neuronList.size(); i++) {
+				neuronList.get(i).setLabel(tfNeuronLabel.getText());
+
+			}
+		}
+
+		extraDataPanel.commitChanges();
+
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
 	public DropDownTriangle getDetailTriangle() {

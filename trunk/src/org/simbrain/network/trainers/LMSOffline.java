@@ -18,14 +18,13 @@
  */
 package org.simbrain.network.trainers;
 
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
-import org.simbrain.util.Matrices;
+import org.simbrain.util.math.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import Jama.Matrix;
@@ -106,7 +105,7 @@ public class LMSOffline extends Trainer {
 					network.getTrainingSet().getTargetData()[i][index] =
 							((SigmoidalRule) n.getUpdateRule())
 									.getInverse(network.getTrainingSet()
-											.getTargetData()[i][index], n);
+											.getTargetData()[i][index]);
 				}
 			}
 			index++;

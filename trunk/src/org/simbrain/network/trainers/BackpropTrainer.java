@@ -211,8 +211,7 @@ public class BackpropTrainer extends IterableTrainer {
 		if (neuron.getUpdateRule() instanceof DifferentiableUpdateRule) {
 			double derivative =
 					((DifferentiableUpdateRule) neuron.getUpdateRule())
-							.getDerivative(neuron.getWeightedInputs(),
-									neuron);
+							.getDerivative(neuron.getWeightedInputs());
 			errorSignal = error * derivative;
 			errorMap.put(neuron, errorSignal);
 		}

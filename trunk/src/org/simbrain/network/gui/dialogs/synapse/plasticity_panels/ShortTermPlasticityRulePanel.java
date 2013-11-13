@@ -26,7 +26,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
-import org.simbrain.util.TristateDropDown;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * <b>ShortTermPlasticitySynapsePanel</b>.

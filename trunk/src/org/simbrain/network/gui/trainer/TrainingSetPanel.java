@@ -24,8 +24,8 @@ import javax.swing.JSplitPane;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
-import org.simbrain.util.NumericMatrix;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Display input data and target data.

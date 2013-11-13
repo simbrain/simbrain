@@ -33,7 +33,6 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
@@ -41,6 +40,7 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -92,7 +92,8 @@ public class EchoStateNetwork extends Subnetwork {
 
 	/** Default TANH neurons for the reservoir */
 	{
-		((SigmoidalRule) reservoirNeuronType).setType(SigmoidType.TANH);
+		((SigmoidalRule) reservoirNeuronType)
+				.setSquashFunction(SquashingFunction.TANH);
 	}
 
 	/** Default output neuron type */
@@ -336,7 +337,7 @@ public class EchoStateNetwork extends Subnetwork {
 					int col = outputLayer.getNeuronList().indexOf(n);
 					targetData[i][col] =
 							((SigmoidalRule) n.getUpdateRule())
-									.getInverse(targetData[i][col], n);
+									.getInverse(targetData[i][col]);
 				}
 			}
 		}

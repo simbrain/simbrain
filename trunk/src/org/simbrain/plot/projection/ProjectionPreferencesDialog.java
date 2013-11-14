@@ -14,6 +14,7 @@
 package org.simbrain.plot.projection;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
@@ -49,7 +50,12 @@ public class ProjectionPreferencesDialog extends StandardDialog {
      */
     public ProjectionPreferencesDialog(Projector projector) {
         this.projector = projector;
-        mainPanel.addItem("New datapoint tolerance", tolerance);
+        String toleranceToolTip = "Only add a new datapoint if it is at least this "
+                + "far from an existing datapoint in the high-dim space";
+        JLabel toleranceLabel = new JLabel("New datapoint tolerance");
+        tolerance.setToolTipText(toleranceToolTip);
+        toleranceLabel.setToolTipText(toleranceToolTip);
+        mainPanel.addItemLabel(toleranceLabel, tolerance);
         if (projector.getProjectionMethod() instanceof ProjectCoordinate) {
             mainPanel.addItem("Coordinate projection auto-find mode", autoFind);
         }

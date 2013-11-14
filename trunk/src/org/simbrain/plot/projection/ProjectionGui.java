@@ -20,6 +20,7 @@ package org.simbrain.plot.projection;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
@@ -27,16 +28,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -66,7 +70,6 @@ import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.util.projection.ProjectorListener;
 import org.simbrain.util.projection.ProjectorPreferences;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -130,12 +133,19 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     /** Show error option. */
     private boolean showError = true;
 
+    /** Help action used in menu and button. */
+    private ShowHelpAction helpAction = new ShowHelpAction(
+            "Pages/Plot/projection.html");
+
     /** Warning label. */
-    JLabel warningLabel = new JLabel(
+    private JLabel warningLabel = new JLabel(
             ResourceManager.getImageIcon("Warning.png"));
 
-    /** Shows the epsilon value for Sammon map. */
-    JTextField sammonEpsilon = new JTextField(""
+    /** Panel for showing Sammon step size and label, both with tooltip. */
+    private Box sammonStepSizePanel = Box.createHorizontalBox();
+
+    /** Shows the step size for Sammon map. */
+    private JTextField sammonStepSize = new JTextField(""
             + ProjectorPreferences.getEpsilon());
 
     /** Combo box for first dimension of coordinate projection. */
@@ -222,9 +232,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         // Toolbar
         openBtn.setToolTipText("Open high-dimensional data");
         saveBtn.setToolTipText("Save data");
-        playBtn.setToolTipText("Iterate projection algorithm");
-        iterateBtn.setToolTipText("Step projection algorithm");
-        clearBtn.setToolTipText("Clear current data");
         projectionList.setMaximumSize(new java.awt.Dimension(200, 100));
         iterateBtn.addActionListener(new ActionListener() {
             @Override
@@ -271,21 +278,35 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
             }
         });
         theToolBar.add(projectionList);
+        playBtn.setToolTipText("Iterate projection algorithm");
         theToolBar.add(playBtn);
+        iterateBtn.setToolTipText("Step projection algorithm");
         theToolBar.add(iterateBtn);
+        clearBtn.setToolTipText("Clear current data");
         theToolBar.add(clearBtn);
+        randomBtn.setToolTipText("Randomize datapoints");
         theToolBar.add(randomBtn);
         theToolBar.addSeparator();
-        theToolBar.add(warningLabel);
-        theToolBar.add(sammonEpsilon);
-        theToolBar.add(adjustDimension1);
-        theToolBar.add(adjustDimension2);
-        sammonEpsilon.setColumns(3);
-
-        // Set up Warning Label
         warningLabel.setPreferredSize(new Dimension(16, 16));
         warningLabel.setToolTipText("This method works best with more "
                 + "datapoints already added");
+        theToolBar.add(warningLabel);
+        String stepSizeToolTip = "Scales the amount points are moved on each iteration";
+        JLabel stepSizeLabel = new JLabel("Step Size");
+        stepSizeLabel.setToolTipText(stepSizeToolTip);
+        sammonStepSizePanel.add(stepSizeLabel);
+        sammonStepSize.setColumns(3);
+        sammonStepSize.setToolTipText(stepSizeToolTip);
+        sammonStepSizePanel.add(sammonStepSize);
+        theToolBar.add(sammonStepSizePanel);
+        adjustDimension1.setToolTipText("Dimension 1");
+        adjustDimension2.setToolTipText("Dimension 2");
+        theToolBar.add(adjustDimension1);
+        theToolBar.add(adjustDimension2);
+
+        // Help button
+        JButton helpButton = new JButton();
+        helpButton.setAction(helpAction);
 
         // Add/Remove dimension buttons
         JButton addButton = new JButton("Add Dimension");
@@ -307,6 +328,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         // Button Panel
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(helpButton);
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
 
@@ -339,16 +361,16 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     }
 
     /**
-     * Initialize all the comobo boxes.
+     * Initialize all the combo boxes.
      */
     private void initializeComboBoxes() {
+
         // Populate projection list combo box
         for (Entry<Class<?>, String> projMethod : getWorkspaceComponent()
                 .getProjector().getProjectionMethods().entrySet()) {
             projectionList.addItem(projMethod.getValue());
         }
         projectionList.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMethod = (String) projectionList
@@ -357,7 +379,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                         selectedMethod);
                 updateToolBar();
             }
-
         });
         projectionList.getModel()
                 .setSelectedItem(getWorkspaceComponent().getProjector()
@@ -417,9 +438,9 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
             return;
         }
 
-        // Clear unuseud toolbar items
+        // Clear unused toolbar items
         if (!(proj instanceof ProjectSammon)) {
-            sammonEpsilon.setVisible(false);
+            sammonStepSizePanel.setVisible(false);
         }
         if (!(proj instanceof ProjectCoordinate)) {
             adjustDimension1.setVisible(false);
@@ -449,7 +470,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         // Handle new toolbar items
         if (proj instanceof ProjectSammon) {
-            sammonEpsilon.setVisible(true);
+            sammonStepSizePanel.setVisible(true);
         } else if (proj instanceof ProjectCoordinate) {
             adjustDimension1.setVisible(true);
             adjustDimension2.setVisible(true);
@@ -527,7 +548,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         // Epsilon field should update the model whenever a user clicks out of
         // it.
-        sammonEpsilon.addFocusListener(new FocusAdapter() {
+        sammonStepSize.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 ProjectionMethod proj = getWorkspaceComponent().getProjector()
@@ -535,7 +556,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                 if (proj != null) {
                     if (proj instanceof ProjectSammon) {
                         ((ProjectSammon) proj).setEpsilon(Double
-                                .parseDouble(sammonEpsilon.getText()));
+                                .parseDouble(sammonStepSize.getText()));
                     }
                 }
             }
@@ -635,8 +656,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         // editMenu.add(dims);
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Plot/projection.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 

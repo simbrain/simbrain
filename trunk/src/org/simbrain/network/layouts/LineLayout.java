@@ -74,6 +74,22 @@ public class LineLayout implements Layout {
     }
 
     /**
+     * Create a line layout with all values specified.
+     *
+     * @param x initial x position
+     * @param y initial y position
+     * @param spacing spacing between neurons
+     * @param orientation vertical or horizontal
+     */
+    public LineLayout(final double x, final double y, final double spacing,
+            final LineOrientation orientation) {
+        initialX = x;
+        initialY = y;
+        this.spacing = spacing;
+        this.orientation = orientation;
+    }
+
+    /**
      * Default Constructor.
      */
     public LineLayout() {

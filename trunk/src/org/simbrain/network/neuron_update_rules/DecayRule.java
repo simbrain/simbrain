@@ -153,7 +153,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void incrementActivation(Neuron n) {
+	public void contextualIncrement(Neuron n) {
 		double act = n.getActivation();
 		if (act >= getCeiling() && isClipped()) {
 			return;
@@ -172,7 +172,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void decrementActivation(Neuron n) {
+	public void contextualDecrement(Neuron n) {
 		double act = n.getActivation();
 		if (act <= getFloor() && isClipped()) {
 			return;

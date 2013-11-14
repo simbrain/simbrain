@@ -111,11 +111,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 		neuron.setBuffer(val);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+
 	@Override
-	public void incrementActivation(Neuron n) {
+	public void contextualIncrement(Neuron n) {
 		double act = n.getActivation();
 		if (act < getCeiling()) {
 			act += getIncrement();
@@ -126,11 +124,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void decrementActivation(Neuron n) {
+	public void contextualDecrement(Neuron n) {
 		double act = n.getActivation();
 		if (act > getFloor()) {
 			act -= getIncrement();

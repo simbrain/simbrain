@@ -93,6 +93,27 @@ public class KeyBindings {
             }
         });
 
+        // Contextual increment / decrement
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.ALT_MASK),
+                "contextualIncrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
+                ActionEvent.ALT_MASK), "contextualIncrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                ActionEvent.ALT_MASK), "contextualDecrement");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
+                ActionEvent.ALT_MASK), "contextualDecrement");
+        panel.getActionMap().put("contextualIncrement", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.contextualIncrementSelectedObjects();
+            }
+        });
+        panel.getActionMap().put("contextualDecrement", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.contextualDecrementSelectedObjects();
+            }
+        });
+
 //        // Undo
 //        inputMap.put(
 //            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit

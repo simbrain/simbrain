@@ -63,7 +63,7 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Increment a neuron by increment.
 	 */
-	public void incrementActivation(Neuron n) {
+	public final void incrementActivation(Neuron n) {
 		n.forceSetActivation(n.getActivation() + increment);
 		n.getNetwork().fireNeuronChanged(n);
 	}
@@ -71,10 +71,26 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Decrement a neuron by increment.
 	 */
-	public void decrementActivation(Neuron n) {
+	public final void decrementActivation(Neuron n) {
 		n.forceSetActivation(n.getActivation() - increment);
 		n.getNetwork().fireNeuronChanged(n);
 	}
+
+    /**
+     * Increment a neuron by increment, respecting neuron specific constraints.
+     * Intended to be overriden.
+     */
+    public void contextualIncrement(Neuron n) {
+        incrementActivation(n);
+    }
+
+    /**
+     * Decrement a neuron by increment, respecting neuron specific constraints.
+     * Intended to be overriden.
+     */
+    public void contextualDecrement(Neuron n) {
+        decrementActivation(n);
+    }
 
 	/**
 	 * Returns a random value between the upper and lower bounds of this neuron.
@@ -91,11 +107,21 @@ public abstract class NeuronUpdateRule {
 	 *            reference to parent neuron
 	 */
 	public void clear(final Neuron neuron) {
-		neuron.setActivation(0);
+		neuron.forceSetActivation(0);
 	}
 
+	/**
+	 * Upper bound for activation.
+	 *
+	 * @return the ceiling
+	 */
 	public abstract double getCeiling();
 
+	/**
+	 * Lower bound for activation.
+	 *
+	 * @return the floor
+	 */
 	public abstract double getFloor();
 
 	/**
@@ -119,16 +145,25 @@ public abstract class NeuronUpdateRule {
 				+ Utils.round(neuron.getActivation(), MAX_DIGITS);
 	}
 
-	public double getIncrement() {
-		return increment;
-	}
+    /**
+     * @return the increment
+     */
+    public double getIncrement() {
+        return increment;
+    }
 
-	public void setIncrement(double increment) {
-		this.increment = increment;
-	}
+    /**
+     * @param increment the increment to set
+     */
+    public void setIncrement(double increment) {
+        this.increment = increment;
+    }
 
-	public double getDefaultIncrement() {
-		return DEFAULT_INCREMENT;
-	}
+    /**
+     * @return the defaultIncrement
+     */
+    public static double getDefaultIncrement() {
+        return DEFAULT_INCREMENT;
+    }
 
 }

@@ -150,11 +150,8 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 		neuron.setBuffer(val);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void incrementActivation(Neuron n) {
+	public void contextualIncrement(Neuron n) {
 		double act = n.getActivation();
 		if (act <= getCeiling()) {
 			if (act + increment > getCeiling()) {

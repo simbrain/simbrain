@@ -2177,6 +2177,36 @@ public class NetworkPanel extends JPanel {
 		}
 	}
 
+    /**
+     * Invoke contextual increment (which respects neuron specific rules) on
+     * selected objects.
+     */
+    public void contextualIncrementSelectedObjects() {
+        for (PNode node : getSelection()) {
+            if (node instanceof NeuronNode) {
+                NeuronNode neuronNode = (NeuronNode) node;
+                neuronNode.getNeuron().getUpdateRule()
+                        .contextualIncrement(neuronNode.getNeuron());
+            }
+        }
+    }
+
+    /**
+     * Invoke contextual decrement (which respects neuron specific rules) on
+     * selected objects.
+     */
+    public void contextualDecrementSelectedObjects() {
+        for (PNode node : getSelection()) {
+            if (node instanceof NeuronNode) {
+                NeuronNode neuronNode = (NeuronNode) node;
+                neuronNode.getNeuron().getUpdateRule()
+                        .contextualDecrement(neuronNode.getNeuron());
+            }
+        }
+    }
+
+
+
 	/**
 	 * Nudge selected object.
 	 *

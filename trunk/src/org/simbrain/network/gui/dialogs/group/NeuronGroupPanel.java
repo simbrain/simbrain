@@ -96,7 +96,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     private JPanel specificNeuronGroupPanel;
 
     /** Label Field. */
-    private final JTextField tfNeuronGroupLabel = new JTextField();
+    private final JTextField tfNeuronGroupLabel = new JTextField(7);
 
     /** Main properties panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -283,8 +283,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
                     networkPanel.getLastClickedPosition(),
                     Integer.parseInt(tfNumNeurons.getText()));
-            // TODO: editBasicNeuronInfo... no way to apply this to a set of
-            // neurons
+            editBasicNeuronInfo.commitChanges(neuronGroup.getNeuronList());
             editNeuronType.getNeuronPanel()
                     .commitChanges(neuronGroup.getNeuronList());
             applyLayout();

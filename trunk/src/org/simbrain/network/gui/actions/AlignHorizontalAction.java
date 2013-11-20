@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Aligns horizontal.
@@ -46,6 +47,7 @@ public final class AlignHorizontalAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignHorizontal.png"));
     }
 
     /** @see AbstractAction */

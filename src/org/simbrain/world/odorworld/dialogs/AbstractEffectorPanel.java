@@ -16,14 +16,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * Super class for effector panels.
+ */
 public abstract class AbstractEffectorPanel extends LabelledItemPanel {
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public abstract void commitChanges();
+
+    /**
+     * Fill in appropriate text fields when speech effector is being modified.
+     */
+    public abstract void fillFieldValues();
+
 }

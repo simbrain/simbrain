@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
 
@@ -38,7 +38,7 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param entity the entity to which a straight movement effector is added.
      */
     public StraightEffectorPanel(OdorWorldEntity entity) {
@@ -63,5 +63,11 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
     public void fillFieldValues(StraightMovement effector) {
         label.setText("" + effector.getLabel());
         bma.setText("" + effector.getScalingFactor());
+    }
+
+    @Override
+    public void fillFieldValues() {
+        // TODO Auto-generated method stub
+
     }
 }

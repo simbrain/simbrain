@@ -117,4 +117,10 @@ public class Hearing extends Sensor {
             return 0;
         }
     }
+
+    @Override
+    public String getTypeDescription() {
+        return "Hearing";
+    }
+
 }

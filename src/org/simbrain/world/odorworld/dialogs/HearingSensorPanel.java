@@ -11,73 +11,72 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Hearing;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
- * Panel to add a speech effector to an entity.
+ * Panel to add a hearing sensor to an entity.
  *
  * @author Lam Nguyen
  *
  */
-public class SpeechEffectorPanel extends AbstractEffectorPanel {
+public class HearingSensorPanel extends AbstractSensorPanel {
 
-    /** Text field to edit uttered phrase. */
+    /** Text field to edit phrase this sensor listens for. */
     private JTextField phrase = new JTextField("Hi!");
 
-    /** Text field to edit threshold above which effector is activated. */
-    private JTextField threshold = new JTextField("" + 0.1);
+    /** Texxt field to edit output amount */
+    private JTextField outputAmount = new JTextField("" + 1);
 
-    /** Entity to which a speech effector is being added. */
-    private RotatingEntity entity;
+    /** Entity to which a hearing sensor is being added. */
+    private OdorWorldEntity entity;
 
     /**
      * Default constructor.
      *
-     * @param entity the entity to which a speech effector is added.
+     * @param entity the entity to which a hearing sensor is added.
      */
-    public SpeechEffectorPanel(OdorWorldEntity entity) {
-        this.entity = (RotatingEntity) entity;
+    public HearingSensorPanel(OdorWorldEntity entity) {
+        this.entity = entity;
         addItem("Utterance", phrase);
-        addItem("Threshold", threshold);
+        addItem("Output Amount", outputAmount);
         setVisible(true);
     }
 
     @Override
     public void commitChanges() {
-        entity.addEffector(new Speech(entity, phrase.getText(), Double.parseDouble(threshold.getText())));
+        entity.addSensor(new Hearing((entity), phrase.getText(), Double.parseDouble(outputAmount.getText())));
         if (phrase.getText().length() > 10) {
             checkPhrase();
         }
     }
 
-    /** Save changes to an edited speech effector. */
-    public void commitChanges(Speech effector) {
-        effector.setPhrase(phrase.getText());
-        effector.setLabel("Say: \"" + phrase.getText() + "\"");
-        effector.setThreshold(Double.parseDouble(threshold.getText()));
-        effector.getParent().getParentWorld()
-        .fireEntityChanged(effector.getParent());
+    /** Save changes to an edited hearing sensor. */
+    public void commitChanges(Hearing sensor) {
+        sensor.setPhrase(phrase.getText());
+        sensor.setLabel("Hear: \"" + phrase.getText() + "\"");
+        sensor.setOutputAmount(Double.parseDouble(outputAmount.getText()));
+        sensor.getParent().getParentWorld()
+        .fireEntityChanged(sensor.getParent());
         if (phrase.getText().length() > 10) {
             checkPhrase();
         }
     }
 
-    /** Fill in appropriate text fields when speech effector is being modified. */
-    public void fillFieldValues(Speech effector) {
-        phrase.setText("" + effector.getPhrase());
-        threshold.setText("" + effector.getThreshold());
+    /** Fill in appropriate text fields when hearing sensor is being modified. */
+    public void fillFieldValues(Hearing sensor) {
+        phrase.setText("" + sensor.getPhrase());
+        outputAmount.setText("" + sensor.getOutputAmount());
     }
 
     /** Displays message when utterance is above 10 char. */
     private void checkPhrase() {
-        JOptionPane.showOptionDialog(null, "Speech utterance is greater than 10 chars! Not guaranteed to render correctly.", "Warning",
+        JOptionPane.showOptionDialog(null, "Heard utterance is greater than 10 chars! Not guaranteed to render correctly.", "Warning",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, null, null);
     }

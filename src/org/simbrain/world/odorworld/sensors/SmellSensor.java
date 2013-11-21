@@ -140,4 +140,10 @@ public class SmellSensor extends Sensor {
         this.radius = radius;
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Smell";
+    }
+
+
 }

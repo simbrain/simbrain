@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
@@ -118,16 +119,13 @@ public class EffectorPanel extends JPanel {
                             }
                             if (effector instanceof Speech) {
                                 SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(
-                                        entity);
-                                speechEffectorPanel
-                                        .fillFieldValues((Speech) effector);
+                                        entity, (Speech) effector);
                                 dialog.setContentPane(speechEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    speechEffectorPanel
-                                            .commitChanges((Speech) effector);
+                                    speechEffectorPanel.commitChanges();
                                 }
                             }
                         }

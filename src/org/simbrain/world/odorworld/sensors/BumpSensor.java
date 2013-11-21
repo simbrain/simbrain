@@ -70,4 +70,9 @@ public class BumpSensor extends Sensor {
         this.wasBumped = wasBumped;
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Bump";
+    }
+
 }

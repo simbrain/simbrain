@@ -54,6 +54,13 @@ public abstract class Sensor {
     public abstract void update();
 
     /**
+     * Short description of the sensor type.
+     *
+     * @return the short description of the type
+     */
+    public abstract String getTypeDescription();
+
+    /**
      * Return a list of entity types which can use this type of sensor.
      *
      * @return list of applicable types.

@@ -50,7 +50,7 @@ public class TileSensor extends Sensor {
 
     /**
      * Construct a tile sensor.
-     * 
+     *
      * @param entity parent entity
      * @param x upper left
      * @param y upper right
@@ -166,6 +166,12 @@ public class TileSensor extends Sensor {
      * @param amount the activation amount to set
      */
     public void setActivationAmount(double amount) {
-        activationAmount = amount;        
+        activationAmount = amount;
     }
+
+    @Override
+    public String getTypeDescription() {
+        return "Tile";
+    }
+
 }

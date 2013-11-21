@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.odorworld.DialogOdorWorldEntity;
+import org.simbrain.world.odorworld.dialogs.EntityDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -51,7 +51,7 @@ public final class ShowEntityDialogAction extends AbstractAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        DialogOdorWorldEntity dialog = new DialogOdorWorldEntity(entity);
+        EntityDialog dialog = new EntityDialog(entity);
         dialog.setTitle("Edit " + entity.getName() + " (" + entity.getId()
                 + ")");
         dialog.pack();

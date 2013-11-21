@@ -18,14 +18,7 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 /**
  * Model simple speech behaviors. Each speech effector is associated with a
@@ -37,20 +30,25 @@ import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 public class Speech extends Effector {
 
     //TODO: Possibly add a radius of influence
-    //      Possibly add a threshold for the value above which to "speak"
     //      Possibly encapsulate phrase String in an utterance class
 
+    /** Default phrase. */
+    public static final String DEFAULT_PHRASE = "Hi!";
+
     /** The thing this speech effector says. */
-    private String phrase = "";
+    private String phrase = DEFAULT_PHRASE;
+
+    /** Default phrase. */
+    public static final double DEFAULT_THRESHOLD = .01;
+
+    /** Threshold above which to "the message. */
+    private double threshold = DEFAULT_THRESHOLD;
 
     /**
      * Whether this is activated. If so, display the phrase and notify all
      * hearing sensors.
      */
     private boolean activated;
-
-    /** Threshold above which to "the message. */
-    private double threshold = 0;
 
     /**
      * If amount is greater than threshold, activate the speech.

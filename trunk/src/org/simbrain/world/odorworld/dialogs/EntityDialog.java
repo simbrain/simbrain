@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -41,7 +41,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
  * creatures and entities within a world environment.
  */
-public class DialogOdorWorldEntity extends StandardDialog implements
+public class EntityDialog extends StandardDialog implements
         ActionListener {
 
     private static final long serialVersionUID = 1L;
@@ -94,7 +94,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements
      * @param we reference to the world entity whose smell signature is being
      *            adjusted
      */
-    public DialogOdorWorldEntity(final OdorWorldEntity we) {
+    public EntityDialog(final OdorWorldEntity we) {
         entityRef = we;
         init();
         this.pack();

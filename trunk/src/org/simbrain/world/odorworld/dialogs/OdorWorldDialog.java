@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -29,13 +29,14 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.world.odorworld.OdorWorldPanel;
 
 /**
  * <b>DialogOdorWorld</b> is used to set the enivronment's parameters, in
  * particular, the way stimuli are constructed to be sent the network, and the
  * way outputs from the network are expressed in the world.
  */
-public class DialogOdorWorld extends StandardDialog implements ActionListener {
+public class OdorWorldDialog extends StandardDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -96,7 +97,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      *
      * @param wp the odorworld calling the constructor
      */
-    public DialogOdorWorld(final OdorWorldPanel wp) {
+    public OdorWorldDialog(final OdorWorldPanel wp) {
         worldPanel = wp;
         init();
     }

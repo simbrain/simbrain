@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.world.odorworld.WorldListenerAdapter;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -277,7 +278,7 @@ public class SensorPanel extends JPanel {
             case 1:
                 return data.get(row).getLabel();
             case 2:
-                return data.get(row).getClass().getSimpleName();
+                return data.get(row).getTypeDescription();
             default:
                 return null;
             }

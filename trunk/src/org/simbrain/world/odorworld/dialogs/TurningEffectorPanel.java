@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
 
@@ -69,5 +69,11 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
         label.setText("" + effector.getLabel());
         direction.setText("" + effector.getDirection());
         amount.setText("" + effector.getAmount());
+    }
+
+    @Override
+    public void fillFieldValues() {
+        // TODO Auto-generated method stub
+        
     }
 }

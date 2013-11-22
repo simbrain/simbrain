@@ -104,7 +104,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
 		// Handle Implementation/Type
 		if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-				"getType")) {
+				"getSquashFunction")) {
 			if ((cbImplementation.getItemCount() == SquashingFunction
 					.values().length - 1)) {
 				cbImplementation.addItem(SquashingFunction.NULL_STRING);

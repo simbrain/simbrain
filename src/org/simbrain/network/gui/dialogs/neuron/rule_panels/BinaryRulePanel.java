@@ -30,6 +30,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 
 /**
  * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
@@ -160,7 +161,7 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 		int numNeurons = neurons.size();
 
 		// Threshold
-		double threshold = doubleParsable(tfThreshold);
+		double threshold = Utils.doubleParsable(tfThreshold);
 		if (!Double.isNaN(threshold)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((BinaryRule) neurons.get(i).getUpdateRule())
@@ -169,7 +170,7 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Lower Value
-		double lv = doubleParsable(tfLowbound);
+		double lv = Utils.doubleParsable(tfLowbound);
 		if (!Double.isNaN(lv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((BinaryRule) neurons.get(i).getUpdateRule())
@@ -178,7 +179,7 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Upper Value
-		double uv = doubleParsable(tfUpbound);
+		double uv = Utils.doubleParsable(tfUpbound);
 		if (!Double.isNaN(uv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((BinaryRule) neurons.get(i).getUpdateRule())
@@ -187,7 +188,7 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Bias
-		double bias = doubleParsable(tfBias);
+		double bias = Utils.doubleParsable(tfBias);
 		if (!Double.isNaN(bias)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((BinaryRule) neurons.get(i).getUpdateRule())
@@ -200,7 +201,8 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	public BinaryRule getPrototypeRule() {
+	@Override
+	protected BinaryRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

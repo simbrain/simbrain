@@ -110,7 +110,7 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected NeuronUpdateRule getPrototypeRule() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -118,6 +118,6 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
 	@Override
 	protected void writeValuesToRules(List<Neuron> neurons) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

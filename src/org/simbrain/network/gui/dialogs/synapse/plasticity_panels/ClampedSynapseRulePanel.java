@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
@@ -29,44 +30,57 @@ import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
  */
 public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
 
-    /** Synapse reference. */
-    private ClampedSynapseRule synapseRef;
+	/** Synapse reference. */
+	private ClampedSynapseRule synapseRef;
 
-    /**
-     * This method is the default constructor.
-     */
-    public ClampedSynapseRulePanel() {
-    }
+	/**
+	 * This method is the default constructor.
+	 */
+	public ClampedSynapseRulePanel() {
+	}
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
-    }
+	/**
+	 * Populate fields with current data.
+	 */
+	public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
+	}
 
-    /**
-     * Fill field values to default values for this synapse type.
-     */
-    public void fillDefaultValues() {
-    }
+	/**
+	 * Fill field values to default values for this synapse type.
+	 */
+	public void fillDefaultValues() {
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(final List<Synapse> commitSynapses) {
-        for (Synapse s : commitSynapses) {
-            commitChanges(s);
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(final List<Synapse> commitSynapses) {
+		for (Synapse s : commitSynapses) {
+			commitChanges(s);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(final Synapse templateSynapse) {
-        synapseRef = new ClampedSynapseRule();
-        templateSynapse.setLearningRule(synapseRef);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commitChanges(final Synapse templateSynapse) {
+		synapseRef = new ClampedSynapseRule();
+		templateSynapse.setLearningRule(synapseRef);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void writeValuesToRules(List<Synapse> synapses) {
+		// No variables: Does nothing...
+	}
+
+	@Override
+	public SynapseUpdateRule getPrototypeRule() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

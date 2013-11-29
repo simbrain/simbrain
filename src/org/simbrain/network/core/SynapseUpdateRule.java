@@ -67,7 +67,7 @@ public abstract class SynapseUpdateRule {
      * @param synapse reference to parent synapse
      */
     public void clear(final Synapse synapse) {
-        synapse.setStrength(0); // TODO: Used?
+        synapse.forceSetStrength(0); // TODO: Used?
     }
 
     /**

@@ -93,7 +93,7 @@ public class EchoStateNetwork extends Subnetwork {
 	/** Default TANH neurons for the reservoir */
 	{
 		((SigmoidalRule) reservoirNeuronType)
-				.setSquashFunction(SquashingFunction.TANH);
+				.setSquashFunctionType(SquashingFunction.TANH);
 	}
 
 	/** Default output neuron type */

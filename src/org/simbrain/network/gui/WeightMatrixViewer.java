@@ -158,7 +158,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             }
 
         });
-     }
+    }
 
     /**
      * Display a warning message if there are empty weights.
@@ -166,10 +166,10 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      * @param weights weight matrix to check
      */
     private void displayWarningIfEmptyCells(Synapse[][] weights) {
-        String warningMessage = "Only fully connected source-target pairs \n" +
-                "are supported.  Some zeros in the matrix \n" +
-                "correspond to non-existent weights and \n" +
-                "cannot be modified in the viewer.";
+        String warningMessage = "Only fully connected source-target pairs \n"
+                + "are supported.  Some zeros in the matrix \n"
+                + "correspond to non-existent weights and \n"
+                + "cannot be modified in the viewer.";
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[0].length; j++) {
                 if (weights[i][j] == null) {
@@ -211,7 +211,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         public void setValue(final int row, final int col, final Double value,
                 final boolean fireEvent) {
             if (weights[row][col] != null) {
-                weights[row][col].setStrength(value);
+                weights[row][col].forceSetStrength(value);
                 /**
                  * Save reference when a non-null is found (important for
                  * networks with null vals)

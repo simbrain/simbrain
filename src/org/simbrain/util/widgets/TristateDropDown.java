@@ -64,7 +64,9 @@ public class TristateDropDown extends JComboBox {
 	}
 
 	/**
-	 * Sets the tristate drop down box to null.
+	 * Sets the tristate drop down box to null. If the box does not have a null
+	 * entry (i.e. has only 2 items), adds a null entry and sets it as the
+	 * selected item.
 	 */
 	public void setNull() {
 		if (this.getItemCount() == 2) {

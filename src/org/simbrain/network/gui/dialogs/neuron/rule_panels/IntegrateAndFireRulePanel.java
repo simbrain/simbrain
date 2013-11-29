@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -185,7 +186,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 
 		if (!(neuron.getUpdateRule() instanceof IntegrateAndFireRule)) {
 			neuron.setUpdateRule(prototypeRule.deepCopy());
-		} 
+		}
 
 		writeValuesToRules(Collections.singletonList(neuron));
 
@@ -202,7 +203,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-		} 
+		}
 		writeValuesToRules(neurons);
 	}
 
@@ -212,77 +213,78 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
 	@Override
 	protected void writeValuesToRules(List<Neuron> neurons) {
 		int numNeurons = neurons.size();
-		
+
 		// Time Constant
-		double timeConstant = doubleParsable(tfTimeConstant);
+		double timeConstant = Utils.doubleParsable(tfTimeConstant);
 		if (!Double.isNaN(timeConstant)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setTimeConstant(timeConstant);
+						.setTimeConstant(timeConstant);
 			}
 		}
-		
+
 		// Threshold
-		double threshold = doubleParsable(tfThreshold);
+		double threshold = Utils.doubleParsable(tfThreshold);
 		if (!Double.isNaN(threshold)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setThreshold(threshold);
+						.setThreshold(threshold);
 			}
 		}
-		
+
 		// Reset
-		double reset = doubleParsable(tfReset);
+		double reset = Utils.doubleParsable(tfReset);
 		if (!Double.isNaN(reset)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setResetPotential(reset);
+						.setResetPotential(reset);
 			}
 		}
-		
+
 		// Resistance
-		double resistance = doubleParsable(tfResistance);
+		double resistance = Utils.doubleParsable(tfResistance);
 		if (!Double.isNaN(resistance)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setResistance(resistance);
+						.setResistance(resistance);
 			}
 		}
 
 		// Resting Potential
-		double restingPotential = doubleParsable(tfRestingPotential);
+		double restingPotential =
+				Utils.doubleParsable(tfRestingPotential);
 		if (!Double.isNaN(restingPotential)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setRestingPotential(restingPotential);
+						.setRestingPotential(restingPotential);
 			}
 		}
 
 		// Add Noise?
-		if(!isAddNoise.isNull()) {
-			boolean addNoise = isAddNoise.getSelectedIndex()
-					== TristateDropDown.getTRUE();
+		if (!isAddNoise.isNull()) {
+			boolean addNoise =
+					isAddNoise.getSelectedIndex() == TristateDropDown
+							.getTRUE();
 			for (int i = 0; i < numNeurons; i++) {
 				((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-				.setAddNoise(addNoise);
+						.setAddNoise(addNoise);
 
-
-			}  		
+			}
 			if (addNoise) {
 				for (int i = 0; i < numNeurons; i++) {
-					randTab.commitRandom(((IntegrateAndFireRule) neurons.get(i)
-							.getUpdateRule()).getNoiseGenerator());
+					randTab.commitRandom(((IntegrateAndFireRule) neurons
+							.get(i).getUpdateRule()).getNoiseGenerator());
 				}
 			}
-		}	
+		}
 
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public IntegrateAndFireRule getPrototypeRule() {
+	protected IntegrateAndFireRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
-	
+
 }

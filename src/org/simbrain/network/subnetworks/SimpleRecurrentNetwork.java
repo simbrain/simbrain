@@ -33,7 +33,7 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
@@ -176,7 +176,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 		connect.setAllowSelfConnection(false);
 		connect.setExcitatoryRatio(.5);
 		Synapse synapse =
-				Synapse.getTemplateSynapse(new ClampedSynapseRule());
+				Synapse.getTemplateSynapse(new StaticSynapseRule());
 		synapse.setLowerBound(-1);
 		synapse.setUpperBound(1);
 		connect.setBaseExcitatorySynapse(synapse);

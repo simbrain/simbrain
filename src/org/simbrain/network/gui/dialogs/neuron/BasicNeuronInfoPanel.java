@@ -35,6 +35,7 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -82,15 +83,20 @@ public class BasicNeuronInfoPanel extends JPanel {
     /**
      * Construct the panel.
      *
-     * @param neuronList the neurons being adjusted
-     * @param parent the parent window
+     * @param neuronList
+     *            the neurons being adjusted
+     * @param parent
+     *            the parent window
      */
-    public BasicNeuronInfoPanel(final List<Neuron> neuronList, Window parent) {
+    public BasicNeuronInfoPanel(final List<Neuron> neuronList,
+            Window parent) {
         this.neuronList = neuronList;
         this.parent = parent;
-        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
-                "Less", parent);
-        extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList, parent);
+        detailTriangle =
+                new DropDownTriangle(UpDirection.LEFT, false, "More",
+                        "Less", parent);
+        extraDataPanel =
+                new ExtendedNeuronInfoPanel(this.neuronList, parent);
         addListeners();
         initializeLayout();
         fillFieldValues();
@@ -99,15 +105,14 @@ public class BasicNeuronInfoPanel extends JPanel {
 
     /**
      * Initialize the basic info panel (generic neuron parameters)
-     *
-     * @return the basic info panel
      */
     private void initializeLayout() {
 
         setLayout(new BorderLayout());
 
         JPanel basicsPanel = new JPanel(new GridBagLayout());
-        basicsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        basicsPanel
+                .setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -230,16 +235,20 @@ public class BasicNeuronInfoPanel extends JPanel {
 
         // Handle Activation
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getActivation"))
+                "getActivation")) {
             tfActivation.setText(NULL_STRING);
-        else
-            tfActivation.setText(Double.toString(neuronRef.getActivation()));
+        } else {
+            tfActivation.setText(Double.toString(neuronRef
+                    .getActivation()));
+        }
 
         // Handle Label
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLabel"))
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getLabel")) {
             tfNeuronLabel.setText(NULL_STRING);
-        else
+        } else {
             tfNeuronLabel.setText(neuronRef.getLabel());
+        }
 
     }
 
@@ -249,7 +258,7 @@ public class BasicNeuronInfoPanel extends JPanel {
     public void commitChanges() {
 
         // Activation
-        double act = AbstractNeuronPanel.doubleParsable(tfActivation);
+        double act = Utils.doubleParsable(tfActivation);
         if (!Double.isNaN(act)) {
             for (int i = 0; i < neuronList.size(); i++) {
                 neuronList.get(i).forceSetActivation(
@@ -272,12 +281,13 @@ public class BasicNeuronInfoPanel extends JPanel {
     /**
      * Commit changes to provided list of neurons.
      *
-     * @param neuronList neuron to apply changes to
+     * @param neuronList
+     *            neuron to apply changes to
      */
     public void commitChanges(List<Neuron> neuronList) {
 
         // Activation
-        double act = AbstractNeuronPanel.doubleParsable(tfActivation);
+        double act = Utils.doubleParsable(tfActivation);
         if (!Double.isNaN(act)) {
             for (int i = 0; i < neuronList.size(); i++) {
                 neuronList.get(i).forceSetActivation(

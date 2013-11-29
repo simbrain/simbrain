@@ -37,8 +37,10 @@ public class SinusoidalRule extends NeuronUpdateRule implements
 	/** Frequency. */
 	private double frequency = .1;
 
+	/** The upper boundary of the activation. */
 	private double ceiling = 1.0;
 
+	/** The lower boundary of the activation. */
 	private double floor = -1.0;
 
 	/** Noise dialog. */
@@ -58,7 +60,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements
 	 * {@inheritDoc}
 	 */
 	public void init(Neuron neuron) {
-		// No implementation
+		neuron.setGenerator(true);
 	}
 
 	/**

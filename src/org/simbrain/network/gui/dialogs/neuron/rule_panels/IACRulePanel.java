@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -171,7 +172,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
 		int numNeurons = neurons.size();
 
 		// Decay
-		double decay = doubleParsable(tfDecay);
+		double decay = Utils.doubleParsable(tfDecay);
 		if (!Double.isNaN(decay)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IACRule) neurons.get(i).getUpdateRule())
@@ -180,7 +181,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Rest
-		double rest = doubleParsable(tfRest);
+		double rest = Utils.doubleParsable(tfRest);
 		if (!Double.isNaN(rest)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IACRule) neurons.get(i).getUpdateRule()).setRest(rest);
@@ -209,7 +210,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IACRule getPrototypeRule() {
+	protected IACRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

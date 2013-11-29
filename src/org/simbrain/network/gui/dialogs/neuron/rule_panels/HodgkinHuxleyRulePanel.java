@@ -115,7 +115,7 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected NeuronUpdateRule getPrototypeRule() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -123,13 +123,13 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 	@Override
 	public void commitChanges(Neuron neuron) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void writeValuesToRules(List<Neuron> neurons) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

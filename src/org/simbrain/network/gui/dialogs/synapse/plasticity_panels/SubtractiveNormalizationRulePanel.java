@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,18 +26,22 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>SubtractiveNormalizationSynapsePanel</b>.
  */
-public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
+public class SubtractiveNormalizationRulePanel extends
+        AbstractSynapsePanel {
 
     /** Learning rate field. */
     private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private SubtractiveNormalizationRule synapseRef;
+    private static final SubtractiveNormalizationRule prototypeRule =
+            new SubtractiveNormalizationRule();
 
     /**
      * This method is the default constructor.
@@ -46,58 +51,88 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-    	synapseRef = (SubtractiveNormalizationRule) ruleList.get(0);
+        SubtractiveNormalizationRule synapseRef =
+                (SubtractiveNormalizationRule) ruleList.get(0);
 
-        //(Below) Handle consistency of multiply selections
-        
+        // (Below) Handle consistency of multiply selections
+
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList,
-                SubtractiveNormalizationRule.class, "getLearningRate"))
+                SubtractiveNormalizationRule.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
-        else
-        	tfLearningRate.setText(Double.toString(synapseRef
-        			.getLearningRate()));
-        
+        } else {
+            tfLearningRate.setText(Double.toString(synapseRef
+                    .getLearningRate()));
+        }
+
     }
 
     /**
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        // SubtractiveNormalizationSynapse synapseRef = new
-        // SubtractiveNormalizationSynapse();
-        tfLearningRate.setText(Double
-                .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
+        tfLearningRate
+                .setText(Double
+                        .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(final List<Synapse> commitSynapses) {
-		for(Synapse s : commitSynapses) {
-			commitChanges(s);
-		}  
-	}
+    @Override
+    public void commitChanges(Synapse synapse) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(Synapse templateSynapse) {
-		
-		synapseRef = new SubtractiveNormalizationRule();
-		
-		// Learning Rate
-		if (!tfLearningRate.getText().equals(NULL_STRING))
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-		
-		templateSynapse.setLearningRule(synapseRef);
-		
-	}
+        if (!(synapse.getLearningRule() instanceof SubtractiveNormalizationRule)) {
+            synapse.setLearningRule(prototypeRule.deepCopy());
+        }
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setLearningRule(prototypeRule.deepCopy());
+            }
+        }
+
+        writeValuesToRules(synapses);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Learning Rate
+        double learningRate = Utils.doubleParsable(tfLearningRate);
+        if (!Double.isNaN(learningRate)) {
+            for (Synapse s : synapses) {
+                ((SubtractiveNormalizationRule) s.getLearningRule())
+                        .setLearningRate(learningRate);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
 }

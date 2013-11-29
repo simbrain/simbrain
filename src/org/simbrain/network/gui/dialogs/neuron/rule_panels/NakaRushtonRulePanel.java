@@ -34,6 +34,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -277,7 +278,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		int numNeurons = neurons.size();
 
 		// Steepness
-		double steepness = doubleParsable(tfSteepness);
+		double steepness = Utils.doubleParsable(tfSteepness);
 		if (!Double.isNaN(steepness)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -286,7 +287,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Lower Value
-		double lv = doubleParsable(tfLowbound);
+		double lv = Utils.doubleParsable(tfLowbound);
 		if (!Double.isNaN(lv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -295,7 +296,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Upper Value
-		double uv = doubleParsable(tfUpbound);
+		double uv = Utils.doubleParsable(tfUpbound);
 		if (!Double.isNaN(uv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -304,7 +305,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Semi-Saturation
-		double semiSaturation = doubleParsable(tfSemiSaturation);
+		double semiSaturation = Utils.doubleParsable(tfSemiSaturation);
 		if (!Double.isNaN(semiSaturation)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -313,7 +314,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Time Constant
-		double timeConstant = doubleParsable(tfTimeConstant);
+		double timeConstant = Utils.doubleParsable(tfTimeConstant);
 		if (!Double.isNaN(timeConstant)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -334,7 +335,8 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 			if (adaptation) {
 
 				// Adaptation Time Constant
-				double adaptationTime = doubleParsable(tfAdaptationTime);
+				double adaptationTime =
+						Utils.doubleParsable(tfAdaptationTime);
 				if (!Double.isNaN(adaptationTime)) {
 					for (int i = 0; i < numNeurons; i++) {
 						((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -344,7 +346,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 
 				// Adaptation Parameter
 				double adaptationParameter =
-						doubleParsable(tfAdaptationParam);
+						Utils.doubleParsable(tfAdaptationParam);
 				if (!Double.isNaN(adaptationParameter)) {
 					for (int i = 0; i < numNeurons; i++) {
 						((NakaRushtonRule) neurons.get(i).getUpdateRule())
@@ -393,7 +395,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected NeuronUpdateRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

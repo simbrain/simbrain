@@ -36,20 +36,21 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- *
+ * 
  * A panel containing more detailed generic information about neurons. Generally
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- *
+ * 
  * Values included are: Activation ceiling and floor, label, priority and
  * increment.
- *
+ * 
  * @author ztosi
- *
+ * 
  */
 public class ExtendedNeuronInfoPanel extends JPanel {
 
@@ -119,19 +120,21 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 	/** The neurons being modified. */
 	private List<Neuron> neuronList;
 
-	    /**
-     * Construct the panel representing the provided neurons.
-     *
-     * @param neuronList list of neurons to represent.
-     * @param parent parent window so pack can be called
-     */
-    public ExtendedNeuronInfoPanel(final List<Neuron> neuronList,
-            final Window parent) {
-        this.neuronList = neuronList;
-        this.parent = parent;
-        fillFieldValues();
-        initializeLayout();
-    }
+	/**
+	 * Construct the panel representing the provided neurons.
+	 * 
+	 * @param neuronList
+	 *            list of neurons to represent.
+	 * @param parent
+	 *            parent window so pack can be called
+	 */
+	public ExtendedNeuronInfoPanel(final List<Neuron> neuronList,
+			final Window parent) {
+		this.neuronList = neuronList;
+		this.parent = parent;
+		fillFieldValues();
+		initializeLayout();
+	}
 
 	/**
 	 * Lays out the panel
@@ -259,6 +262,10 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 
 	}
 
+	/**
+	 * 
+	 * @param rule
+	 */
 	public void fillDefaultValues(NeuronUpdateRule rule) {
 		setBoundsVisible(rule instanceof BoundedUpdateRule
 				&& rule instanceof ClippableUpdateRule);
@@ -291,8 +298,7 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 
 				if (clip) {
 					// Upper Bound
-					double ceiling =
-							AbstractNeuronPanel.doubleParsable(tfCeiling);
+					double ceiling = Utils.doubleParsable(tfCeiling);
 					if (!Double.isNaN(ceiling)) {
 						for (int i = 0; i < numNeurons; i++) {
 							((BoundedUpdateRule) neuronList.get(i)
@@ -300,8 +306,7 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 						}
 					}
 					// Lower Bound
-					double floor =
-							AbstractNeuronPanel.doubleParsable(tfFloor);
+					double floor = Utils.doubleParsable(tfFloor);
 					if (!Double.isNaN(floor)) {
 						for (int i = 0; i < numNeurons; i++) {
 							((BoundedUpdateRule) neuronList.get(i)
@@ -314,8 +319,7 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		}
 
 		// Increment
-		double increment =
-				AbstractNeuronPanel.doubleParsable(tfIncrement);
+		double increment = Utils.doubleParsable(tfIncrement);
 		if (!Double.isNaN(increment)) {
 			for (int i = 0; i < numNeurons; i++) {
 				neuronList.get(i).getUpdateRule().setIncrement(increment);
@@ -323,7 +327,7 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		}
 
 		// Priority
-		double priority = AbstractNeuronPanel.doubleParsable(tfPriority);
+		double priority = Utils.doubleParsable(tfPriority);
 		if (!Double.isNaN(priority)) {
 			int p = (int) priority; // Cast to integer (there is no NaN value
 			// for integers to use as a flag).
@@ -352,6 +356,10 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		return clamped;
 	}
 
+	/**
+	 * 
+	 * @param enabled
+	 */
 	public void setBoundsEnabled(boolean enabled) {
 		boundsEnabled = enabled;
 		int t = TristateDropDown.getTRUE();
@@ -362,6 +370,10 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * 
+	 * @param visible
+	 */
 	public void setBoundsVisible(boolean visible) {
 		boundsVisible = visible;
 		boundsPanel.setVisible(visible);
@@ -369,10 +381,22 @@ public class ExtendedNeuronInfoPanel extends JPanel {
 		parent.pack();
 	}
 
+	/**
+	 * 
+	 * @return whether or not boundaries are visible. Only occurs in cases where
+	 * clippable 
+	 * 
+	 * 
+	 * @see org.simbrain.network.neuron_update_rules.interfaces.Clippable.java
+	 */
 	public boolean isBoundsVisible() {
 		return boundsVisible;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isBoundsEnabled() {
 		return boundsEnabled;
 	}

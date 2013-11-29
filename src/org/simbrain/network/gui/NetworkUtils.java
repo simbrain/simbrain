@@ -20,6 +20,7 @@ package org.simbrain.network.gui;
 
 import java.awt.Dimension;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,8 +46,9 @@ public class NetworkUtils {
      * @return true if the list of objects returns the same value for
      *         methodName, false otherwise
      */
+	@SuppressWarnings("rawtypes")
     public static boolean isConsistent(final List toCheck,
-            final Class theClass, final String methodName) {
+            final Class<?> theClass, final String methodName) {
         Method theMethod = null;
 
         try {
@@ -56,37 +58,35 @@ public class NetworkUtils {
         } catch (NoSuchMethodException e1) {
             e1.printStackTrace();
         }
+        
+        if(toCheck.size() == 0) {
+        	throw new IllegalArgumentException("List to check is empty.");
+        }
+        
+        Object o1 = toCheck.get(0);
+        Object result1 = null;
 
-        Iterator i = toCheck.iterator();
-
-        while (i.hasNext()) {
-            Object o1 = i.next();
-            Object result1 = null;
-
-            try {
-                result1 = theMethod.invoke(o1, (Object[]) null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            Iterator j = toCheck.iterator();
-
-            while (j.hasNext()) {
-                Object o2 = j.next();
-                Object result2 = null;
-
-                try {
-                    result2 = theMethod.invoke(o2, (Object[]) null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (!result1.equals(result2)) {
-                    return false;
-                }
-            }
+        try {
+        	result1 = theMethod.invoke(o1, (Object[]) null);
+        } catch (Exception e) {
+        	e.printStackTrace();
         }
 
+        Iterator<Object> j = toCheck.iterator();
+        j.next();
+        while (j.hasNext()) {
+        	Object o2 = j.next();
+        	Object result2 = null;
+        	try {
+        		result2 = theMethod.invoke(o2, (Object[]) null);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
+
+        	if (!result1.equals(result2)) {
+        		return false;
+        	}
+        }
         return true;
     }
 

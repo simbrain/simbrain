@@ -34,6 +34,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -240,7 +241,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Decay Amount
-		double decayAmount = doubleParsable(tfDecayAmount);
+		double decayAmount = Utils.doubleParsable(tfDecayAmount);
 		if (!Double.isNaN(decayAmount)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((DecayRule) neurons.get(i).getUpdateRule())
@@ -249,7 +250,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Decay Fraction
-		double decayFraction = doubleParsable(tfDecayFraction);
+		double decayFraction = Utils.doubleParsable(tfDecayFraction);
 		if (!Double.isNaN(decayFraction)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((DecayRule) neurons.get(i).getUpdateRule())
@@ -258,7 +259,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 		}
 
 		// Decay Baseline
-		double baseLine = doubleParsable(tfBaseLine);
+		double baseLine = Utils.doubleParsable(tfBaseLine);
 		if (!Double.isNaN(baseLine)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((DecayRule) neurons.get(i).getUpdateRule())
@@ -289,7 +290,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 	/**
 	 * {@inheritDoc}
 	 */
-	public DecayRule getPrototypeRule() {
+	protected DecayRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

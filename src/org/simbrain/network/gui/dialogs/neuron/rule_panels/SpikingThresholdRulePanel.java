@@ -30,6 +30,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>. TODO: Deactivated until discussion
@@ -52,7 +53,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 	 */
 	public SpikingThresholdRulePanel() {
 		super();
-		setLayout(new GridLayout(1,2));
+		setLayout(new GridLayout(1, 2));
 		add(new JLabel("Threshold: "));
 		add(tfThreshold);
 	}
@@ -92,9 +93,9 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 		if (!(neuron.getUpdateRule() instanceof SpikingThresholdRule)) {
 			neuron.setUpdateRule(prototypeRule.deepCopy());
 		}
-		
+
 		writeValuesToRules(Collections.singletonList(neuron));
-		
+
 	}
 
 	/**
@@ -109,7 +110,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
 		}
-		
+
 		writeValuesToRules(neurons);
 
 	}
@@ -120,24 +121,24 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
 	@Override
 	protected void writeValuesToRules(List<Neuron> neurons) {
 		int numNeurons = neurons.size();
-		
+
 		// Threshold
-		double threshold = doubleParsable(tfThreshold);
+		double threshold = Utils.doubleParsable(tfThreshold);
 		if (!Double.isNaN(threshold)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SpikingThresholdRule) neurons.get(i).getUpdateRule())
-				.setThreshold(threshold);
+						.setThreshold(threshold);
 			}
 		}
-		
+
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected NeuronUpdateRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
-	
+
 }

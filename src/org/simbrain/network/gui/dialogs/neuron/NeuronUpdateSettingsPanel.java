@@ -43,336 +43,295 @@ import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
- *
  * A panel for setting the neuron type and changing the parameters of the
  * selected update rule.
- *
+ * 
  * @author ztosi
  * @author jyoshimi
- *
  */
 public class NeuronUpdateSettingsPanel extends JPanel {
 
-	/** Null string. */
-	public static final String NULL_STRING = "...";
+    /** Null string. */
+    public static final String NULL_STRING = "...";
 
-	/**
-	 * The default display state of the neuron panel. Currently, True, that is,
-	 * by default, the neuron panel corresponding to the rule in the combo box
-	 * is visible.
-	 */
-	private static final boolean DEFAULT_NP_DISPLAY_STATE = true;
+    /**
+     * The default display state of the neuron panel. Currently, True, that is,
+     * by default, the neuron panel corresponding to the rule in the combo box
+     * is visible.
+     */
+    private static final boolean DEFAULT_NP_DISPLAY_STATE = true;
 
-	/** Neuron type combo box. */
-	private final JComboBox<String> cbNeuronType;
+    /** Neuron type combo box. */
+    private final JComboBox<String> cbNeuronType;
 
-	/** Associations between names of rules and panels for editing them. */
-	private final LinkedHashMap<String, AbstractNeuronPanel> ruleMap;
+    /** Associations between names of rules and panels for editing them. */
+    private final LinkedHashMap<String, AbstractNeuronPanel> ruleMap;
 
-	/** The neurons being modified. */
-	private final List<Neuron> neuronList;
+    /** The neurons being modified. */
+    private final List<Neuron> neuronList;
 
-	/** Neuron panel. */
-	private AbstractNeuronPanel neuronPanel;
+    /** Neuron panel. */
+    private AbstractNeuronPanel neuronPanel;
 
-	/** For showing/hiding the neuron panel. */
-	private final DropDownTriangle displayNPTriangle;
+    /** For showing/hiding the neuron panel. */
+    private final DropDownTriangle displayNPTriangle;
 
-	/**
-	 * A reference to the parent window containing this panel for the purpose of
-	 * adjusting to different sized neuron update rule dialogs.
-	 */
-	private final Window parent;
+    /**
+     * A reference to the parent window containing this panel for the purpose of
+     * adjusting to different sized neuron update rule dialogs.
+     */
+    private final Window parent;
 
-	/**
-	 * A reference to the original panel, so that we can easily know if we are
-	 * writing to already existing neuron update rules or replacing them with
-	 * new rules.
-	 */
-	private final AbstractNeuronPanel startingPanel;
+    /**
+     * A reference to the original panel, so that we can easily know if we are
+     * writing to already existing neuron update rules or replacing them with
+     * new rules.
+     */
+    private final AbstractNeuronPanel startingPanel;
 
-	/**
-	 * Create a the panel with the default starting visibility (visible) for the
-	 * neuron panel.
-	 *
-	 * @param neuronList
-	 *            the list of neurons being edited
-	 * @param parent
-	 *            the parent window referenced for resizing purposes
-	 */
-	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
-			Window parent) {
-		this(neuronList, parent, DEFAULT_NP_DISPLAY_STATE);
-	}
+    /**
+     * Create a the panel with the default starting visibility (visible) for the
+     * neuron panel.
+     * 
+     * @param neuronList
+     *            the list of neurons being edited
+     * @param parent
+     *            the parent window referenced for resizing purposes
+     */
+    public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
+            Window parent) {
+        this(neuronList, parent, DEFAULT_NP_DISPLAY_STATE);
+    }
 
-	/**
-	 * Create the panel with specified starting visibility.
-	 *
-	 * @param neuronList
-	 *            the list of neurons being edited
-	 * @param parent
-	 *            the parent window referenced for resizing purposes
-	 * @param startingState
-	 */
-	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
-			Window parent, boolean startingState) {
-		this.neuronList = neuronList;
-		this.parent = parent;
-		ruleMap = AbstractNeuronPanel.RULE_MAP;
-		cbNeuronType =
-				new JComboBox<String>(AbstractNeuronPanel.getRulelist());
-		displayNPTriangle =
-				new DropDownTriangle(UpDirection.LEFT, !startingState,
-						"Settings", "Settings", parent);
-		initNeuronType();
-		startingPanel = neuronPanel;
-		initializeLayout();
-		addListeners();
-	}
+    /**
+     * Create the panel with specified starting visibility.
+     * 
+     * @param neuronList
+     *            the list of neurons being edited
+     * @param parent
+     *            the parent window referenced for resizing purposes
+     * @param startingState
+     *            the starting state of whether or not details of the rule are
+     *            initially visible
+     */
+    public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
+            Window parent, boolean startingState) {
+        this.neuronList = neuronList;
+        this.parent = parent;
+        ruleMap = AbstractNeuronPanel.RULE_MAP;
+        cbNeuronType =
+                new JComboBox<String>(AbstractNeuronPanel.getRulelist());
+        displayNPTriangle =
+                new DropDownTriangle(UpDirection.LEFT, !startingState,
+                        "Settings", "Settings", parent);
+        initNeuronType();
+        startingPanel = neuronPanel;
+        initializeLayout();
+        addListeners();
+    }
 
-	/**
-	 * Create the panel with specified starting visibility and which only has
-	 * the specified rules as options.
-	 *
-	 * WARNING: Do not use this constructor if there is a chance that the
-	 * resulting panel will ever edit neurons. If the selected neurons contain
-	 * neurons with update rules which are not in the list passed into this
-	 * constructor a NullPointerException will be thrown.
-	 *
-	 * @param neuronList
-	 *            the list of neurons being edited
-	 * @param updateRules
-	 *            the update rules this panel will support.
-	 * @param parent
-	 *            the parent window referenced for resizing purposes
-	 * @param startingState
-	 */
-	public NeuronUpdateSettingsPanel(List<Neuron> neuronList,
-			List<String> updateRules, Window parent, boolean startingState) {
-		this.neuronList = neuronList;
-		this.parent = parent;
-		ruleMap = new LinkedHashMap<String, AbstractNeuronPanel>();
-		populateRuleMap(updateRules);
-		cbNeuronType =
-				new JComboBox<String>(ruleMap.keySet().toArray(
-						new String[ruleMap.size()]));
-		displayNPTriangle =
-				new DropDownTriangle(UpDirection.LEFT, !startingState,
-						"Settings", "Settings", parent);
-		initNeuronType();
-		startingPanel = neuronPanel;
-		initializeLayout();
-		addListeners();
-	}
+    /**
+     * Lays out the components of the panel.
+     */
+    private void initializeLayout() {
 
-	/**
-	 * Lays out the components of the panel.
-	 *
-	 */
-	private void initializeLayout() {
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-		Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+        JPanel tPanel = new JPanel();
+        tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
+        tPanel.add(cbNeuronType);
+        int horzStrut = 30;
 
-		JPanel tPanel = new JPanel();
-		tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
-		tPanel.add(cbNeuronType);
-		int horzStrut = 30;
+        // Create a minimum spacing
+        tPanel.add(Box.createHorizontalStrut(horzStrut));
 
-		// Create a minimum spacing
-		tPanel.add(Box.createHorizontalStrut(horzStrut));
+        // Give all extra space to the space between the components
+        tPanel.add(Box.createHorizontalGlue());
 
-		// Give all extra space to the space between the components
-		tPanel.add(Box.createHorizontalGlue());
+        tPanel.add(displayNPTriangle);
+        tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tPanel.setBorder(padding);
+        this.add(tPanel);
 
-		tPanel.add(displayNPTriangle);
-		tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		tPanel.setBorder(padding);
-		this.add(tPanel);
+        this.add(Box.createRigidArea(new Dimension(0, 5)));
 
-		this.add(Box.createRigidArea(new Dimension(0, 5)));
+        neuronPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        neuronPanel.setBorder(padding);
+        neuronPanel.setVisible(displayNPTriangle.isDown());
+        this.add(neuronPanel);
 
-		neuronPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		neuronPanel.setBorder(padding);
-		neuronPanel.setVisible(displayNPTriangle.isDown());
-		this.add(neuronPanel);
+        TitledBorder tb2 =
+                BorderFactory.createTitledBorder("Update Rule");
+        this.setBorder(tb2);
 
-		TitledBorder tb2 =
-				BorderFactory.createTitledBorder("Update Rule");
-		this.setBorder(tb2);
+    }
 
-	}
+    /**
+     * Adds the listeners to this dialog.
+     */
+    private void addListeners() {
+        displayNPTriangle.addMouseListener(new MouseListener() {
 
-	/**
-	 * Populates the local rule map based on the names of the update rules
-	 * passed into it. The rule map determines what {@link #cbNeuronType} will
-	 * be populated with and therefore which neuron panels will be made
-	 * available for editing.
-	 *
-	 * @param updateRules
-	 *            the update rules which will fill {@link #ruleMap}
-	 */
-	private void populateRuleMap(List<String> updateRules)
-			throws NullPointerException {
-		for (String name : updateRules) {
-			AbstractNeuronPanel np =
-					AbstractNeuronPanel.RULE_MAP.get(name);
-			if (np == null) {
-				throw new NullPointerException(
-						"No such update rule error.");
-			}
-			ruleMap.put(name, np);
-		}
-	}
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                neuronPanel.setVisible(displayNPTriangle.isDown());
+                repaint();
+                parent.pack();
+            }
 
-	/**
-	 * Adds the listeners to this dialog.
-	 */
-	private void addListeners() {
-		displayNPTriangle.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				neuronPanel.setVisible(displayNPTriangle.isDown());
-				repaint();
-				parent.pack();
-			}
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-			}
+            @Override
+            public void mousePressed(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-			}
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+            }
 
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-			}
+        });
 
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-			}
+        cbNeuronType.addActionListener(new ActionListener() {
 
-		});
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
 
-		cbNeuronType.addActionListener(new ActionListener() {
+                neuronPanel = ruleMap.get(cbNeuronType.getSelectedItem());
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
+                // Is the current panel different from the starting panel?
+                boolean replace = neuronPanel != startingPanel;
 
-				neuronPanel = ruleMap.get(cbNeuronType.getSelectedItem());
-				boolean replacement = neuronPanel != startingPanel;
-				neuronPanel.setReplace(replacement);
-				if (replacement) {
-					neuronPanel.fillDefaultValues();
-				} else {
-					neuronPanel.fillFieldValues(Neuron
-							.getRuleList(neuronList));
-				}
-				repaintPanel();
-				parent.pack();
-			}
+                // If so we have to fill the new panel with default values
+                if (replace) {
+                    neuronPanel.fillDefaultValues();
+                } else {
+                    // If not we can fill the new panel with values from the
+                    // neurons being edited.
+                    neuronPanel.fillFieldValues(Neuron
+                            .getRuleList(neuronList));
+                }
 
-		});
+                // Tell the panel whether it will have to replace neuron
+                // update rules or edit them upon commit.
+                neuronPanel.setReplace(replace);
 
-	}
+                repaintPanel();
+                parent.pack();
 
-	/**
-	 * Called on exit to write changes in the dialog to the underlying model.
-	 */
-	public void commitChanges() {
-		neuronPanel.commitChanges(neuronList);
-	}
+            }
 
-	/**
-	 * Called to repaint the panel based on changes in the to the selected
-	 * neuron type.
-	 */
-	public void repaintPanel() {
-		removeAll();
-		initializeLayout();
-		repaint();
-	}
+        });
 
-	/**
-	 * Initialize the main neuron panel based on the type of the selected
-	 * neurons.
-	 */
-	private void initNeuronType() {
+    }
 
-		if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-				"getType")) {
-			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
-			cbNeuronType
-					.setSelectedIndex(cbNeuronType.getItemCount() - 1);
-			neuronPanel = new EmptyRulePanel();
-		} else {
-			String neuronName =
-					neuronList.get(0).getUpdateRule().getDescription();
-			neuronPanel = ruleMap.get(neuronName);
-			neuronPanel.setReplace(false);
-			neuronPanel.fillFieldValues(Neuron.getRuleList(neuronList));
-			cbNeuronType.setSelectedItem(neuronName);
+    /**
+     * Called on exit to write changes in the dialog to the underlying model.
+     */
+    public void commitChanges() {
+        neuronPanel.commitChanges(neuronList);
+    }
 
-		}
-	}
+    /**
+     * Called to repaint the panel based on changes in the to the selected
+     * neuron type.
+     */
+    public void repaintPanel() {
+        removeAll();
+        initializeLayout();
+        repaint();
+    }
 
-	/**
-	 * Directly access the neuron panel to utilize its methods without using
-	 * this class as an intermediary. An example of this can be seen in
-	 *
-	 * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
-	 * @return the currently displayed neuron update rule panel
-	 */
-	public AbstractNeuronPanel getNeuronPanel() {
-		return neuronPanel;
-	}
+    /**
+     * Initialize the main neuron panel based on the type of the selected
+     * neurons.
+     */
+    private void initNeuronType() {
 
-	public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
-		this.neuronPanel = neuronPanel;
-	}
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getType")) {
+            cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
+            cbNeuronType
+                    .setSelectedIndex(cbNeuronType.getItemCount() - 1);
+            neuronPanel = new EmptyRulePanel();
+        } else {
+            String neuronName =
+                    neuronList.get(0).getUpdateRule().getDescription();
+            neuronPanel = ruleMap.get(neuronName);
+            neuronPanel.setReplace(false);
+            neuronPanel.fillFieldValues(Neuron.getRuleList(neuronList));
+            cbNeuronType.setSelectedItem(neuronName);
 
-	public JComboBox<String> getCbNeuronType() {
-		return cbNeuronType;
-	}
+        }
+    }
 
-	/**
-	 *
-	 * An empty panel displayed in cases where the selected neurons have more
-	 * than one type of update rule.
-	 *
-	 * @author ztosi
-	 *
-	 */
-	private class EmptyRulePanel extends AbstractNeuronPanel {
+    /**
+     * Directly access the neuron panel to utilize its methods without using
+     * this class as an intermediary. An example of this can be seen in
+     * 
+     * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
+     * @return the currently displayed neuron update rule panel
+     */
+    public AbstractNeuronPanel getNeuronPanel() {
+        return neuronPanel;
+    }
 
-		@Override
-		public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-		}
+    /**
+     * 
+     * @param neuronPanel
+     */
+    public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
+        this.neuronPanel = neuronPanel;
+    }
 
-		@Override
-		public void fillDefaultValues() {
-		}
+    /**
+     * 
+     * @return
+     */
+    public JComboBox<String> getCbNeuronType() {
+        return cbNeuronType;
+    }
 
-		@Override
-		public void commitChanges(Neuron neuron) {
-		}
+    /**
+     * An empty panel displayed in cases where the selected neurons have more
+     * than one type of update rule.
+     * 
+     * @author ztosi
+     */
+    private class EmptyRulePanel extends AbstractNeuronPanel {
 
-		@Override
-		public void commitChanges(List<Neuron> neuron) {
-		}
+        @Override
+        public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        }
 
-		@Override
-		public NeuronUpdateRule getPrototypeRule() {
-			return null;
-		}
+        @Override
+        public void fillDefaultValues() {
+        }
 
-		@Override
-		protected void writeValuesToRules(List<Neuron> neurons) {
-		}
+        @Override
+        public void commitChanges(Neuron neuron) {
+        }
 
-	}
+        @Override
+        public void commitChanges(List<Neuron> neuron) {
+        }
+
+        @Override
+        public NeuronUpdateRule getPrototypeRule() {
+            return null;
+        }
+
+        @Override
+        protected void writeValuesToRules(List<Neuron> neurons) {
+        }
+
+    }
 
 }

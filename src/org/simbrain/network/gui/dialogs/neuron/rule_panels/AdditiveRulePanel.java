@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -174,7 +175,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		int numNeurons = neurons.size();
 
 		// Lambda
-		double lambda = doubleParsable(tfLambda);
+		double lambda = Utils.doubleParsable(tfLambda);
 		if (!Double.isNaN(lambda)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((AdditiveRule) neurons.get(i).getUpdateRule())
@@ -183,7 +184,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Resistance
-		double resistance = doubleParsable(tfResistance);
+		double resistance = Utils.doubleParsable(tfResistance);
 		if (!Double.isNaN(resistance)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((AdditiveRule) neurons.get(i).getUpdateRule())
@@ -213,7 +214,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	public AdditiveRule getPrototypeRule() {
+	protected AdditiveRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

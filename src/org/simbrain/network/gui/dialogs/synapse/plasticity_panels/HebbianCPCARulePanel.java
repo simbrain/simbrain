@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,12 +26,16 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>HebbianCPCAPanel</b>.
  */
 public class HebbianCPCARulePanel extends AbstractSynapsePanel {
+
+    /** TODO: Auto-Generated Stub */
     private static final long serialVersionUID = 1L;
 
     /** Learning rate field. */
@@ -46,7 +51,8 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
     private final JTextField tfLambda = new JTextField();
 
     /** Synapse reference. */
-    private HebbianCPCARule synapseRef;
+    private static final HebbianCPCARule prototypeRule =
+            new HebbianCPCARule();
 
     /**
      * This method is the default constructor.
@@ -60,40 +66,49 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
+     * 
+     * @param ruleList
+     *            the list of rules being edited
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-    	synapseRef = (HebbianCPCARule) ruleList.get(0);
+        HebbianCPCARule synapseRef = (HebbianCPCARule) ruleList.get(0);
 
         // Handle consistency of multiply selections
-    	
-    	// Handle Learning Rate
+
+        // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLearningRate"))
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
-        else 
-        	tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        
-        //Handle M
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) 
+        } else {
+            tfLearningRate.setText(Double.toString(synapseRef
+                    .getLearningRate()));
+        }
+
+        // Handle M
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
+                "getM")) {
             tfM.setText(NULL_STRING);
-        else 
-        	tfM.setText(Double.toString(synapseRef.getM()));
-        
-        //Handle Theta
+        } else {
+            tfM.setText(Double.toString(synapseRef.getM()));
+        }
+
+        // Handle Theta
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getTheta")) 
+                "getTheta")) {
             tfTheta.setText(NULL_STRING);
-        else
-        	tfTheta.setText(Double.toString(synapseRef.getTheta()));
-        
-        //Handle Lambda
+        } else {
+            tfTheta.setText(Double.toString(synapseRef.getTheta()));
+        }
+
+        // Handle Lambda
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLambda"))
+                "getLambda")) {
             tfLambda.setText(NULL_STRING);
-        else
-        	tfLambda.setText(Double.toString(synapseRef.getLambda()));
-        
+        } else {
+            tfLambda.setText(Double.toString(synapseRef.getLambda()));
+        }
+
     }
 
     /**
@@ -111,35 +126,80 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(final List<Synapse> commitSynapses) {      
-		for(Synapse s : commitSynapses) {
-			commitChanges(s);
-		}      
-	}
+    @Override
+    public void commitChanges(final Synapse synapse) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(final Synapse templateSynapse) {
-		synapseRef = new HebbianCPCARule();		
-		
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
+        if (!(synapse.getLearningRule() instanceof HebbianCPCARule)) {
+            synapse.setLearningRule(prototypeRule.deepCopy());
         }
-        if (!tfM.getText().equals(NULL_STRING)) {
-            synapseRef.setM(Double.parseDouble(tfM.getText()));
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setLearningRule(prototypeRule.deepCopy());
+            }
         }
-        if (!tfTheta.getText().equals(NULL_STRING)) {
-            synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
+
+        writeValuesToRules(synapses);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(final List<Synapse> synapses) {
+
+        // Learning Rate
+        double learningRate = Utils.doubleParsable(tfLearningRate);
+        if (!Double.isNaN(learningRate)) {
+            for (Synapse s : synapses) {
+                ((HebbianCPCARule) s.getLearningRule())
+                        .setLearningRate(learningRate);
+            }
         }
-        if (!tfLambda.getText().equals(NULL_STRING)) {
-            synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
+
+        // M
+        double m = Utils.doubleParsable(tfM);
+        if (!Double.isNaN(m)) {
+            for (Synapse s : synapses) {
+                ((HebbianCPCARule) s.getLearningRule()).setM(m);
+            }
         }
-		
-        templateSynapse.setLearningRule(synapseRef); 
-	}
-    
+
+        // Theta
+        double theta = Utils.doubleParsable(tfTheta);
+        if (!Double.isNaN(theta)) {
+            for (Synapse s : synapses) {
+                ((HebbianCPCARule) s.getLearningRule()).setTheta(theta);
+            }
+        }
+
+        // Lambda
+        double lambda = Utils.doubleParsable(tfLambda);
+        if (!Double.isNaN(lambda)) {
+            for (Synapse s : synapses) {
+                ((HebbianCPCARule) s.getLearningRule()).setLambda(lambda);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HebbianCPCARule getPrototypeRule() {
+        return prototypeRule;
+    }
+
 }

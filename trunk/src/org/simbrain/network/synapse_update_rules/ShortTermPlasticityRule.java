@@ -80,56 +80,59 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
 
     @Override
     public String getDescription() {
-	return "Short Term Plasticity";
+        return "Short Term Plasticity";
     }
 
     @Override
     public SynapseUpdateRule deepCopy() {
-	ShortTermPlasticityRule stp = new ShortTermPlasticityRule();
-	stp.setBaseLineStrength(getBaseLineStrength());
-	stp.setBumpRate(getBumpRate());
-	stp.setDecayRate(getDecayRate());
-	stp.setInputThreshold(getInputThreshold());
-	stp.setPlasticityType(getPlasticityType());
-	return stp;
+        ShortTermPlasticityRule stp = new ShortTermPlasticityRule();
+        stp.setBaseLineStrength(getBaseLineStrength());
+        stp.setBumpRate(getBumpRate());
+        stp.setDecayRate(getDecayRate());
+        stp.setInputThreshold(getInputThreshold());
+        stp.setPlasticityType(getPlasticityType());
+        return stp;
     }
 
     @Override
     public void update(Synapse synapse) {
-	// Determine whether to activate short term dynamics
-	if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-	    if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
-		    .hasSpiked()) {
-		activated = true;
-	    } else {
-		activated = false;
-	    }
-	} else {
-	    if (synapse.getSource().getActivation() > firingThreshold) {
-		activated = true;
-	    } else {
-		activated = false;
-	    }
-	}
-	double strength = synapse.getStrength();
-	if (activated) {
-	    if (plasticityType == STD) {
-		strength -= (bumpRate * (strength - synapse.getLowerBound()));
-	    } else {
-		strength += (bumpRate * (synapse.getUpperBound() - strength));
-	    }
-	} else {
-	    strength -= (decayRate * (strength - baseLineStrength));
-	}
+        // Determine whether to activate short term dynamics
+        if (synapse.getSource().getUpdateRule()
+                instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) synapse.getSource()
+                    .getUpdateRule()).hasSpiked()) {
+                activated = true;
+            } else {
+                activated = false;
+            }
+        } else {
+            if (synapse.getSource().getActivation() > firingThreshold) {
+                activated = true;
+            } else {
+                activated = false;
+            }
+        }
+        double strength = synapse.getStrength();
+        if (activated) {
+            if (plasticityType == STD) {
+                strength -=
+                        (bumpRate * (strength - synapse.getLowerBound()));
+            } else {
+                strength +=
+                        (bumpRate * (synapse.getUpperBound() - strength));
+            }
+        } else {
+            strength -= (decayRate * (strength - baseLineStrength));
+        }
 
-	synapse.setStrength(synapse.clip(strength));
+        synapse.setStrength(synapse.clip(strength));
     }
 
     /**
      * @return Returns the baseLineStrength.
      */
     public double getBaseLineStrength() {
-	return baseLineStrength;
+        return baseLineStrength;
     }
 
     /**
@@ -137,14 +140,14 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The baseLineStrength to set.
      */
     public void setBaseLineStrength(final double baseLineStrength) {
-	this.baseLineStrength = baseLineStrength;
+        this.baseLineStrength = baseLineStrength;
     }
 
     /**
      * @return Returns the decayRate.
      */
     public double getDecayRate() {
-	return decayRate;
+        return decayRate;
     }
 
     /**
@@ -152,14 +155,14 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The decayRate to set.
      */
     public void setDecayRate(final double decayRate) {
-	this.decayRate = decayRate;
+        this.decayRate = decayRate;
     }
 
     /**
      * @return Returns the growthRate.
      */
     public double getBumpRate() {
-	return bumpRate;
+        return bumpRate;
     }
 
     /**
@@ -167,14 +170,14 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The growthRate to set.
      */
     public void setBumpRate(final double growthRate) {
-	this.bumpRate = growthRate;
+        this.bumpRate = growthRate;
     }
 
     /**
      * @return Returns the inputThreshold.
      */
     public double getInputThreshold() {
-	return inputThreshold;
+        return inputThreshold;
     }
 
     /**
@@ -182,14 +185,14 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The inputThreshold to set.
      */
     public void setInputThreshold(final double inputThreshold) {
-	this.inputThreshold = inputThreshold;
+        this.inputThreshold = inputThreshold;
     }
 
     /**
      * @return Returns the plasticityType.
      */
     public int getPlasticityType() {
-	return plasticityType;
+        return plasticityType;
     }
 
     /**
@@ -197,14 +200,14 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The plasticityType to set.
      */
     public void setPlasticityType(final int plasticityType) {
-	this.plasticityType = plasticityType;
+        this.plasticityType = plasticityType;
     }
 
     /**
      * @return the firing threshold.
      */
     public double getFiringThreshold() {
-	return firingThreshold;
+        return firingThreshold;
     }
 
     /**
@@ -212,6 +215,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
      *            The firingThreshold to set.
      */
     public void setFiringThreshold(final double firingThreshold) {
-	this.firingThreshold = firingThreshold;
+        this.firingThreshold = firingThreshold;
     }
+
 }

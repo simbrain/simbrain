@@ -173,7 +173,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 	public SigmoidalRule deepCopy() {
 		SigmoidalRule sn = new SigmoidalRule();
 		sn.setBias(getBias());
-		sn.setSquashFunction(getSquashFunction());
+		sn.setSquashFunctionType(getSquashFunctionType());
 		sn.setSlope(getSlope());
 		sn.setAddNoise(getAddNoise());
 		sn.noiseGenerator = new Randomizer(noiseGenerator);
@@ -250,7 +250,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 	/**
 	 * @return the type
 	 */
-	public SquashingFunction getSquashFunction() {
+	public SquashingFunction getSquashFunctionType() {
 		if (sFunction == null) {
 			sFunction = SquashingFunction.LOGISTIC; // TODO: Explain (backwards
 			// compat)
@@ -262,7 +262,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 	 * @param type
 	 *            the type to set
 	 */
-	public void setSquashFunction(SquashingFunction type) {
+	public void setSquashFunctionType(SquashingFunction type) {
 		this.sFunction = type;
 	}
 

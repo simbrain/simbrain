@@ -26,7 +26,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
@@ -122,7 +122,7 @@ public class FeedForward extends Subnetwork {
         layout.layoutNeurons(inputLayerNeurons);
 
         // Prepare base synapse for connecting layers
-        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapseRule());
+        Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
         synapse.setLowerBound(-1);
         synapse.setUpperBound(1);
 

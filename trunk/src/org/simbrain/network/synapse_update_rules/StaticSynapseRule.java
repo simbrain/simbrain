@@ -24,47 +24,47 @@ import org.simbrain.network.core.SynapseUpdateRule;
 /**
  * <b>ClampedSynapse</b>.
  */
-public class ClampedSynapseRule extends SynapseUpdateRule {
+public class StaticSynapseRule extends SynapseUpdateRule {
 
-	/** Clipped. */
-	public boolean clipped = false;
+    /** Clipped. */
+    public boolean clipped = false;
 
-	@Override
-	public void init(Synapse synapse) {
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public void init(Synapse synapse) {
+        // TODO Auto-generated method stub
+    }
 
-	@Override
-	public SynapseUpdateRule deepCopy() {
-		ClampedSynapseRule cs = new ClampedSynapseRule();
-		return cs;
-	}
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        StaticSynapseRule cs = new StaticSynapseRule();
+        return cs;
+    }
 
-	@Override
-	public void update(Synapse synapse) {
-		// if (clipped) {
-		// super.setStrength(Synapse(synapse.getStrength()));
-		// }
-	}
+    @Override
+    public void update(Synapse synapse) {
+        // if (clipped) {
+        // super.setStrength(Synapse(synapse.getStrength()));
+        // }
+    }
 
-	@Override
-	public String getDescription() {
-		return "No Plasticity";
-	}
+    @Override
+    public String getDescription() {
+        return "Static (none)";
+    }
 
-	/**
-	 * Return clipped.
-	 */
-	public boolean isClipped() {
-		return clipped;
-	}
+    /**
+     * Return clipped.
+     */
+    public boolean isClipped() {
+        return clipped;
+    }
 
-	/**
-	 * @param clipped
-	 *            value to set
-	 */
-	public void setClipped(boolean clipped) {
-		this.clipped = clipped;
-	}
+    /**
+     * @param clipped
+     *            value to set
+     */
+    public void setClipped(boolean clipped) {
+        this.clipped = clipped;
+    }
 
 }

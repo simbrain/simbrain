@@ -29,6 +29,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 
 /**
  * <b>ThreeValuedNeuronPanel</b> creates a dialog for setting preferences of
@@ -41,7 +42,7 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 
 	/** Upper threshold field. */
 	private JTextField tfUpperThreshold = new JTextField();
-	
+
 	/** Bias for this neuron. */
 	private JTextField tfBias = new JTextField();
 
@@ -155,13 +156,13 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 	 */
 	@Override
 	public void commitChanges(Neuron neuron) {
-		
+
 		if (!(neuron.getUpdateRule() instanceof ThreeValueRule)) {
 			neuron.setUpdateRule(prototypeRule.deepCopy());
-		} 
-		
+		}
+
 		writeValuesToRules(Collections.singletonList(neuron));
-		
+
 	}
 
 	/**
@@ -176,78 +177,78 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
 		}
-		
+
 		writeValuesToRules(neurons);
-		
+
 	}
 
-	/**
-	 * {@inheritDoc} 
-	 */
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
-		int numNeurons = neurons.size();
-		
-		// Lower Threshold
-		double lt = doubleParsable(tfLowerThreshold);
-		if (!Double.isNaN(lt)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setLowerThreshold(lt);
-			}
-		}
-		
-		// Upper Threshold
-		double ut = doubleParsable(tfUpperThreshold);
-		if (!Double.isNaN(ut)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setUpperThreshold(ut);
-			}
-		}
-		
-		// Bias
-		double bias = doubleParsable(tfBias);
-		if (!Double.isNaN(bias)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setBias(bias);
-			}
-		}
-		
-		// Lower Value
-		double lv = doubleParsable(tfLowerValue);
-		if (!Double.isNaN(lv)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setLowerValue(lv);
-			}
-		}
-		
-		// Middle Value
-		double mv = doubleParsable(tfMiddleValue);
-		if (!Double.isNaN(mv)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setMiddleValue(mv);
-			}
-		}
-		
-		// Upper Value
-		double uv = doubleParsable(tfUpperValue);
-		if (!Double.isNaN(uv)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((ThreeValueRule) neurons.get(i).getUpdateRule())
-				.setUpperValue(uv);
-			}
-		}
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected void writeValuesToRules(List<Neuron> neurons) {
+		int numNeurons = neurons.size();
+
+		// Lower Threshold
+		double lt = Utils.doubleParsable(tfLowerThreshold);
+		if (!Double.isNaN(lt)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setLowerThreshold(lt);
+			}
+		}
+
+		// Upper Threshold
+		double ut = Utils.doubleParsable(tfUpperThreshold);
+		if (!Double.isNaN(ut)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setUpperThreshold(ut);
+			}
+		}
+
+		// Bias
+		double bias = Utils.doubleParsable(tfBias);
+		if (!Double.isNaN(bias)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setBias(bias);
+			}
+		}
+
+		// Lower Value
+		double lv = Utils.doubleParsable(tfLowerValue);
+		if (!Double.isNaN(lv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setLowerValue(lv);
+			}
+		}
+
+		// Middle Value
+		double mv = Utils.doubleParsable(tfMiddleValue);
+		if (!Double.isNaN(mv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setMiddleValue(mv);
+			}
+		}
+
+		// Upper Value
+		double uv = Utils.doubleParsable(tfUpperValue);
+		if (!Double.isNaN(uv)) {
+			for (int i = 0; i < numNeurons; i++) {
+				((ThreeValueRule) neurons.get(i).getUpdateRule())
+						.setUpperValue(uv);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected NeuronUpdateRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

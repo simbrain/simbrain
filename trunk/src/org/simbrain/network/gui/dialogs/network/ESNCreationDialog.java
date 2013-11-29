@@ -124,10 +124,10 @@ public class ESNCreationDialog extends StandardDialog implements
 	{
 		boxMap.put("Linear", new LinearRule());
 		SigmoidalRule sig0 = new SigmoidalRule();
-		sig0.setSquashFunction(SquashingFunction.LOGISTIC);
+		sig0.setSquashFunctionType(SquashingFunction.LOGISTIC);
 		boxMap.put("Logistic", sig0);
 		SigmoidalRule sig1 = new SigmoidalRule();
-		sig1.setSquashFunction(SquashingFunction.TANH);
+		sig1.setSquashFunctionType(SquashingFunction.TANH);
 		boxMap.put("Tanh", sig1);
 	}
 

@@ -26,7 +26,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
@@ -100,7 +100,7 @@ public class Hopfield extends Subnetwork {
 			for (Neuron target : this.getNeuronGroup().getNeuronList()) {
 				if (source != target) {
 					Synapse newSynapse = new Synapse(source, target,
-							new ClampedSynapseRule());
+							new StaticSynapseRule());
 					newSynapse.setStrength(0);
 					getSynapseGroup().addSynapse(newSynapse);
 				}

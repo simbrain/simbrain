@@ -48,7 +48,7 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
 	 * {@inheritDoc}
 	 */
 	public void init(Neuron neuron) {
-		// No implementation
+		neuron.setGenerator(true);
 	}
 
 	/**

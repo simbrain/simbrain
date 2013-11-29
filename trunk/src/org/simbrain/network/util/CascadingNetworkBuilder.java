@@ -26,7 +26,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 
 /**
  * Creates a cascading network.
@@ -129,7 +129,7 @@ public final class CascadingNetworkBuilder {
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
                     Synapse synapse = new Synapse(baseNeuron, targetNeuron,
-                            new ClampedSynapseRule());
+                            new StaticSynapseRule());
                     network.addSynapse(synapse);
                 }
             }

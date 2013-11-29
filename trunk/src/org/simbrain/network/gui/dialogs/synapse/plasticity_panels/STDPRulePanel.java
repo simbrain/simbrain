@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,7 +26,9 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.STDPRule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>ShortTermPlasticitySynapsePanel</b> allows users to edit STDP synapses.
@@ -48,7 +51,7 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private STDPRule synapseRef;
+    private static final STDPRule prototypeRule = new STDPRule();
 
     /**
      * Creates a short term plasticity synapse panel.
@@ -62,48 +65,57 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
+    @Override
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-    	synapseRef = (STDPRule) ruleList.get(0);
+        STDPRule synapseRef = (STDPRule) ruleList.get(0);
 
-        //(Below) Handle consistency of multiply selections
-        
+        // (Below) Handle consistency of multiply selections
+
         // Handle Tau Minus
-        if (!NetworkUtils
-                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) 
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
+                "getTau_minus")) {
             tfTauMinus.setText(NULL_STRING);
-        else
-        	tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
-        
+        } else {
+            tfTauMinus
+                    .setText(Double.toString(synapseRef.getTau_minus()));
+        }
+
         // Handle Tau Plus
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-        		"getTau_plus"))
+                "getTau_plus")) {
             tfTauPlus.setText(NULL_STRING);
-        else
-        	tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
-        
+        } else {
+            tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
+        }
+
         // Handle W Minus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_minus"))
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
+                "getW_minus")) {
             tfWMinus.setText(NULL_STRING);
-        else
-        	tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
-        
+        } else {
+            tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
+        }
+
         // Handle W Plus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus"))
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
+                "getW_plus")) {
             tfWPlus.setText(NULL_STRING);
-        else
-        	tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
-        
+        } else {
+            tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
+        }
+
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getLearningRate")) 
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
-        else
-        	tfLearningRate.setText(Double.toString(synapseRef
-        			.getLearningRate()));
-        
+        } else {
+            tfLearningRate.setText(Double.toString(synapseRef
+                    .getLearningRate()));
+        }
+
     }
 
     /**
@@ -121,44 +133,87 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(final List<Synapse> commitSynapses) {
-		for(Synapse s : commitSynapses) {
-			commitChanges(s);
-		}    	
-	}
+    @Override
+    public void commitChanges(final Synapse synapse) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(final Synapse templateSynapse) {
-		
-		synapseRef = new STDPRule();
-		
-		// Tau minus
-		if (!tfTauMinus.getText().equals(NULL_STRING))
-            synapseRef
-                    .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
-        
-		// Tau plus
-        if (!tfTauPlus.getText().equals(NULL_STRING))
-            synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
-        
-        // W minus
-        if (!tfWMinus.getText().equals(NULL_STRING))
-            synapseRef.setW_minus(Double.parseDouble(tfWMinus.getText()));
-        
-        // W plus
-        if (!tfWPlus.getText().equals(NULL_STRING))
-            synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
-        
-        // Learning rate
-        if (!tfLearningRate.getText().equals(NULL_STRING))
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
-        
-		templateSynapse.setLearningRule(synapseRef);
-		
-	}
+        if (!(synapse.getLearningRule() instanceof STDPRule)) {
+            synapse.setLearningRule(prototypeRule.deepCopy());
+        }
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Synapse> synapses) {
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setLearningRule(prototypeRule.deepCopy());
+            }
+        }
+
+        writeValuesToRules(synapses);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Tau Minus
+        double tauMinus = Utils.doubleParsable(tfTauMinus);
+        if (!Double.isNaN(tauMinus)) {
+            for (Synapse s : synapses) {
+                ((STDPRule) s.getLearningRule()).setTau_minus(tauMinus);
+            }
+        }
+
+        // Tau Plus
+        double tauPlus = Utils.doubleParsable(tfTauPlus);
+        if (!Double.isNaN(tauPlus)) {
+            for (Synapse s : synapses) {
+                ((STDPRule) s.getLearningRule()).setTau_plus(tauPlus);
+            }
+        }
+
+        // W Minus
+        double wMinus = Utils.doubleParsable(tfWMinus);
+        if (!Double.isNaN(wMinus)) {
+            for (Synapse s : synapses) {
+                ((STDPRule) s.getLearningRule()).setW_minus(wMinus);
+            }
+        }
+
+        // W Plus
+        double wPlus = Utils.doubleParsable(tfWPlus);
+        if (!Double.isNaN(wPlus)) {
+            for (Synapse s : synapses) {
+                ((STDPRule) s.getLearningRule()).setW_plus(wPlus);
+            }
+        }
+
+        // Learning Rate
+        double learningRate = Utils.doubleParsable(tfLearningRate);
+        if (!Double.isNaN(learningRate)) {
+            for (Synapse s : synapses) {
+                ((STDPRule) s.getLearningRule())
+                        .setLearningRate(learningRate);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
 }

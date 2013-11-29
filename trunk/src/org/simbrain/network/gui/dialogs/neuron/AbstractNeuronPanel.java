@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -80,8 +79,6 @@ public abstract class AbstractNeuronPanel extends JPanel {
 
 	// Populate the Rule Map
 	static {
-		RULE_MAP.put(new AdditiveRule().getDescription(),
-				new AdditiveRulePanel());
 		RULE_MAP.put(new BinaryRule().getDescription(),
 				new BinaryRulePanel());
 		RULE_MAP.put(new DecayRule().getDescription(),
@@ -169,8 +166,18 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	 * <b> false </b>, indicating to the panel that it is editing rather than
 	 * changing/replacing existing neuron update rules.
 	 */
-	public abstract void commitChanges(final List<Neuron> neuron);
+	public abstract void commitChanges(final List<Neuron> neurons);
 
+	/**
+	 * Edits neuron update rules that already exist. This is the alternative to
+	 * replacing the rules and occurs when the neuron update rules being edited
+	 * are the same type as the panel. {@link #replacing} is the flag for
+	 * whether this method is used for committing or the rules are deleted and
+	 * replaced entirely, in which case this method is not called.
+	 * 
+	 * @param neurons
+	 *            the neurons whose rules are being <b>edited</b>, not replaced.
+	 */
 	protected abstract void
 			writeValuesToRules(final List<Neuron> neurons);
 
@@ -189,14 +196,34 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	}
 
 	/**
-	 * @return the neuron update rule being edited.
+	 * Each neuron panel contains a static final subclass of NeuronUpdateRule
+	 * variable called a prototype rule. The specific subclass of
+	 * NeuronUpdateRule corresponds to the rule specified by the panel name.
+	 * Used so that other classes can query specific properties of the rule the
+	 * panel edits. Also used internally to make deep copies.
+	 * 
+	 * @return an instance of the neuron rule which corresponds to the panel.
 	 */
-	public abstract NeuronUpdateRule getPrototypeRule();
+	protected abstract NeuronUpdateRule getPrototypeRule();
 
+	/**
+	 * Are we replacing rules or editing them? Replacing happens when
+	 * {@link #commitChanges(List)} is called on a neuron panel whose rule is
+	 * different from the rules of the neurons being edited.
+	 * 
+	 * @return replacing or editing
+	 */
 	protected boolean isReplace() {
 		return replacing;
 	}
 
+	/**
+	 * Tells this panel whether it is going to be editing neuron update rules,
+	 * or creating new ones and replacing the update rule of each of the neurons
+	 * being edited.
+	 * 
+	 * @param replace
+	 */
 	protected void setReplace(boolean replace) {
 		this.replacing = replace;
 	}
@@ -214,29 +241,6 @@ public abstract class AbstractNeuronPanel extends JPanel {
 	public static String[] getGeneratorlist() {
 		return GENERATOR_MAP.keySet()
 				.toArray(new String[RULE_MAP.size()]);
-	}
-
-	/**
-	 * TODO: This is a general utility, where is a better place to put it? Tests
-	 * whether the string in a text field is parsable into a double. If so, the
-	 * double value is returned, if not Double.NaN is returned as a flag that
-	 * the (double) parsing failed. This method compactly handles exceptions
-	 * thrown by Double.parseDouble(String), so that try/catch fields do not
-	 * have to be repeatedly written, and allows the program to continue in the
-	 * case that the string is not parsable.
-	 * 
-	 * @param tField
-	 *            The text field to read from and test if its text can be parsed
-	 *            into a double value
-	 * @return Either the double value of the String in the text field, if it
-	 *         can be parsed, or NaN, as a flag, if it cannot be.
-	 */
-	protected static double doubleParsable(JTextField tField) {
-		try {
-			return Double.parseDouble(tField.getText());
-		} catch (NullPointerException | NumberFormatException ex) {
-			return Double.NaN;
-		}
 	}
 
 }

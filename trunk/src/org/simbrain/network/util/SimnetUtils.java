@@ -73,7 +73,6 @@ public class SimnetUtils {
      * the root network (from where it can in some cases be routed to a
      * SynapseGroup)
      *
-     * @param network network in which missing weights should be added.
      * @param src the list of source neurons
      * @param tar the list of target neurons
      * @param w the new weight values for the network.
@@ -84,10 +83,10 @@ public class SimnetUtils {
             for (int j = 0; j < tar.size(); j++) {
                 Synapse s = Network.getSynapse(src.get(i), tar.get(j));
                 if (s != null) {
-                    s.setStrength(w[i][j]);
+                    s.forceSetStrength(w[i][j]);
                 } else {
                     Synapse newSynapse = new Synapse(src.get(i), tar.get(j));
-                    newSynapse.setStrength(w[i][j]);
+                    newSynapse.forceSetStrength(w[i][j]);
                     newSynapse.getParentNetwork().addSynapse(newSynapse);
                 }
             }
@@ -137,7 +136,7 @@ public class SimnetUtils {
             for (Neuron target : tar) {
                 Synapse weight = Network.getSynapse(source, target);
                 if (weight != null) {
-                    Network.getSynapse(source, target).setStrength(
+                    Network.getSynapse(source, target).forceSetStrength(
                             weight.getStrength() * scalar);
                 }
             }

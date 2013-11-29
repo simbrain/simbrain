@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.GridLayout;
@@ -10,129 +28,173 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.Utils;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * 
+ *
  * @author ztosi
- * 
+ *
  */
 public class ExtendedSynapseInfoPanel extends JPanel {
 
-	/** Null string. */
-	public static final String NULL_STRING = "...";
+    /** Null string. */
+    public static final String NULL_STRING = "...";
+    
+    /** Freeze synapse field. */
+    private TristateDropDown frozenDD = new TristateDropDown();
 
-	/** Increment field. */
-	private JTextField tfIncrement = new JTextField();
+    //    TODO: Implement...
+//    private TristateDropDown clippingDD = new TristateDropDown();
+    
+    /** Increment field. */
+    private JTextField tfIncrement = new JTextField();
 
-	/** Upper bound field. */
-	private JTextField tfUpBound = new JTextField();
+    /** Upper bound field. */
+    private JTextField tfUpBound = new JTextField();
 
-	/** Lower bound field. */
-	private JTextField tfLowBound = new JTextField();
+    /** Lower bound field. */
+    private JTextField tfLowBound = new JTextField();
 
-	/** Delay field. */
-	private JTextField tfDelay = new JTextField();
+    /** Delay field. */
+    private JTextField tfDelay = new JTextField();
 
-	/** The synapses being modified. */
-	private List<Synapse> synapseList;
+    /**
+     *
+     * @param synapseList
+     *                  The list of synapses being edited.
+     */
+    public ExtendedSynapseInfoPanel(final List<Synapse> synapseList) {
+        fillFieldValues(synapseList);
+        initializeLayout();
+    }
 
-	/**
-	 * 
-	 * @param synapseList
-	 */
-	public ExtendedSynapseInfoPanel(List<Synapse> synapseList) {
-		this.synapseList = synapseList;
-		fillFieldValues();
-		initializeLayout();
-	}
+    /**
+     * Lays out the panel
+     */
+    private void initializeLayout() {
+        GridLayout gl = new GridLayout(0, 2);
+        gl.setVgap(5);
+        setLayout(gl);
+        add(new JLabel("Frozen: "));
+        add(frozenDD);
+//        add(new JLabel("Clipping: "));
+//        add(clippingDD);
+        add(new JLabel("Upper Bound:"));
+        add(tfUpBound);
+        add(new JLabel("Lower Bound"));
+        add(tfLowBound);
+        add(new JLabel("Increment:"));
+        add(tfIncrement);
+        add(new JLabel("Delay:"));
+        add(tfDelay);
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    }
 
-	/**
-	 * Lays out the panel
-	 */
-	private void initializeLayout() {
-		GridLayout gl = new GridLayout(0, 2);
-		gl.setVgap(5);
-		setLayout(gl);
-		add(new JLabel("Upper Bound:"));
-		add(tfUpBound);
-		add(new JLabel("Lower Bound"));
-		add(tfLowBound);
-		add(new JLabel("Increment:"));
-		add(tfIncrement);
-		add(new JLabel("Delay:"));
-		add(tfDelay);
-		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-	}
+    /**
+     * Fills the values of the text fields based on the corresponding values of
+     * the synapses to be edited.
+     */
+    public void fillFieldValues(List<Synapse> synapseList) {
 
-	/**
-	 * Fills the values of the text fields based on the corresponding values of
-	 * the synapses to be edited.
-	 */
-	public void fillFieldValues() {
+        Synapse synapseRef = synapseList.get(0);
 
-		Synapse synapseRef = synapseList.get(0);
+        // Handle Upper Bound
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getUpperBound")) {
+            tfUpBound.setText(NULL_STRING);
+        } else {
+            tfUpBound
+                    .setText(Double.toString(synapseRef.getUpperBound()));
+        }
 
-		// Handle Upper Bound
-		if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-				"getUpperBound"))
-			tfUpBound.setText(NULL_STRING);
-		else
-			tfUpBound
-					.setText(Double.toString(synapseRef.getUpperBound()));
+        // Handle Lower Bound
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getLowerBound")) {
+            tfLowBound.setText(NULL_STRING);
+        } else {
+            tfLowBound
+                    .setText(Double.toString(synapseRef.getLowerBound()));
+        }
 
-		// Handle Lower Bound
-		if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-				"getLowerBound"))
-			tfLowBound.setText(NULL_STRING);
-		else
-			tfLowBound
-					.setText(Double.toString(synapseRef.getLowerBound()));
+        // Handle Increment
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getIncrement")) {
+            tfIncrement.setText(NULL_STRING);
+        } else {
+            tfIncrement
+                    .setText(Double.toString(synapseRef.getIncrement()));
+        }
 
-		// Handle Increment
-		if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-				"getIncrement"))
-			tfIncrement.setText(NULL_STRING);
-		else
-			tfIncrement
-					.setText(Double.toString(synapseRef.getIncrement()));
+        // Handle Delay
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "getDelay")) {
+            tfDelay.setText(NULL_STRING);
+        } else {
+            tfDelay.setText(Integer.toString(synapseRef.getDelay()));
+        }
+        
+        // Handle Frozen
+        if(!NetworkUtils.isConsistent(synapseList, Synapse.class,
+        		"isFrozen")) {
+        	frozenDD.setNull();
+        } else {
+        	frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
+        }
 
-		// Handle Delay
-		if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-				"getDelay"))
-			tfDelay.setText(NULL_STRING);
-		else
-			tfDelay.setText(Integer.toString(synapseRef.getDelay()));
+    }
 
-	}
+    /**
+     * Uses the values from text fields to alter corresponding values in the
+     * synapse(s) being edited. Called externally to apply changes.
+     */
+    public void commitChanges(List<Synapse> synapses) {
+    	
+    	
+    	// Upper Bound
+    	double uB = Utils.doubleParsable(tfUpBound);
+    	if(!Double.isNaN(uB)) {
+    		for(Synapse s : synapses) {
+    			s.setUpperBound(uB);
+    		}
+    	}
+    	
+    	// Lower Bound
+    	double lB = Utils.doubleParsable(tfLowBound);
+    	if(!Double.isInfinite(lB)) {
+    		for(Synapse s : synapses) {
+    			s.setLowerBound(lB);
+    		}
+    	}
+    
+    	// Increment
+    	double increment = Utils.doubleParsable(tfIncrement);
+    	if(!Double.isNaN(increment)) {
+    		for(Synapse s : synapses) {
+    			s.setIncrement(increment);
+    		}
+    	}
+    	
+    	// Delay
+    	double delay = Utils.doubleParsable(tfDelay);
+    	if (!Double.isNaN(delay)) {
+    		int dly = (int) delay;
+    		for (Synapse s : synapses) {
+    			s.setDelay(dly);
+    		}
+    	}
+    	
 
-	/**
-	 * Uses the values from text fields to alter corresponding values in the
-	 * synapse(s) being edited. Called externally to apply changes.
-	 */
-	public void commitChanges() {
-		for (int i = 0; i < synapseList.size(); i++) {
-
-			Synapse synapseRef = synapseList.get(i);
-
-			// Upper Bound
-			if (!tfUpBound.getText().equals(NULL_STRING))
-				synapseRef.setUpperBound(Double.parseDouble(tfUpBound
-						.getText()));
-
-			// Lower Bound
-			if (!tfLowBound.getText().equals(NULL_STRING))
-				synapseRef.setLowerBound(Double.parseDouble(tfLowBound
-						.getText()));
-
-			// Increment
-			if (!tfIncrement.getText().equals(NULL_STRING))
-				synapseRef.setIncrement(Double.parseDouble(tfIncrement
-						.getText()));
-
-			// Delay
-			if (!tfDelay.getText().equals(NULL_STRING))
-				synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
-		}
-	}
+    	// Frozen ?
+    	boolean frozen = frozenDD.getSelectedIndex()
+    			== TristateDropDown.getTRUE();
+    	if (frozenDD.getSelectedIndex()
+    			!= TristateDropDown.getNULL()) {
+    		for (Synapse s : synapses) {
+    			s.setFrozen(frozen);
+    		}
+    	}
+        
+    }
 
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,7 +26,9 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.OjaRule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>OjaSynapsePanel</b>.
@@ -39,7 +42,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
     private final JTextField tfNormalize = new JTextField();
 
     /** Synapse reference. */
-    private OjaRule synapseRef;
+    private static final OjaRule prototypeRule = new OjaRule();
 
     /**
      * This method is the default constructor.
@@ -53,27 +56,29 @@ public class OjaRulePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
-    	
-    	synapseRef = (OjaRule) ruleList.get(0);
 
-        //(Below) Handle consistency of multiply selections
-        
+        OjaRule synapseRef = (OjaRule) ruleList.get(0);
+
+        // (Below) Handle consistency of multiply selections
+
         // Handle Normalization Factor
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getNormalizationFactor")) 
+                "getNormalizationFactor")) {
             tfNormalize.setText(NULL_STRING);
-        else
-        	tfNormalize
-            .setText(Double.toString(synapseRef.getNormalizationFactor()));
-        
+        } else {
+            tfNormalize.setText(Double.toString(synapseRef
+                    .getNormalizationFactor()));
+        }
+
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getLearningRate")) 
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
-        else
-        	tfLearningRate.setText(
-        			Double.toString(synapseRef.getLearningRate()));
-        
+        } else {
+            tfLearningRate.setText(Double.toString(synapseRef
+                    .getLearningRate()));
+        }
+
     }
 
     /**
@@ -83,37 +88,72 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         // OjaSynapse synapseRef = new OjaSynapse();
         tfNormalize.setText(Double
                 .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
-        tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
+        tfLearningRate.setText(Double
+                .toString(OjaRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(final List<Synapse> commitSynapses) {
-		for(Synapse s : commitSynapses) {
-			commitChanges(s);
-		}              
-	}
+    @Override
+    public void commitChanges(final Synapse synapse) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(final Synapse templateSynapse) {
-		 OjaRule synapseRef = new OjaRule();
+        if (!(synapse.getLearningRule() instanceof OjaRule)) {
+            synapse.setLearningRule(prototypeRule.deepCopy());
+        }
 
-         if (!tfNormalize.getText().equals(NULL_STRING)) {
-             synapseRef.setNormalizationFactor(Double
-                     .parseDouble(tfNormalize.getText()));
-         }
+        writeValuesToRules(Collections.singletonList(synapse));
 
-         if (!tfLearningRate.getText().equals(NULL_STRING)) {
-             synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                     .getText()));
-         }		
- 		
-			templateSynapse.setLearningRule(synapseRef);	
-		
-	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setLearningRule(prototypeRule.deepCopy());
+            }
+        }
+
+        writeValuesToRules(synapses);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(final List<Synapse> synapses) {
+
+        // Normalize
+        double normalize = Utils.doubleParsable(tfNormalize);
+        if (!Double.isNaN(normalize)) {
+            for (Synapse s : synapses) {
+                ((OjaRule) s.getLearningRule())
+                        .setNormalizationFactor(normalize);
+            }
+        }
+
+        // Learning Rate
+        double learningRate = Utils.doubleParsable(tfLearningRate);
+        if (!Double.isNaN(learningRate)) {
+            for (Synapse s : synapses) {
+                ((OjaRule) s.getLearningRule())
+                        .setLearningRate(learningRate);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
 }

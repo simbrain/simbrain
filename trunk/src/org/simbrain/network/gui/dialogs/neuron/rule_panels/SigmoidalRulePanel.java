@@ -33,6 +33,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -104,7 +105,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 
 		// Handle Implementation/Type
 		if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-				"getSquashFunction")) {
+				"getSquashFunctionType")) {
 			if ((cbImplementation.getItemCount() == SquashingFunction
 					.values().length - 1)) {
 				cbImplementation.addItem(SquashingFunction.NULL_STRING);
@@ -113,7 +114,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 					.setSelectedIndex(SquashingFunction.values().length - 1);
 		} else
 			cbImplementation.setSelectedItem(neuronRef
-					.getSquashFunction());
+					.getSquashFunctionType());
 
 		// Handle Bias
 		if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
@@ -173,7 +174,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 	 */
 	public void fillDefaultValues() {
 		cbImplementation.setSelectedItem(prototypeRule
-				.getSquashFunction());
+				.getSquashFunctionType());
 		tfBias.setText(Double.toString(prototypeRule.getBias()));
 		tfSlope.setText(Double.toString(prototypeRule.getSlope()));
 		tfUpbound.setText(Double.toString(prototypeRule.getCeiling()));
@@ -225,13 +226,13 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 				SquashingFunction.NULL_STRING)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
-						.setSquashFunction((SquashingFunction) cbImplementation
+						.setSquashFunctionType((SquashingFunction) cbImplementation
 								.getSelectedItem());
 			}
 		}
 
 		// Bias
-		double bias = doubleParsable(tfBias);
+		double bias = Utils.doubleParsable(tfBias);
 		if (!Double.isNaN(bias)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
@@ -240,7 +241,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Slope
-		double slope = doubleParsable(tfSlope);
+		double slope = Utils.doubleParsable(tfSlope);
 		if (!Double.isNaN(slope)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
@@ -249,7 +250,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Lower Value
-		double lv = doubleParsable(tfLowbound);
+		double lv = Utils.doubleParsable(tfLowbound);
 		if (!Double.isNaN(lv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
@@ -258,7 +259,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 		}
 
 		// Upper Value
-		double uv = doubleParsable(tfUpbound);
+		double uv = Utils.doubleParsable(tfUpbound);
 		if (!Double.isNaN(uv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((SigmoidalRule) neurons.get(i).getUpdateRule())
@@ -288,7 +289,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NeuronUpdateRule getPrototypeRule() {
+	protected NeuronUpdateRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
 

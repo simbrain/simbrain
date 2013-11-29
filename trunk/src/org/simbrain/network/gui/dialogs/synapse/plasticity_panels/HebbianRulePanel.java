@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -25,7 +26,9 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
+import org.simbrain.util.Utils;
 
 /**
  * <b>HebbianSynapsePanel</b>.
@@ -36,7 +39,7 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
     private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private HebbianRule synapseRef;
+    private static final HebbianRule prototypeRule = new HebbianRule();
 
     /**
      * This method is the default constructor.
@@ -50,18 +53,19 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-    	synapseRef = (HebbianRule) ruleList.get(0);
-    	
-        //(Below) Handle consistency of multiply selections
-        
+        HebbianRule synapseRef = (HebbianRule) ruleList.get(0);
+
+        // (Below) Handle consistency of multiply selections
+
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianRule.class,
-                "getLearningRate")) 
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
-        else
-        	tfLearningRate.setText(Double.toString(synapseRef.
-        			getLearningRate()));
-        
+        } else {
+            tfLearningRate.setText(Double.toString(synapseRef
+                    .getLearningRate()));
+        }
+
     }
 
     /**
@@ -71,31 +75,59 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
         tfLearningRate.setText(Double
                 .toString(HebbianRule.DEFAULT_LEARNING_RATE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void commitChanges(final List<Synapse> commitSynapses) {	
-		for(Synapse s : commitSynapses) {
-			commitChanges(s);
-		}              
-	}
+    @Override
+    public void commitChanges(final Synapse synapse) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(final Synapse templateSynapse) {
-		synapseRef = new HebbianRule();		
-		
-        if (!tfLearningRate.getText().equals(NULL_STRING)) {
-            synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
-                    .getText()));
+        if (!(synapse.getLearningRule() instanceof HebbianRule)) {
+            synapse.setLearningRule(prototypeRule.deepCopy());
         }
-		
-        templateSynapse.setLearningRule(synapseRef); 
-        
-	}
-	
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setLearningRule(prototypeRule.deepCopy());
+            }
+        }
+        writeValuesToRules(synapses);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(final List<Synapse> synapses) {
+
+        // Learning Rate
+        double learningRate = Utils.doubleParsable(tfLearningRate);
+        if (!Double.isNaN(learningRate)) {
+            for (Synapse s : synapses) {
+                ((HebbianRule) s.getLearningRule())
+                        .setLearningRate(learningRate);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
 }

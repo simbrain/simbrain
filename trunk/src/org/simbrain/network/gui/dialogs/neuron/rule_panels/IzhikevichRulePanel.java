@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -167,7 +168,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 		if (!(neuron.getUpdateRule() instanceof IzhikevichRule)) {
 			neuron.setUpdateRule(prototypeRule.deepCopy());
 		}
-		
+
 		writeValuesToRules(Collections.singletonList(neuron));
 
 	}
@@ -183,8 +184,8 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 			for (Neuron n : neurons) {
 				n.setUpdateRule(neuronRef.deepCopy());
 			}
-		} 
-		
+		}
+
 		writeValuesToRules(neurons);
 
 	}
@@ -195,49 +196,49 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 	@Override
 	protected void writeValuesToRules(List<Neuron> neurons) {
 		int numNeurons = neurons.size();
-		
+
 		// A
-		double a = doubleParsable(tfA);
+		double a = Utils.doubleParsable(tfA);
 		if (!Double.isNaN(a)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IzhikevichRule) neurons.get(i).getUpdateRule()).setA(a);
 			}
 		}
-		
+
 		// B
-		double b = doubleParsable(tfB);
+		double b = Utils.doubleParsable(tfB);
 		if (!Double.isNaN(b)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IzhikevichRule) neurons.get(i).getUpdateRule()).setB(b);
 			}
 		}
-		
+
 		// C
-		double c = doubleParsable(tfC);
+		double c = Utils.doubleParsable(tfC);
 		if (!Double.isNaN(c)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IzhikevichRule) neurons.get(i).getUpdateRule()).setC(c);
 			}
 		}
-		
+
 		// D
-		double d = doubleParsable(tfD);
+		double d = Utils.doubleParsable(tfD);
 		if (!Double.isNaN(d)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((IzhikevichRule) neurons.get(i).getUpdateRule()).setD(d);
 			}
 		}
-		
+
 		// Add Noise?
-		if(!tsNoise.isNull()) {
-			boolean addNoise = tsNoise.getSelectedIndex()
-					== TristateDropDown.getTRUE();
+		if (!tsNoise.isNull()) {
+			boolean addNoise =
+					tsNoise.getSelectedIndex() == TristateDropDown
+							.getTRUE();
 			for (int i = 0; i < numNeurons; i++) {
 				((IzhikevichRule) neurons.get(i).getUpdateRule())
-				.setAddNoise(addNoise);
+						.setAddNoise(addNoise);
 
-
-			}  		
+			}
 			if (addNoise) {
 				for (int i = 0; i < numNeurons; i++) {
 					randTab.commitRandom(((IzhikevichRule) neurons.get(i)
@@ -250,8 +251,8 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IzhikevichRule getPrototypeRule() {
+	protected IzhikevichRule getPrototypeRule() {
 		return prototypeRule.deepCopy();
 	}
-	
+
 }

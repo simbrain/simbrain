@@ -18,17 +18,27 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import java.util.Collections;
+
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
+import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
+import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
 import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -65,6 +75,15 @@ public class SynapseGroupDialog extends StandardDialog {
     /** Main properties panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
+    /** Panel to edit synapse basic info. */
+    private BasicSynapseInfoPanel editBasicSynapseInfo;
+
+    /** Panel to edit synapse update rule. */
+    private SynapseUpdateSettingsPanel editSynapseType;
+
+    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    private boolean isCreationPanel = false;
+
     /**
      * Construct the Synapse group dialog.
      *
@@ -89,18 +108,39 @@ public class SynapseGroupDialog extends StandardDialog {
             mainPanel.addItem("Learning Rate:", tfRateLabel);
         }
 
-        // Adjust weights
-        tabbedPane.addTab("Adjust weights", tabAdjust);
-        tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
-                .getSynapseList()));
+        // Synapse edit tab
+        Box editSynapses =  Box.createVerticalBox();
+        if (isCreationPanel) {
+            // TODO: Not yet tested.  Creation dialog is not accessible yet.
+            Synapse baseSynapse = new Synapse(null);
+            editBasicSynapseInfo = new BasicSynapseInfoPanel(
+                    Collections.singletonList(baseSynapse), this);
+            editSynapseType = new SynapseUpdateSettingsPanel(
+                    Collections.singletonList(baseSynapse), this);
+        } else {
+            editBasicSynapseInfo = new BasicSynapseInfoPanel(
+                    synapseGroup.getSynapseList(), this);
+            editSynapseType = new SynapseUpdateSettingsPanel(
+                    synapseGroup.getSynapseList(), this);
+        }
+        editSynapses.add(editBasicSynapseInfo);
+        editSynapses.add(editSynapseType);
+        tabbedPane.addTab("Edit Synapses", editSynapses);
+
+        // Adjust weights tab.  TODO: Add back once SynapseAdjustmentPanel worked out
+        //tabbedPane.addTab("Adjust weights", tabAdjust);
+        //tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
+        //        .getSynapseList()));
 
         // Weight Matrix
         tabbedPane.addTab("Matrix", tabMatrix);
         tabMatrix.add(new WeightMatrixViewer(synapseGroup.getSourceNeurons(),
                 synapseGroup.getTargetNeurons(), networkPanel));
 
-        // TODO: Help button
-
+        // Set up help button
+        Action helpAction;
+        helpAction = new ShowHelpAction("Pages/Network/groups.html");
+        addButton(new JButton(helpAction));
     }
 
 
@@ -121,6 +161,12 @@ public class SynapseGroupDialog extends StandardDialog {
      */
     public void commitChanges() {
         synapseGroup.setLabel(tfSynapseLabel.getText());
+        if (isCreationPanel) {
+            // TODO
+        } else {
+            //editBasicSynapseInfo.commitChanges()
+            //editSynapseType.commitChanges()
+        }
         if (synapseGroup instanceof SynapseGroupWithLearningRate) {
             ((SynapseGroupWithLearningRate) synapseGroup)
                     .setLearningRate(Double.parseDouble(tfRateLabel.getText()));
@@ -133,6 +179,5 @@ public class SynapseGroupDialog extends StandardDialog {
         super.closeDialogOk();
         commitChanges();
     }
-    
 
 }

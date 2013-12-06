@@ -27,11 +27,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
@@ -77,6 +79,13 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
 
         setContextMenu(menu);
+    }
+
+    @Override
+    protected StandardDialog getPropertyDialog() {
+
+        return new BackpropEditorDialog(this.getNetworkPanel(),
+                (BackpropNetwork) getGroup());
     }
 
     /**

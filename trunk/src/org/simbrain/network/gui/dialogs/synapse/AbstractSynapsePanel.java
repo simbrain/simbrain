@@ -28,21 +28,23 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ClampedSynapseRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianCPCARulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.OjaRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.STDPRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ShortTermPlasticityRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.SubtractiveNormalizationRulePanel;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.network.synapse_update_rules.OjaRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -64,6 +66,8 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     // Populate synapse rule map
     static {
+        RULE_MAP.put(new ClampedSynapseRule().getDescription(),
+                new ClampedSynapseRulePanel()); // TODO: Backwards compatibility.  Remove for 3.0 after converting all sims.
         RULE_MAP.put(new StaticSynapseRule().getDescription(),
                 new StaticSynapsePanel());
         RULE_MAP.put(new HebbianRule().getDescription(),

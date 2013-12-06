@@ -314,6 +314,42 @@ public class SynapseGroup extends Group {
         }
     }
 
+    /**
+     * Disable all synapses.
+     */
+    public void disableSynapses() {
+        for (Synapse s : getSynapseList()) {
+            s.setEnabled(false);
+        }
+    }
+
+    /**
+     * Disable all synapses.
+     */
+    public void enableSynapses() {
+        for (Synapse s : getSynapseList()) {
+            s.setEnabled(true);
+        }
+    }
+
+    /**
+     * Freeze all synapses so that learning cannot take place.
+     */
+    public void freezeSynapses() {
+        for (Synapse s : getSynapseList()) {
+            s.setFrozen(true);
+        }
+    }
+
+    /**
+     * Un-freeze all synapses so that learning can take place.
+     */
+    public void unFreezeSynapses() {
+        for (Synapse s : getSynapseList()) {
+            s.setFrozen(false);
+        }
+    }
+
     @Override
     public String getUpdateMethodDesecription() {
         return "Update synapses";

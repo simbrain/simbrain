@@ -18,25 +18,22 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.geom.Point2D;
+import javax.swing.JOptionPane;
 
-import javax.swing.JTextField;
-
-import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>FeedForwardCreationDialog</b> is a dialog box for creating a generic layered network.
+ * <b>FeedForwardCreationDialog</b> is a dialog box for creating a generic
+ * layered network.
  */
 public class FeedForwardCreationDialog extends StandardDialog {
 
-    /** Network Topology. */
-    private JTextField networkTopology = new JTextField();
-
     /** Network panel. */
-    private NetworkPanel networkPanel;
+    protected NetworkPanel networkPanel;
+
+    /** Main network creation panel. */
+    protected LayeredNetworkCreationPanel networkCreationPanel;
 
     /**
      * This method is the default constructor.
@@ -52,43 +49,23 @@ public class FeedForwardCreationDialog extends StandardDialog {
      * This method initializes the components on the panel.
      */
     private void init() {
-        // Initialize Dialog
         setTitle("New Feed-forward Network");
-
-        fillFieldValues();
-
-        LabelledItemPanel panel = new LabelledItemPanel();
-        panel.addItem("Topology", networkTopology);
-        setContentPane(panel);
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        networkTopology.setText("5,3,5");
+        networkCreationPanel = new LayeredNetworkCreationPanel(3, this);
+        setContentPane(networkCreationPanel);
     }
 
     /**
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        int[] topology;
-        String[] parsedString = networkTopology.getText().split(",");
-        topology = new int[parsedString.length];
-        for (int i = 0; i < parsedString.length; i++) {
-            topology[i] = Integer.parseInt(parsedString[i]);
+        try {
+            networkCreationPanel.commit(networkPanel, "FeedForward");
+            super.closeDialogOk();
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null,
+                    "Inappropriate Field Values (Numbers only in all all field)", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            nfe.printStackTrace();
         }
-
-        // Get last clicked position in the panel
-        Point2D lastClicked = networkPanel.getLastClickedPosition();
-
-        // Create the layered network
-        networkPanel.getNetwork().addGroup(
-                new FeedForward(networkPanel.getNetwork(), topology,
-                        lastClicked));
-
-        networkPanel.repaint();
-        super.closeDialogOk();
     }
 }

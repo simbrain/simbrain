@@ -162,6 +162,7 @@ public class DataPanel extends JPanel {
             parentFrame.setPreferredSize(new Dimension(parentFrame
                     .getPreferredSize().width, newHeight));
             parentFrame.pack();
+            parentFrame.setLocationRelativeTo(null);
         }
     }
 

@@ -18,79 +18,37 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.geom.Point2D;
-
-import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 
 /**
- * <b>BackpropDialog</b> is a dialog box for creating a Backprop network
+ * <b>BackpropDialog</b> is a dialog box for creating a Backprop network.
  */
-public class BackpropCreationDialog extends StandardDialog {
-
-    /** Network Topology. */
-    private JTextField networkTopology = new JTextField();
-
-    /** Network panel. */
-    private NetworkPanel networkPanel;
+public class BackpropCreationDialog extends FeedForwardCreationDialog {
 
     /**
-     * This method is the default constructor.
+     * Construct the dialog.  Called using reflection by AddGroupAction.
      *
      * @param np Network panel
      */
     public BackpropCreationDialog(final NetworkPanel np) {
-        networkPanel = np;
-        init();
-        networkTopology.requestFocus();
-    }
-
-    /**
-     * This method initialises the components on the panel.
-     */
-    private void init() {
-        // Initialize Dialog
+        super(np);
         setTitle("New Backprop Network");
-
-        fillFieldValues();
-
-        LabelledItemPanel panel = new LabelledItemPanel();
-        panel.addItem("Topology", networkTopology);
-        setContentPane(panel);
     }
 
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        networkTopology.setText("5,7,5");
-    }
-
-    /**
-     * Called when dialog closes.
-     */
+    @Override
     protected void closeDialogOk() {
-        int[] topology;
-        String[] parsedString = networkTopology.getText().split(",");
-        topology = new int[parsedString.length];
-        for (int i = 0; i < parsedString.length; i++) {
-            topology[i] = Integer.parseInt(parsedString[i]);
+        try {
+            networkCreationPanel.commit(networkPanel, "Backprop");
+            dispose();
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null,
+                    "Inappropriate Field Values (Numbers only in all all field)", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            nfe.printStackTrace();
         }
-
-        // Get last clicked position in the panel
-        Point2D lastClicked = networkPanel.getLastClickedPosition();
-
-        // Create the layered network
-        BackpropNetwork network = new BackpropNetwork(networkPanel.getNetwork(), topology,
-                lastClicked);
-        networkPanel.getNetwork().addGroup(network);
-
-        
-        networkPanel.repaint();
-        super.closeDialogOk();
     }
+
+
 }

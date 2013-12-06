@@ -634,6 +634,17 @@ public class Synapse {
     }
 
     /**
+     * A better name than setSendWeightedInput. Forwarding to
+     * setSendWeightedInput for now. Possibly change name for 3.0. have not done
+     * so yet so as note to break a bunch of simulations.
+     *
+     * @param enabled true if enabled, false otherwise.
+     */
+    public void setEnabled(final boolean enabled) {
+        setSendWeightedInput(enabled);
+    }
+
+    /**
      * @param sendWeightedInput
      *            to set.
      */

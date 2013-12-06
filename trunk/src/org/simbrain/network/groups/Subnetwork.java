@@ -352,6 +352,30 @@ public class Subnetwork extends Group {
     }
 
     /**
+     * Get long description for info box, formmated in html.   Override
+     * for more detailed description.
+     *
+     * @return the long description.
+     */
+    public String getLongDescription() {
+        String ret = new String();
+        ret += ("<html>Subnetwork [" + getLabel() + "]<br>"
+                + "Subnetwork with " + neuronGroupList.size() + " neuron group(s) and ");
+        ret += (synapseGroupList.size() + " synapse group(s)");
+        if ((getNeuronGroupCount() + getSynapseGroupCount()) > 0) {
+            ret += "<br>";
+        }
+        for (NeuronGroup neuronGroup : neuronGroupList) {
+            ret += "Neuron Group:  " + neuronGroup.getLabel() + "<br>";
+        }
+        for (SynapseGroup synapseGroup : synapseGroupList) {
+            ret += "Synapse Group:   " + synapseGroup.getLabel() + "<br>";
+        }
+        ret += "</html>";
+        return ret;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public boolean getEnabled() {

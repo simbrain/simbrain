@@ -101,5 +101,6 @@ public class BackpropEditorDialog extends StandardDialog {
      */
     protected void closeDialogOk() {
         // no implementation yet
+        super.closeDialogOk();
     }
 }

@@ -1,5 +1,7 @@
 package org.simbrain.util.genericframe;
 
+import java.awt.Component;
+
 import javax.swing.JInternalFrame;
 
 /**
@@ -7,4 +9,8 @@ import javax.swing.JInternalFrame;
  */
 public class GenericJInternalFrame extends JInternalFrame implements
         GenericFrame {
+
+    @Override
+    public void setLocationRelativeTo(Component c) {
+    }
 }

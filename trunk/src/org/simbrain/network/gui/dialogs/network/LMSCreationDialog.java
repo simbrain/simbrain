@@ -15,23 +15,27 @@ package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.geom.Point2D;
 
+import javax.swing.Box;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.network.LayeredNetworkCreationPanel.LayerCreationPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>LMSDialog</b> is a dialog box for creating an LMS network
+ * <b>LMSDialog</b> is a dialog box for creating an LMS network.
  */
 public class LMSCreationDialog extends StandardDialog {
 
-    private JTextField numInputs = new JTextField();
-    private JTextField numOutputs = new JTextField();
-
     /** Network panel. */
     private NetworkPanel networkPanel;
+
+    /** Input layer creation panel. */
+    private LayerCreationPanel inputLayer;
+
+    /** Target layer creation panel. */
+    private LayerCreationPanel outputLayer;
 
     /**
      * This method is the default constructor.
@@ -44,26 +48,20 @@ public class LMSCreationDialog extends StandardDialog {
     }
 
     /**
-     * This method initialises the components on the panel.
+     * This method initializes the components on the panel.
      */
     private void init() {
-        // Initialize Dialog
         setTitle("New LMS Network");
 
-        fillFieldValues();
-
-        LabelledItemPanel panel = new LabelledItemPanel();
-        panel.addItem("Number of inputs: ", numInputs);
-        panel.addItem("Number of outputs: ", numOutputs);
+        Box panel  = Box.createVerticalBox();
+        inputLayer = new LayerCreationPanel("Input layer", 5);
+        inputLayer.setComboBox("Linear");
+        outputLayer = new LayerCreationPanel("Output layer", 5);
+        outputLayer.setComboBox("Logistic");
+        panel.add(outputLayer);
+        panel.add(inputLayer);
         setContentPane(panel);
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    private void fillFieldValues() {
-        numInputs.setText("5");
-        numOutputs.setText("5");
+        pack();
     }
 
     /**
@@ -75,10 +73,12 @@ public class LMSCreationDialog extends StandardDialog {
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
         // Create the layered network
-        networkPanel.getNetwork().addGroup(
-                new LMSNetwork(networkPanel.getNetwork(), Integer
-                        .parseInt(numInputs.getText()), Integer
-                        .parseInt(numOutputs.getText()), lastClicked));
+        LMSNetwork lms =   new LMSNetwork(networkPanel.getNetwork(), inputLayer
+                .getNumNeurons(), outputLayer.getNumNeurons(),
+                lastClicked);
+        lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
+        lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
+        networkPanel.getNetwork().addGroup(lms);
 
         networkPanel.repaint();
         super.closeDialogOk();

@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.genericframe;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -54,6 +55,8 @@ public interface GenericFrame {
 
     public void setBounds(Rectangle bounds);
 
+    public void setLocationRelativeTo(Component c);
+    
     public void setLocation(int xposition, int yposition);
 
     public void setContentPane(Container container);

@@ -18,9 +18,15 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
+import javax.swing.JDialog;
+
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
+import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
+import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.util.StandardDialog;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -40,6 +46,7 @@ public class SubnetworkNode extends GroupNode {
      */
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
         super(networkPanel, group);
+        setInteractionBox(new SubnetworkNodeInteractionBox(networkPanel));
     }
 
     @Override
@@ -66,6 +73,52 @@ public class SubnetworkNode extends GroupNode {
         } else {
             super.updateBounds();
         }
+    }
+
+    /**
+     * Custom interaction box for Subnetwork node. Ensures a property dialog
+     * appears when the box is double-clicked.
+     */
+    private class SubnetworkNodeInteractionBox extends InteractionBox {
+
+        public SubnetworkNodeInteractionBox(NetworkPanel net) {
+            super(net, SubnetworkNode.this);
+        }
+
+        @Override
+        protected JDialog getPropertyDialog() {
+            return SubnetworkNode.this.getPropertyDialog();
+        }
+
+        @Override
+        protected boolean hasPropertyDialog() {
+            return true;
+        }
+
+    };
+
+    /**
+     * Helper class to create the subnetwork dialog.
+     *
+     * @return the neuron group property dialog.
+     */
+    protected StandardDialog getPropertyDialog() {
+
+        StandardDialog dialog = new StandardDialog() {
+            private final SubnetworkPanel panel;
+            {
+                panel = new SubnetworkPanel(getNetworkPanel(),
+                        (Subnetwork) SubnetworkNode.this.getGroup(), this);
+                setContentPane(panel);
+            }
+
+            @Override
+            protected void closeDialogOk() {
+                super.closeDialogOk();
+                //panel.commitChanges();
+            }
+        };
+        return dialog;
     }
 
 }

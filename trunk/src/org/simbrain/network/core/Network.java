@@ -76,7 +76,7 @@ public class Network {
 	private NetworkUpdateManager updateManager;
 
 	/** The initial time-step for the network. */
-	private static final double DEFAULT_TIME_STEP = .01;
+	private static final double DEFAULT_TIME_STEP = .1;
 
 	/** Constant value for Math.log(10); used to approximate log 10. */
 	private static final double LOG_10 = Math.log(10);

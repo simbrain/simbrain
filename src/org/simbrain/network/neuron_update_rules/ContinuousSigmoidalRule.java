@@ -18,32 +18,38 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.
+    DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>SigmoidalNeuron</b> provides various implementations of a standard
- * sigmoidal neuron.
+ * <b>Continuous Sigmoidal Neuron</b> provides various squashing function
+ * implementations of a sigmoidal neuron numerically integrated continuously
+ * over time.
  *
  * @author Zach Tosi
  * @author Jeff Yoshimi
+ *
  */
-public class SigmoidalRule extends NeuronUpdateRule implements
+public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
     BoundedUpdateRule {
 
+    /** Default time constant (ms). */
+    public static final double DEFAULT_TIME_CONSTANT = 10.0;
+
     /** The Default upper bound. */
-    private static final double DEFAULT_CEILING = 1.0;
+    public static final double DEFAULT_CEILING = 1.0;
 
     /** The Default lower bound. */
-    private static final double DEFAULT_FLOOR = 0.0;
+    public static final double DEFAULT_FLOOR = 0.0;
 
     /** Current implementation. */
     private SquashingFunction sFunction = SquashingFunction.LOGISTIC;
@@ -67,9 +73,26 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     private double floor = DEFAULT_FLOOR;
 
     /**
+     * The time constant of these neurons. If the time constant is equal to
+     * the network time-step (or vice versa), behavior is equivalent to
+     * discrete sigmoid. The larger the time constant relative to the
+     * time-step, the more slowly inputs will be integrated.
+     */
+    private double timeConstant = DEFAULT_TIME_CONSTANT;
+
+    /**
+     * The net value of this neuron. This is the value that is integrated over
+     * time and then passed to the squashing function. NOTE: the net inputs are
+     * integrated and that value is passed through a squashing function to give
+     * the neurons activation. The activation post-squashing is NOT what is
+     * being numerically integrated.
+     */
+    private double netActivation;
+
+    /**
      * Default sigmoidal.
      */
-    public SigmoidalRule() {
+    public ContinuousSigmoidalRule() {
         super();
     }
 
@@ -77,9 +100,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * Construct a sigmoid update with a specified implementation.
      *
      * @param sFunction
-     *            the squashing function implementation to use.
+     *            the implementation to use.
      */
-    public SigmoidalRule(SquashingFunction sFunction) {
+    public ContinuousSigmoidalRule(SquashingFunction sFunction) {
         super();
         this.sFunction = sFunction;
     }
@@ -88,7 +111,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     public TimeType getTimeType() {
-        return TimeType.DISCRETE;
+        return TimeType.CONTINUOUS;
     }
 
     /**
@@ -96,10 +119,14 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     public void update(Neuron neuron) {
 
-        double val = neuron.getWeightedInputs();
+        double timeVal = neuron.getNetwork().getTimeStep() / timeConstant;
+
+        double val = timeVal * neuron.getWeightedInputs();
+
+        netActivation = (netActivation * (1 - timeVal)) + val;
 
         val =
-                sFunction.valueOf(val, getCeiling(), getFloor(),
+                sFunction.valueOf(netActivation, getCeiling(), getFloor(),
                         getSlope());
 
         if (addNoise) {
@@ -108,7 +135,6 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         neuron.setBuffer(val);
     }
-
 
     /**
      * {@inheritDoc}
@@ -176,8 +202,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public SigmoidalRule deepCopy() {
-        SigmoidalRule sn = new SigmoidalRule();
+    public ContinuousSigmoidalRule deepCopy() {
+        ContinuousSigmoidalRule sn = new ContinuousSigmoidalRule();
         sn.setBias(getBias());
         sn.setSquashFunctionType(getSquashFunctionType());
         sn.setSlope(getSlope());
@@ -250,7 +276,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
     @Override
     public String getDescription() {
-        return "Sigmoidal (Discrete)";
+        return "Sigmoidal (Continuous)";
     }
 
     /**
@@ -258,8 +284,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     public SquashingFunction getSquashFunctionType() {
         if (sFunction == null) {
-            sFunction = SquashingFunction.LOGISTIC; // TODO: Explain (backwards
-            // compat)
+            sFunction = SquashingFunction.LOGISTIC;
         }
         return sFunction;
     }
@@ -302,6 +327,20 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     @Override
     public void setFloor(double floor) {
         this.floor = floor;
+    }
+
+    /**
+     * @return the time constant
+     */
+    public double getTimeConstant() {
+        return timeConstant;
+    }
+
+    /**
+     * @param timeConstant the new time constant
+     */
+    public void setTimeConstant(double timeConstant) {
+        this.timeConstant = timeConstant;
     }
 
 }

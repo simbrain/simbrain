@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 
 /**

@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
+
 /**
  * <b>BlankSpikerPanel</b>.
  */

@@ -292,7 +292,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public void setCeiling(double ceiling) {
+    public void setUpperBound(double ceiling) {
         this.ceiling = ceiling;
     }
 
@@ -300,7 +300,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public void setFloor(double floor) {
+    public void setLowerBound(double floor) {
         this.floor = floor;
     }
 

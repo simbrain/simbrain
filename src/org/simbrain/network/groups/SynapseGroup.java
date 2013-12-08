@@ -315,38 +315,24 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Disable all synapses.
+     * Enable or disable all synapses in this group.
+     *
+     * @param enabled true to enable them all; false to disable them all
      */
-    public void disableSynapses() {
-        for (Synapse s : getSynapseList()) {
-            s.setEnabled(false);
+    public void setEnabled(final boolean enabled) {
+        for (Synapse synapse: this.getSynapseList()) {
+            synapse.setEnabled(enabled);
         }
     }
 
     /**
-     * Disable all synapses.
+     * Freeze or  unfreeze all synapses in this group.
+     *
+     * @param freeze true to freeze the group; false to unfreeze it
      */
-    public void enableSynapses() {
-        for (Synapse s : getSynapseList()) {
-            s.setEnabled(true);
-        }
-    }
-
-    /**
-     * Freeze all synapses so that learning cannot take place.
-     */
-    public void freezeSynapses() {
-        for (Synapse s : getSynapseList()) {
-            s.setFrozen(true);
-        }
-    }
-
-    /**
-     * Un-freeze all synapses so that learning can take place.
-     */
-    public void unFreezeSynapses() {
-        for (Synapse s : getSynapseList()) {
-            s.setFrozen(false);
+    public void setFrozen(final boolean freeze) {
+        for (Synapse synapse: this.getSynapseList()) {
+            synapse.setFrozen(freeze);
         }
     }
 

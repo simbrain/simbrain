@@ -421,20 +421,6 @@ public class NetworkPanel extends JPanel {
 				});
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
-			public void neuronClampToggled() {
-				syncNeuronClampState();
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			public void synapseClampToggled() {
-				syncSynapseClampState();
-			}
-
 		});
 
 		// Handle Neuron Events
@@ -1893,25 +1879,8 @@ public class NetworkPanel extends JPanel {
 		for (NetworkTextObject text : network.getTextList()) {
 			addTextObject(text);
 		}
-		syncSynapseClampState();
-		syncNeuronClampState();
 	}
 
-	/**
-	 * Sync gui to network neuron clamp state.
-	 */
-	private void syncNeuronClampState() {
-		neuronClampButton.setSelected(network.getClampNeurons());
-		neuronClampMenuItem.setSelected(network.getClampNeurons());
-	}
-
-	/**
-	 * Sync gui to network synapse clamp state.
-	 */
-	private void syncSynapseClampState() {
-		synapseClampButton.setSelected(network.getClampWeights());
-		synapseClampMenuItem.setSelected(network.getClampWeights());
-	}
 
 	/**
 	 * Find the upper left corner of the subnet nodes.

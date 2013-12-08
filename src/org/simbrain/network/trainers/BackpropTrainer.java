@@ -37,7 +37,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateR
 /**
  * Backprop trainer. An implementation of the backpropagation learning
  * algorithm.
- * 
+ *
  * @author jyoshimi
  */
 public class BackpropTrainer extends IterableTrainer {
@@ -71,7 +71,7 @@ public class BackpropTrainer extends IterableTrainer {
 
 	/**
 	 * Construct the backprop trainer.
-	 * 
+	 *
 	 * @param network
 	 *            the network
 	 * @param layers
@@ -107,10 +107,10 @@ public class BackpropTrainer extends IterableTrainer {
 
 			// Set activations on input layer
 			for (int i = 0; i < numInputs; i++) {
-				network.getInputNeurons()
-						.get(i)
-						.setActivation(
-								network.getTrainingSet().getInputData()[row][i]);
+                network.getInputNeurons()
+                        .get(i)
+                        .forceSetActivation(
+                                network.getTrainingSet().getInputData()[row][i]);
 			}
 
 			// Update network
@@ -146,7 +146,7 @@ public class BackpropTrainer extends IterableTrainer {
 
 	/**
 	 * Compute error contribution for all nodes using backprop algorithm.
-	 * 
+	 *
 	 * @param row
 	 *            current row of training data
 	 */
@@ -197,7 +197,7 @@ public class BackpropTrainer extends IterableTrainer {
 	/**
 	 * Store the error value, bias delta, and fan-in weight deltas for this
 	 * neuron.
-	 * 
+	 *
 	 * @param neuron
 	 *            neuron whose activation function's derivative is used
 	 * @param error
@@ -249,7 +249,7 @@ public class BackpropTrainer extends IterableTrainer {
 
 	/**
 	 * Randomize the specified layer.
-	 * 
+	 *
 	 * @param layer
 	 *            the layer to randomize
 	 */
@@ -296,7 +296,7 @@ public class BackpropTrainer extends IterableTrainer {
 
 	/**
 	 * Test method.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {

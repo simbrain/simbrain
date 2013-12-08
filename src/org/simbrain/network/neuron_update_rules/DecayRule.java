@@ -86,8 +86,8 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 		dn.setDecayAmount(getDecayAmount());
 		dn.setDecayFraction(getDecayFraction());
 		dn.setClipped(isClipped());
-		dn.setCeiling(getCeiling());
-		dn.setFloor(getFloor());
+		dn.setUpperBound(getCeiling());
+		dn.setLowerBound(getFloor());
 		dn.setIncrement(getIncrement());
 		dn.setAddNoise(getAddNoise());
 		dn.noiseGenerator = new Randomizer(noiseGenerator);
@@ -302,12 +302,12 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 	}
 
 	@Override
-	public void setCeiling(double ceiling) {
+	public void setUpperBound(double ceiling) {
 		this.ceiling = ceiling;
 	}
 
 	@Override
-	public void setFloor(double floor) {
+	public void setLowerBound(double floor) {
 		this.floor = floor;
 	}
 

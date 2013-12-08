@@ -31,14 +31,4 @@ public interface NetworkListener {
      */
     void networkChanged();
 
-    /**
-     * Notify listeners that all neurons have been clamped or un-clamped.
-     */
-    void neuronClampToggled();
-
-    /**
-     * Notify listeners that all synapses have been clamped or un-clamped.
-     */
-    void synapseClampToggled();
-
 }

@@ -14,29 +14,27 @@
 package org.simbrain.network.neuron_update_rules.interfaces;
 
 /**
- * 
+ *
  * An interface for rules with no intrinsic boundaries allowing an upper and
  * lower bound for the activation to be set.
- * 
+ *
  * @author zach
- * 
+ *
  */
 public interface BoundedUpdateRule {
 
-	/**
-	 * Sets the upper bound of this neuron update rule's activation.
-	 * 
-	 * @param ceiling
-	 *            the upper bound
-	 */
-	public void setCeiling(double ceiling);
+    /**
+     * Sets the upper bound of this neuron update rule's activation.
+     *
+     * @param upperBound the upper bound
+     */
+    void setUpperBound(double upperBound);
 
-	/**
-	 * Sets the lower bound of this neuron update rule's activation.
-	 * 
-	 * @param floor
-	 *            the lower bound
-	 */
-	public void setFloor(double floor);
+    /**
+     * Sets the lower bound of this neuron update rule's activation.
+     *
+     * @param lowerBound the lower bound
+     */
+    void setLowerBound(double lowerBound);
 
 }

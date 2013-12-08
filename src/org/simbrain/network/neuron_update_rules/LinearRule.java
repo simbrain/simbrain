@@ -80,8 +80,8 @@ public class LinearRule extends NeuronUpdateRule implements
 		ln.setSlope(getSlope());
 		ln.setClipped(isClipped());
 		ln.setAddNoise(getAddNoise());
-		ln.setCeiling(getCeiling());
-		ln.setFloor(getFloor());
+		ln.setUpperBound(getCeiling());
+		ln.setLowerBound(getFloor());
 		ln.noiseGenerator = new Randomizer(noiseGenerator);
 		return ln;
 	}
@@ -254,12 +254,12 @@ public class LinearRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setCeiling(double upperBound) {
+	public void setUpperBound(double upperBound) {
 		this.upperBound = upperBound;
 	}
 
 	@Override
-	public void setFloor(double lowerBound) {
+	public void setLowerBound(double lowerBound) {
 		this.lowerBound = lowerBound;
 	}
 

@@ -80,8 +80,8 @@ public class LogisticRule extends NeuronUpdateRule implements
 	public LogisticRule deepCopy() {
 		LogisticRule ln = new LogisticRule();
 		ln.setGrowthRate(getGrowthRate());
-		ln.setCeiling(ceiling);
-		ln.setFloor(floor);
+		ln.setUpperBound(ceiling);
+		ln.setLowerBound(floor);
 		return ln;
 	}
 
@@ -148,12 +148,12 @@ public class LogisticRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setCeiling(double ceiling) {
+	public void setUpperBound(double ceiling) {
 		this.ceiling = ceiling;
 	}
 
 	@Override
-	public void setFloor(double floor) {
+	public void setLowerBound(double floor) {
 		this.floor = floor;
 	}
 

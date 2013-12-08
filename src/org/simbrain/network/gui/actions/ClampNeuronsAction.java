@@ -28,7 +28,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clamps neurons action.
+ * Clamps neurons action.  NOTE: No longer used as of 3.0.  Leaving it here
+ * for reference since the GUI worked well and could be used elsewhere.
  */
 public final class ClampNeuronsAction extends AbstractAction {
 
@@ -61,10 +62,10 @@ public final class ClampNeuronsAction extends AbstractAction {
         // JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
-            networkPanel.getNetwork().setClampNeurons(cb.isSelected());
+           // networkPanel.getNetwork().setClampNeurons(cb.isSelected());
         } else {
             JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-            networkPanel.getNetwork().setClampNeurons(cb.isSelected());
+           // networkPanel.getNetwork().setClampNeurons(cb.isSelected());
         }
 
         // Determine status

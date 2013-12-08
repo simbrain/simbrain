@@ -521,6 +521,17 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Set clamping on all neurons in this group.
+     *
+     * @param clamp true to clamp them, false otherwise
+     */
+    public void setClamped(final boolean clamp) {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.setClamped(clamp);
+        }
+    }
+
+    /**
      * Set all activations to a specified value.
      *
      * @param value the value to set the neurons to

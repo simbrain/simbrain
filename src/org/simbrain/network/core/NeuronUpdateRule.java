@@ -19,11 +19,12 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.Utils;
 
 /**
  * A rule for updating a neuron.
- * 
+ *
  * @author jyoshimi
  */
 public abstract class NeuronUpdateRule {
@@ -40,14 +41,14 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Returns the type of time update (discrete or continuous) associated with
 	 * this neuron.
-	 * 
+	 *
 	 * @return the time type
 	 */
 	public abstract TimeType getTimeType();
 
 	/**
 	 * Apply the update rule.
-	 * 
+	 *
 	 * @param neuron
 	 *            parent neuron
 	 */
@@ -55,7 +56,7 @@ public abstract class NeuronUpdateRule {
 
 	/**
 	 * Returns a deep copy of the update rule.
-	 * 
+	 *
 	 * @return Duplicated update rule
 	 */
 	public abstract NeuronUpdateRule deepCopy();
@@ -94,7 +95,7 @@ public abstract class NeuronUpdateRule {
 
 	/**
 	 * Returns a random value between the upper and lower bounds of this neuron.
-	 * 
+	 *
 	 * @return the random value.
 	 */
 	public abstract double getRandomValue();
@@ -102,7 +103,7 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Set activation to 0; override for other "clearing" behavior (e.g. setting
 	 * other variables to 0. Called in Gui when "clear" button pressed.
-	 * 
+	 *
 	 * @param neuron
 	 *            reference to parent neuron
 	 */
@@ -127,7 +128,7 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Returns a brief description of this update rule. Used in combo boxes in
 	 * the GUI.
-	 * 
+	 *
 	 * @return the description.
 	 */
 	public abstract String getDescription();
@@ -135,7 +136,7 @@ public abstract class NeuronUpdateRule {
 	/**
 	 * Returns string for tool tip or short description. Override to provide
 	 * custom information.
-	 * 
+	 *
 	 * @param neuron
 	 *            reference to parent neuron
 	 * @return tool tip text

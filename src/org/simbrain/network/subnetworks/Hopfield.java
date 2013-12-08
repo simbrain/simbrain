@@ -156,10 +156,6 @@ public class Hopfield extends Subnetwork {
 	@Override
 	public void update() {
 
-		if (getParentNetwork().getClampNeurons()) {
-			return;
-		}
-
 		int nCount = getNeuronGroup().getNeuronList().size();
 		Neuron n;
 

@@ -30,12 +30,12 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 
 /**
  * Train using least mean squares.
- * 
+ *
  * @author jyoshimi
  */
 public class LMSIterative extends IterableTrainer {
 
-	/** Current error. */
+    /** Current error. */
 	private double rmsError;
 
 	/** Learning rate. */
@@ -43,7 +43,7 @@ public class LMSIterative extends IterableTrainer {
 
 	/**
 	 * Construct a least mean squares iterative panel.
-	 * 
+	 *
 	 * @param network
 	 */
 	public LMSIterative(Trainable network) {
@@ -74,7 +74,7 @@ public class LMSIterative extends IterableTrainer {
 			for (int i = 0; i < numInputs; i++) {
 				network.getInputNeurons()
 						.get(i)
-						.setActivation(
+						.forceSetActivation(
 								network.getTrainingSet().getInputData()[row][i]);
 			}
 
@@ -151,7 +151,7 @@ public class LMSIterative extends IterableTrainer {
 
 	/**
 	 * Test method.
-	 * 
+	 *
 	 * @param args
 	 *            unused
 	 */
@@ -191,8 +191,8 @@ public class LMSIterative extends IterableTrainer {
 			LinearRule rule = new LinearRule();
 			Neuron neuron = new Neuron(network, rule);
 			((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
-			rule.setFloor(0);
-			rule.setCeiling(1);
+			rule.setLowerBound(0);
+			rule.setUpperBound(1);
 			network.addNeuron(neuron);
 			// System.out.println("Output " + i + " = " + neuron.getId());
 			outputLayer.add(neuron);
@@ -265,8 +265,8 @@ public class LMSIterative extends IterableTrainer {
 			LinearRule rule = new LinearRule();
 			Neuron neuron = new Neuron(network, rule);
 			((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
-			rule.setFloor(0);
-			rule.setCeiling(1);
+			rule.setLowerBound(0);
+			rule.setUpperBound(1);
 			network.addNeuron(neuron);
 			// System.out.println("Output " + i + " = " + neuron.getId());
 			outputLayer.add(neuron);

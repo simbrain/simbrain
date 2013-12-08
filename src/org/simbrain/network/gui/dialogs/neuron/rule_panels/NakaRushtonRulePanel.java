@@ -291,7 +291,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		if (!Double.isNaN(lv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
-						.setFloor(lv);
+						.setLowerBound(lv);
 			}
 		}
 
@@ -300,7 +300,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 		if (!Double.isNaN(uv)) {
 			for (int i = 0; i < numNeurons; i++) {
 				((NakaRushtonRule) neurons.get(i).getUpdateRule())
-						.setCeiling(uv);
+						.setUpperBound(uv);
 			}
 		}
 

@@ -30,12 +30,4 @@ public class NetworkAdapter implements NetworkListener {
     public void networkChanged() {
     }
 
-    @Override
-    public void neuronClampToggled() {
-    }
-
-    @Override
-    public void synapseClampToggled() {
-    }
-
 }

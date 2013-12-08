@@ -84,10 +84,6 @@ public class WinnerTakeAll extends NeuronGroup {
     @Override
     public void update() {
 
-        if (getParentNetwork().getClampNeurons()) {
-            return;
-        }
-
         // Determine the winning neuron
         int winnerIndex;
         if (useRandom) {

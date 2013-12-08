@@ -331,46 +331,42 @@ public class SOM extends NeuronGroup {
         Neuron winner = calculateWinner();
 
         // Neuron update
-        if (!getParentNetwork().getClampNeurons()) {
-            if (updateMethod == STANDARD) {
-                super.update();
-            } else {
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = getNeuronList().get(i);
-                    if (n == winner) {
-                        n.setActivation(1);
-                    } else {
-                        n.setActivation(0);
-                    }
+        if (updateMethod == STANDARD) {
+            super.update();
+        } else {
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron n = getNeuronList().get(i);
+                if (n == winner) {
+                    n.setActivation(1);
+                } else {
+                    n.setActivation(0);
                 }
             }
         }
 
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
-        if (!getParentNetwork().getClampWeights()) {
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronList().get(i);
-                physicalDistance = findPhysicalDistance(neuron, winner);
-                // The center of the neuron is within the update region.
-                if (physicalDistance <= neighborhoodSize) {
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        val = incoming.getStrength()
-                                + alpha
-                                * (incoming.getSource().getActivation() - incoming
-                                        .getStrength());
-                        incoming.setStrength(val);
-                    }
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron neuron = getNeuronList().get(i);
+            physicalDistance = findPhysicalDistance(neuron, winner);
+            // The center of the neuron is within the update region.
+            if (physicalDistance <= neighborhoodSize) {
+                for (Synapse incoming : neuron.getFanIn()) {
+                    val = incoming.getStrength()
+                            + alpha
+                            * (incoming.getSource().getActivation() - incoming
+                                    .getStrength());
+                    incoming.setStrength(val);
                 }
             }
-            // TODO: Now reducing decay rate as
-            // percentage. Document and make
-            // others consistent with this.
-            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                neighborhoodSize -= neighborhoodDecayAmount;
-            } else {
-                neighborhoodSize = 0;
-            }
+        }
+        // TODO: Now reducing decay rate as
+        // percentage. Document and make
+        // others consistent with this.
+        if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+            neighborhoodSize -= neighborhoodDecayAmount;
+        } else {
+            neighborhoodSize = 0;
         }
     }
 
@@ -459,7 +455,7 @@ public class SOM extends NeuronGroup {
         LinearRule rule = new LinearRule();
         Neuron ret = new Neuron(getParentNetwork(), rule);
         rule.setIncrement(1);
-        rule.setFloor(0);
+        rule.setLowerBound(0);
         return ret;
     }
 

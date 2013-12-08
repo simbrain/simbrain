@@ -152,8 +152,8 @@ public class Neuron {
 
         updateRule.setIncrement(increment);
         if (updateRule instanceof BoundedUpdateRule) {
-            ((BoundedUpdateRule) updateRule).setFloor(lowerBound);
-            ((BoundedUpdateRule) updateRule).setCeiling(upperBound);
+            ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
+            ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
         }
     }
 
@@ -783,5 +783,30 @@ public class Neuron {
             fanIn = null;
         }
     }
+
+    /**
+     * Convenience method to set upper bound on the neuron's update rule,
+     * if it is a bounded update rule.
+     *
+     * @param upperBound upper bound to set.
+     */
+    public void setUpperBound(final double upperBound) {
+        if (this instanceof BoundedUpdateRule) {
+            ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
+        }
+    }
+
+    /**
+     * Convenience method to set lower bound on the neuron's update rule,
+     * if it is a bounded update rule.
+     *
+     * @param lowerBound lower bound to set.
+     */
+    public void setLowerBound(final double lowerBound) {
+        if (this instanceof BoundedUpdateRule) {
+            ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
+        }
+    }
+
 
 }

@@ -59,7 +59,7 @@ public class TestInputPanel extends JPanel {
     private SimbrainJTableScrollPanel scroller;
 
     /** True when iteration mode is on. */
-    private boolean iterationMode = false;
+    private boolean iterationMode = true;
 
     /** Button used to advance row. Disabled when iteration mode is on. */
     private JButton advance;
@@ -111,18 +111,20 @@ public class TestInputPanel extends JPanel {
         this.data = data;
         initTestInputPanel();
     }
+    
+    NumericTable numericTable;
 
     /**
      * Initiate the test network panel using the network panel.
      */
     private void initTestInputPanel() {
         network = networkPanel.getNetwork();
-        NumericTable numericTable = new NumericTable(5, inputNeurons.size());
+        numericTable = new NumericTable(5, inputNeurons.size());
         if (data != null) {
             numericTable.setData(data);
         }
         table = new SimbrainJTable(numericTable);
-        ((NumericTable) table.getData()).setIterationMode(true);
+        ((NumericTable) table.getData()).setIterationMode(iterationMode);
         // Set up column headings
         List<String> colHeaders = new ArrayList<String>();
         for (int i = 0; i < inputNeurons.size(); i++) {
@@ -144,6 +146,7 @@ public class TestInputPanel extends JPanel {
         advance = new JButton(advanceRowAction);
         JButton testTable = new JButton(testTableAction);
         JCheckBox iterationCheckBox = new JCheckBox(iterationModeAction);
+        iterationCheckBox.setSelected(iterationMode);
         JToolBar testToolBar = new JToolBar();
         testToolBar.add(test);
         testToolBar.add(advance);
@@ -192,7 +195,7 @@ public class TestInputPanel extends JPanel {
      */
     private Action iterationModeAction = new AbstractAction() {
         {
-            putValue(NAME, "Iteration mode");
+            putValue(NAME, "Iteration mode");        
         }
 
         /**
@@ -247,7 +250,7 @@ public class TestInputPanel extends JPanel {
         }
         table.updateRowSelection();
         for (int j = 0; j < inputNeurons.size(); j++) {
-            inputNeurons.get(j).setInputValue(
+            inputNeurons.get(j).forceSetActivation(
                     ((NumericTable) table.getData()).getValue(testRow, j));
         }
         if (network != null) {
@@ -281,5 +284,18 @@ public class TestInputPanel extends JPanel {
      */
     public SimbrainJTable getTable() {
         return table;
+    }
+
+    /**
+     * Reset the data in this panel.
+     *
+     * @param data the data to set
+     */
+    public void setData(double[][] data) {
+        this.data = data;
+        if (data != null) {
+            numericTable.setData(data);
+        }
+
     }
 }

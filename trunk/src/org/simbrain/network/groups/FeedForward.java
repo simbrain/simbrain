@@ -82,7 +82,7 @@ public class FeedForward extends Subnetwork {
         LinearRule rule = new LinearRule();
         Neuron neuron = new Neuron(network, rule);
         rule.setIncrement(1); // For easier testing
-        rule.setFloor(0);
+        rule.setLowerBound(0);
         buildNetwork(network, nodesPerLayer, initialPosition, neuron);
     }
 
@@ -113,6 +113,8 @@ public class FeedForward extends Subnetwork {
             inputLayerNeurons.add(new Neuron(network, inputNeuronTemplate));
         }
         NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
+        inputLayer.setClamped(true); // Clamping makes everything easier in the
+                                     // GUI. The trainer uses forceset.
         addNeuronGroup(inputLayer);
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0, 0);
@@ -135,7 +137,7 @@ public class FeedForward extends Subnetwork {
             for (int j = 0; j < nodesPerLayer[i]; j++) {
             	SigmoidalRule rule = new SigmoidalRule();
                 Neuron neuron = new Neuron(network, rule);
-                rule.setFloor(0);
+                rule.setLowerBound(0);
                 neuron.setUpdatePriority(i);
                 hiddenLayerNeurons.add(neuron);
             }

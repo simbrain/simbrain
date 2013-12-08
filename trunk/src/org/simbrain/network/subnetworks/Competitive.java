@@ -150,23 +150,16 @@ public class Competitive extends NeuronGroup {
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron neuron = getNeuronList().get(i);
             if (i == winner) {
-                if (!getParentNetwork().getClampNeurons()) {
-                    neuron.setActivation(winValue);
-                }
-                if (!getParentNetwork().getClampWeights()) {
-                    if (updateMethod == UpdateMethod.RUMM_ZIPSER) {
-                        rummelhartZipser(neuron);
-                    } else if (updateMethod == UpdateMethod.ALVAREZ_SQUIRE) {
-                        squireAlvarezWeightUpdate(neuron);
-                        decayAllSynapses();
-                    }
+                neuron.setActivation(winValue);
+                if (updateMethod == UpdateMethod.RUMM_ZIPSER) {
+                    rummelhartZipser(neuron);
+                } else if (updateMethod == UpdateMethod.ALVAREZ_SQUIRE) {
+                    squireAlvarezWeightUpdate(neuron);
+                    decayAllSynapses();
                 }
             } else {
-                if (!getParentNetwork().getClampNeurons()) {
-                    neuron.setActivation(loseValue);
-                }
-                if ((useLeakyLearning)
-                        & (!getParentNetwork().getClampWeights())) {
+                neuron.setActivation(loseValue);
+                if (useLeakyLearning) {
                     leakyLearning(neuron);
                 }
 

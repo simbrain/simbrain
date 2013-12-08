@@ -375,13 +375,6 @@ public class SynapseAdjustmentPanel extends JPanel {
 			getParent().repaint();
 		}
 
-		@Override
-		public void neuronClampToggled() {
-		}
-
-		@Override
-		public void synapseClampToggled() {
-		}
 	};
 
 	/**

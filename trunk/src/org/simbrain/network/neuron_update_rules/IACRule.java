@@ -74,8 +74,8 @@ public class IACRule extends NeuronUpdateRule implements
 		iac.setDecay(getDecay());
 		iac.setRest(getRest());
 		iac.setClipped(isClipped());
-		iac.setCeiling(getCeiling());
-		iac.setFloor(getFloor());
+		iac.setUpperBound(getCeiling());
+		iac.setLowerBound(getFloor());
 		iac.setAddNoise(getAddNoise());
 		iac.noiseGenerator = new Randomizer(noiseGenerator);
 		return iac;
@@ -251,12 +251,12 @@ public class IACRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setCeiling(double ceiling) {
+	public void setUpperBound(double ceiling) {
 		this.ceiling = ceiling;
 	}
 
 	@Override
-	public void setFloor(double floor) {
+	public void setLowerBound(double floor) {
 		this.floor = floor;
 	}
 

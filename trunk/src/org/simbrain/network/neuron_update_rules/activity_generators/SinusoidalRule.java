@@ -161,12 +161,12 @@ public class SinusoidalRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setCeiling(double ceiling) {
+	public void setUpperBound(double ceiling) {
 		this.ceiling = ceiling;
 	}
 
 	@Override
-	public void setFloor(double floor) {
+	public void setLowerBound(double floor) {
 		this.floor = floor;
 	}
 

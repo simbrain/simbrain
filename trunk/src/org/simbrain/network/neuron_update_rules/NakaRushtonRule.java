@@ -94,7 +94,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 		NakaRushtonRule rn = new NakaRushtonRule();
 		rn.setSteepness(getSteepness());
 		rn.setSemiSaturationConstant(getSemiSaturationConstant());
-		rn.setCeiling(getCeiling());
+		rn.setUpperBound(getCeiling());
 		rn.setAddNoise(getAddNoise());
 		rn.setUseAdaptation(getUseAdaptation());
 		rn.setAdaptationParameter(getAdaptationParameter());
@@ -330,7 +330,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setCeiling(double ceiling) {
+	public void setUpperBound(double ceiling) {
 		this.ceiling = ceiling;
 	}
 
@@ -340,7 +340,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 	}
 
 	@Override
-	public void setFloor(double floor) {
+	public void setLowerBound(double floor) {
 		this.floor = floor;
 	}
 

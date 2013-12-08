@@ -245,10 +245,6 @@ public class Network {
 	 */
 	public void updateNeuronsByPriority() {
 
-		if (this.getClampNeurons() == true) {
-			return;
-		}
-
 		for (Neuron neuron : prioritySortedNeuronList) {
 			neuron.update();
 			neuron.setActivation(neuron.getBuffer());
@@ -259,10 +255,6 @@ public class Network {
 	 * Calls {@link Neuron#update} for each neuron.
 	 */
 	public void bufferedUpdateAllNeurons() {
-
-		if (getClampNeurons()) {
-			return;
-		}
 
 		// First update the activation buffers
 		for (Neuron n : neuronList) {
@@ -540,10 +532,6 @@ public class Network {
 	 * Calls {@link Synapse#update} for each weight.
 	 */
 	public void updateAllSynapses() {
-
-		if (getClampWeights()) {
-			return;
-		}
 
 		// No Buffering necessary because the values of weights don't depend on
 		// one another
@@ -1306,26 +1294,6 @@ public class Network {
 	}
 
 	/**
-	 * Fire a neuron clamp toggle event to all registered model listeners.
-	 */
-	public void fireNeuronClampToggle() {
-
-		for (NetworkListener listener : networkListeners) {
-			listener.neuronClampToggled();
-		}
-	}
-
-	/**
-	 * Fire a neuron synapse toggle event to all registered model listeners.
-	 */
-	public void fireSynapseClampToggle() {
-
-		for (NetworkListener listener : networkListeners) {
-			listener.synapseClampToggled();
-		}
-	}
-
-	/**
 	 * Fire a network changed event to all registered model listeners.
 	 *
 	 * @param moved
@@ -1575,42 +1543,6 @@ public class Network {
 			listener.groupParameterChanged(new NetworkEvent<Group>(this,
 					group, group));
 		}
-	}
-
-	/**
-	 * @return Clamped weights.
-	 */
-	public boolean getClampWeights() {
-		return clampWeights;
-	}
-
-	/**
-	 * Sets weights to clamped values.
-	 *
-	 * @param clampWeights
-	 *            Weights to set
-	 */
-	public void setClampWeights(final boolean clampWeights) {
-		this.clampWeights = clampWeights;
-		this.fireSynapseClampToggle();
-	}
-
-	/**
-	 * @return Clamped neurons.
-	 */
-	public boolean getClampNeurons() {
-		return clampNeurons;
-	}
-
-	/**
-	 * Sets neurons to clamped values.
-	 *
-	 * @param clampNeurons
-	 *            Neurons to set
-	 */
-	public void setClampNeurons(final boolean clampNeurons) {
-		this.clampNeurons = clampNeurons;
-		this.fireNeuronClampToggle();
 	}
 
 	@Override

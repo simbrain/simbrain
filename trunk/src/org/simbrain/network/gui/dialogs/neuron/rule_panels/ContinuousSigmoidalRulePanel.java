@@ -301,7 +301,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!Double.isNaN(lv)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                .setFloor(lv);
+                .setLowerBound(lv);
             }
         }
 
@@ -310,7 +310,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!Double.isNaN(uv)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                .setCeiling(uv);
+                .setUpperBound(uv);
             }
         }
 

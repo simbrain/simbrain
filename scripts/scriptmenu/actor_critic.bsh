@@ -11,6 +11,7 @@ import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.update_actions.*;
 import org.simbrain.network.util.*;
 import org.simbrain.util.*;
+import org.simbrain.util.math.*;
 import org.simbrain.util.environment.*;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.updater.*;
@@ -192,7 +193,7 @@ import java.util.concurrent.*;
             for(NeuronWithMemory neuron : actionNeurons) {
                 if (neuron == winningNeuron) {
                     neuron.setActivation(tileSize * movementFactor);
-
+                    neuron.update();
                 } else {
                     neuron.setActivation(0);
                 }
@@ -205,27 +206,25 @@ import java.util.concurrent.*;
 
 
             // Update all value synapses 
-            if(!network.getClampWeights()) {
-                for (Synapse synapse : valueNeuron.getFanIn()) {
-                    NeuronWithMemory sourceNeuron = synapse.getSource(); 
-                    double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
-                    //synapse.setStrength(synapse.clip(newStrength)); 
-                    synapse.setStrength(newStrength); 
-                    //System.out.println("Value Neuron / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
-                }
-                // Update all actor neurons
-                for (NeuronWithMemory neuron : actionNeurons) {
-                    // Just update the last winner
-                    if (neuron.getLastActivation() > 0) {
-                        for (Synapse synapse : neuron.getFanIn()) {
-                            Neuron sourceNeuron = synapse.getSource(); 
-                            double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
-                            //synapse.setStrength(synapse.clip(newStrength)); 
-                            synapse.setStrength(newStrength); 
-                            //System.out.println("Neuron (" + neuron.getLabel() + ") / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
-                        }
-                        
+            for (Synapse synapse : valueNeuron.getFanIn()) {
+                NeuronWithMemory sourceNeuron = synapse.getSource(); 
+                double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
+                //synapse.setStrength(synapse.clip(newStrength)); 
+                synapse.setStrength(newStrength); 
+                //System.out.println("Value Neuron / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
+            }
+            // Update all actor neurons
+            for (NeuronWithMemory neuron : actionNeurons) {
+                // Just update the last winner
+                if (neuron.getLastActivation() > 0) {
+                    for (Synapse synapse : neuron.getFanIn()) {
+                        Neuron sourceNeuron = synapse.getSource(); 
+                        double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
+                        synapse.setStrength(synapse.clip(newStrength)); 
+                        //synapse.setStrength(newStrength); 
+                        //System.out.println("Neuron (" + neuron.getLabel() + ") / Tile //neuron (" + sourceNeuron.getId() + "):" + newStrength);
                     }
+                    
                 }
             } 
 

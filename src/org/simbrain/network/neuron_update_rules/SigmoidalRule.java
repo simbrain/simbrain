@@ -23,7 +23,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.
+    DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
@@ -96,7 +97,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     public void update(Neuron neuron) {
 
-        double val = neuron.getWeightedInputs();
+        double val = neuron.getWeightedInputs() + bias;
 
         val =
                 sFunction.valueOf(val, getCeiling(), getFloor(),

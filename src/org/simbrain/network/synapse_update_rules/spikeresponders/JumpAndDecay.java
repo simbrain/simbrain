@@ -19,36 +19,56 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>JumpAndDecay</b>.
  */
 public class JumpAndDecay extends SpikeResponder {
+
     /** Jump height value. */
-    private double jumpHeight = 2;
+    private double jumpHeight = 1;
+
     /** Base line value. */
-    private double baseLine = 0;
-    /** Rate at which synapse will decay. */
-    private double decayRate = .1;
+    private double baseLine;
+
+    /** Rate at which synapse will decay (ms). */
+    private double timeConstant = 3;
 
     /**
-     * @return null
+     * {@inheritDoc}
      */
-    public SpikeResponder duplicate() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public JumpAndDecay deepCopy() {
+        JumpAndDecay jad = new JumpAndDecay();
+        jad.setBaseLine(this.getBaseLine());
+        jad.setJumpHeight(this.getJumpHeight());
+        jad.setTimeConstant(this.getTimeConstant());
+        return jad;
     }
 
     /**
-     * Update the synapse.
+     * {@inheritDoc}
      */
-    public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
-                .hasSpiked()) {
-            value = jumpHeight;
+    public void update(final Synapse s) {
+        value = s.getPsr();
+        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
+                .hasSpiked())
+        {
+            value = jumpHeight * s.getStrength();
         } else {
-            value += (decayRate * (baseLine - value));
+            double timeStep = s.getParentNetwork().getTimeStep();
+            value += timeStep * (baseLine - value) / timeConstant;
         }
+        s.setPsr(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription() {
+        return "Jump and Decay";
     }
 
     /**
@@ -63,20 +83,6 @@ public class JumpAndDecay extends SpikeResponder {
      */
     public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
-    }
-
-    /**
-     * @return Returns the decayRate.
-     */
-    public double getDecayRate() {
-        return decayRate;
-    }
-
-    /**
-     * @param decayRate The decayRate to set.
-     */
-    public void setDecayRate(final double decayRate) {
-        this.decayRate = decayRate;
     }
 
     /**
@@ -99,4 +105,21 @@ public class JumpAndDecay extends SpikeResponder {
     public static String getName() {
         return "Jump and decay";
     }
+
+    /**
+     * @return the time constant of the exponential decay of the post synaptic
+     * response
+     */
+    public double getTimeConstant() {
+        return timeConstant;
+    }
+
+    /**
+     * @param decayTimeConstant the new time constant of the exponential decay
+     * of the post synaptic response
+     */
+    public void setTimeConstant(double decayTimeConstant) {
+        this.timeConstant = decayTimeConstant;
+    }
+
 }

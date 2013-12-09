@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>Step</b>.
@@ -26,46 +27,51 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 public class Step extends SpikeResponder {
 
     /** Timer. */
-    private double timer = 0;
+    private double timer;
 
-    /** Response height. */
+    /**
+     * Response height: The value by which the strength of the synapse is
+     * scaled to determine the post synaptic response.
+     */
     private double responseHeight = 1;
 
-    /** Response time. */
-    private double responseTime = 1;
+    /** Response duration (ms). */
+    private double responseDuration = 1;
 
     /**
-     * @return duplicate StepSynapse (used, e.g., in copy/paste).
+     * {@inheritDoc}
      */
-    public SpikeResponder duplicate() {
-        Step s = new Step();
-        s = (Step) super.duplicate(s);
-        s.setResponseHeight(getResponseHeight());
-        s.setResponseHeight(getResponseTime());
-
-        return s;
-    }
-
-    /**
-     * Update the synapse.
-     */
-    public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
-                .hasSpiked()) {
-            timer = responseTime;
+    public void update(Synapse s) {
+        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
+                .hasSpiked())
+        {
+            timer = responseDuration;
         } else {
-            timer--;
-
+            timer -= s.getNetwork().getTimeStep();
             if (timer < 0) {
                 timer = 0;
             }
         }
 
         if (timer > 0) {
-            value = responseHeight;
+            value = responseHeight * s.getStrength();
         } else {
             value = 0;
         }
+
+        s.setPsr(value);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Step deepCopy() {
+        Step st = new Step();
+        st.setResponseHeight(this.getResponseHeight());
+        st.setResponseDuration(this.getResponseDuration());
+        return st;
     }
 
     /**
@@ -85,21 +91,22 @@ public class Step extends SpikeResponder {
     /**
      * @return Returns the responseTime.
      */
-    public double getResponseTime() {
-        return responseTime;
+    public double getResponseDuration() {
+        return responseDuration;
     }
 
     /**
-     * @param responseTime The responseTime to set.
+     * @param responseDuration The responseTime to set.
      */
-    public void setResponseTime(final double responseTime) {
-        this.responseTime = responseTime;
+    public void setResponseDuration(final double responseDuration) {
+        this.responseDuration = responseDuration;
     }
 
     /**
-     * @return Name of synapse type.
+     * {@inheritDoc}
      */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Step";
     }
 }

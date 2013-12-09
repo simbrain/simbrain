@@ -43,19 +43,19 @@ public class Neuron {
     private NeuronUpdateRule updateRule;
 
     /** A unique id for this neuron. */
-    private String id = null;
+    private String id;
 
     /** An optional String description associated with this neuron. */
     private String label = "";
 
     /** Activation value of the neuron. The main state variable. */
-    private double activation = 0;
+    private double activation;
 
     /** Temporary activation value. */
-    private double buffer = 0;
+    private double buffer;
 
     /** Value of any external inputs to neuron. */
-    private double inputValue = 0;
+    private double inputValue;
 
     /** Reference to network this neuron is part of. */
     private Network parent;
@@ -67,7 +67,7 @@ public class Neuron {
     private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
 
     /** A marker for whether or not the update rule is an input generator. */
-    private boolean generator = false;
+    private boolean generator;
 
     /** x-coordinate of this neuron in 2-space. */
     private double x;
@@ -76,10 +76,10 @@ public class Neuron {
     private double y;
 
     /** If true then do not update this neuron. */
-    private boolean clamped = false;
+    private boolean clamped;
 
     /** Target value. */
-    private double targetValue = 0;
+    private double targetValue;
 
     /** Parent group, if any (null if none). */
     private Group parentGroup;
@@ -89,13 +89,13 @@ public class Neuron {
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
-    private int updatePriority = 0;
+    private int updatePriority;
 
     // Temporary properties and init for backwards compatibility and
     // workspace conversion. Also see postunmarshallinit
     // TODO: Remove these before 3.0 release
     private double lowerBound = 1;
-    private double upperBound = 0;
+    private double upperBound;
     private double increment = .1;
 
     /**
@@ -220,8 +220,9 @@ public class Neuron {
      * Updates neuron.
      */
     public void update() {
-        if (isClamped())
+        if (isClamped()) {
             return;
+        }
         updateRule.update(this);
     }
 
@@ -248,7 +249,7 @@ public class Neuron {
      * classes usually shouldn't use this method to set neuron activations.
      * Notable exceptions to this include copy constructors and randomizers.
      *
-     * @param act
+     * @param act the new activation value
      */
     public void forceSetActivation(final double act) {
         activation = act;
@@ -350,10 +351,6 @@ public class Neuron {
                 }
             }
         }
-        if (this.getUpdateRule() instanceof BiasedUpdateRule) {
-            wtdSum += ((BiasedUpdateRule) this.getUpdateRule()).getBias();
-        }
-
         return wtdSum;
     }
 

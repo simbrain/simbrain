@@ -18,12 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.Utils;
 
 /**
  * <b>RiseAndDecayPanel</b>.
@@ -33,78 +38,131 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
     /** Maximum response field. */
     private JTextField tfMaximumResponse = new JTextField();
 
-    /** Time step field. */
-    private JTextField tfTimeStep = new JTextField();
-
     /** Decay rate field. */
-    private JTextField tfDecayRate = new JTextField();
+    private JTextField tfTimeConstant = new JTextField();
+
+    /**
+     * The prototypical rise and decay spike responder. Used for default values
+     * and when references are required by other gui classes to aspects of the
+     * rise and decay model class.
+     */
+    public static final RiseAndDecay PROTOTYPE_RESPONDER = new RiseAndDecay();
 
     /**
      * This method is the default constructor.
-     *
-     * @param net Network
      */
-    public RiseAndDecayPanel(final Network net) {
-        parentNet = net;
-
+    public RiseAndDecayPanel() {
         tfMaximumResponse.setColumns(6);
         this.addItem("Maximum response", tfMaximumResponse);
-        this.addItem("Time step", tfTimeStep);
-        this.addItem("Decay rate", tfDecayRate);
+        this.addItem("Time Constant", tfTimeConstant);
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
-    public void fillFieldValues() {
+    @Override
+    public void fillDefaultValues() {
+        tfMaximumResponse.setText(Double.toString(PROTOTYPE_RESPONDER
+                .getMaximumResponse()));
+        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER
+                .getTimeConstant()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillFieldValues(List<SpikeResponder> spikeResponderList) {
+
         RiseAndDecay spikeResponder = (RiseAndDecay) spikeResponderList.get(0);
 
-        tfMaximumResponse.setText(Double.toString(spikeResponder
-                .getMaximumResponse()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfDecayRate.setText(Double.toString(spikeResponder.getDecayRate()));
-
         // Handle consistency of multiply selections
+
+        // Handle Maximum Response
         if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
-                "getMaximumResponse")) {
+                "getMaximumResponse"))
+        {
             tfMaximumResponse.setText(NULL_STRING);
+        } else {
+            tfMaximumResponse.setText(Double.toString(spikeResponder
+                    .getMaximumResponse()));
         }
 
+        // Handle Decay Rate
         if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
-                "getDecayRate")) {
-            tfDecayRate.setText(NULL_STRING);
+                "getTimeConstant"))
+        {
+            tfTimeConstant.setText(NULL_STRING);
+        } else {
+            tfTimeConstant.setText(Double.toString(spikeResponder
+                    .getTimeConstant()));
+
         }
+
     }
 
     /**
-     * Fill field values to default values for this synapse type.
+     * {@inheritDoc}
      */
-    public void fillDefaultValues() {
-        RiseAndDecay spikerRef = new RiseAndDecay();
-        tfMaximumResponse.setText(Double.toString(spikerRef
-                .getMaximumResponse()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
+    @Override
+    public void commitChanges(Synapse synapse) {
+
+        if (!(synapse.getSpikeResponder() instanceof RiseAndDecay)) {
+            synapse.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
+        }
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+    @Override
+    public void commitChanges(List<Synapse> synapses) {
 
-        for (int i = 0; i < spikeResponderList.size(); i++) {
-            RiseAndDecay spikerRef = (RiseAndDecay) spikeResponderList.get(i);
-
-            if (!tfMaximumResponse.getText().equals(NULL_STRING)) {
-                spikerRef.setMaximumResponse(Double
-                        .parseDouble(tfMaximumResponse.getText()));
-            }
-
-            if (!tfDecayRate.getText().equals(NULL_STRING)) {
-                spikerRef
-                        .setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
             }
         }
+
+        writeValuesToRules(synapses);
+
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Max Response
+        double maxResponse = Utils.doubleParsable(tfMaximumResponse);
+        if (!Double.isNaN(maxResponse)) {
+            for (Synapse s : synapses) {
+                ((RiseAndDecay) s.getSpikeResponder()).
+                setMaximumResponse(maxResponse);
+            }
+        }
+
+        // Time Constant
+        double timeConstant = Utils.doubleParsable(tfTimeConstant);
+        if (!Double.isNaN(timeConstant)) {
+            for (Synapse s : synapses) {
+                ((RiseAndDecay) s.getSpikeResponder()).
+                setTimeConstant(timeConstant);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RiseAndDecay getPrototypeResponder() {
+        return PROTOTYPE_RESPONDER;
+    }
+
 }

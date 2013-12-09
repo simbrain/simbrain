@@ -19,70 +19,72 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>RiseAndDecay</b>.
  */
 public class RiseAndDecay extends SpikeResponder {
+
     /** Maximum response value. */
     private double maximumResponse = 1;
-    /** Rate at which synapse will decay. */
-    private double decayRate = .1;
-    /** Time step value. */
-    private double timeStep = .01;
+
+    /** The time constant of decay and recovery (ms). */
+    private double timeConstant = 3;
+
     /** Recovery value. */
-    private double recovery = 0;
+    private double recovery;
 
     /**
-     * Duplicates a spike responder synapse.
-     *
-     * @return null
+     * {@inheritDoc}
      */
-    public SpikeResponder duplicate() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public RiseAndDecay deepCopy() {
+        RiseAndDecay rad = new RiseAndDecay();
+        rad.setMaximumResponse(this.getMaximumResponse());
+        rad.setTimeConstant(this.getTimeConstant());
+        return rad;
     }
 
     /**
-     * Update the synapse.
+     * {@inheritDoc}
      */
-    public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
-                .hasSpiked()) {
+    public void update(Synapse s) {
+        double timeStep = s.getParentNetwork().getTimeStep();
+        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
+                .hasSpiked())
+        {
             recovery = 1;
         }
 
-        recovery += ((timeStep / decayRate) * (-recovery));
-        value += ((timeStep / decayRate) * ((Math.E * maximumResponse
+        recovery += ((timeStep / timeConstant) * (-recovery));
+        value += ((timeStep / timeConstant) * ((Math.E * maximumResponse
                 * recovery * (1 - value)) - value));
+
+        s.setPsr(value * s.getStrength());
+
     }
 
     /**
-     * @return Returns the timeStep.
+     * {@inheritDoc}
      */
-    public double getTimeStep() {
-        return timeStep;
-    }
-
-    /**
-     * @param timeStep The timeStep to set.
-     */
-    public void setTimeStep(final double timeStep) {
-        this.timeStep = timeStep;
+    @Override
+    public String getDescription() {
+        return "Rise and Decay";
     }
 
     /**
      * @return Returns the decayRate.
      */
-    public double getDecayRate() {
-        return decayRate;
+    public double getTimeConstant() {
+        return timeConstant;
     }
 
     /**
-     * @param decayRate The decayRate to set.
+     * @param timeConstant The decayRate to set.
      */
-    public void setDecayRate(final double decayRate) {
-        this.decayRate = decayRate;
+    public void setTimeConstant(final double timeConstant) {
+        this.timeConstant = timeConstant;
     }
 
     /**
@@ -99,10 +101,4 @@ public class RiseAndDecay extends SpikeResponder {
         this.maximumResponse = maximumResponse;
     }
 
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
-        return "Rise and decay";
-    }
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,10 +37,16 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    StaticSynapsePanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
+/**
+ *
+ * @author ztosi
+ *
+ */
 @SuppressWarnings("serial")
 public class SynapseUpdateSettingsPanel extends JPanel {
 
@@ -68,6 +73,12 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     /** For showing/hiding the synapse panel. */
     private final DropDownTriangle displaySPTriangle;
 
+    /**
+     * The originally displayed abstract synapse panel. If the currently
+     * displayed panel is not the same as the starting panel, then we can be
+     * sure that we are not editing synapse update rules, but rather are
+     * replacing them.
+     */
     private final AbstractSynapsePanel startingPanel;
 
     /**
@@ -77,8 +88,13 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     private final Window parent;
 
     /**
-     * 
-     * @param synapseList
+     * Constructs a synapse update settings panel for a given synapse list and
+     * within a specified parent window. Starts in the default display state
+     * for the actual neuron update panel.
+     * @param synapseList the list of synapses which will be edited by the
+     * displayed neuron update rule panel
+     * @param parent the swing window within which this panel will be placed.
+     * Here so that "pack()" can be called when this panel resizes itself.
      */
     public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
             final Window parent) {
@@ -86,9 +102,15 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     * 
-     * @param synapseList
-     * @param startingState
+     * Constructs a synapse update settings panel for a given synapse list and
+     * within a specified parent window, and with the starting display state of
+     * the neuron update panel specified.
+     * @param synapseList the list of synapses which will be edited by the
+     * displayed neuron update rule panel
+     * @param startingState whether or not the neuron update rule panel starts
+     * off displayed or hidden
+     * @param parent the swing window within which this panel will be placed.
+     * Here so that "pack()" can be called when this panel resizes itself.
      */
     public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
             boolean startingState, final Window parent) {
@@ -105,8 +127,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 
     /**
      * Lays out this panel.
-     * 
-     * @return
      */
     private void initializeLayout() {
 
@@ -118,11 +138,8 @@ public class SynapseUpdateSettingsPanel extends JPanel {
         tPanel.setLayout(new BoxLayout(tPanel, BoxLayout.X_AXIS));
         tPanel.add(cbSynapseType);
         tPanel.add(Box.createHorizontalStrut(20));
+        tPanel.add(displaySPTriangle);
 
-        JPanel supP = new JPanel(new FlowLayout());
-        supP.add(displaySPTriangle);
-
-        tPanel.add(supP);
         tPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         tPanel.setBorder(padding);
         this.add(tPanel);
@@ -184,7 +201,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
                 // Is the current panel different from the starting panel?
                 boolean replace = synapsePanel != startingPanel;
 
-                if(replace) {
+                if (replace) {
                     // If so we have to fill the new panel with default values
                     synapsePanel.fillDefaultValues();
                 }
@@ -219,7 +236,8 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     private void initSynapseType() {
 
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getType")) {
+                "getType"))
+        {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType
                     .setSelectedIndex(cbSynapseType.getItemCount() - 1);
@@ -237,7 +255,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     * 
      * @return the name of the selected synapse update rule
      */
     public JComboBox<String> getCbSynapseType() {
@@ -245,7 +262,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     * 
      * @return the currently displayed synapse panel
      */
     public AbstractSynapsePanel getSynapsePanel() {
@@ -253,7 +269,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     * 
      * @param synapsePanel
      *            set the currently displayed synapse panel to the specified
      *            panel

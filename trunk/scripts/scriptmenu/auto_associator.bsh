@@ -46,7 +46,7 @@ import org.simbrain.util.*;
 	layout.setInitialLocation(new Point(10, 10));
 	List sourceNeurons = new ArrayList();
 	for (int i = 0; i < NUM_NEURONS; i++) {
-		Neuron neuron = new Neuron(network, "AdditiveRule");
+		Neuron neuron = new Neuron(network, "DecayRule");
 		neuron.setActivation(-1);
 		network.addNeuron(neuron);
 		neuron.setUpperBound(10); // This is for nicer graphics

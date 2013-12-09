@@ -179,8 +179,7 @@ import org.jgap.impl.*;
 
         /**
          * Helper method. Determines the percentage of neurons in a network active,
-         * where "active" means activation greater than 1/2 * that neuron's upper
-         * bound.
+         * where "active" means activation greater than .5
          *
          * Takes average over several iterations, to avoid solutions that oscillate.
          *
@@ -196,9 +195,7 @@ import org.jgap.impl.*;
 
             for (int iterations = 0; iterations < numIterations; iterations++) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
-                    if (neuron.getActivation() > neuron.getUpperBound() / 2) {
-                        // System.out.println(neuron.getId() + ":" +
-                        // neuron.getActivation() + "/" + neuron.getUpperBound());
+                    if (neuron.getActivation() > .5) {
                         numActive++;
                     }
                 }

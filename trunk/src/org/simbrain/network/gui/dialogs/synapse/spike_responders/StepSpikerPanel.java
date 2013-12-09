@@ -18,11 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
+import org.simbrain.util.Utils;
 
 /**
  * <b>StepSpikerPanel</b>.
@@ -33,7 +39,14 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     private JTextField tfResponseHeight = new JTextField();
 
     /** Response time field. */
-    private JTextField tfResponseTime = new JTextField();
+    private JTextField tfResponseDuration = new JTextField();
+
+    /**
+     * The prototypical rise and decay spike responder. Used for default values
+     * and when references are required by other gui classes to aspects of the
+     * rise and decay model class.
+     */
+    public static final Step PROTOTYPE_RESPONDER = new Step();
 
     /**
      * This method is the default constructor.
@@ -42,58 +55,111 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     public StepSpikerPanel() {
         tfResponseHeight.setColumns(6);
         this.addItem("Response height", tfResponseHeight);
-        this.addItem("Response time", tfResponseTime);
+        this.addItem("Response time", tfResponseDuration);
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
-    public void fillFieldValues() {
+    @Override
+    public void fillDefaultValues() {
+        tfResponseHeight
+                .setText(Double.toString(PROTOTYPE_RESPONDER.
+                        getResponseHeight()));
+        tfResponseDuration.setText(Double.toString(PROTOTYPE_RESPONDER.
+                getResponseDuration()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillFieldValues(List<SpikeResponder> spikeResponderList) {
+
         Step spikeResponder = (Step) spikeResponderList.get(0);
 
-        tfResponseHeight.setText(Double.toString(spikeResponder
-                .getResponseHeight()));
-        tfResponseTime
-                .setText(Double.toString(spikeResponder.getResponseTime()));
-
         // Handle consistency of multiply selections
+
+        // Handle Response Height
         if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
-                "getResponseHeight")) {
+                "getResponseHeight"))
+        {
             tfResponseHeight.setText(NULL_STRING);
+        } else {
+            tfResponseHeight.setText(Double.toString(spikeResponder
+                    .getResponseHeight()));
         }
 
+        // Handle Response Duration
         if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
-                "getResponseTime")) {
-            tfResponseTime.setText(NULL_STRING);
+                "getResponseDuration"))
+        {
+            tfResponseDuration.setText(NULL_STRING);
+        } else {
+            tfResponseDuration
+            .setText(Double.toString(spikeResponder.getResponseDuration()));
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(Synapse synapse) {
+
+        if (!(synapse.getSpikeResponder() instanceof Step)) {
+            synapse.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
+        }
+
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
+            }
+        }
+
+        writeValuesToRules(synapses);
+
+    }
+
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Response Height
+        double responseHeight = Utils.doubleParsable(tfResponseHeight);
+        if (!Double.isNaN(responseHeight)) {
+            for (Synapse s : synapses) {
+                ((Step) s.getSpikeResponder()).setResponseHeight(
+                        responseHeight);
+            }
+        }
+
+        // Response Duration
+        double responseDuration = Utils.doubleParsable(tfResponseDuration);
+        if (!Double.isNaN(responseDuration)) {
+            for (Synapse s : synapses) {
+                ((Step) s.getSpikeResponder()).setResponseDuration(
+                        responseDuration);
+            }
         }
     }
 
     /**
-     * Fill field values to default values for this synapse type.
+     * {@inheritDoc}
      */
-    public void fillDefaultValues() {
-        Step spikerRef = new Step();
-        tfResponseHeight
-                .setText(Double.toString(spikerRef.getResponseHeight()));
-        tfResponseTime.setText(Double.toString(spikerRef.getResponseTime()));
+    @Override
+    public Step getPrototypeResponder() {
+        return PROTOTYPE_RESPONDER;
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        for (int i = 0; i < spikeResponderList.size(); i++) {
-            Step stepRef = (Step) spikeResponderList.get(i);
-
-            if (!tfResponseHeight.getText().equals(NULL_STRING)) {
-                stepRef.setResponseHeight(Double.parseDouble(tfResponseHeight
-                        .getText()));
-            }
-
-            if (!tfResponseTime.getText().equals(NULL_STRING)) {
-                stepRef.setResponseTime(Double.parseDouble(tfResponseTime
-                        .getText()));
-            }
-        }
-    }
 }

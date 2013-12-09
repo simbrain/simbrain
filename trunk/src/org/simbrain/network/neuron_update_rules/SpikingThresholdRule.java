@@ -29,67 +29,66 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
  */
 public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
 
-	/** Threshold. */
-	private double threshold = .5;
+    /** Threshold. */
+    private double threshold = .5;
 
-	@Override
-	public SpikingThresholdRule deepCopy() {
-		SpikingThresholdRule neuron = new SpikingThresholdRule();
-		neuron.setThreshold(getThreshold());
-		return neuron;
-	}
+    @Override
+    public SpikingThresholdRule deepCopy() {
+        SpikingThresholdRule neuron = new SpikingThresholdRule();
+        neuron.setThreshold(getThreshold());
+        return neuron;
+    }
 
-	@Override
-	public void update(Neuron neuron) {
+    @Override
+    public void update(Neuron neuron) {
 
-		if (neuron.getWeightedInputs() >= threshold) {
-			setHasSpiked(true, neuron);
-			neuron.setBuffer(1);
-		} else {
-			setHasSpiked(false, neuron);
-			neuron.setBuffer(0); // Make this a separate variable?
-		}
+        if (neuron.getWeightedInputs() >= threshold) {
+            setHasSpiked(true, neuron);
+            neuron.setBuffer(1);
+        } else {
+            setHasSpiked(false, neuron);
+            neuron.setBuffer(0); // Make this a separate variable?
+        }
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getRandomValue() {
-		Random rand = new Random();
-		return rand.nextBoolean() ? 1 : 0;
-	}
-	
-	/**
-	 * @return the threshold
-	 */
-	public double getThreshold() {
-		return threshold;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRandomValue() {
+        Random rand = new Random();
+        return rand.nextBoolean() ? 1 : 0;
+    }
 
-	/**
-	 * @param threshold
-	 *            the threshold to set
-	 */
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
+    /**
+     * @return the threshold
+     */
+    public double getThreshold() {
+        return threshold;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Spiking Threshold";
-	}
+    /**
+     * @param threshold
+     *            the threshold to set
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
 
-	@Override
-	public double getCeiling() {
-		return 1;
-	}
+    @Override
+    public String getDescription() {
+        return "Spiking Threshold";
+    }
 
-	@Override
-	public double getFloor() {
-		return 0;
-	}
+    @Override
+    public double getCeiling() {
+        return 1 + 0.1;
+    }
 
+    @Override
+    public double getFloor() {
+        return 0;
+    }
 
 }

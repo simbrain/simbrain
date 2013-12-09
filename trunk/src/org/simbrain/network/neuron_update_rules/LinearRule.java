@@ -53,7 +53,7 @@ public class LinearRule extends NeuronUpdateRule implements
 	private Randomizer noiseGenerator = new Randomizer();
 
 	/** Add noise to the neuron. */
-	private boolean addNoise = false;
+	private boolean addNoise;
 
 	/** Clipping. */
 	private boolean clipping = DEFAULT_CLIPPING;
@@ -64,16 +64,16 @@ public class LinearRule extends NeuronUpdateRule implements
 	/** The lower bound of the activity if clipping is used. */
 	private double lowerBound = DEFAULT_LOWER_BOUND;
 
-	/**
-	 * @{inheritDoc
-	 */
+    /**
+     * {@inheritDoc}
+     */
 	public TimeType getTimeType() {
 		return TimeType.DISCRETE;
 	}
 
-	/**
-	 * @{inheritDoc
-	 */
+    /**
+     * {@inheritDoc}
+     */
 	public LinearRule deepCopy() {
 		LinearRule ln = new LinearRule();
 		ln.setBias(getBias());
@@ -87,10 +87,10 @@ public class LinearRule extends NeuronUpdateRule implements
 	}
 
 	/**
-	 * @{inheritDoc
+	 * {@inheritDoc}
 	 */
 	public void update(Neuron neuron) {
-		double wtdInput = neuron.getWeightedInputs();
+		double wtdInput = neuron.getWeightedInputs() + bias;
 		double val = slope * wtdInput;
 
 		if (addNoise) {

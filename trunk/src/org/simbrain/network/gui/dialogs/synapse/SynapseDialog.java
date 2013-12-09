@@ -23,18 +23,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
@@ -56,18 +54,27 @@ public class SynapseDialog extends StandardDialog {
     /**
      * Top panel. Contains fields for displaying/editing basic synapse
      * information.
-     * 
+     *
      * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
      */
-    private final BasicSynapseInfoPanel topPanel;
+    private final BasicSynapseInfoPanel infoPanel;
 
     /**
      * Bottom panel. Contains fields for displaying/editing synapse update rule
      * parameters.
-     * 
-     * @see org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel.java
      */
-    private final SynapseUpdateSettingsPanel bottomPanel;
+    private final SynapseUpdateSettingsPanel updatePanel;
+
+    /** The currently displayed spike responder panel. */
+    private final SpikeResponderSettingsPanel responderPanel;
+
+    /**
+     * A boolean value to store the results of {@link #spikeResponderTest(List)}
+     * which determines whether or not a spike responder panel should be
+     * displayed based on the update rules used by the presynaptic neurons to
+     * the synapses being edited.
+     */
+    private final boolean usesSpikeResponders;
 
     /**
      * Help Button. Links to information about the currently selected synapse
@@ -95,9 +102,12 @@ public class SynapseDialog extends StandardDialog {
      */
     public SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        topPanel = new BasicSynapseInfoPanel(synapseList, this);
-        bottomPanel = new SynapseUpdateSettingsPanel(synapseList, this);
-        init();
+        infoPanel = new BasicSynapseInfoPanel(synapseList, this);
+        updatePanel = new SynapseUpdateSettingsPanel(synapseList, this);
+        responderPanel = new SpikeResponderSettingsPanel(synapseList,
+                this);
+        usesSpikeResponders = spikeResponderTest(synapseList);
+        initializeLayout();
         addListeners();
         updateHelp();
     }
@@ -121,11 +131,15 @@ public class SynapseDialog extends StandardDialog {
     /**
      * Initializes the components on the panel.
      */
-    private void init() {
+    private void initializeLayout() {
         setTitle("Synapse Dialog");
-        mainPanel.add(topPanel);
+        mainPanel.add(infoPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainPanel.add(bottomPanel);
+        mainPanel.add(updatePanel);
+        if (usesSpikeResponders) {
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            mainPanel.add(responderPanel);
+        }
         setContentPane(mainPanel);
         this.addButton(helpButton);
     }
@@ -134,17 +148,17 @@ public class SynapseDialog extends StandardDialog {
      * Add listeners to the components of the dialog
      */
     private void addListeners() {
-    	bottomPanel.getCbSynapseType().addActionListener(
-    			new ActionListener() {
+        updatePanel.getCbSynapseType().addActionListener(
+                new ActionListener() {
 
-    				@Override
-    				public void actionPerformed(ActionEvent arg0) {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
 
-    					updateHelp();
+                        updateHelp();
 
-    				}
+                    }
 
-    			});
+                });
     }
 
     /**
@@ -160,12 +174,12 @@ public class SynapseDialog extends StandardDialog {
      * Set the help page based on the currently selected synapse type.
      */
     public void updateHelp() {
-        if (bottomPanel.getCbSynapseType().getSelectedItem() == NULL_STRING) {
+        if (updatePanel.getCbSynapseType().getSelectedItem() == NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else {
             String name =
-                    (String) bottomPanel.getCbSynapseType()
-                            .getSelectedItem();
+                    (String) updatePanel.getCbSynapseType()
+                        .getSelectedItem();
             helpAction =
                     new ShowHelpAction("Pages/Network/synapse/" + name
                             + ".html");
@@ -178,10 +192,15 @@ public class SynapseDialog extends StandardDialog {
      */
     public void commitChanges() {
 
-        topPanel.commitChanges(synapseList);
+        infoPanel.commitChanges(synapseList);
 
         // Now commit changes specific to the synapse type
-        bottomPanel.getSynapsePanel().commitChanges(synapseList);
+        updatePanel.getSynapsePanel().commitChanges(synapseList);
+
+        // If applicable commit changes for spike responders
+        if (usesSpikeResponders) {
+            responderPanel.getSpikeResponsePanel().commitChanges(synapseList);
+        }
 
         // Notify the network that changes have been made
         synapseList.get(0).getNetwork().fireNetworkChanged();
@@ -196,24 +215,51 @@ public class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * Test Main: For fast prototyping.
-     * 
-     * @param args
+     * Tests to make sure that all the source neurons of each synapse use
+     * spiking neuron update rules. This is used to determine if a spike
+     * responder panel should or shouldn't be displayed. If all the source
+     * neurons use a spiking rule, then the panel ought to appear, conversely
+     * if any of the source neurons do not use a spiking neuron update rule, the
+     * panel ought not to appear.
+     * @param synapses the synapses who's source neurons will be tested.
+     * @return whether or not it would be applicable to display a spike
+     * responder panel based on the update rules in use by the source neurons
      */
-    public static void main(String[] args) {
-        Network net = new Network();
-        NetworkPanel np = new NetworkPanel(net);
-        Neuron n = new Neuron(net, new LinearRule());
-        NeuronNode nn = new NeuronNode(np, n);
-
-        Synapse s = new Synapse(n, n);
-        ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
-        arr.add(new SynapseNode(np, nn, nn, s));
-        SynapseDialog nd = new SynapseDialog(arr);
-
-        nd.pack();
-        nd.setVisible(true);
-
+    public static boolean spikeResponderTest(List<Synapse> synapses) {
+        HashSet<SpikingNeuronUpdateRule> snurs =
+                new HashSet<SpikingNeuronUpdateRule>();
+        for (Synapse s : synapses) {
+            NeuronUpdateRule nur = s.getSource().getUpdateRule();
+            if (!snurs.contains(nur)) {
+                if (!(nur instanceof SpikingNeuronUpdateRule)) {
+                    return false;
+                } else {
+                    snurs.add((SpikingNeuronUpdateRule) nur);
+                }
+            }
+        }
+        return true;
     }
+
+//    /**
+//     * Test Main: For fast prototyping.
+//     *
+//     * @param args
+//     */
+//    public static void main(String[] args) {
+//        Network net = new Network();
+//        NetworkPanel np = new NetworkPanel(net);
+//        Neuron n = new Neuron(net, new LinearRule());
+//        NeuronNode nn = new NeuronNode(np, n);
+//
+//        Synapse s = new Synapse(n, n);
+//        ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
+//        arr.add(new SynapseNode(np, nn, nn, s));
+//        SynapseDialog nd = new SynapseDialog(arr);
+//
+//        nd.pack();
+//        nd.setVisible(true);
+//
+//    }
 
 }

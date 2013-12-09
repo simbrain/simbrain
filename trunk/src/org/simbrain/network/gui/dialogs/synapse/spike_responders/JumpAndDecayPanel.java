@@ -18,11 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.Utils;
 
 /**
  * <b>JumpAndDecayPanel</b>.
@@ -36,7 +42,10 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
     private JTextField tfBaseLine = new JTextField();
 
     /** Decay rate field. */
-    private JTextField tfDecayRate = new JTextField();
+    private JTextField tfTimeConstant = new JTextField();
+
+    /** The prototypical jump and decay responder. */
+    public static final JumpAndDecay PROTOTYPE_RESPONDER = new JumpAndDecay();
 
     /**
      * This method is the default constructor.
@@ -45,66 +54,131 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         tfJumpHeight.setColumns(6);
         this.addItem("Jump height", tfJumpHeight);
         this.addItem("Base-line", tfBaseLine);
-        this.addItem("Decay rate", tfDecayRate);
+        this.addItem("Time Constant", tfTimeConstant);
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
-    public void fillFieldValues() {
+    @Override
+    public void fillFieldValues(List<SpikeResponder> spikeResponderList) {
+
         JumpAndDecay spikeResponder = (JumpAndDecay) spikeResponderList.get(0);
 
-        tfJumpHeight.setText(Double.toString(spikeResponder.getJumpHeight()));
-        tfBaseLine.setText(Double.toString(spikeResponder.getBaseLine()));
-        tfDecayRate.setText(Double.toString(spikeResponder.getDecayRate()));
-
         // Handle consistency of multiply selections
+
+        // Handle Jump Height
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getJumpHeight")) {
+                "getJumpHeight"))
+        {
             tfJumpHeight.setText(NULL_STRING);
+        } else {
+            tfJumpHeight.setText(Double.toString(spikeResponder.
+                    getJumpHeight()));
         }
 
+        // Handle Baseline
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getBaseLine")) {
+                "getBaseLine"))
+        {
             tfBaseLine.setText(NULL_STRING);
+        } else {
+            tfBaseLine.setText(Double.toString(spikeResponder.getBaseLine()));
         }
 
+        // Handle Decay Rate
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
-                "getDecayRate")) {
-            tfDecayRate.setText(NULL_STRING);
+                "getTimeConstant"))
+        {
+            tfTimeConstant.setText(NULL_STRING);
+        } else {
+            tfTimeConstant.setText(Double.toString(spikeResponder.
+                    getTimeConstant()));
         }
+
     }
 
     /**
-     * Fill field values to default values for this synapse type.
+     * {@inheritDoc}
      */
+    @Override
     public void fillDefaultValues() {
-        JumpAndDecay spikerRef = new JumpAndDecay();
-        tfJumpHeight.setText(Double.toString(spikerRef.getJumpHeight()));
-        tfBaseLine.setText(Double.toString(spikerRef.getBaseLine()));
-        tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
+        tfJumpHeight.setText(Double.toString(PROTOTYPE_RESPONDER.
+                getJumpHeight()));
+        tfBaseLine.setText(Double.toString(PROTOTYPE_RESPONDER.getBaseLine()));
+        tfTimeConstant.setText(Double.toString(PROTOTYPE_RESPONDER.
+                getTimeConstant()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        for (int i = 0; i < spikeResponderList.size(); i++) {
-            JumpAndDecay spikerRef = (JumpAndDecay) spikeResponderList.get(i);
+    @Override
+    public void commitChanges(Synapse synapse) {
 
-            if (!tfJumpHeight.getText().equals(NULL_STRING)) {
-                spikerRef.setJumpHeight(Double.parseDouble(tfJumpHeight
-                        .getText()));
-            }
+        if (!(synapse.getSpikeResponder() instanceof JumpAndDecay)) {
+            synapse.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
+        }
 
-            if (!tfBaseLine.getText().equals(NULL_STRING)) {
-                spikerRef.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
-            }
+        writeValuesToRules(Collections.singletonList(synapse));
 
-            if (!tfDecayRate.getText().equals(NULL_STRING)) {
-                spikerRef
-                        .setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Synapse> synapses) {
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
             }
         }
+
+        writeValuesToRules(synapses);
+
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Jump Height
+        double jumpHeight = Utils.doubleParsable(tfJumpHeight);
+        if (!Double.isNaN(jumpHeight)) {
+            for (Synapse s : synapses) {
+                ((JumpAndDecay) s.getSpikeResponder()).setJumpHeight(
+                        jumpHeight);
+            }
+        }
+
+        // Base Line
+        double baseLine = Utils.doubleParsable(tfBaseLine);
+        if (!Double.isNaN(baseLine)) {
+            for (Synapse s : synapses) {
+                ((JumpAndDecay) s.getSpikeResponder()).setBaseLine(baseLine);
+            }
+        }
+
+        // Decay Rate
+        double timeConstant = Utils.doubleParsable(tfTimeConstant);
+        if (!Double.isNaN(timeConstant)) {
+            for (Synapse s : synapses) {
+                ((JumpAndDecay) s.getSpikeResponder()).setTimeConstant(
+                        timeConstant);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JumpAndDecay getPrototypeResponder() {
+        return PROTOTYPE_RESPONDER;
+    }
+
 }

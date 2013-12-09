@@ -19,8 +19,6 @@
 package org.simbrain.network.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,10 +54,10 @@ public class Synapse {
     private SynapseUpdateRule learningRule;
 
     /** Only used of source neuron is a spiking neuron. */
-    protected SpikeResponder spikeResponder;
+    private SpikeResponder spikeResponder;
 
     /** Synapse id. */
-    protected String id;
+    private String id;
 
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 2;
@@ -68,16 +66,19 @@ public class Synapse {
     // public static final int NUM_PARAMETERS = 8;
 
     /** Strength of synapse. */
-    protected double strength = 1;
+    private double strength = 1;
+
+    /** Post-Synaptic Response */
+    private double psr;
 
     /** Amount to increment the neuron. */
-    protected double increment = 1;
+    private double increment = 1;
 
     /** Upper limit of synapse. */
-    protected double upperBound = 10;
+    private double upperBound = 10;
 
     /** Lower limit of synapse. */
-    protected double lowerBound = -10;
+    private double lowerBound = -10;
 
     /** Time to delay sending activation to target neuron. */
     private int delay;
@@ -95,7 +96,7 @@ public class Synapse {
      * Boolean flag, indicating whether or not this synapse's strength can be
      * changed by any means other than direct user intervention.
      */
-    private boolean frozen = false;
+    private boolean frozen;
 
     /** Manages synaptic delay */
     private LinkedList<Double> delayManager;
@@ -218,9 +219,9 @@ public class Synapse {
      * Update this synapse using its current learning rule.
      */
     public void update() {
-    	if(!isFrozen()) {
-    		learningRule.update(this);
-    	}
+        if (!isFrozen()) {
+            learningRule.update(this);
+        }
     }
 
     /**
@@ -231,19 +232,16 @@ public class Synapse {
      * @return Value
      */
     public double getValue() {
-        double val;
-
         if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            spikeResponder.update();
-            val = strength * spikeResponder.getValue();
+            spikeResponder.update(this);
         } else {
-            val = source.getActivation() * strength;
+            psr = source.getActivation() * strength;
         }
 
         if (delayManager == null) {
-            return val;
+            return psr;
         } else {
-            enqueu(val);
+            enqueu(psr);
             return dequeu();
         }
     }
@@ -486,9 +484,9 @@ public class Synapse {
      */
     public double getRandomValue() {
         this.getParentNetwork().getWeightRandomizer()
-                .setUpperBound(upperBound);
+        .setUpperBound(upperBound);
         this.getParentNetwork().getWeightRandomizer()
-                .setLowerBound(lowerBound);
+        .setLowerBound(lowerBound);
         return this.getParentNetwork().getWeightRandomizer().getRandom();
     }
 
@@ -554,12 +552,9 @@ public class Synapse {
      */
     public void setSpikeResponder(final SpikeResponder sr) {
         this.spikeResponder = sr;
-
         if (sr == null) {
             return;
         }
-
-        spikeResponder.setParent(this);
     }
 
     /**
@@ -755,8 +750,8 @@ public class Synapse {
      * update rules in order.
      *
      * @param synapseList
-     *            The list of neurons whose update rules we want to query.
-     * @return Returns a list of synapse update rules associated with a
+     *            The list of synapses whose update rules we want to query.
+     * @return Returns a list of synapse update rules associated with the
      *         group of synapses
      */
     public static List<SynapseUpdateRule> getRuleList(
@@ -834,6 +829,20 @@ public class Synapse {
      */
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
+    }
+
+    /**
+     * @return the post-synaptic response
+     */
+    public double getPsr() {
+        return psr;
+    }
+
+    /**
+     * @param psr set the post-synaptic response
+     */
+    public void setPsr(double psr) {
+        this.psr = psr;
     }
 
 }

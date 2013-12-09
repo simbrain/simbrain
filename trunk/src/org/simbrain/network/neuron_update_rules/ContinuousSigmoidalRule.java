@@ -121,7 +121,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
         double timeVal = neuron.getNetwork().getTimeStep() / timeConstant;
 
-        double val = timeVal * neuron.getWeightedInputs();
+        double val = timeVal * (neuron.getWeightedInputs() + bias);
 
         netActivation = (netActivation * (1 - timeVal)) + val;
 

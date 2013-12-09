@@ -34,4 +34,5 @@ public interface BiasedUpdateRule {
      * @param bias the bias to set.
      */
     void setBias(double bias);
+
 }

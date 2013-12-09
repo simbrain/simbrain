@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>Probabilistic</b> spike responders produces a response with some
@@ -29,40 +30,47 @@ public class ProbabilisticResponder extends SpikeResponder {
     /** Probability of producing an output; must be between 0 and 1. */
     private double activationProbability = .5;
 
-    /** Amount of activation to return when this responder is activated. */
+    /**
+     * Amount by which the synapse's strength will be scaled to determine the
+     * post synaptic response of the synapse in the event that this responder
+     * is actually active.
+     */
     private double responseValue = 1;
 
     /**
-     * @return duplicate StepSynapse (used, e.g., in copy/paste).
+     * {@inheritDoc}
      */
-    public SpikeResponder duplicate() {
-        ProbabilisticResponder s = new ProbabilisticResponder();
-        s = (ProbabilisticResponder) super.duplicate(s);
-        s.setActivationProbability(this.getActivationProbability());
-        s.setResponseValue(this.getResponseValue());
-        return s;
+    @Override
+    public ProbabilisticResponder deepCopy() {
+        ProbabilisticResponder pr = new ProbabilisticResponder();
+        pr.setActivationProbability(this.getActivationProbability());
+        pr.setResponseValue(this.getResponseValue());
+        return pr;
     }
 
     /**
-     * Update the synapse.
+     * {@inheritDoc}
      */
-    public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
-                .hasSpiked()) {
+    public void update(Synapse s) {
+        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
+                .hasSpiked())
+        {
             if (Math.random() > (1 - activationProbability)) {
-                value = responseValue * parent.getStrength();
+                value = responseValue * s.getStrength();
             } else {
                 value = 0;
             }
         } else {
             value = 0; // In case it did not spike at all;
         }
+        s.setPsr(value);
     }
 
     /**
-     * @return Name of synapse type.
+     * {@inheritDoc}
      */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Probabilistic";
     }
 

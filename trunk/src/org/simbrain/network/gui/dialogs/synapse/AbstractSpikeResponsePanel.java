@@ -19,12 +19,28 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.
+    JumpAndDecayPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.
+    ProbabilisticSpikeResponderPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.
+    RiseAndDecayPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.
+    StepSpikerPanel;
+import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.
+    ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -35,14 +51,38 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     /** Null string. */
     public static final String NULL_STRING = "...";
 
+    /**
+     * A mapping of available spike responders to their respective panels. Used
+     * as a reference (especially for combo-boxes) by GUI classes.
+     */
+    public static final HashMap<String, AbstractSpikeResponsePanel>
+    RESPONDER_MAP = new HashMap<String, AbstractSpikeResponsePanel>();
+
+    static {
+        RESPONDER_MAP.put(new JumpAndDecay().getDescription(),
+                new JumpAndDecayPanel());
+        RESPONDER_MAP.put(new ProbabilisticResponder().getDescription(),
+                new ProbabilisticSpikeResponderPanel());
+        RESPONDER_MAP.put(new RiseAndDecay().getDescription(),
+                new RiseAndDecayPanel());
+        RESPONDER_MAP.put(new Step().getDescription(),
+                new StepSpikerPanel());
+    }
+
     /** Main panel. */
-    protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** The neurons being modified. */
-    protected ArrayList spikeResponderList;
-
-    /** Parent network. */
-    protected org.simbrain.network.core.Network parentNet = null;
+    /**
+     * A flag used to indicate whether this panel will be replacing spike
+     * responders or simply writing to them. In cases where the panel
+     * represents the same responder as the responder of each of the synapses
+     * (i.e. Step panel & Step spike responder) the synapses' update rules are
+     * edited, not replaced. However, if the panel does not correspond to the
+     * spike responder of the synapses being edited, then new
+     * SpikeResponder objects are created, and replace the old rule.
+     * This optimization prevents multiple redundant "instanceof" checks.
+     */
+    private boolean replacing = true;
 
     /**
      * Adds an item.
@@ -74,8 +114,11 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Populate fields with current data.
+     * @param spikeResponderList the list of spike responders being used to
+     * ascertain which values should fill their respective fields.
      */
-    public abstract void fillFieldValues();
+    public abstract void fillFieldValues(
+            final List<SpikeResponder> spikeResponderList);
 
     /**
      * Populate fields with default data.
@@ -84,22 +127,73 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
+     * Specifically, this version is typically used to commit changes to a
+     * synapse which will be used as a template and copied, since it only takes
+     * in one synapse. This typically occurs during the creation of multiple
+     * synapses.
+     * @param synapse the synapse to which spike responder changes will be
+     * committed
      */
-    public abstract void commitChanges();
+    public abstract void commitChanges(final Synapse synapse);
 
     /**
-     * @return Returns the spiker_list.
+     * Called externally when the dialog is closed, to commit any changes made.
+     * Specifically, this version is used in the editing process (rather than
+     * creation), as it takes in a whole list of synapses and commits changes to
+     * the spike responders of all of them in accordance with the values entered
+     * into the panel's fields. This method is meant to ensure that each synapse
+     * has the correct kind of spike responder, then pass the list to
+     * {@link #writeValuesToRules(List)} to make the actual changes.
+     *
+     * @param synapses the synapses to which spike responder changes will be
+     * committed
      */
-    public ArrayList getSpikeResponderList() {
-        return spikeResponderList;
+    public abstract void commitChanges(final List<Synapse> synapses);
+
+    /**
+     * Used internally to actually write all changes to the spike responders of
+     * a given list of synapses. Prior to using this method it must be the case
+     * that all synapses in the lists' spike responders are of the appropriate
+     * type, otherwise a ClassCastException will be thrown.
+     * @param synapses the synapses whose spike responders will be written to
+     * based on the values in their respective fields.
+     */
+    protected abstract void writeValuesToRules(final List<Synapse> synapses);
+
+    /**
+     * Tells this panel whether it is going to be editing spike responders,
+     * or creating new ones and replacing the spike responders of each of the
+     * synapses being edited.
+     *
+     * @param replace
+     *              tell the panel if it's replacing responders or editing them
+     */
+    protected void setReplace(boolean replace) {
+        this.replacing = replace;
     }
 
     /**
-     * @param spikerList The spiker_list to set.
+     * Are we replacing rules or editing them? Replacing happens when
+     * {@link #commitChanges(List)} is called on a synapse panel whose rule is
+     * different from the rules of the synapses being edited.
+     *
+     * @return replacing or editing
      */
-    public void setSpikeResponderList(final ArrayList spikerList) {
-        this.spikeResponderList = spikerList;
+    protected boolean isReplace() {
+        return replacing;
     }
+
+    /**
+     * @return the list of the names of the spike responders for combo-boxes
+     */
+    public static String [] getResponderList() {
+        return RESPONDER_MAP.keySet().toArray(new String[RESPONDER_MAP.size()]);
+    }
+
+    /**
+     * @return the prototypical model rule represented by this panel.
+     */
+    public abstract SpikeResponder getPrototypeResponder();
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted..
@@ -112,4 +206,19 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
         labelPanel.add(theLabel);
         this.add(labelPanel, BorderLayout.SOUTH);
     }
+
+    /**
+     * @return the mainPanel
+     */
+    public LabelledItemPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    /**
+     * @param mainPanel the mainPanel to set
+     */
+    public void setMainPanel(LabelledItemPanel mainPanel) {
+        this.mainPanel = mainPanel;
+    }
+
 }

@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -26,35 +29,23 @@ import org.simbrain.network.core.Synapse;
 public abstract class SpikeResponder {
 
     /** Value. */
-    protected double value = 0;
-
-    /** Parent. */
-    protected Synapse parent;
-
-    /** Used for combo box. */
-    private static String[] typeList = { Step.getName(),
-            JumpAndDecay.getName(), ProbabilisticResponder.getName(),
-            RiseAndDecay.getName() };
+    protected double value;
 
     /**
-     * @return Spike responder to duplcate.
+     * @return Spike responder to duplicate.
      */
-    public abstract SpikeResponder duplicate();
+    public abstract SpikeResponder deepCopy();
 
     /**
      * Update the synapse.
+     * @param s the synapse being updated
      */
-    public abstract void update();
+    public abstract void update(final Synapse s);
 
     /**
-     * Duplicates synapses of type Spiker.
-     *
-     * @param s Synapse to duplicate
-     * @return Duplicate synapse
+     * @return the name of the spike responder
      */
-    public SpikeResponder duplicate(final SpikeResponder s) {
-        return s;
-    }
+    public abstract String getDescription();
 
     /**
      * @return the name of the class of this synapse
@@ -65,26 +56,23 @@ public abstract class SpikeResponder {
     }
 
     /**
-     * @return Returns the typeList.
-     */
-    public static String[] getTypeList() {
-        return typeList;
-    }
-
-    /**
-     * Helper function for combo boxes. Associates strings with indices.
+     * A method which takes in a list of synapses and returns a list of their
+     * spike responder, if they have any.
      *
-     * @param type Type of spiker
-     * @return Combo box index
+     * @param synapses
+     *            The list of synapses whose spike responders we want to query.
+     * @return Returns a list of spike responders associated with the
+     *         group of synapses
      */
-    public static int getSpikerTypeIndex(final String type) {
-        for (int i = 0; i < typeList.length; i++) {
-            if (type.equals(typeList[i])) {
-                return i;
+    public static List<SpikeResponder> getResponderList(List<Synapse> synapses)
+    {
+        List<SpikeResponder> srList = new ArrayList<SpikeResponder>();
+        for (Synapse s : synapses) {
+            if (s.getSpikeResponder() != null) {
+                srList.add(s.getSpikeResponder());
             }
         }
-
-        return 0;
+        return srList;
     }
 
     /**
@@ -101,17 +89,4 @@ public abstract class SpikeResponder {
         this.value = value;
     }
 
-    /**
-     * @return Returns the parent.
-     */
-    public Synapse getParent() {
-        return parent;
-    }
-
-    /**
-     * @param parent The parent to set.
-     */
-    public void setParent(final Synapse parent) {
-        this.parent = parent;
-    }
 }

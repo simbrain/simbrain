@@ -18,11 +18,18 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.
+    ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.Utils;
 
 /**
  * <b>ProbabilisticSpikeResponderPanel</b>.
@@ -36,6 +43,10 @@ public class ProbabilisticSpikeResponderPanel extends
     /** Response value. */
     private JTextField tfResponseValue = new JTextField();
 
+    /** The prototypical probabilistic responder rule. */
+    public static final ProbabilisticResponder PROTOTYPE_RESPONDER =
+            new ProbabilisticResponder();
+
     /**
      * This method is the default constructor.
      *
@@ -47,57 +58,111 @@ public class ProbabilisticSpikeResponderPanel extends
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
-    public void fillFieldValues() {
-        ProbabilisticResponder spikeResponder = (ProbabilisticResponder) spikeResponderList
+    @Override
+    public void fillFieldValues(List<SpikeResponder> spikeResponderList) {
+
+        ProbabilisticResponder spikeResponder =
+                (ProbabilisticResponder) spikeResponderList
                 .get(0);
 
-        tfActivationProbability.setText(Double.toString(spikeResponder
-                .getActivationProbability()));
-        tfResponseValue.setText(Double.toString(spikeResponder
-                .getResponseValue()));
-
         // Handle consistency of multiply selections
+
+        // Handle Activation Probability
         if (!NetworkUtils.isConsistent(spikeResponderList,
-                ProbabilisticResponder.class, "getActivationProbability")) {
+                ProbabilisticResponder.class, "getActivationProbability"))
+        {
             tfActivationProbability.setText(NULL_STRING);
+        } else {
+            tfActivationProbability.setText(Double.toString(spikeResponder
+                    .getActivationProbability()));
         }
 
+        // Handle Response Value
         if (!NetworkUtils.isConsistent(spikeResponderList,
-                ProbabilisticResponder.class, "getResponseValue")) {
+                ProbabilisticResponder.class, "getResponseValue"))
+        {
             tfResponseValue.setText(NULL_STRING);
+        } else {
+            tfResponseValue.setText(Double.toString(spikeResponder
+                    .getResponseValue()));
         }
+
     }
 
     /**
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        ProbabilisticResponder spikerRef = new ProbabilisticResponder();
-        tfActivationProbability.setText(Double.toString(spikerRef
+        tfActivationProbability.setText(Double.toString(PROTOTYPE_RESPONDER
                 .getActivationProbability()));
-        tfResponseValue.setText(Double.toString(spikerRef
+        tfResponseValue.setText(Double.toString(PROTOTYPE_RESPONDER
                 .getActivationProbability()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
-        for (int i = 0; i < spikeResponderList.size(); i++) {
-            ProbabilisticResponder stepRef = (ProbabilisticResponder) spikeResponderList
-                    .get(i);
+    @Override
+    public void commitChanges(Synapse synapse) {
 
-            if (!tfActivationProbability.getText().equals(NULL_STRING)) {
-                stepRef.setActivationProbability(Double
-                        .parseDouble(tfActivationProbability.getText()));
-            }
+        if (!(synapse.getSpikeResponder() instanceof ProbabilisticResponder)) {
+            synapse.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
+        }
 
-            if (!tfResponseValue.getText().equals(NULL_STRING)) {
-                stepRef.setResponseValue(Double.parseDouble(tfResponseValue
-                        .getText()));
+        writeValuesToRules(Collections.singletonList(synapse));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Synapse> synapses) {
+
+        if (isReplace()) {
+            for (Synapse s : synapses) {
+                s.setSpikeResponder(PROTOTYPE_RESPONDER.deepCopy());
             }
         }
+
+        writeValuesToRules(synapses);
+
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Synapse> synapses) {
+
+        // Activation Probability
+        double actProb = Utils.doubleParsable(tfActivationProbability);
+        if (!Double.isNaN(actProb)) {
+            for (Synapse s : synapses) {
+                ((ProbabilisticResponder) s.getSpikeResponder()).
+                setActivationProbability(actProb);
+            }
+        }
+
+        // Response Value
+        double responseValue = Utils.doubleParsable(tfResponseValue);
+        if (!Double.isNaN(responseValue)) {
+            for (Synapse s : synapses) {
+                ((ProbabilisticResponder) s.getSpikeResponder()).
+                setResponseValue(responseValue);
+            }
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProbabilisticResponder getPrototypeResponder() {
+        return PROTOTYPE_RESPONDER;
+    }
+
 }

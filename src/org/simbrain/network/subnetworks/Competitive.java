@@ -139,7 +139,9 @@ public class Competitive extends NeuronGroup {
         // Determine Winner
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron n = getNeuronList().get(i);
-            n.update();
+            if (!n.isClamped()) {
+                n.update();
+            }
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;

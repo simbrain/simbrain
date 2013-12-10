@@ -1860,4 +1860,50 @@ public class Network {
 		addGroup(group);
 	}
 
+	/**
+	 * Freeze or unfreeze all synapses in the network.
+	 *
+	 * @param freeze frozen if true; unfrozen if false
+	 */
+	public void freezeSynapses(final boolean freeze) {
+	    // Freeze synapses in synapse groups
+	    for (SynapseGroup group : getSynapseGroups()) {
+	        group.setFrozen(freeze);
+	    }
+	    // Freeze loose synapses
+	    for (Synapse synapse : this.getSynapseList()) {
+	        synapse.setFrozen(freeze);
+	    }
+	}
+
+	/**
+	 * Convenience method to return a list of synapse groups in the network.
+	 *
+	 * @return list of all synapse groups
+	 */
+    public List<SynapseGroup> getSynapseGroups() {
+        List<SynapseGroup> retList = new ArrayList<SynapseGroup>();
+        for (Group group : this.getGroupList()) {
+            if (group instanceof SynapseGroup) {
+                retList.add((SynapseGroup) group);
+            }
+        }
+        return retList;
+    }
+
+    /**
+     * Convenience method to return a list of neuron groups in the network.
+     *
+     * @return list of all neuron groups
+     */
+    public List<NeuronGroup> getNeuronGroups() {
+        List<NeuronGroup> retList = new ArrayList<NeuronGroup>();
+        for (Group group : this.getGroupList()) {
+            if (group instanceof NeuronGroup) {
+                retList.add((NeuronGroup) group);
+            }
+        }
+        return retList;
+    }
+
 }

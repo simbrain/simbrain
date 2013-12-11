@@ -36,6 +36,12 @@ import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
  */
 public class Hearing extends Sensor {
 
+    /** Default phrase. */
+    public static final String DEFAULT_PHRASE = "Hi!";
+
+    /** Default output amount. */
+    public static final double DEFAULT_OUTPUT_AMOUNT = 1;
+
     /** The thing this hearing sensor listens for. */
     private String phrase = "";
 
@@ -47,7 +53,7 @@ public class Hearing extends Sensor {
     /**
      * If amount to pass out if this sensor is activated.
      */
-    private double outputAmount = 1;
+    private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
     /**
      * Construct the hearing sensor.

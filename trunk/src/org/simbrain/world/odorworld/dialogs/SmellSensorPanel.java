@@ -16,8 +16,10 @@ package org.simbrain.world.odorworld.dialogs;
 import javax.swing.JTextField;
 import javax.swing.JTextField;
 
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.sensors.TileSensor;
 
 /**
  * Panel to add a smell sensor to an entity.
@@ -28,49 +30,77 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 public class SmellSensorPanel extends AbstractSensorPanel {
 
     /** Text field to edit label. */
-    private JTextField label = new JTextField("SmellSensor");
+    private JTextField label = new JTextField();
 
     /** Text field to edit theta. */
-    private JTextField theta = new JTextField("" + Math.PI/4);
+    private JTextField theta = new JTextField();
 
     /** Text field to edit radius. */
-    private JTextField radius = new JTextField("" + 23);
+    private JTextField radius = new JTextField();
 
     /** Entity to which a smell sensor is being added. */
     private OdorWorldEntity entity;
 
     /**
-     * Default constructor.
+     * Reference to smell sensor. Initially null if this is a creation panel.
+     */
+    private SmellSensor smellSensor;
+
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
+
+    /**
+     * Constructor for the case where a sensor is being created.
      *
      * @param entity the entity to which a smell sensor is added.
      */
     public SmellSensorPanel(OdorWorldEntity entity) {
         this.entity = entity;
+        isCreationPanel = true;
         addItem("Label", label);
         addItem("Sensor angle", theta);
         addItem("Sensor length", radius);
-        setVisible(true);
+        fillFieldValues();
+    }
+
+    /**
+     * Constructor for the case where a sensor is being edited.
+     *
+     * @param entity the entity to which a smell sensor is added.
+     * @param sensor sensor to edit
+     */
+    public SmellSensorPanel(OdorWorldEntity entity, SmellSensor sensor) {
+        this.entity = entity;
+        this.smellSensor = sensor;
+        isCreationPanel = false;
+        addItem("Label", label);
+        addItem("Sensor angle", theta);
+        addItem("Sensor length", radius);
+        fillFieldValues();
     }
 
     @Override
     public void commitChanges() {
-        entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText()))); // todo: label
-
+        if (isCreationPanel) {
+            entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText())));
+        } else {
+            smellSensor.setLabel(label.getText());
+            smellSensor.setTheta(Double.parseDouble(theta.getText()));
+            smellSensor.setRadius(Double.parseDouble(radius.getText()));
+            smellSensor.getParent().getParentWorld().fireEntityChanged(smellSensor.getParent());
+        }
     }
 
-    /** Save changes to an edited smell sensor. */
-    public void commitChanges(SmellSensor sensor) {
-        sensor.setLabel(label.getText());
-        sensor.setTheta(Double.parseDouble(theta.getText()));
-        sensor.setRadius(Double.parseDouble(radius.getText()));
-        sensor.getParent().getParentWorld()
-        .fireEntityChanged(sensor.getParent());
-    }
-
-    /** Fill in appropriate text fields when smell sensor is being modified. */
-    public void fillFieldValues(SmellSensor sensor) {
-        label.setText("" + sensor.getLabel());
-        theta.setText("" + sensor.getTheta());
-        radius.setText("" + sensor.getRadius());
+    @Override
+    public void fillFieldValues() {
+        if (isCreationPanel) {
+            label.setText("" + SmellSensor.DEFAULT_LABEL);
+            theta.setText("" + SmellSensor.DEFAULT_THETA);
+            radius.setText("" + SmellSensor.DEFAULT_RADIUS);
+        } else {
+            label.setText("" + smellSensor.getLabel());
+            theta.setText("" + smellSensor.getTheta());
+            radius.setText("" + smellSensor.getRadius());
+        }
     }
 }

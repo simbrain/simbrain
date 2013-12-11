@@ -15,12 +15,13 @@ package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
 
+import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Panel to add a straight movement effector to an entity.
+ * Panel to add a straight movement effector to an entity or to modify and existing one.
  *
  * @author Lam Nguyen
  *
@@ -28,16 +29,24 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 public class StraightEffectorPanel extends AbstractEffectorPanel {
 
     /** Text field to edit label. */
-    private JTextField label = new JTextField("Go-Straight");
+    private JTextField label = new JTextField();
 
     /** Text field to edit the base movement rate. */
-    private JTextField bma = new JTextField("" + 0);
+    private JTextField bma = new JTextField();
 
     /** Entity to which a straight movement effector is being added. */
     private RotatingEntity entity;
 
     /**
-     * Default constructor.
+     * Reference to straight movement effector. Initially null if this is a creation panel.
+     */
+    private StraightMovement straightEffector;
+
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
+
+    /**
+     * Constructor for the case where an effector is being created.
      *
      * @param entity the entity to which a straight movement effector is added.
      */
@@ -45,29 +54,42 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
         this.entity = (RotatingEntity) entity;
         addItem("Label", label);
         addItem("Base movement amount", bma); // TODO: Better name?
-        setVisible(true);
+        isCreationPanel = true;
+        fillFieldValues();
+    }
+
+    /**
+     * Constructor for the case where an effector is being edited.
+     *
+     * @param entity the entity to which a straight movement effector is added.
+     */
+    public StraightEffectorPanel(OdorWorldEntity entity, StraightMovement effector) {
+        this.entity = (RotatingEntity) entity;
+        this.straightEffector = effector;
+        addItem("Label", label);
+        addItem("Base movement amount", bma);
+        isCreationPanel = false;
+        fillFieldValues();
     }
 
     @Override
     public void commitChanges() {
-        entity.addEffector(new StraightMovement(entity, bma.getText()));
-    }
-
-    /** Save changes to an edited straight movement effector. */
-    public void commitChanges(StraightMovement effector) {
-        effector.setLabel(label.getText());
-        effector.setScalingFactor(Double.parseDouble(bma.getText()));
-    }
-
-    /** Fill in appropriate text fields when straight movement effector is being modified. */
-    public void fillFieldValues(StraightMovement effector) {
-        label.setText("" + effector.getLabel());
-        bma.setText("" + effector.getScalingFactor());
+        if (isCreationPanel) {
+            entity.addEffector(new StraightMovement(entity, bma.getText()));
+        } else {
+            straightEffector.setLabel(label.getText());
+            straightEffector.setScalingFactor(Double.parseDouble(bma.getText()));
+        }
     }
 
     @Override
     public void fillFieldValues() {
-        // TODO Auto-generated method stub
-
+        if (isCreationPanel) {
+            label.setText("" + StraightMovement.DEFAULT_LABEL);
+            bma.setText("" + StraightMovement.DEFAULT_SCALING_FACTOR);
+        } else {
+            label.setText("" + straightEffector.getLabel());
+            bma.setText("" + straightEffector.getScalingFactor());
+        }
     }
 }

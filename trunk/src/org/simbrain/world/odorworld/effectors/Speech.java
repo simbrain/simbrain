@@ -38,7 +38,7 @@ public class Speech extends Effector {
     /** The thing this speech effector says. */
     private String phrase = DEFAULT_PHRASE;
 
-    /** Default phrase. */
+    /** Default threshold. */
     public static final double DEFAULT_THRESHOLD = .01;
 
     /** Threshold above which to "the message. */

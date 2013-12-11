@@ -20,10 +20,18 @@ package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * Super class for sensor panels.
+ */
 public abstract class AbstractSensorPanel extends LabelledItemPanel {
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public abstract void commitChanges();
+    
+    /**
+     * Fill in appropriate text fields when sensor is being modified.
+     */
+    protected abstract void fillFieldValues();
 }

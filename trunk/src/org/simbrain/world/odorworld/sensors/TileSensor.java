@@ -28,13 +28,28 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  */
 public class TileSensor extends Sensor {
 
+    /** Default Activation Amount. */
+    public static final double DEFAULT_ACTIVATION = 1;
+    
+    /** Default X coordinate of the upper left corner. */
+    public static final int DEFAULT_X = 0;
+
+    /** Default Y coordinate of the upper left corner. */
+    public static final int DEFAULT_Y = 0;
+
+    /** Default width. */
+    public static final int DEFAULT_WIDTH = 20;
+
+    /** Default height. */
+    public static final int DEFAULT_HEIGHT = 20;
+
     /**
      * Current value of the sensor; activationAmount if "active", 0 otherwise.
      */
     private double value = 0;
 
     /** Value to return when the tile sensor is activated. */
-    private double activationAmount = 1;
+    private double activationAmount = DEFAULT_ACTIVATION;
 
     /** Upper left corner. */
     private int x;
@@ -42,10 +57,10 @@ public class TileSensor extends Sensor {
     /** Upper left corner. */
     private int y;
 
-    /** Upper left corner. */
+    /** Width of the sensor. */
     private int width;
 
-    /** Upper left corner. */
+    /** Height of the sensor. */
     private int height;
 
     /**

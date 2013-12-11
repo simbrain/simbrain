@@ -27,11 +27,20 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class Turning extends Effector {
 
+    /** Default direction. */
+    public static final double DEFAULT_DIRECTION = 0;
+
     /** Turn by amount times fixed amount. 1 for left, -1 for right. */
     private double direction;
 
+    /** Default amount. */
+    public static final double DEFAULT_AMOUNT = 0;
+
     /** Amount to turn in radians. */
     private double amount = 0;
+
+    /** Default label. */
+    public static final String DEFAULT_LABEL = "Turn";
 
     /**
      * Construct a turning effector.

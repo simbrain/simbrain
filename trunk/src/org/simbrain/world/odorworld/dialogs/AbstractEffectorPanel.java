@@ -31,8 +31,7 @@ public abstract class AbstractEffectorPanel extends LabelledItemPanel {
     public abstract void commitChanges();
 
     /**
-     * Fill in appropriate text fields when speech effector is being modified.
+     * Fill in appropriate text fields when effector is being modified.
      */
-    public abstract void fillFieldValues();
-
+    protected abstract void fillFieldValues();
 }

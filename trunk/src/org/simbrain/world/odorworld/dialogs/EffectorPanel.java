@@ -35,6 +35,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -51,9 +53,10 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * Panel showing an agent's effectors.
  *
  * TODO: Possibly abstract and integrate with sensor panel.
- *
- * @author Lam Nguyen
+ * 
  * @author Jeff Yoshimi
+ * @author Lam Nguyen
+ * 
  */
 public class EffectorPanel extends JPanel {
 
@@ -63,6 +66,20 @@ public class EffectorPanel extends JPanel {
     /** Table model. */
     private EffectorModel model;
 
+    /** The parent entity. */
+    private OdorWorldEntity entity;
+
+    /** 
+     * The selected effector to edit. If more than one effector is selected
+     * in the table, this is the first selected row.
+     */
+    private Effector selectedEffector;
+
+    /**
+     * Construct the effector panel.
+     *
+     * @param entity the entity whose effectors should be represented.
+     */
     public EffectorPanel(final OdorWorldEntity entity) {
 
         // Set up table
@@ -84,54 +101,31 @@ public class EffectorPanel extends JPanel {
                     effectorPop.add(menuItem);
                     effectorPop.show(e.getComponent(), e.getX(), e.getY());
                     final Effector effector = model.getEffector(row);
-                    menuItem.setAction(new AbstractAction("Edit Effector...",
-                            ResourceManager.getImageIcon("Properties.png")) {
-                        public void actionPerformed(ActionEvent e) {
-                            StandardDialog dialog = new StandardDialog();
-                            dialog.setTitle("Edit Effector");
-                            if (effector instanceof Turning) {
-                                TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
-                                turningEffectorPanel.fillFieldValues();
-                                dialog.setContentPane(turningEffectorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    turningEffectorPanel.commitChanges();
-                                }
-                            }
-                            if (effector instanceof StraightMovement) {
-                                StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
-                                straightEffectorPanel
-                                        .fillFieldValues();
-                                dialog.setContentPane(straightEffectorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    straightEffectorPanel
-                                            .commitChanges();
-                                }
-                            }
-                            if (effector instanceof Speech) {
-                                SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
-                                dialog.setContentPane(speechEffectorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    speechEffectorPanel.commitChanges();
-                                }
-                            }
+                    menuItem.addMouseListener(new MouseAdapter() {
+                        public void mouseReleased(MouseEvent e) {
+                            editEffector(effector);
                         }
-
                     });
                     effectorPop.add(menuItem);
                     effectorPop.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
-
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(final MouseEvent e) {
+                if (e.getClickCount() == 2 && table.columnAtPoint(e.getPoint()) != 1) {
+                    final int row = table.rowAtPoint(e.getPoint());
+                    table.setRowSelectionInterval(row, row);
+                    final Effector effector = model.getEffector(row);
+                    editEffector(effector);
+                }
+            }
+        });
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
+            public void valueChanged(ListSelectionEvent e) {
+                selectedEffector = model.getEffector(table.getSelectedRow());
+            }
+        });
         for (Effector effector : entity.getEffectors()) {
             model.addRow(effector);
         }
@@ -140,10 +134,16 @@ public class EffectorPanel extends JPanel {
         JPanel buttonBar = new JPanel();
         JButton addEffector = new JButton("Add",
                 ResourceManager.getImageIcon("plus.png"));
+        addEffector.setToolTipText("Add effector...");
         JButton deleteEffector = new JButton("Delete",
                 ResourceManager.getImageIcon("minus.png"));
+        deleteEffector.setToolTipText("Delete effector...");
+        JButton editEffector = new JButton("Edit",
+                ResourceManager.getImageIcon("Properties.png"));
+        editEffector.setToolTipText("Edit effector...");
         buttonBar.add(addEffector);
         buttonBar.add(deleteEffector);
+        buttonBar.add(editEffector);
         deleteEffector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent del) {
                 int[] selectedRows = table.getSelectedRows();
@@ -168,25 +168,68 @@ public class EffectorPanel extends JPanel {
                 model.fireTableDataChanged();
             }
         });
-        setLayout(new BorderLayout());
-        add(BorderLayout.CENTER, scrollPane);
-        add(BorderLayout.SOUTH, buttonBar);
-
+        editEffector.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    editEffector(selectedEffector);
+                }
+            }
+        });
         entity.getParentWorld().addListener(new WorldListenerAdapter() {
             @Override
             public void effectorRemoved(Effector effector) {
                 model.removeEffector(effector);
             }
-
             @Override
             public void effectorAdded(Effector effector) {
                 model.addRow(effector);
             }
         });
+        setLayout(new BorderLayout());
+        add(BorderLayout.CENTER, scrollPane);
+        add(BorderLayout.SOUTH, buttonBar);
     }
 
     /**
-     * Table model which represents Effectors
+     * Edit an effector.
+     */
+    private void editEffector(Effector effector) {
+        StandardDialog dialog = new StandardDialog();
+        dialog.setTitle("Edit Effector");
+        if (effector instanceof Turning) {
+            TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
+            dialog.setContentPane(turningEffectorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                turningEffectorPanel.commitChanges();
+            }
+        }
+        if (effector instanceof StraightMovement) {
+            StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
+            dialog.setContentPane(straightEffectorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                straightEffectorPanel.commitChanges();
+            }
+        }
+        if (effector instanceof Speech) {
+            SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
+            dialog.setContentPane(speechEffectorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                speechEffectorPanel.commitChanges();
+            }
+        } 
+    }
+
+    /**
+     * Table model which represents effectors.
      */
     class EffectorModel extends AbstractTableModel {
 
@@ -325,6 +368,5 @@ public class EffectorPanel extends JPanel {
                 return null;
             }
         }
-
     }
 }

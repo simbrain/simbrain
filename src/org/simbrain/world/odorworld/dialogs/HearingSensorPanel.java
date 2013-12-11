@@ -15,6 +15,8 @@ package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -28,50 +30,75 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 public class HearingSensorPanel extends AbstractSensorPanel {
 
     /** Text field to edit phrase this sensor listens for. */
-    private JTextField phrase = new JTextField("Hi!");
+    private JTextField phrase = new JTextField();
 
     /** Texxt field to edit output amount */
-    private JTextField outputAmount = new JTextField("" + 1);
+    private JTextField outputAmount = new JTextField();
 
     /** Entity to which a hearing sensor is being added. */
     private OdorWorldEntity entity;
+    
+    /** Reference to hearing sensor. Initially null if this is a creation panel. */
+    private Hearing hearingSensor;
+
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
 
     /**
-     * Default constructor.
+     * Constructor for the case where a sensor is being created.
      *
      * @param entity the entity to which a hearing sensor is added.
      */
     public HearingSensorPanel(OdorWorldEntity entity) {
         this.entity = entity;
+        isCreationPanel = true;
         addItem("Utterance", phrase);
         addItem("Output Amount", outputAmount);
-        setVisible(true);
+        fillFieldValues();
+    }
+
+    /**
+     * Constructor for the case where a sensor is being edited.
+     *
+     * @param entity parent entity
+     * @param sensor sensor to edit
+     */
+    public HearingSensorPanel(OdorWorldEntity entity, Hearing sensor) {
+        this.entity = entity;
+        this.hearingSensor = sensor;
+        isCreationPanel = false;
+        addItem("Utterance", phrase);
+        addItem("Output Amount", outputAmount);
+        fillFieldValues();
     }
 
     @Override
     public void commitChanges() {
-        entity.addSensor(new Hearing((entity), phrase.getText(), Double.parseDouble(outputAmount.getText())));
-        if (phrase.getText().length() > 10) {
-            checkPhrase();
+        if (isCreationPanel) {
+            entity.addSensor(new Hearing((entity), phrase.getText(), Double.parseDouble(outputAmount.getText())));
+            if (phrase.getText().length() > 10) {
+                checkPhrase();
+            }
+        } else {
+            hearingSensor.setPhrase(phrase.getText());
+            hearingSensor.setLabel("Hear: \"" + phrase.getText() + "\"");
+            hearingSensor.setOutputAmount(Double.parseDouble(outputAmount.getText()));
+            hearingSensor.getParent().getParentWorld().fireEntityChanged(hearingSensor.getParent());
+            if (phrase.getText().length() > 10) {
+                checkPhrase();
+            }
         }
     }
 
-    /** Save changes to an edited hearing sensor. */
-    public void commitChanges(Hearing sensor) {
-        sensor.setPhrase(phrase.getText());
-        sensor.setLabel("Hear: \"" + phrase.getText() + "\"");
-        sensor.setOutputAmount(Double.parseDouble(outputAmount.getText()));
-        sensor.getParent().getParentWorld()
-        .fireEntityChanged(sensor.getParent());
-        if (phrase.getText().length() > 10) {
-            checkPhrase();
+    @Override
+    protected void fillFieldValues() {
+        if (isCreationPanel) {
+            phrase.setText("" + Hearing.DEFAULT_PHRASE);
+            outputAmount.setText("" + Hearing.DEFAULT_OUTPUT_AMOUNT);
+        } else {
+            phrase.setText("" + hearingSensor.getPhrase());
+            outputAmount.setText("" + hearingSensor.getOutputAmount());
         }
-    }
-
-    /** Fill in appropriate text fields when hearing sensor is being modified. */
-    public void fillFieldValues(Hearing sensor) {
-        phrase.setText("" + sensor.getPhrase());
-        outputAmount.setText("" + sensor.getOutputAmount());
     }
 
     /** Displays message when utterance is above 10 char. */

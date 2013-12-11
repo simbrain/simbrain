@@ -29,10 +29,10 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 public class SpeechEffectorPanel extends AbstractEffectorPanel {
 
     /** Text field to edit uttered phrase. */
-    private JTextField phrase = new JTextField("Hi!");
+    private JTextField phrase = new JTextField();
 
     /** Text field to edit threshold above which effector is activated. */
-    private JTextField threshold = new JTextField(2);
+    private JTextField threshold = new JTextField();
 
     /** Entity to which a speech effector is being added. */
     private RotatingEntity entity;
@@ -56,7 +56,9 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
     public SpeechEffectorPanel(final OdorWorldEntity entity) {
         this.entity = (RotatingEntity) entity;
         isCreationPanel = true;
-        init();
+        addItem("Utterance", phrase);
+        addItem("Threshold", threshold);
+        fillFieldValues();
     }
 
     /**
@@ -70,17 +72,9 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         this.entity = (RotatingEntity) entity;
         this.speechEffector = effector;
         isCreationPanel = false;
-        init();
-    }
-
-    /**
-     * Initialize the panel
-     */
-    private void init() {
         addItem("Utterance", phrase);
         addItem("Threshold", threshold);
         fillFieldValues();
-        setVisible(true);
     }
 
     @Override
@@ -107,7 +101,7 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
     }
 
     @Override
-    public void fillFieldValues() {
+    protected void fillFieldValues() {
         if (isCreationPanel) {
             phrase.setText("" + Speech.DEFAULT_PHRASE);
             threshold.setText("" + Speech.DEFAULT_THRESHOLD);

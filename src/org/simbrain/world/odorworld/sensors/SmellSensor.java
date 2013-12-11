@@ -30,11 +30,14 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  */
 public class SmellSensor extends Sensor {
 
+    /** Default label. */
+    public static final String DEFAULT_LABEL = "SmellSensor";
+
     /** Angle of whisker in radians. */
     public static double DEFAULT_THETA = Math.PI / 4;
 
     /** Initial length of mouse whisker. */
-    private final double DEFAULT_RADIUS = 23;
+    public static final double DEFAULT_RADIUS = 23;
 
     /** Relative location of the sensor in polar coordinates. */
     private double theta = DEFAULT_THETA;

@@ -30,8 +30,14 @@ public class StraightMovement extends Effector {
     /** Amount by which to move ahead. Set externally. */
     private double amount = 0;
 
+    /** Default scaling factor. */
+    public static final double DEFAULT_SCALING_FACTOR = 1;
+
     /** Effector moves agent ahead by scaling factor times amount. */
-    private double scalingFactor = 1;
+    private double scalingFactor = DEFAULT_SCALING_FACTOR;
+
+    /** Default label. */
+    public static final String DEFAULT_LABEL = "Go-Straight";
 
     /**
      * Construct the straight movement effector.

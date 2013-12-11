@@ -20,7 +20,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Panel to add a turning effector to an entity.
+ * Panel to add a turning effector to an entity or to modify an existing one.
  *
  * @author Lam Nguyen
  *
@@ -28,52 +28,76 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 public class TurningEffectorPanel extends AbstractEffectorPanel {
 
     /** Text field to edit label. */
-    private JTextField label = new JTextField("Turn");
+    private JTextField label = new JTextField();
 
     /** Text field to edit direction. */
-    private JTextField direction = new JTextField("" + 0);
+    private JTextField direction = new JTextField();
 
     /** Text field to edit amount. */
-    private JTextField amount = new JTextField("" + 0);
+    private JTextField amount = new JTextField();
 
     /** Entity to which a turning effector is being added. */
     private RotatingEntity entity;
 
+    /** 
+     * Reference to straight movement effector. Initially null if this is a creation panel.
+     */
+    private Turning turningEffector;
+
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
+    private boolean isCreationPanel;
+
     /**
-     * Default constructor.
+     * Constructor for the case where an effector is being created.
      *
-     * @param entity the entity to which a turning effector is added.
+     * @param entity the entity to which a straight movement effector is added.
      */
     public TurningEffectorPanel(OdorWorldEntity entity) {
         this.entity = (RotatingEntity) entity;
+        isCreationPanel = true;
         addItem("Label", label);
         addItem("Turning direction", direction);
         addItem("Turning amount", amount);
-        setVisible(true);
+        fillFieldValues();
+    }
+
+    /**
+     * Constructor for the case where an effector is being edited.
+     *
+     * @param entity parent entity
+     * @param effector effector to edit
+     */
+    public TurningEffectorPanel(OdorWorldEntity entity, Turning effector) {
+        this.entity = (RotatingEntity) entity;
+        this.turningEffector = effector;
+        isCreationPanel = false;
+        addItem("Label", label);
+        addItem("Turning direction", direction);
+        addItem("Turning amount", amount);
+        fillFieldValues();
     }
 
     @Override
     public void commitChanges() {
-        entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText()))); // todo: label
-    }
-
-    /** Save changes to an edited turning effector. */
-    public void commitChanges(Turning effector) {
-        effector.setLabel(label.getText());
-        effector.setDirection(Double.parseDouble(direction.getText()));
-        effector.setAmount(Double.parseDouble(amount.getText()));
-    }
-
-    /** Fill in appropriate text fields when turning effector is being modified. */
-    public void fillFieldValues(Turning effector) {
-        label.setText("" + effector.getLabel());
-        direction.setText("" + effector.getDirection());
-        amount.setText("" + effector.getAmount());
+        if (isCreationPanel) {
+            entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText())));
+        } else {
+            turningEffector.setLabel(label.getText());
+            turningEffector.setDirection(Double.parseDouble(direction.getText()));
+            turningEffector.setAmount(Double.parseDouble(amount.getText()));
+        }
     }
 
     @Override
-    public void fillFieldValues() {
-        // TODO Auto-generated method stub
-        
+    protected void fillFieldValues() {
+        if (isCreationPanel) {
+            label.setText("" + Turning.DEFAULT_LABEL);
+            direction.setText("" + Turning.DEFAULT_DIRECTION);
+            amount.setText("" + Turning.DEFAULT_AMOUNT);
+        } else {
+            label.setText("" + turningEffector.getLabel());
+            direction.setText("" + turningEffector.getDirection());
+            amount.setText("" + turningEffector.getAmount());
+        }
     }
 }

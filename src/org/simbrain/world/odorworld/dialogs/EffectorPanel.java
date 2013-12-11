@@ -90,36 +90,31 @@ public class EffectorPanel extends JPanel {
                             StandardDialog dialog = new StandardDialog();
                             dialog.setTitle("Edit Effector");
                             if (effector instanceof Turning) {
-                                TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(
-                                        entity);
-                                turningEffectorPanel
-                                        .fillFieldValues((Turning) effector);
+                                TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
+                                turningEffectorPanel.fillFieldValues();
                                 dialog.setContentPane(turningEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
-                                    turningEffectorPanel
-                                            .commitChanges((Turning) effector);
+                                    turningEffectorPanel.commitChanges();
                                 }
                             }
                             if (effector instanceof StraightMovement) {
-                                StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(
-                                        entity);
+                                StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
                                 straightEffectorPanel
-                                        .fillFieldValues((StraightMovement) effector);
+                                        .fillFieldValues();
                                 dialog.setContentPane(straightEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);
                                 dialog.setVisible(true);
                                 if (!dialog.hasUserCancelled()) {
                                     straightEffectorPanel
-                                            .commitChanges((StraightMovement) effector);
+                                            .commitChanges();
                                 }
                             }
                             if (effector instanceof Speech) {
-                                SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(
-                                        entity, (Speech) effector);
+                                SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
                                 dialog.setContentPane(speechEffectorPanel);
                                 dialog.pack();
                                 dialog.setLocationRelativeTo(null);

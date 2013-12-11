@@ -35,12 +35,15 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.WorldListenerAdapter;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -62,6 +65,15 @@ public class SensorPanel extends JPanel {
     /** Table model. */
     private SensorModel model;
 
+    /** The parent entity. */
+    private OdorWorldEntity entity;
+
+    /** 
+     * The selected sensor to edit. If more than one sensor is selected
+     * in the table, this is the first selected row.
+     */
+    private Sensor selectedSensor;
+
     /**
      * Construct the sensor panel.
      *
@@ -78,7 +90,6 @@ public class SensorPanel extends JPanel {
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
         table.setFocusable(false);
-
         table.addMouseListener(new MouseAdapter() {
             public void mouseReleased(final MouseEvent e) {
                 if (e.isControlDown() || (e.getButton() == 3)) {
@@ -89,43 +100,9 @@ public class SensorPanel extends JPanel {
                     sensorPop.add(menuItem);
                     sensorPop.show(e.getComponent(), e.getX(), e.getY());
                     final Sensor sensor = model.getSensor(row);
-                    menuItem.setAction(new AbstractAction("Edit Sensor...",
-                            ResourceManager.getImageIcon("Properties.png")) {
-                        public void actionPerformed(ActionEvent e) {
-                            StandardDialog dialog = new StandardDialog();
-                            dialog.setTitle("Edit Sensor");
-                            if (sensor instanceof SmellSensor) {
-                                SmellSensorPanel smellSensorPanel = new SmellSensorPanel(entity, (SmellSensor) sensor);
-                                dialog.setContentPane(smellSensorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    smellSensorPanel.commitChanges();
-                                }
-                            }
-                            if (sensor instanceof TileSensor) {
-                                TileSensorPanel tileSensorPanel = new TileSensorPanel(entity, (TileSensor) sensor);
-                                tileSensorPanel.fillFieldValues();
-                                dialog.setContentPane(tileSensorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    tileSensorPanel.commitChanges();
-                                }
-                            }
-                            if (sensor instanceof Hearing) {
-                                HearingSensorPanel hearingSensorPanel = new HearingSensorPanel(entity, (Hearing) sensor);
-                                hearingSensorPanel.fillFieldValues();
-                                dialog.setContentPane(hearingSensorPanel);
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
-                                if (!dialog.hasUserCancelled()) {
-                                    hearingSensorPanel.commitChanges();
-                                }
-                            }
+                    menuItem.addMouseListener(new MouseAdapter() {
+                        public void mouseReleased(MouseEvent e) {
+                            editSensor(sensor);
                         }
                     });
                     sensorPop.add(menuItem);
@@ -133,7 +110,21 @@ public class SensorPanel extends JPanel {
                 }
             }
         });
-
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(final MouseEvent e) {
+                if (e.getClickCount() == 2 && table.columnAtPoint(e.getPoint()) != 1) {
+                    final int row = table.rowAtPoint(e.getPoint());
+                    table.setRowSelectionInterval(row, row);
+                    final Sensor sensor = model.getSensor(row);
+                    editSensor(sensor);
+                }
+            }
+        });
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
+            public void valueChanged(ListSelectionEvent e) {
+                selectedSensor = model.getSensor(table.getSelectedRow());
+            }
+        });
         for (Sensor sensor : entity.getSensors()) {
             model.addRow(sensor);
         }
@@ -142,10 +133,16 @@ public class SensorPanel extends JPanel {
         JPanel buttonBar = new JPanel();
         JButton addSensor = new JButton("Add",
                 ResourceManager.getImageIcon("plus.png"));
+        addSensor.setToolTipText("Add sensor...");
         JButton deleteSensor = new JButton("Delete",
                 ResourceManager.getImageIcon("minus.png"));
+        deleteSensor.setToolTipText("Delete sensor...");
+        JButton editSensor = new JButton("Edit",
+                ResourceManager.getImageIcon("Properties.png"));
+        editSensor.setToolTipText("Edit sensor...");
         buttonBar.add(addSensor);
         buttonBar.add(deleteSensor);
+        buttonBar.add(editSensor);
         deleteSensor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int[] selectedRows = table.getSelectedRows();
@@ -169,13 +166,19 @@ public class SensorPanel extends JPanel {
                 model.fireTableDataChanged();
             }
         });
-
-        // Add sensor Listener
+        editSensor.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    editSensor(selectedSensor);
+                }
+            }
+        });
         entity.getParentWorld().addListener(new WorldListenerAdapter() {
             @Override
             public void sensorRemoved(Sensor sensor) {
                 model.removeSensor(sensor);
             }
+            @Override
             public void sensorAdded(Sensor sensor) {
                 model.addRow(sensor);
             }
@@ -183,6 +186,46 @@ public class SensorPanel extends JPanel {
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, scrollPane);
         add(BorderLayout.SOUTH, buttonBar);
+    }
+
+    /**
+     * Edit a sensor.
+     */
+    private void editSensor(Sensor sensor) {
+        StandardDialog dialog = new StandardDialog();
+        dialog.setTitle("Edit Sensor");
+        if (sensor instanceof SmellSensor) {
+            SmellSensorPanel smellSensorPanel = new SmellSensorPanel(entity, (SmellSensor) sensor);
+            dialog.setContentPane(smellSensorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                smellSensorPanel.commitChanges();
+            }
+        }
+        if (sensor instanceof TileSensor) {
+            TileSensorPanel tileSensorPanel = new TileSensorPanel(entity, (TileSensor) sensor);
+            tileSensorPanel.fillFieldValues();
+            dialog.setContentPane(tileSensorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                tileSensorPanel.commitChanges();
+            }
+        }
+        if (sensor instanceof Hearing) {
+            HearingSensorPanel hearingSensorPanel = new HearingSensorPanel(entity, (Hearing) sensor);
+            hearingSensorPanel.fillFieldValues();
+            dialog.setContentPane(hearingSensorPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+                hearingSensorPanel.commitChanges();
+            }
+        }
     }
 
     /**

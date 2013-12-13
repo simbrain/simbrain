@@ -49,10 +49,10 @@ public class RandomPanelNetwork extends RandomizerPanel implements
     public void fillFieldValues(final ArrayList randomizers) {
         super.fillFieldValues(randomizers);
 
-//        if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
-//                "getClipping")) {
-//            this.getTsClipping().setNull();
-//        }
+        // if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
+        // "getClipping")) {
+        // this.getTsClipping().setNull();
+        // }
 
         if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
                 "getLowerBound")) {
@@ -69,8 +69,8 @@ public class RandomPanelNetwork extends RandomizerPanel implements
             this.getTfStandardDeviation().setText(nullString);
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
-                "getMean")) {
+        if (!NetworkUtils
+                .isConsistent(randomizers, Randomizer.class, "getMean")) {
             this.getTfMean().setText(nullString);
         }
     }
@@ -104,12 +104,12 @@ public class RandomPanelNetwork extends RandomizerPanel implements
             rand.setMean(Double.parseDouble(getTfMean().getText()));
         }
 
-//        if (!(this.getTsClipping().getSelectedIndex() == TristateDropDown
-//                .getNULL())) {
-//            rand.setClipping(getTsClipping().isSelected());
-//        }
+        // if (!(this.getTsClipping().getSelectedIndex() == TristateDropDown
+        // .getNULL())) {
+        // rand.setClipping(getTsClipping().isSelected());
+        // }
         rand.setClipping(getTsClipping().isSelected());
-        
+
     }
 
 }

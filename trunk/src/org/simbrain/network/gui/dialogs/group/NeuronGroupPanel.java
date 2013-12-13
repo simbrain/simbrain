@@ -21,7 +21,6 @@ package org.simbrain.network.gui.dialogs.group;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.util.Collections;
 
 import javax.swing.Action;
@@ -107,12 +106,11 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     /** Panel to edit neuron update rule. */
     private NeuronUpdateSettingsPanel editNeuronType;
 
-    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel;
 
     /**
-     * Constructor for the case where a neuron group is being
-     * created.
+     * Constructor for the case where a neuron group is being created.
      *
      * @param np Parent network panel
      * @param parentDialog parent dialog containing this panel.
@@ -126,8 +124,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     }
 
     /**
-     * Constructor for case where an existing neuron group is being
-     * edited.
+     * Constructor for case where an existing neuron group is being edited.
      *
      * @param np Parent network panel
      * @param ng neuron group being edited
@@ -178,7 +175,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         }
 
         // Set up neuron edit panels
-        Box editNeurons =  Box.createVerticalBox();
+        Box editNeurons = Box.createVerticalBox();
         if (!isCreationPanel) {
             editBasicNeuronInfo = new BasicNeuronInfoPanel(
                     neuronGroup.getNeuronList(), parentDialog);
@@ -232,11 +229,11 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             specificNeuronGroupPanel = new CompetitivePropertiesPanel(
                     networkPanel, (Competitive) neuronGroup);
         } else if (neuronGroup instanceof WinnerTakeAll) {
-            specificNeuronGroupPanel = new WTAPropertiesPanel(
-                    networkPanel, (WinnerTakeAll) neuronGroup);
+            specificNeuronGroupPanel = new WTAPropertiesPanel(networkPanel,
+                    (WinnerTakeAll) neuronGroup);
         } else if (neuronGroup instanceof SOM) {
-            specificNeuronGroupPanel = new SOMPropertiesPanel(
-                    networkPanel, (SOM) neuronGroup);
+            specificNeuronGroupPanel = new SOMPropertiesPanel(networkPanel,
+                    (SOM) neuronGroup);
         }
     }
 
@@ -265,8 +262,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
         tfNeuronGroupLabel.setText(neuronGroup.getLabel());
         if (specificNeuronGroupPanel != null) {
-            ((GroupPropertiesPanel) specificNeuronGroupPanel)
-                    .fillFieldValues();
+            ((GroupPropertiesPanel) specificNeuronGroupPanel).fillFieldValues();
         }
 
         // For backwards compatibility
@@ -284,8 +280,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
                     networkPanel.getLastClickedPosition(),
                     Integer.parseInt(tfNumNeurons.getText()));
             editBasicNeuronInfo.commitChanges(neuronGroup.getNeuronList());
-            editNeuronType.getNeuronPanel()
-                    .commitChanges(neuronGroup.getNeuronList());
+            editNeuronType.getNeuronPanel().commitChanges(
+                    neuronGroup.getNeuronList());
             applyLayout();
         } else {
             editBasicNeuronInfo.commitChanges();
@@ -315,6 +311,5 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         neuronGroup.setLayout(layoutPanel.getCurrentLayout());
         neuronGroup.applyLayout();
     }
-
 
 }

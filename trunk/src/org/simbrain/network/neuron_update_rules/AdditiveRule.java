@@ -30,155 +30,148 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class AdditiveRule extends NeuronUpdateRule {
 
-	/** Lambda. */
-	private double lambda = 1.4;
+    /** Lambda. */
+    private double lambda = 1.4;
 
-	/** Resistance. */
-	private double resistance = 1;
+    /** Resistance. */
+    private double resistance = 1;
 
-	/** Noise dialog. */
-	private Randomizer noiseGenerator = new Randomizer();
+    /** Noise dialog. */
+    private Randomizer noiseGenerator = new Randomizer();
 
-	/** For adding noise to the neuron. */
-	private boolean addNoise = false;
+    /** For adding noise to the neuron. */
+    private boolean addNoise = false;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.CONTINUOUS;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public AdditiveRule deepCopy() {
-		AdditiveRule an = new AdditiveRule();
-		an.setLambda(getLambda());
-		an.setResistance(getResistance());
-		an.setAddNoise(getAddNoise());
-		an.noiseGenerator = new Randomizer(noiseGenerator);
-		an.setIncrement(getIncrement());
-		return an;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public AdditiveRule deepCopy() {
+        AdditiveRule an = new AdditiveRule();
+        an.setLambda(getLambda());
+        an.setResistance(getResistance());
+        an.setAddNoise(getAddNoise());
+        an.noiseGenerator = new Randomizer(noiseGenerator);
+        an.setIncrement(getIncrement());
+        return an;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
 
-		// Update buffer of additive neuron using Euler's method.
-		double wtdSum = 0;
-		if (neuron.getFanIn().size() > 0) {
-			for (int j = 0; j < neuron.getFanIn().size(); j++) {
-				Synapse w = neuron.getFanIn().get(j);
-				Neuron source = w.getSource();
-				wtdSum += (w.getStrength() * g(source.getActivation()));
-			}
-		}
+        // Update buffer of additive neuron using Euler's method.
+        double wtdSum = 0;
+        if (neuron.getFanIn().size() > 0) {
+            for (int j = 0; j < neuron.getFanIn().size(); j++) {
+                Synapse w = neuron.getFanIn().get(j);
+                Neuron source = w.getSource();
+                wtdSum += (w.getStrength() * g(source.getActivation()));
+            }
+        }
 
-		double val =
-				neuron.getActivation()
-						+ neuron.getNetwork().getTimeStep()
-						* (-neuron.getActivation() / resistance + wtdSum);
+        double val = neuron.getActivation() + neuron.getNetwork().getTimeStep()
+                * (-neuron.getActivation() / resistance + wtdSum);
 
-		if (addNoise) {
-			val += noiseGenerator.getRandom();
-		}
+        if (addNoise) {
+            val += noiseGenerator.getRandom();
+        }
 
-		neuron.setBuffer(val);
-		neuron.setInputValue(0);
-	}
+        neuron.setBuffer(val);
+        neuron.setInputValue(0);
+    }
 
-	/**
-	 * Implements a Hopfield type sigmoidal function.
-	 *
-	 * @param x
-	 *            input to function
-	 * @return output of function
-	 */
-	private double g(final double x) {
-		return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
-	}
+    /**
+     * Implements a Hopfield type sigmoidal function.
+     *
+     * @param x input to function
+     * @return output of function
+     */
+    private double g(final double x) {
+        return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
+    }
 
-	/**
-	 * @return Returns the lambda.
-	 */
-	public double getLambda() {
-		return lambda;
-	}
+    /**
+     * @return Returns the lambda.
+     */
+    public double getLambda() {
+        return lambda;
+    }
 
-	/**
-	 * @param lambda
-	 *            The lambda to set.
-	 */
-	public void setLambda(final double lambda) {
-		this.lambda = lambda;
-	}
+    /**
+     * @param lambda The lambda to set.
+     */
+    public void setLambda(final double lambda) {
+        this.lambda = lambda;
+    }
 
-	/**
-	 * @return Returns the resistance.
-	 */
-	public double getResistance() {
-		return resistance;
-	}
+    /**
+     * @return Returns the resistance.
+     */
+    public double getResistance() {
+        return resistance;
+    }
 
-	/**
-	 * @param resistance
-	 *            The resistance to set.
-	 */
-	public void setResistance(final double resistance) {
-		this.resistance = resistance;
-	}
+    /**
+     * @param resistance The resistance to set.
+     */
+    public void setResistance(final double resistance) {
+        this.resistance = resistance;
+    }
 
-	/**
-	 * @return Noise generator dialog.
-	 */
-	public Randomizer getNoiseGenerator() {
-		return noiseGenerator;
-	}
+    /**
+     * @return Noise generator dialog.
+     */
+    public Randomizer getNoiseGenerator() {
+        return noiseGenerator;
+    }
 
-	/**
-	 * @param noise
-	 *            The noise to set.
-	 */
-	public void setNoiseGenerator(final Randomizer noise) {
-		this.noiseGenerator = noise;
-	}
+    /**
+     * @param noise The noise to set.
+     */
+    public void setNoiseGenerator(final Randomizer noise) {
+        this.noiseGenerator = noise;
+    }
 
-	/**
-	 * @return Returns the addNoise.
-	 */
-	public boolean getAddNoise() {
-		return addNoise;
-	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
 
-	/**
-	 * @param addNoise
-	 *            The addNoise to set.
-	 */
-	public void setAddNoise(final boolean addNoise) {
-		this.addNoise = addNoise;
-	}
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(final boolean addNoise) {
+        this.addNoise = addNoise;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Additive (Continuous Hopfield)";
-	}
+    @Override
+    public String getDescription() {
+        return "Additive (Continuous Hopfield)";
+    }
 
-	@Override
-	public double getRandomValue() {
-		return (getCeiling() - getFloor()) * Math.random() + getFloor();
-	}
+    @Override
+    public double getRandomValue() {
+        return (getCeiling() - getFloor()) * Math.random() + getFloor();
+    }
 
-	@Override
-	public double getCeiling() {
-		return 1.0;
-	}
+    @Override
+    public double getCeiling() {
+        return 1.0;
+    }
 
-	@Override
-	public double getFloor() {
-		return -1.0;
-	}
+    @Override
+    public double getFloor() {
+        return -1.0;
+    }
 
 }

@@ -95,8 +95,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         if (timeSeriesConsumerType.isVisible()) {
             for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
                 String description = timeSeriesConsumerType
-                        .getSimpleDescription("Time Series "
-                                + (i + 1));
+                        .getSimpleDescription("Time Series " + (i + 1));
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(this, "setValue",
                                 new Class[] { double.class, Integer.class },
@@ -215,7 +214,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param index which time series curve to set.
      */
     public void setValue(final double value, final Integer index) {
-        //TODO: Throw exception if index out of current bounds
+        // TODO: Throw exception if index out of current bounds
         model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
                 .getTime(), value);
     }

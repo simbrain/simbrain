@@ -76,8 +76,8 @@ public class FindReplaceDialog extends JPanel {
     private RSyntaxTextArea textArea;
 
     // TODO
-    //  Say how may replacements were made in replace all
-    //  Various warnings, etc.
+    // Say how may replacements were made in replace all
+    // Various warnings, etc.
 
     /**
      * Construct the panel.
@@ -180,8 +180,8 @@ public class FindReplaceDialog extends JPanel {
                 editor.setLastReplaceString(replaceField.getText());
                 SearchContext context = setUpContext();
                 if (context != null) {
-                    int replacements = SearchEngine.replaceAll(
-                            textArea, context);
+                    int replacements = SearchEngine.replaceAll(textArea,
+                            context);
                     // TODO: Display number of replacements made in dialog
                 }
             }
@@ -233,8 +233,7 @@ public class FindReplaceDialog extends JPanel {
                     if (forwardSearch.isSelected()) {
                         textArea.setCaretPosition(0);
                     } else {
-                        textArea.setCaretPosition(
-                                textArea.getText().length());
+                        textArea.setCaretPosition(textArea.getText().length());
                     }
                 }
             }
@@ -248,8 +247,7 @@ public class FindReplaceDialog extends JPanel {
      */
     private void replace(SearchContext context) {
         if (context != null) {
-            SearchEngine.replace(
-                    (RTextArea) textArea, context);
+            SearchEngine.replace((RTextArea) textArea, context);
         }
 
     }

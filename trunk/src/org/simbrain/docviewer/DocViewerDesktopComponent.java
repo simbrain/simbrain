@@ -124,8 +124,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
         JMenu helpMenu = new JMenu("Help");
         JMenuItem helpItem = new JMenuItem("Help");
-        Action helpAction = new ShowHelpAction(
-                "Pages/DocEditor.html");
+        Action helpAction = new ShowHelpAction("Pages/DocEditor.html");
         helpItem.setAction(helpAction);
         helpMenu.add(helpItem);
         menuBar.add(helpMenu);
@@ -183,7 +182,8 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
         };
         tabs.addChangeListener(changeListener);
 
-        // Respond to clicks on hyper-links by opening a web page in the defautl browser
+        // Respond to clicks on hyper-links by opening a web page in the defautl
+        // browser
         HyperlinkListener l = new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {

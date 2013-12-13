@@ -69,15 +69,16 @@ public abstract class AbstractConnectionPanel extends JPanel {
     public abstract void fillFieldValues();
 
     /**
-     * Populates fields with data from a connect neurons object. 
+     * Populates fields with data from a connect neurons object.
+     *
      * @param connection
      * @throws ClassCastException may occur if a sub-class of connect neurons
-     * not consistent with one of the sub-classes of AbstractConnectionPanel
-     * is passed into this method. 
+     *             not consistent with one of the sub-classes of
+     *             AbstractConnectionPanel is passed into this method.
      */
     public abstract void fillFieldValues(ConnectNeurons connection)
-    		throws ClassCastException;
-    
+            throws ClassCastException;
+
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
@@ -98,14 +99,14 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /**
      * @return the ConnectNeurons object
      */
-	public ConnectNeurons getConnection() {
-		return connection;
-	}
+    public ConnectNeurons getConnection() {
+        return connection;
+    }
 
-	/**
-	 * @param connection the desired ConnectNeurons object
-	 */
-	public void setConnection(ConnectNeurons connection) {
-		this.connection = connection;
-	}
+    /**
+     * @param connection the desired ConnectNeurons object
+     */
+    public void setConnection(ConnectNeurons connection) {
+        this.connection = connection;
+    }
 }

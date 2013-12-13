@@ -33,7 +33,7 @@ public interface GroupPropertiesPanel {
      * relevant object.
      *
      * @return a reference to the group, used to get a reference when the panel
-     * is used for group creation.
+     *         is used for group creation.
      */
     Group commitChanges();
 

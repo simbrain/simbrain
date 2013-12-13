@@ -20,15 +20,11 @@ package org.simbrain.plot.histogram;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.ShowHelpAction;
@@ -47,7 +43,7 @@ public class HistogramGui extends GuiComponent<HistogramComponent> {
     /** Preferred frame size. */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /** The histogram panel.  This panel contains most of the GUI code.  */
+    /** The histogram panel. This panel contains most of the GUI code. */
     private HistogramPanel cPanel;
 
     /**
@@ -93,7 +89,7 @@ public class HistogramGui extends GuiComponent<HistogramComponent> {
         helpMenu.add(helpItem);
 
         bar.add(fileMenu);
-        //bar.add(editMenu);
+        // bar.add(editMenu);
         bar.add(helpMenu);
 
         getParentFrame().setJMenuBar(bar);

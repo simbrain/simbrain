@@ -30,141 +30,140 @@ import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
  * for the default growth rate. Does not use inputs from other neurons.
  */
 public class LogisticRule extends NeuronUpdateRule implements
-		BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
+        BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
 
-	public static final double DEFAULT_FLOOR = 0.0;
+    public static final double DEFAULT_FLOOR = 0.0;
 
-	/** Growth rate. */
-	private double growthRate = 3.9;
+    /** Growth rate. */
+    private double growthRate = 3.9;
 
-	private double ceiling = 1.0;
+    private double ceiling = 1.0;
 
-	private double floor = -1.0;
+    private double floor = -1.0;
 
-	public LogisticRule(LogisticRule lr, Neuron n) {
-		super();
-		this.ceiling = lr.getCeiling();
-		this.floor = lr.getFloor();
-		this.growthRate = lr.getGrowthRate();
-		init(n);
-	}
+    public LogisticRule(LogisticRule lr, Neuron n) {
+        super();
+        this.ceiling = lr.getCeiling();
+        this.floor = lr.getFloor();
+        this.growthRate = lr.getGrowthRate();
+        init(n);
+    }
 
-	public LogisticRule() {
-		super();
-	}
+    public LogisticRule() {
+        super();
+    }
 
-	/**
-	 * @{inheritDoc
-	 */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /**
+     * @{inheritDoc
+     */
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	/**
-	 * @{inheritDoc
-	 */
-	@Override
-	public void init(Neuron neuron) {
-		neuron.setGenerator(true);
-	}
+    /**
+     * @{inheritDoc
+     */
+    @Override
+    public void init(Neuron neuron) {
+        neuron.setGenerator(true);
+    }
 
-	/**
-	 * @{inheritDoc <b>Unsafe for activity generators</b>. If copied across a
-	 *              set of neurons, {@link #init(Neuron) init} must be called to
-	 *              ensure rational behavior for an activity generator. The
-	 *              {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy
-	 *              constructor} is the preferred method of copying because
-	 *              {@link #init(Neuron) init} is called on the neuron parameter
-	 *              automatically.
-	 */
-	public LogisticRule deepCopy() {
-		LogisticRule ln = new LogisticRule();
-		ln.setGrowthRate(getGrowthRate());
-		ln.setUpperBound(ceiling);
-		ln.setLowerBound(floor);
-		return ln;
-	}
+    /**
+     * @{inheritDoc <b>Unsafe for activity generators</b>. If copied across a
+     *              set of neurons, {@link #init(Neuron) init} must be called to
+     *              ensure rational behavior for an activity generator. The
+     *              {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy
+     *              constructor} is the preferred method of copying because
+     *              {@link #init(Neuron) init} is called on the neuron parameter
+     *              automatically.
+     */
+    public LogisticRule deepCopy() {
+        LogisticRule ln = new LogisticRule();
+        ln.setGrowthRate(getGrowthRate());
+        ln.setUpperBound(ceiling);
+        ln.setLowerBound(floor);
+        return ln;
+    }
 
-	/**
-	 * @{inheritDoc
-	 */
-	public void update(Neuron neuron) {
+    /**
+     * @{inheritDoc
+     */
+    public void update(Neuron neuron) {
 
-		// TODO: Note that the inputs have to be within the neuron's bounds for
-		// behavior to be reasonable.
+        // TODO: Note that the inputs have to be within the neuron's bounds for
+        // behavior to be reasonable.
 
-		double x = neuron.getActivation();
+        double x = neuron.getActivation();
 
-		double y = (x - getFloor()) / (getCeiling() - getFloor());
-		y = growthRate * y * (1 - y);
-		x = ((getCeiling() - getFloor()) * y) + getFloor();
+        double y = (x - getFloor()) / (getCeiling() - getFloor());
+        y = growthRate * y * (1 - y);
+        x = ((getCeiling() - getFloor()) * y) + getFloor();
 
-		neuron.setBuffer(clip(x));
-	}
+        neuron.setBuffer(clip(x));
+    }
 
-	@Override
-	public double getRandomValue() {
-		return (ceiling - floor) * Math.random() + floor;
-	}
+    @Override
+    public double getRandomValue() {
+        return (ceiling - floor) * Math.random() + floor;
+    }
 
-	/**
-	 * @return Returns the firingProbability.
-	 */
-	public double getGrowthRate() {
-		return growthRate;
-	}
+    /**
+     * @return Returns the firingProbability.
+     */
+    public double getGrowthRate() {
+        return growthRate;
+    }
 
-	/**
-	 * @param growthRate
-	 *            The growthRate to set.
-	 */
-	public void setGrowthRate(final double growthRate) {
-		this.growthRate = growthRate;
-	}
+    /**
+     * @param growthRate The growthRate to set.
+     */
+    public void setGrowthRate(final double growthRate) {
+        this.growthRate = growthRate;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Logistic";
-	}
+    @Override
+    public String getDescription() {
+        return "Logistic";
+    }
 
-	@Override
-	public double clip(double val) {
-		if (val < getFloor()) {
-			return getFloor();
-		}
-		if (val > getCeiling()) {
-			return getCeiling();
-		}
-		return val;
-	}
+    @Override
+    public double clip(double val) {
+        if (val < getFloor()) {
+            return getFloor();
+        }
+        if (val > getCeiling()) {
+            return getCeiling();
+        }
+        return val;
+    }
 
-	@Override
-	public boolean isClipped() {
-		return true;
-	}
+    @Override
+    public boolean isClipped() {
+        return true;
+    }
 
-	@Override
-	public void setClipped(boolean clipping) {
-	}
+    @Override
+    public void setClipped(boolean clipping) {
+    }
 
-	@Override
-	public void setUpperBound(double ceiling) {
-		this.ceiling = ceiling;
-	}
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceiling = ceiling;
+    }
 
-	@Override
-	public void setLowerBound(double floor) {
-		this.floor = floor;
-	}
+    @Override
+    public void setLowerBound(double floor) {
+        this.floor = floor;
+    }
 
-	@Override
-	public double getCeiling() {
-		return ceiling;
-	}
+    @Override
+    public double getCeiling() {
+        return ceiling;
+    }
 
-	@Override
-	public double getFloor() {
-		return floor;
-	}
+    @Override
+    public double getFloor() {
+        return floor;
+    }
 
 }

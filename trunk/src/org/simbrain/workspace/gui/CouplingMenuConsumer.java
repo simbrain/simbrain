@@ -20,7 +20,6 @@ package org.simbrain.workspace.gui;
 
 import javax.swing.JMenu;
 
-import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;

@@ -30,8 +30,8 @@ public class Step extends SpikeResponder {
     private double timer;
 
     /**
-     * Response height: The value by which the strength of the synapse is
-     * scaled to determine the post synaptic response.
+     * Response height: The value by which the strength of the synapse is scaled
+     * to determine the post synaptic response.
      */
     private double responseHeight = 1;
 
@@ -43,8 +43,7 @@ public class Step extends SpikeResponder {
      */
     public void update(Synapse s) {
         if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked())
-        {
+                .hasSpiked()) {
             timer = responseDuration;
         } else {
             timer -= s.getNetwork().getTimeStep();

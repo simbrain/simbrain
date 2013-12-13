@@ -81,9 +81,9 @@ public final class ApplyConnectionAction extends AbstractAction {
                     networkPanel.getSelectedModelNeurons(),
                     networkPanel.getSelectedModelNeurons(), true);
         } else {
-        	
-        	String title = "Connect ";
-        	
+
+            String title = "Connect ";
+
             if (connection instanceof AllToAll) {
                 optionsPanel = new AllToAllPanel((AllToAll) connection);
                 optionsPanel.fillFieldValues();
@@ -103,7 +103,7 @@ public final class ApplyConnectionAction extends AbstractAction {
                 title += "Sparse";
             }
             ConnectionDialog dialog = new ConnectionDialog(networkPanel,
-            		optionsPanel, connection);
+                    optionsPanel, connection);
             dialog.setTitle(title);
             dialog.setLocationRelativeTo(null);
             dialog.pack();

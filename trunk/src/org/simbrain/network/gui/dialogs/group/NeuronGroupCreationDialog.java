@@ -50,8 +50,7 @@ public class NeuronGroupCreationDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        NeuronGroup group =  neuronGroupPanel
-                .commitChanges();
+        NeuronGroup group = neuronGroupPanel.commitChanges();
         networkPanel.getNetwork().addGroup(group);
         networkPanel.repaint();
         super.closeDialogOk();

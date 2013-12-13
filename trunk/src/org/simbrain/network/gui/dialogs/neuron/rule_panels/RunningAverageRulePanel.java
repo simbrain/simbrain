@@ -34,90 +34,89 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public class RunningAverageRulePanel extends AbstractNeuronPanel {
 
-	/** Rate constant field. */
-	private JTextField tfRateConstant = new JTextField();
+    /** Rate constant field. */
+    private JTextField tfRateConstant = new JTextField();
 
-	/** Main tab. */
-	private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Main tab. */
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-	/**
-	 * This method is the default constructor.
-	 */
-	public RunningAverageRulePanel() {
-		super();
-		add(mainTab);
-		mainTab.addItem("Rate Constant", tfRateConstant);
-	}
+    /**
+     * This method is the default constructor.
+     */
+    public RunningAverageRulePanel() {
+        super();
+        add(mainTab);
+        mainTab.addItem("Rate Constant", tfRateConstant);
+    }
 
-	// /**
-	// * Populate fields with current data.
-	// */
-	// public void fillFieldValues() {
-	// RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(0);
-	//
-	// tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
-	//
-	// // Handle consistency of multiple selections
-	// if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class,
-	// "getRateConstant")) {
-	// tfRateConstant.setText(NULL_STRING);
-	// }
-	// }
+    // /**
+    // * Populate fields with current data.
+    // */
+    // public void fillFieldValues() {
+    // RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(0);
+    //
+    // tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
+    //
+    // // Handle consistency of multiple selections
+    // if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class,
+    // "getRateConstant")) {
+    // tfRateConstant.setText(NULL_STRING);
+    // }
+    // }
 
-	/**
-	 * Populate fields with default data.
-	 */
-	public void fillDefaultValues() {
-		RunningAverageRule neuronRef = new RunningAverageRule();
-		tfRateConstant.setText(Double.toString(neuronRef
-				.getRateConstant()));
-	}
+    /**
+     * Populate fields with default data.
+     */
+    public void fillDefaultValues() {
+        RunningAverageRule neuronRef = new RunningAverageRule();
+        tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
+    }
 
-	// /**
-	// * Called externally when the dialog is closed, to commit any changes
-	// made.
-	// */
-	// public void commitChanges() {
-	// for (int i = 0; i < ruleList.size(); i++) {
-	// RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(i);
-	//
-	// if (!tfRateConstant.getText().equals(NULL_STRING)) {
-	// neuronRef.setRateConstant(Double.parseDouble(tfRateConstant
-	// .getText()));
-	// }
-	// }
-	// }
+    // /**
+    // * Called externally when the dialog is closed, to commit any changes
+    // made.
+    // */
+    // public void commitChanges() {
+    // for (int i = 0; i < ruleList.size(); i++) {
+    // RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(i);
+    //
+    // if (!tfRateConstant.getText().equals(NULL_STRING)) {
+    // neuronRef.setRateConstant(Double.parseDouble(tfRateConstant
+    // .getText()));
+    // }
+    // }
+    // }
 
-	@Override
-	public void commitChanges(Neuron neuron) {
-		// TODO Auto-generated method stub
+    @Override
+    public void commitChanges(Neuron neuron) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void commitChanges(List<Neuron> neuron) {
-		// TODO Auto-generated method stub
+    @Override
+    public void commitChanges(List<Neuron> neuron) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-		// TODO Auto-generated method stub
+    @Override
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected NeuronUpdateRule getPrototypeRule() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NeuronUpdateRule getPrototypeRule() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
-		// TODO Auto-generated method stub
+    @Override
+    protected void writeValuesToRules(List<Neuron> neurons) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

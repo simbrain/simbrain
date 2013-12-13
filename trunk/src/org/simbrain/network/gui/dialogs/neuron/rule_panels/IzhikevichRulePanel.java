@@ -41,218 +41,210 @@ import org.simbrain.util.widgets.TristateDropDown;
  */
 public class IzhikevichRulePanel extends AbstractNeuronPanel {
 
-	/** A field. */
-	private JTextField tfA = new JTextField();
+    /** A field. */
+    private JTextField tfA = new JTextField();
 
-	/** B field. */
-	private JTextField tfB = new JTextField();
+    /** B field. */
+    private JTextField tfB = new JTextField();
 
-	/** C field. */
-	private JTextField tfC = new JTextField();
+    /** C field. */
+    private JTextField tfC = new JTextField();
 
-	/** D field. */
-	private JTextField tfD = new JTextField();
+    /** D field. */
+    private JTextField tfD = new JTextField();
 
-	/** Add noise combo box. */
-	private TristateDropDown tsNoise = new TristateDropDown();
+    /** Add noise combo box. */
+    private TristateDropDown tsNoise = new TristateDropDown();
 
-	/** Tabbed pane. */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
-	/** Main tab. */
-	private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Main tab. */
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-	/** Random tab. */
-	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    /** Random tab. */
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-	/** A reference to the neuron update rule being edited. */
-	private static final IzhikevichRule prototypeRule =
-			new IzhikevichRule();
+    /** A reference to the neuron update rule being edited. */
+    private static final IzhikevichRule prototypeRule = new IzhikevichRule();
 
-	/**
-	 * Creates an instance of this panel.
+    /**
+     * Creates an instance of this panel.
+     */
+    public IzhikevichRulePanel() {
+        super();
+        this.add(tabbedPane);
+        mainTab.addItem("A", tfA);
+        mainTab.addItem("B", tfB);
+        mainTab.addItem("C", tfC);
+        mainTab.addItem("D", tfD);
+        mainTab.addItem("Add noise", tsNoise);
+        tabbedPane.add(mainTab, "Main");
+        tabbedPane.add(randTab, "Noise");
+        this.addBottomText("<html>For a list of useful parameter settings<p>"
+                + "press the \"Help\" Button.</html>");
+    }
+
+    /**
+     * Populate fields with current data.
+     */
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+
+        IzhikevichRule neuronRef = (IzhikevichRule) ruleList.get(0);
+
+        // (Below) Handle consistency of multiple selections
+
+        // Handle A
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getA"))
+            tfA.setText(NULL_STRING);
+        else
+            tfA.setText(Double.toString(neuronRef.getA()));
+
+        // Handle B
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getB"))
+            tfB.setText(NULL_STRING);
+        else
+            tfB.setText(Double.toString(neuronRef.getB()));
+
+        // Handle C
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getC"))
+            tfC.setText(NULL_STRING);
+        else
+            tfC.setText(Double.toString(neuronRef.getC()));
+
+        // Handle D
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getD"))
+            tfD.setText(NULL_STRING);
+        else
+            tfD.setText(Double.toString(neuronRef.getD()));
+
+        // Handle Noise
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
+                "getAddNoise"))
+            tsNoise.setNull();
+        else
+            tsNoise.setSelected(neuronRef.getAddNoise());
+
+        randTab.fillFieldValues(getRandomizers(ruleList));
+
+    }
+
+    /**
+     * @return List of randomizers.
+     */
+    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((IzhikevichRule) ruleList.get(i)).getNoiseGenerator());
+        }
+        return ret;
+    }
+
+    /**
+     * Populate fields with default data.
+     */
+    public void fillDefaultValues() {
+        tfA.setText(Double.toString(prototypeRule.getA()));
+        tfB.setText(Double.toString(prototypeRule.getB()));
+        tfC.setText(Double.toString(prototypeRule.getC()));
+        tfD.setText(Double.toString(prototypeRule.getD()));
+        tsNoise.setSelected(prototypeRule.getAddNoise());
+        randTab.fillDefaultValues();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(Neuron neuron) {
+
+        if (!(neuron.getUpdateRule() instanceof IzhikevichRule)) {
+            neuron.setUpdateRule(prototypeRule.deepCopy());
+        }
+
+        writeValuesToRules(Collections.singletonList(neuron));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Neuron> neurons) {
+
+        if (isReplace()) {
+            IzhikevichRule neuronRef = prototypeRule.deepCopy();
+            for (Neuron n : neurons) {
+                n.setUpdateRule(neuronRef.deepCopy());
+            }
+        }
+
+        writeValuesToRules(neurons);
+
+    }
+
+    /**
+	 *
 	 */
-	public IzhikevichRulePanel() {
-		super();
-		this.add(tabbedPane);
-		mainTab.addItem("A", tfA);
-		mainTab.addItem("B", tfB);
-		mainTab.addItem("C", tfC);
-		mainTab.addItem("D", tfD);
-		mainTab.addItem("Add noise", tsNoise);
-		tabbedPane.add(mainTab, "Main");
-		tabbedPane.add(randTab, "Noise");
-		this.addBottomText("<html>For a list of useful parameter settings<p>"
-				+ "press the \"Help\" Button.</html>");
-	}
+    @Override
+    protected void writeValuesToRules(List<Neuron> neurons) {
+        int numNeurons = neurons.size();
 
-	/**
-	 * Populate fields with current data.
-	 */
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        // A
+        double a = Utils.doubleParsable(tfA);
+        if (!Double.isNaN(a)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IzhikevichRule) neurons.get(i).getUpdateRule()).setA(a);
+            }
+        }
 
-		IzhikevichRule neuronRef = (IzhikevichRule) ruleList.get(0);
+        // B
+        double b = Utils.doubleParsable(tfB);
+        if (!Double.isNaN(b)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IzhikevichRule) neurons.get(i).getUpdateRule()).setB(b);
+            }
+        }
 
-		// (Below) Handle consistency of multiple selections
+        // C
+        double c = Utils.doubleParsable(tfC);
+        if (!Double.isNaN(c)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IzhikevichRule) neurons.get(i).getUpdateRule()).setC(c);
+            }
+        }
 
-		// Handle A
-		if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
-				"getA"))
-			tfA.setText(NULL_STRING);
-		else
-			tfA.setText(Double.toString(neuronRef.getA()));
+        // D
+        double d = Utils.doubleParsable(tfD);
+        if (!Double.isNaN(d)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IzhikevichRule) neurons.get(i).getUpdateRule()).setD(d);
+            }
+        }
 
-		// Handle B
-		if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
-				"getB"))
-			tfB.setText(NULL_STRING);
-		else
-			tfB.setText(Double.toString(neuronRef.getB()));
+        // Add Noise?
+        if (!tsNoise.isNull()) {
+            boolean addNoise = tsNoise.getSelectedIndex() == TristateDropDown
+                    .getTRUE();
+            for (int i = 0; i < numNeurons; i++) {
+                ((IzhikevichRule) neurons.get(i).getUpdateRule())
+                        .setAddNoise(addNoise);
 
-		// Handle C
-		if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
-				"getC"))
-			tfC.setText(NULL_STRING);
-		else
-			tfC.setText(Double.toString(neuronRef.getC()));
+            }
+            if (addNoise) {
+                for (int i = 0; i < numNeurons; i++) {
+                    randTab.commitRandom(((IzhikevichRule) neurons.get(i)
+                            .getUpdateRule()).getNoiseGenerator());
+                }
+            }
+        }
+    }
 
-		// Handle D
-		if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
-				"getD"))
-			tfD.setText(NULL_STRING);
-		else
-			tfD.setText(Double.toString(neuronRef.getD()));
-
-		// Handle Noise
-		if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
-				"getAddNoise"))
-			tsNoise.setNull();
-		else
-			tsNoise.setSelected(neuronRef.getAddNoise());
-
-		randTab.fillFieldValues(getRandomizers(ruleList));
-
-	}
-
-	/**
-	 * @return List of randomizers.
-	 */
-	private ArrayList<Randomizer> getRandomizers(
-			List<NeuronUpdateRule> ruleList) {
-		ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-		for (int i = 0; i < ruleList.size(); i++) {
-			ret.add(((IzhikevichRule) ruleList.get(i))
-					.getNoiseGenerator());
-		}
-		return ret;
-	}
-
-	/**
-	 * Populate fields with default data.
-	 */
-	public void fillDefaultValues() {
-		tfA.setText(Double.toString(prototypeRule.getA()));
-		tfB.setText(Double.toString(prototypeRule.getB()));
-		tfC.setText(Double.toString(prototypeRule.getC()));
-		tfD.setText(Double.toString(prototypeRule.getD()));
-		tsNoise.setSelected(prototypeRule.getAddNoise());
-		randTab.fillDefaultValues();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(Neuron neuron) {
-
-		if (!(neuron.getUpdateRule() instanceof IzhikevichRule)) {
-			neuron.setUpdateRule(prototypeRule.deepCopy());
-		}
-
-		writeValuesToRules(Collections.singletonList(neuron));
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
-
-		if (isReplace()) {
-			IzhikevichRule neuronRef = prototypeRule.deepCopy();
-			for (Neuron n : neurons) {
-				n.setUpdateRule(neuronRef.deepCopy());
-			}
-		}
-
-		writeValuesToRules(neurons);
-
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
-		int numNeurons = neurons.size();
-
-		// A
-		double a = Utils.doubleParsable(tfA);
-		if (!Double.isNaN(a)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IzhikevichRule) neurons.get(i).getUpdateRule()).setA(a);
-			}
-		}
-
-		// B
-		double b = Utils.doubleParsable(tfB);
-		if (!Double.isNaN(b)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IzhikevichRule) neurons.get(i).getUpdateRule()).setB(b);
-			}
-		}
-
-		// C
-		double c = Utils.doubleParsable(tfC);
-		if (!Double.isNaN(c)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IzhikevichRule) neurons.get(i).getUpdateRule()).setC(c);
-			}
-		}
-
-		// D
-		double d = Utils.doubleParsable(tfD);
-		if (!Double.isNaN(d)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IzhikevichRule) neurons.get(i).getUpdateRule()).setD(d);
-			}
-		}
-
-		// Add Noise?
-		if (!tsNoise.isNull()) {
-			boolean addNoise =
-					tsNoise.getSelectedIndex() == TristateDropDown
-							.getTRUE();
-			for (int i = 0; i < numNeurons; i++) {
-				((IzhikevichRule) neurons.get(i).getUpdateRule())
-						.setAddNoise(addNoise);
-
-			}
-			if (addNoise) {
-				for (int i = 0; i < numNeurons; i++) {
-					randTab.commitRandom(((IzhikevichRule) neurons.get(i)
-							.getUpdateRule()).getNoiseGenerator());
-				}
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected IzhikevichRule getPrototypeRule() {
-		return prototypeRule.deepCopy();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected IzhikevichRule getPrototypeRule() {
+        return prototypeRule.deepCopy();
+    }
 
 }

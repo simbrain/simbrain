@@ -299,7 +299,6 @@ public class DataPointColoringDialog extends StandardDialog implements
         super.closeDialogOk();
     }
 
-
     /**
      * Helper method to check that a value is between 0 and 1 and display a
      * warning if not.

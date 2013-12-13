@@ -14,12 +14,9 @@
 package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
-import javax.swing.JTextField;
 
-import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.TileSensor;
 
 /**
  * Panel to add a smell sensor to an entity.
@@ -82,12 +79,15 @@ public class SmellSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addSensor(new SmellSensor(entity, label.getText(), Double.parseDouble(theta.getText()), Double.parseDouble(radius.getText())));
+            entity.addSensor(new SmellSensor(entity, label.getText(), Double
+                    .parseDouble(theta.getText()), Double.parseDouble(radius
+                    .getText())));
         } else {
             smellSensor.setLabel(label.getText());
             smellSensor.setTheta(Double.parseDouble(theta.getText()));
             smellSensor.setRadius(Double.parseDouble(radius.getText()));
-            smellSensor.getParent().getParentWorld().fireEntityChanged(smellSensor.getParent());
+            smellSensor.getParent().getParentWorld()
+                    .fireEntityChanged(smellSensor.getParent());
         }
     }
 

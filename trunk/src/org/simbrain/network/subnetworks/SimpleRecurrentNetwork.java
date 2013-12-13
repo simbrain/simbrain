@@ -41,239 +41,218 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991).
- * 
+ *
  * @author ztosi
  * @author Jeff Yoshimi
  */
 public final class SimpleRecurrentNetwork extends Subnetwork implements
-		Trainable {
+        Trainable {
 
-	/**
-	 * A layer consisting of a copy of the hidden layer from a previous time
-	 * step
-	 */
-	private NeuronGroup contextLayer;
+    /**
+     * A layer consisting of a copy of the hidden layer from a previous time
+     * step
+     */
+    private NeuronGroup contextLayer;
 
-	/** Reference to the input layer. */
-	private final NeuronGroup inputLayer;
+    /** Reference to the input layer. */
+    private final NeuronGroup inputLayer;
 
-	/** Reference to the hidden layer. */
-	private final NeuronGroup hiddenLayer;
+    /** Reference to the hidden layer. */
+    private final NeuronGroup hiddenLayer;
 
-	/** Reference to the output layer. */
-	private final NeuronGroup outputLayer;
+    /** Reference to the output layer. */
+    private final NeuronGroup outputLayer;
 
-	/** Initial position of network (from bottom left). */
-	private Point2D initialPosition;
+    /** Initial position of network (from bottom left). */
+    private Point2D initialPosition;
 
-	/** space between layers */
-	private int betweenLayerInterval = 150;
+    /** space between layers */
+    private int betweenLayerInterval = 150;
 
-	/** space between neurons within layers */
-	private int betweenNeuronInterval = 50;
+    /** space between neurons within layers */
+    private int betweenNeuronInterval = 50;
 
-	/**
-	 * Training set.
-	 */
-	private final TrainingSet trainingSet = new TrainingSet();
+    /**
+     * Training set.
+     */
+    private final TrainingSet trainingSet = new TrainingSet();
 
-	// TODO: Add a simpler constructor without neurontypes.
+    // TODO: Add a simpler constructor without neurontypes.
 
-	/**
-	 * Constructor specifying root network, and number of nodes in each layer.
-	 * 
-	 * @param network
-	 *            underlying network
-	 * @param numInputNodes
-	 *            number of nodes in the input layer
-	 * @param numHiddenNodes
-	 *            number of nodes in the hidden and context layers
-	 * @param numOutputNodes
-	 *            number of output nodes
-	 * @param hiddenNeuronType
-	 *            update rule for hidden nodes
-	 * @param outputNeuronType
-	 *            update rule for hidden nodes
-	 * @param initialPosition
-	 *            where to position the network (upper left)
-	 */
-	public SimpleRecurrentNetwork(final Network network,
-			int numInputNodes, int numHiddenNodes, int numOutputNodes,
-			NeuronUpdateRule hiddenNeuronType,
-			NeuronUpdateRule outputNeuronType, Point2D initialPosition) {
-		super(network);
+    /**
+     * Constructor specifying root network, and number of nodes in each layer.
+     *
+     * @param network underlying network
+     * @param numInputNodes number of nodes in the input layer
+     * @param numHiddenNodes number of nodes in the hidden and context layers
+     * @param numOutputNodes number of output nodes
+     * @param hiddenNeuronType update rule for hidden nodes
+     * @param outputNeuronType update rule for hidden nodes
+     * @param initialPosition where to position the network (upper left)
+     */
+    public SimpleRecurrentNetwork(final Network network, int numInputNodes,
+            int numHiddenNodes, int numOutputNodes,
+            NeuronUpdateRule hiddenNeuronType,
+            NeuronUpdateRule outputNeuronType, Point2D initialPosition) {
+        super(network);
 
-		this.initialPosition = initialPosition;
+        this.initialPosition = initialPosition;
 
-		setLabel("SRN");
+        setLabel("SRN");
 
-		// TODO: implement new connectNeuronGroups method
-		// Initialize layers
-		List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
-		List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
-		List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
-		List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
+        // TODO: implement new connectNeuronGroups method
+        // Initialize layers
+        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
 
-		// TODO: Think about these defaults...
-		initializeLayer(inputLayerNeurons, new LinearRule(),
-				numInputNodes);
-		initializeLayer(hiddenLayerNeurons, hiddenNeuronType,
-				numHiddenNodes);
-		initializeLayer(outputLayerNeurons, outputNeuronType,
-				numOutputNodes);
-		initializeLayer(contextLayerNeurons, new LinearRule(),
-				numHiddenNodes);
+        // TODO: Think about these defaults...
+        initializeLayer(inputLayerNeurons, new LinearRule(), numInputNodes);
+        initializeLayer(hiddenLayerNeurons, hiddenNeuronType, numHiddenNodes);
+        initializeLayer(outputLayerNeurons, outputNeuronType, numOutputNodes);
+        initializeLayer(contextLayerNeurons, new LinearRule(), numHiddenNodes);
 
-		// Input Layer
-		LineLayout layerLayout =
-				new LineLayout(betweenNeuronInterval,
-						LineOrientation.HORIZONTAL);
-		layerLayout.setInitialLocation(new Point((int) initialPosition
-				.getX(), (int) initialPosition.getY()));
-		layerLayout.layoutNeurons(inputLayerNeurons);
-		inputLayer =
-				new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-		inputLayer.setLabel("Inputs");
-		addNeuronGroup(inputLayer);
+        // Input Layer
+        LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
+                LineOrientation.HORIZONTAL);
+        layerLayout.setInitialLocation(new Point((int) initialPosition.getX(),
+                (int) initialPosition.getY()));
+        layerLayout.layoutNeurons(inputLayerNeurons);
+        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
+        inputLayer.setLabel("Inputs");
+        addNeuronGroup(inputLayer);
 
-		// Hidden Layer
-		layerLayout.layoutNeurons(hiddenLayerNeurons);
-		hiddenLayer =
-				new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
-		hiddenLayer.setLabel("Hidden layer");
-		addNeuronGroup(hiddenLayer);
-		NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
-				Direction.NORTH, betweenLayerInterval);
+        // Hidden Layer
+        layerLayout.layoutNeurons(hiddenLayerNeurons);
+        hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
+        hiddenLayer.setLabel("Hidden layer");
+        addNeuronGroup(hiddenLayer);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
+                Direction.NORTH, betweenLayerInterval);
 
-		// Context Layer
-		// Initial context layer values set to 0.5 (as in Elman 1991)
-		layerLayout.layoutNeurons(contextLayerNeurons);
-		contextLayer =
-				new NeuronGroup(getParentNetwork(), contextLayerNeurons);
-		contextLayer.setLabel("Context nodes");
-		addNeuronGroup(contextLayer);
-		NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
-				Direction.EAST, betweenLayerInterval);
+        // Context Layer
+        // Initial context layer values set to 0.5 (as in Elman 1991)
+        layerLayout.layoutNeurons(contextLayerNeurons);
+        contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
+        contextLayer.setLabel("Context nodes");
+        addNeuronGroup(contextLayer);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
+                Direction.EAST, betweenLayerInterval);
 
-		// Output layer
-		layerLayout.layoutNeurons(outputLayerNeurons);
-		outputLayer =
-				new NeuronGroup(getParentNetwork(), outputLayerNeurons);
-		addNeuronGroup(outputLayer);
-		outputLayer.setLabel("Output layer");
-		NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
-				Direction.NORTH, betweenLayerInterval);
+        // Output layer
+        layerLayout.layoutNeurons(outputLayerNeurons);
+        outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
+        addNeuronGroup(outputLayer);
+        outputLayer.setLabel("Output layer");
+        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
+                Direction.NORTH, betweenLayerInterval);
 
-		// Connect the laid-out layers
-		connect();
+        // Connect the laid-out layers
+        connect();
 
-	}
+    }
 
-	/** Connects SRN layers. */
-	private void connect() {
-		// Standard all to all connections
-		AllToAll connect = new AllToAll(this.getParentNetwork());
-		connect.setAllowSelfConnection(false);
-		connect.setExcitatoryRatio(.5);
-		Synapse synapse =
-				Synapse.getTemplateSynapse(new StaticSynapseRule());
-		synapse.setLowerBound(-1);
-		synapse.setUpperBound(1);
-		connect.setBaseExcitatorySynapse(synapse);
-		connect.setBaseInhibitorySynapse(synapse);
-		connectNeuronGroups(inputLayer, hiddenLayer, connect);
-		connectNeuronGroups(contextLayer, hiddenLayer, connect);
-		connectNeuronGroups(hiddenLayer, outputLayer, connect);
-	}
+    /** Connects SRN layers. */
+    private void connect() {
+        // Standard all to all connections
+        AllToAll connect = new AllToAll(this.getParentNetwork());
+        connect.setAllowSelfConnection(false);
+        connect.setExcitatoryRatio(.5);
+        Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
+        synapse.setLowerBound(-1);
+        synapse.setUpperBound(1);
+        connect.setBaseExcitatorySynapse(synapse);
+        connect.setBaseInhibitorySynapse(synapse);
+        connectNeuronGroups(inputLayer, hiddenLayer, connect);
+        connectNeuronGroups(contextLayer, hiddenLayer, connect);
+        connectNeuronGroups(hiddenLayer, outputLayer, connect);
+    }
 
-	/**
-	 * Initializes a layer by adding the desired number of neurons with the
-	 * desired neuron update rule to the List of neurons.
-	 * 
-	 * @param layer
-	 *            the list of neurons
-	 * @param nodeType
-	 *            the desired neuron update rule
-	 * @param lowerBound
-	 *            lower bound for neurons in this layer
-	 * @param nodes
-	 *            the desired number of nodes
-	 */
-	private void initializeLayer(List<Neuron> layer,
-			NeuronUpdateRule nodeType, int nodes) {
+    /**
+     * Initializes a layer by adding the desired number of neurons with the
+     * desired neuron update rule to the List of neurons.
+     *
+     * @param layer the list of neurons
+     * @param nodeType the desired neuron update rule
+     * @param lowerBound lower bound for neurons in this layer
+     * @param nodes the desired number of nodes
+     */
+    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
+            int nodes) {
 
-		for (int i = 0; i < nodes; i++) {
-			Neuron node = new Neuron(getParentNetwork(), nodeType);
-			nodeType.setIncrement(1);
-			layer.add(node);
-		}
-	}
+        for (int i = 0; i < nodes; i++) {
+            Neuron node = new Neuron(getParentNetwork(), nodeType);
+            nodeType.setIncrement(1);
+            layer.add(node);
+        }
+    }
 
-	@Override
-	public void initNetwork() {
-		clearActivations();
-		// TODO: Do this once there is a GUI hook to make sure this is done
-		// when the user tests the network
-		// contextLayer.setActivationLevels(.5);
-	}
+    @Override
+    public void initNetwork() {
+        clearActivations();
+        // TODO: Do this once there is a GUI hook to make sure this is done
+        // when the user tests the network
+        // contextLayer.setActivationLevels(.5);
+    }
 
-	@Override
-	public void update() {
+    @Override
+    public void update() {
 
-		inputLayer.update();
-		hiddenLayer.update();
+        inputLayer.update();
+        hiddenLayer.update();
 
-		// Update context Layer
-		for (Neuron n : hiddenLayer.getNeuronList()) {
-			double act = n.getActivation();
-			int index = hiddenLayer.getNeuronList().indexOf(n);
-			contextLayer.getNeuronList().get(index).setActivation(act);
-		}
+        // Update context Layer
+        for (Neuron n : hiddenLayer.getNeuronList()) {
+            double act = n.getActivation();
+            int index = hiddenLayer.getNeuronList().indexOf(n);
+            contextLayer.getNeuronList().get(index).setActivation(act);
+        }
 
-		outputLayer.update();
-	}
+        outputLayer.update();
+    }
 
-	@Override
-	public List<List<Neuron>> getNeuronGroupsAsList() {
-		List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
-		ret.add(getInputNeurons());
-		ret.add(getHiddenLayer().getNeuronList());
-		ret.add(getOutputNeurons());
-		return ret;
-	}
+    @Override
+    public List<List<Neuron>> getNeuronGroupsAsList() {
+        List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
+        ret.add(getInputNeurons());
+        ret.add(getHiddenLayer().getNeuronList());
+        ret.add(getOutputNeurons());
+        return ret;
+    }
 
-	@Override
-	public List<Neuron> getInputNeurons() {
-		return inputLayer.getNeuronList();
-	}
+    @Override
+    public List<Neuron> getInputNeurons() {
+        return inputLayer.getNeuronList();
+    }
 
-	@Override
-	public List<Neuron> getOutputNeurons() {
-		return outputLayer.getNeuronList();
-	}
+    @Override
+    public List<Neuron> getOutputNeurons() {
+        return outputLayer.getNeuronList();
+    }
 
-	@Override
-	public TrainingSet getTrainingSet() {
-		return trainingSet;
-	}
+    @Override
+    public TrainingSet getTrainingSet() {
+        return trainingSet;
+    }
 
-	/**
-	 * @return the contextLayer
-	 */
-	public NeuronGroup getContextLayer() {
-		return contextLayer;
-	}
+    /**
+     * @return the contextLayer
+     */
+    public NeuronGroup getContextLayer() {
+        return contextLayer;
+    }
 
-	/**
-	 * @return the hiddenLayer
-	 */
-	public NeuronGroup getHiddenLayer() {
-		return hiddenLayer;
-	}
+    /**
+     * @return the hiddenLayer
+     */
+    public NeuronGroup getHiddenLayer() {
+        return hiddenLayer;
+    }
 
-	@Override
-	public String getUpdateMethodDesecription() {
-		return "Hidden layer, copy hidden to context, update layer";
-	}
+    @Override
+    public String getUpdateMethodDesecription() {
+        return "Hidden layer, copy hidden to context, update layer";
+    }
 
 }

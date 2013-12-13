@@ -18,14 +18,7 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 /**
  * Implement a simple hearing sensor. When the phrase is heard, the sensor is

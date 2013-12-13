@@ -89,23 +89,20 @@ public class SynapseDialog extends StandardDialog {
     private final ArrayList<Synapse> synapseList;
 
     /**
-     * @param selectedSynapses
-     *            the pnode_synapses being adjusted
+     * @param selectedSynapses the pnode_synapses being adjusted
      */
     public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
         this(getSynapses(selectedSynapses));
     }
 
     /**
-     * @param synapseList
-     *            the logical synapses being adjusted
+     * @param synapseList the logical synapses being adjusted
      */
     public SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
         infoPanel = new BasicSynapseInfoPanel(synapseList, this);
         updatePanel = new SynapseUpdateSettingsPanel(synapseList, this);
-        responderPanel = new SpikeResponderSettingsPanel(synapseList,
-                this);
+        responderPanel = new SpikeResponderSettingsPanel(synapseList, this);
         usesSpikeResponders = spikeResponderTest(synapseList);
         initializeLayout();
         addListeners();
@@ -115,8 +112,7 @@ public class SynapseDialog extends StandardDialog {
     /**
      * Gets the logical synapses from a list of gui Synapse Nodes
      *
-     * @param selectedSynapses
-     *            the selected Synapse Node gui objects
+     * @param selectedSynapses the selected Synapse Node gui objects
      * @return the synapses contained within the slected synapse nodes
      */
     private static ArrayList<Synapse> getSynapses(
@@ -148,17 +144,16 @@ public class SynapseDialog extends StandardDialog {
      * Add listeners to the components of the dialog
      */
     private void addListeners() {
-        updatePanel.getCbSynapseType().addActionListener(
-                new ActionListener() {
+        updatePanel.getCbSynapseType().addActionListener(new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
 
-                        updateHelp();
+                updateHelp();
 
-                    }
+            }
 
-                });
+        });
     }
 
     /**
@@ -177,12 +172,10 @@ public class SynapseDialog extends StandardDialog {
         if (updatePanel.getCbSynapseType().getSelectedItem() == NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else {
-            String name =
-                    (String) updatePanel.getCbSynapseType()
-                        .getSelectedItem();
-            helpAction =
-                    new ShowHelpAction("Pages/Network/synapse/" + name
-                            + ".html");
+            String name = (String) updatePanel.getCbSynapseType()
+                    .getSelectedItem();
+            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
+                    + ".html");
         }
         helpButton.setAction(helpAction);
     }
@@ -218,16 +211,17 @@ public class SynapseDialog extends StandardDialog {
      * Tests to make sure that all the source neurons of each synapse use
      * spiking neuron update rules. This is used to determine if a spike
      * responder panel should or shouldn't be displayed. If all the source
-     * neurons use a spiking rule, then the panel ought to appear, conversely
-     * if any of the source neurons do not use a spiking neuron update rule, the
+     * neurons use a spiking rule, then the panel ought to appear, conversely if
+     * any of the source neurons do not use a spiking neuron update rule, the
      * panel ought not to appear.
+     *
      * @param synapses the synapses who's source neurons will be tested.
      * @return whether or not it would be applicable to display a spike
-     * responder panel based on the update rules in use by the source neurons
+     *         responder panel based on the update rules in use by the source
+     *         neurons
      */
     public static boolean spikeResponderTest(List<Synapse> synapses) {
-        HashSet<SpikingNeuronUpdateRule> snurs =
-                new HashSet<SpikingNeuronUpdateRule>();
+        HashSet<SpikingNeuronUpdateRule> snurs = new HashSet<SpikingNeuronUpdateRule>();
         for (Synapse s : synapses) {
             NeuronUpdateRule nur = s.getSource().getUpdateRule();
             if (!snurs.contains(nur)) {
@@ -241,25 +235,25 @@ public class SynapseDialog extends StandardDialog {
         return true;
     }
 
-//    /**
-//     * Test Main: For fast prototyping.
-//     *
-//     * @param args
-//     */
-//    public static void main(String[] args) {
-//        Network net = new Network();
-//        NetworkPanel np = new NetworkPanel(net);
-//        Neuron n = new Neuron(net, new LinearRule());
-//        NeuronNode nn = new NeuronNode(np, n);
-//
-//        Synapse s = new Synapse(n, n);
-//        ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
-//        arr.add(new SynapseNode(np, nn, nn, s));
-//        SynapseDialog nd = new SynapseDialog(arr);
-//
-//        nd.pack();
-//        nd.setVisible(true);
-//
-//    }
+    // /**
+    // * Test Main: For fast prototyping.
+    // *
+    // * @param args
+    // */
+    // public static void main(String[] args) {
+    // Network net = new Network();
+    // NetworkPanel np = new NetworkPanel(net);
+    // Neuron n = new Neuron(net, new LinearRule());
+    // NeuronNode nn = new NeuronNode(np, n);
+    //
+    // Synapse s = new Synapse(n, n);
+    // ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
+    // arr.add(new SynapseNode(np, nn, nn, s));
+    // SynapseDialog nd = new SynapseDialog(arr);
+    //
+    // nd.pack();
+    // nd.setVisible(true);
+    //
+    // }
 
 }

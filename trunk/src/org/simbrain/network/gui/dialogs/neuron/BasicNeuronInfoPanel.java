@@ -83,20 +83,15 @@ public class BasicNeuronInfoPanel extends JPanel {
     /**
      * Construct the panel.
      *
-     * @param neuronList
-     *            the neurons being adjusted
-     * @param parent
-     *            the parent window
+     * @param neuronList the neurons being adjusted
+     * @param parent the parent window
      */
-    public BasicNeuronInfoPanel(final List<Neuron> neuronList,
-            Window parent) {
+    public BasicNeuronInfoPanel(final List<Neuron> neuronList, Window parent) {
         this.neuronList = neuronList;
         this.parent = parent;
-        detailTriangle =
-                new DropDownTriangle(UpDirection.LEFT, false, "More",
-                        "Less", parent);
-        extraDataPanel =
-                new ExtendedNeuronInfoPanel(this.neuronList, parent);
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
+                "Less", parent);
+        extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList, parent);
         addListeners();
         initializeLayout();
         fillFieldValues();
@@ -111,8 +106,7 @@ public class BasicNeuronInfoPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel basicsPanel = new JPanel(new GridBagLayout());
-        basicsPanel
-                .setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        basicsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -238,13 +232,11 @@ public class BasicNeuronInfoPanel extends JPanel {
                 "getActivation")) {
             tfActivation.setText(NULL_STRING);
         } else {
-            tfActivation.setText(Double.toString(neuronRef
-                    .getActivation()));
+            tfActivation.setText(Double.toString(neuronRef.getActivation()));
         }
 
         // Handle Label
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getLabel")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLabel")) {
             tfNeuronLabel.setText(NULL_STRING);
         } else {
             tfNeuronLabel.setText(neuronRef.getLabel());
@@ -281,8 +273,7 @@ public class BasicNeuronInfoPanel extends JPanel {
     /**
      * Commit changes to provided list of neurons.
      *
-     * @param neuronList
-     *            neuron to apply changes to
+     * @param neuronList neuron to apply changes to
      */
     public void commitChanges(List<Neuron> neuronList) {
 

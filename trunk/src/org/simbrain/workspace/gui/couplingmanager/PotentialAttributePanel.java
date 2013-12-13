@@ -283,12 +283,10 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             PotentialAttribute id = (PotentialAttribute) object;
 
             // Set text color based on data type
-            renderer.setForeground(CouplingManager.getColor(id
-                    .getDataType()));
+            renderer.setForeground(CouplingManager.getColor(id.getDataType()));
 
             renderer.setText(id.getDescription() + "<"
-                    + CouplingManager.getTypeDescriptor(id.getDataType())
-                    + ">");
+                    + CouplingManager.getTypeDescriptor(id.getDataType()) + ">");
             return renderer;
         }
 

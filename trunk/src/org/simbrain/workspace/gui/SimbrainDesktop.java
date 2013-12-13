@@ -373,7 +373,8 @@ public class SimbrainDesktop {
     private static void registerComponents() {
         // TODO use a configuration file
         registerComponent(BarChartComponent.class, BarChartGui.class);
-        registerComponent(DocViewerComponent.class, DocViewerDesktopComponent.class);
+        registerComponent(DocViewerComponent.class,
+                DocViewerDesktopComponent.class);
         registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         registerComponent(DisplayComponent.class,
                 DisplayComponentDesktopGui.class);
@@ -685,7 +686,8 @@ public class SimbrainDesktop {
         helpMenu.add(new ShowHelpAction("Main Help", "SimbrainDocs.html"));
         helpMenu.addSeparator();
         helpMenu.add(new ShowHelpAction("Quick start", "Pages/QuickStart.html"));
-        helpMenu.add(new ShowHelpAction("Keyboard Shortcuts", "KeyboardShortcuts.html"));
+        helpMenu.add(new ShowHelpAction("Keyboard Shortcuts",
+                "KeyboardShortcuts.html"));
         helpMenu.add(new ShowHelpAction("Credits", "SimbrainCredits.html"));
         return helpMenu;
     }

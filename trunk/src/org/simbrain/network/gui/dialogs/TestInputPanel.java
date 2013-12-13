@@ -100,8 +100,8 @@ public class TestInputPanel extends JPanel {
      * @param data input data to test
      */
 
-    public TestInputPanel(NetworkPanel networkPanel,
-            List<Neuron> inputNeurons, double[][] data) {
+    public TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
+            double[][] data) {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
@@ -111,7 +111,7 @@ public class TestInputPanel extends JPanel {
         this.data = data;
         initTestInputPanel();
     }
-    
+
     NumericTable numericTable;
 
     /**
@@ -129,7 +129,8 @@ public class TestInputPanel extends JPanel {
         List<String> colHeaders = new ArrayList<String>();
         for (int i = 0; i < inputNeurons.size(); i++) {
             colHeaders.add(new String("" + (i + 1) + " ("
-                    + inputNeurons.get(i).getId()) + ")");
+                    + inputNeurons.get(i).getId())
+                    + ")");
         }
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
@@ -195,7 +196,7 @@ public class TestInputPanel extends JPanel {
      */
     private Action iterationModeAction = new AbstractAction() {
         {
-            putValue(NAME, "Iteration mode");        
+            putValue(NAME, "Iteration mode");
         }
 
         /**
@@ -269,8 +270,7 @@ public class TestInputPanel extends JPanel {
      * Advance through the entire table and test each row.
      */
     private void testTable() {
-        for (int j = 0; j < ((NumericTable) table.getData()).getRowCount(); j++)
-        {
+        for (int j = 0; j < ((NumericTable) table.getData()).getRowCount(); j++) {
             ((NumericTable) table.getData()).setCurrentRow(j);
             table.scrollRectToVisible(table.getCellRect(
                     ((NumericTable) table.getData()).getCurrentRow(),

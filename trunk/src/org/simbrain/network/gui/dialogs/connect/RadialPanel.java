@@ -142,11 +142,11 @@ public class RadialPanel extends AbstractConnectionPanel {
                 .isAllowSelfConnections());
     }
 
-	@Override
-	public void fillFieldValues(ConnectNeurons connection)
-			throws ClassCastException {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void fillFieldValues(ConnectNeurons connection)
+            throws ClassCastException {
+        // TODO Auto-generated method stub
+
+    }
 
 }

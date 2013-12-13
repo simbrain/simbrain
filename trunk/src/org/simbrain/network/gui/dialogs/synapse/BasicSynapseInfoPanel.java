@@ -51,13 +51,13 @@ public class BasicSynapseInfoPanel extends JPanel {
     /** Strength field. */
     private final JTextField tfStrength = new JTextField();
 
-    /** 
-     * A switch for determining whether or not the synapse will send a 
-     * weighted input. 
+    /**
+     * A switch for determining whether or not the synapse will send a weighted
+     * input.
      */
     private final TristateDropDown synapseEnabled = new TristateDropDown(
-    		"Enabled", "Disabled");
-    
+            "Enabled", "Disabled");
+
     /**
      * A triangle that switches between an up (left) and a down state Used for
      * showing/hiding extra synapse data.
@@ -78,19 +78,16 @@ public class BasicSynapseInfoPanel extends JPanel {
 
     /**
      *
-     * @param synapseList
-     *                  The list of synapses to be edited.
-     * @param parent
-     *              The "parent" window (frame, dialog, etc.) containing this
-     *              panel. Here so that it can be resized when this panel
-     *              changes its size.
+     * @param synapseList The list of synapses to be edited.
+     * @param parent The "parent" window (frame, dialog, etc.) containing this
+     *            panel. Here so that it can be resized when this panel changes
+     *            its size.
      */
     public BasicSynapseInfoPanel(final List<Synapse> synapseList,
-    		final Window parent) {
+            final Window parent) {
         this.parent = parent;
-        detailTriangle =
-                new DropDownTriangle(UpDirection.LEFT, false, "More",
-                        "Less", parent);
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
+                "Less", parent);
         extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
         initializeLayout();
         fillFieldValues(synapseList);
@@ -106,8 +103,7 @@ public class BasicSynapseInfoPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel basicsPanel = new JPanel(new GridBagLayout());
-        basicsPanel
-                .setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        basicsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -142,15 +138,14 @@ public class BasicSynapseInfoPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         basicsPanel.add(new JLabel("Status: "), gbc);
-        
+
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 3, 0, 0);
         gbc.gridwidth = 2;
         gbc.weightx = 0.2;
         gbc.gridx = 1;
         basicsPanel.add(synapseEnabled, gbc);
-        
-        
+
         gbc.gridwidth = 1;
         int lgap = detailTriangle.isDown() ? 5 : 0;
         gbc.insets = new Insets(10, 5, lgap, 5);
@@ -227,17 +222,17 @@ public class BasicSynapseInfoPanel extends JPanel {
         } else {
             tfStrength.setText(Double.toString(synapseRef.getStrength()));
         }
-        
+
         // Handle Enabled
-        if(!NetworkUtils.isConsistent(synapseList, Synapse.class,
-        		"isSendWeightedInput")) {
-        	synapseEnabled.setNull();
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+                "isSendWeightedInput")) {
+            synapseEnabled.setNull();
         } else {
-        	synapseEnabled.setSelectedIndex(synapseRef.isSendWeightedInput()
-        			? TristateDropDown.getTRUE()
-        					: TristateDropDown.getFALSE());
+            synapseEnabled
+                    .setSelectedIndex(synapseRef.isSendWeightedInput() ? TristateDropDown
+                            .getTRUE() : TristateDropDown.getFALSE());
         }
-        
+
     }
 
     /**
@@ -246,32 +241,30 @@ public class BasicSynapseInfoPanel extends JPanel {
      */
     public void commitChanges(List<Synapse> synapseList) {
 
-    	// Strength
-    	double strength = Utils.doubleParsable(tfStrength);
-    	if(!Double.isNaN(strength)) {
-    		for(Synapse s : synapseList) {
-    			s.setStrength(strength);
-    		}
-    	}
+        // Strength
+        double strength = Utils.doubleParsable(tfStrength);
+        if (!Double.isNaN(strength)) {
+            for (Synapse s : synapseList) {
+                s.setStrength(strength);
+            }
+        }
 
-    	// Enabled?
-    	boolean enabled = synapseEnabled.getSelectedIndex()
-    			== TristateDropDown.getTRUE();
-    	if(synapseEnabled.getSelectedIndex()
-    			!= TristateDropDown.getNULL()) {
-    		for(Synapse s: synapseList) {
-    			s.setSendWeightedInput(enabled);
-    		}
-    	}
+        // Enabled?
+        boolean enabled = synapseEnabled.getSelectedIndex() == TristateDropDown
+                .getTRUE();
+        if (synapseEnabled.getSelectedIndex() != TristateDropDown.getNULL()) {
+            for (Synapse s : synapseList) {
+                s.setSendWeightedInput(enabled);
+            }
+        }
 
-    	extraDataPanel.commitChanges(synapseList);
+        extraDataPanel.commitChanges(synapseList);
 
     }
 
     /**
-     * @return
-     *      The triangle widget used to view/hide extra data (spec. the extra
-     *      data panel {@link #extraDataPanel}).
+     * @return The triangle widget used to view/hide extra data (spec. the extra
+     *         data panel {@link #extraDataPanel}).
      */
     public DropDownTriangle getDetailTriangle() {
         return detailTriangle;

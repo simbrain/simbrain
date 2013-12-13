@@ -47,8 +47,8 @@ public class TrainingSetPanel extends JPanel {
      * Construct a new pane for displaying training sets.
      *
      * @param trainable the parent trainable object.
-     * @param numVisibleColumnsPerTable number of columns to make visible
-     *  in the input and target data tables.
+     * @param numVisibleColumnsPerTable number of columns to make visible in the
+     *            input and target data tables.
      */
     public TrainingSetPanel(final Trainable trainable,
             final int numVisibleColumnsPerTable) {
@@ -71,8 +71,8 @@ public class TrainingSetPanel extends JPanel {
      * @param inputData the input data
      * @param targetNeurons the output neurons
      * @param targetData target data
-     * @param numVisibleColumnsPerTable number of columns to make visible
-     *  in the input and target data tables.
+     * @param numVisibleColumnsPerTable number of columns to make visible in the
+     *            input and target data tables.
      */
     public TrainingSetPanel(List<Neuron> inputNeurons, NumericMatrix inputData,
             List<Neuron> targetNeurons, NumericMatrix targetData,
@@ -135,7 +135,6 @@ public class TrainingSetPanel extends JPanel {
         wholePanelConstraints.gridy = 0;
         add(split, wholePanelConstraints);
     }
-
 
     /**
      * Hacked code for resizing sub-panels as this panel is resized.

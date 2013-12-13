@@ -22,7 +22,6 @@ import javax.swing.JDialog;
 
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
@@ -115,7 +114,7 @@ public class SubnetworkNode extends GroupNode {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();
-                //panel.commitChanges();
+                // panel.commitChanges();
             }
         };
         return dialog;

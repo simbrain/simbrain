@@ -28,8 +28,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clamps weights action. NOTE: No longer used as of 3.0.  Leaving it here
- * for reference since the GUI worked well and could be used elsewhere.
+ * Clamps weights action. NOTE: No longer used as of 3.0. Leaving it here for
+ * reference since the GUI worked well and could be used elsewhere.
  */
 public final class ClampWeightsAction extends AbstractAction {
 
@@ -62,10 +62,10 @@ public final class ClampWeightsAction extends AbstractAction {
         // JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
-            //networkPanel.getNetwork().setClampWeights(cb.isSelected());
+            // networkPanel.getNetwork().setClampWeights(cb.isSelected());
         } else {
             JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-           // networkPanel.getNetwork().setClampWeights(cb.isSelected());
+            // networkPanel.getNetwork().setClampWeights(cb.isSelected());
         }
 
         // Determine status

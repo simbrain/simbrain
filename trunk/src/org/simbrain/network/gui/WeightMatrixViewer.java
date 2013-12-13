@@ -42,7 +42,7 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  * matrix, in a jtable.
  *
  * TODO: Better display of non-existent connections (perhaps by disabling those
- * cells for now).  What would be super cool is gray for no synapse. and then as
+ * cells for now). What would be super cool is gray for no synapse. and then as
  * added or deleted ungray it.
  *
  * @author jyoshimi
@@ -104,9 +104,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      */
     private void init(List<Neuron> sourceList, List<Neuron> targetList,
             NetworkPanel panel) {
-         // By default the lists are sorted horizontally.
-         // TODO: Allow for vertical sorting, or for some appropriate sorting
-         // when displaying an adjacency matrix
+        // By default the lists are sorted horizontally.
+        // TODO: Allow for vertical sorting, or for some appropriate sorting
+        // when displaying an adjacency matrix
 
         // By default the lists are sorted horizontally.
         // TODO: Allow for vertical sorting, or for some appropriate sorting

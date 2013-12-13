@@ -28,7 +28,6 @@ package org.simbrain.workspace;
  */
 public class PotentialConsumer extends PotentialAttribute {
 
-
     /**
      * Construct a potential consumer for the case where the method has multiple
      * arguments. For more on what these fields mean see the javadocs for
@@ -48,7 +47,6 @@ public class PotentialConsumer extends PotentialAttribute {
         super(parent, object, methodName, argDataTypes[0], argDataTypes,
                 argValues, description);
     }
-
 
     /**
      * Actualize this potential attribute into a consumer.

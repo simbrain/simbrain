@@ -268,8 +268,8 @@ final class NetworkSelectionModel {
     }
 
     /**
-     * A hack to broadcast a selection changed event.  Used to update
-     * some gui actions (like show weight matrix).
+     * A hack to broadcast a selection changed event. Used to update some gui
+     * actions (like show weight matrix).
      */
     public void fireSelectionChanged() {
         fireSelectionChanged(selection, selection);

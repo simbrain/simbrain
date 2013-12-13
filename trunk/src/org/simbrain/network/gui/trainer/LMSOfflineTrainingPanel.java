@@ -66,7 +66,6 @@ public class LMSOfflineTrainingPanel extends JPanel {
         // Set up main controls
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
 
-
         // Training Set Panel
         trainingSetPanel = new TrainingSetPanel(trainer.getTrainableNetwork(),
                 3);

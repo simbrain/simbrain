@@ -32,10 +32,10 @@ import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Action to construct a test input panel. The user of this class
- * provides the input neurons and network panel from which the action gets
- * the network to be updated. If input neurons are not provided, selected
- * neurons are used as input neurons.
+ * Action to construct a test input panel. The user of this class provides the
+ * input neurons and network panel from which the action gets the network to be
+ * updated. If input neurons are not provided, selected neurons are used as
+ * input neurons.
  *
  * @author Jeff Yoshimi
  * @author Lam Nguyen

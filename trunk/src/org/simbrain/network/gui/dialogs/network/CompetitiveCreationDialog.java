@@ -30,7 +30,7 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>CompetitiveDialog</b>.  Create competitive networks.
+ * <b>CompetitiveDialog</b>. Create competitive networks.
  */
 public class CompetitiveCreationDialog extends StandardDialog {
 

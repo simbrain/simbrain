@@ -77,7 +77,6 @@ public class OdorWorldRenderer {
             g.drawImage(background, 0, 0, null);
         }
 
-
         // For debugging world bounds
         // g.setColor(Color.black);
         // g.drawRect(0, 0, world.getWidth(), world.getHeight());
@@ -94,8 +93,8 @@ public class OdorWorldRenderer {
             // }
 
             // For debugging entity boundary issues
-            //g.drawRect((int) entity.getX(), (int) entity.getY(),
-            //        entity.getWidth(), entity.getHeight());
+            // g.drawRect((int) entity.getX(), (int) entity.getY(),
+            // entity.getWidth(), entity.getHeight());
 
             while (g.drawImage(entity.getImage(), x, y, null) == false) {
                 ; // keep trying to draw the image until you can. Dangerous?
@@ -106,7 +105,11 @@ public class OdorWorldRenderer {
                 if (effector instanceof Speech) {
                     if (((Speech) effector).isActivated()) {
                         RotatingEntity rotatingEntity = (RotatingEntity) entity;
-                        g.drawImage(getSpeechBalloon((Speech) effector), null, getBalloonLocationX((RotatingEntity) entity), (int)(entity.getY() - 60 + entity.getHeight()/3));
+                        g.drawImage(
+                                getSpeechBalloon((Speech) effector),
+                                null,
+                                getBalloonLocationX((RotatingEntity) entity),
+                                (int) (entity.getY() - 60 + entity.getHeight() / 3));
                     }
                 }
 
@@ -121,7 +124,12 @@ public class OdorWorldRenderer {
                         } else if (sensor instanceof Hearing) {
                             if (((Hearing) sensor).isActivated()) {
                                 RotatingEntity rotatingEntity = (RotatingEntity) entity;
-                                g.drawImage(getHearingSensorImage((Hearing) sensor), null, getBalloonLocationX(rotatingEntity), (int)(entity.getY() - 60 + entity.getHeight()/3));
+                                g.drawImage(
+                                        getHearingSensorImage((Hearing) sensor),
+                                        null,
+                                        getBalloonLocationX(rotatingEntity),
+                                        (int) (entity.getY() - 60 + entity
+                                                .getHeight() / 3));
                             }
                         } else if (sensor instanceof SmellSensor) {
 
@@ -131,10 +139,11 @@ public class OdorWorldRenderer {
                             float saturation = 0;
                             if (world.getTotalSmellVectorLength() > 0) {
                                 saturation = checkValid((float) Math.abs(val
-                                        / (1 * world.getTotalSmellVectorLength())));
+                                        / (1 * world
+                                                .getTotalSmellVectorLength())));
                             }
-                            g.setPaint(Color.getHSBColor(sensorColor, saturation,
-                                    1));
+                            g.setPaint(Color.getHSBColor(sensorColor,
+                                    saturation, 1));
                             // System.out.println(val + "--" +
                             // world.getTotalSmellVectorLength());
                             double[] location = ((SmellSensor) sensor)
@@ -159,12 +168,18 @@ public class OdorWorldRenderer {
      * @return the buffered image
      */
     public BufferedImage getSpeechBalloon(Speech effector) {
-        BufferedImage vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage vocalize = new BufferedImage(80, 60,
+                BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
-        if (((RotatingEntity)effector.getParent()).getHeading() > 90 && ((RotatingEntity) effector.getParent()).getHeading() <= 270) {
-            g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloonLeft.png"), 0, 0, null);
+        if (((RotatingEntity) effector.getParent()).getHeading() > 90
+                && ((RotatingEntity) effector.getParent()).getHeading() <= 270) {
+            g.drawImage(
+                    OdorWorldResourceManager.getImage("SpeechBalloonLeft.png"),
+                    0, 0, null);
         } else {
-            g.drawImage(OdorWorldResourceManager.getImage("SpeechBalloonRight.png"), 0, 0, null);
+            g.drawImage(
+                    OdorWorldResourceManager.getImage("SpeechBalloonRight.png"),
+                    0, 0, null);
         }
         g.setColor(Color.black);
         int fontSize = 20; // is there a more elegant way to change font size?
@@ -178,7 +193,8 @@ public class OdorWorldRenderer {
         g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
         FontMetrics fm = g.getFontMetrics();
         int x = (vocalize.getWidth() - fm.stringWidth(effector.getPhrase())) / 2;
-        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm
+                .getDescent()))) / 2);
         g.drawString(effector.getPhrase(), x, y);
         g.dispose();
         return vocalize;
@@ -190,12 +206,18 @@ public class OdorWorldRenderer {
      * @return the buffered image
      */
     public BufferedImage getHearingSensorImage(Hearing sensor) {
-        BufferedImage vocalize = new BufferedImage(80, 60, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage vocalize = new BufferedImage(80, 60,
+                BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
-        if (((RotatingEntity)sensor.getParent()).getHeading() > 90 && ((RotatingEntity) sensor.getParent()).getHeading() <= 270) {
-            g.drawImage(OdorWorldResourceManager.getImage("HearingSensorLeft.png"), 0, 0, null);
+        if (((RotatingEntity) sensor.getParent()).getHeading() > 90
+                && ((RotatingEntity) sensor.getParent()).getHeading() <= 270) {
+            g.drawImage(
+                    OdorWorldResourceManager.getImage("HearingSensorLeft.png"),
+                    0, 0, null);
         } else {
-            g.drawImage(OdorWorldResourceManager.getImage("HearingSensorRight.png"), 0, 0, null);
+            g.drawImage(
+                    OdorWorldResourceManager.getImage("HearingSensorRight.png"),
+                    0, 0, null);
         }
         g.setColor(Color.black);
         int fontSize = 20; // is there a more elegant way to change font size?
@@ -209,7 +231,8 @@ public class OdorWorldRenderer {
         g.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
         FontMetrics fm = g.getFontMetrics();
         int x = (vocalize.getWidth() - fm.stringWidth(sensor.getPhrase())) / 2;
-        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm.getDescent()))) / 2);
+        int y = (fm.getAscent() + ((vocalize.getHeight() - (fm.getAscent() + fm
+                .getDescent()))) / 2);
         g.drawString(sensor.getPhrase(), x, y);
         g.dispose();
         return vocalize;
@@ -237,14 +260,15 @@ public class OdorWorldRenderer {
 
     /**
      * @param entity the entity to be rendered.
-     * @return the appropriate X coordinate to render speech balloons and thought bubbles.
+     * @return the appropriate X coordinate to render speech balloons and
+     *         thought bubbles.
      */
     public int getBalloonLocationX(RotatingEntity entity) {
         int x = 0;
         if (entity.getHeading() > 90 && entity.getHeading() <= 270) {
-            x = (int)entity.getX() - 80;
+            x = (int) entity.getX() - 80;
         } else {
-            x = (int)(entity.getX() + entity.getWidth());
+            x = (int) (entity.getX() + entity.getWidth());
         }
         return x;
     }

@@ -55,7 +55,6 @@ public class InvisibleSynapseGroupNode extends SynapseGroupNode {
         updateBounds();
     }
 
-
     @Override
     public void updateBounds() {
         double srcX = this.getSynapseGroup().getSourceNeuronGroup()

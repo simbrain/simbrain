@@ -75,8 +75,8 @@ public class OjaRulePanel extends AbstractSynapsePanel {
                 "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -88,8 +88,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         // OjaSynapse synapseRef = new OjaSynapse();
         tfNormalize.setText(Double
                 .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
-        tfLearningRate.setText(Double
-                .toString(OjaRule.DEFAULT_LEARNING_RATE));
+        tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
@@ -141,8 +140,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         double learningRate = Utils.doubleParsable(tfLearningRate);
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
-                ((OjaRule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                ((OjaRule) s.getLearningRule()).setLearningRate(learningRate);
             }
         }
 

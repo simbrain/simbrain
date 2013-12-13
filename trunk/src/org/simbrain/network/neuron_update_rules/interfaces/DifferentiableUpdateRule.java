@@ -13,25 +13,22 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
-
 /**
  * Indicates that an update rule is differentiable, and has a getDerivative
  * function. Used by backprop.
- * 
+ *
  * @author jyoshimi
  */
 public interface DifferentiableUpdateRule {
 
-	/**
-	 * The inverse of the activation function.
-	 * 
-	 * @param val
-	 *            the value being sent through the neuron's derivative
-	 * @param neuron
-	 *            the neuron this derivative is being taken from
-	 * @return the derivative of the neuron's activation function with respect
-	 *         to val.
-	 */
-	double getDerivative(double val);
+    /**
+     * The inverse of the activation function.
+     *
+     * @param val the value being sent through the neuron's derivative
+     * @param neuron the neuron this derivative is being taken from
+     * @return the derivative of the neuron's activation function with respect
+     *         to val.
+     */
+    double getDerivative(double val);
 
 }

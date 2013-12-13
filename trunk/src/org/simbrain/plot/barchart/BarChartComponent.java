@@ -28,8 +28,6 @@ import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
-import cern.colt.function.DoubleProcedure;
-
 /**
  * Data for a JFreeChart bar chart.
  */
@@ -195,8 +193,7 @@ public class BarChartComponent extends WorkspaceComponent {
         }
         if (barChartVectorConsumer.isVisible()) {
             PotentialConsumer consumer = getAttributeManager()
-                    .createPotentialConsumer(model, "setBars",
-                           double[].class);
+                    .createPotentialConsumer(model, "setBars", double[].class);
             consumer.setCustomDescription("Set bars");
             returnList.add(consumer);
         }

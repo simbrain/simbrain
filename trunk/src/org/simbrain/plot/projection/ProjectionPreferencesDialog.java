@@ -78,8 +78,8 @@ public class ProjectionPreferencesDialog extends StandardDialog {
     protected void closeDialogOk() {
         projector.setTolerance(Double.parseDouble(tolerance.getText()));
         if (projector.getProjectionMethod() instanceof ProjectCoordinate) {
-            ((ProjectCoordinate) projector
-                    .getProjectionMethod()).setAutoFind(autoFind.isSelected());
+            ((ProjectCoordinate) projector.getProjectionMethod())
+                    .setAutoFind(autoFind.isSelected());
         }
         super.closeDialogOk();
     }

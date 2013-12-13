@@ -30,7 +30,7 @@ public class TileSensor extends Sensor {
 
     /** Default Activation Amount. */
     public static final double DEFAULT_ACTIVATION = 1;
-    
+
     /** Default X coordinate of the upper left corner. */
     public static final int DEFAULT_X = 0;
 

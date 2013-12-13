@@ -16,10 +16,8 @@ package org.simbrain.world.odorworld.dialogs;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Panel to add a hearing sensor to an entity.
@@ -37,7 +35,7 @@ public class HearingSensorPanel extends AbstractSensorPanel {
 
     /** Entity to which a hearing sensor is being added. */
     private OdorWorldEntity entity;
-    
+
     /** Reference to hearing sensor. Initially null if this is a creation panel. */
     private Hearing hearingSensor;
 
@@ -75,15 +73,18 @@ public class HearingSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addSensor(new Hearing((entity), phrase.getText(), Double.parseDouble(outputAmount.getText())));
+            entity.addSensor(new Hearing((entity), phrase.getText(), Double
+                    .parseDouble(outputAmount.getText())));
             if (phrase.getText().length() > 10) {
                 checkPhrase();
             }
         } else {
             hearingSensor.setPhrase(phrase.getText());
             hearingSensor.setLabel("Hear: \"" + phrase.getText() + "\"");
-            hearingSensor.setOutputAmount(Double.parseDouble(outputAmount.getText()));
-            hearingSensor.getParent().getParentWorld().fireEntityChanged(hearingSensor.getParent());
+            hearingSensor.setOutputAmount(Double.parseDouble(outputAmount
+                    .getText()));
+            hearingSensor.getParent().getParentWorld()
+                    .fireEntityChanged(hearingSensor.getParent());
             if (phrase.getText().length() > 10) {
                 checkPhrase();
             }
@@ -103,8 +104,11 @@ public class HearingSensorPanel extends AbstractSensorPanel {
 
     /** Displays message when utterance is above 10 char. */
     private void checkPhrase() {
-        JOptionPane.showOptionDialog(null, "Heard utterance is greater than 10 chars! Not guaranteed to render correctly.", "Warning",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, null, null);
+        JOptionPane
+                .showOptionDialog(
+                        null,
+                        "Heard utterance is greater than 10 chars! Not guaranteed to render correctly.",
+                        "Warning", JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 }

@@ -40,13 +40,13 @@ public class ExtendedSynapseInfoPanel extends JPanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
-    
+
     /** Freeze synapse field. */
     private TristateDropDown frozenDD = new TristateDropDown();
 
-    //    TODO: Implement...
-//    private TristateDropDown clippingDD = new TristateDropDown();
-    
+    // TODO: Implement...
+    // private TristateDropDown clippingDD = new TristateDropDown();
+
     /** Increment field. */
     private JTextField tfIncrement = new JTextField();
 
@@ -61,8 +61,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
 
     /**
      *
-     * @param synapseList
-     *                  The list of synapses being edited.
+     * @param synapseList The list of synapses being edited.
      */
     public ExtendedSynapseInfoPanel(final List<Synapse> synapseList) {
         fillFieldValues(synapseList);
@@ -78,8 +77,8 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         setLayout(gl);
         add(new JLabel("Frozen: "));
         add(frozenDD);
-//        add(new JLabel("Clipping: "));
-//        add(clippingDD);
+        // add(new JLabel("Clipping: "));
+        // add(clippingDD);
         add(new JLabel("Upper Bound:"));
         add(tfUpBound);
         add(new JLabel("Lower Bound"));
@@ -104,8 +103,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 "getUpperBound")) {
             tfUpBound.setText(NULL_STRING);
         } else {
-            tfUpBound
-                    .setText(Double.toString(synapseRef.getUpperBound()));
+            tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         }
 
         // Handle Lower Bound
@@ -113,8 +111,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         } else {
-            tfLowBound
-                    .setText(Double.toString(synapseRef.getLowerBound()));
+            tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         }
 
         // Handle Increment
@@ -122,24 +119,21 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         } else {
-            tfIncrement
-                    .setText(Double.toString(synapseRef.getIncrement()));
+            tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         }
 
         // Handle Delay
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getDelay")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
             tfDelay.setText(NULL_STRING);
         } else {
             tfDelay.setText(Integer.toString(synapseRef.getDelay()));
         }
-        
+
         // Handle Frozen
-        if(!NetworkUtils.isConsistent(synapseList, Synapse.class,
-        		"isFrozen")) {
-        	frozenDD.setNull();
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "isFrozen")) {
+            frozenDD.setNull();
         } else {
-        	frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
+            frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
         }
 
     }
@@ -149,52 +143,49 @@ public class ExtendedSynapseInfoPanel extends JPanel {
      * synapse(s) being edited. Called externally to apply changes.
      */
     public void commitChanges(List<Synapse> synapses) {
-    	
-    	
-    	// Upper Bound
-    	double uB = Utils.doubleParsable(tfUpBound);
-    	if(!Double.isNaN(uB)) {
-    		for(Synapse s : synapses) {
-    			s.setUpperBound(uB);
-    		}
-    	}
-    	
-    	// Lower Bound
-    	double lB = Utils.doubleParsable(tfLowBound);
-    	if(!Double.isInfinite(lB)) {
-    		for(Synapse s : synapses) {
-    			s.setLowerBound(lB);
-    		}
-    	}
-    
-    	// Increment
-    	double increment = Utils.doubleParsable(tfIncrement);
-    	if(!Double.isNaN(increment)) {
-    		for(Synapse s : synapses) {
-    			s.setIncrement(increment);
-    		}
-    	}
-    	
-    	// Delay
-    	double delay = Utils.doubleParsable(tfDelay);
-    	if (!Double.isNaN(delay)) {
-    		int dly = (int) delay;
-    		for (Synapse s : synapses) {
-    			s.setDelay(dly);
-    		}
-    	}
-    	
 
-    	// Frozen ?
-    	boolean frozen = frozenDD.getSelectedIndex()
-    			== TristateDropDown.getTRUE();
-    	if (frozenDD.getSelectedIndex()
-    			!= TristateDropDown.getNULL()) {
-    		for (Synapse s : synapses) {
-    			s.setFrozen(frozen);
-    		}
-    	}
-        
+        // Upper Bound
+        double uB = Utils.doubleParsable(tfUpBound);
+        if (!Double.isNaN(uB)) {
+            for (Synapse s : synapses) {
+                s.setUpperBound(uB);
+            }
+        }
+
+        // Lower Bound
+        double lB = Utils.doubleParsable(tfLowBound);
+        if (!Double.isInfinite(lB)) {
+            for (Synapse s : synapses) {
+                s.setLowerBound(lB);
+            }
+        }
+
+        // Increment
+        double increment = Utils.doubleParsable(tfIncrement);
+        if (!Double.isNaN(increment)) {
+            for (Synapse s : synapses) {
+                s.setIncrement(increment);
+            }
+        }
+
+        // Delay
+        double delay = Utils.doubleParsable(tfDelay);
+        if (!Double.isNaN(delay)) {
+            int dly = (int) delay;
+            for (Synapse s : synapses) {
+                s.setDelay(dly);
+            }
+        }
+
+        // Frozen ?
+        boolean frozen = frozenDD.getSelectedIndex() == TristateDropDown
+                .getTRUE();
+        if (frozenDD.getSelectedIndex() != TristateDropDown.getNULL()) {
+            for (Synapse s : synapses) {
+                s.setFrozen(frozen);
+            }
+        }
+
     }
 
 }

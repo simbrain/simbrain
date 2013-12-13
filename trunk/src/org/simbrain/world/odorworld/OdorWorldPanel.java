@@ -38,7 +38,6 @@ import javax.swing.JPopupMenu;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.actions.AddSmellSourceAction;
-import org.simbrain.world.odorworld.actions.AddTileSensorsAction;
 import org.simbrain.world.odorworld.actions.DeleteEntityAction;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;

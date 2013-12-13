@@ -30,318 +30,304 @@ import org.simbrain.util.randomizer.Randomizer;
  * Spikes, Decisions, and Action.
  */
 public class NakaRushtonRule extends NeuronUpdateRule implements
-		BoundedUpdateRule {
+        BoundedUpdateRule {
 
-	/** The default activation ceiling. */
-	public static final int DEFAULT_CEILING = 100;
+    /** The default activation ceiling. */
+    public static final int DEFAULT_CEILING = 100;
 
-	/** The default activation floor. */
-	public static final int DEFAULT_FLOOR = 0;
+    /** The default activation floor. */
+    public static final int DEFAULT_FLOOR = 0;
 
-	/** Steepness. */
-	private double steepness = 2;
+    /** Steepness. */
+    private double steepness = 2;
 
-	/** Semi saturation constant. */
-	private double semiSaturationConstant = 120;
+    /** Semi saturation constant. */
+    private double semiSaturationConstant = 120;
 
-	/** Time constant of spike rate adaptation. */
-	private double adaptationTimeConstant = 1;
+    /** Time constant of spike rate adaptation. */
+    private double adaptationTimeConstant = 1;
 
-	/** Parameter of spike rate adaptation. */
-	private double adaptationParameter = .7;
+    /** Parameter of spike rate adaptation. */
+    private double adaptationParameter = .7;
 
-	/** Whether to use spike rate adaptation or not. */
-	private boolean useAdaptation = false;
+    /** Whether to use spike rate adaptation or not. */
+    private boolean useAdaptation = false;
 
-	/** Time constant. */
-	private double timeConstant = .1;
+    /** Time constant. */
+    private double timeConstant = .1;
 
-	/** Noise dialog. */
-	private Randomizer noiseGenerator = new Randomizer();
+    /** Noise dialog. */
+    private Randomizer noiseGenerator = new Randomizer();
 
-	/** Add noise to neuron. */
-	private boolean addNoise = false;
+    /** Add noise to neuron. */
+    private boolean addNoise = false;
 
-	/** Local variable. */
-	private double s = 0;
+    /** Local variable. */
+    private double s = 0;
 
-	/** Local variable. */
-	private double a = 0;
+    /** Local variable. */
+    private double a = 0;
 
-	/** The upper bound of the activity. */
-	private double ceiling = DEFAULT_CEILING;
+    /** The upper bound of the activity. */
+    private double ceiling = DEFAULT_CEILING;
 
-	/** The lower bound of the activity. */
-	private double floor = DEFAULT_FLOOR;
+    /** The lower bound of the activity. */
+    private double floor = DEFAULT_FLOOR;
 
-	/**
-	 * Default constructor.
-	 */
-	public NakaRushtonRule() {
-	}
+    /**
+     * Default constructor.
+     */
+    public NakaRushtonRule() {
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.CONTINUOUS;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public NakaRushtonRule deepCopy() {
-		NakaRushtonRule rn = new NakaRushtonRule();
-		rn.setSteepness(getSteepness());
-		rn.setSemiSaturationConstant(getSemiSaturationConstant());
-		rn.setUpperBound(getCeiling());
-		rn.setAddNoise(getAddNoise());
-		rn.setUseAdaptation(getUseAdaptation());
-		rn.setAdaptationParameter(getAdaptationParameter());
-		rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
-		rn.noiseGenerator = new Randomizer(noiseGenerator);
-		return rn;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public NakaRushtonRule deepCopy() {
+        NakaRushtonRule rn = new NakaRushtonRule();
+        rn.setSteepness(getSteepness());
+        rn.setSemiSaturationConstant(getSemiSaturationConstant());
+        rn.setUpperBound(getCeiling());
+        rn.setAddNoise(getAddNoise());
+        rn.setUseAdaptation(getUseAdaptation());
+        rn.setAdaptationParameter(getAdaptationParameter());
+        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
+        rn.noiseGenerator = new Randomizer(noiseGenerator);
+        return rn;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
 
-		// See Spikes (Hugh Wilson), pp. 20-21
+        // See Spikes (Hugh Wilson), pp. 20-21
 
-		double p = neuron.getWeightedInputs();
-		double val = neuron.getActivation();
+        double p = neuron.getWeightedInputs();
+        double val = neuron.getActivation();
 
-		// Update adaptation term; see Spike, p. 81
-		if (useAdaptation) {
-			a +=
-					(neuron.getNetwork().getTimeStep() / adaptationTimeConstant)
-							* (adaptationParameter * val - a);
-		} else {
-			a = 0;
-		}
+        // Update adaptation term; see Spike, p. 81
+        if (useAdaptation) {
+            a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant)
+                    * (adaptationParameter * val - a);
+        } else {
+            a = 0;
+        }
 
-		if (p > 0) {
-			s =
-					(getCeiling() * Math.pow(p, steepness))
-							/ (Math.pow(semiSaturationConstant + a,
-									steepness) + Math.pow(p, steepness));
-		} else {
-			s = 0;
-		}
+        if (p > 0) {
+            s = (getCeiling() * Math.pow(p, steepness))
+                    / (Math.pow(semiSaturationConstant + a, steepness) + Math
+                            .pow(p, steepness));
+        } else {
+            s = 0;
+        }
 
-		if (addNoise) {
-			val +=
-					(neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
-							.getRandom()));
-		} else {
-			val +=
-					(neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
-		}
+        if (addNoise) {
+            val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
+                    .getRandom()));
+        } else {
+            val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+        }
 
-		if (val < floor) {
-			val = floor;
-		}
-		if (val > ceiling) {
-			val = ceiling;
-		}
+        if (val < floor) {
+            val = floor;
+        }
+        if (val > ceiling) {
+            val = ceiling;
+        }
 
-		neuron.setBuffer(val);
-	}
+        neuron.setBuffer(val);
+    }
 
-	@Override
-	public void contextualIncrement(Neuron n) {
-		double act = n.getActivation();
-		if (act <= getCeiling()) {
-			if (act + increment > getCeiling()) {
-				act = getCeiling();
-			}
-			n.setActivation(act);
-			n.getNetwork().fireNeuronChanged(n);
-		}
-	}
+    @Override
+    public void contextualIncrement(Neuron n) {
+        double act = n.getActivation();
+        if (act <= getCeiling()) {
+            if (act + increment > getCeiling()) {
+                act = getCeiling();
+            }
+            n.setActivation(act);
+            n.getNetwork().fireNeuronChanged(n);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getRandomValue() {
-		return getCeiling() * Math.random();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRandomValue() {
+        return getCeiling() * Math.random();
+    }
 
-	/**
-	 * @return Returns the semiSaturationConstant.
-	 */
-	public double getSemiSaturationConstant() {
-		return semiSaturationConstant;
-	}
+    /**
+     * @return Returns the semiSaturationConstant.
+     */
+    public double getSemiSaturationConstant() {
+        return semiSaturationConstant;
+    }
 
-	/**
-	 * @param semiSaturationConstant
-	 *            The semiSaturationConstant to set.
-	 */
-	public void setSemiSaturationConstant(
-			final double semiSaturationConstant) {
-		this.semiSaturationConstant = semiSaturationConstant;
-	}
+    /**
+     * @param semiSaturationConstant The semiSaturationConstant to set.
+     */
+    public void setSemiSaturationConstant(final double semiSaturationConstant) {
+        this.semiSaturationConstant = semiSaturationConstant;
+    }
 
-	/**
-	 * @return Returns the steepness.
-	 */
-	public double getSteepness() {
-		return steepness;
-	}
+    /**
+     * @return Returns the steepness.
+     */
+    public double getSteepness() {
+        return steepness;
+    }
 
-	/**
-	 * @param steepness
-	 *            The steepness to set.
-	 */
-	public void setSteepness(final double steepness) {
-		this.steepness = steepness;
-	}
+    /**
+     * @param steepness The steepness to set.
+     */
+    public void setSteepness(final double steepness) {
+        this.steepness = steepness;
+    }
 
-	/**
-	 * @return Returns the timeConstant.
-	 */
-	public double getTimeConstant() {
-		return timeConstant;
-	}
+    /**
+     * @return Returns the timeConstant.
+     */
+    public double getTimeConstant() {
+        return timeConstant;
+    }
 
-	/**
-	 * @param timeConstant
-	 *            The timeConstant to set.
-	 */
-	public void setTimeConstant(final double timeConstant) {
-		this.timeConstant = timeConstant;
-	}
+    /**
+     * @param timeConstant The timeConstant to set.
+     */
+    public void setTimeConstant(final double timeConstant) {
+        this.timeConstant = timeConstant;
+    }
 
-	/**
-	 * @return Returns the addNoise.
-	 */
-	public boolean getAddNoise() {
-		return addNoise;
-	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
 
-	/**
-	 * @param addNoise
-	 *            The addNoise to set.
-	 */
-	public void setAddNoise(final boolean addNoise) {
-		this.addNoise = addNoise;
-	}
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(final boolean addNoise) {
+        this.addNoise = addNoise;
+    }
 
-	/**
-	 * @return Returns the noiseGenerator.
-	 */
-	public Randomizer getNoiseGenerator() {
-		return noiseGenerator;
-	}
+    /**
+     * @return Returns the noiseGenerator.
+     */
+    public Randomizer getNoiseGenerator() {
+        return noiseGenerator;
+    }
 
-	/**
-	 * @param noiseGenerator
-	 *            The noiseGenerator to set.
-	 */
-	public void setNoiseGenerator(final Randomizer noiseGenerator) {
-		this.noiseGenerator = noiseGenerator;
-	}
+    /**
+     * @param noiseGenerator The noiseGenerator to set.
+     */
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
 
-	/**
-	 * @return the boolean value.
-	 */
-	public boolean getUseAdaptation() {
-		return useAdaptation;
-	}
+    /**
+     * @return the boolean value.
+     */
+    public boolean getUseAdaptation() {
+        return useAdaptation;
+    }
 
-	/**
-	 * Sets the boolean use adaptation value.
-	 * 
-	 * @param useAdaptation
-	 *            Value to set use adaptation to
-	 */
-	public void setUseAdaptation(final boolean useAdaptation) {
-		this.useAdaptation = useAdaptation;
-	}
+    /**
+     * Sets the boolean use adaptation value.
+     *
+     * @param useAdaptation Value to set use adaptation to
+     */
+    public void setUseAdaptation(final boolean useAdaptation) {
+        this.useAdaptation = useAdaptation;
+    }
 
-	/**
-	 * @return the adaptation time constant.
-	 */
-	public double getAdaptationTimeConstant() {
-		return adaptationTimeConstant;
-	}
+    /**
+     * @return the adaptation time constant.
+     */
+    public double getAdaptationTimeConstant() {
+        return adaptationTimeConstant;
+    }
 
-	/**
-	 * Sets the adaptation time constant.
-	 * 
-	 * @param adaptationTimeConstant
-	 *            Value to set adaptation time constant
-	 */
-	public void setAdaptationTimeConstant(
-			final double adaptationTimeConstant) {
-		this.adaptationTimeConstant = adaptationTimeConstant;
-	}
+    /**
+     * Sets the adaptation time constant.
+     *
+     * @param adaptationTimeConstant Value to set adaptation time constant
+     */
+    public void setAdaptationTimeConstant(final double adaptationTimeConstant) {
+        this.adaptationTimeConstant = adaptationTimeConstant;
+    }
 
-	@Override
-	public void clear(Neuron neuron) {
-		super.clear(neuron);
-		a = 0;
-		s = 0;
-	}
+    @Override
+    public void clear(Neuron neuron) {
+        super.clear(neuron);
+        a = 0;
+        s = 0;
+    }
 
-	@Override
-	public String getToolTipText(Neuron neuron) {
-		if (useAdaptation) {
-			return "" + neuron.getActivation() + " A = " + a;
-		} else {
-			return super.getToolTipText(neuron);
-		}
-	}
+    @Override
+    public String getToolTipText(Neuron neuron) {
+        if (useAdaptation) {
+            return "" + neuron.getActivation() + " A = " + a;
+        } else {
+            return super.getToolTipText(neuron);
+        }
+    }
 
-	/**
-	 * Return the adaptation parameter.
-	 * 
-	 * @return the adaptation parameter
-	 */
-	public double getAdaptationParameter() {
-		return adaptationParameter;
-	}
+    /**
+     * Return the adaptation parameter.
+     *
+     * @return the adaptation parameter
+     */
+    public double getAdaptationParameter() {
+        return adaptationParameter;
+    }
 
-	/**
-	 * Sets the adaptation parameter.
-	 * 
-	 * @param adaptationParameter
-	 *            value to set
-	 */
-	public void setAdaptationParameter(final double adaptationParameter) {
-		this.adaptationParameter = adaptationParameter;
-	}
+    /**
+     * Sets the adaptation parameter.
+     *
+     * @param adaptationParameter value to set
+     */
+    public void setAdaptationParameter(final double adaptationParameter) {
+        this.adaptationParameter = adaptationParameter;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getDescription() {
-		return "Naka-Rushton";
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription() {
+        return "Naka-Rushton";
+    }
 
-	@Override
-	public double getCeiling() {
-		return ceiling;
-	}
+    @Override
+    public double getCeiling() {
+        return ceiling;
+    }
 
-	@Override
-	public void setUpperBound(double ceiling) {
-		this.ceiling = ceiling;
-	}
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceiling = ceiling;
+    }
 
-	@Override
-	public double getFloor() {
-		return floor;
-	}
+    @Override
+    public double getFloor() {
+        return floor;
+    }
 
-	@Override
-	public void setLowerBound(double floor) {
-		this.floor = floor;
-	}
+    @Override
+    public void setLowerBound(double floor) {
+        this.floor = floor;
+    }
 
 }

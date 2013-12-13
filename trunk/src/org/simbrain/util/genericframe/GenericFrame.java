@@ -56,7 +56,7 @@ public interface GenericFrame {
     public void setBounds(Rectangle bounds);
 
     public void setLocationRelativeTo(Component c);
-    
+
     public void setLocation(int xposition, int yposition);
 
     public void setContentPane(Container container);

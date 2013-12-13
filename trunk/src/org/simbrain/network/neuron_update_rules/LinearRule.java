@@ -30,247 +30,242 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements
-		BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule,
-		ClippableUpdateRule {
+public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
+        DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule {
 
-	/** The Default upper bound. */
-	private static final double DEFAULT_UPPER_BOUND = 1.0;
+    /** The Default upper bound. */
+    private static final double DEFAULT_UPPER_BOUND = 1.0;
 
-	/** The Default lower bound. */
-	private static final double DEFAULT_LOWER_BOUND = -1.0;
+    /** The Default lower bound. */
+    private static final double DEFAULT_LOWER_BOUND = -1.0;
 
-	/** Default clipping setting. */
-	private static final boolean DEFAULT_CLIPPING = true;
+    /** Default clipping setting. */
+    private static final boolean DEFAULT_CLIPPING = true;
 
-	/** Slope. */
-	private double slope = 1;
+    /** Slope. */
+    private double slope = 1;
 
-	/** Bias. */
-	private double bias = 0;
+    /** Bias. */
+    private double bias = 0;
 
-	/** Noise dialog. */
-	private Randomizer noiseGenerator = new Randomizer();
+    /** Noise dialog. */
+    private Randomizer noiseGenerator = new Randomizer();
 
-	/** Add noise to the neuron. */
-	private boolean addNoise;
+    /** Add noise to the neuron. */
+    private boolean addNoise;
 
-	/** Clipping. */
-	private boolean clipping = DEFAULT_CLIPPING;
+    /** Clipping. */
+    private boolean clipping = DEFAULT_CLIPPING;
 
-	/** The upper bound of the activity if clipping is used. */
-	private double upperBound = DEFAULT_UPPER_BOUND;
+    /** The upper bound of the activity if clipping is used. */
+    private double upperBound = DEFAULT_UPPER_BOUND;
 
-	/** The lower bound of the activity if clipping is used. */
-	private double lowerBound = DEFAULT_LOWER_BOUND;
-
-    /**
-     * {@inheritDoc}
-     */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /** The lower bound of the activity if clipping is used. */
+    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * {@inheritDoc}
      */
-	public LinearRule deepCopy() {
-		LinearRule ln = new LinearRule();
-		ln.setBias(getBias());
-		ln.setSlope(getSlope());
-		ln.setClipped(isClipped());
-		ln.setAddNoise(getAddNoise());
-		ln.setUpperBound(getCeiling());
-		ln.setLowerBound(getFloor());
-		ln.noiseGenerator = new Randomizer(noiseGenerator);
-		return ln;
-	}
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
-		double wtdInput = neuron.getWeightedInputs() + bias;
-		double val = slope * wtdInput;
+    /**
+     * {@inheritDoc}
+     */
+    public LinearRule deepCopy() {
+        LinearRule ln = new LinearRule();
+        ln.setBias(getBias());
+        ln.setSlope(getSlope());
+        ln.setClipped(isClipped());
+        ln.setAddNoise(getAddNoise());
+        ln.setUpperBound(getCeiling());
+        ln.setLowerBound(getFloor());
+        ln.noiseGenerator = new Randomizer(noiseGenerator);
+        return ln;
+    }
 
-		if (addNoise) {
-			val += noiseGenerator.getRandom();
-		}
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
+        double wtdInput = neuron.getWeightedInputs() + bias;
+        double val = slope * wtdInput;
 
-		if (clipping) {
-			val = clip(val);
-		}
+        if (addNoise) {
+            val += noiseGenerator.getRandom();
+        }
 
-		neuron.setBuffer(val);
-	}
+        if (clipping) {
+            val = clip(val);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double clip(double val) {
-		if (val > getCeiling()) {
-			return getCeiling();
-		} else if (val < getFloor()) {
-			return getFloor();
-		} else {
-			return val;
-		}
-	}
+        neuron.setBuffer(val);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getRandomValue() {
-		return (getCeiling() - getFloor()) * Math.random() - getFloor();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double clip(double val) {
+        if (val > getCeiling()) {
+            return getCeiling();
+        } else if (val < getFloor()) {
+            return getFloor();
+        } else {
+            return val;
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextualIncrement(Neuron n) {
-		double act = n.getActivation();
-		if (act >= getCeiling() && isClipped()) {
-			return;
-		} else {
-			if (isClipped()) {
-				act = clip(act + increment);
-			} else {
-				act = act + increment;
-			}
-			n.setActivation(act);
-			n.getNetwork().fireNeuronChanged(n);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRandomValue() {
+        return (getCeiling() - getFloor()) * Math.random() - getFloor();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextualDecrement(Neuron n) {
-		double act = n.getActivation();
-		if (act <= getFloor() && isClipped()) {
-			return;
-		} else {
-			if (isClipped()) {
-				act = clip(act - increment);
-			} else {
-				act = act - increment;
-			}
-			n.setActivation(act);
-			n.getNetwork().fireNeuronChanged(n);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextualIncrement(Neuron n) {
+        double act = n.getActivation();
+        if (act >= getCeiling() && isClipped()) {
+            return;
+        } else {
+            if (isClipped()) {
+                act = clip(act + increment);
+            } else {
+                act = act + increment;
+            }
+            n.setActivation(act);
+            n.getNetwork().fireNeuronChanged(n);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getDerivative(double val) {
-		if (val >= getCeiling()) {
-			return 0;
-		} else if (val <= getFloor()) {
-			return 0;
-		} else {
-			return slope;
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextualDecrement(Neuron n) {
+        double act = n.getActivation();
+        if (act <= getFloor() && isClipped()) {
+            return;
+        } else {
+            if (isClipped()) {
+                act = clip(act - increment);
+            } else {
+                act = act - increment;
+            }
+            n.setActivation(act);
+            n.getNetwork().fireNeuronChanged(n);
+        }
+    }
 
-	/**
-	 * @return Returns the bias.
-	 */
-	public double getBias() {
-		return bias;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getDerivative(double val) {
+        if (val >= getCeiling()) {
+            return 0;
+        } else if (val <= getFloor()) {
+            return 0;
+        } else {
+            return slope;
+        }
+    }
 
-	/**
-	 * @param bias
-	 *            The bias to set.
-	 */
-	public void setBias(final double bias) {
-		this.bias = bias;
-	}
+    /**
+     * @return Returns the bias.
+     */
+    public double getBias() {
+        return bias;
+    }
 
-	/**
-	 * @return Returns the slope.
-	 */
-	public double getSlope() {
-		return slope;
-	}
+    /**
+     * @param bias The bias to set.
+     */
+    public void setBias(final double bias) {
+        this.bias = bias;
+    }
 
-	/**
-	 * @param slope
-	 *            The slope to set.
-	 */
-	public void setSlope(final double slope) {
-		this.slope = slope;
-	}
+    /**
+     * @return Returns the slope.
+     */
+    public double getSlope() {
+        return slope;
+    }
 
-	/**
-	 * @return Returns the noise generator.
-	 */
-	public Randomizer getNoiseGenerator() {
-		return noiseGenerator;
-	}
+    /**
+     * @param slope The slope to set.
+     */
+    public void setSlope(final double slope) {
+        this.slope = slope;
+    }
 
-	/**
-	 * @param noise
-	 *            The noise generator to set.
-	 */
-	public void setNoiseGenerator(final Randomizer noise) {
-		this.noiseGenerator = noise;
-	}
+    /**
+     * @return Returns the noise generator.
+     */
+    public Randomizer getNoiseGenerator() {
+        return noiseGenerator;
+    }
 
-	/**
-	 * @return Returns the addNoise.
-	 */
-	public boolean getAddNoise() {
-		return addNoise;
-	}
+    /**
+     * @param noise The noise generator to set.
+     */
+    public void setNoiseGenerator(final Randomizer noise) {
+        this.noiseGenerator = noise;
+    }
 
-	/**
-	 * @param addNoise
-	 *            The addNoise to set.
-	 */
-	public void setAddNoise(final boolean addNoise) {
-		this.addNoise = addNoise;
-	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Linear";
-	}
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(final boolean addNoise) {
+        this.addNoise = addNoise;
+    }
 
-	@Override
-	public double getCeiling() {
-		return upperBound;
-	}
+    @Override
+    public String getDescription() {
+        return "Linear";
+    }
 
-	@Override
-	public double getFloor() {
-		return lowerBound;
-	}
+    @Override
+    public double getCeiling() {
+        return upperBound;
+    }
 
-	@Override
-	public void setUpperBound(double upperBound) {
-		this.upperBound = upperBound;
-	}
+    @Override
+    public double getFloor() {
+        return lowerBound;
+    }
 
-	@Override
-	public void setLowerBound(double lowerBound) {
-		this.lowerBound = lowerBound;
-	}
+    @Override
+    public void setUpperBound(double upperBound) {
+        this.upperBound = upperBound;
+    }
 
-	@Override
-	public boolean isClipped() {
-		return clipping;
-	}
+    @Override
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
+    }
 
-	@Override
-	public void setClipped(boolean clipping) {
-		this.clipping = clipping;
-	}
+    @Override
+    public boolean isClipped() {
+        return clipping;
+    }
+
+    @Override
+    public void setClipped(boolean clipping) {
+        this.clipping = clipping;
+    }
 
 }

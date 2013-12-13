@@ -28,10 +28,9 @@ package org.simbrain.workspace;
  */
 public class PotentialProducer extends PotentialAttribute {
 
-
     /**
-     * Construct a potential consumer. For more on what these fields mean
-     * see the javadocs for <code>Attribute</code>.
+     * Construct a potential consumer. For more on what these fields mean see
+     * the javadocs for <code>Attribute</code>.
      *
      * @param parent parent workspace component
      * @param baseObject base object containing method to call
@@ -44,8 +43,8 @@ public class PotentialProducer extends PotentialAttribute {
     protected PotentialProducer(WorkspaceComponent parent, Object baseObject,
             String methodName, Class<?> dataType, Class<?>[] argDataTypes,
             Object[] argValues, String description) {
-        super(parent, baseObject, methodName, dataType,
-                argDataTypes, argValues, description);
+        super(parent, baseObject, methodName, dataType, argDataTypes,
+                argValues, description);
     }
 
     /**

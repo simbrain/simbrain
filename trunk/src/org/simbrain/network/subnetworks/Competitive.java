@@ -26,7 +26,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**

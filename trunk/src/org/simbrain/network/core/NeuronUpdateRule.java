@@ -19,7 +19,6 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.Utils;
 
 /**
@@ -29,53 +28,52 @@ import org.simbrain.util.Utils;
  */
 public abstract class NeuronUpdateRule {
 
-	/** The maximum number of digits to display in the tool tip. */
-	private static final int MAX_DIGITS = 9;
+    /** The maximum number of digits to display in the tool tip. */
+    private static final int MAX_DIGITS = 9;
 
-	/** The default increment of a neuron using this rule. */
-	public static final double DEFAULT_INCREMENT = 0.1;
+    /** The default increment of a neuron using this rule. */
+    public static final double DEFAULT_INCREMENT = 0.1;
 
-	/** Amount by which to increment or decrement neuron. */
-	protected double increment = DEFAULT_INCREMENT;
+    /** Amount by which to increment or decrement neuron. */
+    protected double increment = DEFAULT_INCREMENT;
 
-	/**
-	 * Returns the type of time update (discrete or continuous) associated with
-	 * this neuron.
-	 *
-	 * @return the time type
-	 */
-	public abstract TimeType getTimeType();
+    /**
+     * Returns the type of time update (discrete or continuous) associated with
+     * this neuron.
+     *
+     * @return the time type
+     */
+    public abstract TimeType getTimeType();
 
-	/**
-	 * Apply the update rule.
-	 *
-	 * @param neuron
-	 *            parent neuron
-	 */
-	public abstract void update(Neuron neuron);
+    /**
+     * Apply the update rule.
+     *
+     * @param neuron parent neuron
+     */
+    public abstract void update(Neuron neuron);
 
-	/**
-	 * Returns a deep copy of the update rule.
-	 *
-	 * @return Duplicated update rule
-	 */
-	public abstract NeuronUpdateRule deepCopy();
+    /**
+     * Returns a deep copy of the update rule.
+     *
+     * @return Duplicated update rule
+     */
+    public abstract NeuronUpdateRule deepCopy();
 
-	/**
-	 * Increment a neuron by increment.
-	 */
-	public final void incrementActivation(Neuron n) {
-		n.forceSetActivation(n.getActivation() + increment);
-		n.getNetwork().fireNeuronChanged(n);
-	}
+    /**
+     * Increment a neuron by increment.
+     */
+    public final void incrementActivation(Neuron n) {
+        n.forceSetActivation(n.getActivation() + increment);
+        n.getNetwork().fireNeuronChanged(n);
+    }
 
-	/**
-	 * Decrement a neuron by increment.
-	 */
-	public final void decrementActivation(Neuron n) {
-		n.forceSetActivation(n.getActivation() - increment);
-		n.getNetwork().fireNeuronChanged(n);
-	}
+    /**
+     * Decrement a neuron by increment.
+     */
+    public final void decrementActivation(Neuron n) {
+        n.forceSetActivation(n.getActivation() - increment);
+        n.getNetwork().fireNeuronChanged(n);
+    }
 
     /**
      * Increment a neuron by increment, respecting neuron specific constraints.
@@ -93,58 +91,56 @@ public abstract class NeuronUpdateRule {
         decrementActivation(n);
     }
 
-	/**
-	 * Returns a random value between the upper and lower bounds of this neuron.
-	 *
-	 * @return the random value.
-	 */
-	public abstract double getRandomValue();
+    /**
+     * Returns a random value between the upper and lower bounds of this neuron.
+     *
+     * @return the random value.
+     */
+    public abstract double getRandomValue();
 
-	/**
-	 * Set activation to 0; override for other "clearing" behavior (e.g. setting
-	 * other variables to 0. Called in Gui when "clear" button pressed.
-	 *
-	 * @param neuron
-	 *            reference to parent neuron
-	 */
-	public void clear(final Neuron neuron) {
-		neuron.forceSetActivation(0);
-	}
+    /**
+     * Set activation to 0; override for other "clearing" behavior (e.g. setting
+     * other variables to 0. Called in Gui when "clear" button pressed.
+     *
+     * @param neuron reference to parent neuron
+     */
+    public void clear(final Neuron neuron) {
+        neuron.forceSetActivation(0);
+    }
 
-	/**
-	 * Upper bound for activation.
-	 *
-	 * @return the ceiling
-	 */
-	public abstract double getCeiling();
+    /**
+     * Upper bound for activation.
+     *
+     * @return the ceiling
+     */
+    public abstract double getCeiling();
 
-	/**
-	 * Lower bound for activation.
-	 *
-	 * @return the floor
-	 */
-	public abstract double getFloor();
+    /**
+     * Lower bound for activation.
+     *
+     * @return the floor
+     */
+    public abstract double getFloor();
 
-	/**
-	 * Returns a brief description of this update rule. Used in combo boxes in
-	 * the GUI.
-	 *
-	 * @return the description.
-	 */
-	public abstract String getDescription();
+    /**
+     * Returns a brief description of this update rule. Used in combo boxes in
+     * the GUI.
+     *
+     * @return the description.
+     */
+    public abstract String getDescription();
 
-	/**
-	 * Returns string for tool tip or short description. Override to provide
-	 * custom information.
-	 *
-	 * @param neuron
-	 *            reference to parent neuron
-	 * @return tool tip text
-	 */
-	public String getToolTipText(final Neuron neuron) {
-		return "(" + neuron.getId() + ") Activation: "
-				+ Utils.round(neuron.getActivation(), MAX_DIGITS);
-	}
+    /**
+     * Returns string for tool tip or short description. Override to provide
+     * custom information.
+     *
+     * @param neuron reference to parent neuron
+     * @return tool tip text
+     */
+    public String getToolTipText(final Neuron neuron) {
+        return "(" + neuron.getId() + ") Activation: "
+                + Utils.round(neuron.getActivation(), MAX_DIGITS);
+    }
 
     /**
      * @return the increment

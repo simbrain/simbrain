@@ -36,7 +36,7 @@ public class DataPointColored extends DataPoint {
 
     /**
      * An activation associated with this point that is used to determine the
-     * color of the point.  Frequency increments this when the point is active.
+     * color of the point. Frequency increments this when the point is active.
      * Decay decrements it at every time step but spikes the activate point to a
      * max value.
      *
@@ -81,7 +81,7 @@ public class DataPointColored extends DataPoint {
      */
     public void setColorBasedOnVal(float baseColor) {
         float saturation = clip((float) Math.abs(activation));
-        //System.out.println(activation + "  " + saturation);
+        // System.out.println(activation + "  " + saturation);
         setColor(Color.getHSBColor(baseColor, saturation, 1));
     }
 
@@ -116,7 +116,7 @@ public class DataPointColored extends DataPoint {
      */
     public void incrementActivation(double ceiling, double incrementAmount) {
         activation += incrementAmount;
-        //System.out.println("activation:" + activation);
+        // System.out.println("activation:" + activation);
         // in case of an overshoot
         if (activation > ceiling) {
             activation = ceiling;

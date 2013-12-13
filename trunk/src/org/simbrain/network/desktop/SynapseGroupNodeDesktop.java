@@ -56,25 +56,24 @@ public class SynapseGroupNodeDesktop extends SynapseGroupNode {
     public JMenu getProducerMenu() {
         if (component != null) {
             PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(getGroup(),
-                            "getWeightVector", double[].class);
+                    .createPotentialProducer(getGroup(), "getWeightVector",
+                            double[].class);
             producer.setCustomDescription("Synapse Group: "
                     + getGroup().getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component
-                            .getWorkspace(), producer);
+                    "Send Vector Coupling to", component.getWorkspace(),
+                    producer);
             return producerMenu;
         }
         return null;
     }
 
-
     @Override
     public JMenu getConsumerMenu() {
         if (component != null) {
             PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(getGroup(),
-                            "setWeightVector", double[].class);
+                    .createPotentialConsumer(getGroup(), "setWeightVector",
+                            double[].class);
             consumer.setCustomDescription("Synapse Group: "
                     + getGroup().getLabel());
 

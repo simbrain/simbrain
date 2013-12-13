@@ -28,7 +28,6 @@ import org.simbrain.network.trainers.TrainingSet;
  */
 public class LMSNetwork extends FeedForward implements Trainable {
 
-
     /**
      * Training set.
      */
@@ -36,6 +35,7 @@ public class LMSNetwork extends FeedForward implements Trainable {
 
     /**
      * Construct a new LMS Network.
+     *
      * @param network the parent network
      * @param numInputNeurons number of input neurons
      * @param numOutputNeurons number of output neurons

@@ -29,84 +29,83 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
  * probability, and the lower bound otherwise. Ignores inputs.
  */
 public class StochasticRule extends SpikingNeuronUpdateRule implements
-		ActivityGenerator {
+        ActivityGenerator {
 
-	/** The default firing probability for the Neuron. */
-	private static final double DEFAULT_FIRING_PROBABILITY = .5;
+    /** The default firing probability for the Neuron. */
+    private static final double DEFAULT_FIRING_PROBABILITY = .5;
 
-	/** Probability the neuron will fire. */
-	private double firingProbability = DEFAULT_FIRING_PROBABILITY;
+    /** Probability the neuron will fire. */
+    private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void init(Neuron neuron) {
-		neuron.setGenerator(true);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void init(Neuron neuron) {
+        neuron.setGenerator(true);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public StochasticRule deepCopy() {
-		StochasticRule sn = new StochasticRule();
-		sn.setFiringProbability(getFiringProbability());
-		return sn;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public StochasticRule deepCopy() {
+        StochasticRule sn = new StochasticRule();
+        sn.setFiringProbability(getFiringProbability());
+        return sn;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
-		double rand = Math.random();
-		if (rand > firingProbability) {
-			neuron.setBuffer(getFloor());
-		} else {
-			neuron.setBuffer(getCeiling());
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
+        double rand = Math.random();
+        if (rand > firingProbability) {
+            neuron.setBuffer(getFloor());
+        } else {
+            neuron.setBuffer(getCeiling());
+        }
+    }
 
-	/**
-	 * @return Returns the firingProbability.
-	 */
-	public double getFiringProbability() {
-		return firingProbability;
-	}
+    /**
+     * @return Returns the firingProbability.
+     */
+    public double getFiringProbability() {
+        return firingProbability;
+    }
 
-	/**
-	 * @param firingProbability
-	 *            The firingProbability to set.
-	 */
-	public void setFiringProbability(final double firingProbability) {
-		this.firingProbability = firingProbability;
-	}
+    /**
+     * @param firingProbability The firingProbability to set.
+     */
+    public void setFiringProbability(final double firingProbability) {
+        this.firingProbability = firingProbability;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Stochastic";
-	}
+    @Override
+    public String getDescription() {
+        return "Stochastic";
+    }
 
-	@Override
-	public double getRandomValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public double getRandomValue() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	public double getCeiling() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public double getCeiling() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	public double getFloor() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public double getFloor() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

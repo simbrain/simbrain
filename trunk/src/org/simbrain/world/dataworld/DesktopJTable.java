@@ -44,8 +44,7 @@ public class DesktopJTable extends SimbrainJTable {
      * @param dataModel base table
      * @param component parent component
      */
-    public DesktopJTable(NumericTable dataModel,
-            DataWorldComponent component) {
+    public DesktopJTable(NumericTable dataModel, DataWorldComponent component) {
         super(dataModel);
         this.component = component;
     }
@@ -61,8 +60,7 @@ public class DesktopJTable extends SimbrainJTable {
         ret.addSeparator();
         String producerDescription = component.getProducingColumnType()
                 .getDescription("Column " + getSelectedColumn());
-        PotentialProducer producer = component
-                .getAttributeManager()
+        PotentialProducer producer = component.getAttributeManager()
                 .createPotentialProducer(
                         component.getObjectFromKey("producerList:"
                                 + getSelectedColumn()),
@@ -73,8 +71,7 @@ public class DesktopJTable extends SimbrainJTable {
         ret.add(producerMenu);
         String consumerDescription = component.getConsumingColumnType()
                 .getDescription("Column " + getSelectedColumn());
-        PotentialConsumer consumer = component
-                .getAttributeManager()
+        PotentialConsumer consumer = component.getAttributeManager()
                 .createPotentialConsumer(
                         component.getObjectFromKey("consumerList:"
                                 + getSelectedColumn()),

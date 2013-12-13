@@ -25,7 +25,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 
 /**
- * TODO: Here for backwards compatibility.  Remove by 3.0 after updating all simulations.
+ * TODO: Here for backwards compatibility. Remove by 3.0 after updating all
+ * simulations.
  */
 public class ClampedNeuronRule extends NeuronUpdateRule {
 

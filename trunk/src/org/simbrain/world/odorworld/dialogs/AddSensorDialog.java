@@ -24,7 +24,6 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
@@ -35,36 +34,37 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 public class AddSensorDialog extends StandardDialog implements ActionListener {
 
-	/** String of Sensor types. */
-	private String[] sensors = {"SmellSensor", "TileSensor", "Tile Set", "Hearing"};
+    /** String of Sensor types. */
+    private String[] sensors = { "SmellSensor", "TileSensor", "Tile Set",
+            "Hearing" };
 
-	/** Entity to which sensor is being added. */
-	private OdorWorldEntity entity;
+    /** Entity to which sensor is being added. */
+    private OdorWorldEntity entity;
 
-	/** Select sensor type. */
-	private JComboBox sensorType = new JComboBox(sensors);
+    /** Select sensor type. */
+    private JComboBox sensorType = new JComboBox(sensors);
 
-	/** Panel that changes to a specific sensor panel. */
-	private AbstractSensorPanel currentSensorPanel;
+    /** Panel that changes to a specific sensor panel. */
+    private AbstractSensorPanel currentSensorPanel;
 
-	/** Main dialog box. */
-	private Box mainPanel = Box.createVerticalBox();
+    /** Main dialog box. */
+    private Box mainPanel = Box.createVerticalBox();
 
-	/** Panel for setting sensor type. */
-	private LabelledItemPanel typePanel = new LabelledItemPanel();
+    /** Panel for setting sensor type. */
+    private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-	/** Sensor Dialog add sensor constructor. */
-	public AddSensorDialog(OdorWorldEntity entity) {
-		this.entity = entity;
-		init("Add Sensor");
-	}
+    /** Sensor Dialog add sensor constructor. */
+    public AddSensorDialog(OdorWorldEntity entity) {
+        this.entity = entity;
+        init("Add Sensor");
+    }
 
-	/**
-	 * Initialize default constructor.
-	 */
-	private void init(String title) {
-		setTitle(title);
-		sensorType.addActionListener(this);
+    /**
+     * Initialize default constructor.
+     */
+    private void init(String title) {
+        setTitle(title);
+        sensorType.addActionListener(this);
         typePanel.addItem("Sensor Type", sensorType);
         sensorType.setSelectedItem("SmellSensor");
         ShowHelpAction helpAction = new ShowHelpAction(
@@ -74,29 +74,29 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
         mainPanel.add(typePanel);
         mainPanel.add(currentSensorPanel);
         setContentPane(mainPanel);
-	}
+    }
 
-	@Override
-	protected void closeDialogOk() {
-		super.closeDialogOk();
-		commitChanges();
-	}
+    @Override
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+    }
 
-	/**
-	 * Initialize the Sensor Dialog Panel based upon the current sensor type.
-	 */
-	private void initPanel() {
-		if (sensorType.getSelectedItem() == "TileSensor") {
-			clearSensorPanel();
+    /**
+     * Initialize the Sensor Dialog Panel based upon the current sensor type.
+     */
+    private void initPanel() {
+        if (sensorType.getSelectedItem() == "TileSensor") {
+            clearSensorPanel();
             setTitle("Add a tile sensor");
-			currentSensorPanel = new TileSensorPanel(entity);
-			mainPanel.add(currentSensorPanel);
-		} else if (sensorType.getSelectedItem() == "SmellSensor") {
-			clearSensorPanel();
+            currentSensorPanel = new TileSensorPanel(entity);
+            mainPanel.add(currentSensorPanel);
+        } else if (sensorType.getSelectedItem() == "SmellSensor") {
+            clearSensorPanel();
             setTitle("Add a smell sensor");
-			currentSensorPanel = new SmellSensorPanel(entity);
-			mainPanel.add(currentSensorPanel);
-		} else if (sensorType.getSelectedItem() == "Tile Set") {
+            currentSensorPanel = new SmellSensorPanel(entity);
+            mainPanel.add(currentSensorPanel);
+        } else if (sensorType.getSelectedItem() == "Tile Set") {
             clearSensorPanel();
             setTitle("Add a grid of tile sensors");
             currentSensorPanel = new TileSetPanel(entity);
@@ -107,31 +107,31 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
             currentSensorPanel = new HearingSensorPanel(entity);
             mainPanel.add(currentSensorPanel);
         }
-		pack();
-		setLocationRelativeTo(null);
-	}
+        pack();
+        setLocationRelativeTo(null);
+    }
 
-	/**
-	 * Remove current panel, if any.
-	 */
-	private void clearSensorPanel() {
-		if (currentSensorPanel != null) {
-			mainPanel.remove(currentSensorPanel);
-		}
-	}
+    /**
+     * Remove current panel, if any.
+     */
+    private void clearSensorPanel() {
+        if (currentSensorPanel != null) {
+            mainPanel.remove(currentSensorPanel);
+        }
+    }
 
-	/**
-	 *
-	 * @param e Action event.
-	 */
-	public void actionPerformed(final ActionEvent e) {
-		initPanel();
-	}
+    /**
+     *
+     * @param e Action event.
+     */
+    public void actionPerformed(final ActionEvent e) {
+        initPanel();
+    }
 
-	/**
-	 * Called externally when the dialog is closed, to commit any changes made.
-	 */
-	public void commitChanges() {
-		currentSensorPanel.commitChanges();
-	}
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
+    public void commitChanges() {
+        currentSensorPanel.commitChanges();
+    }
 }

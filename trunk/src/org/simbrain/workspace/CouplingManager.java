@@ -265,7 +265,8 @@ public class CouplingManager {
         boolean typeMatches = (attribute1.getDataType() == attribute2
                 .getDataType());
         boolean argTypesMatch = Arrays.deepEquals(
-                attribute1.getArgumentDataTypes(), attribute2.getArgumentDataTypes());
+                attribute1.getArgumentDataTypes(),
+                attribute2.getArgumentDataTypes());
         boolean argValuesMatch = Arrays.deepEquals(
                 attribute1.getArgumentValues(), attribute2.getArgumentValues());
         return (baseObjectMatches && methodNameMatches && typeMatches
@@ -314,11 +315,11 @@ public class CouplingManager {
         if (coupling.getConsumer().getDataType() != coupling.getProducer()
                 .getDataType()) {
             String warning = "Producer type ("
-                    + CouplingManager.getTypeDescriptor(coupling
-                            .getProducer().getDataType())
+                    + CouplingManager.getTypeDescriptor(coupling.getProducer()
+                            .getDataType())
                     + ") does not match consumer type ("
-                    + CouplingManager.getTypeDescriptor(coupling
-                            .getConsumer().getDataType()) + ")";
+                    + CouplingManager.getTypeDescriptor(coupling.getConsumer()
+                            .getDataType()) + ")";
             throw new UmatchedAttributesException(warning);
         }
         couplingList.add(coupling);

@@ -25,14 +25,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -142,10 +140,10 @@ public class OdorWorld {
             // Add default effectors
             entity.addEffector(new StraightMovement((RotatingEntity) entity,
                     "Go-straight"));
-            entity.addEffector(new Turning((RotatingEntity) entity,
-                    "Go-left", 1));
-            entity.addEffector(new Turning((RotatingEntity) entity,
-                    "Go-right", -1));
+            entity.addEffector(new Turning((RotatingEntity) entity, "Go-left",
+                    1));
+            entity.addEffector(new Turning((RotatingEntity) entity, "Go-right",
+                    -1));
 
             // Add default sensors
             entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8,
@@ -302,10 +300,9 @@ public class OdorWorld {
     }
 
     /**
-     * Updates all entities.  TODO: Should this be in OdorWorldEntity?
+     * Updates all entities. TODO: Should this be in OdorWorldEntity?
      */
-    private void updateEntity(final OdorWorldEntity entity,
-            final int time) {
+    private void updateEntity(final OdorWorldEntity entity, final int time) {
 
         // Collision detection
         float dx = entity.getVelocityX();
@@ -338,17 +335,17 @@ public class OdorWorld {
             }
         }
         //
-        //        // Handle sprite collisions
-        //        if (xCollission(entity, newX)) {
-        //            entity.collideHorizontal();
-        //        } else {
-        //            // sprite.setX(newX);
-        //        }
-        //        if (yCollission(entity, newY)) {
-        //            entity.collideVertical();
-        //        } else {
-        //            // sprite.setY(newY);
-        //        }
+        // // Handle sprite collisions
+        // if (xCollission(entity, newX)) {
+        // entity.collideHorizontal();
+        // } else {
+        // // sprite.setX(newX);
+        // }
+        // if (yCollission(entity, newY)) {
+        // entity.collideVertical();
+        // } else {
+        // // sprite.setY(newY);
+        // }
 
         // Update creature
         entity.update();

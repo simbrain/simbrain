@@ -158,7 +158,8 @@ public class SimbrainJTable extends JXTable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.isControlDown() || (e.getButton() == 1)) {
-                    final int column = convertColumnIndexToModel(columnAtPoint(e.getPoint()));
+                    final int column = convertColumnIndexToModel(columnAtPoint(e
+                            .getPoint()));
                     if (e.isShiftDown()) {
                         for (int i = 1; i < getRowCount(); i++) {
                             changeSelection(i, column, true, true);
@@ -185,7 +186,7 @@ public class SimbrainJTable extends JXTable {
                     }
                 }
             }
-        } );
+        });
     }
 
     /**
@@ -324,9 +325,9 @@ public class SimbrainJTable extends JXTable {
     /**
      * Return a toolbar with buttons for opening from and saving to .csv files.
      *
-      * @param allowRowChanges whether to allow number of rows to change
-      * @param allowColumnChanges whether to allow number of columns to change
-      * @return the csv toolbar
+     * @param allowRowChanges whether to allow number of rows to change
+     * @param allowColumnChanges whether to allow number of columns to change
+     * @return the csv toolbar
      */
     public JToolBar getToolbarCSV(final boolean allowRowChanges,
             final boolean allowColumnChanges) {
@@ -384,8 +385,7 @@ public class SimbrainJTable extends JXTable {
     public JToolBar getToolbarRandomize() {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(TableActionManager
-                    .getRandomizeAction(this));
+            toolbar.add(TableActionManager.getRandomizeAction(this));
             toolbar.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return toolbar;
@@ -399,8 +399,7 @@ public class SimbrainJTable extends JXTable {
     public JToolBar getToolbarNormalize() {
         if (getData() instanceof NumericTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(TableActionManager
-                    .getNormalizeAction(this));
+            toolbar.add(TableActionManager.getNormalizeAction(this));
             return toolbar;
         }
         return null;
@@ -437,9 +436,10 @@ public class SimbrainJTable extends JXTable {
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i,j)) {
+                if (isCellSelected(i, j)) {
                     if (j > 0) {
-                        double val = ((NumericTable) getData()).getValue(i, j-1);
+                        double val = ((NumericTable) getData()).getValue(i,
+                                j - 1);
 
                         if (val > max) {
                             max = val;
@@ -453,9 +453,15 @@ public class SimbrainJTable extends JXTable {
         }
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i,j)) {
+                if (isCellSelected(i, j)) {
                     if (j > 0) {
-                        ((NumericTable) getData()).setValue(i, j-1, (((NumericTable) getData()).getValue(i, j-1) - min) / (max - min), false);
+                        ((NumericTable) getData())
+                                .setValue(
+                                        i,
+                                        j - 1,
+                                        (((NumericTable) getData()).getValue(i,
+                                                j - 1) - min) / (max - min),
+                                        false);
                     }
                 }
             }
@@ -471,9 +477,10 @@ public class SimbrainJTable extends JXTable {
     public void fill(final double value) {
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i,j)) {
-                    if (j >0) {
-                        ((NumericTable) getData()).setValue(i, j-1, value, false);
+                if (isCellSelected(i, j)) {
+                    if (j > 0) {
+                        ((NumericTable) getData()).setValue(i, j - 1, value,
+                                false);
                     }
                 }
             }
@@ -510,8 +517,7 @@ public class SimbrainJTable extends JXTable {
     public JMenu getMenuRandomize() {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Randomize");
-            menu.add(TableActionManager
-                    .getRandomizeAction(this));
+            menu.add(TableActionManager.getRandomizeAction(this));
             menu.add(TableActionManager
                     .getSetTableBoundsAction((NumericTable) getData()));
             return menu;
@@ -527,8 +533,7 @@ public class SimbrainJTable extends JXTable {
     public JMenu getMenuNormalize() {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Normalize");
-            menu.add(TableActionManager
-                    .getNormalizeAction(this));
+            menu.add(TableActionManager.getNormalizeAction(this));
             return menu;
         }
         return null;
@@ -544,8 +549,7 @@ public class SimbrainJTable extends JXTable {
             JMenu menu = new JMenu("Fill values");
             menu.add(new JMenuItem(TableActionManager
                     .getFillAction((NumericTable) getData())));
-            menu.add(new JMenuItem(TableActionManager
-                    .getZeroFillAction(this)));
+            menu.add(new JMenuItem(TableActionManager.getZeroFillAction(this)));
             return menu;
         }
         return null;
@@ -616,7 +620,6 @@ public class SimbrainJTable extends JXTable {
     TableModel getTableModel() {
         return tableModel;
     }
-
 
     /**
      * Renderer for table. If custom row headings are used, treats first column

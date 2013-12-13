@@ -47,7 +47,8 @@ public final class AlignHorizontalAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignHorizontal.png"));
+        putValue(SMALL_ICON,
+                ResourceManager.getImageIcon("AlignHorizontal.png"));
     }
 
     /** @see AbstractAction */

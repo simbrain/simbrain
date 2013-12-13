@@ -36,85 +36,83 @@ import org.simbrain.util.StandardDialog;
  */
 public class KwtaCreationDialog extends StandardDialog {
 
-	/** Tabbed pane. */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
-	/** Logic tab panel. */
-	private JPanel tabLogic = new JPanel();
+    /** Logic tab panel. */
+    private JPanel tabLogic = new JPanel();
 
-	/** Layout tab panel. */
-	private JPanel tabLayout = new JPanel();
+    /** Layout tab panel. */
+    private JPanel tabLayout = new JPanel();
 
-	/** Logic panel. */
-	private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    /** Logic panel. */
+    private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
-	/** Layout panel. */
-	private MainLayoutPanel layoutPanel;
+    /** Layout panel. */
+    private MainLayoutPanel layoutPanel;
 
-	// TODO: Separate this from number of neurons! Add a second field.
-	/** K field. */
-	private JTextField tfK = new JTextField("5");
+    // TODO: Separate this from number of neurons! Add a second field.
+    /** K field. */
+    private JTextField tfK = new JTextField("5");
 
-	/** Network Panel. */
-	private NetworkPanel networkPanel;
+    /** Network Panel. */
+    private NetworkPanel networkPanel;
 
-	/**
-	 * This method is the default constructor.
-	 * 
-	 * @param networkPanel
-	 *            Network panel
-	 */
-	public KwtaCreationDialog(final NetworkPanel networkPanel) {
-		this.networkPanel = networkPanel;
-		layoutPanel = new MainLayoutPanel(false, this);
-		init();
-	}
+    /**
+     * This method is the default constructor.
+     *
+     * @param networkPanel Network panel
+     */
+    public KwtaCreationDialog(final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+        layoutPanel = new MainLayoutPanel(false, this);
+        init();
+    }
 
-	/**
-	 * Called when dialog closes.
-	 */
-	protected void closeDialogOk() {
-		KWTA kWTA =
-				new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK
-						.getText()));
-		layoutPanel.commitChanges();
-		Layout layout = layoutPanel.getCurrentLayout();
-		layout.setInitialLocation(networkPanel.getLastClickedPosition());
-		layout.layoutNeurons(kWTA.getNeuronList());
-		networkPanel.getNetwork().addGroup(kWTA);
-		networkPanel.repaint();
-		super.closeDialogOk();
-	}
+    /**
+     * Called when dialog closes.
+     */
+    protected void closeDialogOk() {
+        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK
+                .getText()));
+        layoutPanel.commitChanges();
+        Layout layout = layoutPanel.getCurrentLayout();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        layout.layoutNeurons(kWTA.getNeuronList());
+        networkPanel.getNetwork().addGroup(kWTA);
+        networkPanel.repaint();
+        super.closeDialogOk();
+    }
 
-	/**
-	 * Initializes all components used in dialog.
-	 */
-	private void init() {
-		// Initializes dialog
-		setTitle("New K Winner Take All Network");
+    /**
+     * Initializes all components used in dialog.
+     */
+    private void init() {
+        // Initializes dialog
+        setTitle("New K Winner Take All Network");
 
-		fillFieldValues();
+        fillFieldValues();
 
-		tfK.setColumns(5);
+        tfK.setColumns(5);
 
-		// Set up logic panel
-		logicPanel.addItem("Number of Neurons", tfK);
+        // Set up logic panel
+        logicPanel.addItem("Number of Neurons", tfK);
 
-		// Set up tab panels
-		tabLogic.add(logicPanel);
-		tabLayout.add(layoutPanel);
-		tabbedPane.addTab("Logic", tabLogic);
-		tabbedPane.addTab("Layout", layoutPanel);
-		setContentPane(tabbedPane);
-	}
+        // Set up tab panels
+        tabLogic.add(logicPanel);
+        tabLayout.add(layoutPanel);
+        tabbedPane.addTab("Logic", tabLogic);
+        tabbedPane.addTab("Layout", layoutPanel);
+        setContentPane(tabbedPane);
+    }
 
-	/**
-	 * Populate fields with current data.
-	 */
-	private void fillFieldValues() {
-		// KWTA kw = new KWTA();
-		tfK.setText("5");
+    /**
+     * Populate fields with current data.
+     */
+    private void fillFieldValues() {
+        // KWTA kw = new KWTA();
+        tfK.setText("5");
 
-	}
+    }
 
 }

@@ -200,7 +200,8 @@ public class Workspace {
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(final List<PotentialProducer> producerKeys,
-            final List<PotentialConsumer> consumerKeys) throws UmatchedAttributesException {
+            final List<PotentialConsumer> consumerKeys)
+            throws UmatchedAttributesException {
 
         Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
 
@@ -752,6 +753,5 @@ public class Workspace {
         updater.getUpdateManager().clearCurrentActions();
         updater.getUpdateManager().addAction(action);
     }
-
 
 }

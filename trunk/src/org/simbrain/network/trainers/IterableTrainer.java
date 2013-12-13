@@ -235,8 +235,8 @@ public abstract class IterableTrainer extends Trainer {
     }
 
     /**
-     * Returns the number of rows in whichever dataset has fewer rows.
-     * Used when mismatched datasets are in use.
+     * Returns the number of rows in whichever dataset has fewer rows. Used when
+     * mismatched datasets are in use.
      *
      * @return least number of rows
      */

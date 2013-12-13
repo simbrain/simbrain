@@ -69,8 +69,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param threshold
-     *            the threshold to set
+     * @param threshold the threshold to set
      */
     public void setThreshold(double threshold) {
         this.threshold = threshold;

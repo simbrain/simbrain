@@ -135,7 +135,7 @@ public class FeedForward extends Subnetwork {
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
-            	SigmoidalRule rule = new SigmoidalRule();
+                SigmoidalRule rule = new SigmoidalRule();
                 Neuron neuron = new Neuron(network, rule);
                 rule.setLowerBound(0);
                 neuron.setUpdatePriority(i);

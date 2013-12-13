@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.listeners;
 
-
 /**
  * Adapter class for NeuronListener.
  *

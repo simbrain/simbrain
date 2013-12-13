@@ -73,9 +73,8 @@ public class ReservoirUtilsPanel extends JPanel {
     public ReservoirUtilsPanel(EchoStateNetwork esn) {
         this.esn = esn;
         this.setLayout(new GridBagLayout());
-        //this.setBorder(title);
+        // this.setBorder(title);
         randomSource = esn.getNoiseGenerator();
-
 
         noiseEnabled = false;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -206,6 +205,5 @@ public class ReservoirUtilsPanel extends JPanel {
     public void setFrame(GenericFrame frame) {
         this.frame = frame;
     }
-
 
 }

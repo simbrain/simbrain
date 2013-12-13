@@ -158,7 +158,7 @@ public class StandardDialog extends GenericJDialog {
                 COMPONENT_SPACING));
 
         // Create the standard "Ok" Button
-		Action okAction = new AbstractAction("OK") {
+        Action okAction = new AbstractAction("OK") {
             public void actionPerformed(final ActionEvent actionEvent) {
                 if (isValidData()) {
                     myIsDialogCancelled = false;
@@ -168,7 +168,7 @@ public class StandardDialog extends GenericJDialog {
         };
 
         // Create the standard "Cancel" Button
-		Action cancelAction = new AbstractAction("Cancel") {
+        Action cancelAction = new AbstractAction("Cancel") {
             public void actionPerformed(final ActionEvent actionEvent) {
                 myIsDialogCancelled = true;
                 closeDialogCancel();

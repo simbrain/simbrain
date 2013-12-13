@@ -83,8 +83,8 @@ public class NetworkUpdateManager {
     }
 
     /**
-     * Update manager listen for relevant changes in network.  In particular group
-     * update actions are added or removed as groups are added or removed.
+     * Update manager listen for relevant changes in network. In particular
+     * group update actions are added or removed as groups are added or removed.
      */
     private void addListeners() {
         network.addGroupListener(new GroupListener() {

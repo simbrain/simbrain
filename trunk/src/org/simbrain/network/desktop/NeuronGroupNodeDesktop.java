@@ -48,9 +48,10 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
         super(node.getNetworkPanel(), node.getNeuronGroup());
         this.component = component;
         // TODO: Confusing design...
-        //  A subclass of NeuronGroupNode comes in, but is converted in to this
-        //  different subclass at the same level.   The main thing lost in the process
-        //  is a custom menu, which is passed along here.
+        // A subclass of NeuronGroupNode comes in, but is converted in to this
+        // different subclass at the same level. The main thing lost in the
+        // process
+        // is a custom menu, which is passed along here.
         this.setCustomMenu(node.getCustomMenu());
     }
 
@@ -58,19 +59,18 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
     public JMenu getProducerMenu() {
         if (component != null) {
             PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(getGroup(),
-                            "getActivations", double[].class);
+                    .createPotentialProducer(getGroup(), "getActivations",
+                            double[].class);
             producer.setCustomDescription("Neuron Group: "
                     + getGroup().getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component
-                            .getWorkspace(), producer);
+                    "Send Vector Coupling to", component.getWorkspace(),
+                    producer);
             return producerMenu;
         }
         return null;
 
     }
-
 
     @Override
     public JMenu getConsumerMenu() {

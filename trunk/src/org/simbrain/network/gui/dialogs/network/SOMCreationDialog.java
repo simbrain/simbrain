@@ -99,7 +99,6 @@ public class SOMCreationDialog extends StandardDialog {
         networkPanel.repaint();
         super.closeDialogOk();
 
-
     }
 
 }

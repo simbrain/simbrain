@@ -114,7 +114,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
 
         couplings.setCellRenderer(new CouplingCellRenderer());
 
-
         // Scroll pane for showing lists larger than viewing window and setting
         // maximum size
         final JScrollPane listScroll = new JScrollPane(couplings);

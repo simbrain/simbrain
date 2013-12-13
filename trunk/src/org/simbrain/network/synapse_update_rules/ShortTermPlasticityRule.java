@@ -97,10 +97,9 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     @Override
     public void update(Synapse synapse) {
         // Determine whether to activate short term dynamics
-        if (synapse.getSource().getUpdateRule()
-                instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) synapse.getSource()
-                    .getUpdateRule()).hasSpiked()) {
+        if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
+                    .hasSpiked()) {
                 activated = true;
             } else {
                 activated = false;
@@ -115,11 +114,9 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
         double strength = synapse.getStrength();
         if (activated) {
             if (plasticityType == STD) {
-                strength -=
-                        (bumpRate * (strength - synapse.getLowerBound()));
+                strength -= (bumpRate * (strength - synapse.getLowerBound()));
             } else {
-                strength +=
-                        (bumpRate * (synapse.getUpperBound() - strength));
+                strength += (bumpRate * (synapse.getUpperBound() - strength));
             }
         } else {
             strength -= (decayRate * (strength - baseLineStrength));
@@ -136,8 +133,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param baseLineStrength
-     *            The baseLineStrength to set.
+     * @param baseLineStrength The baseLineStrength to set.
      */
     public void setBaseLineStrength(final double baseLineStrength) {
         this.baseLineStrength = baseLineStrength;
@@ -151,8 +147,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param decayRate
-     *            The decayRate to set.
+     * @param decayRate The decayRate to set.
      */
     public void setDecayRate(final double decayRate) {
         this.decayRate = decayRate;
@@ -166,8 +161,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param growthRate
-     *            The growthRate to set.
+     * @param growthRate The growthRate to set.
      */
     public void setBumpRate(final double growthRate) {
         this.bumpRate = growthRate;
@@ -181,8 +175,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param inputThreshold
-     *            The inputThreshold to set.
+     * @param inputThreshold The inputThreshold to set.
      */
     public void setInputThreshold(final double inputThreshold) {
         this.inputThreshold = inputThreshold;
@@ -196,8 +189,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param plasticityType
-     *            The plasticityType to set.
+     * @param plasticityType The plasticityType to set.
      */
     public void setPlasticityType(final int plasticityType) {
         this.plasticityType = plasticityType;
@@ -211,8 +203,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     /**
-     * @param firingThreshold
-     *            The firingThreshold to set.
+     * @param firingThreshold The firingThreshold to set.
      */
     public void setFiringThreshold(final double firingThreshold) {
         this.firingThreshold = firingThreshold;

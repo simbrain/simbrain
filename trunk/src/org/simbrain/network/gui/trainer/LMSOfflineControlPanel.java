@@ -112,10 +112,9 @@ public class LMSOfflineControlPanel extends JPanel {
     private GenericFrame frame;
 
     /**
-     * Build the panel. No trainer is supplied.  It will be supplied
-     * later once it has been created.  This is used by ESN for example
-     * where states must first be harvested and only then is the trainer
-     * built.
+     * Build the panel. No trainer is supplied. It will be supplied later once
+     * it has been created. This is used by ESN for example where states must
+     * first be harvested and only then is the trainer built.
      *
      * @param networkPanel the parent network panel
      */
@@ -205,7 +204,7 @@ public class LMSOfflineControlPanel extends JPanel {
      * field to set alpha levels.
      */
     private void fillRegressionPanel() {
-        regressionPanel.setLayout(new GridLayout(1,3));
+        regressionPanel.setLayout(new GridLayout(1, 3));
         regressionPanel.add(new JLabel("Ridge regression"));
         regressionPanel.add(regSwitch);
         alpha.setEnabled(false);
@@ -339,8 +338,7 @@ public class LMSOfflineControlPanel extends JPanel {
                 } catch (DataNotInitializedException e) {
                     JOptionPane.showOptionDialog(null, e.getMessage(),
                             "Warning", JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, null,
-                            null);
+                            JOptionPane.WARNING_MESSAGE, null, null, null);
                 }
                 return null;
             }

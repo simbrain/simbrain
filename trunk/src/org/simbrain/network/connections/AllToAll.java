@@ -58,8 +58,6 @@ public class AllToAll extends ConnectNeurons {
     public AllToAll() {
     }
 
-
-
     @Override
     public String toString() {
         return "All to all";

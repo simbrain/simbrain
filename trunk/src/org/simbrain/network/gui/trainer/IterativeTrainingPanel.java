@@ -103,7 +103,7 @@ public class IterativeTrainingPanel extends JPanel {
      */
     public static void main(String args[]) {
         IterativeTrainingPanel test = new IterativeTrainingPanel(null, null);
-        //test.errorBar.setValue(5);
+        // test.errorBar.setValue(5);
         SimpleFrame.displayPanel(test);
     }
 

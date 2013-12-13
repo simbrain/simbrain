@@ -85,7 +85,7 @@ public class SensorPanel extends JPanel {
         model = new SensorModel();
         table = new JTable(model);
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-        .setHorizontalAlignment(SwingConstants.CENTER);
+                .setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);

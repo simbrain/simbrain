@@ -182,8 +182,9 @@ public class ReflectivePropertyEditor extends JPanel {
      * Set up the main panel.
      *
      * The items in the underlying java class can be ordered using an annotation
+     *
      * @DisplayOrder(val = 1) For an example see
-     * org.simbrain.util.projection.DataColoringManager
+     *                   org.simbrain.util.projection.DataColoringManager
      */
     private void initPanel() {
 

@@ -28,7 +28,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -40,7 +39,6 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
@@ -92,7 +90,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Set up table
         table = new DesktopJTable(component.getDataModel(), component);
-        scroller = new SimbrainJTableScrollPanel(table);        
+        scroller = new SimbrainJTableScrollPanel(table);
         add(scroller, BorderLayout.CENTER);
 
         // Add toolbars
@@ -196,8 +194,8 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private void resizePanel() {
         scroller.resize();
         if (getParentFrame() != null) {
-            //getParentFrame()
-            //        .setMaximumSize(getParentFrame().getPreferredSize());
+            // getParentFrame()
+            // .setMaximumSize(getParentFrame().getPreferredSize());
             getParentFrame().pack();
         }
     }

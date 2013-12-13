@@ -148,5 +148,4 @@ public class SmellSensor extends Sensor {
         return "Smell";
     }
 
-
 }

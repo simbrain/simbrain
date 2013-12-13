@@ -52,8 +52,7 @@ public class RiseAndDecay extends SpikeResponder {
     public void update(Synapse s) {
         double timeStep = s.getParentNetwork().getTimeStep();
         if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked())
-        {
+                .hasSpiked()) {
             recovery = 1;
         }
 

@@ -29,7 +29,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
@@ -76,7 +75,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     /** Interaction box. */
     private InteractionBox interactionBox;
 
-    /**  Custom menu items specific to a subclass. */
+    /** Custom menu items specific to a subclass. */
     private JMenu customMenu;
 
     /** Network panel. */

@@ -73,10 +73,10 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     private final Workspace workspace;
 
     /** Script directory for custom workspace updates. */
-    private static final String SCRIPT_DIR = "." + System.getProperty("file.separator")
-            + "scripts" + System.getProperty("file.separator")
-            + "updateScripts" + System.getProperty("file.separator")
-            + "workspaceUpdate";
+    private static final String SCRIPT_DIR = "."
+            + System.getProperty("file.separator") + "scripts"
+            + System.getProperty("file.separator") + "updateScripts"
+            + System.getProperty("file.separator") + "workspaceUpdate";
 
     /**
      * Creates a new action list panel.
@@ -259,8 +259,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
         if (!dialog.hasUserCancelled()) {
-            ((UpdateActionCustom) action).setScriptString(panel
-                    .getTextArea().getText());
+            ((UpdateActionCustom) action).setScriptString(panel.getTextArea()
+                    .getText());
             ((UpdateActionCustom) action).init();
         }
     }
@@ -295,7 +295,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                     continue;
                 } else {
                     workspace.getUpdater().getUpdateManager()
-                    .removeAction((UpdateAction) action);
+                            .removeAction((UpdateAction) action);
                 }
             }
         }

@@ -53,8 +53,7 @@ public class JumpAndDecay extends SpikeResponder {
     public void update(final Synapse s) {
         value = s.getPsr();
         if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked())
-        {
+                .hasSpiked()) {
             value = jumpHeight * s.getStrength();
         } else {
             double timeStep = s.getParentNetwork().getTimeStep();
@@ -108,7 +107,7 @@ public class JumpAndDecay extends SpikeResponder {
 
     /**
      * @return the time constant of the exponential decay of the post synaptic
-     * response
+     *         response
      */
     public double getTimeConstant() {
         return timeConstant;
@@ -116,7 +115,7 @@ public class JumpAndDecay extends SpikeResponder {
 
     /**
      * @param decayTimeConstant the new time constant of the exponential decay
-     * of the post synaptic response
+     *            of the post synaptic response
      */
     public void setTimeConstant(double decayTimeConstant) {
         this.timeConstant = decayTimeConstant;

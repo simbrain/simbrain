@@ -49,8 +49,8 @@ public class FreeBirdView extends Moveable {
                                                                                   // Point
                                                                                   // location)
                                                                                   // {
-    // this.direction = direction;
-    // this.location = location.add(new Vector(0, START_HEIGHT, 0));
+        // this.direction = direction;
+        // this.location = location.add(new Vector(0, START_HEIGHT, 0));
     }
 
     /**

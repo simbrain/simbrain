@@ -63,7 +63,7 @@ public class Clipboard {
      */
     public static void add(final ArrayList objects) {
         clipboard = objects;
-        //System.out.println("add-->"+ Arrays.asList(objects));
+        // System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged();
     }
 
@@ -80,7 +80,7 @@ public class Clipboard {
 
         // Create a copy of the clipboard objects.
         ArrayList copy = CopyPaste.getCopy(net.getNetwork(), clipboard);
-        //System.out.println("paste-->"+ Arrays.asList(copy));
+        // System.out.println("paste-->"+ Arrays.asList(copy));
 
         // Gather data for translating the object then add the objects to the
         // network.

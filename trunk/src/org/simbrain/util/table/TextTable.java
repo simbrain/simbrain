@@ -18,8 +18,6 @@
  */
 package org.simbrain.util.table;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -75,6 +73,5 @@ public class TextTable extends MutableTable<String> {
     public Class getDataType() {
         return String.class;
     }
-
 
 }

@@ -183,7 +183,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
                     .equalsIgnoreCase("One to many")) {
                 desktop.getWorkspace().coupleOneToMany(potentialProducers,
                         potentialConsumers);
-            }            
+            }
         } catch (UmatchedAttributesException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(),
                     "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);

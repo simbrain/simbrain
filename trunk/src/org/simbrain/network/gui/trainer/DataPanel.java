@@ -52,8 +52,8 @@ public class DataPanel extends JPanel {
     private GenericFrame parentFrame;
 
     /**
-     * Panel which represents input or target data. Can be created without
-     * data initially, in which case a default dataset is created.
+     * Panel which represents input or target data. Can be created without data
+     * initially, in which case a default dataset is created.
      *
      * @param neurons neurons corresponding to columns
      * @param data the numerical data
@@ -65,8 +65,8 @@ public class DataPanel extends JPanel {
 
         // If no data exists, create it!
         if (data.getData() == null) {
-            table = new SimbrainJTable(new NumericTable(
-                    DEFAULT_NUM_ROWS, neurons.size()));
+            table = new SimbrainJTable(new NumericTable(DEFAULT_NUM_ROWS,
+                    neurons.size()));
         } else {
             table = new SimbrainJTable(new NumericTable(data.getData()));
         }
@@ -91,19 +91,16 @@ public class DataPanel extends JPanel {
 
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
-        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table,
-                data));
+        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, data));
         fileToolBar.add(TableActionManager
                 .getSaveCSVAction((NumericTable) table.getData()));
         toolbars.add(fileToolBar);
 
         // Edit tools
         JToolBar editToolBar = new JToolBar();
-        editToolBar
-                .add(TableActionManager.getInsertRowAction(table));
-        editToolBar
-                .add(TableActionManager.getDeleteRowAction(table));
-        //toolbars.add(editToolBar);
+        editToolBar.add(TableActionManager.getInsertRowAction(table));
+        editToolBar.add(TableActionManager.getDeleteRowAction(table));
+        // toolbars.add(editToolBar);
 
         // Randomize tools
         toolbars.add(table.getToolbarRandomize());
@@ -167,7 +164,7 @@ public class DataPanel extends JPanel {
     }
 
     /**
-     * Set the frame.  Used for dynamically resizing the internal frame.
+     * Set the frame. Used for dynamically resizing the internal frame.
      *
      * @param parentFrame the parentFrame to set
      */

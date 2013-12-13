@@ -24,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.ShowHelpAction;
@@ -87,8 +86,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         setContentPane(tabbedPane);
 
         // Help action
-        Action helpAction = new ShowHelpAction(
-                hopPropertiesPanel.getHelpPath());
+        Action helpAction = new ShowHelpAction(hopPropertiesPanel.getHelpPath());
         addButton(new JButton(helpAction));
 
     }

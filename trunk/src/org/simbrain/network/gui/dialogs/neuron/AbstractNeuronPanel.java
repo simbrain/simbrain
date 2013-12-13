@@ -31,7 +31,6 @@ import org.simbrain.network.gui.dialogs.neuron.generator_panels.LogisticGenerato
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.RandomGeneratorPanel;
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.SinusoidalGeneratorPanel;
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.StochasticGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.AdditiveRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.BinaryRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ContinuousSigmoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.DecayRulePanel;
@@ -44,7 +43,6 @@ import org.simbrain.network.gui.dialogs.neuron.rule_panels.PointNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
-import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
@@ -76,22 +74,18 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Associations between names of rules and panels for editing them. */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
-            new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
 
     // Populate the Rule Map
     static {
-        RULE_MAP.put(new BinaryRule().getDescription(),
-                new BinaryRulePanel());
-        RULE_MAP.put(new DecayRule().getDescription(),
-                new DecayRulePanel());
+        RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
+        RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
         RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
         RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
                 new IntegrateAndFireRulePanel());
         RULE_MAP.put(new IzhikevichRule().getDescription(),
                 new IzhikevichRulePanel());
-        RULE_MAP.put(new LinearRule().getDescription(),
-                new LinearRulePanel());
+        RULE_MAP.put(new LinearRule().getDescription(), new LinearRulePanel());
         RULE_MAP.put(new NakaRushtonRule().getDescription(),
                 new NakaRushtonRulePanel());
         RULE_MAP.put(new PointNeuronRule().getDescription(),
@@ -110,8 +104,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * Associations between names of activity generators and panels for editing
      * them.
      */
-    public static final LinkedHashMap<String, AbstractNeuronPanel>
-    GENERATOR_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> GENERATOR_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
 
     // Populate the Generator Map
     static {
@@ -145,11 +138,11 @@ public abstract class AbstractNeuronPanel extends JPanel {
 
     /**
      * Populate fields with current data.
+     *
      * @param ruleList the list of rules being used to determine which values
-     * should be used to fill the fields with data.
+     *            should be used to fill the fields with data.
      */
-    public abstract void fillFieldValues(
-            final List<NeuronUpdateRule> ruleList);
+    public abstract void fillFieldValues(final List<NeuronUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
@@ -162,6 +155,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * neurons. Using this method to commit changes to many neurons is not
      * recommended. Instead pass a list of the neurons to be changed into
      * {@link #commitChanges(List) commitChanges}.
+     *
      * @param neuron the neuron to which changes are being committed to.
      */
     public abstract void commitChanges(final Neuron neuron);
@@ -172,8 +166,10 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * neurons' update rules. To change this behavior set {@link #replacing} to
      * <b> false </b>, indicating to the panel that it is editing rather than
      * changing/replacing existing neuron update rules.
+     *
      * @param neurons the list of neurons which are being edited and to which
-     * changes based on the values in the fields of this panel will be committed
+     *            changes based on the values in the fields of this panel will
+     *            be committed
      */
     public abstract void commitChanges(final List<Neuron> neurons);
 
@@ -184,18 +180,16 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * whether this method is used for committing or the rules are deleted and
      * replaced entirely, in which case this method is not called.
      *
-     * @param neurons
-     *            the neurons whose rules are being <b>edited</b>, not replaced.
+     * @param neurons the neurons whose rules are being <b>edited</b>, not
+     *            replaced.
      */
-    protected abstract void
-    writeValuesToRules(final List<Neuron> neurons);
+    protected abstract void writeValuesToRules(final List<Neuron> neurons);
 
     /**
      * Override to add custom notes or other text to bottom of panel. Can be
      * html formatted.
      *
-     * @param text
-     *            Text to be added
+     * @param text Text to be added
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
@@ -232,7 +226,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * being edited.
      *
      * @param replace used to tell the panel if it's being used to replace
-     * neuron update rules.
+     *            neuron update rules.
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -249,8 +243,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * @return the generator list
      */
     public static String[] getGeneratorlist() {
-        return GENERATOR_MAP.keySet()
-                .toArray(new String[RULE_MAP.size()]);
+        return GENERATOR_MAP.keySet().toArray(new String[RULE_MAP.size()]);
     }
 
 }

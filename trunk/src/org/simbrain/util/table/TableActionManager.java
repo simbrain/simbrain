@@ -80,10 +80,10 @@ public class TableActionManager {
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     try {
-                        table.readData(theFile, allowRowChanges, allowColumnChanges);
+                        table.readData(theFile, allowRowChanges,
+                                allowColumnChanges);
                     } catch (TableDataException e) {
-                        JOptionPane.showOptionDialog(null,
-                                e.getMessage(),
+                        JOptionPane.showOptionDialog(null, e.getMessage(),
                                 "Warning", JOptionPane.DEFAULT_OPTION,
                                 JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
@@ -152,7 +152,6 @@ public class TableActionManager {
 
         };
     }
-
 
     /**
      * Action for normalizing selected parts of a table.
@@ -308,7 +307,8 @@ public class TableActionManager {
                 JTextField columns = new JTextField();
                 rows.setText(Integer.toString(table.getData().getRowCount()));
                 rows.setColumns(3);
-                columns.setText(Integer.toString(table.getData().getColumnCount()));
+                columns.setText(Integer.toString(table.getData()
+                        .getColumnCount()));
                 columns.setColumns(3);
                 pane.add(new JLabel("Rows"));
                 pane.add(rows);
@@ -386,8 +386,8 @@ public class TableActionManager {
              */
             public void actionPerformed(ActionEvent arg0) {
                 if (jtable.getSelectedColumn() != -1) {
-                    ((MutableTable) jtable.getData()).insertColumn(
-                            jtable.getSelectedColumn());
+                    ((MutableTable) jtable.getData()).insertColumn(jtable
+                            .getSelectedColumn());
                 }
             }
 
@@ -427,12 +427,13 @@ public class TableActionManager {
                         ((MutableTable) jtable.getData()).removeRow(i);
                     }
                 }
-                // Rule for selecting row after deleting a row.  Needs work.
-                //  Should work well when button is repeatedly pressed
+                // Rule for selecting row after deleting a row. Needs work.
+                // Should work well when button is repeatedly pressed
                 if (selection.size() > 0) {
                     int newSelection = selection.get(selection.size() - 1) - 1;
                     if (newSelection >= 0) {
-                        jtable.setRowSelectionInterval(newSelection, newSelection);
+                        jtable.setRowSelectionInterval(newSelection,
+                                newSelection);
                     }
                 }
             }
@@ -579,8 +580,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String val = JOptionPane.showInputDialog(null,
-                        "Value:", "0");
+                String val = JOptionPane.showInputDialog(null, "Value:", "0");
                 table.fill(Double.parseDouble(val));
             }
 

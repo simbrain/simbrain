@@ -69,7 +69,6 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
         addRows(rowsToAdd, getDefaultValue());
     }
 
-
     /**
      * Insert a new row at the specified position.
      *
@@ -82,15 +81,14 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     }
 
     /**
-     * Insert a new row at the specified position,
-     * using the default data.
+     * Insert a new row at the specified position, using the default data.
      *
      * @param at row index for where to put the new row
      */
     public void insertRow(int at) {
         insertRow(at, getDefaultValue());
     }
-    
+
     /**
      * Remove row with choice whether to fire an event or not.
      *
@@ -160,7 +158,6 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
         addColumns(colsToAdd, getDefaultValue());
     }
 
-
     /**
      * Insert a new column at the specified position.
      *
@@ -175,8 +172,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     }
 
     /**
-     * Insert a new column at the specified position,
-     * using the default data.
+     * Insert a new column at the specified position, using the default data.
      *
      * @param at column index for where to put the new row
      */

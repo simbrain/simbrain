@@ -86,7 +86,7 @@ public class EffectorPanel extends JPanel {
         model = new EffectorModel();
         table = new JTable(model);
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
-        .setHorizontalAlignment(SwingConstants.CENTER);
+                .setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
@@ -151,7 +151,7 @@ public class EffectorPanel extends JPanel {
                 for (int i = 0; i < selectedRows.length; i++) {
                     toDelete.add(model.getEffector(selectedRows[i]));
                 }
-                for (Effector effector: toDelete) {
+                for (Effector effector : toDelete) {
                     if (effector != null) {
                         entity.removeEffector(effector);
                     }
@@ -256,6 +256,7 @@ public class EffectorPanel extends JPanel {
         public void commitChanges() {
 
         }
+
         /**
          * Remove an effector from the table representation.
          *

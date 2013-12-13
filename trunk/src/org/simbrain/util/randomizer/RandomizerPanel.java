@@ -34,24 +34,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer object.
+ * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
+ * object.
  */
 public class RandomizerPanel extends JPanel implements ActionListener {
 
     /** Distribution combo box. */
     private JComboBox cbDistribution = new JComboBox(
-            Randomizer.getFunctionList()){
-    	
-    	@Override
-    	public void setSelectedIndex(int index){
-    		this.setSelectedItem(Randomizer.getFunctionList()[index]);
-    		this.firePropertyChange("Distribution", null,
-    				null);
-    	}
-    	
+            Randomizer.getFunctionList()) {
+
+        @Override
+        public void setSelectedIndex(int index) {
+            this.setSelectedItem(Randomizer.getFunctionList()[index]);
+            this.firePropertyChange("Distribution", null, null);
+        }
+
     };
-    
-  
 
     /** Upper bound field. */
     private JFormattedTextField tfUpBound = new JFormattedTextField();
@@ -65,9 +63,9 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     /** Standard deviation field. */
     private JFormattedTextField tfStandardDeviation = new JFormattedTextField();
 
-//    /** Clipping combo box. */
-//    private TristateDropDown tsClipping = new TristateDropDown();
-    
+    // /** Clipping combo box. */
+    // private TristateDropDown tsClipping = new TristateDropDown();
+
     private JCheckBox tsClipping = new JCheckBox();
 
     /**
@@ -76,40 +74,40 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      * @param useLocalBounds Should local bounds be used
      */
     public RandomizerPanel(final boolean useLocalBounds) {
-    	
-    	GridLayout gl = new GridLayout(0,2);
-    	gl.setVgap(5);
-    	JPanel center = new JPanel(gl);
-    	
-    	this.setLayout(new GridBagLayout());
-    	GridBagConstraints gbc = new GridBagConstraints();
-    	gbc.anchor = GridBagConstraints.CENTER;
-    	gbc.fill = GridBagConstraints.BOTH;
-    	gbc.weightx = 1.0;
-    	gbc.weighty = 1.0;
-    	gbc.insets = new Insets(5, 5, 5, 5);
+
+        GridLayout gl = new GridLayout(0, 2);
+        gl.setVgap(5);
+        JPanel center = new JPanel(gl);
+
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
         cbDistribution.addActionListener(this);
         tsClipping.addActionListener(this);
         tsClipping.setActionCommand("useBounds");
-        
+
         center.add(new JLabel("Distribution"));
         center.add(cbDistribution);
-        
+
         center.add(new JLabel("Ceiling:"));
         center.add(tfUpBound);
-        
+
         center.add(new JLabel("Floor:"));
         center.add(tfLowBound);
-        
+
         center.add(new JLabel("Mean:"));
         center.add(tfMean);
-        
+
         center.add(new JLabel("Std. Dev.:"));
         center.add(tfStandardDeviation);
-        
+
         center.add(new JLabel("Clipping"));
         center.add(tsClipping);
-        
+
         this.add(center, gbc);
         init();
     }
@@ -137,7 +135,7 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      * rounding button.
      */
     public void checkBounds() {
-    	tfLowBound.setEnabled(tsClipping.isSelected());
+        tfLowBound.setEnabled(tsClipping.isSelected());
         tfUpBound.setEnabled(tsClipping.isSelected());
     }
 
@@ -161,8 +159,8 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setValue(Double.toString(rand.getLowerBound()));
         tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation
-                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation.setValue(Double.toString(rand
+                .getStandardDeviation()));
         tfMean.setValue(Double.toString(rand.getMean()));
 
     }
@@ -177,8 +175,8 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setValue(Double.toString(rand.getLowerBound()));
         tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation
-                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation.setValue(Double.toString(rand
+                .getStandardDeviation()));
         tfMean.setValue(Double.toString(rand.getMean()));
     }
 
@@ -191,8 +189,8 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setValue(Double.toString(rand.getLowerBound()));
         tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation
-                .setValue(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation.setValue(Double.toString(rand
+                .getStandardDeviation()));
         tfMean.setValue(Double.toString(rand.getMean()));
     }
 
@@ -213,25 +211,24 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         rand.setClipping(tsClipping.isSelected());
     }
 
-    
-    public void setEnabled(boolean enabled){
-    	
-    	boolean gaussConditions = enabled &&
-    			(cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN);
-    	boolean roundingConditions = (tsClipping.isSelected() ||
-    			(cbDistribution.getSelectedIndex() == Randomizer.UNIFORM)) && enabled;
-    	
-    	cbDistribution.setEnabled(enabled);
-    	
-    	tfUpBound.setEnabled(roundingConditions);
-    	tfLowBound.setEnabled(roundingConditions);	
-    	
-    	tfMean.setEnabled(gaussConditions);
-    	tfStandardDeviation.setEnabled(gaussConditions); 	
-    	tsClipping.setEnabled(gaussConditions);
-    	
+    public void setEnabled(boolean enabled) {
+
+        boolean gaussConditions = enabled
+                && (cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN);
+        boolean roundingConditions = (tsClipping.isSelected() || (cbDistribution
+                .getSelectedIndex() == Randomizer.UNIFORM)) && enabled;
+
+        cbDistribution.setEnabled(enabled);
+
+        tfUpBound.setEnabled(roundingConditions);
+        tfLowBound.setEnabled(roundingConditions);
+
+        tfMean.setEnabled(gaussConditions);
+        tfStandardDeviation.setEnabled(gaussConditions);
+        tsClipping.setEnabled(gaussConditions);
+
     }
-    
+
     /**
      * @return Returns the cbDistribution.
      */
@@ -246,12 +243,12 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         this.cbDistribution = cbDistribution;
     }
 
-//    /**
-//     * @return Returns the isUseBoundsBox.
-//     */
-//    public TristateDropDown getTsClipping() {
-//        return tsClipping;
-//    }
+    // /**
+    // * @return Returns the isUseBoundsBox.
+    // */
+    // public TristateDropDown getTsClipping() {
+    // return tsClipping;
+    // }
 
     /**
      * @return Returns the isUseBoundsBox.
@@ -260,14 +257,13 @@ public class RandomizerPanel extends JPanel implements ActionListener {
         return tsClipping;
     }
 
-    
-//    /**
-//     * @param isUseBoundsBox The isUseBoundsBox to set.
-//     */
-//    public void setTsClipping(final TristateDropDown isUseBoundsBox) {
-//        this.tsClipping = isUseBoundsBox;
-//    }
-    
+    // /**
+    // * @param isUseBoundsBox The isUseBoundsBox to set.
+    // */
+    // public void setTsClipping(final TristateDropDown isUseBoundsBox) {
+    // this.tsClipping = isUseBoundsBox;
+    // }
+
     /**
      * @param isUseBoundsBox The isUseBoundsBox to set.
      */
@@ -313,7 +309,8 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     /**
      * @param tfStandardDeviation The tfStandardDeviation to set.
      */
-    public void setTfStandardDeviation(final JFormattedTextField tfStandardDeviation) {
+    public void setTfStandardDeviation(
+            final JFormattedTextField tfStandardDeviation) {
         this.tfStandardDeviation = tfStandardDeviation;
     }
 
@@ -330,15 +327,13 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     public void setTfUpBound(final JFormattedTextField tfUpBound) {
         this.tfUpBound = tfUpBound;
     }
-    
-   
-    
+
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
-    	cbDistribution.addPropertyChangeListener(pc);
-    	tfUpBound.addPropertyChangeListener(pc);
-    	tfLowBound.addPropertyChangeListener(pc);
-    	tfMean.addPropertyChangeListener(pc);
-    	tfStandardDeviation.addPropertyChangeListener(pc);
-    	tsClipping.addPropertyChangeListener(pc); 	
+        cbDistribution.addPropertyChangeListener(pc);
+        tfUpBound.addPropertyChangeListener(pc);
+        tfLowBound.addPropertyChangeListener(pc);
+        tfMean.addPropertyChangeListener(pc);
+        tfStandardDeviation.addPropertyChangeListener(pc);
+        tsClipping.addPropertyChangeListener(pc);
     }
 }

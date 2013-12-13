@@ -360,8 +360,7 @@ public class SimbrainMath {
      * @return rounded value
      */
     public static final double roundDouble(double d, int places) {
-        return Math.round(d * Math.pow(10, places))
-                / Math.pow(10, places);
+        return Math.round(d * Math.pow(10, places)) / Math.pow(10, places);
     }
 
     /**

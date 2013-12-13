@@ -74,14 +74,13 @@ public class IterativeControlsPanel extends JPanel {
     private JProgressBar errorBar;
 
     /** Validation progress bar. */
-    //private JProgressBar validationBar;
+    // private JProgressBar validationBar;
 
     /** Number of "ticks" in progress bars. */
     private int numTicks = 1000;
 
     /** The error listener. */
     private ErrorListener errorListener;
-
 
     /**
      * Construct the panel with no trainer. It will be supplied later once it
@@ -144,11 +143,11 @@ public class IterativeControlsPanel extends JPanel {
         numTicks = 10;
         errorBar = new JProgressBar(0, numTicks);
         errorBar.setStringPainted(true);
-        //errorBar.setMinimumSize(new Dimension(200,100));
+        // errorBar.setMinimumSize(new Dimension(200,100));
         labelPanel.addItem("Error:", errorBar);
-        //validationBar = new JProgressBar(0, numTicks);
-        //validationBar.setStringPainted(true);
-        //labelPanel.addItem("Validation Error:", validationBar);
+        // validationBar = new JProgressBar(0, numTicks);
+        // validationBar.setStringPainted(true);
+        // labelPanel.addItem("Validation Error:", validationBar);
         controlPanelConstraints.weightx = 0.5;
         controlPanelConstraints.gridx = 0;
         controlPanelConstraints.gridy = 2;
@@ -217,16 +216,16 @@ public class IterativeControlsPanel extends JPanel {
      */
     private void updateError() {
         errorBar.setValue((int) (numTicks * trainer.getError()));
-        //validationBar.setValue((int) (numTicks * trainer.getError()));
+        // validationBar.setValue((int) (numTicks * trainer.getError()));
         errorBar.setString("" + Utils.round(trainer.getError(), 4));
-        //validationBar.setString("" + Utils.round(trainer.getError(), 4));
+        // validationBar.setString("" + Utils.round(trainer.getError(), 4));
     }
 
     /**
      * Called whenever the trainer should be reinitialized. Actual trainer
      * initialization happens in subclasses that override this method. If
      * forcereinit is true the training set is recreated. If not some useful
-     * data integrity checks still happen.  (Not currently used).
+     * data integrity checks still happen. (Not currently used).
      *
      * @param forceReinit whether to require that data be reinitialized
      */
@@ -258,8 +257,7 @@ public class IterativeControlsPanel extends JPanel {
             if (trainer.isUpdateCompleted()) {
                 // Start running
                 trainer.setUpdateCompleted(false);
-                putValue(SMALL_ICON, ResourceManager
-                        .getImageIcon("Stop.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     public void run() {
                         try {
@@ -376,8 +374,7 @@ public class IterativeControlsPanel extends JPanel {
                 return;
             }
             ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-            editor.setExcludeList(new String[] { "iteration",
-                    "updateCompleted" });
+            editor.setExcludeList(new String[] { "iteration", "updateCompleted" });
             editor.setObject(trainer);
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);

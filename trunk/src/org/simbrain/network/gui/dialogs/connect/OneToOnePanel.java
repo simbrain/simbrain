@@ -93,10 +93,10 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      */
-    public void fillFieldValues(ConnectNeurons connection){
-    	//TODO Auto-Generated Method Stub
+    public void fillFieldValues(ConnectNeurons connection) {
+        // TODO Auto-Generated Method Stub
     }
-    
+
 }

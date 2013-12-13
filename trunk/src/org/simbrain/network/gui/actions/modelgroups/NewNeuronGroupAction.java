@@ -55,8 +55,7 @@ public final class NewNeuronGroupAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        List<Neuron> neuronList = networkPanel
-                .getSelectedModelNeurons();
+        List<Neuron> neuronList = networkPanel.getSelectedModelNeurons();
         if (neuronList.size() > 0) {
             NeuronGroup group = new NeuronGroup(networkPanel.getNetwork());
             networkPanel.getNetwork().transferNeuronsToGroup(neuronList, group);

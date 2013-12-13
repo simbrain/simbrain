@@ -44,14 +44,14 @@ public class ConnectionDialog extends StandardDialog {
     /** The connection object associated with the connection panel. */
     private ConnectNeurons connection;
 
-    //TODO: Unused, find use or schedule for removal
-//    /** The mapping of group names to available synapse groups. */
-//    private LinkedHashMap<String, SynapseGroup> groupingOptions =
-//    		new LinkedHashMap<String, SynapseGroup>();
-//    
-//    /** A combo-box showing the available group options. */
-//    private JComboBox synapseGroups;
-    
+    // TODO: Unused, find use or schedule for removal
+    // /** The mapping of group names to available synapse groups. */
+    // private LinkedHashMap<String, SynapseGroup> groupingOptions =
+    // new LinkedHashMap<String, SynapseGroup>();
+    //
+    // /** A combo-box showing the available group options. */
+    // private JComboBox synapseGroups;
+
     /**
      *
      * @param networkPanel

@@ -86,10 +86,9 @@ public class NeuronGroupNode extends GroupNode {
      *
      * @return the neuron group
      */
-    public NeuronGroup getNeuronGroup(){
+    public NeuronGroup getNeuronGroup() {
         return (NeuronGroup) getGroup();
     }
-
 
     /**
      * Custom interaction box for Neuron Group node.
@@ -127,8 +126,7 @@ public class NeuronGroupNode extends GroupNode {
         StandardDialog dialog = new StandardDialog() {
             private final NeuronGroupPanel panel;
             {
-                panel = new NeuronGroupPanel(
-                        getNetworkPanel(), group, this);
+                panel = new NeuronGroupPanel(getNetworkPanel(), group, this);
                 setContentPane(panel);
             }
 
@@ -140,7 +138,6 @@ public class NeuronGroupNode extends GroupNode {
         };
         return dialog;
     }
-
 
     /**
      * Returns default actions for a context menu.
@@ -202,8 +199,7 @@ public class NeuronGroupNode extends GroupNode {
 
         // Connect neuron groups
         menu.addSeparator();
-        Action setSource  = new AbstractAction(
-                "Set Group as Source") {
+        Action setSource = new AbstractAction("Set Group as Source") {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().clearSelection();
                 getNetworkPanel().setSelection(
@@ -213,14 +209,13 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(setSource);
-        Action clearSource  = new AbstractAction(
-                "Clear Source Neuron Groups") {
+        Action clearSource = new AbstractAction("Clear Source Neuron Groups") {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().clearSourceElements();
             }
         };
         menu.add(clearSource);
-        Action makeConnection  = new AbstractAction(
+        Action makeConnection = new AbstractAction(
                 "Connect Neuron Groups with Synapse Group(s)") {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().clearSelection();

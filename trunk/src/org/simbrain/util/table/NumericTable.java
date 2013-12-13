@@ -21,8 +21,6 @@ package org.simbrain.util.table;
 import java.io.File;
 import java.util.Random;
 
-import javax.swing.JOptionPane;
-
 import org.simbrain.util.Utils;
 
 import com.thoughtworks.xstream.XStream;
@@ -34,7 +32,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  *
  * @author jyoshimi
  */
-public class NumericTable extends MutableTable<Double> implements IterableRowsTable {
+public class NumericTable extends MutableTable<Double> implements
+        IterableRowsTable {
 
     /** Default initial number of rows. */
     private static final int DEFAULT_ROW_COUNT = 30;
@@ -231,7 +230,8 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      *
      * @param columnIndex column to normalize.
      */
-    public void normalizeColumn(final int columnIndex) { // TODO: combine with normalizeTable?
+    public void normalizeColumn(final int columnIndex) { // TODO: combine with
+                                                         // normalizeTable?
         // TODO: Check for valid column
         double max = Double.NEGATIVE_INFINITY;
         double min = Double.POSITIVE_INFINITY;
@@ -245,7 +245,8 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
             }
         }
         for (int i = 0; i < this.getRowCount(); i++) {
-            setValue(i, columnIndex, (getValue(i, columnIndex) - min) / (max - min), false);
+            setValue(i, columnIndex, (getValue(i, columnIndex) - min)
+                    / (max - min), false);
         }
         this.fireTableDataChanged();
     }

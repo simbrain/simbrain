@@ -62,12 +62,11 @@ public class DataWorldComponent extends WorkspaceComponent {
     private final AttributeType consumingColumnType = new AttributeType(this,
             "Column", "setValue", double.class, true);
 
-    private final AttributeType consumingColumnVectorType = new AttributeType(this,
-            "Current row", "setVector", double[].class, true);
+    private final AttributeType consumingColumnVectorType = new AttributeType(
+            this, "Current row", "setVector", double[].class, true);
 
-    private final AttributeType producingColumnVectorType = new AttributeType(this,
-            "Current row", "getVector", double[].class, true);
-
+    private final AttributeType producingColumnVectorType = new AttributeType(
+            this, "Current row", "getVector", double[].class, true);
 
     /**
      * This method is the default constructor.
@@ -110,8 +109,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param dataModel the model
      */
     @SuppressWarnings("unchecked")
-    public DataWorldComponent(final String name,
-            final NumericTable dataModel) {
+    public DataWorldComponent(final String name, final NumericTable dataModel) {
         super(name);
         this.dataModel = dataModel;
         init();
@@ -152,18 +150,17 @@ public class DataWorldComponent extends WorkspaceComponent {
                         .getSimpleDescription("Column "
                                 + (attribute.getIndex() + 1));
                 PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(attribute,
-                                consumingColumnType);
+                        .createPotentialConsumer(attribute, consumingColumnType);
                 consumer.setCustomDescription(description);
                 returnList.add(consumer);
             }
         }
         if (consumingColumnVectorType.isVisible()) {
-                PotentialConsumer consumer = getAttributeManager()
-                        .createPotentialConsumer(dataModel, "setVectorCurrentRow",
-                               double[].class);
-                consumer.setCustomDescription("Set current row");
-                returnList.add(consumer);
+            PotentialConsumer consumer = getAttributeManager()
+                    .createPotentialConsumer(dataModel, "setVectorCurrentRow",
+                            double[].class);
+            consumer.setCustomDescription("Set current row");
+            returnList.add(consumer);
         }
         return returnList;
     }
@@ -196,7 +193,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private final SimbrainTableListener listener = new SimbrainTableListener() {
 
         public void columnAdded(int column) {
-            //System.out.println("In column added");
+            // System.out.println("In column added");
             int index = dataModel.getColumnCount() - 1;
             addColumnAttribute(index, consumerList);
             addColumnAttribute(index, producerList);
@@ -205,7 +202,7 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
         public void columnRemoved(int index) {
-            //System.out.println("In column removed");
+            // System.out.println("In column removed");
             ColumnAttribute producer = getColumnAttribute(index, producerList);
             ColumnAttribute consumer = getColumnAttribute(index, consumerList);
             DataWorldComponent.this.fireAttributeObjectRemoved(producer);
@@ -217,27 +214,27 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
         public void tableDataChanged() {
-            //System.out.println("In table data changed");
+            // System.out.println("In table data changed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void cellDataChanged(int row, int column) {
-            //System.out.println("In cell data changed");
+            // System.out.println("In cell data changed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowAdded(int row) {
-            //System.out.println("In row added");
+            // System.out.println("In row added");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowRemoved(int row) {
-            //System.out.println("In row removed");
+            // System.out.println("In row removed");
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void tableStructureChanged() {
-            //System.out.println("In table structure changed");
+            // System.out.println("In table structure changed");
             initProducerConsumerLists();
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
@@ -312,8 +309,8 @@ public class DataWorldComponent extends WorkspaceComponent {
     public static DataWorldComponent open(InputStream input, String name,
             String format) {
         // TODO: Use format to determine how to open this.
-        NumericTable model = (NumericTable) NumericTable
-                .getXStream().fromXML(input);
+        NumericTable model = (NumericTable) NumericTable.getXStream().fromXML(
+                input);
         return new DataWorldComponent(name, model);
     }
 

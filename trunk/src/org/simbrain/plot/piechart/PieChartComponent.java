@@ -101,8 +101,7 @@ public class PieChartComponent extends WorkspaceComponent {
         }
         if (pieChartVectorConsumer.isVisible()) {
             PotentialConsumer consumer = getAttributeManager()
-                    .createPotentialConsumer(model, "setValues",
-                           double[].class);
+                    .createPotentialConsumer(model, "setValues", double[].class);
             consumer.setCustomDescription("Set slices");
             returnList.add(consumer);
         }

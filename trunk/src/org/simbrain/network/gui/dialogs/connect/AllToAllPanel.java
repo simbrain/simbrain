@@ -41,10 +41,10 @@ import org.simbrain.network.connections.ConnectNeurons;
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
-	/** The panel for setting the ratio of excitatory to inhibitory synapses.*/
+    /** The panel for setting the ratio of excitatory to inhibitory synapses. */
     private ExcitatoryInhibitoryRatioPanel eirPanel;
-    
-    /** The panel for setting learning rules and randomization for synapses.*/
+
+    /** The panel for setting learning rules and randomization for synapses. */
     private SynapsePropertiesPanel spPanel;
 
     /** Allow self connection check box. */
@@ -56,17 +56,17 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * @param connection type
      */
     public AllToAllPanel(final AllToAll connection) {
-        super(connection);  
+        super(connection);
         eirPanel = new ExcitatoryInhibitoryRatioPanel(connection);
-        spPanel = new SynapsePropertiesPanel(connection);     
+        spPanel = new SynapsePropertiesPanel(connection);
         initializeLayout();
     }
-    
-    private void initializeLayout(){
 
-    	//A sub-panel for the synapse properties and ei panel
+    private void initializeLayout() {
+
+        // A sub-panel for the synapse properties and ei panel
         JPanel pPanel = new JPanel(new BorderLayout());
-        //A sub-sub-panel for the "allow self connections" checkbox and label
+        // A sub-sub-panel for the "allow self connections" checkbox and label
         JPanel allowSelfConnectPanel = new JPanel(new FlowLayout());
         JLabel selfConnectLabel = new JLabel("Self-Connections: ");
         Font font = selfConnectLabel.getFont();
@@ -74,25 +74,24 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         selfConnectLabel.setFont(bold);
         allowSelfConnectPanel.add(selfConnectLabel);
         allowSelfConnectPanel.add(allowSelfConnect);
-        
+
         pPanel.add(eirPanel, BorderLayout.NORTH);
         pPanel.add(allowSelfConnectPanel, BorderLayout.CENTER);
         pPanel.add(spPanel, BorderLayout.SOUTH);
         Border b = BorderFactory.createEtchedBorder();
         Border pBorder = BorderFactory.createTitledBorder(b,
-        		"Excitatory/Inhibitory Properties");
+                "Excitatory/Inhibitory Properties");
         pPanel.setBorder(pBorder);
-        
-        //Add the first sub-sub panel (eip and synapse properties)
+
+        // Add the first sub-sub panel (eip and synapse properties)
         this.add(pPanel, BorderLayout.CENTER);
-       
+
     }
-    
 
     /**
      * {@inheritDoc}
      */
-    public void commitChanges() {     
+    public void commitChanges() {
         eirPanel.commitChanges();
         spPanel.commitChanges();
         ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
@@ -105,11 +104,11 @@ public class AllToAllPanel extends AbstractConnectionPanel {
     public void fillFieldValues() {
     }
 
-	@Override
-	public void fillFieldValues(ConnectNeurons connection)
-			throws ClassCastException {
-		eirPanel.fillFieldValues(connection);
-		spPanel.fillFieldValues(connection);	
-	}
+    @Override
+    public void fillFieldValues(ConnectNeurons connection)
+            throws ClassCastException {
+        eirPanel.fillFieldValues(connection);
+        spPanel.fillFieldValues(connection);
+    }
 
 }

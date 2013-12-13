@@ -29,112 +29,108 @@ import org.simbrain.network.core.NeuronUpdateRule;
  */
 public class BinaryRule extends NeuronUpdateRule {
 
-	private static final double DEFAULT_CEILING = 1.0;
-	
-	private static final double DEFAULT_FLOOR = -1.0;
-	
-	/** Threshold for binary neurons. */
-	private double threshold = .5;
+    private static final double DEFAULT_CEILING = 1.0;
 
-	private double ceiling = DEFAULT_CEILING;
-	
-	private double floor = DEFAULT_FLOOR;
-	
-	/** Bias for binary neurons. */
-	private double bias = 0;
+    private static final double DEFAULT_FLOOR = -1.0;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /** Threshold for binary neurons. */
+    private double threshold = .5;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public BinaryRule deepCopy() {
-		BinaryRule bn = new BinaryRule();
-		bn.setThreshold(getThreshold());
-		bn.setCeiling(getCeiling());
-		bn.setFloor(getFloor());
-		bn.setIncrement(getIncrement());
-		return bn;
-	}
+    private double ceiling = DEFAULT_CEILING;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
-		double wtdInput = neuron.getWeightedInputs() + bias;
+    private double floor = DEFAULT_FLOOR;
 
-		if (wtdInput > threshold) {
-			neuron.setBuffer(getCeiling());
-		} else {
-			neuron.setBuffer(getFloor());
-		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getRandomValue() {
-		Random rand = new Random();
-		return rand.nextBoolean() ? getCeiling() : getFloor();
-	}
-	
-	/**
-	 * @return Returns the threshold.
-	 */
-	public double getThreshold() {
-		return threshold;
-	}
+    /** Bias for binary neurons. */
+    private double bias = 0;
 
-	/**
-	 * @param threshold
-	 *            The threshold to set.
-	 */
-	public void setThreshold(final double threshold) {
-		this.threshold = threshold;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	/**
-	 * @return the bias of the neuron.
-	 */
-	public double getBias() {
-		return bias;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public BinaryRule deepCopy() {
+        BinaryRule bn = new BinaryRule();
+        bn.setThreshold(getThreshold());
+        bn.setCeiling(getCeiling());
+        bn.setFloor(getFloor());
+        bn.setIncrement(getIncrement());
+        return bn;
+    }
 
-	/**
-	 * @param bias
-	 *            sets the bias of the neuron.
-	 */
-	public void setBias(final double bias) {
-		this.bias = bias;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
+        double wtdInput = neuron.getWeightedInputs() + bias;
 
-	@Override
-	public String getDescription() {
-		return "Binary";
-	}
+        if (wtdInput > threshold) {
+            neuron.setBuffer(getCeiling());
+        } else {
+            neuron.setBuffer(getFloor());
+        }
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRandomValue() {
+        Random rand = new Random();
+        return rand.nextBoolean() ? getCeiling() : getFloor();
+    }
 
-	public double getCeiling() {
-		return ceiling;
-	}
+    /**
+     * @return Returns the threshold.
+     */
+    public double getThreshold() {
+        return threshold;
+    }
 
-	public void setCeiling(double ceiling) {
-		this.ceiling = ceiling;
-	}
+    /**
+     * @param threshold The threshold to set.
+     */
+    public void setThreshold(final double threshold) {
+        this.threshold = threshold;
+    }
 
+    /**
+     * @return the bias of the neuron.
+     */
+    public double getBias() {
+        return bias;
+    }
 
-	public double getFloor() {
-		return floor;
-	}
+    /**
+     * @param bias sets the bias of the neuron.
+     */
+    public void setBias(final double bias) {
+        this.bias = bias;
+    }
 
-	public void setFloor(double floor) {
-		this.floor = floor;
-	}
+    @Override
+    public String getDescription() {
+        return "Binary";
+    }
+
+    public double getCeiling() {
+        return ceiling;
+    }
+
+    public void setCeiling(double ceiling) {
+        this.ceiling = ceiling;
+    }
+
+    public double getFloor() {
+        return floor;
+    }
+
+    public void setFloor(double floor) {
+        this.floor = floor;
+    }
 
 }

@@ -23,60 +23,55 @@ import org.simbrain.util.StandardDialog;
  */
 public class LayoutDialog extends StandardDialog {
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = 1L;
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
 
-	/** The default initial layout. */
-	private static final Layout DEFAULT_LAYOUT = new GridLayout();
+    /** The default initial layout. */
+    private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
-	/** Main panel. */
-	private MainLayoutPanel mainPanel;
+    /** Main panel. */
+    private MainLayoutPanel mainPanel;
 
-	/** The network panel where layout will occur. */
-	private final NetworkPanel networkPanel;
+    /** The network panel where layout will occur. */
+    private final NetworkPanel networkPanel;
 
-	/**
-	 * Constructor for creating dialog.
-	 * 
-	 * @param networkPanel
-	 *            the networkPanel where layout will occur
-	 */
-	public LayoutDialog(final NetworkPanel networkPanel) {
-		this(DEFAULT_LAYOUT, networkPanel);
-	}
+    /**
+     * Constructor for creating dialog.
+     *
+     * @param networkPanel the networkPanel where layout will occur
+     */
+    public LayoutDialog(final NetworkPanel networkPanel) {
+        this(DEFAULT_LAYOUT, networkPanel);
+    }
 
-	/**
-	 * Constructor for creating independent dialog.
-	 * 
-	 * @param layout
-	 *            the layout to show
-	 * @param networkPanel
-	 *            the networkPanel where layout will occur
-	 */
-	public LayoutDialog(final Layout layout,
-			final NetworkPanel networkPanel) {
-		this.networkPanel = networkPanel;
-		mainPanel =
-				new MainLayoutPanel(layout.getDescription(), false, this);
-		setContentPane(mainPanel);
-	}
+    /**
+     * Constructor for creating independent dialog.
+     *
+     * @param layout the layout to show
+     * @param networkPanel the networkPanel where layout will occur
+     */
+    public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+        mainPanel = new MainLayoutPanel(layout.getDescription(), false, this);
+        setContentPane(mainPanel);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void closeDialogOk() {
-		super.closeDialogOk();
-		commitChanges();
-		mainPanel.getCurrentLayout().setInitialLocation(
-				networkPanel.getLastClickedPosition());
-		mainPanel.getCurrentLayout().layoutNeurons(
-				networkPanel.getSelectedModelNeurons());
-		networkPanel.repaint();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+        mainPanel.getCurrentLayout().setInitialLocation(
+                networkPanel.getLastClickedPosition());
+        mainPanel.getCurrentLayout().layoutNeurons(
+                networkPanel.getSelectedModelNeurons());
+        networkPanel.repaint();
+    }
 
-	/** @see AbstractLayoutPanel */
-	public void commitChanges() {
-		mainPanel.commitChanges();
-	}
+    /** @see AbstractLayoutPanel */
+    public void commitChanges() {
+        mainPanel.commitChanges();
+    }
 
 }

@@ -60,21 +60,21 @@ public final class ShowClampToolBarAction extends AbstractAction {
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        //networkPanel.getClampToolBar().setVisible(cb.isSelected());
+        // networkPanel.getClampToolBar().setVisible(cb.isSelected());
 
     }
 
-    // For reference: From NetworkActionManager.  See r2805
-//    /**
-//     * Return the show clamp tool bar menu item.
-//     *
-//     * @return the show clamp tool bar menu item
-//     */
-//    public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
-//        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-//                showClampToolBarAction);
-//        actionWrapper.setSelected(networkPanel.getClampToolBar().isVisible());
-//        return actionWrapper;
-//    }
+    // For reference: From NetworkActionManager. See r2805
+    // /**
+    // * Return the show clamp tool bar menu item.
+    // *
+    // * @return the show clamp tool bar menu item
+    // */
+    // public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
+    // JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
+    // showClampToolBarAction);
+    // actionWrapper.setSelected(networkPanel.getClampToolBar().isVisible());
+    // return actionWrapper;
+    // }
 
 }

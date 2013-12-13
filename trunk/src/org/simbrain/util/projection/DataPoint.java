@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.projection;
 
-
 /**
  * <b>Datapoint</b> represents a single datapoint.
  */

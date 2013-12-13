@@ -344,8 +344,8 @@ public final class NetworkActionManager {
                 networkPanel));
         showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(
                 networkPanel));
-        showNetworkHierarchyAction = new JCheckBoxMenuItem(new ShowNetworkHierarchyPanel(
-                networkPanel));
+        showNetworkHierarchyAction = new JCheckBoxMenuItem(
+                new ShowNetworkHierarchyPanel(networkPanel));
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -498,7 +498,7 @@ public final class NetworkActionManager {
      * @return the group menu
      */
     public JMenu getGroupMenu() {
-        //TODO: Fix menu.  Alone with one right now.
+        // TODO: Fix menu. Alone with one right now.
         JMenu groupMenu = new JMenu("Group");
         groupMenu.add(neuronGroupAction);
         return groupMenu;
@@ -579,7 +579,8 @@ public final class NetworkActionManager {
      * @return a list of the new neuron groups that can be inserted
      */
     public List<Action> getNewGroupActions() {
-        return Arrays.asList(new Action[] {
+        return Arrays
+                .asList(new Action[] {
                         new AddGroupAction(networkPanel,
                                 NeuronGroupCreationDialog.class,
                                 "(Bare) Neuron Group"),
@@ -769,7 +770,6 @@ public final class NetworkActionManager {
     public Action getSpaceVerticalAction() {
         return spaceVerticalAction;
     }
-
 
     /**
      * Return the show IO information check box menu item.

@@ -257,7 +257,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public void update() {
         // Constantly erase. How is performance for this version?
         for (ScatterPlotSetter setter : setterList) {
-            Integer index = setter.getIndex()+1;
+            Integer index = setter.getIndex() + 1;
             if (!model.isShowHistory()) {
                 model.getDataset().getSeries(index).clear();
             }

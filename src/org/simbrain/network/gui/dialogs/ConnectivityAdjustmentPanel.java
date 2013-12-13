@@ -48,7 +48,7 @@ import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryRatioPanel;
  * Panel for adjusting the connectivity between a source and target set of
  * neurons.
  *
- * TODO: Not yet completed.  This is temporary.
+ * TODO: Not yet completed. This is temporary.
  *
  */
 public class ConnectivityAdjustmentPanel extends JPanel {
@@ -121,27 +121,27 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
 
-//        gbc.insets = new Insets(10, 10, 0, 10);
-//        gbc.gridy = 4;
-//        gbc.gridheight = 1;
-//        sparseContainer.add(new JSeparator(), gbc);
-//
-//        gbc.insets = new Insets(0, 0, 0, 0);
-//        gbc.gridy = 5;
-//        gbc.gridheight = 9;
-//        sparseContainer.add(eipPanel, gbc);
-//
-//        gbc.insets = new Insets(10, 10, 0, 10);
-//        gbc.gridy = 14;
-//        gbc.gridheight = 1;
-//        sparseContainer.add(new JSeparator(), gbc);
-//
-//        gbc.gridy = 15;
-//        gbc.gridwidth = 1;
-//        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
-//
-//        gbc.gridx = 2;
-//        sparseContainer.add(allowSelfConnect, gbc);
+        // gbc.insets = new Insets(10, 10, 0, 10);
+        // gbc.gridy = 4;
+        // gbc.gridheight = 1;
+        // sparseContainer.add(new JSeparator(), gbc);
+        //
+        // gbc.insets = new Insets(0, 0, 0, 0);
+        // gbc.gridy = 5;
+        // gbc.gridheight = 9;
+        // sparseContainer.add(eipPanel, gbc);
+        //
+        // gbc.insets = new Insets(10, 10, 0, 10);
+        // gbc.gridy = 14;
+        // gbc.gridheight = 1;
+        // sparseContainer.add(new JSeparator(), gbc);
+        //
+        // gbc.gridy = 15;
+        // gbc.gridwidth = 1;
+        // sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
+        //
+        // gbc.gridx = 2;
+        // sparseContainer.add(allowSelfConnect, gbc);
 
     }
 

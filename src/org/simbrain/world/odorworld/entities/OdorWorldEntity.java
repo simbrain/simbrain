@@ -21,16 +21,13 @@ package org.simbrain.world.odorworld.entities;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
-import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -145,15 +142,15 @@ public abstract class OdorWorldEntity {
      * velocity.
      */
     public void update() {
-        //System.out.println(Arrays.asList(currentlyHeardPhrases));
+        // System.out.println(Arrays.asList(currentlyHeardPhrases));
 
         // For Backwards compatibility
         if (currentlyHeardPhrases != null) {
             currentlyHeardPhrases.clear();
         }
-        //if (usesLifeCycle) {
-        //    cycle.update();
-        //}
+        // if (usesLifeCycle) {
+        // cycle.update();
+        // }
     }
 
     /**
@@ -625,9 +622,9 @@ public abstract class OdorWorldEntity {
      * @param collission the collision to set
      */
     public void setHasCollided(boolean collission) {
-        //if (collission) {
-        //    cycle.bite();
-        //}
+        // if (collission) {
+        // cycle.bite();
+        // }
         this.collision = collission;
     }
 
@@ -695,45 +692,45 @@ public abstract class OdorWorldEntity {
      *
      * @return behavior object.
      */
-    public Behavior getBehavior () {
+    public Behavior getBehavior() {
         return behavior;
     }
 
-//    /**
-//     * Return the object's current behavior.
-//     *
-//     * @return the current behavior
-//     */
-//    public ComboBoxWrapper getObjectBehavior() {
-//        return new ComboBoxWrapper() {
-//            public Object getCurrentObject() {
-//                if (behavior instanceof StationaryBehavior) {
-//                    return "Stationary";
-//                } else if (behavior instanceof NewtonianBouncer) {
-//                    return "Bouncer";
-//                }
-//                return behavior;
-//            }
-//
-//            public Object[] getObjects() {
-//                return new Object[] { "Stationary", "Bouncer"};
-//            }
-//        };
-//    }
-//
-//    /**
-//     * Set the object's current behavior.
-//     *
-//     * @param behaviorData the behavior selected in a gui combo box
-//     */
-//    public void setObjectBehavior(ComboBoxWrapper behaviorData) {
-//        String behaviorString = ((String) behaviorData.getCurrentObject());
-//        if (behaviorString.equalsIgnoreCase("Stationary")) {
-//            behavior = new StationaryBehavior();
-//        } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
-//            behavior = new NewtonianBouncer(this);
-//        }
-//    }
+    // /**
+    // * Return the object's current behavior.
+    // *
+    // * @return the current behavior
+    // */
+    // public ComboBoxWrapper getObjectBehavior() {
+    // return new ComboBoxWrapper() {
+    // public Object getCurrentObject() {
+    // if (behavior instanceof StationaryBehavior) {
+    // return "Stationary";
+    // } else if (behavior instanceof NewtonianBouncer) {
+    // return "Bouncer";
+    // }
+    // return behavior;
+    // }
+    //
+    // public Object[] getObjects() {
+    // return new Object[] { "Stationary", "Bouncer"};
+    // }
+    // };
+    // }
+    //
+    // /**
+    // * Set the object's current behavior.
+    // *
+    // * @param behaviorData the behavior selected in a gui combo box
+    // */
+    // public void setObjectBehavior(ComboBoxWrapper behaviorData) {
+    // String behaviorString = ((String) behaviorData.getCurrentObject());
+    // if (behaviorString.equalsIgnoreCase("Stationary")) {
+    // behavior = new StationaryBehavior();
+    // } else if (behaviorString.equalsIgnoreCase("Bouncer")) {
+    // behavior = new NewtonianBouncer(this);
+    // }
+    // }
 
     // TODO: the methods below need not be double, but are double to accommodate
     // the
@@ -840,6 +837,5 @@ public abstract class OdorWorldEntity {
     public List<String> getCurrentlyHeardPhrases() {
         return currentlyHeardPhrases;
     }
-
 
 }

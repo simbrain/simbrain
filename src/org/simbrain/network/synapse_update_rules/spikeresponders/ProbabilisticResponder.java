@@ -32,8 +32,8 @@ public class ProbabilisticResponder extends SpikeResponder {
 
     /**
      * Amount by which the synapse's strength will be scaled to determine the
-     * post synaptic response of the synapse in the event that this responder
-     * is actually active.
+     * post synaptic response of the synapse in the event that this responder is
+     * actually active.
      */
     private double responseValue = 1;
 
@@ -53,8 +53,7 @@ public class ProbabilisticResponder extends SpikeResponder {
      */
     public void update(Synapse s) {
         if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked())
-        {
+                .hasSpiked()) {
             if (Math.random() > (1 - activationProbability)) {
                 value = responseValue * s.getStrength();
             } else {

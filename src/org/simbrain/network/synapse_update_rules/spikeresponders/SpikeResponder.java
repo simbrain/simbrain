@@ -38,6 +38,7 @@ public abstract class SpikeResponder {
 
     /**
      * Update the synapse.
+     *
      * @param s the synapse being updated
      */
     public abstract void update(final Synapse s);
@@ -59,13 +60,12 @@ public abstract class SpikeResponder {
      * A method which takes in a list of synapses and returns a list of their
      * spike responder, if they have any.
      *
-     * @param synapses
-     *            The list of synapses whose spike responders we want to query.
-     * @return Returns a list of spike responders associated with the
-     *         group of synapses
+     * @param synapses The list of synapses whose spike responders we want to
+     *            query.
+     * @return Returns a list of spike responders associated with the group of
+     *         synapses
      */
-    public static List<SpikeResponder> getResponderList(List<Synapse> synapses)
-    {
+    public static List<SpikeResponder> getResponderList(List<Synapse> synapses) {
         List<SpikeResponder> srList = new ArrayList<SpikeResponder>();
         for (Synapse s : synapses) {
             if (s.getSpikeResponder() != null) {

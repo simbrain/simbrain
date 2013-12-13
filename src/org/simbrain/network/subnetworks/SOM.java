@@ -120,7 +120,7 @@ public class SOM extends NeuronGroup {
 
     /**
      * Default layout for neuron groups. Used to set layout defaults in SOM
-     * Creation dialog.  Overrides superclass DEFAULT_LAYOUT.
+     * Creation dialog. Overrides superclass DEFAULT_LAYOUT.
      */
     public static final Layout DEFAULT_LAYOUT = new HexagonalGridLayout(50, 50,
             5);

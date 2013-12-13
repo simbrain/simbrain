@@ -107,10 +107,10 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         }
 
         // Set height of scrollpane based on number of rows
-        //  Add 1 to numrows for header row
+        // Add 1 to numrows for header row
         int rows = jtable.getData().getRowCount();
         if (rows < maxVisibleRows) {
-            height = (rows  + 1) * rowHeight;
+            height = (rows + 1) * rowHeight;
         } else {
             height = (maxVisibleRows + 1) * rowHeight;
         }
@@ -148,6 +148,5 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         this.maxVisibleRows = maxVisibleRows;
         resize();
     }
-
 
 }

@@ -69,7 +69,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
     /** Show Help Action. */
     private ShowHelpAction helpAction;
 
-    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel;
 
     /**

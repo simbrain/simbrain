@@ -31,52 +31,52 @@ import org.simbrain.network.layouts.GridLayout;
  */
 public class GridLayoutPanel extends AbstractLayoutPanel {
 
-	/** Spacing field. */
-	private JTextField tfNumColumns = new JTextField();
+    /** Spacing field. */
+    private JTextField tfNumColumns = new JTextField();
 
-	/** Spacing field. */
-	private JTextField tfHSpacing = new JTextField();
+    /** Spacing field. */
+    private JTextField tfHSpacing = new JTextField();
 
-	/** Vertical spacing field. */
-	private JTextField tfVSpacing = new JTextField();
+    /** Vertical spacing field. */
+    private JTextField tfVSpacing = new JTextField();
 
-	/** Manual spacing field. */
-	private JCheckBox manuallySetNumColumns = new JCheckBox();
+    /** Manual spacing field. */
+    private JCheckBox manuallySetNumColumns = new JCheckBox();
 
-	/**
-	 * Default constructor.
-	 */
-	public GridLayoutPanel(GridLayout layout) {
-		this.layout = layout;
-		fillFieldValues();
-		this.addItem("Horizontal Spacing:", tfHSpacing);
-		this.addItem("Vertical Spacing:", tfVSpacing);
-		this.addItem("Manual Columns:", manuallySetNumColumns);
-		this.addItem("Number of columns:", tfNumColumns);
-		manuallySetNumColumns.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				enableDisableSpacingFields();
-			}
-		});
-	}
+    /**
+     * Default constructor.
+     */
+    public GridLayoutPanel(GridLayout layout) {
+        this.layout = layout;
+        fillFieldValues();
+        this.addItem("Horizontal Spacing:", tfHSpacing);
+        this.addItem("Vertical Spacing:", tfVSpacing);
+        this.addItem("Manual Columns:", manuallySetNumColumns);
+        this.addItem("Number of columns:", tfNumColumns);
+        manuallySetNumColumns.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                enableDisableSpacingFields();
+            }
+        });
+    }
 
-	/**
-	 * Enable or disable spacing fields depending on whether the layout is in
-	 * manual columns mode.
-	 */
-	private void enableDisableSpacingFields() {
-		if (manuallySetNumColumns.isSelected()) {
-			tfNumColumns.setEnabled(true);
-		} else {
-			tfNumColumns.setEnabled(false);
-		}
-	}
+    /**
+     * Enable or disable spacing fields depending on whether the layout is in
+     * manual columns mode.
+     */
+    private void enableDisableSpacingFields() {
+        if (manuallySetNumColumns.isSelected()) {
+            tfNumColumns.setEnabled(true);
+        } else {
+            tfNumColumns.setEnabled(false);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges() {
         ((GridLayout) layout).setNumColumns(Integer.parseInt(tfNumColumns
                 .getText()));
         ((GridLayout) layout).setHSpacing(Double.parseDouble(tfHSpacing
@@ -85,13 +85,13 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
                 .getText()));
         ((GridLayout) layout).setManualColumns(manuallySetNumColumns
                 .isSelected());
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void fillFieldValues() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillFieldValues() {
         tfNumColumns.setText(Integer.toString(((GridLayout) layout)
                 .getNumColumns()));
         tfHSpacing
@@ -101,7 +101,6 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
         manuallySetNumColumns.setSelected(((GridLayout) layout)
                 .isManualColumns());
         enableDisableSpacingFields();
-	}
-
+    }
 
 }

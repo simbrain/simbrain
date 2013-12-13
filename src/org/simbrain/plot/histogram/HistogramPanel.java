@@ -28,10 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -46,7 +43,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.ui.RefineryUtilities;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a

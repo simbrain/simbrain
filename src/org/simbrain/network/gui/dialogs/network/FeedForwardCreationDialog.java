@@ -62,9 +62,11 @@ public class FeedForwardCreationDialog extends StandardDialog {
             networkCreationPanel.commit(networkPanel, "FeedForward");
             super.closeDialogOk();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null,
-                    "Inappropriate Field Values (Numbers only in all all field)", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane
+                    .showMessageDialog(
+                            null,
+                            "Inappropriate Field Values (Numbers only in all all field)",
+                            "Error", JOptionPane.ERROR_MESSAGE);
             nfe.printStackTrace();
         }
     }

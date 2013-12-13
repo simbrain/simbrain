@@ -158,7 +158,6 @@ public class WorkspaceUpdater {
         this.time = time;
     }
 
-
     /**
      * Reset time to 0.
      */

@@ -16,11 +16,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.util.Utils;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
@@ -147,9 +145,9 @@ public class HistogramModel extends ChartModel {
     }
 
     /**
-     * Add data to a specified data series.   This is the main
-     * method used to dynamically add data when the histogram is used
-     * as a plot component.  Called via reflection from HistogramComponent.
+     * Add data to a specified data series. This is the main method used to
+     * dynamically add data when the histogram is used as a plot component.
+     * Called via reflection from HistogramComponent.
      *
      * @param index data index
      * @param histData the data to add at that index
@@ -167,7 +165,7 @@ public class HistogramModel extends ChartModel {
         for (int i = 0; i < data.size(); i++) {
             // System.out.println(i + ":" + Utils.getVectorString(data.get(i),
             // ","));
-            //System.out.println(i + ":" + dataNames.get(i));
+            // System.out.println(i + ":" + dataNames.get(i));
             sort(data.get(i));
             double min = minValue(data.get(i));
             double max = maxValue(data.get(i));

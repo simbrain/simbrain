@@ -47,9 +47,9 @@ import org.simbrain.network.listeners.SynapseAdapter;
  * Displays the hierarchy of neurons, synapses and groups in a network in a Tree
  * View.
  *
- * TODO: This class is slated for removal.  It is being left here for now as a 
- * scrap heap for building other components.   All code for responding to 
- * network selection events has been commented out.
+ * TODO: This class is slated for removal. It is being left here for now as a
+ * scrap heap for building other components. All code for responding to network
+ * selection events has been commented out.
  *
  * @author Jeff Yoshimi
  */
@@ -72,7 +72,8 @@ public class NetworkHierarchyPanel extends JScrollPane {
      * in the jtree model. Used to get references to the jtree nodes when
      * responding to changes in the network.
      */
-    //private HashMap<Object, DefaultMutableTreeNode> objectNodeMap = new HashMap<Object, DefaultMutableTreeNode>();
+    // private HashMap<Object, DefaultMutableTreeNode> objectNodeMap = new
+    // HashMap<Object, DefaultMutableTreeNode>();
 
     /**
      * Construct the panel.
@@ -100,7 +101,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
         setViewportView(panel);
 
         // Add all listeners
-        //addListeners();  // Note this causes a major performance slowdown
+        // addListeners(); // Note this causes a major performance slowdown
 
     }
 
@@ -142,28 +143,28 @@ public class NetworkHierarchyPanel extends JScrollPane {
         }
     }
 
-//    /**
-//     * Sync selected node of jtree to selected neurons of network panel
-//     */
-//    private void syncSelection() {
-//        tree.clearSelection();
-//        for (Object networkElement : networkPanel.getSelectedModelElements()) {
-//            if (networkElement instanceof Neuron) {
-//                DefaultMutableTreeNode treeNode = objectNodeMap
-//                        .get((Neuron) networkElement);
-//                if (treeNode != null) {
-//                    tree.addSelectionPath(new TreePath(treeNode.getPath()));
-//                }
-//            } else if (networkElement instanceof Synapse) {
-//                DefaultMutableTreeNode treeNode = objectNodeMap
-//                        .get((Synapse) networkElement);
-//                if (treeNode != null) {
-//                    tree.addSelectionPath(new TreePath(treeNode.getPath()));
-//                }
-//            }
-//
-//        }
-//    }
+    // /**
+    // * Sync selected node of jtree to selected neurons of network panel
+    // */
+    // private void syncSelection() {
+    // tree.clearSelection();
+    // for (Object networkElement : networkPanel.getSelectedModelElements()) {
+    // if (networkElement instanceof Neuron) {
+    // DefaultMutableTreeNode treeNode = objectNodeMap
+    // .get((Neuron) networkElement);
+    // if (treeNode != null) {
+    // tree.addSelectionPath(new TreePath(treeNode.getPath()));
+    // }
+    // } else if (networkElement instanceof Synapse) {
+    // DefaultMutableTreeNode treeNode = objectNodeMap
+    // .get((Synapse) networkElement);
+    // if (treeNode != null) {
+    // tree.addSelectionPath(new TreePath(treeNode.getPath()));
+    // }
+    // }
+    //
+    // }
+    // }
 
     /**
      * Reset the tree.
@@ -185,7 +186,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
             DefaultMutableTreeNode neuronTreeNode = new DefaultMutableTreeNode(
                     neuron);
             model.insertNodeInto(neuronTreeNode, neurons, 0);
-            //objectNodeMap.put(neuron, neuronTreeNode);
+            // objectNodeMap.put(neuron, neuronTreeNode);
         }
 
         // Synapses
@@ -195,7 +196,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
             DefaultMutableTreeNode synapseTreeNode = new DefaultMutableTreeNode(
                     synapse);
             model.insertNodeInto(synapseTreeNode, synapses, 0);
-            //objectNodeMap.put(synapse, synapseTreeNode);
+            // objectNodeMap.put(synapse, synapseTreeNode);
         }
         root.add(synapses);
 
@@ -272,14 +273,14 @@ public class NetworkHierarchyPanel extends JScrollPane {
         });
 
         // Respond to changes in what was selected in the network panel here
-//        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-//
-//            /** @see NetworkSelectionListener */
-//            public void selectionChanged(final NetworkSelectionEvent event) {
-//                // reset();
-//                syncSelection();
-//            }
-//        });
+        // networkPanel.addSelectionListener(new NetworkSelectionListener() {
+        //
+        // /** @see NetworkSelectionListener */
+        // public void selectionChanged(final NetworkSelectionEvent event) {
+        // // reset();
+        // syncSelection();
+        // }
+        // });
 
         //
         // Code below is for changing the tree in response to changes in the
@@ -295,7 +296,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
             @Override
             public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
                 reset();
-                //objectNodeMap.remove(networkEvent.getSource());
+                // objectNodeMap.remove(networkEvent.getSource());
             }
 
         });
@@ -315,7 +316,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
             @Override
             public void neuronRemoved(NetworkEvent<Neuron> networkEvent) {
                 reset();
-                //objectNodeMap.remove(networkEvent.getSource());
+                // objectNodeMap.remove(networkEvent.getSource());
             }
         });
 

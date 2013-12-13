@@ -27,7 +27,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.ShowHelpAction;
@@ -74,8 +73,7 @@ public class HopfieldNode extends SubnetworkNode {
                     }
                 };
                 dialog.setContentPane(panel);
-                Action helpAction = new ShowHelpAction(
-                        panel.getHelpPath());
+                Action helpAction = new ShowHelpAction(panel.getHelpPath());
                 dialog.addButton(new JButton(helpAction));
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();

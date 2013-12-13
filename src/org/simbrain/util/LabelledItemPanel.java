@@ -70,8 +70,8 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * Add a labeled item to the panel. The item is added to the
-     * row below the last item added.
+     * Add a labeled item to the panel. The item is added to the row below the
+     * last item added.
      *
      * @param labelText The label text for the item.
      * @param item The item to be added.
@@ -149,7 +149,7 @@ public class LabelledItemPanel extends JPanel {
      */
     public void addItem(final String name, final JComponent item, int col) {
 
-    	JLabel label = new JLabel(name);
+        JLabel label = new JLabel(name);
 
         GridBagConstraints labelConstraints = new GridBagConstraints();
 

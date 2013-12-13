@@ -59,16 +59,16 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.addSeparator();
 
         final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
-        final TrainingSet trainingSet =  new TrainingSet(esn.getInputData(), esn
-                .getTargetData());
+        final TrainingSet trainingSet = new TrainingSet(esn.getInputData(),
+                esn.getTargetData());
 
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
-                .getInputLayer().getNeuronList(), trainingSet
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
-                .getOutputLayer().getNeuronList(), trainingSet
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                esn.getInputLayer().getNeuronList(),
+                trainingSet.getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                esn.getOutputLayer().getNeuronList(),
+                trainingSet.getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
         setContextMenu(menu);
     }
@@ -90,8 +90,8 @@ public class ESNNetworkNode extends SubnetworkNode {
             EchoStateNetwork network = (EchoStateNetwork) getGroup();
             ESNOfflineTrainingPanel trainingPanel = new ESNOfflineTrainingPanel(
                     getNetworkPanel(), network);
-            GenericFrame frame  = getNetworkPanel().displayPanel(
-                    trainingPanel, "Trainer");
+            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
+                    "Trainer");
             trainingPanel.setFrame(frame);
         }
     };

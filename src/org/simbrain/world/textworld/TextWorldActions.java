@@ -26,7 +26,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
 
@@ -40,9 +39,9 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.util.table.TextTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
+import org.simbrain.util.table.TextTable;
 
 /**
  * Contains actions relating to Text World.
@@ -86,7 +85,7 @@ public class TextWorldActions {
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(
                         getDictionaryDirectory(), "text file", "txt");
-                chooser.addExtension("rtf"); //(Must do other stuff to support
+                chooser.addExtension("rtf"); // (Must do other stuff to support
                 // rich text)
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {

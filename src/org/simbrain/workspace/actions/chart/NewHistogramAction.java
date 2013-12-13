@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.plot.histogram.HistogramComponent;
-import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;

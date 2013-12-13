@@ -32,7 +32,7 @@ import org.simbrain.network.neuron_update_rules.PointNeuronRule;
  * those k neurons being active about threshold. From O'Reilley and Munakata,
  * Computational Explorations in Cognitive Neuroscience, p. 110. All page
  * references below are are to this book.
- * 
+ *
  * TODO: This has been temporarilty disabled. When re-enabled, it's name should
  * reflect its' connection to the Leabra framework, since generic kwta is
  * possible and is slated to be implemented in a regular WTA network.

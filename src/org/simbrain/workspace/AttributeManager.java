@@ -19,7 +19,6 @@ package org.simbrain.workspace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * The main usage of this class by API users is to create potential attributes

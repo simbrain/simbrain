@@ -18,7 +18,6 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JMenuItem;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;

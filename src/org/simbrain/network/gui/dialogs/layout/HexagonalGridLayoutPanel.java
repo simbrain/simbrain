@@ -20,7 +20,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.Layout;
 
 /**
  * <b>HexagonalGridLayoutPanel</b> allows the user to define the layout of a
@@ -28,48 +27,48 @@ import org.simbrain.network.layouts.Layout;
  */
 public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 
-	/** Spacing field. */
-	private JTextField tfNumColumns = new JTextField();
+    /** Spacing field. */
+    private JTextField tfNumColumns = new JTextField();
 
-	/** Spacing field. */
-	private JTextField tfHSpacing = new JTextField();
+    /** Spacing field. */
+    private JTextField tfHSpacing = new JTextField();
 
-	/** Vertical spacing field. */
-	private JTextField tfVSpacing = new JTextField();
+    /** Vertical spacing field. */
+    private JTextField tfVSpacing = new JTextField();
 
-	/** Manual spacing field. */
-	private JCheckBox manuallySetNumColumns = new JCheckBox();
+    /** Manual spacing field. */
+    private JCheckBox manuallySetNumColumns = new JCheckBox();
 
-	/**
-	 * Default constructor.
-	 */
-	HexagonalGridLayoutPanel(HexagonalGridLayout layout) {
-		this.layout = layout;
-		fillFieldValues();
-		this.addItem("Horizontal Spacing:", tfHSpacing);
-		this.addItem("Vertical Spacing:", tfVSpacing);
-		this.addItem("Manual Columns:", manuallySetNumColumns);
-		this.addItem("Number of columns:", tfNumColumns);
-		manuallySetNumColumns.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				enableDisableSpacingFields();
-			}
-		});
-	}
+    /**
+     * Default constructor.
+     */
+    HexagonalGridLayoutPanel(HexagonalGridLayout layout) {
+        this.layout = layout;
+        fillFieldValues();
+        this.addItem("Horizontal Spacing:", tfHSpacing);
+        this.addItem("Vertical Spacing:", tfVSpacing);
+        this.addItem("Manual Columns:", manuallySetNumColumns);
+        this.addItem("Number of columns:", tfNumColumns);
+        manuallySetNumColumns.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                enableDisableSpacingFields();
+            }
+        });
+    }
 
-	/**
-	 * Enable or disable spacing fields depending on whether the layout is in
-	 * manual columns mode.
-	 */
-	private void enableDisableSpacingFields() {
-		if (manuallySetNumColumns.isSelected()) {
-			tfNumColumns.setEnabled(true);
-		} else {
-			tfNumColumns.setEnabled(false);
-		}
-	}
+    /**
+     * Enable or disable spacing fields depending on whether the layout is in
+     * manual columns mode.
+     */
+    private void enableDisableSpacingFields() {
+        if (manuallySetNumColumns.isSelected()) {
+            tfNumColumns.setEnabled(true);
+        } else {
+            tfNumColumns.setEnabled(false);
+        }
+    }
 
-	    /**
+    /**
      * {@inheritDoc}
      */
     @Override

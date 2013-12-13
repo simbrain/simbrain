@@ -31,8 +31,7 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 public class StaticSynapsePanel extends AbstractSynapsePanel {
 
     /** Synapse reference. */
-    private static final StaticSynapseRule prototypeRule =
-            new StaticSynapseRule();
+    private static final StaticSynapseRule prototypeRule = new StaticSynapseRule();
 
     /**
      * This method is the default constructor.
@@ -58,7 +57,7 @@ public class StaticSynapsePanel extends AbstractSynapsePanel {
     @Override
     public void commitChanges(final List<Synapse> synapses) {
         if (isReplace()) {
-            for(Synapse s : synapses) {
+            for (Synapse s : synapses) {
                 s.setLearningRule(prototypeRule.deepCopy());
             }
         }
@@ -69,7 +68,7 @@ public class StaticSynapsePanel extends AbstractSynapsePanel {
      */
     @Override
     public void commitChanges(final Synapse synapse) {
-        synapse.setLearningRule(prototypeRule.deepCopy());    
+        synapse.setLearningRule(prototypeRule.deepCopy());
     }
 
     /**

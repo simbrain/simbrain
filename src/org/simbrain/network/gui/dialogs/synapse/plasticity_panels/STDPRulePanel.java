@@ -75,33 +75,29 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         // (Below) Handle consistency of multiply selections
 
         // Handle Tau Minus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getTau_minus")) {
+        if (!NetworkUtils
+                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
             tfTauMinus.setText(NULL_STRING);
         } else {
-            tfTauMinus
-                    .setText(Double.toString(synapseRef.getTau_minus()));
+            tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
         }
 
         // Handle Tau Plus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getTau_plus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getTau_plus")) {
             tfTauPlus.setText(NULL_STRING);
         } else {
             tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
         }
 
         // Handle W Minus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getW_minus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_minus")) {
             tfWMinus.setText(NULL_STRING);
         } else {
             tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
         }
 
         // Handle W Plus
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getW_plus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus")) {
             tfWPlus.setText(NULL_STRING);
         } else {
             tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
@@ -112,8 +108,8 @@ public class STDPRulePanel extends AbstractSynapsePanel {
                 "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -201,8 +197,7 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         double learningRate = Utils.doubleParsable(tfLearningRate);
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
-                ((STDPRule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                ((STDPRule) s.getLearningRule()).setLearningRate(learningRate);
             }
         }
 

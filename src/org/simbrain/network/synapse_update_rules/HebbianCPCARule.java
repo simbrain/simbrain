@@ -59,105 +59,100 @@ public class HebbianCPCARule extends SynapseUpdateRule {
 
     @Override
     public String getDescription() {
-	return "Hebbian CPCA";
+        return "Hebbian CPCA";
     }
 
     @Override
     public SynapseUpdateRule deepCopy() {
-	HebbianCPCARule learningRule = new HebbianCPCARule();
-	learningRule.setLearningRate(getLearningRate());
-	learningRule.setM(getM());
-	learningRule.setTheta(getTheta());
-	learningRule.setLambda(getLambda());
-	return learningRule;
+        HebbianCPCARule learningRule = new HebbianCPCARule();
+        learningRule.setLearningRate(getLearningRate());
+        learningRule.setM(getM());
+        learningRule.setTheta(getTheta());
+        learningRule.setLambda(getLambda());
+        return learningRule;
     }
 
     @Override
     public void update(Synapse synapse) {
-	// Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
+        // Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
 
-	double input = synapse.getSource().getActivation();
-	double output = synapse.getTarget().getActivation();
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
 
-	double deltaW = learningRate
-		* ((output * input) - (output * synapse.getStrength())); // Equation
-									 // 4.12
-	// deltaW = learningRate * (output * input * (m - strength) + output *
-	// (1 - input) * (-strength));
-	// strength = sigmoidal(strength);
-	// strength = clip(strength + deltaW);
-	synapse.setStrength(synapse.getStrength() + deltaW);
+        double deltaW = learningRate
+                * ((output * input) - (output * synapse.getStrength())); // Equation
+        // 4.12
+        // deltaW = learningRate * (output * input * (m - strength) + output *
+        // (1 - input) * (-strength));
+        // strength = sigmoidal(strength);
+        // strength = clip(strength + deltaW);
+        synapse.setStrength(synapse.getStrength() + deltaW);
     }
 
     /**
      * Sigmoidal Function (see equation 4.23 in O'Reilly and Munakata).
-     * 
-     * @param arg
-     *            value to send to sigmoidal
+     *
+     * @param arg value to send to sigmoidal
      * @return value of sigmoidal
      */
     private double sigmoidal(final double arg) {
-	return 1 / (1 + Math.pow(theta * (arg / (1 - arg)), -lambda));
+        return 1 / (1 + Math.pow(theta * (arg / (1 - arg)), -lambda));
     }
 
     /**
      * @return Returns the momentum.
      */
     public double getLearningRate() {
-	return learningRate;
+        return learningRate;
     }
 
     /**
      * @return Returns the maximum weight.
      */
     public double getM() {
-	return m;
+        return m;
     }
 
     /**
      * @return Returns the weight offset.
      */
     public double getTheta() {
-	return theta;
+        return theta;
     }
 
     /**
      * @return Returns sigmoidal function.
      */
     public double getLambda() {
-	return lambda;
+        return lambda;
     }
 
     /**
-     * @param momentum
-     *            The momentum to set.
+     * @param momentum The momentum to set.
      */
     public void setLearningRate(final double momentum) {
-	this.learningRate = momentum;
+        this.learningRate = momentum;
     }
 
     /**
-     * @param m
-     *            is maximum weight The maximum weight to set
+     * @param m is maximum weight The maximum weight to set
      */
     public void setM(final double m) {
-	this.m = m;
+        this.m = m;
     }
 
     /**
-     * @param theta
-     *            is weight offset The weight offset to set.
+     * @param theta is weight offset The weight offset to set.
      */
     public void setTheta(final double theta) {
-	this.theta = theta;
+        this.theta = theta;
     }
 
     /**
-     * @param lambda
-     *            is The sigmoidal to set.
+     * @param lambda is The sigmoidal to set.
      */
     public void setLambda(final double lambda) {
-	this.lambda = lambda;
+        this.lambda = lambda;
     }
 
 }

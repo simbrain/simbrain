@@ -231,7 +231,8 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Amy", "Arnold", "Boy" ,"Cow",  "Girl" ,"Lion", "Mouse", "Susi",  "Steve"};
+                return new Object[] { "Amy", "Arnold", "Boy", "Cow", "Girl",
+                        "Lion", "Mouse", "Susi", "Steve" };
             }
         };
     }
@@ -248,7 +249,7 @@ public class RotatingEntity extends OdorWorldEntity {
     /**
      * Rotate left by the specified amount.
      *
-     * @param amount amount to turn left. Assumes a positive number. 
+     * @param amount amount to turn left. Assumes a positive number.
      */
     public void turnLeft(double amount) {
         turn(amount);
@@ -272,7 +273,7 @@ public class RotatingEntity extends OdorWorldEntity {
     /**
      * Rotate right by the specified amount.
      *
-     * @param amount amount to turn right.  Assumes a positive number.
+     * @param amount amount to turn right. Assumes a positive number.
      */
     public void turnRight(double amount) {
         if (amount == 0) {

@@ -185,8 +185,7 @@ public class TrainerGuiActions {
                                 exception.getMessage(), "Error",
                                 JOptionPane.ERROR_MESSAGE);
                     } catch (TableDataException e) {
-                        JOptionPane.showOptionDialog(null,
-                                e.getMessage(),
+                        JOptionPane.showOptionDialog(null, e.getMessage(),
                                 "Warning", JOptionPane.DEFAULT_OPTION,
                                 JOptionPane.WARNING_MESSAGE, null, null, null);
                     }

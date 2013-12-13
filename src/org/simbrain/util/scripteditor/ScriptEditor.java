@@ -56,7 +56,8 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 /**
  * An editor for beanshell scripts with syntax highlighting.
  *
- * Uses RSyntaxTextArea by Robert Futrell. See http://fifesoft.com/rsyntaxtextarea/
+ * Uses RSyntaxTextArea by Robert Futrell. See
+ * http://fifesoft.com/rsyntaxtextarea/
  *
  * @author Jeff Yoshimi
  */
@@ -87,7 +88,6 @@ public class ScriptEditor extends JPanel {
 
     /** Memory for last replace string used in find and replace. */
     private String lastReplace = "";
-
 
     /**
      * Construct the main frame.
@@ -214,8 +214,7 @@ public class ScriptEditor extends JPanel {
      * @param frame frame to initialize
      * @param editor the panel to display in the frame
      */
-    private void initFrame(final GenericFrame frame,
-            final ScriptEditor editor) {
+    private void initFrame(final GenericFrame frame, final ScriptEditor editor) {
         final JPanel mainPanel = new JPanel(new BorderLayout());
         createAttachMenuBar(frame, editor);
         mainPanel.add("North", getToolbarOpenClose(frame, editor));
@@ -296,8 +295,8 @@ public class ScriptEditor extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                SFileChooser fileChooser = new SFileChooser(
-                        scriptDirectory, "Edit Script", "bsh");
+                SFileChooser fileChooser = new SFileChooser(scriptDirectory,
+                        "Edit Script", "bsh");
                 final File scriptFile = fileChooser.showOpenDialog();
                 if (scriptFile == null) {
                     return;
@@ -381,8 +380,8 @@ public class ScriptEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                SFileChooser fileChooser = new SFileChooser(
-                        scriptDirectory, "Edit Script", "bsh");
+                SFileChooser fileChooser = new SFileChooser(scriptDirectory,
+                        "Edit Script", "bsh");
                 File scriptFile = fileChooser.showSaveDialog();
                 if (scriptFile == null) {
                     return;
@@ -469,6 +468,5 @@ public class ScriptEditor extends JPanel {
     public void setLastReplaceString(String lastReplace) {
         this.lastReplace = lastReplace;
     }
-
 
 }

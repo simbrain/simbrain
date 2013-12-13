@@ -76,7 +76,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
     /**
      * Creates a new update manager panel.
      */
-    public NetworkUpdateManagerPanel(final Network network, final StandardDialog parentDialog) {
+    public NetworkUpdateManagerPanel(final Network network,
+            final StandardDialog parentDialog) {
 
         super(new BorderLayout());
         this.network = network;
@@ -122,8 +123,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         buttonPanel.add(upButton);
         JButton upFullButton = new JButton(
                 ResourceManager.getImageIcon("UpFull.png"));
-        upFullButton
-            .setToolTipText("Move selected action to top of sequence");
+        upFullButton.setToolTipText("Move selected action to top of sequence");
         upFullButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -279,7 +279,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
             putValue(NAME, "Remove action(s)");
-            putValue(SHORT_DESCRIPTION, "Remove selected action(s) from update sequence");
+            putValue(SHORT_DESCRIPTION,
+                    "Remove selected action(s) from update sequence");
             NetworkUpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("BACK_SPACE"), this);

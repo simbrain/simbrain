@@ -97,12 +97,15 @@ public class KeyBindings {
         inputMap.put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.ALT_MASK),
                 "contextualIncrement");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
-                ActionEvent.ALT_MASK), "contextualIncrement");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-                ActionEvent.ALT_MASK), "contextualDecrement");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
-                ActionEvent.ALT_MASK), "contextualDecrement");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.ALT_MASK),
+                "contextualIncrement");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.ALT_MASK),
+                "contextualDecrement");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK),
+                "contextualDecrement");
         panel.getActionMap().put("contextualIncrement", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.contextualIncrementSelectedObjects();
@@ -114,27 +117,26 @@ public class KeyBindings {
             }
         });
 
-//        // Undo
-//        inputMap.put(
-//            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
-//                            .getDefaultToolkit().getMenuShortcutKeyMask()), "undo");
-//        panel.getActionMap().put("undo", new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                panel.getUndoManager().undo();
-//            }
-//        });
-//        // Redo
-//        inputMap.put(
-//                KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
-//                        .getDefaultToolkit().getMenuShortcutKeyMask() +
-//                        ActionEvent.SHIFT_MASK), "redo");
-//        panel.getActionMap().put("redo", new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                panel.getUndoManager().redo();
-//                panel.repaint();
-//            }
-//        });
-
+        // // Undo
+        // inputMap.put(
+        // KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+        // .getDefaultToolkit().getMenuShortcutKeyMask()), "undo");
+        // panel.getActionMap().put("undo", new AbstractAction() {
+        // public void actionPerformed(ActionEvent e) {
+        // panel.getUndoManager().undo();
+        // }
+        // });
+        // // Redo
+        // inputMap.put(
+        // KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
+        // .getDefaultToolkit().getMenuShortcutKeyMask() +
+        // ActionEvent.SHIFT_MASK), "redo");
+        // panel.getActionMap().put("redo", new AbstractAction() {
+        // public void actionPerformed(ActionEvent e) {
+        // panel.getUndoManager().redo();
+        // panel.repaint();
+        // }
+        // });
 
         // Print debug info
         inputMap.put(
@@ -145,7 +147,6 @@ public class KeyBindings {
                 System.out.println(panel.getNetwork().toString());
             }
         });
-
 
         // Selection Mode
         inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");

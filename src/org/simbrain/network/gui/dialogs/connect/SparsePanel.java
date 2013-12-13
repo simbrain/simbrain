@@ -46,15 +46,14 @@ import org.simbrain.network.gui.NetworkPanel;
  */
 public class SparsePanel extends AbstractConnectionPanel {
 
-	/**
-	 * A sub-panel for editing the connection sparsity.
-	 */
-	private final SparsityAdjustmentPanel saPanel;
-	
-	/**
-	 * A sub-panel for editing the ratio of excitatory to inhibitory
-	 * connecitons
-	 */
+    /**
+     * A sub-panel for editing the connection sparsity.
+     */
+    private final SparsityAdjustmentPanel saPanel;
+
+    /**
+     * A sub-panel for editing the ratio of excitatory to inhibitory connecitons
+     */
     private final ExcitatoryInhibitoryRatioPanel eirPanel;
 
     /**
@@ -79,7 +78,7 @@ public class SparsePanel extends AbstractConnectionPanel {
         eirPanel = new ExcitatoryInhibitoryRatioPanel(connection);
         saPanel = new SparsityAdjustmentPanel(connection, numTargs);
         spPanel = new SynapsePropertiesPanel(connection);
-        
+
         fillFieldValues();
         initializeLayout();
 
@@ -90,90 +89,92 @@ public class SparsePanel extends AbstractConnectionPanel {
      */
     private void initializeLayout() {
 
-    	JPanel sparseContainer = new JPanel(new GridBagLayout());
-    	this.add(sparseContainer);
-    	JPanel ei = new JPanel(new BorderLayout());
-    	
-    	//A sub-sub-panel for the "allow self connections" checkbox and label
-        JPanel allowSelfConnectPanel = new JPanel(new FlowLayout());   	
+        JPanel sparseContainer = new JPanel(new GridBagLayout());
+        this.add(sparseContainer);
+        JPanel ei = new JPanel(new BorderLayout());
+
+        // A sub-sub-panel for the "allow self connections" checkbox and label
+        JPanel allowSelfConnectPanel = new JPanel(new FlowLayout());
         JLabel selfConnectLabel = new JLabel("Self-Connections: ");
         Font font = selfConnectLabel.getFont();
         Font bold = new Font(font.getName(), Font.BOLD, font.getSize());
         selfConnectLabel.setFont(bold);
         allowSelfConnectPanel.add(selfConnectLabel);
         allowSelfConnectPanel.add(allowSelfConnect);
-        
-        /* Add a listener to allowSelfConnect allowing the sparsity adjustment
-         * sub-panel to change its field values accordingly. */
-        allowSelfConnect.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				saPanel.setAllowSelfConnect(allowSelfConnect.isSelected());
-			}  	
+
+        /*
+         * Add a listener to allowSelfConnect allowing the sparsity adjustment
+         * sub-panel to change its field values accordingly.
+         */
+        allowSelfConnect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                saPanel.setAllowSelfConnect(allowSelfConnect.isSelected());
+            }
         });
-    	
+
         Border l = BorderFactory.createEtchedBorder();
         Border sparseBorder = BorderFactory.createTitledBorder(l, "Sparsity");
         saPanel.setBorder(sparseBorder);
         sparseBorder = BorderFactory.createTitledBorder(l,
-        		"Excitatory/Inhibitory Properties");
+                "Excitatory/Inhibitory Properties");
         ei.setBorder(sparseBorder);
         ei.add(eirPanel, BorderLayout.NORTH);
         ei.add(allowSelfConnectPanel, BorderLayout.CENTER);
         ei.add(spPanel, BorderLayout.SOUTH);
-           
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(5, 5, 0, 5);   
+        gbc.insets = new Insets(5, 5, 0, 5);
         sparseContainer.add(saPanel, gbc);
-    
-        gbc.gridy++;     
+
+        gbc.gridy++;
         sparseContainer.add(ei, gbc);
-        
+
     }
 
     /**
      * {@inheritDoc}
      */
     public void commitChanges() {
-    	saPanel.commitChanges();
+        saPanel.commitChanges();
         eirPanel.commitChanges();
         spPanel.commitChanges();
         ((Sparse) connection).setAllowSelfConnection(allowSelfConnect
-                .isSelected());     
+                .isSelected());
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * Performed in the sub-panel constructors.
-     * TODO: Deprecate?
+     *
+     * Performed in the sub-panel constructors. TODO: Deprecate?
      */
-	public void fillFieldValues() {}
-	
-	/**
-	 * Fills the field values of this panel based on an already
-	 * existing connect neurons object.
-	 */
-	public void fillFieldValues(ConnectNeurons connection) {
-		this.connection = connection;
-		try{
-			saPanel.fillFieldValues((Sparse) connection);
-		} catch (ClassCastException e) {
-			//TODO: How to handle this case...
-		}
-		spPanel.fillFieldValues(connection);
-		eirPanel.fillFieldValues(connection);
-	}
-
-	/**
-	 * Returns the connection object associated with this panel.
-	 */
-    public Sparse getConnection(){
-    	return (Sparse) connection;
+    public void fillFieldValues() {
     }
-	
+
+    /**
+     * Fills the field values of this panel based on an already existing connect
+     * neurons object.
+     */
+    public void fillFieldValues(ConnectNeurons connection) {
+        this.connection = connection;
+        try {
+            saPanel.fillFieldValues((Sparse) connection);
+        } catch (ClassCastException e) {
+            // TODO: How to handle this case...
+        }
+        spPanel.fillFieldValues(connection);
+        eirPanel.fillFieldValues(connection);
+    }
+
+    /**
+     * Returns the connection object associated with this panel.
+     */
+    public Sparse getConnection() {
+        return (Sparse) connection;
+    }
+
 }

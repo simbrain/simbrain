@@ -115,7 +115,8 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
                                 targetComponent.getPotentialConsumers());
                     } catch (UmatchedAttributesException e1) {
                         JOptionPane.showMessageDialog(null, e1.getMessage(),
-                                "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
+                                "Unmatched Attributes",
+                                JOptionPane.WARNING_MESSAGE, null);
                     }
                 }
             });

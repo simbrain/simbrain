@@ -29,7 +29,7 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * The Component representation of a histogram.   Contains attributes that allow
+ * The Component representation of a histogram. Contains attributes that allow
  * other components to couple to this one.
  */
 public class HistogramComponent extends WorkspaceComponent {
@@ -171,6 +171,5 @@ public class HistogramComponent extends WorkspaceComponent {
         }
         return returnList;
     }
-
 
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.statistics.HistogramBin;
+import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.statistics.SimpleHistogramDataset;
 import org.jfree.data.xy.AbstractIntervalXYDataset;

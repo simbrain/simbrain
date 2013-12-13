@@ -85,8 +85,7 @@ public class Projector {
         listeners = new ArrayList<ProjectorListener>();
         colorManager = new DataColoringManager(this);
 
-        projectionMethods.put(ProjectCoordinate.class,
-                    "Coordinate Projection");
+        projectionMethods.put(ProjectCoordinate.class, "Coordinate Projection");
         projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
         projectionMethods.put(ProjectPCA.class, "PCA");
         projectionMethods.put(ProjectTriangulate.class, "Triangulation");
@@ -175,7 +174,8 @@ public class Projector {
             currentPoint = existingPoint;
         } else {
             currentPoint = point;
-            //colorManager.updateColorOfPoint(point); TODO: Seems to be needed so that  hot stays hot.  But then hot color "doubling"
+            // colorManager.updateColorOfPoint(point); TODO: Seems to be needed
+            // so that hot stays hot. But then hot color "doubling"
             DataPoint newPoint;
             if (point.getDimension() == 1) {
                 // For 1-d datasets plot points on a horizontal line
@@ -190,7 +190,6 @@ public class Projector {
         }
         colorManager.updateDataPointColors(upstairs);
     }
-
 
     /**
      * Change the current projection method and perform and other needed
@@ -212,7 +211,7 @@ public class Projector {
         if (projName == null) {
             return;
         }
-        for (Class<?> method: projectionMethods.keySet()) {
+        for (Class<?> method : projectionMethods.keySet()) {
             if (projName.equalsIgnoreCase(projectionMethods.get(method))) {
                 try {
                     ProjectionMethod projMethod;
@@ -235,8 +234,8 @@ public class Projector {
      */
     public void importData(final File theFile) {
         try {
-            CSVParser theParser = new CSVParser(new FileInputStream(theFile), "",
-                    "", "#");
+            CSVParser theParser = new CSVParser(new FileInputStream(theFile),
+                    "", "", "#");
 
             // # is a comment delimeter in net files
             String[][] values = theParser.getAllValues();
@@ -378,7 +377,6 @@ public class Projector {
         }
         colorManager.updateDataPointColors(upstairs);
     }
-
 
     /**
      * Returns the size of the dataset.

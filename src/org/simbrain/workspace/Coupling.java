@@ -109,12 +109,12 @@ public final class Coupling<E> {
      * @param producer producing attribute for this coupling
      * @param consumer consuming attribute for this coupling
      */
-    public Coupling(final PotentialProducer producer, final PotentialConsumer consumer) {
+    public Coupling(final PotentialProducer producer,
+            final PotentialConsumer consumer) {
         LOGGER.debug("new Coupling");
         this.producer = (Producer<E>) producer.createProducer();
         this.consumer = (Consumer<E>) consumer.createConsumer();
     }
-
 
     /**
      * Set value of buffer.

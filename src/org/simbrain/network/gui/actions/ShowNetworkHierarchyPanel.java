@@ -48,8 +48,7 @@ public final class ShowNetworkHierarchyPanel extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION,
-                "Show Network Hierarchy");
+        putValue(SHORT_DESCRIPTION, "Show Network Hierarchy");
     }
 
     /** @see AbstractAction */

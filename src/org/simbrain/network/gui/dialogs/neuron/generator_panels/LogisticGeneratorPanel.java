@@ -35,90 +35,90 @@ import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
  */
 public class LogisticGeneratorPanel extends AbstractNeuronPanel {
 
-	/** Growth rate field. */
-	private JTextField tfGrowthRate = new JTextField();
+    /** Growth rate field. */
+    private JTextField tfGrowthRate = new JTextField();
 
-	/**
-	 * Creates an instance of this panel.
-	 */
-	public LogisticGeneratorPanel() {
-		super();
-		setLayout(new GridLayout(1,2));
-		add(new JLabel("Growth Rate: "));
-		add(tfGrowthRate);
-		this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"
-				+ "For that, set update rule to sigmoidal.<p> "
-				+ " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
-	}
+    /**
+     * Creates an instance of this panel.
+     */
+    public LogisticGeneratorPanel() {
+        super();
+        setLayout(new GridLayout(1, 2));
+        add(new JLabel("Growth Rate: "));
+        add(tfGrowthRate);
+        this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"
+                + "For that, set update rule to sigmoidal.<p> "
+                + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
+    }
 
-	// /**
-	// * Populate fields with current data.
-	// */
-	// public void fillFieldValues() {
-	// LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
-	//
-	// tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-	//
-	// // Handle consistency of multiple selections
-	// if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
-	// "getGrowthRate")) {
-	// tfGrowthRate.setText(NULL_STRING);
-	// }
-	// }
+    // /**
+    // * Populate fields with current data.
+    // */
+    // public void fillFieldValues() {
+    // LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
+    //
+    // tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
+    //
+    // // Handle consistency of multiple selections
+    // if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
+    // "getGrowthRate")) {
+    // tfGrowthRate.setText(NULL_STRING);
+    // }
+    // }
 
-	/**
-	 * Populate fields with default data.
-	 */
-	public void fillDefaultValues() {
-		LogisticRule neuronRef = new LogisticRule();
-		tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-	}
+    /**
+     * Populate fields with default data.
+     */
+    public void fillDefaultValues() {
+        LogisticRule neuronRef = new LogisticRule();
+        tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
+    }
 
-	// /**
-	// * Called externally when the dialog is closed, to commit any changes
-	// made.
-	// */
-	// public void commitChanges() {
-	// for (int i = 0; i < ruleList.size(); i++) {
-	// LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
-	//
-	// if (!tfGrowthRate.getText().equals(NULL_STRING)) {
-	// neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
-	// .getText()));
-	// }
-	// }
-	// }
+    // /**
+    // * Called externally when the dialog is closed, to commit any changes
+    // made.
+    // */
+    // public void commitChanges() {
+    // for (int i = 0; i < ruleList.size(); i++) {
+    // LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
+    //
+    // if (!tfGrowthRate.getText().equals(NULL_STRING)) {
+    // neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
+    // .getText()));
+    // }
+    // }
+    // }
 
-	@Override
-	public void commitChanges(Neuron neuron) {
-		// TODO Auto-generated method stub
+    @Override
+    public void commitChanges(Neuron neuron) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void commitChanges(List<Neuron> neuron) {
-		// TODO Auto-generated method stub
+    @Override
+    public void commitChanges(List<Neuron> neuron) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-		// TODO Auto-generated method stub
+    @Override
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public NeuronUpdateRule getPrototypeRule() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NeuronUpdateRule getPrototypeRule() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void writeValuesToRules(List<Neuron> neurons) {
+        // TODO Auto-generated method stub
+
+    }
 }

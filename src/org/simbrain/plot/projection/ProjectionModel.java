@@ -78,7 +78,7 @@ public class ProjectionModel extends ChartModel {
             dataset = new XYSeriesCollection();
             dataset.addSeries(new XYSeries("Data", false, true));
         }
-        if (numDataSources == -1){
+        if (numDataSources == -1) {
             projector = new Projector();
         } else {
             projector = new Projector(numDataSources);
@@ -98,19 +98,19 @@ public class ProjectionModel extends ChartModel {
 
             @Override
             public void projectionMethodChanged() {
-                //System.out.println("ProjectionModel: In method changed");
+                // System.out.println("ProjectionModel: In method changed");
                 resetData();
             }
 
             @Override
             public void projectorDataChanged() {
-                //System.out.println("ProjectionModel: In data changed");
+                // System.out.println("ProjectionModel: In data changed");
                 resetData();
             }
 
             @Override
             public void datapointAdded() {
-                //System.out.println("ProjectionModel: In data added");
+                // System.out.println("ProjectionModel: In data added");
                 // TODO: For some projection methods full data reset is not
                 // really required...
                 resetData();
@@ -118,7 +118,7 @@ public class ProjectionModel extends ChartModel {
 
             @Override
             public void projectorColorsChanged() {
-                //System.out.println("ProjectionModel: In color changed");
+                // System.out.println("ProjectionModel: In color changed");
             }
 
         });

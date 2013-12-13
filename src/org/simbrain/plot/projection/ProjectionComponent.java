@@ -101,8 +101,8 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     protected void initializeConsumers() {
         dimensionList.clear();
-        projectionConsumerType = new AttributeType(this, "Single scalars", "setValue",
-                double.class, true);
+        projectionConsumerType = new AttributeType(this, "Single scalars",
+                "setValue", double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
             addDimension(i);
@@ -117,8 +117,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (projectionVectorConsumer.isVisible()) {
             PotentialConsumer consumer = getAttributeManager()
-                    .createPotentialConsumer(this, "addPoint",
-                           double[].class);
+                    .createPotentialConsumer(this, "addPoint", double[].class);
             consumer.setCustomDescription("Set point");
             returnList.add(consumer);
         }
@@ -340,9 +339,9 @@ public class ProjectionComponent extends WorkspaceComponent {
                 .println("------------ Print contents of dataset ------------");
         Projector projector = projectionModel.getProjector();
         for (int i = 0; i < projector.getNumPoints(); i++) {
-//            System.out.println("<" + i + "> "
-//                    + projector.getProjectedPoint(i).get(0) + ","
-//                    + projector.getProjectedPoint(i).get(1));
+            // System.out.println("<" + i + "> "
+            // + projector.getProjectedPoint(i).get(0) + ","
+            // + projector.getProjectedPoint(i).get(1));
         }
         System.out.println("--------------------------------------");
     }

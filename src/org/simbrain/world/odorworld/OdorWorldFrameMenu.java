@@ -30,7 +30,6 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 
 /**

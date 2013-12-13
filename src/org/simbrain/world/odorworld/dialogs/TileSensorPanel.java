@@ -15,8 +15,6 @@ package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
 
-import org.simbrain.world.odorworld.effectors.Speech;
-import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.TileSensor;
 
@@ -47,7 +45,8 @@ public class TileSensorPanel extends AbstractSensorPanel {
     private OdorWorldEntity entity;
 
     /**
-     * Reference to straight movement effector. Initially null if this is a creation panel.
+     * Reference to straight movement effector. Initially null if this is a
+     * creation panel.
      */
     private TileSensor tileSensor;
 
@@ -91,14 +90,15 @@ public class TileSensorPanel extends AbstractSensorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            TileSensor sensor = new TileSensor(entity,
-                    Integer.parseInt(x.getText()), Integer.parseInt(y.getText()),
+            TileSensor sensor = new TileSensor(entity, Integer.parseInt(x
+                    .getText()), Integer.parseInt(y.getText()),
                     Integer.parseInt(width.getText()), Integer.parseInt(height
                             .getText()));
             sensor.setActivationAmount(Double.parseDouble(activation.getText()));
             entity.addSensor(sensor);
         } else {
-            tileSensor.setActivationAmount(Double.parseDouble(activation.getText()));
+            tileSensor.setActivationAmount(Double.parseDouble(activation
+                    .getText()));
             tileSensor.setX(Integer.parseInt(x.getText()));
             tileSensor.setY(Integer.parseInt(y.getText()));
             tileSensor.setWidth(Integer.parseInt(width.getText()));
@@ -117,7 +117,8 @@ public class TileSensorPanel extends AbstractSensorPanel {
             width.setText("" + TileSensor.DEFAULT_WIDTH);
             height.setText("" + TileSensor.DEFAULT_HEIGHT);
         } else {
-            activation.setText("" + Double.toString(tileSensor.getActivationAmount()));
+            activation.setText(""
+                    + Double.toString(tileSensor.getActivationAmount()));
             x.setText("" + Integer.toString(tileSensor.getX()));
             y.setText("" + Integer.toString(tileSensor.getY()));
             width.setText("" + Integer.toString(tileSensor.getWidth()));

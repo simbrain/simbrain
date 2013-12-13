@@ -35,251 +35,237 @@ import javax.swing.JPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  * @author ztosi
- * 
+ *
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
-	public enum UpDirection {
-		LEFT, RIGHT;
-	}
+    public enum UpDirection {
+        LEFT, RIGHT;
+    }
 
-	/** The label for the triangle when it is in the "up" state. */
-	private final JLabel upTriLabel;
+    /** The label for the triangle when it is in the "up" state. */
+    private final JLabel upTriLabel;
 
-	/** The label for the triangle when it is in the down state. */
-	private final JLabel downTriLabel;
+    /** The label for the triangle when it is in the down state. */
+    private final JLabel downTriLabel;
 
-	private JLabel label;
+    private JLabel label;
 
-	/** The clickable triangle. */
-	private final ClickableTriangle ddTriangle;
+    /** The clickable triangle. */
+    private final ClickableTriangle ddTriangle;
 
-	/** Whether or not the triangle is pointing down. */
-	private boolean down;
+    /** Whether or not the triangle is pointing down. */
+    private boolean down;
 
-	/**
-	 * A reference to the window containing this component for ensuring that
-	 * changes in size due to changes in label are reflected in the parent
-	 * container.
-	 */
-	private final Window parent;
+    /**
+     * A reference to the window containing this component for ensuring that
+     * changes in size due to changes in label are reflected in the parent
+     * container.
+     */
+    private final Window parent;
 
-	/**
-	 * Creates an unlabeled drop down triangle pointing either left or right in
-	 * the "up" state and starting either "up" or down.
-	 * 
-	 * @param upState
-	 *            The direction the triangle points when in the "up" state
-	 * @param down
-	 *            Whether or not the triangle is initialized in the "up" or down
-	 *            state
-	 * @param parent
-	 *            The parent window, allowing this component to ensure it fits
-	 *            in its container.
-	 */
-	public DropDownTriangle(UpDirection upState, boolean down,
-			final Window parent) {
-		this(upState, down, "", "", parent);
-	}
+    /**
+     * Creates an unlabeled drop down triangle pointing either left or right in
+     * the "up" state and starting either "up" or down.
+     *
+     * @param upState The direction the triangle points when in the "up" state
+     * @param down Whether or not the triangle is initialized in the "up" or
+     *            down state
+     * @param parent The parent window, allowing this component to ensure it
+     *            fits in its container.
+     */
+    public DropDownTriangle(UpDirection upState, boolean down,
+            final Window parent) {
+        this(upState, down, "", "", parent);
+    }
 
-	/**
-	 * Creates a drop down triangle with a label displayed when it is in the
-	 * "up" state and a label displayed when it is in the "down" state. The
-	 * triangle points either left or right in the "up" state and starts out
-	 * either "up" or down.
-	 * 
-	 * @param upState
-	 *            The direction the triangle points when in the "up" state
-	 * @param down
-	 *            Whether or not the triangle is initialized in the "up" or down
-	 *            state
-	 * @param upLabel
-	 *            The label displayed when the triangle is in the "up" state
-	 * @param downLabel
-	 *            The label displayed when the triangle is in the down state.
-	 * @param parent
-	 *            The parent window, allowing this component to ensure it fits
-	 *            in its container.
-	 */
-	public DropDownTriangle(final UpDirection upState, final boolean down,
-			final String upLabel, final String downLabel,
-			final Window parent) {
-		ddTriangle = new ClickableTriangle(upState, down);
-		upTriLabel = new JLabel(upLabel);
-		downTriLabel = new JLabel(downLabel);
-		this.parent = parent;
-		this.down = down;
-		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		initLayout();
-		addMouseListener(this);
-	}
+    /**
+     * Creates a drop down triangle with a label displayed when it is in the
+     * "up" state and a label displayed when it is in the "down" state. The
+     * triangle points either left or right in the "up" state and starts out
+     * either "up" or down.
+     *
+     * @param upState The direction the triangle points when in the "up" state
+     * @param down Whether or not the triangle is initialized in the "up" or
+     *            down state
+     * @param upLabel The label displayed when the triangle is in the "up" state
+     * @param downLabel The label displayed when the triangle is in the down
+     *            state.
+     * @param parent The parent window, allowing this component to ensure it
+     *            fits in its container.
+     */
+    public DropDownTriangle(final UpDirection upState, final boolean down,
+            final String upLabel, final String downLabel, final Window parent) {
+        ddTriangle = new ClickableTriangle(upState, down);
+        upTriLabel = new JLabel(upLabel);
+        downTriLabel = new JLabel(downLabel);
+        this.parent = parent;
+        this.down = down;
+        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        initLayout();
+        addMouseListener(this);
+    }
 
-	/**
-	 * Lays out the label and triangle based on the current state.
-	 */
-	private void initLayout() {
-		label = down ? downTriLabel : upTriLabel;
-		this.add(label);
-		this.add(Box.createHorizontalStrut(10));
-		this.add(ddTriangle);
-		parent.pack();
-	}
+    /**
+     * Lays out the label and triangle based on the current state.
+     */
+    private void initLayout() {
+        label = down ? downTriLabel : upTriLabel;
+        this.add(label);
+        this.add(Box.createHorizontalStrut(10));
+        this.add(ddTriangle);
+        parent.pack();
+    }
 
-	/**
-	 * Changes the state of the triangle: if called when pointing "up"
-	 * (left/right) the triangle changes to point down and vice versa.
-	 */
-	public void changeState() {
-		// Whatever state it's in, change it to the other state.
-		down = !down;
-		ddTriangle.setState(down);
-		removeAll();
-		initLayout();
-		repaint();
-	}
+    /**
+     * Changes the state of the triangle: if called when pointing "up"
+     * (left/right) the triangle changes to point down and vice versa.
+     */
+    public void changeState() {
+        // Whatever state it's in, change it to the other state.
+        down = !down;
+        ddTriangle.setState(down);
+        removeAll();
+        initLayout();
+        repaint();
+    }
 
-	public boolean isDown() {
-		return down;
-	}
+    public boolean isDown() {
+        return down;
+    }
 
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		changeState();
-	}
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        changeState();
+    }
 
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
-	
-	@Override
-	public void addMouseListener(MouseListener l) {
-		super.addMouseListener(l);
-		ddTriangle.addMouseListener(l);
-		label.addMouseListener(l);
-	}
+    }
 
-	/**
-	 * 
-	 * @author zach
-	 * 
-	 */
-	private class ClickableTriangle extends JPanel {
+    @Override
+    public void addMouseListener(MouseListener l) {
+        super.addMouseListener(l);
+        ddTriangle.addMouseListener(l);
+        label.addMouseListener(l);
+    }
 
-		/** The image icon for the triangle in it's down pointing state. */
-		private ImageIcon downTriangle = ResourceManager
-				.getImageIcon("DownTriangle.png");
+    /**
+     *
+     * @author zach
+     *
+     */
+    private class ClickableTriangle extends JPanel {
 
-		/** The image icon for the triangle in it's left pointing state. */
-		private ImageIcon leftTriangle = ResourceManager
-				.getImageIcon("LeftTriangle.png");
+        /** The image icon for the triangle in it's down pointing state. */
+        private ImageIcon downTriangle = ResourceManager
+                .getImageIcon("DownTriangle.png");
 
-		/** The image icon for the triangle in it's left pointing state. */
-		private ImageIcon rightTriangle = ResourceManager
-				.getImageIcon("RightTriangle.png");
+        /** The image icon for the triangle in it's left pointing state. */
+        private ImageIcon leftTriangle = ResourceManager
+                .getImageIcon("LeftTriangle.png");
 
-		/**
-		 * The image icon for the triangle in it's "up" pointing state
-		 * (Left/Right).
-		 */
-		private ImageIcon upTriangle;
+        /** The image icon for the triangle in it's left pointing state. */
+        private ImageIcon rightTriangle = ResourceManager
+                .getImageIcon("RightTriangle.png");
 
-		/** The currently displayed triangle image. */
-		private Image triangle;
+        /**
+         * The image icon for the triangle in it's "up" pointing state
+         * (Left/Right).
+         */
+        private ImageIcon upTriangle;
 
-		/**
-		 * 
-		 * @param upState
-		 * @param down
-		 */
-		public ClickableTriangle(UpDirection upState, boolean down) {
+        /** The currently displayed triangle image. */
+        private Image triangle;
 
-			if (upState == UpDirection.LEFT)
-				upTriangle = leftTriangle;
-			else
-				upTriangle = rightTriangle;
+        /**
+         *
+         * @param upState
+         * @param down
+         */
+        public ClickableTriangle(UpDirection upState, boolean down) {
 
-			triangle =
-					down ? downTriangle.getImage() : upTriangle
-							.getImage();
-			setSize();
-			setLayout(null);
-			repaint();
+            if (upState == UpDirection.LEFT)
+                upTriangle = leftTriangle;
+            else
+                upTriangle = rightTriangle;
 
-		}
+            triangle = down ? downTriangle.getImage() : upTriangle.getImage();
+            setSize();
+            setLayout(null);
+            repaint();
 
-		/**
-		 * Sets the size of the panel to fit the triangle image.
-		 */
-		private void setSize() {
-			Dimension size =
-					new Dimension((int) triangle.getWidth(null),
-							(int) triangle.getHeight(null));
-			setPreferredSize(size);
-			setMaximumSize(size);
-			setMinimumSize(size);
-			setSize(size);
-		}
+        }
 
-		/**
-		 * Sets the state of the triangle, to either the "up" position (Left or
-		 * Right) or the down position.
-		 * 
-		 * @param down
-		 *            the desired state of the triangle. False, puts the
-		 *            triangle in the "up" position: pointing left or right,
-		 *            specified at the time of creation, true points the
-		 *            triangle down.
-		 */
-		public void setState(boolean down) {
-			triangle =
-					down ? downTriangle.getImage() : upTriangle
-							.getImage();
-			setSize();
-		}
+        /**
+         * Sets the size of the panel to fit the triangle image.
+         */
+        private void setSize() {
+            Dimension size = new Dimension((int) triangle.getWidth(null),
+                    (int) triangle.getHeight(null));
+            setPreferredSize(size);
+            setMaximumSize(size);
+            setMinimumSize(size);
+            setSize(size);
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void paintComponent(Graphics g) {
-			removeAll();
-			super.paintComponent(g);
-			setSize();
-			g.drawImage(triangle, 0, 0, null);
-		}
+        /**
+         * Sets the state of the triangle, to either the "up" position (Left or
+         * Right) or the down position.
+         *
+         * @param down the desired state of the triangle. False, puts the
+         *            triangle in the "up" position: pointing left or right,
+         *            specified at the time of creation, true points the
+         *            triangle down.
+         */
+        public void setState(boolean down) {
+            triangle = down ? downTriangle.getImage() : upTriangle.getImage();
+            setSize();
+        }
 
-	}
+        /**
+         * {@inheritDoc}
+         */
+        public void paintComponent(Graphics g) {
+            removeAll();
+            super.paintComponent(g);
+            setSize();
+            g.drawImage(triangle, 0, 0, null);
+        }
 
-	public static void main(String[] args) {
-		JFrame f = new JFrame();
-		DropDownTriangle ddt =
-				new DropDownTriangle(UpDirection.LEFT, false, "X", "Y", f);
-		f.setContentPane(ddt);
-		f.pack();
-		f.setVisible(true);
+    }
 
-	}
+    public static void main(String[] args) {
+        JFrame f = new JFrame();
+        DropDownTriangle ddt = new DropDownTriangle(UpDirection.LEFT, false,
+                "X", "Y", f);
+        f.setContentPane(ddt);
+        f.pack();
+        f.setVisible(true);
+
+    }
 }

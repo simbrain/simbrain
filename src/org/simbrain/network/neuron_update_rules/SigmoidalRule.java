@@ -23,8 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.
-    DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
@@ -37,8 +36,8 @@ import org.simbrain.util.randomizer.Randomizer;
  * @author Jeff Yoshimi
  */
 public class SigmoidalRule extends NeuronUpdateRule implements
-    BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-    BoundedUpdateRule {
+        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
+        BoundedUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_CEILING = 1.0;
@@ -77,8 +76,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction
-     *            the squashing function implementation to use.
+     * @param sFunction the squashing function implementation to use.
      */
     public SigmoidalRule(SquashingFunction sFunction) {
         super();
@@ -99,9 +97,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         double val = neuron.getWeightedInputs() + bias;
 
-        val =
-                sFunction.valueOf(val, getCeiling(), getFloor(),
-                        getSlope());
+        val = sFunction.valueOf(val, getCeiling(), getFloor(), getSlope());
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -109,7 +105,6 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         neuron.setBuffer(val);
     }
-
 
     /**
      * {@inheritDoc}
@@ -196,8 +191,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionY
-     *            The inflectionY to set.
+     * @param inflectionY The inflectionY to set.
      */
     @Override
     public void setBias(final double inflectionY) {
@@ -212,8 +206,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionPointSlope
-     *            The inflectionPointSlope to set.
+     * @param inflectionPointSlope The inflectionPointSlope to set.
      */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
@@ -227,8 +220,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param noise
-     *            The noise to set.
+     * @param noise The noise to set.
      */
     public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
@@ -242,8 +234,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param addNoise
-     *            The addNoise to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -266,8 +257,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setSquashFunctionType(SquashingFunction type) {
         this.sFunction = type;

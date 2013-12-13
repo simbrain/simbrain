@@ -41,177 +41,171 @@ import org.simbrain.util.widgets.TristateDropDown;
  */
 public class IACRulePanel extends AbstractNeuronPanel {
 
-	/** Main panel. */
-	private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** Main panel. */
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-	/** Tabbed pane. */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
-	/** Decay field. */
-	private JTextField tfDecay = new JTextField();
+    /** Decay field. */
+    private JTextField tfDecay = new JTextField();
 
-	/** Rest field. */
-	private JTextField tfRest = new JTextField();
+    /** Rest field. */
+    private JTextField tfRest = new JTextField();
 
-	/** Random panel. */
-	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    /** Random panel. */
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-	/** Add noise combo box. */
-	private TristateDropDown isAddNoise = new TristateDropDown();
+    /** Add noise combo box. */
+    private TristateDropDown isAddNoise = new TristateDropDown();
 
-	/** A reference to the neuron update rule being edited. */
-	private static final IACRule prototypeRule = new IACRule();
+    /** A reference to the neuron update rule being edited. */
+    private static final IACRule prototypeRule = new IACRule();
 
-	/**
-	 * This method is the default constructor.
-	 * 
-	 */
-	public IACRulePanel() {
-		super();
-		this.add(tabbedPane);
-		mainPanel.addItem("Decay", tfDecay);
-		mainPanel.addItem("Rest", tfRest);
-		mainPanel.addItem("Add noise", isAddNoise);
-		tabbedPane.add(mainPanel, "Main");
-		tabbedPane.add(randTab, "Noise");
-	}
+    /**
+     * This method is the default constructor.
+     *
+     */
+    public IACRulePanel() {
+        super();
+        this.add(tabbedPane);
+        mainPanel.addItem("Decay", tfDecay);
+        mainPanel.addItem("Rest", tfRest);
+        mainPanel.addItem("Add noise", isAddNoise);
+        tabbedPane.add(mainPanel, "Main");
+        tabbedPane.add(randTab, "Noise");
+    }
 
-	/**
-	 * Populate fields with current data.
-	 */
+    /**
+     * Populate fields with current data.
+     */
 
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-		IACRule neuronRef = (IACRule) ruleList.get(0);
+        IACRule neuronRef = (IACRule) ruleList.get(0);
 
-		// (Below) Handle consistency of multiple selections
+        // (Below) Handle consistency of multiple selections
 
-		// Handle Decay
-		if (!NetworkUtils.isConsistent(ruleList, IACRule.class,
-				"getDecay"))
-			tfDecay.setText(NULL_STRING);
-		else
-			tfDecay.setText(Double.toString(neuronRef.getDecay()));
+        // Handle Decay
+        if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getDecay"))
+            tfDecay.setText(NULL_STRING);
+        else
+            tfDecay.setText(Double.toString(neuronRef.getDecay()));
 
-		// Handle Rest
-		if (!NetworkUtils
-				.isConsistent(ruleList, IACRule.class, "getRest"))
-			tfRest.setText(NULL_STRING);
-		else
-			tfRest.setText(Double.toString(neuronRef.getRest()));
+        // Handle Rest
+        if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getRest"))
+            tfRest.setText(NULL_STRING);
+        else
+            tfRest.setText(Double.toString(neuronRef.getRest()));
 
-		// Handle Add Noise
-		if (!NetworkUtils.isConsistent(ruleList, IACRule.class,
-				"getAddNoise"))
-			isAddNoise.setNull();
-		else
-			isAddNoise.setSelected(neuronRef.getAddNoise());
+        // Handle Add Noise
+        if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getAddNoise"))
+            isAddNoise.setNull();
+        else
+            isAddNoise.setSelected(neuronRef.getAddNoise());
 
-		randTab.fillFieldValues(getRandomizers(ruleList));
+        randTab.fillFieldValues(getRandomizers(ruleList));
 
-	}
+    }
 
-	/**
-	 * @return List of randomizers.
-	 */
-	private ArrayList<Randomizer> getRandomizers(
-			List<NeuronUpdateRule> ruleList) {
-		ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-		for (int i = 0; i < ruleList.size(); i++) {
-			ret.add(((IACRule) ruleList.get(i)).getNoiseGenerator());
-		}
-		return ret;
-	}
+    /**
+     * @return List of randomizers.
+     */
+    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((IACRule) ruleList.get(i)).getNoiseGenerator());
+        }
+        return ret;
+    }
 
-	/**
-	 * Fill field values to default values for binary neuron.
-	 */
-	public void fillDefaultValues() {
-		tfDecay.setText(Double.toString(prototypeRule.getDecay()));
-		tfRest.setText(Double.toString(prototypeRule.getRest()));
-		isAddNoise.setSelected(prototypeRule.getAddNoise());
-		randTab.fillDefaultValues();
-	}
+    /**
+     * Fill field values to default values for binary neuron.
+     */
+    public void fillDefaultValues() {
+        tfDecay.setText(Double.toString(prototypeRule.getDecay()));
+        tfRest.setText(Double.toString(prototypeRule.getRest()));
+        isAddNoise.setSelected(prototypeRule.getAddNoise());
+        randTab.fillDefaultValues();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(Neuron neuron) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(Neuron neuron) {
 
-		if (!(neuron.getUpdateRule() instanceof IACRule)) {
-			neuron.setUpdateRule(prototypeRule.deepCopy());
-		}
+        if (!(neuron.getUpdateRule() instanceof IACRule)) {
+            neuron.setUpdateRule(prototypeRule.deepCopy());
+        }
 
-		writeValuesToRules(Collections.singletonList(neuron));
+        writeValuesToRules(Collections.singletonList(neuron));
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(List<Neuron> neurons) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(List<Neuron> neurons) {
 
-		if (isReplace()) {
-			IACRule neuronRef = prototypeRule.deepCopy();
-			for (Neuron n : neurons) {
-				n.setUpdateRule(neuronRef.deepCopy());
-			}
-		}
+        if (isReplace()) {
+            IACRule neuronRef = prototypeRule.deepCopy();
+            for (Neuron n : neurons) {
+                n.setUpdateRule(neuronRef.deepCopy());
+            }
+        }
 
-		writeValuesToRules(neurons);
+        writeValuesToRules(neurons);
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
-		int numNeurons = neurons.size();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Neuron> neurons) {
+        int numNeurons = neurons.size();
 
-		// Decay
-		double decay = Utils.doubleParsable(tfDecay);
-		if (!Double.isNaN(decay)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IACRule) neurons.get(i).getUpdateRule())
-						.setDecay(decay);
-			}
-		}
+        // Decay
+        double decay = Utils.doubleParsable(tfDecay);
+        if (!Double.isNaN(decay)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IACRule) neurons.get(i).getUpdateRule()).setDecay(decay);
+            }
+        }
 
-		// Rest
-		double rest = Utils.doubleParsable(tfRest);
-		if (!Double.isNaN(rest)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((IACRule) neurons.get(i).getUpdateRule()).setRest(rest);
-			}
-		}
+        // Rest
+        double rest = Utils.doubleParsable(tfRest);
+        if (!Double.isNaN(rest)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((IACRule) neurons.get(i).getUpdateRule()).setRest(rest);
+            }
+        }
 
-		// Add Noise?
-		if (!isAddNoise.isNull()) {
-			boolean addNoise =
-					isAddNoise.getSelectedIndex() == TristateDropDown
-							.getTRUE();
-			for (int i = 0; i < numNeurons; i++) {
-				((IACRule) neurons.get(i).getUpdateRule())
-						.setAddNoise(addNoise);
+        // Add Noise?
+        if (!isAddNoise.isNull()) {
+            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+                    .getTRUE();
+            for (int i = 0; i < numNeurons; i++) {
+                ((IACRule) neurons.get(i).getUpdateRule())
+                        .setAddNoise(addNoise);
 
-			}
-			if (addNoise) {
-				for (int i = 0; i < numNeurons; i++) {
-					randTab.commitRandom(((IACRule) neurons.get(i)
-							.getUpdateRule()).getNoiseGenerator());
-				}
-			}
-		}
-	}
+            }
+            if (addNoise) {
+                for (int i = 0; i < numNeurons; i++) {
+                    randTab.commitRandom(((IACRule) neurons.get(i)
+                            .getUpdateRule()).getNoiseGenerator());
+                }
+            }
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected IACRule getPrototypeRule() {
-		return prototypeRule.deepCopy();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected IACRule getPrototypeRule() {
+        return prototypeRule.deepCopy();
+    }
 
 }

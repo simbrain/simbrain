@@ -20,14 +20,11 @@ package org.simbrain.network.gui.dialogs.network;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -39,58 +36,55 @@ import org.simbrain.util.StandardDialog;
 public class WTACreationDialog extends StandardDialog {
 
     /** Tabbed pane. */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
-	/** Logic tab panel. */
-	private JPanel tabLogic = new JPanel();
+    /** Logic tab panel. */
+    private JPanel tabLogic = new JPanel();
 
-	/** Layout tab panel. */
-	private JPanel tabLayout = new JPanel();
+    /** Layout tab panel. */
+    private JPanel tabLayout = new JPanel();
 
-	/** Logic panel. */
-	private WTAPropertiesPanel wtaPanel;
+    /** Logic panel. */
+    private WTAPropertiesPanel wtaPanel;
 
-	/** Layout panel. */
-	private MainLayoutPanel layoutPanel;
+    /** Layout panel. */
+    private MainLayoutPanel layoutPanel;
 
-	/** Network panel. */
-	private NetworkPanel networkPanel;
+    /** Network panel. */
+    private NetworkPanel networkPanel;
 
-	/**
-	 * This method is the default constructor.
-	 *
-	 * @param np
-	 *            Network panel
-	 */
-	public WTACreationDialog(final NetworkPanel np) {
-		networkPanel = np;
-		layoutPanel = new MainLayoutPanel(false, this);
-		init();
-	}
+    /**
+     * This method is the default constructor.
+     *
+     * @param np Network panel
+     */
+    public WTACreationDialog(final NetworkPanel np) {
+        networkPanel = np;
+        layoutPanel = new MainLayoutPanel(false, this);
+        init();
+    }
 
-	/**
-	 * This method initializes the components on the panel.
-	 */
-	private void init() {
-		// Initialize Dialog
-		setTitle("New WTA Network");
+    /**
+     * This method initializes the components on the panel.
+     */
+    private void init() {
+        // Initialize Dialog
+        setTitle("New WTA Network");
 
-		// Set up tab panels
+        // Set up tab panels
         wtaPanel = new WTAPropertiesPanel(networkPanel);
-		tabLogic.add(wtaPanel);
+        tabLogic.add(wtaPanel);
         layoutPanel = new MainLayoutPanel(false, this);
         layoutPanel.setCurrentLayout(WinnerTakeAll.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
-		tabbedPane.addTab("Logic", tabLogic);
-		tabbedPane.addTab("Layout", tabLayout);
-		setContentPane(tabbedPane);
+        tabbedPane.addTab("Logic", tabLogic);
+        tabbedPane.addTab("Layout", tabLayout);
+        setContentPane(tabbedPane);
 
         // Help action
-        Action helpAction = new ShowHelpAction(
-                wtaPanel.getHelpPath());
+        Action helpAction = new ShowHelpAction(wtaPanel.getHelpPath());
         addButton(new JButton(helpAction));
-	}
-
+    }
 
     /**
      * Called when dialog closes.

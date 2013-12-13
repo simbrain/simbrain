@@ -23,9 +23,9 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 /**
  * Trainer for SRN Networks. Extends backprop trainer but instead of using a
  * list of layers uses the built in srn layers
- * 
- * Example: 5_binary_orth.csv > 5_binary_orth_offset.csv.  Manually set 
- *    inputs to test.  0 error is possible with defaults. 
+ *
+ * Example: 5_binary_orth.csv > 5_binary_orth_offset.csv. Manually set inputs to
+ * test. 0 error is possible with defaults.
  *
  * @author jyoshimi
  */
@@ -49,7 +49,6 @@ public class SRNTrainer extends BackpropTrainer {
         randomize(srn.getHiddenLayer().getNeuronList());
         randomize(srn.getOutputNeurons());
     }
-
 
     @Override
     protected void updateNetwork() {

@@ -33,15 +33,13 @@ import org.simbrain.util.Utils;
 /**
  * <b>SubtractiveNormalizationSynapsePanel</b>.
  */
-public class SubtractiveNormalizationRulePanel extends
-        AbstractSynapsePanel {
+public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
 
     /** Learning rate field. */
     private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private static final SubtractiveNormalizationRule prototypeRule =
-            new SubtractiveNormalizationRule();
+    private static final SubtractiveNormalizationRule prototypeRule = new SubtractiveNormalizationRule();
 
     /**
      * This method is the default constructor.
@@ -55,8 +53,8 @@ public class SubtractiveNormalizationRulePanel extends
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        SubtractiveNormalizationRule synapseRef =
-                (SubtractiveNormalizationRule) ruleList.get(0);
+        SubtractiveNormalizationRule synapseRef = (SubtractiveNormalizationRule) ruleList
+                .get(0);
 
         // (Below) Handle consistency of multiply selections
 
@@ -65,8 +63,8 @@ public class SubtractiveNormalizationRulePanel extends
                 SubtractiveNormalizationRule.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -75,9 +73,8 @@ public class SubtractiveNormalizationRulePanel extends
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        tfLearningRate
-                .setText(Double
-                        .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
+        tfLearningRate.setText(Double
+                .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
     }
 
     /**

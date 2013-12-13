@@ -72,6 +72,4 @@ public final class ScriptEditorAction extends AbstractAction {
         frame.pack();
     }
 
-
-
 }

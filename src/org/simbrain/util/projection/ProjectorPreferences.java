@@ -23,8 +23,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * <b>ProjectionPreferences</b> handles storage and retrieval of user preferences for
- * projections.
+ * <b>ProjectionPreferences</b> handles storage and retrieval of user
+ * preferences for projections.
  */
 public final class ProjectorPreferences {
 
@@ -41,8 +41,8 @@ public final class ProjectorPreferences {
     private static final int DEFAULT_EPSILON = 3;
 
     /** User preferences. */
-    private static final Preferences PROJECTION_PREFERENCES = Preferences.userRoot()
-            .node("/org/simbrain/util/projection");
+    private static final Preferences PROJECTION_PREFERENCES = Preferences
+            .userRoot().node("/org/simbrain/util/projection");
 
     /** File system separator. */
     public static final String FS = System.getProperty("file.separator");
@@ -181,7 +181,8 @@ public final class ProjectorPreferences {
      * @return Tolerance.
      */
     public static double getTolerance() {
-        return PROJECTION_PREFERENCES.getDouble("Tolerance", getDefaultTolerance());
+        return PROJECTION_PREFERENCES.getDouble("Tolerance",
+                getDefaultTolerance());
     }
 
     /**
@@ -224,7 +225,8 @@ public final class ProjectorPreferences {
      * @return Current show error value.
      */
     public static boolean getShowError() {
-        return PROJECTION_PREFERENCES.getBoolean("ShowError", getDefaultShowError());
+        return PROJECTION_PREFERENCES.getBoolean("ShowError",
+                getDefaultShowError());
     }
 
     /**
@@ -289,7 +291,8 @@ public final class ProjectorPreferences {
      * @return Current point size.
      */
     public static double getPointSize() {
-        return PROJECTION_PREFERENCES.getDouble("PointSize", getDefaultPointSize());
+        return PROJECTION_PREFERENCES.getDouble("PointSize",
+                getDefaultPointSize());
     }
 
     /**
@@ -395,7 +398,8 @@ public final class ProjectorPreferences {
      * @return Current auto find value.
      */
     public static boolean getAutoFind() {
-        return PROJECTION_PREFERENCES.getBoolean("AutoFind", getDefaultAutoFind());
+        return PROJECTION_PREFERENCES.getBoolean("AutoFind",
+                getDefaultAutoFind());
     }
 
     /**

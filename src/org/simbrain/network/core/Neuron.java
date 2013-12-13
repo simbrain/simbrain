@@ -782,8 +782,8 @@ public class Neuron {
     }
 
     /**
-     * Convenience method to set upper bound on the neuron's update rule,
-     * if it is a bounded update rule.
+     * Convenience method to set upper bound on the neuron's update rule, if it
+     * is a bounded update rule.
      *
      * @param upperBound upper bound to set.
      */
@@ -794,8 +794,8 @@ public class Neuron {
     }
 
     /**
-     * Convenience method to set lower bound on the neuron's update rule,
-     * if it is a bounded update rule.
+     * Convenience method to set lower bound on the neuron's update rule, if it
+     * is a bounded update rule.
      *
      * @param lowerBound lower bound to set.
      */
@@ -804,6 +804,5 @@ public class Neuron {
             ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
         }
     }
-
 
 }

@@ -26,7 +26,7 @@ import java.util.List;
  * are objects which are simple objects that call get or set for some property.
  * Used to create access to objects in lists or arrays for Attributes to use.
  * <p>
- * TODO: No longer being used in favor of auxiliary arguments.  Possibly remove.
+ * TODO: No longer being used in favor of auxiliary arguments. Possibly remove.
  *
  * @param <E> the data type used in the underlying getterSetter objects.
  */

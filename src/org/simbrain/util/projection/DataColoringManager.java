@@ -21,7 +21,6 @@ package org.simbrain.util.projection;
 import java.awt.Color;
 
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor.DisplayOrder;
 
 /**
@@ -117,18 +116,19 @@ public class DataColoringManager {
      */
     private void updateColorOfPoint(DataPointColored point) {
         if (coloringMethod == ColoringMethod.None) {
-        	if (point == projector.getCurrentPoint() && hotPointMode == true) {
-        		point.setColor(hotColor);
-        	} else {
-        		point.setColor(baseColor);
-        	}
+            if (point == projector.getCurrentPoint() && hotPointMode == true) {
+                point.setColor(hotColor);
+            } else {
+                point.setColor(baseColor);
+            }
         } else if (coloringMethod == ColoringMethod.DecayTrail) {
             if (point == projector.getCurrentPoint()) {
-            	if (point == projector.getCurrentPoint() && hotPointMode == true) {
-            		point.setColor(hotColor);
-            	} else {
-            		point.setColor(baseColor);
-            	}
+                if (point == projector.getCurrentPoint()
+                        && hotPointMode == true) {
+                    point.setColor(hotColor);
+                } else {
+                    point.setColor(baseColor);
+                }
                 point.spikeActivation(ceiling);
             } else {
                 point.decrementActivation(floor, decrementAmount);
@@ -136,11 +136,12 @@ public class DataColoringManager {
             }
         } else if (coloringMethod == ColoringMethod.Frequency) {
             if (point == projector.getCurrentPoint()) {
-            	if (point == projector.getCurrentPoint() && hotPointMode == true) {
-            		point.setColor(hotColor);
-            	} else {
-            		point.setColor(baseColor);
-            	}
+                if (point == projector.getCurrentPoint()
+                        && hotPointMode == true) {
+                    point.setColor(hotColor);
+                } else {
+                    point.setColor(baseColor);
+                }
                 point.incrementActivation(ceiling, incrementAmount);
             } else {
                 point.setColorBasedOnVal(Utils.colorToFloat(baseColor));

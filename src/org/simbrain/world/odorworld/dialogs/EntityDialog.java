@@ -41,8 +41,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of
  * creatures and entities within a world environment.
  */
-public class EntityDialog extends StandardDialog implements
-        ActionListener {
+public class EntityDialog extends StandardDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -149,7 +148,7 @@ public class EntityDialog extends StandardDialog implements
                     "Pages/Worlds/OdorWorld/agents.html");
         } else {
             helpAction = new ShowHelpAction(
-                "Pages/Worlds/OdorWorld/objects.html");
+                    "Pages/Worlds/OdorWorld/objects.html");
         }
         addButton(new JButton(helpAction));
         setContentPane(tabbedPane);

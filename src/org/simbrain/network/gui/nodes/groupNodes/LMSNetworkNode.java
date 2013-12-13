@@ -95,8 +95,8 @@ public class LMSNetworkNode extends SubnetworkNode {
             }
 
         };
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-                (Trainable) getGroup()));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
+                getNetworkPanel(), (Trainable) getGroup()));
         dataActions.addSeparator();
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
                 lms.getInputNeurons(), inputData, "Input"));

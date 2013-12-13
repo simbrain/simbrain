@@ -72,7 +72,7 @@ public class DocViewerComponent extends WorkspaceComponent {
     }
 
     /**
-     * Constructa  new document viewer component.
+     * Constructa new document viewer component.
      */
     public DocViewerComponent(String name) {
         super(name);
@@ -87,11 +87,9 @@ public class DocViewerComponent extends WorkspaceComponent {
         }
     }
 
-
     @Override
     public void update() {
     }
-
 
     @Override
     public void closing() {

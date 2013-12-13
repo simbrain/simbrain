@@ -27,17 +27,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.
-    JumpAndDecayPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.
-    ProbabilisticSpikeResponderPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.
-    RiseAndDecayPanel;
-import org.simbrain.network.gui.dialogs.synapse.spike_responders.
-    StepSpikerPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.JumpAndDecayPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.ProbabilisticSpikeResponderPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.RiseAndDecayPanel;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.StepSpikerPanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.
-    ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
@@ -55,8 +50,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * A mapping of available spike responders to their respective panels. Used
      * as a reference (especially for combo-boxes) by GUI classes.
      */
-    public static final HashMap<String, AbstractSpikeResponsePanel>
-    RESPONDER_MAP = new HashMap<String, AbstractSpikeResponsePanel>();
+    public static final HashMap<String, AbstractSpikeResponsePanel> RESPONDER_MAP = new HashMap<String, AbstractSpikeResponsePanel>();
 
     static {
         RESPONDER_MAP.put(new JumpAndDecay().getDescription(),
@@ -65,8 +59,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
                 new ProbabilisticSpikeResponderPanel());
         RESPONDER_MAP.put(new RiseAndDecay().getDescription(),
                 new RiseAndDecayPanel());
-        RESPONDER_MAP.put(new Step().getDescription(),
-                new StepSpikerPanel());
+        RESPONDER_MAP.put(new Step().getDescription(), new StepSpikerPanel());
     }
 
     /** Main panel. */
@@ -74,13 +67,13 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * A flag used to indicate whether this panel will be replacing spike
-     * responders or simply writing to them. In cases where the panel
-     * represents the same responder as the responder of each of the synapses
-     * (i.e. Step panel & Step spike responder) the synapses' update rules are
-     * edited, not replaced. However, if the panel does not correspond to the
-     * spike responder of the synapses being edited, then new
-     * SpikeResponder objects are created, and replace the old rule.
-     * This optimization prevents multiple redundant "instanceof" checks.
+     * responders or simply writing to them. In cases where the panel represents
+     * the same responder as the responder of each of the synapses (i.e. Step
+     * panel & Step spike responder) the synapses' update rules are edited, not
+     * replaced. However, if the panel does not correspond to the spike
+     * responder of the synapses being edited, then new SpikeResponder objects
+     * are created, and replace the old rule. This optimization prevents
+     * multiple redundant "instanceof" checks.
      */
     private boolean replacing = true;
 
@@ -114,8 +107,9 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Populate fields with current data.
+     *
      * @param spikeResponderList the list of spike responders being used to
-     * ascertain which values should fill their respective fields.
+     *            ascertain which values should fill their respective fields.
      */
     public abstract void fillFieldValues(
             final List<SpikeResponder> spikeResponderList);
@@ -131,8 +125,9 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * synapse which will be used as a template and copied, since it only takes
      * in one synapse. This typically occurs during the creation of multiple
      * synapses.
+     *
      * @param synapse the synapse to which spike responder changes will be
-     * committed
+     *            committed
      */
     public abstract void commitChanges(final Synapse synapse);
 
@@ -146,7 +141,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * {@link #writeValuesToRules(List)} to make the actual changes.
      *
      * @param synapses the synapses to which spike responder changes will be
-     * committed
+     *            committed
      */
     public abstract void commitChanges(final List<Synapse> synapses);
 
@@ -155,18 +150,19 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * a given list of synapses. Prior to using this method it must be the case
      * that all synapses in the lists' spike responders are of the appropriate
      * type, otherwise a ClassCastException will be thrown.
+     *
      * @param synapses the synapses whose spike responders will be written to
-     * based on the values in their respective fields.
+     *            based on the values in their respective fields.
      */
     protected abstract void writeValuesToRules(final List<Synapse> synapses);
 
     /**
-     * Tells this panel whether it is going to be editing spike responders,
-     * or creating new ones and replacing the spike responders of each of the
+     * Tells this panel whether it is going to be editing spike responders, or
+     * creating new ones and replacing the spike responders of each of the
      * synapses being edited.
      *
-     * @param replace
-     *              tell the panel if it's replacing responders or editing them
+     * @param replace tell the panel if it's replacing responders or editing
+     *            them
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -186,7 +182,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     /**
      * @return the list of the names of the spike responders for combo-boxes
      */
-    public static String [] getResponderList() {
+    public static String[] getResponderList() {
         return RESPONDER_MAP.keySet().toArray(new String[RESPONDER_MAP.size()]);
     }
 

@@ -15,13 +15,13 @@ package org.simbrain.world.odorworld.dialogs;
 
 import javax.swing.JTextField;
 
-import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Panel to add a straight movement effector to an entity or to modify and existing one.
+ * Panel to add a straight movement effector to an entity or to modify and
+ * existing one.
  *
  * @author Lam Nguyen
  *
@@ -38,7 +38,8 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
     private RotatingEntity entity;
 
     /**
-     * Reference to straight movement effector. Initially null if this is a creation panel.
+     * Reference to straight movement effector. Initially null if this is a
+     * creation panel.
      */
     private StraightMovement straightEffector;
 
@@ -63,7 +64,8 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
      *
      * @param entity the entity to which a straight movement effector is added.
      */
-    public StraightEffectorPanel(OdorWorldEntity entity, StraightMovement effector) {
+    public StraightEffectorPanel(OdorWorldEntity entity,
+            StraightMovement effector) {
         this.entity = (RotatingEntity) entity;
         this.straightEffector = effector;
         addItem("Label", label);
@@ -78,7 +80,8 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
             entity.addEffector(new StraightMovement(entity, bma.getText()));
         } else {
             straightEffector.setLabel(label.getText());
-            straightEffector.setScalingFactor(Double.parseDouble(bma.getText()));
+            straightEffector
+                    .setScalingFactor(Double.parseDouble(bma.getText()));
         }
     }
 

@@ -32,8 +32,7 @@ import org.simbrain.network.trainers.TrainingSet;
  *
  * @author Jeff Yoshimi
  */
-public final class BPTTNetwork extends FeedForward implements
-        Trainable {
+public final class BPTTNetwork extends FeedForward implements Trainable {
 
     /** Number of steps in each trained sequences. */
     private int stepsPerSequences = 5;
@@ -60,9 +59,7 @@ public final class BPTTNetwork extends FeedForward implements
         this.getInputLayer().setNeuronType(new LinearRule());
         setLabel("BPTT");
 
-
     }
-
 
     @Override
     public void initNetwork() {
@@ -79,18 +76,17 @@ public final class BPTTNetwork extends FeedForward implements
 
     /**
      * Returns the hidden layer.
+     *
      * @return the hidden layer
      */
     public NeuronGroup getHiddenLayer() {
         return this.getNeuronGroup(1);
     }
 
-
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
     }
-
 
     /**
      * @return the stepsPerSequences

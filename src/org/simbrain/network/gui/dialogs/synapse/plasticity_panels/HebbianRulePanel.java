@@ -62,8 +62,8 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
                 "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }

@@ -16,7 +16,6 @@ package org.simbrain.network.gui.dialogs.layout;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 
@@ -25,28 +24,27 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
  */
 public class LineLayoutPanel extends AbstractLayoutPanel {
 
-	/** Spacing field. */
-	private JTextField tfSpacing = new JTextField();
+    /** Spacing field. */
+    private JTextField tfSpacing = new JTextField();
 
-	/** Layout style selected. */
-	private JComboBox<LineOrientation> cbLayouts =
-			new JComboBox<LineOrientation>(
-					new LineOrientation[] { LineOrientation.HORIZONTAL,
-							LineOrientation.VERTICAL });
+    /** Layout style selected. */
+    private JComboBox<LineOrientation> cbLayouts = new JComboBox<LineOrientation>(
+            new LineOrientation[] { LineOrientation.HORIZONTAL,
+                    LineOrientation.VERTICAL });
 
-	/**
-	 * Default constructor.
-	 */
-	public LineLayoutPanel(LineLayout layout) {
-		this.layout = layout;
-		fillFieldValues();
-		this.addItem("Layout Style", cbLayouts);
-		this.addItem("Spacing:", tfSpacing);
-	}
+    /**
+     * Default constructor.
+     */
+    public LineLayoutPanel(LineLayout layout) {
+        this.layout = layout;
+        fillFieldValues();
+        this.addItem("Layout Style", cbLayouts);
+        this.addItem("Spacing:", tfSpacing);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void commitChanges() {
         ((LineLayout) layout).setOrientation((LineOrientation) cbLayouts

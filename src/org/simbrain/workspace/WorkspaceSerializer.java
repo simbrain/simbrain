@@ -274,8 +274,8 @@ public class WorkspaceSerializer {
 
                 Class[] argDataTypes = couplingRef.getArchivedConsumer()
                         .getArgumentDataTypes();
-                Consumer<?> consumer = targetComponent
-                        .getAttributeManager().createConsumer(
+                Consumer<?> consumer = targetComponent.getAttributeManager()
+                        .createConsumer(
                                 targetComponent.getObjectFromKey(couplingRef
                                         .getArchivedConsumer()
                                         .getBaseObjectKey()),

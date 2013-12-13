@@ -50,7 +50,7 @@ public final class ShowAdjustConnectivityDialog extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        //putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
         updateAction();
 
         // add a selection listener to update state based on selection

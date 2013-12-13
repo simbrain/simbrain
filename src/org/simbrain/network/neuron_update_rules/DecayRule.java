@@ -29,296 +29,289 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
 public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
-	ClippableUpdateRule {
+        ClippableUpdateRule {
 
-	/** The Default upper bound. */
-	private static final double DEFAULT_CEILING = 1.0;
+    /** The Default upper bound. */
+    private static final double DEFAULT_CEILING = 1.0;
 
-	/** The Default lower bound. */
-	private static final double DEFAULT_FLOOR = -1.0;
+    /** The Default lower bound. */
+    private static final double DEFAULT_FLOOR = -1.0;
 
-	/** Relative. */
-	private static final int RELATIVE = 0;
+    /** Relative. */
+    private static final int RELATIVE = 0;
 
-	/** Absolute. */
-	private static final int ABSOLUTE = 1;
+    /** Absolute. */
+    private static final int ABSOLUTE = 1;
 
-	/** Relative absolute. */
-	private int relAbs = RELATIVE;
+    /** Relative absolute. */
+    private int relAbs = RELATIVE;
 
-	/** Decay amount. */
-	private double decayAmount = .1;
+    /** Decay amount. */
+    private double decayAmount = .1;
 
-	/** Decay fraction. */
-	private double decayFraction = .1;
+    /** Decay fraction. */
+    private double decayFraction = .1;
 
-	/** Base line. */
-	private double baseLine = 0;
+    /** Base line. */
+    private double baseLine = 0;
 
-	/** Clipping. */
-	private boolean clipping = true;
+    /** Clipping. */
+    private boolean clipping = true;
 
-	/** Noise dialog. */
-	private Randomizer noiseGenerator = new Randomizer();
+    /** Noise dialog. */
+    private Randomizer noiseGenerator = new Randomizer();
 
-	/** Add noise to the neuron. */
-	private boolean addNoise = false;
+    /** Add noise to the neuron. */
+    private boolean addNoise = false;
 
-	/** The upper bound of the activity if clipping is used. */
-	private double ceiling = DEFAULT_CEILING;
+    /** The upper bound of the activity if clipping is used. */
+    private double ceiling = DEFAULT_CEILING;
 
-	/** The lower bound of the activity if clipping is used. */
-	private double floor = DEFAULT_FLOOR;
+    /** The lower bound of the activity if clipping is used. */
+    private double floor = DEFAULT_FLOOR;
 
-	/**
-	 * @return Time type.
-	 */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /**
+     * @return Time type.
+     */
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	/**
-	 * @{inheritDoc
-	 */
-	public DecayRule deepCopy() {
-		DecayRule dn = new DecayRule();
-		dn.setRelAbs(getRelAbs());
-		dn.setDecayAmount(getDecayAmount());
-		dn.setDecayFraction(getDecayFraction());
-		dn.setClipped(isClipped());
-		dn.setUpperBound(getCeiling());
-		dn.setLowerBound(getFloor());
-		dn.setIncrement(getIncrement());
-		dn.setAddNoise(getAddNoise());
-		dn.noiseGenerator = new Randomizer(noiseGenerator);
-		return dn;
-	}
+    /**
+     * @{inheritDoc
+     */
+    public DecayRule deepCopy() {
+        DecayRule dn = new DecayRule();
+        dn.setRelAbs(getRelAbs());
+        dn.setDecayAmount(getDecayAmount());
+        dn.setDecayFraction(getDecayFraction());
+        dn.setClipped(isClipped());
+        dn.setUpperBound(getCeiling());
+        dn.setLowerBound(getFloor());
+        dn.setIncrement(getIncrement());
+        dn.setAddNoise(getAddNoise());
+        dn.noiseGenerator = new Randomizer(noiseGenerator);
+        return dn;
+    }
 
-	/**
-	 * @{inheritDoc
-	 */
-	public void update(Neuron neuron) {
-		double val = neuron.getActivation() + neuron.getWeightedInputs();
-		double decayVal = 0;
+    /**
+     * @{inheritDoc
+     */
+    public void update(Neuron neuron) {
+        double val = neuron.getActivation() + neuron.getWeightedInputs();
+        double decayVal = 0;
 
-		if (relAbs == RELATIVE) {
-			decayVal = decayFraction * Math.abs(val - baseLine);
-		} else if (relAbs == ABSOLUTE) {
-			decayVal = decayAmount;
-		}
+        if (relAbs == RELATIVE) {
+            decayVal = decayFraction * Math.abs(val - baseLine);
+        } else if (relAbs == ABSOLUTE) {
+            decayVal = decayAmount;
+        }
 
-		// Here's where the action happens
-		if (val < baseLine) {
-			val += decayVal;
+        // Here's where the action happens
+        if (val < baseLine) {
+            val += decayVal;
 
-			// in case of an overshoot
-			if (val > baseLine) {
-				val = baseLine;
-			}
-		} else if (val > baseLine) {
-			val -= decayVal;
+            // in case of an overshoot
+            if (val > baseLine) {
+                val = baseLine;
+            }
+        } else if (val > baseLine) {
+            val -= decayVal;
 
-			// in case of an overshoot
-			if (val < baseLine) {
-				val = baseLine;
-			}
-		}
+            // in case of an overshoot
+            if (val < baseLine) {
+                val = baseLine;
+            }
+        }
 
-		if (addNoise) {
-			val += noiseGenerator.getRandom();
-		}
+        if (addNoise) {
+            val += noiseGenerator.getRandom();
+        }
 
-		if (clipping) {
-			val = clip(val);
-		}
+        if (clipping) {
+            val = clip(val);
+        }
 
-		neuron.setBuffer(val);
-	}
+        neuron.setBuffer(val);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double clip(double val) {
-		if(val > getCeiling()) {
-			return getCeiling();
-		} else if (val < getFloor()) {
-			return getFloor();
-		} else {
-			return val;
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double clip(double val) {
+        if (val > getCeiling()) {
+            return getCeiling();
+        } else if (val < getFloor()) {
+            return getFloor();
+        } else {
+            return val;
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextualIncrement(Neuron n) {
-		double act = n.getActivation();
-		if (act >= getCeiling() && isClipped()) {
-			return;
-		} else {
-			if(isClipped()) {
-				act = clip(act + increment);
-			} else {
-				act = act + increment;
-			}
-			n.setActivation(act);
-			n.getNetwork().fireNeuronChanged(n);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextualIncrement(Neuron n) {
+        double act = n.getActivation();
+        if (act >= getCeiling() && isClipped()) {
+            return;
+        } else {
+            if (isClipped()) {
+                act = clip(act + increment);
+            } else {
+                act = act + increment;
+            }
+            n.setActivation(act);
+            n.getNetwork().fireNeuronChanged(n);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextualDecrement(Neuron n) {
-		double act = n.getActivation();
-		if (act <= getFloor() && isClipped()) {
-			return;
-		} else {
-			if(isClipped()) {
-				act = clip(act - increment);
-			} else {
-				act = act - increment;
-			}
-			n.setActivation(act);
-			n.getNetwork().fireNeuronChanged(n);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextualDecrement(Neuron n) {
+        double act = n.getActivation();
+        if (act <= getFloor() && isClipped()) {
+            return;
+        } else {
+            if (isClipped()) {
+                act = clip(act - increment);
+            } else {
+                act = act - increment;
+            }
+            n.setActivation(act);
+            n.getNetwork().fireNeuronChanged(n);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getRandomValue() {
-		return (getCeiling() - getFloor()) * Math.random()
-				- getFloor();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRandomValue() {
+        return (getCeiling() - getFloor()) * Math.random() - getFloor();
+    }
 
-	/**
-	 * @return Returns the decayAmount.
-	 */
-	public double getDecayAmount() {
-		return decayAmount;
-	}
+    /**
+     * @return Returns the decayAmount.
+     */
+    public double getDecayAmount() {
+        return decayAmount;
+    }
 
-	/**
-	 * @param decayAmount
-	 *            The decayAmount to set.
-	 */
-	public void setDecayAmount(final double decayAmount) {
-		this.decayAmount = decayAmount;
-	}
+    /**
+     * @param decayAmount The decayAmount to set.
+     */
+    public void setDecayAmount(final double decayAmount) {
+        this.decayAmount = decayAmount;
+    }
 
-	/**
-	 * @return Returns the dedayPercentage.
-	 */
-	public double getDecayFraction() {
-		return decayFraction;
-	}
+    /**
+     * @return Returns the dedayPercentage.
+     */
+    public double getDecayFraction() {
+        return decayFraction;
+    }
 
-	/**
-	 * @param decayFraction
-	 *            The decayFraction to set.
-	 */
-	public void setDecayFraction(final double decayFraction) {
-		this.decayFraction = decayFraction;
-	}
+    /**
+     * @param decayFraction The decayFraction to set.
+     */
+    public void setDecayFraction(final double decayFraction) {
+        this.decayFraction = decayFraction;
+    }
 
-	/**
-	 * @return Returns the relAbs.
-	 */
-	public int getRelAbs() {
-		return relAbs;
-	}
+    /**
+     * @return Returns the relAbs.
+     */
+    public int getRelAbs() {
+        return relAbs;
+    }
 
-	/**
-	 * @param relAbs
-	 *            The relAbs to set.
-	 */
-	public void setRelAbs(final int relAbs) {
-		this.relAbs = relAbs;
-	}
+    /**
+     * @param relAbs The relAbs to set.
+     */
+    public void setRelAbs(final int relAbs) {
+        this.relAbs = relAbs;
+    }
 
-	/**
-	 * @return Returns the addNoise.
-	 */
-	public boolean getAddNoise() {
-		return addNoise;
-	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
 
-	/**
-	 * @param addNoise
-	 *            The addNoise to set.
-	 */
-	public void setAddNoise(final boolean addNoise) {
-		this.addNoise = addNoise;
-	}
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(final boolean addNoise) {
+        this.addNoise = addNoise;
+    }
 
-	/**
-	 * @return Returns the noiseGenerator.
-	 */
-	public Randomizer getNoiseGenerator() {
-		return noiseGenerator;
-	}
+    /**
+     * @return Returns the noiseGenerator.
+     */
+    public Randomizer getNoiseGenerator() {
+        return noiseGenerator;
+    }
 
-	/**
-	 * @param noiseGenerator
-	 *            The noiseGenerator to set.
-	 */
-	public void setNoiseGenerator(final Randomizer noiseGenerator) {
-		this.noiseGenerator = noiseGenerator;
-	}
+    /**
+     * @param noiseGenerator The noiseGenerator to set.
+     */
+    public void setNoiseGenerator(final Randomizer noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
 
-	/**
-	 * @return Returns the baseLine.
-	 */
-	public double getBaseLine() {
-		return baseLine;
-	}
+    /**
+     * @return Returns the baseLine.
+     */
+    public double getBaseLine() {
+        return baseLine;
+    }
 
-	/**
-	 * @param baseLine
-	 *            The baseLine to set.
-	 */
-	public void setBaseLine(final double baseLine) {
-		this.baseLine = baseLine;
-	}
+    /**
+     * @param baseLine The baseLine to set.
+     */
+    public void setBaseLine(final double baseLine) {
+        this.baseLine = baseLine;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Decay";
-	}
+    @Override
+    public String getDescription() {
+        return "Decay";
+    }
 
-	@Override
-	public double getCeiling() {
-		return ceiling;
-	}
+    @Override
+    public double getCeiling() {
+        return ceiling;
+    }
 
-	@Override
-	public double getFloor() {
-		return floor;
-	}
+    @Override
+    public double getFloor() {
+        return floor;
+    }
 
-	@Override
-	public void setUpperBound(double ceiling) {
-		this.ceiling = ceiling;
-	}
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceiling = ceiling;
+    }
 
-	@Override
-	public void setLowerBound(double floor) {
-		this.floor = floor;
-	}
+    @Override
+    public void setLowerBound(double floor) {
+        this.floor = floor;
+    }
 
-	@Override
-	public boolean isClipped() {
-		return clipping;
-	}
+    @Override
+    public boolean isClipped() {
+        return clipping;
+    }
 
-	@Override
-	public void setClipped(boolean clipping) {
-		this.clipping = clipping;
-	}
+    @Override
+    public void setClipped(boolean clipping) {
+        this.clipping = clipping;
+    }
 
 }

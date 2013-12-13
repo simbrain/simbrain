@@ -25,7 +25,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -278,26 +277,27 @@ public abstract class ConnectNeurons {
     }
 
     /**
-     * Sets the target neurons to the neurons specified in the list. If any 
+     * Sets the target neurons to the neurons specified in the list. If any
      * neurons in the list implements the ActivityGenerator interface (which
-     * should never have incoming connections), they are automatically
-     * excluded from the list.
+     * should never have incoming connections), they are automatically excluded
+     * from the list.
+     *
      * @param targetNeurons the target neurons
      */
     public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
-    	ArrayList<Neuron> realTargets = new ArrayList<Neuron>();
-    	
-    	for (Neuron n : targetNeurons) {
-    		// If n not an activity generator, add it.
-    		if (!n.isGenerator()) {
-    			realTargets.add(n);
-    		}
-    	}
-    	
+        ArrayList<Neuron> realTargets = new ArrayList<Neuron>();
+
+        for (Neuron n : targetNeurons) {
+            // If n not an activity generator, add it.
+            if (!n.isGenerator()) {
+                realTargets.add(n);
+            }
+        }
+
         this.targetNeurons = realTargets;
-          
+
         recurrent = testRecurrence();
-        
+
     }
 
     /**
@@ -330,24 +330,24 @@ public abstract class ConnectNeurons {
         this.targetNeurons = target;
     }
 
-	public void setInhibitoryRandomizer(Randomizer inhibitoryRandomizer) {
-		this.inhibitoryRandomizer = inhibitoryRandomizer;
-	}
+    public void setInhibitoryRandomizer(Randomizer inhibitoryRandomizer) {
+        this.inhibitoryRandomizer = inhibitoryRandomizer;
+    }
 
-	public void setExcitatoryRandomizer(Randomizer excitatoryRandomizer) {
-		this.excitatoryRandomizer = excitatoryRandomizer;
-	}
+    public void setExcitatoryRandomizer(Randomizer excitatoryRandomizer) {
+        this.excitatoryRandomizer = excitatoryRandomizer;
+    }
 
-	public double getExcitatoryRatio() {
-		return excitatoryRatio;
-	}
+    public double getExcitatoryRatio() {
+        return excitatoryRatio;
+    }
 
-	public boolean isEnableExcitatoryRandomization() {
-		return enableExcitatoryRandomization;
-	}
+    public boolean isEnableExcitatoryRandomization() {
+        return enableExcitatoryRandomization;
+    }
 
-	public boolean isEnableInhibitoryRandomization() {
-		return enableInhibitoryRandomization;
-	}
+    public boolean isEnableInhibitoryRandomization() {
+        return enableInhibitoryRandomization;
+    }
 
 }

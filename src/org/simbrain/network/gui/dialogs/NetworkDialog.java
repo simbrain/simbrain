@@ -134,7 +134,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
      * Threshold above which subnetworks or groups with that many synapses stop
      * displaying them.
      */
-    private JTextField tfSynapseVisibilityThreshold= new JTextField();
+    private JTextField tfSynapseVisibilityThreshold = new JTextField();
 
     /** Rounding check box. */
     private JCheckBox isRoundingBox = new JCheckBox();
@@ -203,7 +203,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         graphicsPanel.addItem("Show time", showTimeBox);
 
         // Set up Misc Panel
-        miscPanel.addItem("Synapse visibility threshold", tfSynapseVisibilityThreshold);
+        miscPanel.addItem("Synapse visibility threshold",
+                tfSynapseVisibilityThreshold);
         miscPanel.addItem("Round off neuron values", isRoundingBox);
         miscPanel.addItem("Precision of round-off", precisionField);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);

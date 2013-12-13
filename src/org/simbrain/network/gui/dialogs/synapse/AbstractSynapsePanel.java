@@ -61,17 +61,17 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * A mapping of available update rules to their respective panels. Used as a
      * reference (especially for combo-boxes) by GUI classes.
      */
-    public static final LinkedHashMap<String, AbstractSynapsePanel> RULE_MAP =
-            new LinkedHashMap<String, AbstractSynapsePanel>();
+    public static final LinkedHashMap<String, AbstractSynapsePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapsePanel>();
 
     // Populate synapse rule map
     static {
         RULE_MAP.put(new ClampedSynapseRule().getDescription(),
-                new ClampedSynapseRulePanel()); // TODO: Backwards compatibility.  Remove for 3.0 after converting all sims.
+                new ClampedSynapseRulePanel()); // TODO: Backwards
+                                                // compatibility. Remove for 3.0
+                                                // after converting all sims.
         RULE_MAP.put(new StaticSynapseRule().getDescription(),
                 new StaticSynapsePanel());
-        RULE_MAP.put(new HebbianRule().getDescription(),
-                new HebbianRulePanel());
+        RULE_MAP.put(new HebbianRule().getDescription(), new HebbianRulePanel());
         RULE_MAP.put(new HebbianCPCARule().getDescription(),
                 new HebbianCPCARulePanel());
         RULE_MAP.put(new HebbianThresholdRule().getDescription(),
@@ -102,10 +102,8 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Adds an item.
      *
-     * @param text
-     *            label of item to add
-     * @param comp
-     *            component to add
+     * @param text label of item to add
+     * @param comp component to add
      */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
@@ -114,10 +112,8 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Add item label.
      *
-     * @param text
-     *            label to add
-     * @param comp
-     *            component to apply label
+     * @param text label to add
+     * @param comp component to apply label
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
@@ -134,11 +130,9 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Populate fields with current data.
      *
-     * @param ruleList
-     *            the list of rules from which variables will be displayed
+     * @param ruleList the list of rules from which variables will be displayed
      */
-    public abstract void fillFieldValues(
-            final List<SynapseUpdateRule> ruleList);
+    public abstract void fillFieldValues(final List<SynapseUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
@@ -155,8 +149,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * to multiple synapses, {@link #commitChanges(List)} does this much more
      * efficiently.
      *
-     * @param synapse
-     *            the synapse being edited.
+     * @param synapse the synapse being edited.
      */
     public abstract void commitChanges(final Synapse synapse);
 
@@ -166,8 +159,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * process rather than the synapse creation process, but there is no reason
      * outside convention for this to be the case.
      *
-     * @param synapses
-     *            the synapses being edited
+     * @param synapses the synapses being edited
      */
     public abstract void commitChanges(final List<Synapse> synapses);
 
@@ -178,11 +170,10 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * whether the synapse rules are replaced by a new rule before this rule is
      * called.
      *
-     * @param synapses
-     *            the neurons whose rules are being <b>edited</b>, not replaced.
+     * @param synapses the neurons whose rules are being <b>edited</b>, not
+     *            replaced.
      */
-    protected abstract void writeValuesToRules(
-            final List<Synapse> synapses);
+    protected abstract void writeValuesToRules(final List<Synapse> synapses);
 
     /**
      * Are we replacing rules or editing them? Replacing happens when
@@ -200,8 +191,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * or creating new ones and replacing the update rule of each of the
      * synapses being edited.
      *
-     * @param replace
-     *              tell the panel if it's replacing rules or editing them
+     * @param replace tell the panel if it's replacing rules or editing them
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -228,8 +218,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.
      *
-     * @param text
-     *            Text to add to bottom of panel
+     * @param text Text to add to bottom of panel
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();

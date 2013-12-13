@@ -47,12 +47,10 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
     private final JTextField tfOutputThreshold = new JTextField();
 
     /** Output threshold combo box. */
-    private final TristateDropDown isOutputThresholdSliding =
-            new TristateDropDown();
+    private final TristateDropDown isOutputThresholdSliding = new TristateDropDown();
 
     /** Synapse refernece. */
-    private static final HebbianThresholdRule prototypeRule =
-            new HebbianThresholdRule();
+    private static final HebbianThresholdRule prototypeRule = new HebbianThresholdRule();
 
     /**
      * This method is the default constructor.
@@ -66,29 +64,28 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
-     * 
-     * @param ruleList
-     *            the list of rules to edit/use to display variables from
+     *
+     * @param ruleList the list of rules to edit/use to display variables from
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        HebbianThresholdRule synapseRef =
-                (HebbianThresholdRule) ruleList.get(0);
+        HebbianThresholdRule synapseRef = (HebbianThresholdRule) ruleList
+                .get(0);
 
         // (Below) Handle consistency of multiply selections
 
         // Handle Learning Rate
-        if (!NetworkUtils.isConsistent(ruleList,
-                HebbianThresholdRule.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
         // Handle Threshold Momentum
-        if (!NetworkUtils.isConsistent(ruleList,
-                HebbianThresholdRule.class, "getOutputThresholdMomentum")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getOutputThresholdMomentum")) {
             tfOutputThresholdMomentum.setText(NULL_STRING);
         } else {
             tfOutputThresholdMomentum.setText(Double.toString(synapseRef
@@ -96,8 +93,8 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         }
 
         // Handle Output Threshold
-        if (!NetworkUtils.isConsistent(ruleList,
-                HebbianThresholdRule.class, "getOutputThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
+                "getOutputThreshold")) {
             tfOutputThreshold.setText(NULL_STRING);
         } else {
             tfOutputThreshold.setText(Double.toString(synapseRef
@@ -105,8 +102,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         }
 
         // Handle Output Threshold Slider
-        if (!NetworkUtils.isConsistent(ruleList,
-                HebbianThresholdRule.class,
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
                 "getUseSlidingOutputThreshold")) {
             isOutputThresholdSliding.setNull();
         } else {
@@ -195,8 +191,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
 
         // Sliding Output Threshold
         if (!isOutputThresholdSliding.isNull()) {
-            boolean slidingThreshold =
-                    isOutputThresholdSliding.isSelected();
+            boolean slidingThreshold = isOutputThresholdSliding.isSelected();
             for (Synapse s : synapses) {
                 ((HebbianThresholdRule) s.getLearningRule())
                         .setUseSlidingOutputThreshold(slidingThreshold);

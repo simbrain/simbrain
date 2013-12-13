@@ -29,107 +29,106 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
 public class RandomNeuronRule extends NeuronUpdateRule implements
-		BoundedUpdateRule, ActivityGenerator {
+        BoundedUpdateRule, ActivityGenerator {
 
-	/** Noise source. */
-	private Randomizer randomizer = new Randomizer();
+    /** Noise source. */
+    private Randomizer randomizer = new Randomizer();
 
-	private double ceiling = 1.0;
+    private double ceiling = 1.0;
 
-	private double floor = -1.0;
+    private double floor = -1.0;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.DISCRETE;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
 
-	public RandomNeuronRule(Neuron n) {
-		super();
-		init(n);
-		randomizer.setUpperBound(getCeiling());
-		randomizer.setLowerBound(getFloor());
-	}
+    public RandomNeuronRule(Neuron n) {
+        super();
+        init(n);
+        randomizer.setUpperBound(getCeiling());
+        randomizer.setLowerBound(getFloor());
+    }
 
-	public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
-		super();
-		init(n);
-		setRandomizer(new Randomizer(rn.randomizer));
-	}
+    public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
+        super();
+        init(n);
+        setRandomizer(new Randomizer(rn.randomizer));
+    }
 
-	public RandomNeuronRule() {
-		super();
-	}
+    public RandomNeuronRule() {
+        super();
+    }
 
-	/**
-	 * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
-	 * set of neurons, {@link #init(Neuron) init} must be called to ensure
-	 * rational behavior for an activity generator. The
-	 * {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy constructor} is
-	 * the preferred method of copying because {@link #init(Neuron) init} is
-	 * called on the neuron parameter automatically.
-	 */
-	public RandomNeuronRule deepCopy() {
-		RandomNeuronRule rn = new RandomNeuronRule();
-		rn.randomizer = new Randomizer(randomizer);
-		return rn;
-	}
+    /**
+     * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
+     * set of neurons, {@link #init(Neuron) init} must be called to ensure
+     * rational behavior for an activity generator. The
+     * {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy constructor} is
+     * the preferred method of copying because {@link #init(Neuron) init} is
+     * called on the neuron parameter automatically.
+     */
+    public RandomNeuronRule deepCopy() {
+        RandomNeuronRule rn = new RandomNeuronRule();
+        rn.randomizer = new Randomizer(randomizer);
+        return rn;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void update(Neuron neuron) {
-		neuron.setBuffer(randomizer.getRandom());
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void update(Neuron neuron) {
+        neuron.setBuffer(randomizer.getRandom());
+    }
 
-	/**
-	 * @return Returns the randomizer.
-	 */
-	public Randomizer getRandomizer() {
-		return randomizer;
-	}
+    /**
+     * @return Returns the randomizer.
+     */
+    public Randomizer getRandomizer() {
+        return randomizer;
+    }
 
-	/**
-	 * @param randomizer
-	 *            The randomizer to set.
-	 */
-	public void setRandomizer(final Randomizer randomizer) {
-		this.randomizer = randomizer;
-	}
+    /**
+     * @param randomizer The randomizer to set.
+     */
+    public void setRandomizer(final Randomizer randomizer) {
+        this.randomizer = randomizer;
+    }
 
-	@Override
-	public String getDescription() {
-		return "Random";
-	}
+    @Override
+    public String getDescription() {
+        return "Random";
+    }
 
-	@Override
-	public double getRandomValue() {
-		return randomizer.getRandom();
-	}
+    @Override
+    public double getRandomValue() {
+        return randomizer.getRandom();
+    }
 
-	@Override
-	public double getCeiling() {
-		return ceiling;
-	}
+    @Override
+    public double getCeiling() {
+        return ceiling;
+    }
 
-	@Override
-	public double getFloor() {
-		return floor;
-	}
+    @Override
+    public double getFloor() {
+        return floor;
+    }
 
-	@Override
-	public void init(Neuron n) {
-		n.setGenerator(true);
-	}
+    @Override
+    public void init(Neuron n) {
+        n.setGenerator(true);
+    }
 
-	@Override
-	public void setUpperBound(double ceiling) {
-		this.ceiling = ceiling;
-	}
+    @Override
+    public void setUpperBound(double ceiling) {
+        this.ceiling = ceiling;
+    }
 
-	@Override
-	public void setLowerBound(double floor) {
-		this.floor = floor;
-	}
+    @Override
+    public void setLowerBound(double floor) {
+        this.floor = floor;
+    }
 }

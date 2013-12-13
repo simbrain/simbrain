@@ -214,7 +214,6 @@ public class ProjectNNSubspace extends ProjectionMethod {
                 norm2 += (base2Down[k] * base2Down[k]);
             }
 
-
             /**
              * Case where three nearest neighbors are collinear, in which case
              * they don't define a two-dimensional subspace, so we project to a
@@ -237,7 +236,6 @@ public class ProjectNNSubspace extends ProjectionMethod {
             // Create the new point downstairs in terms of the downstairs basis
             x = (n1 * base1Down[0]) + (n2 * base2Down[0]) + point1Down.get(0);
             y = (n1 * base1Down[1]) + (n2 * base2Down[1]) + point1Down.get(1);
-
 
             lastAdded2D.setData(new double[] { x, y });
         }

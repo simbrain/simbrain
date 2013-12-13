@@ -34,8 +34,7 @@ import org.simbrain.util.Utils;
  * Self organizing map.
  *
  */
-public class SOMPropertiesPanel extends JPanel implements
-        GroupPropertiesPanel {
+public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_NEURONS = 16;
@@ -70,9 +69,8 @@ public class SOMPropertiesPanel extends JPanel implements
     /** The model subnetwork. */
     private SOM som;
 
-    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel;
-
 
     /**
      * Constructor for the case where an som is being created.
@@ -87,8 +85,7 @@ public class SOMPropertiesPanel extends JPanel implements
     }
 
     /**
-     * Constructor for case where an existing som  is being
-     * edited.
+     * Constructor for case where an existing som is being edited.
      *
      * @param np parent network panel
      * @param som network being modified.

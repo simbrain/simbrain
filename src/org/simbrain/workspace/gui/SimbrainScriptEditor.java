@@ -21,8 +21,6 @@ package org.simbrain.workspace.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -84,9 +82,8 @@ public class SimbrainScriptEditor extends ScriptEditor {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                //editor.getDesktop().clearDesktop(frame);
+                // editor.getDesktop().clearDesktop(frame);
             }
-
 
         };
     }
@@ -122,7 +119,6 @@ public class SimbrainScriptEditor extends ScriptEditor {
                     e.printStackTrace();
                 }
             }
-
 
         };
     }

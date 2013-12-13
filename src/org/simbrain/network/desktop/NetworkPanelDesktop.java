@@ -131,7 +131,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowWeightMatrixAction());
         editMenu.add(actionManager.getShowAdjustConnectivityDialog());
-        //editMenu.add(actionManager.getShowTrainerAction());
+        // editMenu.add(actionManager.getShowTrainerAction());
         editMenu.addSeparator();
         // editMenu.add(actionManager.getGroupAction());
         // editMenu.add(actionManager.getUngroupAction());
@@ -188,7 +188,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowPrioritiesAction());
-        //viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
+        // viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
         viewMenu.add(actionManager.getShowWeightsAction());
 
         return viewMenu;
@@ -271,12 +271,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     @Override
     public SynapseGroupNode addMenuToSynapseGroupNode(SynapseGroupNode node) {
-        return new SynapseGroupNodeDesktop(
-                component.getWorkspaceComponent(),
+        return new SynapseGroupNodeDesktop(component.getWorkspaceComponent(),
                 node.getNetworkPanel(), node.getSynapseGroup());
     }
-
-
 
     /**
      * This version adds the script menu.
@@ -305,6 +302,5 @@ public class NetworkPanelDesktop extends NetworkPanel {
         frame.setVisible(true);
         return frame;
     }
-
 
 }

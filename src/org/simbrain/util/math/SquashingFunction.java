@@ -144,14 +144,10 @@ public enum SquashingFunction {
      * Gives the value of the given squashing function for some input value, a
      * ceiling, floor, and slope.
      *
-     * @param val
-     *            the base value to pass the function
-     * @param ceil
-     *            the upper limit of the curve
-     * @param floor
-     *            the lower limit of the curve
-     * @param slope
-     *            the slope of the curve at zero
+     * @param val the base value to pass the function
+     * @param ceil the upper limit of the curve
+     * @param floor the lower limit of the curve
+     * @param slope the slope of the curve at zero
      * @return the output of the given squashing function
      */
     public abstract double valueOf(double val, double ceil, double floor,
@@ -161,18 +157,14 @@ public enum SquashingFunction {
      * Gives the value of the inverse of the given squashing function for some
      * input value, a ceiling, floor, and slope.
      *
-     * @param val
-     *            the base value to pass the inverse function
-     * @param ceil
-     *            the upper limit of the squashing function being inverted
-     * @param floor
-     *            the lower limit of the squashing function being inverted
-     * @param slope
-     *            the slope of the squashing function being inverted at zero
+     * @param val the base value to pass the inverse function
+     * @param ceil the upper limit of the squashing function being inverted
+     * @param floor the lower limit of the squashing function being inverted
+     * @param slope the slope of the squashing function being inverted at zero
      * @return the output of the given squashing function's inverse
      */
-    public abstract double inverseVal(double val, double ceil,
-            double floor, double slope);
+    public abstract double inverseVal(double val, double ceil, double floor,
+            double slope);
 
     /**
      * Gives the value of the derivative of the given squashing function for
@@ -180,18 +172,14 @@ public enum SquashingFunction {
      * the squashing function and the return value represents the derivative of
      * THAT function.
      *
-     * @param val
-     *            the base value to pass the function
-     * @param ceil
-     *            the upper limit of the curve
-     * @param floor
-     *            the lower limit of the curve
-     * @param slope
-     *            the slope of the curve at zero
+     * @param val the base value to pass the function
+     * @param ceil the upper limit of the curve
+     * @param floor the lower limit of the curve
+     * @param slope the slope of the curve at zero
      * @return the output of the given squashing function's derivative
      */
-    public abstract double derivVal(double val, double ceil,
-            double floor, double slope);
+    public abstract double derivVal(double val, double ceil, double floor,
+            double slope);
 
     /*
      * ****************************************************************
@@ -208,7 +196,7 @@ public enum SquashingFunction {
      * @param floor the desired minimum value (lower boundary) of tanh
      * @param slope the desired slope of the tanh function for val == 0
      * @return the value of val after being passed through a tanh function with
-     * these parameters
+     *         these parameters
      */
     public static double tanh(double val, double ceil, double floor,
             double slope) {
@@ -218,7 +206,7 @@ public enum SquashingFunction {
     }
 
     /**
-     * The  logistic function given an upper and lower limit and slope for a
+     * The logistic function given an upper and lower limit and slope for a
      * particular value.
      *
      * @param val the input to the logistic function
@@ -226,7 +214,7 @@ public enum SquashingFunction {
      * @param floor the desired minimum value (lower boundary) of logistic
      * @param slope the desired slope of the logistic function for val == 0
      * @return the value of val after being passed through a logistic function
-     * with these parameters
+     *         with these parameters
      */
     public static double logistic(double val, double ceil, double floor,
             double slope) {
@@ -238,8 +226,7 @@ public enum SquashingFunction {
      * Returns the standard logistic. Helper method so that the full logistic
      * function doesn't have to be written out every time it's invoked.
      *
-     * @param x
-     *            input argument
+     * @param x input argument
      * @return result of logistic
      */
     private static double logisticFunc(double x) {
@@ -255,14 +242,13 @@ public enum SquashingFunction {
      * @param floor the desired minimum value (lower boundary) of arctan
      * @param slope the desired slope of the arctan function for val == 0
      * @return the value of val after being passed through a arctan function
-     * with these parameters
+     *         with these parameters
      */
     public static double atan(double val, double ceil, double floor,
             double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
-        return (diff / Math.PI) * Math.atan(a * val)
-                + ((ceil + floor) / 2);
+        return (diff / Math.PI) * Math.atan(a * val) + ((ceil + floor) / 2);
     }
 
     /*
@@ -277,13 +263,13 @@ public enum SquashingFunction {
      *
      * @param val the input to the inverse tanh function
      * @param ceil the desired maximum value (upper boundary) of the tanh
-     * function that this is an inverse of
+     *            function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the tanh
-     * function that this is an inverse of
-     * @param slope the desired slope of the tanh function function that this
-     * is an inverse of for val == 0
+     *            function that this is an inverse of
+     * @param slope the desired slope of the tanh function function that this is
+     *            an inverse of for val == 0
      * @return the value of val after being passed through the inverse tanh
-     * function with these parameters
+     *         function with these parameters
      */
     public static double invTanh(double val, double ceil, double floor,
             double slope) {
@@ -297,16 +283,16 @@ public enum SquashingFunction {
      *
      * @param val the input to the inverse logistic function
      * @param ceil the desired maximum value (upper boundary) of the logistic
-     * function that this is an inverse of
+     *            function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the logistic
-     * function that this is an inverse of
+     *            function that this is an inverse of
      * @param slope the desired slope of the logistic function function that
-     * this is an inverse of for val == 0
+     *            this is an inverse of for val == 0
      * @return the value of val after being passed through the inverse logistic
-     *      function with these parameters.
+     *         function with these parameters.
      */
-    public static double invLogistic(double val, double ceil,
-            double floor, double slope) {
+    public static double invLogistic(double val, double ceil, double floor,
+            double slope) {
         double diff = ceil - floor;
         return diff * -Math.log(diff / (val - floor) - 1) / slope;
     }
@@ -316,13 +302,13 @@ public enum SquashingFunction {
      *
      * @param val the input to the inverse arctan (tan) function
      * @param ceil the desired maximum value (upper boundary) of the arctan
-     * function that this is an inverse of
+     *            function that this is an inverse of
      * @param floor the desired minimum value (lower boundary) of the arctan
-     * function that this is an inverse of
+     *            function that this is an inverse of
      * @param slope the desired slope of the arctan function function that this
-     * is an inverse of for val == 0
+     *            is an inverse of for val == 0
      * @return the value of val after being passed through the inverse arctan
-     * function with these parameters
+     *         function with these parameters
      */
     public static double invAtan(double val, double ceil, double floor,
             double slope) {
@@ -344,13 +330,13 @@ public enum SquashingFunction {
      *
      * @param val the input to the derivative of the tanh function
      * @param ceil the desired maximum value (upper boundary) of the tanh
-     * function that this is the derivative of
+     *            function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the tanh
-     * function that this is the derivative of
-     * @param slope the desired slope of the tanh function function that this
-     * is the derivative of for val == 0
-     * @return the value of val after being passed through the derivative of
-     * the tanh function with these parameters
+     *            function that this is the derivative of
+     * @param slope the desired slope of the tanh function function that this is
+     *            the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         tanh function with these parameters
      */
     public static double derivTanh(double val, double ceil, double floor,
             double slope) {
@@ -365,16 +351,16 @@ public enum SquashingFunction {
      *
      * @param val the input to the derivative of the logistic function
      * @param ceil the desired maximum value (upper boundary) of the logistic
-     * function that this is the derivative of
+     *            function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the logistic
-     * function that this is the derivative of
+     *            function that this is the derivative of
      * @param slope the desired slope of the logistic function function that
-     * this is the derivative of for val == 0
-     * @return the value of val after being passed through the derivative of
-     * the logistic function with these parameters.
+     *            this is the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         logistic function with these parameters.
      */
-    public static double derivLogistic(double val, double ceil,
-            double floor, double slope) {
+    public static double derivLogistic(double val, double ceil, double floor,
+            double slope) {
         double diff = ceil - floor;
         return slope * logisticFunc(slope * val / diff)
                 * (1 - logisticFunc(slope * val / diff));
@@ -386,13 +372,13 @@ public enum SquashingFunction {
      *
      * @param val the input to the derivative of arctan (tan) function
      * @param ceil the desired maximum value (upper boundary) of the arctan
-     * function that this is the derivative of
+     *            function that this is the derivative of
      * @param floor the desired minimum value (lower boundary) of the arctan
-     * function that this is the derivative of
+     *            function that this is the derivative of
      * @param slope the desired slope of the arctan function function that this
-     * is the derivative of for val == 0
-     * @return the value of val after being passed through the derivative of
-     * the arctan function with these parameters
+     *            is the derivative of for val == 0
+     * @return the value of val after being passed through the derivative of the
+     *         arctan function with these parameters
      */
     public static double derivAtan(double val, double ceil, double floor,
             double slope) {

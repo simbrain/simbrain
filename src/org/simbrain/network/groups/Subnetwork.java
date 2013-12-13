@@ -352,8 +352,8 @@ public class Subnetwork extends Group {
     }
 
     /**
-     * Get long description for info box, formmated in html.   Override
-     * for more detailed description.
+     * Get long description for info box, formmated in html. Override for more
+     * detailed description.
      *
      * @return the long description.
      */
@@ -403,8 +403,7 @@ public class Subnetwork extends Group {
      * @return whether to display synapses or not.
      */
     public boolean displaySynapses() {
-        int threshold = getParentNetwork()
-                .getSynapseVisibilityThreshold();
+        int threshold = getParentNetwork().getSynapseVisibilityThreshold();
 
         if (getFlatSynapseList().size() > threshold) {
             return false;

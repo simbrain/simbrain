@@ -345,14 +345,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         // Test input action
         contextMenu.add(new TestInputAction(getNetworkPanel()));
         contextMenu.addSeparator();
-        
+
         // Add property set item
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         // Show weight trainer and matrix action
-        //contextMenu.add(getNetworkPanel().getActionManager()
-        //        .getShowTrainerAction());
+        // contextMenu.add(getNetworkPanel().getActionManager()
+        // .getShowTrainerAction());
         contextMenu.add(getNetworkPanel().getActionManager()
                 .getShowWeightMatrixAction());
         contextMenu.add(getNetworkPanel().getActionManager()
@@ -399,8 +399,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                         NeuronDialog.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(circle.getX() - labelText.getWidth() / 2 + DIAMETER
-                    / 2, circle.getY() - DIAMETER / 2 - 1);
+            labelText.setOffset(circle.getX() - labelText.getWidth() / 2
+                    + DIAMETER / 2, circle.getY() - DIAMETER / 2 - 1);
             labelBackground.setBounds(labelText.getFullBounds());
 
             // update bounds to include text

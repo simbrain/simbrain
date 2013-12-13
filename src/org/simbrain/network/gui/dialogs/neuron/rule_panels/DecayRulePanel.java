@@ -42,256 +42,251 @@ import org.simbrain.util.widgets.TristateDropDown;
  * <b>DecayNeuronPanel</b>.
  */
 public class DecayRulePanel extends AbstractNeuronPanel implements
-		ActionListener {
+        ActionListener {
 
-	/** Relative absolute combo box. */
-	private TristateDropDown cbRelAbs = new TristateDropDown("Relative",
-			"Absolute");
+    /** Relative absolute combo box. */
+    private TristateDropDown cbRelAbs = new TristateDropDown("Relative",
+            "Absolute");
 
-	/** Decay amount field. */
-	private JTextField tfDecayAmount = new JTextField();
+    /** Decay amount field. */
+    private JTextField tfDecayAmount = new JTextField();
 
-	/** Decay fraction field. */
-	private JTextField tfDecayFraction = new JTextField();
+    /** Decay fraction field. */
+    private JTextField tfDecayFraction = new JTextField();
 
-	/** Base line field. */
-	private JTextField tfBaseLine = new JTextField();
+    /** Base line field. */
+    private JTextField tfBaseLine = new JTextField();
 
-	/** Tabbed pane. */
-	private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
-	/** Main tab. */
-	private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Main tab. */
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-	/** Random tab. */
-	private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    /** Random tab. */
+    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
 
-	/** Add noise combo box. */
-	private TristateDropDown isAddNoise = new TristateDropDown();
+    /** Add noise combo box. */
+    private TristateDropDown isAddNoise = new TristateDropDown();
 
-	/** A reference to the neuron update rule being edited. */
-	private static final DecayRule prototypeRule = new DecayRule();
+    /** A reference to the neuron update rule being edited. */
+    private static final DecayRule prototypeRule = new DecayRule();
 
-	/**
-	 * This method is the default constructor.
-	 */
-	public DecayRulePanel() {
-		super();
-		cbRelAbs.addActionListener(this);
-		cbRelAbs.setActionCommand("relAbs");
+    /**
+     * This method is the default constructor.
+     */
+    public DecayRulePanel() {
+        super();
+        cbRelAbs.addActionListener(this);
+        cbRelAbs.setActionCommand("relAbs");
 
-		this.add(tabbedPane);
-		mainTab.addItem("", cbRelAbs);
-		mainTab.addItem("Base line", tfBaseLine);
-		mainTab.addItem("Decay amount", tfDecayAmount);
-		mainTab.addItem("Decay fraction", tfDecayFraction);
-		mainTab.addItem("Add noise", isAddNoise);
-		tabbedPane.add(mainTab, "Main");
-		tabbedPane.add(randTab, "Noise");
-		checkBounds();
-	}
+        this.add(tabbedPane);
+        mainTab.addItem("", cbRelAbs);
+        mainTab.addItem("Base line", tfBaseLine);
+        mainTab.addItem("Decay amount", tfDecayAmount);
+        mainTab.addItem("Decay fraction", tfDecayFraction);
+        mainTab.addItem("Add noise", isAddNoise);
+        tabbedPane.add(mainTab, "Main");
+        tabbedPane.add(randTab, "Noise");
+        checkBounds();
+    }
 
-	/**
-	 * Responds to actions performed.
-	 * 
-	 * @param e
-	 *            Action event
-	 */
-	public void actionPerformed(final ActionEvent e) {
-		if (e.getActionCommand().equals("relAbs")) {
-			checkBounds();
-		}
-	}
+    /**
+     * Responds to actions performed.
+     *
+     * @param e Action event
+     */
+    public void actionPerformed(final ActionEvent e) {
+        if (e.getActionCommand().equals("relAbs")) {
+            checkBounds();
+        }
+    }
 
-	/**
-	 * Checks the relative absolute bounds.
-	 */
-	private void checkBounds() {
-		if (cbRelAbs.getSelectedIndex() == 0) {
-			tfDecayAmount.setEnabled(false);
-			tfDecayFraction.setEnabled(true);
-		} else {
-			tfDecayFraction.setEnabled(false);
-			tfDecayAmount.setEnabled(true);
-		}
-	}
+    /**
+     * Checks the relative absolute bounds.
+     */
+    private void checkBounds() {
+        if (cbRelAbs.getSelectedIndex() == 0) {
+            tfDecayAmount.setEnabled(false);
+            tfDecayFraction.setEnabled(true);
+        } else {
+            tfDecayFraction.setEnabled(false);
+            tfDecayAmount.setEnabled(true);
+        }
+    }
 
-	/**
-	 * Populate fields with current data.
-	 */
-	public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
+    /**
+     * Populate fields with current data.
+     */
+    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-		DecayRule neuronRef = (DecayRule) ruleList.get(0);
+        DecayRule neuronRef = (DecayRule) ruleList.get(0);
 
-		// (Below) Handle consistency of multiple selections
+        // (Below) Handle consistency of multiple selections
 
-		// Handle Relative Absolute
-		if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
-				"getRelAbs"))
-			cbRelAbs.setNull();
-		else
-			cbRelAbs.setSelectedIndex(neuronRef.getRelAbs());
+        // Handle Relative Absolute
+        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class, "getRelAbs"))
+            cbRelAbs.setNull();
+        else
+            cbRelAbs.setSelectedIndex(neuronRef.getRelAbs());
 
-		// Handle Baseline
-		if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
-				"getBaseLine"))
-			tfBaseLine.setText(NULL_STRING);
-		else
-			tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
+        // Handle Baseline
+        if (!NetworkUtils
+                .isConsistent(ruleList, DecayRule.class, "getBaseLine"))
+            tfBaseLine.setText(NULL_STRING);
+        else
+            tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
 
-		// Handle Decay Fraction
-		if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
-				"getDecayFraction"))
-			tfDecayFraction.setText(NULL_STRING);
-		else
-			tfDecayFraction.setText(Double.toString(neuronRef
-					.getDecayFraction()));
+        // Handle Decay Fraction
+        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
+                "getDecayFraction"))
+            tfDecayFraction.setText(NULL_STRING);
+        else
+            tfDecayFraction.setText(Double.toString(neuronRef
+                    .getDecayFraction()));
 
-		// Handle Decay Amount
-		if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
-				"getDecayAmount"))
-			tfDecayAmount.setText(NULL_STRING);
-		else
-			tfDecayAmount.setText(Double.toString(neuronRef
-					.getDecayAmount()));
+        // Handle Decay Amount
+        if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
+                "getDecayAmount"))
+            tfDecayAmount.setText(NULL_STRING);
+        else
+            tfDecayAmount.setText(Double.toString(neuronRef.getDecayAmount()));
 
-		// Handle Noise
-		if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
-				"getAddNoise"))
-			isAddNoise.setNull();
-		else
-			isAddNoise.setSelected(neuronRef.getAddNoise());
+        // Handle Noise
+        if (!NetworkUtils
+                .isConsistent(ruleList, DecayRule.class, "getAddNoise"))
+            isAddNoise.setNull();
+        else
+            isAddNoise.setSelected(neuronRef.getAddNoise());
 
-		randTab.fillFieldValues(getRandomizers(ruleList));
+        randTab.fillFieldValues(getRandomizers(ruleList));
 
-	}
+    }
 
-	/**
-	 * Fill field values to default values for additive neuron.
-	 */
-	public void fillDefaultValues() {
-		cbRelAbs.setSelectedIndex(prototypeRule.getRelAbs());
-		tfBaseLine.setText(Double.toString(prototypeRule.getBaseLine()));
-		tfDecayAmount.setText(Double.toString(prototypeRule
-				.getDecayFraction()));
-		tfDecayFraction.setText(Double.toString(prototypeRule
-				.getDecayFraction()));
-		isAddNoise.setSelected(prototypeRule.getAddNoise());
-		randTab.fillDefaultValues();
-	}
+    /**
+     * Fill field values to default values for additive neuron.
+     */
+    public void fillDefaultValues() {
+        cbRelAbs.setSelectedIndex(prototypeRule.getRelAbs());
+        tfBaseLine.setText(Double.toString(prototypeRule.getBaseLine()));
+        tfDecayAmount
+                .setText(Double.toString(prototypeRule.getDecayFraction()));
+        tfDecayFraction.setText(Double.toString(prototypeRule
+                .getDecayFraction()));
+        isAddNoise.setSelected(prototypeRule.getAddNoise());
+        randTab.fillDefaultValues();
+    }
 
-	/**
-	 * @return A list of randomizers.
-	 */
-	private ArrayList<Randomizer> getRandomizers(
-			List<NeuronUpdateRule> ruleList) {
-		ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-		for (int i = 0; i < ruleList.size(); i++) {
-			ret.add(((DecayRule) ruleList.get(i)).getNoiseGenerator());
-		}
+    /**
+     * @return A list of randomizers.
+     */
+    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((DecayRule) ruleList.get(i)).getNoiseGenerator());
+        }
 
-		return ret;
-	}
+        return ret;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(Neuron neuron) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(Neuron neuron) {
 
-		if (!(neuron.getUpdateRule() instanceof DecayRule)) {
-			neuron.setUpdateRule(prototypeRule.deepCopy());
-		}
+        if (!(neuron.getUpdateRule() instanceof DecayRule)) {
+            neuron.setUpdateRule(prototypeRule.deepCopy());
+        }
 
-		writeValuesToRules(Collections.singletonList(neuron));
+        writeValuesToRules(Collections.singletonList(neuron));
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commitChanges(final List<Neuron> neurons) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commitChanges(final List<Neuron> neurons) {
 
-		if (isReplace()) {
-			DecayRule neuronRef = prototypeRule.deepCopy();
-			for (Neuron n : neurons) {
-				n.setUpdateRule(neuronRef.deepCopy());
-			}
-		}
+        if (isReplace()) {
+            DecayRule neuronRef = prototypeRule.deepCopy();
+            for (Neuron n : neurons) {
+                n.setUpdateRule(neuronRef.deepCopy());
+            }
+        }
 
-		writeValuesToRules(neurons);
+        writeValuesToRules(neurons);
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void writeValuesToRules(List<Neuron> neurons) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeValuesToRules(List<Neuron> neurons) {
 
-		int numNeurons = neurons.size();
+        int numNeurons = neurons.size();
 
-		// Relative/Absolute
-		if (!cbRelAbs.isNull()) {
-			for (int i = 0; i < numNeurons; i++) {
-				((DecayRule) neurons.get(i).getUpdateRule())
-						.setRelAbs(cbRelAbs.getSelectedIndex());
-			}
-		}
+        // Relative/Absolute
+        if (!cbRelAbs.isNull()) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((DecayRule) neurons.get(i).getUpdateRule()).setRelAbs(cbRelAbs
+                        .getSelectedIndex());
+            }
+        }
 
-		// Decay Amount
-		double decayAmount = Utils.doubleParsable(tfDecayAmount);
-		if (!Double.isNaN(decayAmount)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((DecayRule) neurons.get(i).getUpdateRule())
-						.setDecayAmount(decayAmount);
-			}
-		}
+        // Decay Amount
+        double decayAmount = Utils.doubleParsable(tfDecayAmount);
+        if (!Double.isNaN(decayAmount)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((DecayRule) neurons.get(i).getUpdateRule())
+                        .setDecayAmount(decayAmount);
+            }
+        }
 
-		// Decay Fraction
-		double decayFraction = Utils.doubleParsable(tfDecayFraction);
-		if (!Double.isNaN(decayFraction)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((DecayRule) neurons.get(i).getUpdateRule())
-						.setDecayFraction(decayFraction);
-			}
-		}
+        // Decay Fraction
+        double decayFraction = Utils.doubleParsable(tfDecayFraction);
+        if (!Double.isNaN(decayFraction)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((DecayRule) neurons.get(i).getUpdateRule())
+                        .setDecayFraction(decayFraction);
+            }
+        }
 
-		// Decay Baseline
-		double baseLine = Utils.doubleParsable(tfBaseLine);
-		if (!Double.isNaN(baseLine)) {
-			for (int i = 0; i < numNeurons; i++) {
-				((DecayRule) neurons.get(i).getUpdateRule())
-						.setBaseLine(baseLine);
-			}
-		}
+        // Decay Baseline
+        double baseLine = Utils.doubleParsable(tfBaseLine);
+        if (!Double.isNaN(baseLine)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((DecayRule) neurons.get(i).getUpdateRule())
+                        .setBaseLine(baseLine);
+            }
+        }
 
-		// Add Noise?
-		if (!isAddNoise.isNull()) {
-			boolean addNoise =
-					isAddNoise.getSelectedIndex() == TristateDropDown
-							.getTRUE();
-			for (int i = 0; i < numNeurons; i++) {
-				((DecayRule) neurons.get(i).getUpdateRule())
-						.setAddNoise(addNoise);
+        // Add Noise?
+        if (!isAddNoise.isNull()) {
+            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+                    .getTRUE();
+            for (int i = 0; i < numNeurons; i++) {
+                ((DecayRule) neurons.get(i).getUpdateRule())
+                        .setAddNoise(addNoise);
 
-			}
-			if (addNoise) {
-				for (int i = 0; i < numNeurons; i++) {
-					randTab.commitRandom(((DecayRule) neurons.get(i)
-							.getUpdateRule()).getNoiseGenerator());
-				}
-			}
-		}
+            }
+            if (addNoise) {
+                for (int i = 0; i < numNeurons; i++) {
+                    randTab.commitRandom(((DecayRule) neurons.get(i)
+                            .getUpdateRule()).getNoiseGenerator());
+                }
+            }
+        }
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected DecayRule getPrototypeRule() {
-		return prototypeRule.deepCopy();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected DecayRule getPrototypeRule() {
+        return prototypeRule.deepCopy();
+    }
 
 }

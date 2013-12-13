@@ -39,8 +39,9 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
     /** Entity to which a turning effector is being added. */
     private RotatingEntity entity;
 
-    /** 
-     * Reference to straight movement effector. Initially null if this is a creation panel.
+    /**
+     * Reference to straight movement effector. Initially null if this is a
+     * creation panel.
      */
     private Turning turningEffector;
 
@@ -80,10 +81,12 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
     @Override
     public void commitChanges() {
         if (isCreationPanel) {
-            entity.addEffector(new Turning(entity, label.getText(), Double.parseDouble(direction.getText())));
+            entity.addEffector(new Turning(entity, label.getText(), Double
+                    .parseDouble(direction.getText())));
         } else {
             turningEffector.setLabel(label.getText());
-            turningEffector.setDirection(Double.parseDouble(direction.getText()));
+            turningEffector
+                    .setDirection(Double.parseDouble(direction.getText()));
             turningEffector.setAmount(Double.parseDouble(amount.getText()));
         }
     }

@@ -37,15 +37,13 @@ import org.simbrain.util.math.SimbrainMath;
  * book.
  */
 public class PointNeuronRule extends NeuronUpdateRule implements
-    SynapseListener, BiasedUpdateRule {
+        SynapseListener, BiasedUpdateRule {
 
     /** Excitatory inputs for connected Synapses. */
-    private ArrayList<Synapse> excitatoryInputs =
-            new ArrayList<Synapse>();
+    private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
 
     /** Inhibitory inputs for connected Synapses. */
-    private ArrayList<Synapse> inhibitoryInputs =
-            new ArrayList<Synapse>();
+    private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
     /** Time average constant for updating the net current field. (p. 43-44) */
     private double netTimeConstant = 0.7;
@@ -107,8 +105,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     private double inhibitoryReversal = 0.15;
 
     /** Current output function. */
-    private OutputFunction outputFunction =
-            OutputFunction.DISCRETE_SPIKING;
+    private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
 
     /** Gain factor for output function. (p. 46) */
     private double gain = 600;
@@ -144,7 +141,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
         },
 
         /**
-         *The number of spikes over a given time is translated into a
+         * The number of spikes over a given time is translated into a
          * continuous rate value without being passed through any other
          * function.
          */
@@ -210,6 +207,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     /**
      * Update the lists of excitatory and inhibitory currents based on synapse
      * values.
+     *
      * @param neuron the neuron to set the input list for
      */
     private void setInputLists(Neuron neuron) {
@@ -224,8 +222,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     /**
      * Adds a synapse to the appropriate internal list.
      *
-     * @param synapse
-     *            synapse to add.
+     * @param synapse synapse to add.
      */
     private void addSynapseToList(Synapse synapse) {
         if (excitatoryInputs.contains(synapse)) {
@@ -280,28 +277,23 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     public void update(Neuron neuron) {
 
         // Calculate the excitatory conductance (p. 44, eq. 2.16)
-        excitatoryConductance =
-                (1 - netTimeConstant) * excitatoryConductance
+        excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
                 + netTimeConstant * (getExcitatoryInputs());
 
         // Calculate the excitatory current (p. 37 equation 2.5)
-        excitatoryCurrent =
-                excitatoryConductance * excitatoryMaxConductance
+        excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
                 * (membranePotential - excitatoryReversal);
 
         // Calculate the excitatory conductance using time averaging constant.
-        inhibitoryConductance =
-                (1 - netTimeConstant) * inhibitoryConductance
+        inhibitoryConductance = (1 - netTimeConstant) * inhibitoryConductance
                 + netTimeConstant * (getInhibitoryInputs());
 
         // Calculate the inhibitory current.
-        inhibitoryCurrent =
-                inhibitoryConductance * inhibitoryMaxConductance
+        inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance
                 * (membranePotential - inhibitoryReversal);
 
         // Calculate the leak current (p. 37 eq. 2.5)
-        leakCurrent =
-                leakConductance * leakMaxConductance
+        leakCurrent = leakConductance * leakMaxConductance
                 * (membranePotential - leakReversal);
 
         // Calculate the net current (p. 37 eq. 2.6)
@@ -319,20 +311,18 @@ public class PointNeuronRule extends NeuronUpdateRule implements
                 neuron.setBuffer(0);
             }
         } else if (outputFunction == OutputFunction.RATE_CODE) {
-            double val =
-                    (gain * getPositiveComponent(membranePotential
-                            - thresholdPotential))
-                            / (gain
-                                    * getPositiveComponent(membranePotential
-                                            - thresholdPotential) + 1);
-            //TODO: Correct way to bias for this rule?
+            double val = (gain * getPositiveComponent(membranePotential
+                    - thresholdPotential))
+                    / (gain
+                            * getPositiveComponent(membranePotential
+                                    - thresholdPotential) + 1);
+            // TODO: Correct way to bias for this rule?
             neuron.setBuffer(val + bias);
         } else if (outputFunction == OutputFunction.LINEAR) {
-            double val =
-                    gain
+            double val = gain
                     * getPositiveComponent(membranePotential
                             - thresholdPotential);
-            //TODO: Correct way to bias for this rule?
+            // TODO: Correct way to bias for this rule?
             neuron.setBuffer(val + bias);
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             neuron.setBuffer(1); // TODO: Complete this implementation
@@ -355,12 +345,12 @@ public class PointNeuronRule extends NeuronUpdateRule implements
         } else if (outputFunction == OutputFunction.RATE_CODE) {
             return rand.nextDouble();
         } else if (outputFunction == OutputFunction.LINEAR) {
-            //TODO: better value for this?
+            // TODO: better value for this?
             return gain * thresholdPotential * rand.nextDouble();
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             return 0; // TODO: COmplete implementation
         } else {
-            return rand.nextDouble(); //TODO: Better value for this?
+            return rand.nextDouble(); // TODO: Better value for this?
         }
     }
 
@@ -371,11 +361,10 @@ public class PointNeuronRule extends NeuronUpdateRule implements
      * @return the value of that equation
      */
     public double getInhibitoryThresholdConductance() {
-        double excitatoryTerm =
-                excitatoryConductance * excitatoryMaxConductance
+        double excitatoryTerm = excitatoryConductance
+                * excitatoryMaxConductance
                 * (excitatoryReversal - thresholdPotential);
-        double leakTerm =
-                leakConductance * leakMaxConductance
+        double leakTerm = leakConductance * leakMaxConductance
                 * (leakReversal - thresholdPotential);
 
         return (excitatoryTerm + leakTerm)
@@ -387,8 +376,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
         return "Activation: " + neuron.getActivation()
                 + "\n\nMembrane Potential: "
                 + SimbrainMath.roundDouble(membranePotential, 2)
-                + "\n\nNet Current: "
-                + SimbrainMath.roundDouble(netCurrent, 2)
+                + "\n\nNet Current: " + SimbrainMath.roundDouble(netCurrent, 2)
                 + "\n\nExcitatory current:  "
                 + SimbrainMath.roundDouble(excitatoryCurrent, 2)
                 + "\n \nLeak current: "
@@ -457,8 +445,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     /**
      * Returns the positive component of a number.
      *
-     * @param val
-     *            value to consider
+     * @param val value to consider
      * @return positive component
      */
     private double getPositiveComponent(double val) {
@@ -478,8 +465,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param netTimeConstant
-     *            the netTimeConstant to set
+     * @param netTimeConstant the netTimeConstant to set
      */
     public void setNetTimeConstant(double netTimeConstant) {
         this.netTimeConstant = netTimeConstant;
@@ -493,11 +479,9 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param excitatoryMaxConductance
-     *            the excitatoryMaxConductance to set
+     * @param excitatoryMaxConductance the excitatoryMaxConductance to set
      */
-    public void setExcitatoryMaxConductance(
-            double excitatoryMaxConductance) {
+    public void setExcitatoryMaxConductance(double excitatoryMaxConductance) {
         this.excitatoryMaxConductance = excitatoryMaxConductance;
     }
 
@@ -509,8 +493,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param excitatoryConductance
-     *            the excitatoryConductance to set
+     * @param excitatoryConductance the excitatoryConductance to set
      */
     public void setExcitatoryConductance(double excitatoryConductance) {
         this.excitatoryConductance = excitatoryConductance;
@@ -524,8 +507,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param membranePotential
-     *            the membranePotential to set
+     * @param membranePotential the membranePotential to set
      */
     public void setMembranePotential(double membranePotential) {
         this.membranePotential = membranePotential;
@@ -539,8 +521,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param excitatoryReversal
-     *            the excitatoryReversal to set
+     * @param excitatoryReversal the excitatoryReversal to set
      */
     public void setExcitatoryReversal(double excitatoryReversal) {
         this.excitatoryReversal = excitatoryReversal;
@@ -554,8 +535,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param leakReversal
-     *            the leakReversal to set
+     * @param leakReversal the leakReversal to set
      */
     public void setLeakReversal(double leakReversal) {
         this.leakReversal = leakReversal;
@@ -569,8 +549,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param leakMaxConductance
-     *            the leakMaxConductance to set
+     * @param leakMaxConductance the leakMaxConductance to set
      */
     public void setLeakMaxConductance(double leakMaxConductance) {
         this.leakMaxConductance = leakMaxConductance;
@@ -584,8 +563,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param leakConductance
-     *            the leakConductance to set
+     * @param leakConductance the leakConductance to set
      */
     public void setLeakConductance(double leakConductance) {
         this.leakConductance = leakConductance;
@@ -599,8 +577,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param potentialTimeConstant
-     *            the potentialTimeConstant to set
+     * @param potentialTimeConstant the potentialTimeConstant to set
      */
     public void setPotentialTimeConstant(double potentialTimeConstant) {
         this.potentialTimeConstant = potentialTimeConstant;
@@ -614,8 +591,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param currentOutputFunction
-     *            the currentOutputFunction to set
+     * @param currentOutputFunction the currentOutputFunction to set
      */
     public void setOutputFunction(OutputFunction currentOutputFunction) {
         this.outputFunction = currentOutputFunction;
@@ -629,8 +605,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param gain
-     *            the gain to set
+     * @param gain the gain to set
      */
     public void setGain(double gain) {
         this.gain = gain;
@@ -644,8 +619,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param threshold
-     *            the threshold to set
+     * @param threshold the threshold to set
      */
     public void setThresholdPotential(double threshold) {
         this.thresholdPotential = threshold;
@@ -659,16 +633,14 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param refractoryPotential
-     *            the refractoryPotential to set
+     * @param refractoryPotential the refractoryPotential to set
      */
     public void setRefractoryPotential(double refractoryPotential) {
         this.refractoryPotential = refractoryPotential;
     }
 
     /**
-     * @param excitatoryInputs
-     *            the excitatoryInputs to set
+     * @param excitatoryInputs the excitatoryInputs to set
      */
     public void setExcitatoryInputs(ArrayList<Synapse> excitatoryInputs) {
         this.excitatoryInputs = excitatoryInputs;
@@ -682,8 +654,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inhibitoryReversal
-     *            the inhibitoryReversal to set
+     * @param inhibitoryReversal the inhibitoryReversal to set
      */
     public void setInhibitoryReversal(double inhibitoryReversal) {
         this.inhibitoryReversal = inhibitoryReversal;
@@ -697,8 +668,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param excitatoryCurrent
-     *            the excitatoryCurrent to set
+     * @param excitatoryCurrent the excitatoryCurrent to set
      */
     public void setExcitatoryCurrent(double excitatoryCurrent) {
         this.excitatoryCurrent = excitatoryCurrent;
@@ -712,8 +682,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param duration
-     *            the duration to set
+     * @param duration the duration to set
      */
     public void setDuration(int duration) {
         this.duration = duration;
@@ -727,8 +696,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inhibitoryConductance
-     *            the inhibitoryConductance to set
+     * @param inhibitoryConductance the inhibitoryConductance to set
      */
     public void setInhibitoryConductance(double inhibitoryConductance) {
         this.inhibitoryConductance = inhibitoryConductance;
@@ -742,11 +710,9 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inhibitoryMaxConductance
-     *            the inhibitoryMaxConductance to set
+     * @param inhibitoryMaxConductance the inhibitoryMaxConductance to set
      */
-    public void setInhibitoryMaxConductance(
-            double inhibitoryMaxConductance) {
+    public void setInhibitoryMaxConductance(double inhibitoryMaxConductance) {
         this.inhibitoryMaxConductance = inhibitoryMaxConductance;
     }
 
@@ -758,8 +724,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param bias
-     *            the bias to set
+     * @param bias the bias to set
      */
     public void setBias(double bias) {
         this.bias = bias;
@@ -803,8 +768,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     /**
      * {@inheritDoc}
      */
-    public void synapseTypeChanged(
-            NetworkEvent<SynapseUpdateRule> networkEvent) {
+    public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
         // No implementation
     }
 
@@ -820,7 +784,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
         } else if (outputFunction == OutputFunction.RATE_CODE) {
             return 1.0;
         } else if (outputFunction == OutputFunction.LINEAR) {
-            return gain; //TODO: better value for this?
+            return gain; // TODO: better value for this?
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             return 0; // TODO: COmplete implementation
         } else {

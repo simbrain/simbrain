@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.Utils;
 
 import Jama.Matrix;
 
@@ -69,7 +68,6 @@ public class Dataset {
 
     /** The last point added to this dataset. */
     private DataPoint lastAddedPoint;
-
 
     /**
      * Creates and instance of Dataset.

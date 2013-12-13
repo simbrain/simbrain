@@ -29,111 +29,108 @@ import javax.swing.JComboBox;
  */
 public class TristateDropDown extends JComboBox {
 
-	/** Integer value for true. */
-	private static final int TRUE = 0;
+    /** Integer value for true. */
+    private static final int TRUE = 0;
 
-	/** Integer value for false. */
-	private static final int FALSE = 1;
+    /** Integer value for false. */
+    private static final int FALSE = 1;
 
-	/** Integer value for null. */
-	private static final int NULL = 2;
+    /** Integer value for null. */
+    private static final int NULL = 2;
 
-	/**
-	 * Default constructor.
-	 */
-	public TristateDropDown() {
-		super();
-		addItem("Yes");
-		addItem("No");
-		setPreferredSize(new Dimension(60, getPreferredSize().height));
-		setMaximumSize(new Dimension(60, getPreferredSize().height));
-	}
+    /**
+     * Default constructor.
+     */
+    public TristateDropDown() {
+        super();
+        addItem("Yes");
+        addItem("No");
+        setPreferredSize(new Dimension(60, getPreferredSize().height));
+        setMaximumSize(new Dimension(60, getPreferredSize().height));
+    }
 
-	/**
-	 * Create custom three-state combo box using text other than "Yes" and "No".
-	 * 
-	 * @param itemOne
-	 *            Add first item to combo box
-	 * @param itemTwo
-	 *            Add second item to combo box
-	 */
-	public TristateDropDown(final String itemOne, final String itemTwo) {
-		super();
-		addItem(itemOne);
-		addItem(itemTwo);
-	}
+    /**
+     * Create custom three-state combo box using text other than "Yes" and "No".
+     *
+     * @param itemOne Add first item to combo box
+     * @param itemTwo Add second item to combo box
+     */
+    public TristateDropDown(final String itemOne, final String itemTwo) {
+        super();
+        addItem(itemOne);
+        addItem(itemTwo);
+    }
 
-	/**
-	 * Sets the tristate drop down box to null. If the box does not have a null
-	 * entry (i.e. has only 2 items), adds a null entry and sets it as the
-	 * selected item.
-	 */
-	public void setNull() {
-		if (this.getItemCount() == 2) {
-			addItem("...");
-		}
+    /**
+     * Sets the tristate drop down box to null. If the box does not have a null
+     * entry (i.e. has only 2 items), adds a null entry and sets it as the
+     * selected item.
+     */
+    public void setNull() {
+        if (this.getItemCount() == 2) {
+            addItem("...");
+        }
 
-		setSelectedIndex(NULL);
-	}
+        setSelectedIndex(NULL);
+    }
 
-	/**
-	 * Determines if index is selected true.
-	 * 
-	 * @return True or false value
-	 */
-	public boolean isSelected() {
-		if (this.getSelectedIndex() == TRUE) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    /**
+     * Determines if index is selected true.
+     *
+     * @return True or false value
+     */
+    public boolean isSelected() {
+        if (this.getSelectedIndex() == TRUE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * Sets the selected item.
-	 * 
-	 * @param val
-	 *            Value to be set as
-	 */
-	public void setSelected(final boolean val) {
-		if (val) {
-			setSelectedIndex(TRUE);
-		} else {
-			setSelectedIndex(FALSE);
-		}
-	}
+    /**
+     * Sets the selected item.
+     *
+     * @param val Value to be set as
+     */
+    public void setSelected(final boolean val) {
+        if (val) {
+            setSelectedIndex(TRUE);
+        } else {
+            setSelectedIndex(FALSE);
+        }
+    }
 
-	/**
-	 * Determines if value is null.
-	 * 
-	 * @return true or false if value is null
-	 */
-	public boolean isNull() {
-		if (this.getSelectedIndex() == NULL) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    /**
+     * Determines if value is null.
+     *
+     * @return true or false if value is null
+     */
+    public boolean isNull() {
+        if (this.getSelectedIndex() == NULL) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * @return false value.
-	 */
-	public static int getFALSE() {
-		return FALSE;
-	}
+    /**
+     * @return false value.
+     */
+    public static int getFALSE() {
+        return FALSE;
+    }
 
-	/**
-	 * @return null value.
-	 */
-	public static int getNULL() {
-		return NULL;
-	}
+    /**
+     * @return null value.
+     */
+    public static int getNULL() {
+        return NULL;
+    }
 
-	/**
-	 * @return true value.
-	 */
-	public static int getTRUE() {
-		return TRUE;
-	}
+    /**
+     * @return true value.
+     */
+    public static int getTRUE() {
+        return TRUE;
+    }
 }

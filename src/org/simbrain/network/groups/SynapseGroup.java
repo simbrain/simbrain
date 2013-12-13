@@ -26,7 +26,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
 /**
- * A group of synapses.  Must connect a source and target neuron group.
+ * A group of synapses. Must connect a source and target neuron group.
  */
 public class SynapseGroup extends Group {
 
@@ -61,7 +61,6 @@ public class SynapseGroup extends Group {
         }
     }
 
-
     /**
      * Create a new synapse group using a connection object.
      *
@@ -84,7 +83,6 @@ public class SynapseGroup extends Group {
         }
     }
 
-
     @Override
     public void delete() {
         if (isMarkedForDeletion()) {
@@ -100,7 +98,7 @@ public class SynapseGroup extends Group {
                 ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
             }
             if (getParentGroup().isEmpty()) {
-                //System.out.println("SynapseGroup.delete");
+                // System.out.println("SynapseGroup.delete");
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
@@ -161,7 +159,7 @@ public class SynapseGroup extends Group {
         getParentNetwork().fireSynapseRemoved(toDelete);
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
         if (isEmpty()) {
-            //System.out.println("SynapseGroup.removeSynapse:" + toDelete);
+            // System.out.println("SynapseGroup.removeSynapse:" + toDelete);
             delete();
         }
     }
@@ -239,8 +237,7 @@ public class SynapseGroup extends Group {
      * @return whether to display synapses or not.
      */
     public boolean displaySynapses() {
-        int threshold = getParentNetwork()
-                .getSynapseVisibilityThreshold();
+        int threshold = getParentNetwork().getSynapseVisibilityThreshold();
 
         // Isolated synapse group
         if (getParentGroup() == null) {
@@ -253,14 +250,12 @@ public class SynapseGroup extends Group {
         return true;
     }
 
-
     /**
      * @return the sourceNeuronGroup
      */
     public NeuronGroup getSourceNeuronGroup() {
         return sourceNeuronGroup;
     }
-
 
     /**
      * @return the targetNeuronGroup
@@ -284,12 +279,11 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Set the weights using an array of doubles. Assumes the order
-     * of the items in the array should match the order of items in the
-     * synapselist.
+     * Set the weights using an array of doubles. Assumes the order of the items
+     * in the array should match the order of items in the synapselist.
      *
-     * Does not throw an exception if the provided input array and synapse
-     * list do not match in size.
+     * Does not throw an exception if the provided input array and synapse list
+     * do not match in size.
      *
      * @param weightVector the weight vector to set.
      */
@@ -320,18 +314,18 @@ public class SynapseGroup extends Group {
      * @param enabled true to enable them all; false to disable them all
      */
     public void setEnabled(final boolean enabled) {
-        for (Synapse synapse: this.getSynapseList()) {
+        for (Synapse synapse : this.getSynapseList()) {
             synapse.setEnabled(enabled);
         }
     }
 
     /**
-     * Freeze or  unfreeze all synapses in this group.
+     * Freeze or unfreeze all synapses in this group.
      *
      * @param freeze true to freeze the group; false to unfreeze it
      */
     public void setFrozen(final boolean freeze) {
-        for (Synapse synapse: this.getSynapseList()) {
+        for (Synapse synapse : this.getSynapseList()) {
             synapse.setFrozen(freeze);
         }
     }

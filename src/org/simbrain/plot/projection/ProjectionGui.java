@@ -20,7 +20,6 @@ package org.simbrain.plot.projection;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
@@ -28,19 +27,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -381,7 +376,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
             }
         });
         projectionList.getModel()
-                .setSelectedItem(getWorkspaceComponent().getProjector()
+                .setSelectedItem(
+                        getWorkspaceComponent().getProjector()
                                 .getCurrentMethodString());
 
         // Init the adjust dimension combo boxes
@@ -521,24 +517,24 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
                     @Override
                     public void projectionMethodChanged() {
-                        //System.out.println("ProjectionGui: In method changed");
+                        // System.out.println("ProjectionGui: In method changed");
                         update();
                     }
 
                     @Override
                     public void projectorDataChanged() {
-                        //System.out.println("ProjectionGui: In data changed");
+                        // System.out.println("ProjectionGui: In data changed");
                         update();
                     }
 
                     @Override
                     public void datapointAdded() {
-                        //System.out.println("ProjectionGui: In data added");
+                        // System.out.println("ProjectionGui: In data added");
                     }
 
                     @Override
                     public void projectorColorsChanged() {
-                        //System.out.println("ProjectionGui: In colors changed");
+                        // System.out.println("ProjectionGui: In colors changed");
                         getWorkspaceComponent().getProjectionModel()
                                 .getProjector().resetColors();
                         update();

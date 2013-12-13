@@ -52,7 +52,6 @@ public class NeuronNodeDesktop extends NeuronNode {
         this.component = component;
     }
 
-
     @Override
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();

@@ -84,8 +84,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
 
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
-        double val =
-                activation
+        double val = activation
                 + (timeStep * (((.04 * (activation * activation))
                         + (5 * activation) + 140)
                         - recovery + inputs));
@@ -108,8 +107,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     public double getRandomValue() {
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
-        return 2 * (threshold - c) * Math.random()
-                + c;
+        return 2 * (threshold - c) * Math.random() + c;
     }
 
     /**
@@ -120,8 +118,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param a
-     *            The a to set.
+     * @param a The a to set.
      */
     public void setA(final double a) {
         this.a = a;
@@ -135,8 +132,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param b
-     *            The b to set.
+     * @param b The b to set.
      */
     public void setB(final double b) {
         this.b = b;
@@ -150,8 +146,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param c
-     *            The c to set.
+     * @param c The c to set.
      */
     public void setC(final double c) {
         this.c = c;
@@ -165,8 +160,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param d
-     *            The d to set.
+     * @param d The d to set.
      */
     public void setD(final double d) {
         this.d = d;
@@ -180,8 +174,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param addNoise
-     *            The addNoise to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -195,8 +188,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @param noiseGenerator
-     *            The noiseGenerator to set.
+     * @param noiseGenerator The noiseGenerator to set.
      */
     public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;

@@ -29,8 +29,8 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  */
 public class Speech extends Effector {
 
-    //TODO: Possibly add a radius of influence
-    //      Possibly encapsulate phrase String in an utterance class
+    // TODO: Possibly add a radius of influence
+    // Possibly encapsulate phrase String in an utterance class
 
     /** Default phrase. */
     public static final String DEFAULT_PHRASE = "Hi!";
@@ -79,7 +79,7 @@ public class Speech extends Effector {
             for (OdorWorldEntity entity : parent.getParentWorld()
                     .getObjectList()) {
 
-                //TODO: Can add radius check here later
+                // TODO: Can add radius check here later
 
                 // Don't talk to yourself
                 if (entity != parent) {
@@ -117,9 +117,9 @@ public class Speech extends Effector {
         this.activated = activated;
     }
 
-    //**
-     //* @return the amount // obsolete?
-     //*/
+    // **
+    // * @return the amount // obsolete?
+    // */
     public double getAmount() {
         return amount;
     }

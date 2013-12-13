@@ -137,7 +137,7 @@ public class PieChartModel extends ChartModel {
         if ((total == 0) || (index > dataset.getItemCount())) {
             return;
         }
-        //System.out.println(index + "," + Math.abs(value) / total);
+        // System.out.println(index + "," + Math.abs(value) / total);
         this.getDataset().setValue(index, Math.abs(value) / total);
     }
 

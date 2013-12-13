@@ -51,8 +51,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
     private final JTextField tfLambda = new JTextField();
 
     /** Synapse reference. */
-    private static final HebbianCPCARule prototypeRule =
-            new HebbianCPCARule();
+    private static final HebbianCPCARule prototypeRule = new HebbianCPCARule();
 
     /**
      * This method is the default constructor.
@@ -66,9 +65,8 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
-     * 
-     * @param ruleList
-     *            the list of rules being edited
+     *
+     * @param ruleList the list of rules being edited
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
@@ -81,13 +79,12 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
                 "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         } else {
-            tfLearningRate.setText(Double.toString(synapseRef
-                    .getLearningRate()));
+            tfLearningRate
+                    .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
         // Handle M
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getM")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) {
             tfM.setText(NULL_STRING);
         } else {
             tfM.setText(Double.toString(synapseRef.getM()));

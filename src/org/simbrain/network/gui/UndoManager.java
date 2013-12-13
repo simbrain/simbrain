@@ -49,8 +49,8 @@ public class UndoManager {
         undoStack.push(action);
         // When clicking undo then there is no longer anything to redo.
         redoStack.removeAllElements();
-        //System.out.println("Add action");
-        //printUndoRedoStats();
+        // System.out.println("Add action");
+        // printUndoRedoStats();
     }
 
     /**
@@ -61,8 +61,8 @@ public class UndoManager {
             UndoableAction lastEvent = undoStack.pop();
             lastEvent.undo();
             redoStack.push(lastEvent);
-            //System.out.println("Undo");
-            //printUndoRedoStats();
+            // System.out.println("Undo");
+            // printUndoRedoStats();
         }
     }
 
@@ -74,8 +74,8 @@ public class UndoManager {
             UndoableAction redoEvent = redoStack.pop();
             redoEvent.redo();
             undoStack.push(redoEvent);
-            //System.out.println("Redo");
-            //printUndoRedoStats();
+            // System.out.println("Redo");
+            // printUndoRedoStats();
         }
     }
 

@@ -21,7 +21,6 @@ package org.simbrain.network.gui.dialogs.network;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -33,13 +32,11 @@ import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.subnetworks.Competitive.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 
 /**
  * <b>CompetitivePropertiesDialog</b> is a panel box for setting the properties
- * of a competitive network. Can either be used to create a new
- * competitive network or to edit an existing competitive
- * network.
+ * of a competitive network. Can either be used to create a new competitive
+ * network or to edit an existing competitive network.
  */
 public class CompetitivePropertiesPanel extends JPanel implements
         ActionListener, GroupPropertiesPanel {
@@ -84,12 +81,11 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /** The model subnetwork. */
     private Competitive competitive;
 
-    /** If true this is a creation panel.  Otherwise it is an edit panel. */
+    /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel;
 
     /**
-     * Constructor for the case where a competitive network is being
-     * created.
+     * Constructor for the case where a competitive network is being created.
      *
      * @param np parent network panel
      */
@@ -159,8 +155,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
         competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
         competitive.setSynpaseDecayPercent(Double
                 .parseDouble(tfSynpaseDecayPercent.getText()));
-        competitive
-                .setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon.getText()));
+        competitive.setLeakyLearningRate(Double.parseDouble(tfLeakyEpsilon
+                .getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
         return competitive;

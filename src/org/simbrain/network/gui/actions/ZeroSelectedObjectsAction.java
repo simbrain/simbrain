@@ -35,46 +35,44 @@ import org.simbrain.resource.ResourceManager;
  */
 public final class ZeroSelectedObjectsAction extends AbstractAction {
 
-	/** Network panel. */
-	private final NetworkPanel networkPanel;
+    /** Network panel. */
+    private final NetworkPanel networkPanel;
 
-	/**
-	 * Create a new clear selected neurons action with the specified network
-	 * panel.
-	 * 
-	 * @param networkPanel
-	 *            network panel, must not be null
-	 */
-	public ZeroSelectedObjectsAction(final NetworkPanel networkPanel) {
-		super("Set selected objects to zero");
+    /**
+     * Create a new clear selected neurons action with the specified network
+     * panel.
+     *
+     * @param networkPanel network panel, must not be null
+     */
+    public ZeroSelectedObjectsAction(final NetworkPanel networkPanel) {
+        super("Set selected objects to zero");
 
-		if (networkPanel == null) {
-			throw new IllegalArgumentException(
-					"networkPanel must not be null");
-		}
+        if (networkPanel == null) {
+            throw new IllegalArgumentException("networkPanel must not be null");
+        }
 
-		this.networkPanel = networkPanel;
-		putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-		putValue(SHORT_DESCRIPTION,
-				"Set selected neurons and synapses to zero (c)");
+        this.networkPanel = networkPanel;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+        putValue(SHORT_DESCRIPTION,
+                "Set selected neurons and synapses to zero (c)");
 
-		networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke('c'), this);
-		networkPanel.getActionMap().put(this, this);
-	}
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('c'), this);
+        networkPanel.getActionMap().put(this, this);
+    }
 
-	/** @see AbstractAction */
-	public void actionPerformed(final ActionEvent event) {
-		for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i
-				.hasNext();) {
-			NeuronNode node = (NeuronNode) i.next();
-			node.getNeuron().clear();
-		}
-		for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i
-				.hasNext();) {
-			SynapseNode node = (SynapseNode) i.next();
-			node.getSynapse().forceSetStrength(0);
-		}
-		networkPanel.getNetwork().fireNetworkChanged();
-	}
+    /** @see AbstractAction */
+    public void actionPerformed(final ActionEvent event) {
+        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i
+                .hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.getNeuron().clear();
+        }
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i
+                .hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().forceSetStrength(0);
+        }
+        networkPanel.getNetwork().fireNetworkChanged();
+    }
 }

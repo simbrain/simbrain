@@ -66,17 +66,16 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainAction));
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-                network));
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
+                getNetworkPanel(), network));
         dataActions.addSeparator();
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
-                .getInputNeurons(), network.getTrainingSet()
-                .getInputDataMatrix(), "Input"));
-        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network
-                .getOutputNeurons(), network.getTrainingSet()
-                .getTargetDataMatrix(), "Target"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                network.getInputNeurons(), network.getTrainingSet()
+                        .getInputDataMatrix(), "Input"));
+        dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+                network.getOutputNeurons(), network.getTrainingSet()
+                        .getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
-
 
         setContextMenu(menu);
     }

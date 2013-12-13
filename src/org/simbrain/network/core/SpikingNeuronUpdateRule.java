@@ -28,64 +28,62 @@ import org.simbrain.network.core.Network.TimeType;
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
-	/** Time of last spike. */
-	private double lastSpikeTime;
+    /** Time of last spike. */
+    private double lastSpikeTime;
 
-	/** Whether a spike has occurred in the current time. */
-	private boolean hasSpiked;
+    /** Whether a spike has occurred in the current time. */
+    private boolean hasSpiked;
 
-	@Override
-	public void clear(Neuron neuron) {
-		super.clear(neuron);
-		setLastSpikeTime(0);
-	}
+    @Override
+    public void clear(Neuron neuron) {
+        super.clear(neuron);
+        setLastSpikeTime(0);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public TimeType getTimeType() {
-		return TimeType.CONTINUOUS;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public abstract void update(Neuron neuron);
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void update(Neuron neuron);
 
-	/**
-	 * @param hasSpiked
-	 *            the hasSpiked to set
-	 * @param neuron the neuron which has (or has not) spiked.
-	 */
-	public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
-		if (hasSpiked == true) {
-			lastSpikeTime = neuron.getNetwork().getTime();
-		}
-		this.hasSpiked = hasSpiked;
-	}
+    /**
+     * @param hasSpiked the hasSpiked to set
+     * @param neuron the neuron which has (or has not) spiked.
+     */
+    public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
+        if (hasSpiked == true) {
+            lastSpikeTime = neuron.getNetwork().getTime();
+        }
+        this.hasSpiked = hasSpiked;
+    }
 
-	/**
-	 * Whether the neuron has spiked in this instant or not.
-	 * 
-	 * @return true if the neuron spiked.
-	 */
-	public boolean hasSpiked() {
-		return hasSpiked;
-	}
+    /**
+     * Whether the neuron has spiked in this instant or not.
+     *
+     * @return true if the neuron spiked.
+     */
+    public boolean hasSpiked() {
+        return hasSpiked;
+    }
 
-	/**
-	 * @return the lastSpikeTime
-	 */
-	public double getLastSpikeTime() {
-		return lastSpikeTime;
-	}
+    /**
+     * @return the lastSpikeTime
+     */
+    public double getLastSpikeTime() {
+        return lastSpikeTime;
+    }
 
-	/**
-	 * @param lastSpikeTime
-	 *            the lastSpikeTime to set
-	 */
-	public void setLastSpikeTime(double lastSpikeTime) {
-		this.lastSpikeTime = lastSpikeTime;
-	}
+    /**
+     * @param lastSpikeTime the lastSpikeTime to set
+     */
+    public void setLastSpikeTime(double lastSpikeTime) {
+        this.lastSpikeTime = lastSpikeTime;
+    }
 
 }

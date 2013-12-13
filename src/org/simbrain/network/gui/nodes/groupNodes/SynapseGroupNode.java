@@ -129,8 +129,7 @@ public class SynapseGroupNode extends GroupNode {
         @Override
         protected JDialog getPropertyDialog() {
             selectSynapses(); // TODO: Adjust synapses should not rely on this
-            return new SynapseGroupDialog(getNetworkPanel(),
-                    group);
+            return new SynapseGroupDialog(getNetworkPanel(), group);
         }
 
         @Override
@@ -157,7 +156,8 @@ public class SynapseGroupNode extends GroupNode {
         // Edit
         Action editGroup = new AbstractAction("Edit...") {
             public void actionPerformed(final ActionEvent event) {
-                selectSynapses(); // TODO: Adjust synapses should not rely on this
+                selectSynapses(); // TODO: Adjust synapses should not rely on
+                                  // this
                 JDialog dialog = new SynapseGroupDialog(getNetworkPanel(),
                         group);
                 dialog.setLocationRelativeTo(null);

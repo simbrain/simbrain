@@ -207,7 +207,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     } else if (effector instanceof Speech) {
                         if (speechEffectorType.isVisible()) {
                             String description = entity.getName()
-                                    + ((Speech)effector).getLabel();
+                                    + ((Speech) effector).getLabel();
                             PotentialConsumer consumer = getAttributeManager()
                                     .createPotentialConsumer(effector,
                                             "setAmount", double.class);
@@ -234,16 +234,14 @@ public class OdorWorldComponent extends WorkspaceComponent {
             if (xLocationType.isVisible()) {
                 String description = entity.getName() + ":X";
                 PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(entity, "getX",
-                                double.class);
+                        .createPotentialProducer(entity, "getX", double.class);
                 producer.setCustomDescription(description);
                 returnList.add(producer);
             }
             if (yLocationType.isVisible()) {
                 String description = entity.getName() + ":Y";
                 PotentialProducer producer = getAttributeManager()
-                        .createPotentialProducer(entity, "getY",
-                                double.class);
+                        .createPotentialProducer(entity, "getY", double.class);
                 producer.setCustomDescription(description);
                 returnList.add(producer);
             }
@@ -292,8 +290,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         String description = entity.getName()
                                 + ((Hearing) sensor).getLabel();
                         PotentialProducer producer = getAttributeManager()
-                                .createPotentialProducer(sensor,
-                                        "getValue", double.class);
+                                .createPotentialProducer(sensor, "getValue",
+                                        double.class);
                         producer.setCustomDescription(description);
                         returnList.add(producer);
                     }
@@ -304,10 +302,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
             if (tileSensorType.isVisible()) {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
-                        String description = entity.getName()
-                                + ":"
-                                + ((TileSensor) sensor)
-                                        .getLabel();
+                        String description = entity.getName() + ":"
+                                + ((TileSensor) sensor).getLabel();
                         PotentialProducer producer = getAttributeManager()
                                 .createPotentialProducer(sensor, "getValue",
                                         double.class);

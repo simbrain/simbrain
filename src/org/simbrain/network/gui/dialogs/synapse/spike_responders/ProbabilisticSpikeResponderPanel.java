@@ -26,8 +26,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
-import org.simbrain.network.synapse_update_rules.spikeresponders.
-    ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.Utils;
 
@@ -44,8 +43,7 @@ public class ProbabilisticSpikeResponderPanel extends
     private JTextField tfResponseValue = new JTextField();
 
     /** The prototypical probabilistic responder rule. */
-    public static final ProbabilisticResponder PROTOTYPE_RESPONDER =
-            new ProbabilisticResponder();
+    public static final ProbabilisticResponder PROTOTYPE_RESPONDER = new ProbabilisticResponder();
 
     /**
      * This method is the default constructor.
@@ -63,16 +61,14 @@ public class ProbabilisticSpikeResponderPanel extends
     @Override
     public void fillFieldValues(List<SpikeResponder> spikeResponderList) {
 
-        ProbabilisticResponder spikeResponder =
-                (ProbabilisticResponder) spikeResponderList
+        ProbabilisticResponder spikeResponder = (ProbabilisticResponder) spikeResponderList
                 .get(0);
 
         // Handle consistency of multiply selections
 
         // Handle Activation Probability
         if (!NetworkUtils.isConsistent(spikeResponderList,
-                ProbabilisticResponder.class, "getActivationProbability"))
-        {
+                ProbabilisticResponder.class, "getActivationProbability")) {
             tfActivationProbability.setText(NULL_STRING);
         } else {
             tfActivationProbability.setText(Double.toString(spikeResponder
@@ -81,8 +77,7 @@ public class ProbabilisticSpikeResponderPanel extends
 
         // Handle Response Value
         if (!NetworkUtils.isConsistent(spikeResponderList,
-                ProbabilisticResponder.class, "getResponseValue"))
-        {
+                ProbabilisticResponder.class, "getResponseValue")) {
             tfResponseValue.setText(NULL_STRING);
         } else {
             tfResponseValue.setText(Double.toString(spikeResponder
@@ -141,8 +136,8 @@ public class ProbabilisticSpikeResponderPanel extends
         double actProb = Utils.doubleParsable(tfActivationProbability);
         if (!Double.isNaN(actProb)) {
             for (Synapse s : synapses) {
-                ((ProbabilisticResponder) s.getSpikeResponder()).
-                setActivationProbability(actProb);
+                ((ProbabilisticResponder) s.getSpikeResponder())
+                        .setActivationProbability(actProb);
             }
         }
 
@@ -150,8 +145,8 @@ public class ProbabilisticSpikeResponderPanel extends
         double responseValue = Utils.doubleParsable(tfResponseValue);
         if (!Double.isNaN(responseValue)) {
             for (Synapse s : synapses) {
-                ((ProbabilisticResponder) s.getSpikeResponder()).
-                setResponseValue(responseValue);
+                ((ProbabilisticResponder) s.getSpikeResponder())
+                        .setResponseValue(responseValue);
             }
         }
 

@@ -16,7 +16,6 @@ package org.simbrain.network.gui.dialogs.network;
 import java.awt.geom.Point2D;
 
 import javax.swing.Box;
-import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.LayeredNetworkCreationPanel.LayerCreationPanel;

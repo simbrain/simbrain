@@ -56,7 +56,6 @@ public final class SetNeuronPropertiesAction extends AbstractAction {
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('e'), this);
 
-
         this.networkPanel = networkPanel;
         updateAction();
 

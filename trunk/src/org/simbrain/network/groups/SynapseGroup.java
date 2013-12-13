@@ -14,6 +14,7 @@ package org.simbrain.network.groups;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,14 @@ import org.simbrain.network.core.Synapse;
 public class SynapseGroup extends Group {
 
     /** The synapses in this group. */
-    private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
+    private final List<Synapse> synapseList =
+            new CopyOnWriteArrayList<Synapse>();
+//
+//    private final Set<Synapse> synapseSet =
+//            Collections.synchronizedSet(new HashSet<Synapse>());
+
+    /** A map of the neuron pairs which already have a synapse between them. */
+    private final HashMap<Neuron, HashSet<Neuron>> pairMap;
 
     /** Reference to source neuron group. */
     private final NeuronGroup sourceNeuronGroup;
@@ -51,7 +59,12 @@ public class SynapseGroup extends Group {
         super(net);
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
-
+        pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
+                * sourceNeuronGroup.getNeuronList().size());
+        for (Neuron n : sourceNeuronGroup.getNeuronList()) {
+            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup.
+                    getNeuronList().size() * 1.5)));
+        }
         AllToAll connection = new AllToAll(net);
         List<Synapse> synapses = connection.connectNeurons(net,
                 sourceNeuronGroup.getNeuronList(),
@@ -74,12 +87,20 @@ public class SynapseGroup extends Group {
         super(net);
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
-
+        pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
+                * sourceNeuronGroup.getNeuronList().size());
+        for (Neuron n : sourceNeuronGroup.getNeuronList()) {
+            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup.
+                    getNeuronList().size() * 1.5)));
+        }
         List<Synapse> synapses = connection.connectNeurons(net,
                 sourceNeuronGroup.getNeuronList(),
                 targetNeuronGroup.getNeuronList(), false);
-        for (Synapse synapse : synapses) {
-            addSynapse(synapse);
+        for (Synapse syn : synapses) {
+            if (!pairMap.get(syn.getSource()).contains(syn.getTarget())) {
+                pairMap.get(syn.getSource()).add(syn.getTarget());
+                addSynapse(syn);
+            }
         }
     }
 
@@ -115,39 +136,41 @@ public class SynapseGroup extends Group {
      * Add a synapse to this synapse group.
      *
      * @param synapse synapse to add
-     * @param fireEvent whether to fire a synapse added event
      */
-    public boolean addSynapse(final Synapse synapse) {
+    public void addSynapse(final Synapse synapse) {
         // Don't add the synapse if it conflicts with an existing synapse.
-        if (conflictsWithExistingSynapse(synapse)) {
-            return false;
-        }
+//        if (conflictsWithExistingSynapse(synapse)) {
+//            return false;
+//        }
         synapseList.add(synapse);
         if (getParentNetwork() != null) {
             synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
             synapse.setParentGroup(this);
         }
-        return true;
     }
 
-    /**
-     * Returns true if a synapse with the same source and parent neurons already
-     * exists in the synapse group.
-     *
-     * @param toCheck the synapse to check
-     * @return true if a synapse connecting the same neurons already exists,
-     *         false otherwise
-     */
-    private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
-        for (Synapse synapse : synapseList) {
-            if (synapse.getSource() == toCheck.getSource()) {
-                if (synapse.getTarget() == toCheck.getTarget()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    /**
+//     * Returns true if a synapse with the same source and parent neurons
+    //already
+//     * exists in the synapse group.
+//     *
+//     * @param toCheck the synapse to check
+//     * @return true if a synapse connecting the same neurons already exists,
+//     *         false otherwise
+//     */
+//    private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
+//        for (Synapse synapse : synapseList)
+//
+//
+////        for (Synapse synapse : synapseList) {
+////            if (synapse.getSource() == toCheck.getSource()) {
+////                if (synapse.getTarget() == toCheck.getTarget()) {
+////                    return true;
+////                }
+////            }
+////        }
+//        return false;
+//    }
 
     /**
      * Remove the provided synapse.

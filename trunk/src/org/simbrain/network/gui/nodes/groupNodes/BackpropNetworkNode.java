@@ -60,11 +60,12 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * Sets custom menu.
      */
     private void setContextMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(editGroup);
+        menu.add(editGroupName);
+        menu.add(removeGroup);
+        menu.addSeparator();
         final BackpropNetwork network = (BackpropNetwork) getGroup();
-        JPopupMenu menu = super.getDefaultContextMenu();
-        menu.addSeparator();
-        menu.add(new JMenuItem(trainAction));
-        menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
                 getNetworkPanel(), network));
@@ -88,7 +89,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     }
 
     /**
-     * Action to train Backprop
+     * Action to train Backprop.  No longer used.
      */
     private Action trainAction = new AbstractAction() {
 

@@ -158,7 +158,7 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(editGroup);
-        menu.add(removeGroupAction);
+        menu.add(removeGroup);
 
         // Selection submenu
         menu.addSeparator();

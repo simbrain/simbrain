@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JDialog;
 
 import org.simbrain.network.groups.Subnetwork;
@@ -114,10 +118,24 @@ public class SubnetworkNode extends GroupNode {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();
-                // panel.commitChanges();
             }
         };
         return dialog;
     }
+
+    /**
+     * Action for invoking the edit menu. Currently this is always also a
+     * training menu. If this is not the case for other subnetworks then the
+     * name can be changed and separate actions made.
+     */
+    protected Action editGroup = new AbstractAction("Edit / Train...") {
+        public void actionPerformed(final ActionEvent event) {
+            StandardDialog dialog = getPropertyDialog();
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        }
+    };
+
 
 }

@@ -166,7 +166,7 @@ public class SynapseGroupNode extends GroupNode {
             }
         };
         menu.add(editGroup);
-        menu.add(removeGroupAction);
+        menu.add(removeGroup);
 
         // Weight adjustment stuff
         menu.addSeparator();

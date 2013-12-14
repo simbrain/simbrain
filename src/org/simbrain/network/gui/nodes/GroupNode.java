@@ -39,6 +39,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -143,7 +144,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         JPopupMenu ret = new JPopupMenu();
 
         ret.add(editGroupName);
-        ret.add(removeGroupAction);
+        ret.add(removeGroup);
         if (group instanceof Trainable) {
             ret.addSeparator();
             ret.add(testInputAction);
@@ -316,12 +317,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     /**
      * Action for removing this group
      */
-    protected Action removeGroupAction = new AbstractAction() {
+    protected Action removeGroup = new AbstractAction() {
 
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
-            putValue(NAME, "Remove group...");
-            putValue(SHORT_DESCRIPTION, "Remove group...");
+            putValue(NAME, "Remove...");
+            putValue(SHORT_DESCRIPTION, "Remove...");
         }
 
         @Override

@@ -87,4 +87,9 @@ public class Turning extends Effector {
         this.direction = direction;
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Turning Movement";
+    }
+
 }

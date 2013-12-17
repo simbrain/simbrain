@@ -85,8 +85,10 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
         }
     }
 
-    @Override
-    public void fillFieldValues() {
+    /**
+     * Set the current values of all fields.
+     */
+    private void fillFieldValues() {
         if (isCreationPanel) {
             label.setText("" + StraightMovement.DEFAULT_LABEL);
             bma.setText("" + StraightMovement.DEFAULT_SCALING_FACTOR);
@@ -95,4 +97,5 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
             bma.setText("" + straightEffector.getScalingFactor());
         }
     }
+
 }

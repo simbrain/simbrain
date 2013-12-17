@@ -91,8 +91,10 @@ public class HearingSensorPanel extends AbstractSensorPanel {
         }
     }
 
-    @Override
-    protected void fillFieldValues() {
+    /** 
+     * Set the current values of all fields.
+     */
+    private void fillFieldValues() {
         if (isCreationPanel) {
             phrase.setText("" + Hearing.DEFAULT_PHRASE);
             outputAmount.setText("" + Hearing.DEFAULT_OUTPUT_AMOUNT);

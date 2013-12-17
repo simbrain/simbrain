@@ -91,8 +91,10 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
         }
     }
 
-    @Override
-    protected void fillFieldValues() {
+    /**
+     * Set the current values of all fields.
+     */
+    private void fillFieldValues() {
         if (isCreationPanel) {
             label.setText("" + Turning.DEFAULT_LABEL);
             direction.setText("" + Turning.DEFAULT_DIRECTION);
@@ -103,4 +105,5 @@ public class TurningEffectorPanel extends AbstractEffectorPanel {
             amount.setText("" + turningEffector.getAmount());
         }
     }
+
 }

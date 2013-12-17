@@ -30,8 +30,4 @@ public abstract class AbstractEffectorPanel extends LabelledItemPanel {
      */
     public abstract void commitChanges();
 
-    /**
-     * Fill in appropriate text fields when effector is being modified.
-     */
-    protected abstract void fillFieldValues();
 }

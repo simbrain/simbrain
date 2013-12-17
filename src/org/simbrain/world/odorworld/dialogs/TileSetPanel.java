@@ -57,8 +57,4 @@ public class TileSetPanel extends AbstractSensorPanel {
                 Integer.parseInt(offset.getText()));
     }
 
-    @Override
-    protected void fillFieldValues() {
-        // TODO Auto-generated method stub
-    }
 }

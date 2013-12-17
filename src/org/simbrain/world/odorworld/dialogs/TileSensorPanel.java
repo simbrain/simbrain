@@ -109,7 +109,7 @@ public class TileSensorPanel extends AbstractSensorPanel {
     }
 
     /** Fill in appropriate text fields when tile sensor is being modified. */
-    public void fillFieldValues() {
+    private void fillFieldValues() {
         if (isCreationPanel) {
             activation.setText("" + TileSensor.DEFAULT_ACTIVATION);
             x.setText("" + TileSensor.DEFAULT_X);

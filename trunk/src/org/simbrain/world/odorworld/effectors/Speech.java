@@ -144,4 +144,9 @@ public class Speech extends Effector {
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
+
+    @Override
+    public String getTypeDescription() {
+        return "Speech";
+    }
 }

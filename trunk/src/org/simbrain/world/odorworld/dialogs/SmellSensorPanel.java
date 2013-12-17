@@ -91,8 +91,10 @@ public class SmellSensorPanel extends AbstractSensorPanel {
         }
     }
 
-    @Override
-    public void fillFieldValues() {
+    /**
+     * Set the current values of all fields.
+     */
+    private void fillFieldValues() {
         if (isCreationPanel) {
             label.setText("" + SmellSensor.DEFAULT_LABEL);
             theta.setText("" + SmellSensor.DEFAULT_THETA);

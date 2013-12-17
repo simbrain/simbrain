@@ -82,4 +82,8 @@ public class StraightMovement extends Effector {
         this.scalingFactor = scalingFactor;
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Straight Movement";
+    }
 }

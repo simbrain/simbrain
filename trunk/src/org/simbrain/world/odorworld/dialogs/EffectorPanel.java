@@ -52,11 +52,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Panel showing an agent's effectors.
  *
- * TODO: Possibly abstract and integrate with sensor panel.
- * 
  * @author Jeff Yoshimi
  * @author Lam Nguyen
- * 
+ *
  */
 public class EffectorPanel extends JPanel {
 
@@ -69,9 +67,9 @@ public class EffectorPanel extends JPanel {
     /** The parent entity. */
     private OdorWorldEntity entity;
 
-    /** 
-     * The selected effector to edit. If more than one effector is selected
-     * in the table, this is the first selected row.
+    /**
+     * The selected effector to edit. If more than one effector is selected in
+     * the table, this is the first selected row.
      */
     private Effector selectedEffector;
 
@@ -113,7 +111,8 @@ public class EffectorPanel extends JPanel {
         });
         table.addMouseListener(new MouseAdapter() {
             public void mouseReleased(final MouseEvent e) {
-                if (e.getClickCount() == 2 && table.columnAtPoint(e.getPoint()) != 1) {
+                if (e.getClickCount() == 2
+                        && table.columnAtPoint(e.getPoint()) != 1) {
                     final int row = table.rowAtPoint(e.getPoint());
                     table.setRowSelectionInterval(row, row);
                     final Effector effector = model.getEffector(row);
@@ -121,11 +120,13 @@ public class EffectorPanel extends JPanel {
                 }
             }
         });
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
-            public void valueChanged(ListSelectionEvent e) {
-                selectedEffector = model.getEffector(table.getSelectedRow());
-            }
-        });
+        table.getSelectionModel().addListSelectionListener(
+                new ListSelectionListener() {
+                    public void valueChanged(ListSelectionEvent e) {
+                        selectedEffector = model.getEffector(table
+                                .getSelectedRow());
+                    }
+                });
         for (Effector effector : entity.getEffectors()) {
             model.addRow(effector);
         }
@@ -164,15 +165,12 @@ public class EffectorPanel extends JPanel {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                model.commitChanges();
                 model.fireTableDataChanged();
             }
         });
-        editEffector.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    editEffector(selectedEffector);
-                }
+        editEffector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                editEffector(selectedEffector);
             }
         });
         entity.getParentWorld().addListener(new WorldListenerAdapter() {
@@ -180,6 +178,7 @@ public class EffectorPanel extends JPanel {
             public void effectorRemoved(Effector effector) {
                 model.removeEffector(effector);
             }
+
             @Override
             public void effectorAdded(Effector effector) {
                 model.addRow(effector);
@@ -196,36 +195,22 @@ public class EffectorPanel extends JPanel {
     private void editEffector(Effector effector) {
         StandardDialog dialog = new StandardDialog();
         dialog.setTitle("Edit Effector");
+        AbstractEffectorPanel effectorPanel = null;
         if (effector instanceof Turning) {
-            TurningEffectorPanel turningEffectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
-            dialog.setContentPane(turningEffectorPanel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-            if (!dialog.hasUserCancelled()) {
-                turningEffectorPanel.commitChanges();
-            }
+            effectorPanel = new TurningEffectorPanel(entity, (Turning) effector);
+        } else if (effector instanceof StraightMovement) {
+            effectorPanel = new StraightEffectorPanel(entity,
+                    (StraightMovement) effector);
+        } else if (effector instanceof Speech) {
+            effectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
         }
-        if (effector instanceof StraightMovement) {
-            StraightEffectorPanel straightEffectorPanel = new StraightEffectorPanel(entity, (StraightMovement) effector);
-            dialog.setContentPane(straightEffectorPanel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-            if (!dialog.hasUserCancelled()) {
-                straightEffectorPanel.commitChanges();
-            }
+        dialog.setContentPane(effectorPanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+        if (!dialog.hasUserCancelled()) {
+            effectorPanel.commitChanges();
         }
-        if (effector instanceof Speech) {
-            SpeechEffectorPanel speechEffectorPanel = new SpeechEffectorPanel(entity, (Speech) effector);
-            dialog.setContentPane(speechEffectorPanel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-            if (!dialog.hasUserCancelled()) {
-                speechEffectorPanel.commitChanges();
-            }
-        } 
     }
 
     /**
@@ -251,10 +236,6 @@ public class EffectorPanel extends JPanel {
             } else {
                 return null;
             }
-        }
-
-        public void commitChanges() {
-
         }
 
         /**
@@ -316,7 +297,7 @@ public class EffectorPanel extends JPanel {
             case 1:
                 return data.get(row).getLabel();
             case 2:
-                return data.get(row).getClass().getSimpleName();
+                return data.get(row).getTypeDescription();
             default:
                 return null;
             }

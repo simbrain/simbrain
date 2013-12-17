@@ -276,6 +276,7 @@ public class OdorWorld {
         xstream.omitField(BasicEntity.class, "images");
         xstream.omitField(OdorWorldEntity.class, "images");
         xstream.omitField(RotatingEntity.class, "imageMap");
+        xstream.omitField(SmellSensor.class, "DEFAULT_RADIUS");
         return xstream;
     }
 

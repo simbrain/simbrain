@@ -100,8 +100,10 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         }
     }
 
-    @Override
-    protected void fillFieldValues() {
+    /** 
+     * Set the current values of all fields.
+     */
+    private void fillFieldValues() {
         if (isCreationPanel) {
             phrase.setText("" + Speech.DEFAULT_PHRASE);
             threshold.setText("" + Speech.DEFAULT_THRESHOLD);
@@ -119,4 +121,5 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
                 JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
                 null, null);
     }
+
 }

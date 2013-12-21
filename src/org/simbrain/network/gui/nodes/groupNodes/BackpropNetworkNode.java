@@ -62,7 +62,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(editGroup);
-        menu.add(editGroupName);
+        menu.add(renameGroup);
         menu.add(removeGroup);
         menu.addSeparator();
         final BackpropNetwork network = (BackpropNetwork) getGroup();

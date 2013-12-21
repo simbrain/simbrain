@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.util.List;
 import java.util.Random;
 
 import org.simbrain.network.core.Network;
@@ -27,13 +28,13 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.trainers.Trainable;
+import org.simbrain.network.trainers.TrainingSet;
 
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
-public class Hopfield extends Subnetwork {
-
-    // TODO: Generalize to capture a greater variety of Hopfield type networks.
+public class Hopfield extends Subnetwork implements Trainable {
 
     /** Random update. */
     public static final int RANDOM_UPDATE = 1;
@@ -52,6 +53,11 @@ public class Hopfield extends Subnetwork {
 
     /** Random integer generator. */
     private Random randInt;
+
+    /**
+     * Training set.
+     */
+    private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Copy constructor.
@@ -84,10 +90,10 @@ public class Hopfield extends Subnetwork {
         for (int i = 0; i < numNeurons; i++) {
             BinaryRule binary = new BinaryRule();
             binary.setThreshold(0);
-            Neuron n = new Neuron(root, binary);
             binary.setCeiling(1);
             binary.setFloor(0);
             binary.setIncrement(1);
+            Neuron n = new Neuron(root, binary);
             getNeuronGroup().addNeuron(n);
         }
 
@@ -108,7 +114,7 @@ public class Hopfield extends Subnetwork {
     /**
      * Randomize weights symmetrically.
      */
-    public void randomizeWeights() {
+    public void randomize() {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             for (int j = 0; j < i; j++) {
                 Synapse w = Network.getSynapse(getNeuronGroup().getNeuronList()
@@ -124,27 +130,6 @@ public class Hopfield extends Subnetwork {
                     w2.setStrength(w.getStrength());
                 }
             }
-        }
-        getParentNetwork().fireNetworkChanged();
-    }
-
-    /**
-     * Apply Hopfield training rule to current activation pattern.
-     */
-    public void train() {
-        // Assumes all neurons have the same upper and lower values
-        // Will have to be changed if AdditiveRule is ever implemented
-        double low = ((BinaryRule) getNeuronGroup().getNeuronList().get(0)
-                .getUpdateRule()).getFloor();
-        double hi = ((BinaryRule) getNeuronGroup().getNeuronList().get(0)
-                .getUpdateRule()).getCeiling();
-
-        for (Synapse w : this.getSynapseGroup().getSynapseList()) {
-            Neuron src = w.getSource();
-            Neuron tar = w.getTarget();
-            w.setStrength(w.getStrength()
-                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
-                            .getActivation()) - hi - low) / (hi - low))));
         }
         getParentNetwork().fireNetworkChanged();
     }
@@ -166,12 +151,7 @@ public class Hopfield extends Subnetwork {
                 n.setActivation(n.getBuffer());
             }
         } else {
-            for (int i = 0; i < nCount; i++) {
-                n = getNeuronGroup().getNeuronList().get(i);
-                n.update();
-                n.setActivation(n.getBuffer());
-            }
-
+            getNeuronGroup().update();
         }
 
     }
@@ -206,6 +186,40 @@ public class Hopfield extends Subnetwork {
         } else {
             return "Sequential update of neurons";
         }
+    }
+
+    @Override
+    public List<Neuron> getInputNeurons() {
+        return this.getFlatNeuronList();
+    }
+
+    @Override
+    public List<Neuron> getOutputNeurons() {
+        return this.getFlatNeuronList();
+    }
+
+    @Override
+    public TrainingSet getTrainingSet() {
+        return trainingSet;
+    }
+
+    @Override
+    public void initNetwork() {
+        // No implementation
+    }
+
+    /**
+     * Apply the basic Hopfield rule to the current pattern. This is not the
+     * main training algorithm, which directly makes use of the input data.
+     */
+    public void trainOnCurrentPattern() {
+        for (Synapse w : this.getSynapseGroup().getSynapseList()) {
+            Neuron src = w.getSource();
+            Neuron tar = w.getTarget();
+            w.setStrength(w.getStrength() + src.getActivation()
+                    * tar.getActivation());
+        }
+        getParentNetwork().fireNetworkChanged();
     }
 
 }

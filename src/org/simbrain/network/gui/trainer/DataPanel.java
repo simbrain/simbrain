@@ -81,6 +81,7 @@ public class DataPanel extends JPanel {
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
         scroller = new SimbrainJTableScrollPanel(table);
+        scroller.setMinimumSize(new Dimension(200, 500));
         scroller.setMaxVisibleColumns(numVisibleColumns);
 
         setLayout(new BorderLayout());
@@ -156,10 +157,12 @@ public class DataPanel extends JPanel {
                 + additionalParentHeight;
         if (parentFrame != null) {
             // Reset height of parent frame
-            parentFrame.setPreferredSize(new Dimension(parentFrame
-                    .getPreferredSize().width, newHeight));
-            parentFrame.pack();
-            parentFrame.setLocationRelativeTo(null);
+            if (newHeight > 300) {
+                parentFrame.setPreferredSize(new Dimension(parentFrame
+                        .getPreferredSize().width, newHeight));
+                parentFrame.pack();
+                parentFrame.setLocationRelativeTo(null);
+            }
         }
     }
 

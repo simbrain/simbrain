@@ -18,77 +18,76 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.Dialog.ModalityType;
-
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
-import org.simbrain.network.gui.trainer.IterativeControlsPanel;
-import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer;
-import org.simbrain.network.trainers.Trainable;
+import org.simbrain.network.gui.trainer.SimpleTrainerControlPanel;
+import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.network.trainers.HopfieldTrainer;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 
 /**
- * <b>SupervisedTrainingDialog</b> is the superclass of edit dialogs associated
- * with most supervised learning networks.
+ * Dialog for setting the properties of Hopfield networks and training them.
+ *
+ * @author Jeff Yoshimi
+ *
  */
-public class SupervisedTrainingDialog extends StandardDialog {
+public class HopfieldEditTrainDialog extends StandardDialog {
 
-    /** Network panel. */
-    protected NetworkPanel networkPanel;
+    /** The main panel. */
+    final HopfieldPropertiesPanel hopfieldPropsPanel;
 
     /** Main tabbed pane. */
     protected JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Reference to the trainable network being edited. */
-    private Trainable trainable;
-
     /**
-     * Default constructor.
+     * Construct the dialog.
      *
-     * @param np parent panel
-     * @param trainable edited network
+     * @param np parent network panel
+     * @param hop the hopfield network
      */
-    public SupervisedTrainingDialog(final NetworkPanel np,
-            final Trainable trainable) {
-        networkPanel = np;
-        this.trainable = trainable;
-    }
-
-    /**
-     * This method initializes the components on the panel.
-     */
-    protected void initDefaultTabs() {
+    public HopfieldEditTrainDialog(NetworkPanel np, Hopfield hop) {
 
         // Set to modeless so the dialog can be left open
         setModalityType(ModalityType.MODELESS);
 
-        // Input data tab
-        final DataPanel inputPanel = new DataPanel(trainable.getInputNeurons(),
-                trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
-        inputPanel.setFrame(this);
-        tabbedPane.addTab("Input data", inputPanel);
+        // Set up properties tab
+        Box propsBox = Box.createVerticalBox();
+        propsBox.setOpaque(true);
+        propsBox.add(Box.createVerticalGlue());
+        hopfieldPropsPanel = new HopfieldPropertiesPanel(np, hop);
+        propsBox.add(hopfieldPropsPanel);
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        propsBox.add(separator);
+        SimpleTrainerControlPanel controlPanel = new SimpleTrainerControlPanel(
+                np, new HopfieldTrainer(hop));
+        propsBox.add(controlPanel);
+        tabbedPane.addTab("Properties", propsBox);
 
-        // Training data tab
-        DataPanel trainingPanel = new DataPanel(trainable.getOutputNeurons(),
-                trainable.getTrainingSet().getTargetDataMatrix(), 5, "Targets");
-        trainingPanel.setFrame(this);
-        tabbedPane.addTab("Target data", trainingPanel);
+
+        // Input data tab
+        final DataPanel inputPanel = new DataPanel(hop.getInputNeurons(),
+                hop.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        inputPanel.setFrame(this);
+        tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        final TestInputPanel testInputPanel = new TestInputPanel(networkPanel,
-                trainable.getInputNeurons(), trainable.getTrainingSet()
+        final TestInputPanel testInputPanel = new TestInputPanel(np,
+                hop.getInputNeurons(), hop.getTrainingSet()
                         .getInputData());
         tabbedPane.addTab("Test data", testInputPanel);
 
-        // Finalize
-        setContentPane(tabbedPane);
 
         // Listen for tab changed events. Load inputs to test tab
         // If inputs have been loaded
@@ -97,7 +96,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
-                if (index == 3) {
+                if (index == 2) {
                     if (inputPanel.getTable().getData() != null) {
                         testInputPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
@@ -107,12 +106,18 @@ public class SupervisedTrainingDialog extends StandardDialog {
         };
         tabbedPane.addChangeListener(changeListener);
 
+        // Set up help
+        Action helpAction = new ShowHelpAction(hopfieldPropsPanel.getHelpPath());
+        addButton(new JButton(helpAction));
+
+        //  Finish configuration
+        setContentPane(tabbedPane);
+
     }
 
-    /**
-     * Called when dialog closes.
-     */
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
+        hopfieldPropsPanel.commitChanges();
     }
 }

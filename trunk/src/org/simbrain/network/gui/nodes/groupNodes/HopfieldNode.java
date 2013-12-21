@@ -22,20 +22,15 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesPanel;
+import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
  * PNode representation of Hopfield Network.
- *
- * TODO: - Location of top interaction box - Dialog
  *
  * @author jyoshimi
  */
@@ -54,45 +49,42 @@ public class HopfieldNode extends SubnetworkNode {
         // setOutlinePadding(15f);
     }
 
+    @Override
+    protected StandardDialog getPropertyDialog() {
+        return new HopfieldEditTrainDialog(
+                getNetworkPanel(), (Hopfield) getGroup());
+    }
+
+
     /**
      * Sets custom menu for Hopfield node.
      */
     private void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(editGroup);
+        menu.add(renameGroup);
+        menu.add(removeGroup);
         menu.addSeparator();
-        Action editNet = new AbstractAction(
-                "Set Hopfield Network Properties...") {
+        Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                final HopfieldPropertiesPanel panel = new HopfieldPropertiesPanel(
-                        getNetworkPanel(), (Hopfield) getGroup());
-                StandardDialog dialog = new StandardDialog() {
-                    @Override
-                    protected void closeDialogOk() {
-                        super.closeDialogOk();
-                        panel.commitChanges();
-                    }
-                };
-                dialog.setContentPane(panel);
-                Action helpAction = new ShowHelpAction(panel.getHelpPath());
-                dialog.addButton(new JButton(helpAction));
-                dialog.setLocationRelativeTo(null);
-                dialog.pack();
-                dialog.setVisible(true);
+                ((Hopfield) getGroup()).trainOnCurrentPattern();
             }
         };
-        menu.add(new JMenuItem(editNet));
-        Action trainNet = new AbstractAction("Train Hopfield Network...") {
+        menu.add(trainNet);
+        Action randomizeNet = new AbstractAction(
+                "Randomize synapses symmetrically") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getGroup()).train();
+                ((Hopfield) getGroup()).randomize();
             }
         };
-        menu.add(new JMenuItem(trainNet));
-        Action randWeights = new AbstractAction("Randomize Weights...") {
+        menu.add(randomizeNet);
+        Action clearWeights = new AbstractAction(
+                "Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getGroup()).randomizeWeights();
+                ((Hopfield) getGroup()).getSynapseGroup().setStrengths(0);
             }
         };
-        menu.add(new JMenuItem(randWeights));
+        menu.add(clearWeights);
         setContextMenu(menu);
     }
 

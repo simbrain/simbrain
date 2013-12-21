@@ -76,6 +76,9 @@ public class TestInputPanel extends JPanel {
     /** The nodes to test. */
     private List<Neuron> inputNeurons;
 
+    /** Reference to table holding numeric data. */
+    private NumericTable numericTable;
+
     /**
      * Construct panel using a network panel and a list of selected neurons.
      *
@@ -111,8 +114,6 @@ public class TestInputPanel extends JPanel {
         this.data = data;
         initTestInputPanel();
     }
-
-    NumericTable numericTable;
 
     /**
      * Initiate the test network panel using the network panel.

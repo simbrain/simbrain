@@ -64,7 +64,7 @@ public class LMSNetworkNode extends SubnetworkNode {
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(editGroup);
-        menu.add(editGroupName);
+        menu.add(renameGroup);
         menu.add(removeGroup);
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");

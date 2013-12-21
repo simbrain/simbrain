@@ -83,7 +83,6 @@
     <module name="GenericWhitespace"/>
     <module name="FinalClass"/>
     <module name="MissingSwitchDefault"/>
-    <module name="MagicNumber"/>
     <module name="Indentation">
       <property name="caseIndent" value="0"/>
     </module>
@@ -91,7 +90,6 @@
     <module name="EqualsAvoidNull"/>
     <module name="CyclomaticComplexity">
       <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="NestedIfDepth">
       <property name="max" value="3"/>
@@ -109,7 +107,6 @@
       <property name="severity" value="ignore"/>
       <property name="ignoreHashCodeMethod" value="true"/>
       <property name="ignoreAnnotation" value="true"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
   </module>
   <module name="JavadocPackage"/>

@@ -8,7 +8,6 @@ refactored
 clipboard
 piccolo
 combo
-updator
 simbrain
 deselected
 synaptic
@@ -21,3 +20,4 @@ sigmoidal
 scrollpane
 scrollbar
 sexy
+tabbed

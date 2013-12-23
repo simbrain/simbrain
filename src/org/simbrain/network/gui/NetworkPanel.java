@@ -1676,7 +1676,7 @@ public class NetworkPanel extends JPanel {
      * through screen elements and resets relevant colors.
      */
     public void resetColors() {
-        setBackground(NetworkGuiSettings.getBackgroundColor());
+        canvas.setBackground(NetworkGuiSettings.getBackgroundColor());
         for (Object obj : canvas.getLayer().getChildrenReference()) {
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();

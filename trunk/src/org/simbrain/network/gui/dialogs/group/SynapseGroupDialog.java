@@ -29,6 +29,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
@@ -65,7 +66,7 @@ public class SynapseGroupDialog extends StandardDialog {
     private JPanel tabMatrix = new JPanel();
 
     /** Label Field. */
-    private final JTextField tfSynapseLabel = new JTextField();
+    private final JTextField tfSynapseGroupLabel = new JTextField();
 
     /** Rate Field. */
     private final JTextField tfRateLabel = new JTextField();
@@ -82,6 +83,27 @@ public class SynapseGroupDialog extends StandardDialog {
     /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel = false;
 
+    /** Reference to source neuron group. */
+    private NeuronGroup sourceNeuronGroup = null;
+
+    /** Reference to target neuron group. */
+    private NeuronGroup targetNeuronGroup = null;
+
+    /**
+     * Create a new synapse group connecting the indicated neuron groups.
+     *
+     * @param src source neuron group
+     * @param tar target neuron group
+     * @param np parent panel
+     */
+    public SynapseGroupDialog(final NetworkPanel np, NeuronGroup src,
+            NeuronGroup tar) {
+        networkPanel = np;
+        this.sourceNeuronGroup = src;
+        this.targetNeuronGroup = tar;
+        isCreationPanel = true;
+        init();
+    }
     /**
      * Construct the Synapse group dialog.
      *
@@ -91,6 +113,14 @@ public class SynapseGroupDialog extends StandardDialog {
     public SynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
         networkPanel = np;
         synapseGroup = sg;
+        init();
+    }
+
+    /**
+     * Initialize the panel.
+     */
+    private void init() {
+
         setTitle("Edit Synapse Group");
 
         fillFieldValues();
@@ -99,8 +129,11 @@ public class SynapseGroupDialog extends StandardDialog {
         // Generic group properties
         tabbedPane.addTab("Properties", tabMain);
         tabMain.add(mainPanel);
-        mainPanel.addItem("Id:", new JLabel(synapseGroup.getId()));
-        mainPanel.addItem("Label:", tfSynapseLabel);
+        if (!isCreationPanel) {
+            mainPanel.addItem("Id:", new JLabel(synapseGroup.getId()));
+        }
+        mainPanel.addItem("Label:", tfSynapseGroupLabel);
+        tfSynapseGroupLabel.setColumns(5);
         // TODO: As more synapse group types are added generalize
         if (synapseGroup instanceof SynapseGroupWithLearningRate) {
             mainPanel.addItem("Learning Rate:", tfRateLabel);
@@ -110,7 +143,7 @@ public class SynapseGroupDialog extends StandardDialog {
         Box editSynapses = Box.createVerticalBox();
         if (isCreationPanel) {
             // TODO: Not yet tested. Creation dialog is not accessible yet.
-            Synapse baseSynapse = new Synapse(null);
+            Synapse baseSynapse = Synapse.getTemplateSynapse();
             editBasicSynapseInfo = new BasicSynapseInfoPanel(
                     Collections.singletonList(baseSynapse), this);
             editSynapseType = new SynapseUpdateSettingsPanel(
@@ -131,10 +164,14 @@ public class SynapseGroupDialog extends StandardDialog {
         // tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
         // .getSynapseList()));
 
-        // Weight Matrix
-        tabbedPane.addTab("Matrix", tabMatrix);
-        tabMatrix.add(new WeightMatrixViewer(synapseGroup.getSourceNeurons(),
-                synapseGroup.getTargetNeurons(), networkPanel));
+        if (!isCreationPanel) {
+            // Weight Matrix
+            tabbedPane.addTab("Matrix", tabMatrix);
+            tabMatrix.add(WeightMatrixViewer
+                    .getWeightMatrixPanel(new WeightMatrixViewer(synapseGroup
+                            .getSourceNeurons(), synapseGroup
+                            .getTargetNeurons(), networkPanel)));
+        }
 
         // Set up help button
         Action helpAction;
@@ -146,11 +183,13 @@ public class SynapseGroupDialog extends StandardDialog {
      * Set the initial values of dialog components.
      */
     public void fillFieldValues() {
-        tfSynapseLabel.setText(synapseGroup.getLabel());
-        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
-            tfRateLabel.setText(""
-                    + ((SynapseGroupWithLearningRate) synapseGroup)
-                            .getLearningRate());
+        if (!isCreationPanel) {
+            tfSynapseGroupLabel.setText(synapseGroup.getLabel());
+            if (synapseGroup instanceof SynapseGroupWithLearningRate) {
+                tfRateLabel.setText(""
+                        + ((SynapseGroupWithLearningRate) synapseGroup)
+                                .getLearningRate());
+            }
         }
     }
 
@@ -158,13 +197,19 @@ public class SynapseGroupDialog extends StandardDialog {
      * Commit changes.
      */
     public void commitChanges() {
-        synapseGroup.setLabel(tfSynapseLabel.getText());
         if (isCreationPanel) {
-            // TODO
+            synapseGroup = new SynapseGroup(networkPanel.getNetwork(),
+                    sourceNeuronGroup, targetNeuronGroup);
+            synapseGroup.setLabel(tfSynapseGroupLabel.getText());
+            editBasicSynapseInfo.commitChanges(synapseGroup.getSynapseList());
+            editSynapseType.getSynapsePanel().commitChanges(
+                    synapseGroup.getSynapseList());
+            networkPanel.getNetwork().addGroup(synapseGroup);
         } else {
             // editBasicSynapseInfo.commitChanges()
             // editSynapseType.commitChanges()
         }
+        synapseGroup.setLabel(tfSynapseGroupLabel.getText());
         if (synapseGroup instanceof SynapseGroupWithLearningRate) {
             ((SynapseGroupWithLearningRate) synapseGroup)
                     .setLearningRate(Double.parseDouble(tfRateLabel.getText()));

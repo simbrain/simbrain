@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +26,8 @@ import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
@@ -72,11 +73,15 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         cbHolder.add(selectType);
         cbHolder.add(Box.createHorizontalGlue());
 
+
         // Main vertical box
-        JPanel trainerPanel = new JPanel(new BorderLayout());
-        trainerPanel.add("North", cbHolder);
+        Box trainerPanel = Box.createVerticalBox();
+        trainerPanel.setOpaque(true);
+        trainerPanel.add(cbHolder);
         final JPanel trainerContainer = new JPanel();
-        trainerPanel.add("Center", trainerContainer);
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        trainerPanel.add(separator);
+        trainerPanel.add(trainerContainer);
 
         // Add to tabbed pane
         tabbedPane.addTab("Train", trainerPanel);

@@ -18,16 +18,12 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -113,29 +109,33 @@ public class IterativeControlsPanel extends JPanel {
      * Initialize the panel.
      */
     public void init() {
-        setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createTitledBorder("Controls"));
-        GridBagConstraints controlPanelConstraints = new GridBagConstraints();
+
+        //setBorder(BorderFactory.createTitledBorder("Controls"));
+
+        // Set up properties tab
+        Box propsBox = Box.createVerticalBox();
+        propsBox.setOpaque(true);
+        propsBox.add(Box.createVerticalGlue());
 
         // Run Tools
         JPanel runTools = new JPanel();
+        runTools.add(new JLabel("Iterate: "));
         runTools.add(new JButton(runAction));
         runTools.add(new JButton(stepAction));
+        showUpdates
+                .setToolTipText("Update display of network while iterating trainer (slows performance but didactically useful)");
         runTools.add(showUpdates);
-        controlPanelConstraints.weightx = 0.5;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 0;
-        add(runTools, controlPanelConstraints);
+        JButton propertiesButton = new JButton(setPropertiesAction);
+        propertiesButton.setHideActionText(true);
+        runTools.add(propertiesButton);
+        JButton randomizeButton = new JButton(randomizeAction);
+        randomizeButton.setHideActionText(true);
+        runTools.add(randomizeButton);
+        propsBox.add(runTools);
 
         // Separator
-        controlPanelConstraints.weightx = 1;
-        controlPanelConstraints.weighty = 1;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 1;
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setPreferredSize(new Dimension(200, 15));
-        // separator.setBackground(Color.red);
-        add(separator, controlPanelConstraints);
+        propsBox.add(separator);
 
         // Labels
         LabelledItemPanel labelPanel = new LabelledItemPanel();
@@ -148,45 +148,18 @@ public class IterativeControlsPanel extends JPanel {
         // validationBar = new JProgressBar(0, numTicks);
         // validationBar.setStringPainted(true);
         // labelPanel.addItem("Validation Error:", validationBar);
-        controlPanelConstraints.weightx = 0.5;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 2;
-        add(labelPanel, controlPanelConstraints);
+        propsBox.add(labelPanel);
 
         // Separator
-        controlPanelConstraints.weightx = 0.5;
-        controlPanelConstraints.weighty = 0.5;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 3;
         JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
-        separator2.setPreferredSize(new Dimension(200, 15));
-        // separator.setBackground(Color.red);
-        add(separator2, controlPanelConstraints);
+        propsBox.add(separator2);
+        propsBox.add(Box.createVerticalStrut(20));
 
-        // Button panel at bottom
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton propertiesButton = new JButton(setPropertiesAction);
-        propertiesButton.setHideActionText(true);
-        buttonPanel.add(propertiesButton);
-        JButton randomizeButton = new JButton(randomizeAction);
-        randomizeButton.setHideActionText(true);
-        buttonPanel.add(randomizeButton);
-        JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(
-                panel, trainer));
-        plotButton.setHideActionText(true);
-        buttonPanel.add(plotButton);
-        controlPanelConstraints.weightx = 0.5;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 4;
-        add(buttonPanel, controlPanelConstraints);
+        // Time series for error
+        ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
+        propsBox.add(graphPanel);
 
-        // Set up control panel
-        int width = 290;
-        int height = 260;
-        setMaximumSize(new Dimension(width, height));
-        setPreferredSize(new Dimension(width, height));
-        setMinimumSize(new Dimension(width, height));
-
+        add(propsBox);
         addErrorListener();
     }
 
@@ -243,7 +216,8 @@ public class IterativeControlsPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             // putValue(NAME, "Open (.csv)");
-            // putValue(SHORT_DESCRIPTION, "Import table from .csv");
+            putValue(SHORT_DESCRIPTION,
+                    "Iterate training until stopping condition met");
         }
 
         /**
@@ -304,7 +278,7 @@ public class IterativeControlsPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
             // putValue(NAME, "Open (.csv)");
-            // putValue(SHORT_DESCRIPTION, "Import table from .csv");
+            putValue(SHORT_DESCRIPTION, "Iterate training once");
         }
 
         /**
@@ -362,7 +336,7 @@ public class IterativeControlsPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
             putValue(NAME, "Properties");
-            putValue(SHORT_DESCRIPTION, "Edit Properties");
+            putValue(SHORT_DESCRIPTION, "Edit Trainer Settings...");
         }
 
         /**

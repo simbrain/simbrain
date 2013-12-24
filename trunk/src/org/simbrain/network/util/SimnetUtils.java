@@ -20,12 +20,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.ojalgo.access.Access2D.Builder;
+import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Factory;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.scalar.ComplexNumber;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
@@ -151,20 +153,25 @@ public class SimnetUtils {
      * @return the largest eigenvalue of this matrix by absolute value
      */
     public static double findMaxEig(double[][] weightMatrix) {
-        // get reservoir weight matrix
-        Matrix resWeights = new Matrix(weightMatrix);
 
-        // get an array of all the matrix's eigenvalues
-        double[] eigs = new EigenvalueDecomposition(resWeights)
-                .getRealEigenvalues();
+        Factory<?> mf = PrimitiveMatrix.FACTORY;
 
-        // lowest possible absolute value
+        Builder<?> tmpBuilder = mf.getBuilder(weightMatrix.length,
+                weightMatrix[0].length);
+        for (int i = 0; i < tmpBuilder.countRows(); i++) {
+            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                tmpBuilder.set(i, j, weightMatrix[i][j]);
+            }
+        }
+
+        BasicMatrix mat = (BasicMatrix) tmpBuilder.build();
+
+        List<ComplexNumber> eigs = mat.getEigenvalues();
+
         double maxEig = 0.0;
-
-        // find largest eigenvalue by absolute value
-        for (int i = 0; i < eigs.length; i++) {
-            if (Math.abs(eigs[i]) > maxEig) {
-                maxEig = Math.abs(eigs[i]);
+        for (int i = 0, n = eigs.size(); i < n; i++) {
+            if (Math.abs(eigs.get(i).getReal()) > maxEig) {
+                maxEig = Math.abs(eigs.get(i).getReal());
             }
         }
 
@@ -284,7 +291,8 @@ public class SimnetUtils {
         }
 
         if ((theNextLayerIsTheSourceLayer) || (newLayerTemp.size() == 0)
-                || (layers.size() > MAXLAYERS)) {
+                || (layers.size() > MAXLAYERS))
+        {
             // We're done. We found the source layer or there was a problem. Add
             // the source layer and move on.
             layers.add(sourceLayer);

@@ -28,15 +28,22 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ClampedSynapseRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianCPCARulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianThresholdRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    ClampedSynapseRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    HebbianCPCARulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    HebbianRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    HebbianThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.OjaRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.STDPRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ShortTermPlasticityRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.SubtractiveNormalizationRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    ShortTermPlasticityRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    StaticSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
+    SubtractiveNormalizationRulePanel;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
@@ -65,10 +72,9 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     // Populate synapse rule map
     static {
+     // TODO: Backwards compatibility.  Remove for 3.0 after converting all sims
         RULE_MAP.put(new ClampedSynapseRule().getDescription(),
-                new ClampedSynapseRulePanel()); // TODO: Backwards
-                                                // compatibility. Remove for 3.0
-                                                // after converting all sims.
+                new ClampedSynapseRulePanel());
         RULE_MAP.put(new StaticSynapseRule().getDescription(),
                 new StaticSynapsePanel());
         RULE_MAP.put(new HebbianRule().getDescription(), new HebbianRulePanel());
@@ -97,7 +103,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     private boolean replacing = true;
 
     /** Main panel. */
-    protected final LabelledItemPanel mainPanel = new LabelledItemPanel();
+    private final LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /**
      * Adds an item.

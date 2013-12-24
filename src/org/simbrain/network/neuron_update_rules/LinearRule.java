@@ -122,7 +122,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
      */
     @Override
     public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() - getFloor();
+        return (getCeiling() - getFloor()) * Math.random() + getFloor();
     }
 
     /**

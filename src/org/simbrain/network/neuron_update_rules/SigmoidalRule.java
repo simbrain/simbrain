@@ -23,7 +23,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.
+    DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
@@ -81,6 +82,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     public SigmoidalRule(SquashingFunction sFunction) {
         super();
         this.sFunction = sFunction;
+        setUpperBound(sFunction.getDefaultUpperBound());
+        setLowerBound(sFunction.getDefaultLowerBound());
     }
 
     /**
@@ -261,6 +264,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     public void setSquashFunctionType(SquashingFunction type) {
         this.sFunction = type;
+        setUpperBound(type.getDefaultUpperBound());
+        setLowerBound(type.getDefaultLowerBound());
     }
 
     /**

@@ -28,8 +28,17 @@ package org.simbrain.util.math;
  */
 public enum SquashingFunction {
 
+    
+    
+    
     /** Arctangent. */
     ARCTAN {
+        
+        /** The max value as x -> inf of f(x) = arctan(x) .*/
+        private static final double DEFAULT_ARCTAN_CEIL = Math.PI/2;
+        
+        /** The min value as x -> -inf of f(x) = arctan(x) .*/
+        private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI/2;
 
         @Override
         public String toString() {
@@ -54,11 +63,27 @@ public enum SquashingFunction {
             return derivAtan(val, ceil, floor, slope);
         }
 
+        @Override
+        public double getDefaultUpperBound() {
+            return DEFAULT_ARCTAN_CEIL;
+        }
+
+        @Override
+        public double getDefaultLowerBound() {
+            return DEFAULT_ARCTAN_FLOOR;
+        }
+
     },
 
     /** Logistic Function. */
     LOGISTIC {
 
+        /** The max value as x -> inf of f(x) = 1 / (1 + e^x). */
+        private static final double DEFAULT_LOGISTIC_CEIL = 1.0;
+
+        /** The min value as x -> -inf of f(x) = 1 / (1 + e^x). */
+        private static final double DEFAULT_LOGISTIC_FLOOR = 0.0;
+        
         @Override
         public String toString() {
             return "Logistic";
@@ -81,11 +106,28 @@ public enum SquashingFunction {
                 double slope) {
             return derivLogistic(val, ceil, floor, slope);
         }
+
+        @Override
+        public double getDefaultUpperBound() {
+            return DEFAULT_LOGISTIC_CEIL;
+        }
+
+        @Override
+        public double getDefaultLowerBound() {
+            return DEFAULT_LOGISTIC_FLOOR;
+        }
+
     },
 
     /** Hyperbolic Tangent. */
     TANH {
 
+        /** The max value as x -> inf of f(x) = tanh(x). */
+        private static final double DEFAULT_TANH_CEIL = 1.0;
+        
+        /** The max value as x -> -inf of f(x) = tanh(x).*/
+        private static final double DEFAULT_TANH_FLOOR = -1.0;
+        
         @Override
         public String toString() {
             return "Tanh";
@@ -107,6 +149,16 @@ public enum SquashingFunction {
         public double derivVal(double val, double ceil, double floor,
                 double slope) {
             return derivTanh(val, ceil, floor, slope);
+        }
+
+        @Override
+        public double getDefaultUpperBound() {
+            return DEFAULT_TANH_CEIL;
+        }
+
+        @Override
+        public double getDefaultLowerBound() {
+            return DEFAULT_TANH_FLOOR;
         }
     },
 
@@ -138,7 +190,24 @@ public enum SquashingFunction {
                 double slope) {
             return 0;
         }
+
+        @Override
+        public double getDefaultUpperBound() {
+            return 0;
+        }
+
+        @Override
+        public double getDefaultLowerBound() {
+            return 0;
+        }
     };
+
+
+    /*
+     * ****************************************************************
+     * ________________Universal Abstract Methods_____________________*
+     * ****************************************************************
+     */
 
     /**
      * Gives the value of the given squashing function for some input value, a
@@ -181,9 +250,21 @@ public enum SquashingFunction {
     public abstract double derivVal(double val, double ceil, double floor,
             double slope);
 
+    /**
+     * @return the default upper boundary (ceiling) of this particular
+     * squashing function.
+     */
+    public abstract double getDefaultUpperBound();
+
+    /**
+     * @return the default lower boundary (floor) of this particular squashing
+     * function.
+     */
+    public abstract double getDefaultLowerBound();
+
     /*
      * ****************************************************************
-     * _____________________Function Methods_ ________________________*
+     * _____________________Function Methods__________________________*
      * ****************************************************************
      */
 

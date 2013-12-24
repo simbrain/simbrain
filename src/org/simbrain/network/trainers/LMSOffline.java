@@ -18,9 +18,19 @@
  */
 package org.simbrain.network.trainers;
 
+//import java.io.FileWriter;
+//import java.io.IOException;
+//import java.io.PrintWriter;
+//import java.util.ArrayList;
+//import java.util.Collections;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.ojalgo.access.Access2D.Builder;
+import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
@@ -50,7 +60,8 @@ public class LMSOffline extends Trainer {
      * Construct the LMSOOffline object, with a trainable network the Synapse
      * group where the new synapses will be placed.
      *
-     * @param network the network to train
+     * @param network
+     *            the network to train
      */
     public LMSOffline(Trainable network) {
         super(network);
@@ -86,10 +97,12 @@ public class LMSOffline extends Trainer {
     public void apply() throws DataNotInitializedException {
 
         if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
-            throw new DataNotInitializedException("Input data not initalized");
+            throw new DataNotInitializedException(
+                    "Input data not initalized");
         }
         if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
-            throw new DataNotInitializedException("Target data not initalized");
+            throw new DataNotInitializedException(
+                    "Target data not initalized");
         }
 
         fireTrainingBegin();
@@ -97,10 +110,13 @@ public class LMSOffline extends Trainer {
         int index = 0;
         for (Neuron n : network.getOutputNeurons()) {
             if (n.getUpdateRule() instanceof SigmoidalRule) {
-                for (int i = 0; i < network.getTrainingSet().getTargetData().length; i++) {
-                    network.getTrainingSet().getTargetData()[i][index] = ((SigmoidalRule) n
-                            .getUpdateRule()).getInverse(network
-                            .getTrainingSet().getTargetData()[i][index]);
+                for (int i = 0; i < network.getTrainingSet()
+                        .getTargetData().length; i++)
+                {
+                        network.getTrainingSet().getTargetData()[i][index] =
+                        ((SigmoidalRule) n.getUpdateRule())
+                            .getInverse(network.getTrainingSet()
+                                    .getTargetData()[i][index]);
                 }
             }
             index++;
@@ -121,33 +137,72 @@ public class LMSOffline extends Trainer {
 
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
+     * TODO: Fix progress updates to reflect actual training times & %s
+     * @param network the trainable network being trained
      */
     public void weinerHopfSolution(Trainable network) {
-        Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
-        Matrix trainingMatrix = new Matrix(network.getTrainingSet()
-                .getTargetData());
+
+        long start = System.nanoTime();
+        double [][] inputMatrix = network.getTrainingSet().getInputData();
+        double [][] trainingMatrix = network.getTrainingSet().getTargetData();
+
+        Factory<?> mf = PrimitiveMatrix.FACTORY;
+
+        Builder<?> tmpBuilder = mf.getBuilder(inputMatrix.length,
+                inputMatrix[0].length);
+        for (int i = 0; i < tmpBuilder.countRows(); i++) {
+            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                tmpBuilder.set(i, j, inputMatrix[i][j]);
+            }
+        }
+
+        BasicMatrix stateMat = (BasicMatrix) tmpBuilder.build();
+
+        tmpBuilder = mf.getBuilder(trainingMatrix.length,
+                trainingMatrix[0].length);
+        for (int i = 0; i < tmpBuilder.countRows(); i++) {
+            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                tmpBuilder.set(i, j, trainingMatrix[i][j]);
+            }
+        }
+
+        BasicMatrix teachMat = (BasicMatrix) tmpBuilder.build();
 
         fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
-        trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
+        teachMat = stateMat.transpose().multiplyRight(teachMat);
 
         fireProgressUpdate(
-                "Cross-Correlating States with Teacher data (P = S'D)...", 15);
-        inputMatrix = inputMatrix.transpose().times(inputMatrix);
+                "Cross-Correlating States with Teacher data (P = S'D)...",
+                15);
+        stateMat = stateMat.transpose().multiplyRight(stateMat);
 
         fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
         try {
 
             if (ridgeRegression) {
-                Matrix scaledIdentity = Matrix.identity(
-                        inputMatrix.getRowDimension(),
-                        inputMatrix.getColumnDimension()).times(alpha * alpha);
-                inputMatrix = inputMatrix.plus(scaledIdentity);
+                tmpBuilder = mf.getBuilder((int) stateMat.countRows(),
+                        (int) stateMat.countColumns());
+                for (int i = 0, n = (int) stateMat.countColumns(); i < n; i++) {
+                    tmpBuilder.set(i, i, alpha * alpha);
+                }
+                BasicMatrix scaleMat = (BasicMatrix) tmpBuilder.build();
+                stateMat = stateMat.add(scaleMat);
             }
 
-            inputMatrix = inputMatrix.inverse();
+            stateMat = stateMat.invert();
 
             fireProgressUpdate("Computing Weights...", 80);
-            double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+            tmpBuilder =
+                    stateMat.multiplyRight(teachMat).copyToBuilder();
+            BasicMatrix finalMat = (BasicMatrix) tmpBuilder.build();
+            double [][] wOut = new double [(int) tmpBuilder.countRows()]
+                    [(int) tmpBuilder.countColumns()];
+            for (int i = 0, n = (int) tmpBuilder.countRows(); i < n; i++) {
+                for (int j = 0, m = (int) tmpBuilder.countColumns(); j < m; j++)
+                {
+                    wOut[i][j] = finalMat.doubleValue(i, j);
+                }
+            }
             fireProgressUpdate("Setting Weights...", 95);
             SimnetUtils.setWeights(network.getInputNeurons(),
                     network.getOutputNeurons(), wOut);
@@ -163,15 +218,20 @@ public class LMSOffline extends Trainer {
 
         trainingMatrix = null;
         inputMatrix = null;
+
+        long end = System.nanoTime();
+        System.out.println("Time: " + (end - start) / Math.pow(10, 9));
     }
 
     /**
      * Moore penrose.
+     * @param network the trainable network being trained
      */
     public void moorePenroseSolution(Trainable network) {
-        Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
-        Matrix trainingMatrix = new Matrix(network.getTrainingSet()
-                .getTargetData());
+        Matrix inputMatrix =
+                new Matrix(network.getTrainingSet().getInputData());
+        Matrix trainingMatrix =
+                new Matrix(network.getTrainingSet().getTargetData());
 
         fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
@@ -192,7 +252,8 @@ public class LMSOffline extends Trainer {
     /**
      * Set solution type.
      *
-     * @param solutionType the solutionType to set
+     * @param solutionType
+     *            the solutionType to set
      */
     public void setSolutionType(SolutionType solutionType) {
         this.solutionType = solutionType;
@@ -219,7 +280,8 @@ public class LMSOffline extends Trainer {
     /**
      * Set the current parse style. Used by preference dialog.
      *
-     * @param solutionType the current solution.
+     * @param solutionType
+     *            the current solution.
      */
     public void setSolutionType(ComboBoxWrapper solutionType) {
         setSolutionType((SolutionType) solutionType.getCurrentObject());
@@ -240,5 +302,57 @@ public class LMSOffline extends Trainer {
     public void setAlpha(double alpha) {
         this.alpha = alpha;
     }
-
+//
+//    /**
+//     *
+//     * @param args args
+//     */
+//    public static void main(String[] args) {
+//        try {
+//            FileWriter fw = new FileWriter("SinContIn.csv");
+//            PrintWriter pw = new PrintWriter(fw);
+//
+//            int samples = 20;
+//            int tPerSample = 5000;
+//
+//            ArrayList<Double> frequencies = new ArrayList<Double>();
+//            double [] sineWave = new double [samples * tPerSample];
+//            double delta_t = 0.1; //ms
+//
+//            for (int i = 0; i < 20; i++) {
+//                frequencies.add(1.0 + (double) i / 10.0);
+//            }
+//            Collections.shuffle(frequencies);
+//            for (int i = 0; i < samples; i++) {
+//                for (int j = 0; j < tPerSample; j++) {
+//                    
+//                    sineWave[(i * tPerSample) + j] = Math.sin((j/10.0)
+//                            * frequencies.get(i));
+//                    System.out.println((j/100.0) * frequencies.get(i));
+//                    
+//                }
+//            }
+//            
+//            for (int i = 0; i < tPerSample * samples; i++) {
+//                pw.println(frequencies.get((int) Math.floor(i/tPerSample))
+//                        + "");
+//            }
+//            
+//            fw.close();
+//            pw.close();
+//            FileWriter fw2 = new FileWriter("SinContTeach.csv");
+//            PrintWriter pw2 = new PrintWriter(fw2);
+//            
+//            for (int i = 0; i < tPerSample * samples; i++) {
+//                pw2.println(sineWave[i] + "");
+//            }
+//            
+//            pw2.close();
+//            fw2.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
 }

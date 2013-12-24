@@ -69,7 +69,8 @@ public class Network {
     private final List<Group> groupList = new ArrayList<Group>();
 
     /** Text objects. */
-    private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
+    private List<NetworkTextObject> textList =
+            new ArrayList<NetworkTextObject>();
 
     /** The update manager for this network. */
     private NetworkUpdateManager updateManager;
@@ -103,20 +104,31 @@ public class Network {
      * updates advances time by length {@link timeStep}
      */
     public enum TimeType {
-        DISCRETE, CONTINUOUS
+        /**
+         *
+         */
+        DISCRETE,
+
+        /**
+         *
+         */
+        CONTINUOUS;
     }
 
     /** Whether this is a discrete or continuous time network. */
     private TimeType timeType = TimeType.DISCRETE;
 
     /** List of objects registered to observe general network events. */
-    private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
+    private List<NetworkListener> networkListeners =
+            new ArrayList<NetworkListener>();
 
     /** List of objects registered to observe neuron-related network events. */
-    private List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
+    private List<NeuronListener> neuronListeners =
+            new ArrayList<NeuronListener>();
 
     /** List of objects registered to observe synapse-related network events. */
-    private List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
+    private List<SynapseListener> synapseListeners =
+            new ArrayList<SynapseListener>();
 
     /** List of objects registered to observe group-related network events. */
     private List<GroupListener> groupListeners = new ArrayList<GroupListener>();

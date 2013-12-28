@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
@@ -30,16 +31,16 @@ import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
- * <b>SOMNetwork</b> is a small network encompassing an SOM group. An input
- * layer and input data have been added so that the SOM can be easily trained
- * using existing Simbrain GUI tools
+ * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
+ * group. An input layer and input data have been added so that the SOM can be
+ * easily trained using existing Simbrain GUI tools
  *
  * @author Jeff Yoshimi
  */
-public class SOMNetwork  extends Subnetwork implements Trainable {
+public class CompetitiveNetwork extends Subnetwork implements Trainable {
 
-    /** The self organizing map. */
-    private final SOMGroup som;
+    /** The competitive network. */
+    private final CompetitiveGroup competitive;
 
     /** The input layer. */
     private final NeuronGroup inputLayer;
@@ -51,21 +52,26 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
      * Construct an SOM Network.
      *
      * @param net parent network
-     * @param numSOMNeurons number of neurons in the SOM layer
+     * @param numCompetitiveNeurons number of neurons in the Competitive layer
      * @param numInputNeurons number of neurons in the input layer
      */
-    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons) {
+    public CompetitiveNetwork(Network net, int numCompetitiveNeurons,
+            int numInputNeurons) {
         super(net);
-        this.setLabel("SOM Network");
-        som = new SOMGroup(net, numSOMNeurons);
-        inputLayer = new NeuronGroup(net, som.getPosition(), numInputNeurons);
-        this.addNeuronGroup(som);
+        this.setLabel("Competitie Network");
+        competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
+        inputLayer = new NeuronGroup(net, competitive.getPosition(),
+                numInputNeurons);
+        this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
         }
         inputLayer.setClamped(true);
-        this.connectNeuronGroups(inputLayer, som);
+        this.connectNeuronGroups(inputLayer, competitive);
+        for (Synapse synapse : getSynapseGroup().getSynapseList()) {
+            synapse.setLowerBound(0);
+        }
         layoutNetwork();
     }
 
@@ -74,7 +80,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
      */
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, som,
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive,
                 Direction.NORTH, 250);
     }
 
@@ -85,7 +91,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
 
     @Override
     public List<Neuron> getOutputNeurons() {
-        return som.getNeuronList();
+        return competitive.getNeuronList();
     }
 
     @Override
@@ -99,10 +105,10 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
     }
 
     /**
-     * @return the som
+     * @return the competitive network
      */
-    public SOMGroup getSom() {
-        return som;
+    public CompetitiveGroup getCompetitive() {
+        return competitive;
     }
 
     /**

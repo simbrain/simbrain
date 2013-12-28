@@ -79,14 +79,15 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BPTTNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
-import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNode;
+import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.CompetitiveGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.InvisibleSynapseGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.groupNodes.SOMNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SOMGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.SOMNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SRNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
@@ -100,11 +101,12 @@ import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.LMSNetwork;
-import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.util.SimnetUtils;
@@ -624,11 +626,11 @@ public class NetworkPanel extends JPanel {
         GroupNode ret = null;
         // Note that synapseGroupNodes are created inside of addGroup
         if (group instanceof NeuronGroup) {
-            if (group instanceof SOM) {
-                ret = new SOMGroupNode(NetworkPanel.this, (SOM) group);
-            } else if (group instanceof Competitive) {
-                ret = new CompetitiveNode(NetworkPanel.this,
-                        (Competitive) group);
+            if (group instanceof SOMGroup) {
+                ret = new SOMGroupNode(NetworkPanel.this, (SOMGroup) group);
+            } else if (group instanceof CompetitiveGroup) {
+                ret = new CompetitiveGroupNode(NetworkPanel.this,
+                        (CompetitiveGroup) group);
             } else {
                 ret = new NeuronGroupNode(NetworkPanel.this,
                         (NeuronGroup) group);
@@ -636,9 +638,11 @@ public class NetworkPanel extends JPanel {
         } else if (group instanceof Subnetwork) {
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+            } else if (group instanceof CompetitiveNetwork) {
+                ret = new CompetitiveNetworkNode(NetworkPanel.this,
+                        (CompetitiveNetwork) group);
             } else if (group instanceof SOMNetwork) {
                 ret = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) group);
-
             } else if (group instanceof EchoStateNetwork) {
                 ret = new ESNNetworkNode(NetworkPanel.this,
                         (EchoStateNetwork) group);

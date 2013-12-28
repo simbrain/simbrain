@@ -36,7 +36,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends NeuronGroup {
+public class CompetitiveGroup extends NeuronGroup {
 
     // TODO: Add "recall" function as with SOM
 
@@ -104,12 +104,12 @@ public class Competitive extends NeuronGroup {
      * @param numNeurons size of this network in neurons
      * @param root reference to Network.
      */
-    public Competitive(final Network root, final int numNeurons) {
+    public CompetitiveGroup(final Network root, final int numNeurons) {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
             addNeuron(new Neuron(root, new LinearRule()));
         }
-        setLabel("Competitive Network");
+        setLabel("Competitive Group");
     }
 
     // /**

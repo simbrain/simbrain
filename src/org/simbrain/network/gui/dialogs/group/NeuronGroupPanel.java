@@ -42,8 +42,8 @@ import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
 import org.simbrain.network.gui.dialogs.neuron.BasicNeuronInfoPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.subnetworks.Competitive;
-import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
@@ -227,15 +227,15 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
      * Sets the specificNeuronGroupPanel based on the underlying group.
      */
     private void setSpecificGroup() {
-        if (neuronGroup instanceof Competitive) {
+        if (neuronGroup instanceof CompetitiveGroup) {
             specificNeuronGroupPanel = new CompetitivePropertiesPanel(
-                    networkPanel, (Competitive) neuronGroup);
+                    networkPanel, (CompetitiveGroup) neuronGroup);
         } else if (neuronGroup instanceof WinnerTakeAll) {
             specificNeuronGroupPanel = new WTAPropertiesPanel(networkPanel,
                     (WinnerTakeAll) neuronGroup);
-        } else if (neuronGroup instanceof SOM) {
+        } else if (neuronGroup instanceof SOMGroup) {
             specificNeuronGroupPanel = new SOMPropertiesPanel(networkPanel,
-                    (SOM) neuronGroup);
+                    (SOMGroup) neuronGroup);
         }
     }
 

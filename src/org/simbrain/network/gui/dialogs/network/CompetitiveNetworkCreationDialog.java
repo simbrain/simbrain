@@ -25,15 +25,18 @@ import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
-import org.simbrain.network.subnetworks.SOMGroup;
+import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel.CompetitivePropsPanelType;
+import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>SOMDialog</b> is used as an assistant to create SOM networks.
+ * <b>CompetitiveDialog</b> is used as an assistant to create Competitive
+ * networks.
  */
-public class SOMGroupCreationDialog extends StandardDialog {
+public class CompetitiveNetworkCreationDialog extends StandardDialog {
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -45,7 +48,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
     private JPanel tabLayout = new JPanel();
 
     /** SOM properties panel. */
-    private SOMPropertiesPanel somPanel;
+    private CompetitivePropertiesPanel competitivePanel;
 
     /** Layout panel. */
     private MainLayoutPanel layoutPanel;
@@ -58,7 +61,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public SOMGroupCreationDialog(final NetworkPanel networkPanel) {
+    public CompetitiveNetworkCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         layoutPanel = new MainLayoutPanel(false, this);
         init();
@@ -70,20 +73,20 @@ public class SOMGroupCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New SOM Network");
-        somPanel = new SOMPropertiesPanel(networkPanel,
-                SOMPropsPanelType.CREATE_GROUP);
+        competitivePanel = new CompetitivePropertiesPanel(networkPanel,
+                CompetitivePropsPanelType.CREATE_NETWORK);
 
         // Set up tab panels
-        tabLogic.add(somPanel);
+        tabLogic.add(competitivePanel);
         layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(SOMGroup.DEFAULT_LAYOUT);
+        layoutPanel.setCurrentLayout(new LineLayout());
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
 
         // Help action
-        Action helpAction = new ShowHelpAction(somPanel.getHelpPath());
+        Action helpAction = new ShowHelpAction(competitivePanel.getHelpPath());
         addButton(new JButton(helpAction));
 
     }
@@ -92,11 +95,14 @@ public class SOMGroupCreationDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        SOMGroup som = (SOMGroup) somPanel.commitChanges();
-        networkPanel.getNetwork().addGroup(som);
+        CompetitiveNetwork competitiveNet = (CompetitiveNetwork) competitivePanel
+                .commitChanges();
+        CompetitiveGroup competitive = competitiveNet.getCompetitive();
         layoutPanel.commitChanges();
-        som.setLayout(layoutPanel.getCurrentLayout());
-        som.applyLayout();
+        competitive.setLayout(layoutPanel.getCurrentLayout());
+        competitive.applyLayout();
+        competitiveNet.layoutNetwork(); // Must layout competitive net first
+        networkPanel.getNetwork().addGroup(competitiveNet);
         networkPanel.getNetwork().fireNetworkChanged();
         super.closeDialogOk();
 

@@ -29,7 +29,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.listeners.NetworkListener;
-import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.Utils;
 
 /**
@@ -45,7 +45,7 @@ public class SOMGroupNode extends NeuronGroupNode {
      * @param networkPanel parent panel
      * @param group the SOM network
      */
-    public SOMGroupNode(final NetworkPanel networkPanel, final SOM group) {
+    public SOMGroupNode(final NetworkPanel networkPanel, final SOMGroup group) {
         super(networkPanel, group);
         // setStrokePaint(Color.green);
         setCustomMenu();
@@ -79,9 +79,9 @@ public class SOMGroupNode extends NeuronGroupNode {
         @Override
         protected String getToolTipText() {
             return "Current learning rate: "
-                    + Utils.round(((SOM) getGroup()).getAlpha(), 2)
+                    + Utils.round(((SOMGroup) getGroup()).getAlpha(), 2)
                     + "  Current neighborhood size: "
-                    + Utils.round(((SOM) getGroup()).getNeighborhoodSize(), 2);
+                    + Utils.round(((SOMGroup) getGroup()).getNeighborhoodSize(), 2);
         }
 
         @Override
@@ -107,21 +107,21 @@ public class SOMGroupNode extends NeuronGroupNode {
         JMenu customMenuItems = new JMenu("SOM Actions");
         customMenuItems.add(new JMenuItem(new AbstractAction("Reset Network") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM) getGroup()).reset();
-                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getGroup()).reset();
+                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         customMenuItems.add(new JMenuItem(new AbstractAction("Recall") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM) getGroup()).recall();
-                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getGroup()).recall();
+                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         customMenuItems.add(new JMenuItem(new AbstractAction(
                 "Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOM) getGroup()).randomizeIncomingWeights();
-                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getGroup()).randomizeIncomingWeights();
+                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
         setCustomMenu(customMenuItems);

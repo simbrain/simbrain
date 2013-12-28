@@ -35,7 +35,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
-import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
+import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;

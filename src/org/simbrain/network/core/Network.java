@@ -38,8 +38,8 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.subnetworks.Competitive;
-import org.simbrain.network.subnetworks.Competitive.SynapseGroupWithLearningRate;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.Utils;
@@ -1760,7 +1760,7 @@ public class Network {
         // TODO: Below is temporary rule. As more rules are added something more
         // sophisticated
         // might be needed.
-        if (tng instanceof Competitive) {
+        if (tng instanceof CompetitiveGroup) {
             group = new SynapseGroupWithLearningRate(this, sng, tng, connection);
         } else {
             group = new SynapseGroup(this, sng, tng, connection);

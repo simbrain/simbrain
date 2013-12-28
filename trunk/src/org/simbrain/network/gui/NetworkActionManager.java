@@ -93,6 +93,7 @@ import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
+import org.simbrain.network.gui.dialogs.network.CompetitiveNetworkCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
@@ -562,6 +563,9 @@ public final class NetworkActionManager {
                                 BPTTCreationDialog.class,
                                 "Backprop Through Time"),
                         new AddGroupAction(networkPanel,
+                                CompetitiveNetworkCreationDialog.class,
+                                "Competitive Network"),
+                        new AddGroupAction(networkPanel,
                                 ESNCreationDialog.class, "Echo State Network"),
                         new AddGroupAction(networkPanel,
                                 FeedForwardCreationDialog.class,
@@ -572,8 +576,7 @@ public final class NetworkActionManager {
                                 LMSCreationDialog.class,
                                 "LMS (Least Mean Squares)"),
                         new AddGroupAction(networkPanel,
-                                SOMNetworkCreationDialog.class,
-                                "SOM Network"),
+                                SOMNetworkCreationDialog.class, "SOM Network"),
                         new AddGroupAction(networkPanel,
                                 SRNCreationDialog.class,
                                 "SRN (Simple Recurrent Network)") });
@@ -589,7 +592,8 @@ public final class NetworkActionManager {
                                 NeuronGroupCreationDialog.class,
                                 "(Bare) Neuron Group"),
                         new AddGroupAction(networkPanel,
-                                CompetitiveCreationDialog.class, "Competitive"),
+                                CompetitiveCreationDialog.class,
+                                "Competitive (Group only)"),
                         new AddGroupAction(networkPanel,
                                 SOMGroupCreationDialog.class,
                                 "SOM (Group only)"),

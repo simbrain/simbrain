@@ -33,7 +33,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  * @author Jeff Yoshimi
  *
  */
-public class SOM extends NeuronGroup {
+public class SOMGroup extends NeuronGroup {
 
     /** Default alpha. */
     public static final double DEFAULT_ALPHA = 0.06;
@@ -99,7 +99,7 @@ public class SOM extends NeuronGroup {
      * @param numNeurons size of this network in neurons
      * @param root reference to Network.
      */
-    public SOM(final Network root, final int numNeurons) {
+    public SOMGroup(final Network root, final int numNeurons) {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
             addNeuron(new Neuron(getParentNetwork(), new LinearRule()));

@@ -26,7 +26,7 @@ import javax.swing.JTabbedPane;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
-import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -76,7 +76,7 @@ public class SOMNetworkCreationDialog extends StandardDialog {
         // Set up tab panels
         tabLogic.add(somPanel);
         layoutPanel = new MainLayoutPanel(false, this);
-        layoutPanel.setCurrentLayout(SOM.DEFAULT_LAYOUT);
+        layoutPanel.setCurrentLayout(SOMGroup.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -93,7 +93,7 @@ public class SOMNetworkCreationDialog extends StandardDialog {
      */
     protected void closeDialogOk() {
         SOMNetwork somNet =  (SOMNetwork) somPanel.commitChanges();
-        SOM som = somNet.getSom();
+        SOMGroup som = somNet.getSom();
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());
         som.applyLayout();

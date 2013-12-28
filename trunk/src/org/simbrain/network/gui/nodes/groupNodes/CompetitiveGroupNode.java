@@ -25,14 +25,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.subnetworks.Competitive;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
 
 /**
  * PNode representation of Competitive network.
  *
  * @author jyoshimi
  */
-public class CompetitiveNode extends NeuronGroupNode {
+public class CompetitiveGroupNode extends NeuronGroupNode {
 
     /**
      * Create a Competitive Network PNode.
@@ -40,8 +40,8 @@ public class CompetitiveNode extends NeuronGroupNode {
      * @param networkPanel parent panel
      * @param group the competitive network
      */
-    public CompetitiveNode(final NetworkPanel networkPanel,
-            final Competitive group) {
+    public CompetitiveGroupNode(final NetworkPanel networkPanel,
+            final CompetitiveGroup group) {
         super(networkPanel, group);
         setCustomMenu();
 
@@ -73,8 +73,8 @@ public class CompetitiveNode extends NeuronGroupNode {
         JMenu customMenu = new JMenu("Competitive Net");
         customMenu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((Competitive) getGroup()).randomize();
-                ((Competitive) getGroup()).getParentNetwork()
+                ((CompetitiveGroup) getGroup()).randomize();
+                ((CompetitiveGroup) getGroup()).getParentNetwork()
                         .fireNetworkChanged();
             }
         }));

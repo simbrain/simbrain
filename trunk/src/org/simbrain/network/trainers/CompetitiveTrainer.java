@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.subnetworks.SOMNetwork;
 
 /**
@@ -29,10 +30,10 @@ import org.simbrain.network.subnetworks.SOMNetwork;
  *
  * @author Jeff Yoshimi
  */
-public class SOMTrainer extends Trainer {
+public class CompetitiveTrainer extends Trainer {
 
     /** Reference to trainable network. */
-    private final SOMNetwork network;
+    private final CompetitiveNetwork network;
 
     /** Flag used for iterative training methods. */
     private boolean updateCompleted = true;
@@ -41,11 +42,11 @@ public class SOMTrainer extends Trainer {
     private int iteration = 0;
 
     /**
-     * Construct the UnsupervisedNeuronGroupTrainer trainer.
+     * Construct the competitive network trainer. //TODO: Fix javadoc in SOM
      *
      * @param network the parent network
      */
-    public SOMTrainer(SOMNetwork network) {
+    public CompetitiveTrainer(CompetitiveNetwork network) {
         super(network);
         this.network = network;
         this.setIteration(0);
@@ -63,7 +64,7 @@ public class SOMTrainer extends Trainer {
         for (int row = 0; row < numRows; row++) {
             double[] inputs = network.getTrainingSet().getInputData()[row];
             network.getInputLayer().forceSetActivations(inputs);
-            network.getSom().update(); // Call a function here to be overriden in subclasses?
+            network.getCompetitive().update(); // Call a function here to be overriden in subclasses?
         }
         incrementIteration();
 

@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SOMGroupCreationDialog;
 
 /**
  * New winner take all network action.
@@ -52,7 +52,7 @@ public final class NewSOMNetworkAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SOMCreationDialog dialog = new SOMCreationDialog(networkPanel);
+        SOMGroupCreationDialog dialog = new SOMGroupCreationDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

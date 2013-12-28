@@ -37,7 +37,7 @@ import org.simbrain.util.Utils;
  *
  * @author jyoshimi
  */
-public class SOMNode extends NeuronGroupNode {
+public class SOMGroupNode extends NeuronGroupNode {
 
     /**
      * Create a SOM Network PNode.
@@ -45,7 +45,7 @@ public class SOMNode extends NeuronGroupNode {
      * @param networkPanel parent panel
      * @param group the SOM network
      */
-    public SOMNode(final NetworkPanel networkPanel, final SOM group) {
+    public SOMGroupNode(final NetworkPanel networkPanel, final SOM group) {
         super(networkPanel, group);
         // setStrokePaint(Color.green);
         setCustomMenu();
@@ -73,7 +73,7 @@ public class SOMNode extends NeuronGroupNode {
      */
     private class SOMInteractionBox extends InteractionBox {
         public SOMInteractionBox(NetworkPanel net) {
-            super(net, SOMNode.this);
+            super(net, SOMGroupNode.this);
         }
 
         @Override
@@ -121,17 +121,6 @@ public class SOMNode extends NeuronGroupNode {
                 "Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 ((SOM) getGroup()).randomizeIncomingWeights();
-                ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
-            }
-        }));
-        customMenuItems.add(new JMenuItem(new AbstractAction(
-                "Train SOM Network...") {
-            // TODO: Integrate below in to training framework?
-            public void actionPerformed(final ActionEvent event) {
-                JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
-                propertyDialog.pack();
-                propertyDialog.setLocationRelativeTo(null);
-                propertyDialog.setVisible(true);
                 ((SOM) getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));

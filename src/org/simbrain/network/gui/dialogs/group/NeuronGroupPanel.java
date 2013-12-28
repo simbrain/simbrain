@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.group;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -204,9 +205,10 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         // Add all tabs
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, tabbedPane);
+        this.setMinimumSize(new Dimension(200,300));
         tabbedPane.addTab("Basics", tabMain);
-        tabbedPane.addTab("Neurons", editNeurons);
         initializeSpecificGroupTab();
+        tabbedPane.addTab("Neurons", editNeurons);
         tabbedPane.addTab("Layout", tabLayout);
 
         // Set up help button
@@ -244,8 +246,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         if (specificNeuronGroupPanel == null) {
             return;
         } else {
-            tabbedPane.addTab("" + neuronGroup.getClass().getSimpleName()
-                    + " properties", specificNeuronGroupPanel);
+            tabbedPane.addTab("Properties", specificNeuronGroupPanel);
         }
     }
 

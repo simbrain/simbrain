@@ -19,442 +19,360 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
+import java.util.concurrent.Executors;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
+import org.simbrain.network.gui.trainer.DataPanel;
+import org.simbrain.network.subnetworks.SOMNetwork;
+import org.simbrain.network.trainers.SOMTrainer;
+import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SFileChooser;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
+import org.simbrain.util.table.NumericTable;
 
 /**
- * <b>SOMTrainingDialog</b> is a dialog box for training SOM networks.
+ * Dialog for training a SOM network.
+ *
+ * @author Jeff Yoshimi
+ *
  */
-public class SOMTrainingDialog extends StandardDialog implements ActionListener {
+public class SOMTrainingDialog extends StandardDialog {
 
-    /** The visual container for the sub panels. */
-    private Box mainPanel = Box.createVerticalBox();
-
-    /** Top panel. */
-    private LabelledItemPanel topPanel = new LabelledItemPanel();
-
-    /** Bottom panel. */
-    private LabelledItemPanel bottomPanel = new LabelledItemPanel();
-
-    /** User panel. */
-    private LabelledItemPanel userPanel = new LabelledItemPanel();
-
-    /** Batch panel. */
-    private LabelledItemPanel batchPanel = new LabelledItemPanel();
-
-    /** Properties panel. */
-    private LabelledItemPanel parametersPanel = new LabelledItemPanel();
-
-    /** Tabbed Panel. */
+    /** Main tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Input file button. */
-    private JButton jbInputsFile = new JButton("None selected");
+    /** Panel for setting properties of the SOM network. */
+    private SOMPropertiesPanel somPropsPanel;
 
-    /** Epochs field. */
-    private JTextField tfEpochs = new JTextField();
+    /** Reference to network panel. */
+    private NetworkPanel panel;
 
-    /** Learning Rate field. */
-    private JTextField tfLearningRate = new JTextField();
-
-    /** Neighborhood Size field. */
-    private JTextField tfNeighborhoodSize = new JTextField();
-
-    /** Data interval field. */
-    private JTextField tfDataInterval = new JTextField();
-
-    /** AlphaDecayRate value field. */
-    private JTextField tfAlphaDecayRate = new JTextField();
-
-    /** NeighborhoodDecayAmount value field. */
-    private JTextField tfNeigborhoodDecayAmount = new JTextField();
-
-    /** Randomize button. */
-    private JButton jbReset = new JButton("Reset");
-
-    /** Train button. */
-    private JButton jbTrain = new JButton("Train");
-
-    /** Play button. */
-    private JButton jbPlay = new JButton(
-            ResourceManager.getImageIcon("Play.png"));
-
-    /** Step button. */
-    private JButton jbStep = new JButton(
-            ResourceManager.getImageIcon("Step.png"));
-
-    /** Epochs label. */
-    private JLabel epochs = new JLabel();
-
-    /** Learning Rate label. */
-    private JLabel learningRate = new JLabel();
-
-    /** Neighborhood Size label. */
-    private JLabel neighborhoodSize = new JLabel();
-
-    /** Inputs training value. */
-    private double[][] inputsTrain;
-
-    /** Update completed boolean value. */
-    private boolean updateCompleted = false;
-
-    /** SOM network. */
-    private SOM som;
-
-    /** Location of SOM directory. */
-    private static String somDirectory = ".";
-
-    /** SOM training dialog thread. */
-    private SOMTDialogThread theThread = null;
+    /** Reference to the SOM Network. */
+    private SOMNetwork network;
 
     /**
-     * This method is the default constructor.
+     * Construct the dialog.
      *
-     * @param som SOM network
+     * @param np parent network panel
+     * @param network the SOM network
      */
-    public SOMTrainingDialog(final SOM som) {
+    public SOMTrainingDialog(NetworkPanel np, SOMNetwork network) {
 
-        this.som = som;
-        // Initialize Dialog
-        setTitle("Train SOM Network");
-        fillFieldValues();
-        fillLabelValues();
+        this.panel = np;
+        this.network = network;
 
-        // Set up top panel
-        topPanel.addItem("Input file", jbInputsFile);
-        topPanel.addItem("Reset network", jbReset);
+        // Set to modeless so the dialog can be left open
+        setModalityType(ModalityType.MODELESS);
 
-        // Set up bottom panel
-        bottomPanel.addItem("Epochs", epochs);
-        bottomPanel.addItem("Learning Rate", learningRate);
-        bottomPanel.addItem("Neighborhood Size", neighborhoodSize);
+        // Set up properties tab
+        somPropsPanel = new SOMPropertiesPanel(np, network.getSom());
+        tabbedPane.addTab("Network Properties", somPropsPanel);
 
-        // Setup panels for tabs
-        createUserPanel();
-        createBatchPanel();
-        createParametersPanel();
+        // Set up training tab
+        SOMTrainerControlsPanel controlPanel = new SOMTrainerControlsPanel(
+                new SOMTrainer(network));
+        tabbedPane.addTab("Train Network", controlPanel);
 
-        // Create tabs
-        tabbedPane.addTab("User", userPanel);
-        tabbedPane.addTab("Batch", batchPanel);
-        tabbedPane.addTab("Parameters", parametersPanel);
+        // Input data tab
+        final DataPanel inputPanel = new DataPanel(network.getInputNeurons(),
+                network.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        inputPanel.setFrame(this);
+        tabbedPane.addTab("Training data", inputPanel);
 
-        jbInputsFile.addActionListener(this);
-        jbReset.addActionListener(this);
-        jbTrain.addActionListener(this);
-        jbPlay.addActionListener(this);
-        jbStep.addActionListener(this);
+        // Testing tab
+        final TestInputPanel testInputPanel = new TestInputPanel(np,
+                network.getInputNeurons(), network.getTrainingSet()
+                        .getInputData());
+        tabbedPane.addTab("Test data", testInputPanel);
 
-        mainPanel.add(topPanel);
-        mainPanel.add(tabbedPane);
-        mainPanel.add(bottomPanel);
-        setContentPane(mainPanel);
-    }
-
-    /**
-     * Creates user panel.
-     */
-    private void createUserPanel() {
-        userPanel.addItem("Data Interval", tfDataInterval);
-        userPanel.addItem("Play/Stop", jbPlay);
-        userPanel.addItem("Step", jbStep);
-    }
-
-    /**
-     * Creates batch panel.
-     */
-    private void createBatchPanel() {
-        batchPanel.addItem("Epochs", tfEpochs);
-        batchPanel.addItem("Train network", jbTrain);
-    }
-
-    /**
-     * Creates properties panel.
-     */
-    private void createParametersPanel() {
-        parametersPanel.addItem("Learning Rate", tfLearningRate);
-        parametersPanel.addItem("Neighborhood Size", tfNeighborhoodSize);
-        parametersPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
-        parametersPanel.addItem("Neighborhood Decay Amount",
-                tfNeigborhoodDecayAmount);
-    }
-
-    /**
-     * Called when dialog closes.
-     */
-    protected void closeDialogOk() {
-        som.setInitAlpha(Double.parseDouble(tfLearningRate.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
-                .getText()));
-        som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Integer
-                .parseInt(tfNeigborhoodDecayAmount.getText()));
-        // NetworkPreferences.setCurrentSOMDirectory(getSOMDirectory());
-        stopThread();
-        super.closeDialogOk();
-    }
-
-    /**
-     * @see StandardDialog
-     */
-    protected void closeDialogCancel() {
-        stopThread();
-        super.closeDialogCancel();
-    }
-
-    /**
-     * Stops the training when dialog is closed.
-     */
-    private void stopThread() {
-        if (theThread != null) {
-            theThread.setRunning(false);
-            theThread = null;
-        }
-    }
-
-    /**
-     * Sets current input and output training files.
-     */
-    private void checkTrainingFiles() {
-        if (som.getTrainingINFile() != null) {
-            setInputTraining(som.getTrainingINFile());
-        }
-    }
-
-    /**
-     * Sets the input training file.
-     *
-     * @param theFile The file to set input training
-     */
-    private void setInputTraining(final File theFile) {
-        inputsTrain = Utils.getDoubleMatrix(theFile);
-        jbInputsFile.setText(theFile.getName());
-        som.setTrainingInputs(inputsTrain);
-        som.setNumInputVectors(inputsTrain.length);
-        som.setTrainingINFile(theFile);
-    }
-
-    /**
-     * Responds to action within the dialog.
-     *
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        Object o = e.getSource();
-
-        if (o == jbInputsFile) {
-            SFileChooser chooser = new SFileChooser(getSOMDirectory(),
-                    "Comma Separated Values", "csv");
-            File theFile = chooser.showOpenDialog();
-
-            if (theFile == null) {
-                return;
-            }
-
-            setSOMDirectory(chooser.getCurrentLocation());
-            setInputTraining(theFile);
-        } else if (o == jbReset) {
-            som.reset();
-            // som.getNetwork().fireNetworkChanged();
-        } else if (o == jbTrain) {
-            setValues();
-            som.train();
-            // som.getNetwork().fireNetworkChanged();
-            learningRate.setText(Double.toString(som.getAlpha()));
-            epochs.setText(Integer.toString(som.getEpochs()));
-            neighborhoodSize
-                    .setText(Double.toString(som.getNeighborhoodSize()));
-            bottomPanel.repaint();
-        } else if (o == jbPlay) {
-            setValues();
-            if (theThread == null) {
-                theThread = new SOMTDialogThread(this);
-            }
-
-            if (!theThread.isRunning()) {
-                jbPlay.setIcon(ResourceManager.getImageIcon("Stop.png"));
-                theThread.setRunning(true);
-                theThread.start();
-            } else {
-                jbPlay.setIcon(ResourceManager.getImageIcon("Play.png"));
-
-                if (theThread == null) {
-                    return;
+        // Listen for tab changed events. Load inputs to test tab
+        // If inputs have been loaded
+        ChangeListener changeListener = new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
+                        .getSource();
+                int index = sourceTabbedPane.getSelectedIndex();
+                // Just clicked out of Properties tab
+                if (index == 2) {
+                    somPropsPanel.commitChanges();
                 }
-
-                theThread.setRunning(false);
-                theThread = null;
+                // Just clicked out of input tab
+                if (index == 3) {
+                    if (inputPanel.getTable().getData() != null) {
+                        testInputPanel.setData(((NumericTable) inputPanel
+                                .getTable().getData()).asDoubleArray());
+                    }
+                }
             }
-        } else if (o == jbStep) {
-            setValues();
-            iterate();
-        }
+        };
+        tabbedPane.addChangeListener(changeListener);
+
+        // Set up help
+        Action helpAction = new ShowHelpAction(
+                "Pages/Network/network/SOMnetwork.html");
+        addButton(new JButton(helpAction));
+
+        // Finish configuration
+        setContentPane(tabbedPane);
+
+    }
+
+    @Override
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        somPropsPanel.commitChanges();
     }
 
     /**
-     * Iterate network training.
+     * Training panel for SOM Network
      */
-    public void iterate() {
-        if (inputsTrain != null) {
-            som.iterate();
-            epochs.setText(Integer.toString(som.getEpochs()));
-            learningRate.setText(Double.toString(som.getAlpha()));
-            neighborhoodSize
-                    .setText(Double.toString(som.getNeighborhoodSize()));
-            updateCompleted = true;
-            bottomPanel.repaint();
-        }
-    }
+    private class SOMTrainerControlsPanel extends JPanel {
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-        tfEpochs.setText("" + som.getBatchSize());
-        tfLearningRate.setText("" + som.getInitAlpha());
-        tfNeighborhoodSize.setText("" + som.getInitNeighborhoodSize());
-        tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Double.toString(som
-                .getNeighborhoodDecayAmount()));
-        this.checkTrainingFiles();
-    }
+        /** Reference to trainer. */
+        private SOMTrainer trainer;
 
-    /**
-     * Populate labels with current data.
-     */
-    public void fillLabelValues() {
-        epochs.setText(Integer.toString(som.getEpochs()));
-        learningRate.setText(Utils.round(som.getAlpha(), 2));
-        neighborhoodSize.setText(Utils.round(som.getNeighborhoodSize(), 2));
-        updateCompleted = true;
-    }
+        /** Current number of iterations. */
+        private JLabel iterationsLabel = new JLabel("--- ");
 
-    /**
-     * Set projector values based on fields.
-     */
-    public void setValues() {
-        som.setBatchSize(Integer.parseInt(tfEpochs.getText()));
-        som.setInitAlpha(Double.parseDouble(tfLearningRate.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
-                .getText()));
-        som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Integer
-                .parseInt(tfNeigborhoodDecayAmount.getText()));
-    }
+        /** Current Learning Rate. */
+        private JLabel lLearningRate = new JLabel();
 
-    /**
-     * @return boolean updated completed.
-     */
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    /**
-     * Sets updated completed value.
-     *
-     * @param updateCompleted Updated completed value to be set
-     */
-    public void setUpdateCompleted(final boolean updateCompleted) {
-        this.updateCompleted = updateCompleted;
-    }
-
-    /**
-     * SOMTDialogThreadcreates a system thread to be run when training SOM
-     * networks.
-     *
-     */
-    public class SOMTDialogThread extends Thread {
-
-        /** SOM training dialog. */
-        private SOMTrainingDialog dialog = null;
-
-        /** Is thread running boolean value. */
-        private volatile boolean isRunning = false;
+        /** Current Neighborhood Size. */
+        private JLabel lNeighborhoodSize = new JLabel();
 
         /**
-         * Runs the thread.
+         * Construct the SOM Training Controls Panel.
+         *
+         * @param trainer reference to the SOM trainer
          */
-        private Runnable iterate = new Runnable() {
-            public void run() {
-                dialog.iterate();
+        public SOMTrainerControlsPanel(final SOMTrainer trainer) {
+
+            this.trainer = trainer;
+            init();
+        }
+
+        /**
+         * Initialize the panel.
+         */
+        public void init() {
+            // Set up properties tab
+            Box propsBox = Box.createVerticalBox();
+            propsBox.setOpaque(true);
+            propsBox.add(Box.createVerticalGlue());
+
+            // Run Tools
+            JPanel runTools = new JPanel();
+            runTools.add(new JLabel("Iterate: "));
+            runTools.add(new JButton(runAction));
+            JButton stepButton = new JButton(stepAction);
+            stepButton.setHideActionText(true);
+            runTools.add(stepButton);
+            JButton resetButton = new JButton(resetAction);
+            resetButton.setHideActionText(true);
+            runTools.add(resetButton);
+            JButton randomizeButton = new JButton(randomizeAction);
+            randomizeButton.setHideActionText(true);
+            runTools.add(randomizeButton);
+            propsBox.add(runTools);
+
+            // Separator
+            JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+            propsBox.add(separator);
+
+            // Properties
+            Box lrBox = Box.createHorizontalBox();
+            lrBox.add(new JLabel("Learning Rate:"));
+            lrBox.add(Box.createHorizontalStrut(10));
+            lrBox.add(lLearningRate);
+            propsBox.add(lrBox);
+            Box nbBox = Box.createHorizontalBox();
+            nbBox.add(new JLabel("Neighborhood Size:"));
+            nbBox.add(Box.createHorizontalStrut(10));
+            nbBox.add(lNeighborhoodSize);
+            propsBox.add(nbBox);
+
+            // Separator
+            JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
+            propsBox.add(separator2);
+
+            // Labels
+            LabelledItemPanel labelPanel = new LabelledItemPanel();
+            labelPanel.addItem("Iterations:", iterationsLabel);
+            propsBox.add(labelPanel);
+
+            // Wrap it up
+            add(propsBox);
+            update();
+
+        }
+
+        /**
+         * Update internal labels.
+         */
+        private void update() {
+            lLearningRate.setText("" + network.getSom().getAlpha());
+            lNeighborhoodSize.setText(""
+                    + network.getSom().getNeighborhoodSize());
+            iterationsLabel.setText("" + trainer.getIteration());
+        }
+
+        /**
+         * A "play" action, that can be used to repeatedly iterate iterable
+         * training algorithms.
+         *
+         */
+        private Action runAction = new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+                // putValue(NAME, "Open (.csv)");
+                putValue(SHORT_DESCRIPTION,
+                        "Iterate training until stopping condition met");
             }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                if (trainer == null) {
+                    return;
+                }
+                if (trainer.isUpdateCompleted()) {
+                    // Start running
+                    trainer.setUpdateCompleted(false);
+                    putValue(SMALL_ICON,
+                            ResourceManager.getImageIcon("Stop.png"));
+                    Executors.newSingleThreadExecutor().submit(new Runnable() {
+                        public void run() {
+                            try {
+                                while (!trainer.isUpdateCompleted()) {
+                                    trainer.apply();
+                                    update();
+                                    // if (showUpdates.isSelected()) {
+//                                    panel.getNetwork()
+//                                            .setUpdateCompleted(false);
+//                                    panel.getNetwork().fireNetworkChanged();
+//                                    while (!panel.getNetwork()
+//                                            .isUpdateCompleted()) {
+//                                        try {
+//                                            Thread.sleep(1);
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+                                    // }
+                                }
+                            } catch (DataNotInitializedException e) {
+                                JOptionPane.showOptionDialog(null,
+                                        e.getMessage(), "Warning",
+                                        JOptionPane.DEFAULT_OPTION,
+                                        JOptionPane.WARNING_MESSAGE, null,
+                                        null, null);
+                            }
+                        }
+                    });
+                } else {
+                    // Stop running
+                    trainer.setUpdateCompleted(true);
+                    panel.getNetwork().fireNetworkChanged();
+                    putValue(SMALL_ICON,
+                            ResourceManager.getImageIcon("Play.png"));
+                }
+
+            }
+
         };
 
         /**
-         * SOM training dialog thread constructor.
-         *
-         * @param dialog Dialog to run backprop
+         * /** Apply training algorithm.
          */
-        public SOMTDialogThread(final SOMTrainingDialog dialog) {
-            this.dialog = dialog;
-        }
+        private Action stepAction = new AbstractAction() {
 
-        /**
-         * Run the thread.
-         */
-        public void run() {
-            try {
-                while (isRunning) {
-                    dialog.setUpdateCompleted(false);
-                    SwingUtilities.invokeLater(iterate);
-
-                    while (!dialog.isUpdateCompleted()) {
-                        sleep(10);
-                    }
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+                putValue(NAME, "Train network");
+                // putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
-        }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                if (trainer == null) {
+                    return;
+                }
+                try {
+                    trainer.apply();
+                    update();
+                } catch (DataNotInitializedException e) {
+                    JOptionPane.showOptionDialog(null, e.getMessage(),
+                            "Warning", JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, null, null);
+                }
+            }
+
+        };
 
         /**
-         * @return boolean running value.
+         * Action for reseting the underlying network.
          */
-        public boolean isRunning() {
-            return isRunning;
-        }
+        private Action resetAction = new AbstractAction() {
 
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Reset.png"));
+                putValue(NAME, "Reset");
+                putValue(SHORT_DESCRIPTION, "Reset network");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                network.getSom().reset();
+                trainer.setIteration(0);
+                panel.getNetwork().fireNetworkChanged();
+            }
+        };
         /**
-         * Sets if runnable method is running.
-         *
-         * @param isRunning Running value to be set
+         * Action for randomizing the underlying network.
          */
-        public void setRunning(final boolean isRunning) {
-            this.isRunning = isRunning;
-        }
-    }
+        private Action randomizeAction = new AbstractAction() {
 
-    /**
-     * Set the SOM directory.
-     *
-     * @param currentLocation the current location of the backprop dir.
-     */
-    private void setSOMDirectory(final String currentLocation) {
-        somDirectory = currentLocation;
-    }
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Randomize");
+                putValue(SHORT_DESCRIPTION, "Randomize network");
+            }
 
-    /**
-     * Get the SOM directory.
-     *
-     * @return the location of the backprop directory.
-     */
-    private String getSOMDirectory() {
-        return somDirectory;
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                network.getSom().randomizeIncomingWeights();
+                update();
+                panel.getNetwork().fireNetworkChanged();
+            }
+        };
     }
 
 }

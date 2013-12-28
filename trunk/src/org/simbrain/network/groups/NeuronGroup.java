@@ -615,10 +615,20 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Return current position (upper left corner of neuron in the farthest
+     * north-west position.
+     *
+     * @return position upper left position of group
+     */
+    public Point2D.Double getPosition() {
+        return new Point2D.Double(getMinX(), getMinY());
+    }
+
+    /**
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.setInitialLocation(new Point2D.Double(getMinX(), getMinY()));
+        layout.setInitialLocation(getPosition());
         layout.layoutNeurons(getNeuronList());
     }
 

@@ -25,6 +25,7 @@ import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
+import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
 import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
@@ -32,7 +33,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
  */
-public class SOMCreationDialog extends StandardDialog {
+public class SOMGroupCreationDialog extends StandardDialog {
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -57,7 +58,7 @@ public class SOMCreationDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public SOMCreationDialog(final NetworkPanel networkPanel) {
+    public SOMGroupCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         layoutPanel = new MainLayoutPanel(false, this);
         init();
@@ -69,7 +70,8 @@ public class SOMCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New SOM Network");
-        somPanel = new SOMPropertiesPanel(networkPanel);
+        somPanel = new SOMPropertiesPanel(networkPanel,
+                SOMPropsPanelType.CREATE_GROUP);
 
         // Set up tab panels
         tabLogic.add(somPanel);
@@ -95,8 +97,7 @@ public class SOMCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());
         som.applyLayout();
-        networkPanel.getNetwork().fireNetworkChanged(); // Force interaction box
-        networkPanel.repaint();
+        networkPanel.getNetwork().fireNetworkChanged();
         super.closeDialogOk();
 
     }

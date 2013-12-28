@@ -788,7 +788,7 @@ public class Neuron {
      * @param upperBound upper bound to set.
      */
     public void setUpperBound(final double upperBound) {
-        if (this instanceof BoundedUpdateRule) {
+        if (updateRule instanceof BoundedUpdateRule) {
             ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
         }
     }
@@ -800,7 +800,7 @@ public class Neuron {
      * @param lowerBound lower bound to set.
      */
     public void setLowerBound(final double lowerBound) {
-        if (this instanceof BoundedUpdateRule) {
+        if (updateRule instanceof BoundedUpdateRule) {
             ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
         }
     }

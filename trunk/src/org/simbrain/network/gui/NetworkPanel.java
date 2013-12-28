@@ -85,7 +85,8 @@ import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.InvisibleSynapseGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.groupNodes.SOMNode;
+import org.simbrain.network.gui.nodes.groupNodes.SOMNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SRNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
@@ -104,6 +105,7 @@ import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.subnetworks.SOM;
+import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
@@ -623,7 +625,7 @@ public class NetworkPanel extends JPanel {
         // Note that synapseGroupNodes are created inside of addGroup
         if (group instanceof NeuronGroup) {
             if (group instanceof SOM) {
-                ret = new SOMNode(NetworkPanel.this, (SOM) group);
+                ret = new SOMGroupNode(NetworkPanel.this, (SOM) group);
             } else if (group instanceof Competitive) {
                 ret = new CompetitiveNode(NetworkPanel.this,
                         (Competitive) group);
@@ -634,6 +636,15 @@ public class NetworkPanel extends JPanel {
         } else if (group instanceof Subnetwork) {
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+            } else if (group instanceof SOMNetwork) {
+                ret = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) group);
+
+            } else if (group instanceof EchoStateNetwork) {
+                ret = new ESNNetworkNode(NetworkPanel.this,
+                        (EchoStateNetwork) group);
+            } else if (group instanceof SimpleRecurrentNetwork) {
+                ret = new SRNNetworkNode(NetworkPanel.this,
+                        (SimpleRecurrentNetwork) group);
             } else if (group instanceof FeedForward) {
                 if (group instanceof BackpropNetwork) {
                     ret = new BackpropNetworkNode(NetworkPanel.this,
@@ -647,12 +658,6 @@ public class NetworkPanel extends JPanel {
                     ret = new SubnetworkNode(NetworkPanel.this,
                             (Subnetwork) group);
                 }
-            } else if (group instanceof EchoStateNetwork) {
-                ret = new ESNNetworkNode(NetworkPanel.this,
-                        (EchoStateNetwork) group);
-            } else if (group instanceof SimpleRecurrentNetwork) {
-                ret = new SRNNetworkNode(NetworkPanel.this,
-                        (SimpleRecurrentNetwork) group);
             } else {
                 ret = new SubnetworkNode(NetworkPanel.this, (Subnetwork) group);
             }

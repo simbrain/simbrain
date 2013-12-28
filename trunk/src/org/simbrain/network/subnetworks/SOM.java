@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.io.File;
-
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -32,8 +30,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  * <b>SOM</b> implements a Self-Organizing Map network.
  *
  * @author William B. St. Clair
+ * @author Jeff Yoshimi
  *
- *         TODO: Move all "training" functions over to trainer
  */
 public class SOM extends NeuronGroup {
 
@@ -42,21 +40,6 @@ public class SOM extends NeuronGroup {
 
     /** Default initial neighborhood size. */
     public static final double DEFAULT_INIT_NSIZE = 100;
-
-    /** Default numInputVectors. */
-    public static final int DEFAULT_INPUT_VECTORS = 4;
-
-    /** Default Update Interval. */
-    public static final int DEFAULT_UPDATE_INTERVAL = 50;
-
-    /** Standard update. */
-    public static final int STANDARD = 0;
-
-    /** WTA update. */
-    public static final int WTA = 1;
-
-    /** Update method. */
-    public static final int updateMethod = WTA;
 
     /** Default batchSize. */
     public static final int DEFAULT_BATCH_SIZE = 100;
@@ -72,9 +55,6 @@ public class SOM extends NeuronGroup {
 
     /** Learning rate. */
     private double alpha = DEFAULT_ALPHA;
-
-    /** The total epochs the SOM has iterated through since last reset. */
-    private int epochs = 0;
 
     /**
      * Current Neighborhood Size. With a circular neighborhood, neighborhoodSize
@@ -94,20 +74,8 @@ public class SOM extends NeuronGroup {
      */
     private double winDistance, distance, val;
 
-    /** Number of input vectors. */
-    private int numInputVectors = DEFAULT_INPUT_VECTORS;
-
     /** Number of neurons. */
     private int numNeurons = 16;
-
-    /** Number of vectors seen by the SOM since last full iteration. */
-    private int vectorNumber = 0;
-
-    /** Input training file for persistence. */
-    private File trainingINFile = null;
-
-    /** Input portion of training corpus. */
-    private double[][] trainingInputs;
 
     /** The number of epochs run in a given batch. */
     private int batchSize = DEFAULT_BATCH_SIZE;
@@ -139,66 +107,6 @@ public class SOM extends NeuronGroup {
         setLabel("SOM");
     }
 
-    /**
-     * Iterates the network based on training inputs. Does not respect superior
-     * networks.
-     *
-     * TODO: Integrate this code with train and update.
-     */
-    public void iterate() {
-        for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
-
-            winDistance = Double.POSITIVE_INFINITY;
-            int counter;
-            double physicalDistance;
-            Neuron winner = null;
-
-            // Determine Winner: The SOM Neuron with the lowest distance between
-            // it's weight vector and the input neurons's weight vector.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron n = getNeuronList().get(i);
-                distance = 0;
-                counter = 0;
-                for (Synapse incoming : n.getFanIn()) {
-                    distance += Math.pow(incoming.getStrength()
-                            - trainingInputs[vectorNumber][counter], 2);
-                    counter++;
-                }
-                if (distance < winDistance) {
-                    winDistance = distance;
-                    winner = n;
-                }
-            }
-
-            // Update Weights of the neurons within the radius of the winning
-            // neuron.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = getNeuronList().get(i);
-                physicalDistance = findPhysicalDistance(neuron, winner);
-
-                // The center of the neuron is within the update region.
-                if (physicalDistance <= neighborhoodSize) {
-                    counter = 0;
-                    for (Synapse incoming : neuron.getFanIn()) {
-                        val = incoming.getStrength()
-                                + alpha
-                                * (trainingInputs[vectorNumber][counter] - incoming
-                                        .getStrength());
-                        incoming.setStrength(val);
-                        counter++;
-                    }
-                }
-            }
-        } // end this training vector
-
-        alpha = (alpha - alphaDecayRate * alpha);
-        if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-            neighborhoodSize -= neighborhoodDecayAmount;
-        } else {
-            neighborhoodSize = 0;
-        }
-        epochs++;
-    }
 
     /**
      * Randomize all weights coming in to this network. The weights will be
@@ -207,6 +115,7 @@ public class SOM extends NeuronGroup {
     public void randomizeIncomingWeights() {
         for (Neuron n : getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
+                s.setLowerBound(0);
                 s.setStrength(s.getUpperBound() * Math.random());
             }
         }
@@ -217,14 +126,7 @@ public class SOM extends NeuronGroup {
      */
     public void recall() {
         winDistance = 0;
-        Neuron winner = null;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            if (n.getActivation() > winDistance) {
-                winDistance = n.getActivation();
-                winner = n;
-            }
-        }
+        Neuron winner = calculateWinner();
         for (Synapse incoming : winner.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
@@ -237,72 +139,6 @@ public class SOM extends NeuronGroup {
     public void reset() {
         alpha = initAlpha;
         neighborhoodSize = initNeighborhoodSize;
-        vectorNumber = 0;
-        epochs = 0;
-    }
-
-    /**
-     * Trains the network in batches based on trainingInputs. Does not respect
-     * superior networks.
-     *
-     * TODO: Integrate this code with train and update
-     */
-    public void train() {
-        int epochNumber;
-        for (epochNumber = 0; epochNumber < batchSize; epochNumber++) {
-            for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
-
-                winDistance = Double.POSITIVE_INFINITY;
-                Neuron winner = null;
-                int counter;
-                double physicalDistance;
-
-                // Determine Winner: The SOM Neuron with the lowest distance
-                // between
-                // it's weight vector and the input neurons's weight vector.
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = getNeuronList().get(i);
-                    distance = 0;
-                    counter = 0;
-                    for (Synapse incoming : n.getFanIn()) {
-                        distance += Math.pow(incoming.getStrength()
-                                - trainingInputs[vectorNumber][counter], 2);
-                        counter++;
-                    }
-                    if (distance < winDistance) {
-                        winDistance = distance;
-                        winner = n;
-                    }
-                }
-
-                // Update Weights of the neurons within the radius of the
-                // winning neuron.
-                for (Neuron neuron : getNeuronList()) {
-                    physicalDistance = findPhysicalDistance(neuron, winner);
-
-                    // The center of the neuron is within the update region.
-                    if (physicalDistance <= neighborhoodSize) {
-                        counter = 0;
-                        for (Synapse incoming : neuron.getFanIn()) {
-                            val = incoming.getStrength()
-                                    + alpha
-                                    * (trainingInputs[vectorNumber][counter] - incoming
-                                            .getStrength());
-                            incoming.setStrength(val);
-                            counter++;
-                        }
-                    }
-                }
-            } // end this training vector
-
-            alpha = (alpha - alphaDecayRate * alpha);
-            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                neighborhoodSize -= neighborhoodDecayAmount;
-            } else {
-                neighborhoodSize = 0;
-            }
-            epochs++;
-        } // end epoch
     }
 
     /**
@@ -326,21 +162,16 @@ public class SOM extends NeuronGroup {
         // winner = 0;
         double physicalDistance;
 
-        // Determine Winner: The SOM Neuron with the lowest distance between
-        // its weight vector and the input neurons's weight vector.
+        // Determine Winner and update neurons: The SOM Neuron with the lowest
+        // distance between  its weight vector and the input neurons's weight
+        // vector.
         Neuron winner = calculateWinner();
-
-        // Neuron update
-        if (updateMethod == STANDARD) {
-            super.update();
-        } else {
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron n = getNeuronList().get(i);
-                if (n == winner) {
-                    n.setActivation(1);
-                } else {
-                    n.setActivation(0);
-                }
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = getNeuronList().get(i);
+            if (n == winner) {
+                n.setActivation(1);
+            } else {
+                n.setActivation(0);
             }
         }
 
@@ -360,9 +191,9 @@ public class SOM extends NeuronGroup {
                 }
             }
         }
-        // TODO: Now reducing decay rate as
-        // percentage. Document and make
-        // others consistent with this.
+
+        // Update alpha and neighborhood size
+        alpha = (alpha - alphaDecayRate * alpha);
         if (neighborhoodSize - neighborhoodDecayAmount > 0) {
             neighborhoodSize -= neighborhoodDecayAmount;
         } else {
@@ -371,8 +202,7 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * Find the SOM neuron which is closest to the input vector. TODO: Reuse
-     * this more.
+     * Find the SOM neuron which is closest to the input vector.
      *
      * @return winner
      */
@@ -460,15 +290,6 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * get Epochs.
-     *
-     * @return epochs
-     */
-    public int getEpochs() {
-        return epochs;
-    }
-
-    /**
      * get Initial Alpha.
      *
      * @return initAlpha
@@ -496,21 +317,12 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * Get the current neighborhoodsize.
+     * Get the current neighborhood size.
      *
      * @return neighborhoodSize
      */
     public double getNeighborhoodSize() {
         return neighborhoodSize;
-    }
-
-    /**
-     * Get the total number of input vectors.
-     *
-     * @return numInputVectors
-     */
-    public int getNumInputVectors() {
-        return numInputVectors;
     }
 
     /**
@@ -520,33 +332,6 @@ public class SOM extends NeuronGroup {
      */
     public int getNumNeurons() {
         return numNeurons;
-    }
-
-    /**
-     * Get the input training File.
-     *
-     * @return trainingINFile
-     */
-    public File getTrainingINFile() {
-        return trainingINFile;
-    }
-
-    /**
-     * Get the training inputs.
-     *
-     * @return trainingInputs
-     */
-    public double[][] getTrainingInputs() {
-        return trainingInputs;
-    }
-
-    /**
-     * Get the current vector number.
-     *
-     * @return vectorNumber
-     */
-    public int getVectorNumber() {
-        return vectorNumber;
     }
 
     /**
@@ -568,15 +353,6 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * Set Epochs.
-     *
-     * @param epochs epochs
-     */
-    public void setEpochs(final int epochs) {
-        this.epochs = epochs;
-    }
-
-    /**
      * Set the initial value for alpha. Resets SOM if new.
      *
      * @param initAlpha initial alpha
@@ -586,13 +362,12 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * Set the initial neighborhoodsize.
+     * Set the initial neighborhood size.
      *
      * @param initNeighborhoodSize initial neighborhood size Resets SOM if new.
      */
     public void setInitNeighborhoodSize(final double initNeighborhoodSize) {
         this.initNeighborhoodSize = initNeighborhoodSize;
-        // TODO: make it possibly to directly set n-hood size
         neighborhoodSize = initNeighborhoodSize;
     }
 
@@ -606,15 +381,6 @@ public class SOM extends NeuronGroup {
     }
 
     /**
-     * Set the total number of input vectors. Resets SOM if new.
-     *
-     * @param numInputVectors total input vectors
-     */
-    public void setNumInputVectors(final int numInputVectors) {
-        this.numInputVectors = numInputVectors;
-    }
-
-    /**
      * Set the number of neurons.
      *
      * @param numNeurons number of neurons.
@@ -623,21 +389,4 @@ public class SOM extends NeuronGroup {
         this.numNeurons = numNeurons;
     }
 
-    /**
-     * Set the training input File.
-     *
-     * @param trainingINFile input file
-     */
-    public void setTrainingINFile(final File trainingINFile) {
-        this.trainingINFile = trainingINFile;
-    }
-
-    /**
-     * Set the training inputs.
-     *
-     * @param trainingInputs inputs
-     */
-    public void setTrainingInputs(final double[][] trainingInputs) {
-        this.trainingInputs = trainingInputs;
-    }
 }

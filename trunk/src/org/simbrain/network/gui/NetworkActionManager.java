@@ -97,7 +97,8 @@ import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
 import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
-import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SOMGroupCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SOMNetworkCreationDialog;
 import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 import org.simbrain.network.layouts.GridLayout;
@@ -571,6 +572,9 @@ public final class NetworkActionManager {
                                 LMSCreationDialog.class,
                                 "LMS (Least Mean Squares)"),
                         new AddGroupAction(networkPanel,
+                                SOMNetworkCreationDialog.class,
+                                "SOM Network"),
+                        new AddGroupAction(networkPanel,
                                 SRNCreationDialog.class,
                                 "SRN (Simple Recurrent Network)") });
     }
@@ -587,8 +591,8 @@ public final class NetworkActionManager {
                         new AddGroupAction(networkPanel,
                                 CompetitiveCreationDialog.class, "Competitive"),
                         new AddGroupAction(networkPanel,
-                                SOMCreationDialog.class,
-                                "SOM (Self organizing map)"),
+                                SOMGroupCreationDialog.class,
+                                "SOM (Group only)"),
                         new AddGroupAction(networkPanel,
                                 WTACreationDialog.class,
                                 "WTA (Winner take all)") });

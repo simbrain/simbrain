@@ -750,7 +750,6 @@ public class Workspace {
      * @param action new action
      */
     public void setUpdateAction(UpdateAction action) {
-        updater.getUpdateManager().clearCurrentActions();
         updater.getUpdateManager().addAction(action);
     }
 

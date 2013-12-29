@@ -58,12 +58,6 @@ class ArchiveContents {
     /** All of the updateactions in the archive. */
     private List<ArchivedUpdateAction> archivedActions = new ArrayList<ArchivedUpdateAction>();
 
-    /**
-     * All of the "available" update actions in the archive. See
-     * UpdateActionManager for more on this distinction.
-     */
-    private List<ArchivedUpdateAction> archivedAvailableActions = new ArrayList<ArchivedUpdateAction>();
-
     /** The serializer for this archive. */
     private final WorkspaceComponentSerializer serializer;
 
@@ -103,15 +97,6 @@ class ArchiveContents {
      */
     void addUpdateAction(UpdateAction action) {
         archivedActions.add(getArchivedAction(action));
-    }
-
-    /**
-     * Adds an update action the "available" archive.
-     *
-     * @param action the action to archive.
-     */
-    public void addAvailableUpdateAction(UpdateAction action) {
-        archivedAvailableActions.add(getArchivedAction(action));
     }
 
     /**
@@ -634,6 +619,7 @@ class ArchiveContents {
         XStream xstream = new XStream(new DomDriver());
 
         xstream.omitField(ArchiveContents.class, "serializer");
+        xstream.omitField(ArchiveContents.class, "archivedAvailableActions");
         xstream.omitField(ArchivedComponent.class, "serializer");
         xstream.omitField(ArchivedCoupling.class, "serializer");
         xstream.omitField(ArchivedUpdateAction.class, "serializer");
@@ -691,13 +677,6 @@ class ArchiveContents {
      */
     public List<ArchivedUpdateAction> getArchivedActions() {
         return archivedActions;
-    }
-
-    /**
-     * @return the archivedAvailableActions
-     */
-    public List<ArchivedUpdateAction> getArchivedAvailableActions() {
-        return archivedAvailableActions;
     }
 
 }

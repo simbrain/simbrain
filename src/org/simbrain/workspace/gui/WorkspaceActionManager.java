@@ -57,6 +57,7 @@ import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.ScriptEditorAction;
 import org.simbrain.workspace.actions.ShowPropertyDialogAction;
+import org.simbrain.workspace.actions.ShowWorkspaceUpdaterDialog;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewHistogramAction;
@@ -182,6 +183,9 @@ public class WorkspaceActionManager {
     /** Open script editor action. */
     private final Action showScriptEditorAction;
 
+    /** Open script editor action. */
+    private final Action showUpdaterDialog;
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
@@ -230,6 +234,7 @@ public class WorkspaceActionManager {
         globalStopAction = new GlobalStopAction(workspace);
 
         showScriptEditorAction = new ScriptEditorAction(desktop);
+        showUpdaterDialog = new ShowWorkspaceUpdaterDialog(desktop);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
@@ -237,6 +242,7 @@ public class WorkspaceActionManager {
                 desktop);
 
         propertyTabAction = new PropertyTabAction(desktop);
+
     }
 
     /**
@@ -544,6 +550,13 @@ public class WorkspaceActionManager {
      */
     public Action getShowPropertyDialogAction() {
         return showPropertyDialogAction;
+    }
+
+    /**
+     * @return the showtWorkspaceEditorDialog
+     */
+    public Action getShowUpdaterDialog() {
+        return showUpdaterDialog;
     }
 
 }

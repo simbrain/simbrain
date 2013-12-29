@@ -621,6 +621,7 @@ public class SimbrainDesktop {
         }
         fileMenu.add(worldSubMenu);
         fileMenu.addSeparator();
+        fileMenu.add(actionManager.getShowUpdaterDialog());
         fileMenu.add(actionManager.getShowPropertyDialogAction());
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getQuitWorkspaceAction());

@@ -337,7 +337,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         }
     };
 
-    /** Action which deletes selected actions. */
+    /** Add a preset action. */
     Action addPresetAction = new AbstractAction() {
         // Initialize
         {

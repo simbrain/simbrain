@@ -28,7 +28,6 @@ import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -36,6 +35,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.updater.ComponentUpdateListener;
@@ -101,8 +101,9 @@ public class ThreadViewerPanel extends JPanel {
         showUpdateManager.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                JDialog dialog = new JDialog();
-                dialog.setContentPane(new WorkspaceUpdateManagerPanel(workspace));
+                StandardDialog dialog = new StandardDialog();
+                dialog.setContentPane(new WorkspaceUpdateManagerPanel(
+                        workspace, dialog));
                 dialog.setModal(true);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);

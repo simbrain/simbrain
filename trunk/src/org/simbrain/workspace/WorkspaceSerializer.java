@@ -102,10 +102,6 @@ public class WorkspaceSerializer {
                 .getActionList()) {
             archive.addUpdateAction(action);
         }
-        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
-                .getAvailableActionList()) {
-            archive.addAvailableUpdateAction(action);
-        }
 
         ZipEntry entry = new ZipEntry("contents.xml");
         zipStream.putNextEntry(entry);
@@ -304,18 +300,7 @@ public class WorkspaceSerializer {
                                         componentDeserializer, actionRef));
             }
         }
-        if (contents.getArchivedAvailableActions() != null) {
-            for (ArchiveContents.ArchivedUpdateAction actionRef : contents
-                    .getArchivedAvailableActions()) {
-                workspace
-                        .getUpdater()
-                        .getUpdateManager()
-                        .addAvailableAction(
-                                contents.createUpdateAction(workspace,
-                                        componentDeserializer, actionRef));
-            }
-        }
-
+        
         // Deserialize workspace parameters (serialization occurs in
         // ArchiveContents.java).
         if (contents.getWorkspaceParameters() != null) {

@@ -68,11 +68,7 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
         setTitle("Workspace Dialog");
         fillFieldValues();
 
-        // UpdatePanel
-        updatePanel = new WorkspaceUpdateManagerPanel(workspace);
-
         // Set up tab panels
-        tabbedPane.addTab("Update", updatePanel);
         setContentPane(tabbedPane);
 
         LabelledItemPanel miscPanel = new LabelledItemPanel();

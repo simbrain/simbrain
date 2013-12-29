@@ -19,6 +19,7 @@ import java.awt.Component;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -34,12 +35,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;
@@ -47,12 +48,11 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
-import org.simbrain.workspace.updater.UpdateAllBuffered;
 
 /**
  * Panel for display and ordering of workspace update actions.
  *
- * @author jeff yoshimi
+ * @author Jeff Yoshimi
  *
  */
 public class WorkspaceUpdateManagerPanel extends JPanel {
@@ -62,12 +62,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
     /** The model object for current actions. */
     private final DefaultListModel currentActionListModel = new DefaultListModel();
-
-    /** The JList which represents available actions. */
-    private final JList availableActionJList = new JList();
-
-    /** The model object for current actions. */
-    private final DefaultListModel availableActionListModel = new DefaultListModel();
 
     /** Reference to workspace. */
     private final Workspace workspace;
@@ -79,17 +73,20 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             + System.getProperty("file.separator") + "workspaceUpdate";
 
     /**
-     * Creates a new action list panel.
+     * Construct workspace update manager panel.
+     *
+     * @param workspace parent workspace
+     * @param parentDialog dialog containing this panel
      */
-    public WorkspaceUpdateManagerPanel(final Workspace workspace) {
+    public WorkspaceUpdateManagerPanel(final Workspace workspace,
+            StandardDialog parentDialog) {
 
         super(new BorderLayout());
         this.workspace = workspace;
 
-        // Set up Current Action list
+        // Set up the action list
         currentActionJList.setModel(currentActionListModel);
-        updateCurrentActionsList();
-        configureCurrentJList();
+        configureActionList();
         currentActionJList.setDragEnabled(true);
         currentActionJList.setTransferHandler(createTransferHandler());
         currentActionJList.setDropMode(DropMode.INSERT);
@@ -100,39 +97,88 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         currentListScroll.setBorder(BorderFactory
                 .createTitledBorder("Current Update Sequence"));
-        // currentListScroll.setBackground(null);
+        updateCurrentActionsList();
+        add(currentListScroll, BorderLayout.CENTER);
 
-        // Set up Available Action list
-        availableActionJList.setModel(availableActionListModel);
-        updateAvailableActionsList();
-        configureAvailableJList();
-        JScrollPane availableListScroll = new JScrollPane(availableActionJList);
-        // availableActionJList.setBackground(getBackground());
-        // availableListScroll.setBackground(null);
-
-        availableListScroll
-                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        availableListScroll
-                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        availableListScroll.setBorder(BorderFactory
-                .createTitledBorder("Unused Update Actions"));
-
-        // Add lists
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                availableListScroll, currentListScroll);
-        split.setResizeWeight(.5);
-        add(split, BorderLayout.CENTER);
-
-        // Buttons
+        // Add buttons
         JPanel buttonPanel = new JPanel();
+        JButton addActionsButton = new JButton(addPresetAction);
+        buttonPanel.add(addActionsButton);
         JButton customActionButton = new JButton(addCustomAction);
         buttonPanel.add(customActionButton);
-        JButton addActionsButton = new JButton(addActionsAction);
-        buttonPanel.add(addActionsButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
-        updateAvailableActionsList();
+        // TODO: Make movement actions apply to multiple selections
+        JButton upButton = new JButton(ResourceManager.getImageIcon("Up.png"));
+        upButton.setToolTipText("Move selected action up in sequence");
+        upButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int moveMe = currentActionJList.getSelectedIndex();
+                if (moveMe != 0) {
+                    swap(moveMe, moveMe - 1);
+                    currentActionJList.setSelectedIndex(moveMe - 1);
+                    currentActionJList.ensureIndexIsVisible(moveMe - 1);
+                }
+            }
+        });
+        buttonPanel.add(upButton);
+        JButton upFullButton = new JButton(
+                ResourceManager.getImageIcon("UpFull.png"));
+        upFullButton.setToolTipText("Move selected action to top of sequence");
+        upFullButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int moveMe = currentActionJList.getSelectedIndex();
+                if (moveMe != 0) {
+                    swap(moveMe, 0);
+                    currentActionJList.setSelectedIndex(0);
+                    currentActionJList.ensureIndexIsVisible(0);
+                }
+            }
+        });
+        buttonPanel.add(upFullButton);
+        JButton downButton = new JButton(
+                ResourceManager.getImageIcon("Down.png"));
+        downButton.setToolTipText("Move selected action down in sequence");
+        downButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int moveMe = currentActionJList.getSelectedIndex();
+                if (moveMe != currentActionListModel.getSize() - 1) {
+                    swap(moveMe, moveMe + 1);
+                    currentActionJList.setSelectedIndex(moveMe + 1);
+                    currentActionJList.ensureIndexIsVisible(moveMe + 1);
+                }
+            }
+        });
+        buttonPanel.add(downButton);
+        JButton downFullButton = new JButton(
+                ResourceManager.getImageIcon("DownFull.png"));
+        downFullButton
+                .setToolTipText("Move selected action to bottom of sequence");
+        downFullButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int moveMe = currentActionJList.getSelectedIndex();
+                int lastIndex = currentActionListModel.getSize() - 1;
+                if (moveMe != lastIndex) {
+                    swap(moveMe, lastIndex);
+                    currentActionJList.setSelectedIndex(lastIndex);
+                    currentActionJList.ensureIndexIsVisible(lastIndex);
+                }
+            }
+        });
+        buttonPanel.add(downFullButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
+
+        // Help button
+        if (parentDialog != null) {
+            Action helpAction = new ShowHelpAction(
+                    "Pages/Workspace/update.html");
+            parentDialog.addButton(new JButton(helpAction));
+        }
 
         workspace.getUpdater().getUpdateManager().addListener(listener);
 
@@ -156,14 +202,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
         public void actionOrderChanged() {
             updateCurrentActionsList();
-        }
-
-        public void availableActionAdded(UpdateAction action) {
-            updateAvailableActionsList();
-        }
-
-        public void availableActionRemoved(UpdateAction action) {
-            updateAvailableActionsList();
         }
 
     };
@@ -202,10 +240,11 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         };
     };
 
+
     /**
      * Configure the JList.
      */
-    private void configureCurrentJList() {
+    private void configureActionList() {
         currentActionJList.setCellRenderer(listRenderer);
         currentActionJList.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -225,26 +264,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         });
     }
 
-    /**
-     * Configure the JList.
-     */
-    private void configureAvailableJList() {
-        availableActionJList.setCellRenderer(listRenderer);
-        availableActionJList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    UpdateAction action = (UpdateAction) availableActionJList
-                            .getModel().getElementAt(
-                                    availableActionJList.locationToIndex(e
-                                            .getPoint()));
-                    if (action instanceof UpdateActionCustom) {
-                        openScriptEditorPanel(action);
-                    }
-                }
-
-            }
-        });
-    }
 
     /**
      * Open the script editor panel with appropriate defaults.
@@ -285,39 +304,60 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            for (Object action : currentActionJList.getSelectedValues()) {
+            for (Object action : currentActionJList.getSelectedValuesList()) {
                 workspace.getUpdater().getUpdateManager()
-                        .moveActionToAvailableList((UpdateAction) action);
-            }
-            for (Object action : availableActionJList.getSelectedValues()) {
-                // Don't allow built in actions to be removed
-                if (action instanceof UpdateAllBuffered) {
-                    continue;
-                } else {
-                    workspace.getUpdater().getUpdateManager()
-                            .removeAction((UpdateAction) action);
-                }
+                        .removeAction((UpdateAction) action);
             }
         }
     };
 
-    /** Action which deletes selected actions. */
-    Action addActionsAction = new AbstractAction() {
+
+    /** Add a preset action. */
+    Action addPresetAction = new AbstractAction() {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Add selected action(s)");
-            putValue(SHORT_DESCRIPTION, "Add selected actions");
+            putValue(NAME, "Add action");
+            putValue(SHORT_DESCRIPTION, "Add an action to the update sequence");
         }
 
         /**
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            for (Object action : availableActionJList.getSelectedValues()) {
-                workspace.getUpdater().getUpdateManager()
-                        .addAction((UpdateAction) action);
+            final JList availableActionJList = new JList();
+            final DefaultListModel listModel = new DefaultListModel();
+            JScrollPane availableListScroll = new JScrollPane(
+                    availableActionJList);
+            availableListScroll
+                    .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            availableListScroll
+                    .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            availableActionJList.setModel(listModel);
+            listModel.clear();
+            for (UpdateAction action : workspace.getUpdater()
+                    .getUpdateManager().getAvailableActionList()) {
+                listModel.addElement(action);
             }
+            configureAvailableJList(availableActionJList);
+            StandardDialog addActionsDialog = new StandardDialog() {
+                @Override
+                protected void closeDialogOk() {
+                    super.closeDialogOk();
+                    for (Object action : availableActionJList
+                            .getSelectedValuesList()) {
+                        workspace.getUpdater().getUpdateManager().addAction(
+                                (UpdateAction) action);
+                    }
+                    ;
+                }
+            };
+            addActionsDialog.setTitle("Add predefined action");
+            addActionsDialog.setContentPane(availableListScroll);
+            addActionsDialog.pack();
+            addActionsDialog.setLocationRelativeTo(null);
+            addActionsDialog.setVisible(true);
+
         }
     };
 
@@ -358,6 +398,46 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     };
 
     /**
+     * Configure the available JList panel.
+     */
+    private void configureAvailableJList(final JList availableActionJList) {
+        availableActionJList.setCellRenderer(listRenderer);
+        availableActionJList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    UpdateAction action = (UpdateAction) availableActionJList
+                            .getModel().getElementAt(
+                                    availableActionJList.locationToIndex(e
+                                            .getPoint()));
+                    if (action instanceof UpdateActionCustom) {
+                        openScriptEditorPanel((UpdateActionCustom) action);
+                    }
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Open the script editor panel with appropriate defaults.
+     *
+     * @param action the action
+     */
+    private void openScriptEditorPanel(UpdateActionCustom action) {
+        ScriptEditor panel = new ScriptEditor(
+                ((UpdateActionCustom) action).getScriptString(), SCRIPT_DIR);
+        StandardDialog dialog = panel.getDialog(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+        if (!dialog.hasUserCancelled()) {
+            ((UpdateActionCustom) action).setScriptString(panel.getTextArea()
+                    .getText());
+            ((UpdateActionCustom) action).init();
+        }
+    }
+
+    /**
      * Update the JList's model.
      */
     private void updateCurrentActionsList() {
@@ -370,15 +450,17 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     }
 
     /**
-     * Update the combo box showing potential actions.
+     * Swap two elements int the current action list.
+     *
+     * @param a index for item a
+     * @param b index for item b
      */
-    private void updateAvailableActionsList() {
-        availableActionListModel.clear();
-        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
-                .getAvailableActionList()) {
-            availableActionListModel.addElement(action);
-        }
-        repaint();
+    private void swap(int a, int b) {
+        Object aObject = currentActionListModel.getElementAt(a);
+        Object bObject = currentActionListModel.getElementAt(b);
+        currentActionListModel.set(a, bObject);
+        currentActionListModel.set(b, aObject);
+        workspace.getUpdater().getUpdateManager().swapElements(a, b);
     }
 
     /**

@@ -47,11 +47,6 @@ public class UpdateActionManager {
     private final List<UpdateAction> actionList = new CopyOnWriteArrayList<UpdateAction>();
 
     /**
-     * The list of possible update actions that can be added to the main list.
-     */
-    private final List<UpdateAction> availableActionList = new CopyOnWriteArrayList<UpdateAction>();
-
-    /**
      * List of listeners on this update manager
      */
     private final List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
@@ -117,7 +112,6 @@ public class UpdateActionManager {
             public void componentAdded(WorkspaceComponent component) {
                 UpdateComponent componentAction = new UpdateComponent(
                         workspaceUpdater, component);
-                addAvailableAction(componentAction);
                 componentActionMap.put(component, componentAction);
                 // System.out.println("Added component " +
                 // componentActionMap.size());
@@ -140,7 +134,6 @@ public class UpdateActionManager {
                     public void couplingAdded(Coupling<?> coupling) {
                         UpdateCoupling couplingAction = new UpdateCoupling(
                                 coupling);
-                        addAvailableAction(couplingAction);
                         couplingActionMap.put(coupling, couplingAction);
                         // System.out.println("Added coupling " +
                         // couplingActionMap.size());
@@ -196,7 +189,7 @@ public class UpdateActionManager {
     }
 
     /**
-     * Add an action to the list. (Takes it off the available list)
+     * Add an action to the list.
      *
      * @param action the action to add.
      */
@@ -205,57 +198,17 @@ public class UpdateActionManager {
         for (UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);
         }
-        removeAvailableAction(action);
     }
 
     /**
-     * Remove an action from the list. (But adds it it to the available list)
-     *
-     * @param action the action to remove
-     */
-    public void moveActionToAvailableList(UpdateAction action) {
-        actionList.remove(action);
-        for (UpdateManagerListener listener : listeners) {
-            listener.actionRemoved(action);
-        }
-        addAvailableAction(action);
-    }
-
-    /**
-     * Completely remove an action (from both current and available lists).
+     * Completely remove an action.
      *
      * @param action the action to completely remove
      */
     public void removeAction(UpdateAction action) {
         actionList.remove(action);
-        availableActionList.remove(action);
         for (UpdateManagerListener listener : listeners) {
             listener.actionRemoved(action);
-            listener.availableActionRemoved(action);
-        }
-    }
-
-    /**
-     * Add an action to the list.
-     *
-     * @param action the action to add.
-     */
-    public void addAvailableAction(UpdateAction action) {
-        availableActionList.add(action);
-        for (UpdateManagerListener listener : listeners) {
-            listener.availableActionAdded(action);
-        }
-    }
-
-    /**
-     * Remove a potential action from the list.
-     *
-     * @param action the action to remove
-     */
-    public void removeAvailableAction(UpdateAction action) {
-        availableActionList.remove(action);
-        for (UpdateManagerListener listener : listeners) {
-            listener.availableActionRemoved(action);
         }
     }
 
@@ -270,30 +223,8 @@ public class UpdateActionManager {
         /** An action was removed. */
         public void actionRemoved(UpdateAction action);
 
-        /** A potential action was added. */
-        public void availableActionAdded(UpdateAction action);
-
-        /** An potential action was removed. */
-        public void availableActionRemoved(UpdateAction action);
-
         /** The action order was changed. */
         public void actionOrderChanged();
-    }
-
-    /**
-     * @return the potentialActionList
-     */
-    public List<UpdateAction> getAvailableActionList() {
-        return availableActionList;
-    }
-
-    /**
-     * Move all current actions to available actions.
-     */
-    public void clearCurrentActions() {
-        for (UpdateAction action : actionList) {
-            moveActionToAvailableList(action);
-        }
     }
 
     /**
@@ -301,9 +232,6 @@ public class UpdateActionManager {
      */
     public void clear() {
         for (UpdateAction action : actionList) {
-            removeAction(action);
-        }
-        for (UpdateAction action : availableActionList) {
             removeAction(action);
         }
     }
@@ -315,6 +243,32 @@ public class UpdateActionManager {
     public void setDefaultUpdateActions() {
         clear();
         addAction(new UpdateAllBuffered(workspaceUpdater));
+    }
+    
+    /**
+     * Returns a list of network update actions that can be added.
+     *
+     * @return available action list
+     */
+    public List<UpdateAction> getAvailableActionList() {
+        final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
+
+        // Default updater
+        availableActionList.add(new UpdateAllBuffered(workspaceUpdater));
+
+        // Add update actions for all components available
+        for (WorkspaceComponent component : workspaceUpdater.getComponents()) {
+            availableActionList.add(new UpdateComponent(workspaceUpdater,
+                    component));
+        }
+
+        // Add update actions for all components available
+        for (Coupling coupling : workspaceUpdater.getWorkspace()
+                .getCouplingManager().getCouplings()) {
+            availableActionList.add(new UpdateCoupling(coupling));
+        }
+
+        return availableActionList;
     }
 
 }

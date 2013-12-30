@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -191,8 +193,11 @@ public class LayeredNetworkCreationPanel extends JPanel {
     }
 
     /**
-     * Class which encapsulates information about one layer of a layered
-     * network.
+     * JPanel which contains information about one layer of a layered network.
+     * Displayed as
+     * <p>
+     * Custom label | Number of Neurons: [TextField] Neuron Type: [ComboBox]
+     * <p>
      */
     public static class LayerCreationPanel extends JPanel {
 
@@ -227,13 +232,25 @@ public class LayeredNetworkCreationPanel extends JPanel {
             neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet()
                     .toArray(new String[neuronTypeMap.size()]));
 
-            // Set up box
+            // Lay out all compoennt horizontally
             Box component = Box.createHorizontalBox();
-            component.add(new JLabel(label + "    Num neurons:"));
-            component.add(numNeuronsField);
+            component.setAlignmentX(Box.LEFT_ALIGNMENT);
+            JLabel firstLabel = new JLabel(label);
+            firstLabel.setPreferredSize(new Dimension(100, 10));
+            component.add(firstLabel);
+            component.add(new JSeparator(SwingConstants.VERTICAL));
+            component.add(Box.createHorizontalStrut(20));
+            JLabel numNeuronsLabel = new JLabel("Number of neurons:");
+            component.add(numNeuronsLabel);
             numNeuronsField.setText("5");
-            component.add(new JLabel("    Neuron type:"));
+            component.add(numNeuronsField);
+            component.add(Box.createHorizontalStrut(15));
+            JLabel typeLabel = new JLabel("Neuron type:");
+            component.add(typeLabel);
             component.add(neuronTypeComboBox);
+
+            // Add the main horizontal box to the JPanel
+            this.setLayout(new FlowLayout(FlowLayout.LEFT));
             add(component);
         }
 

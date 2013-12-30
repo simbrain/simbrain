@@ -94,8 +94,6 @@ public class Neuron {
     // Temporary properties and init for backwards compatibility and
     // workspace conversion. Also see postunmarshallinit
     // TODO: Remove these before 3.0 release
-    private double lowerBound = 1;
-    private double upperBound;
     private double increment = .1;
 
     /**
@@ -151,10 +149,6 @@ public class Neuron {
         fanIn = new ArrayList<Synapse>();
 
         updateRule.setIncrement(increment);
-        if (updateRule instanceof BoundedUpdateRule) {
-            ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
-            ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
-        }
     }
 
     /**

@@ -1079,6 +1079,8 @@ public class Network {
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 
+        xstream.omitField(Neuron.class, "lowerBound");
+        xstream.omitField(Neuron.class, "upperBound");
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");

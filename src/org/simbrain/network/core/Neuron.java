@@ -91,6 +91,12 @@ public class Neuron {
      */
     private int updatePriority;
 
+    /**
+     * An auxiliary value associated with a neuron. Getting and setting these
+     * values can be useful in scripts.
+     */
+    private double auxValue;
+
     // Temporary properties and init for backwards compatibility and
     // workspace conversion. Also see postunmarshallinit
     // TODO: Remove these before 3.0 release
@@ -797,6 +803,20 @@ public class Neuron {
         if (updateRule instanceof BoundedUpdateRule) {
             ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
         }
+    }
+
+    /**
+     * @return the auxValue
+     */
+    public double getAuxValue() {
+        return auxValue;
+    }
+
+    /**
+     * @param auxValue the auxValue to set
+     */
+    public void setAuxValue(double auxValue) {
+        this.auxValue = auxValue;
     }
 
 }

@@ -18,6 +18,13 @@
  */
 package org.simbrain.workspace.updater;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+import org.simbrain.workspace.Workspace;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 
@@ -44,7 +51,11 @@ public class UpdateActionCustom implements UpdateAction {
     private UpdateAction theAction;
 
     /**
-     * @param controls update controls
+     * Create a new custom update action from a file containing the custom
+     * script.
+     *
+     * @param updater reference to workspace updater
+     * @param script the custom script as a string
      */
     public UpdateActionCustom(final WorkspaceUpdater updater,
             final String script) {
@@ -52,6 +63,35 @@ public class UpdateActionCustom implements UpdateAction {
         this.scriptString = script;
         init();
     }
+
+    /**
+     * Create a new custom update action from a file containing the custom
+     * script.
+     *
+     * @param workspace reference to parent workspace
+     * @param file file containing custom code
+     */
+    public UpdateActionCustom(final Workspace workspace,
+            final File file) {
+        this.updater = workspace.getUpdater();
+        StringBuilder scriptText = new StringBuilder();
+        String newLine = System.getProperty("line.separator");
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new FileInputStream(file));
+            while (scanner.hasNextLine()) {
+                scriptText.append(scanner.nextLine() + newLine);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+        this.scriptString = scriptText.toString();
+        init();
+    }
+
+
 
     /**
      * Initialize the interpreter.

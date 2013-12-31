@@ -223,19 +223,26 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     @Override
     public Object getObjectFromKey(String objectKey) {
-        try {
-            int i = Integer.parseInt(objectKey);
-            Dimension dimension = getDimension(i);
-            return dimension;
-        } catch (NumberFormatException e) {
-            return null; // the supplied string was not an integer
+        if (objectKey.startsWith("Scalar:")) {
+            try {
+                int i = Integer.parseInt(objectKey.replaceFirst("Scalar:", ""));
+                Dimension dimension = getDimension(i);
+                return dimension;
+            } catch (NumberFormatException e) {
+                return null; // the supplied string was not an integer
+            }
+        } else if (objectKey.startsWith("Vector")) {
+            return this;
         }
+        return null;
     }
 
     @Override
     public String getKeyFromObject(Object object) {
         if (object instanceof Dimension) {
-            return "" + ((Dimension) object).getDimension();
+            return "Scalar:" + ((Dimension) object).getDimension();
+        } else if (object instanceof ProjectionComponent) {
+            return "Vector";
         }
         return null;
     }

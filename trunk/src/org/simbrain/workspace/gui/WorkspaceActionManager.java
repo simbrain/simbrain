@@ -305,6 +305,9 @@ public class WorkspaceActionManager {
         }
         // TODO: look for other endings and invoke relevant script types
         for (File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                continue;
+            }
             if (file.getName().endsWith(".bsh")) {
                 list.add(new ScriptAction(desktop, file.getName()));
             }

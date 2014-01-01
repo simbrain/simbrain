@@ -90,7 +90,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /** List of items for combo box. */
     private String[] objectColorList = { BACKGROUND, HOTNODE, COOLNODE,
-            EXCITATORY, INHIBITORY, SPIKE, ZERO, LASSO, LINE, SELECTION, SIGNAL };
+            EXCITATORY, INHIBITORY, SPIKE, ZERO};
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -199,7 +199,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         graphicsPanel.addItem("Color:", colorPanel);
         graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
-        graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
+        //graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
         graphicsPanel.addItem("Show time", showTimeBox);
 
         // Set up Misc Panel

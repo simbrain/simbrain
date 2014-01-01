@@ -16,7 +16,6 @@ package org.simbrain.network.gui.trainer;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,6 +30,8 @@ import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
@@ -44,17 +45,6 @@ import org.simbrain.util.table.SimbrainJTable;
  * @author jyoshimi
  */
 public class TrainerGuiActions {
-
-    /** System file separator property. */
-    public static final String FS = System.getProperty("file.separator");
-
-    /** Directory where text files for dictionaries are stored. */
-    private static String DEFAULT_DIR = "." + FS + "simulations" + FS
-            + "tables";
-
-    /** The main user preference object. */
-    private static final Preferences THE_PREFS = Preferences.userRoot().node(
-            "org/simbrain/network/trainer");
 
     /**
      * Action for viewing data in a table that correlate with a set of neurons.
@@ -135,7 +125,7 @@ public class TrainerGuiActions {
      * @param dir directory to set
      */
     public static void setDataDirectory(final String dir) {
-        THE_PREFS.put("dataDirectory", dir);
+        SimbrainPreferences.putString("networkTableDirectory", dir);
     }
 
     /**
@@ -144,7 +134,13 @@ public class TrainerGuiActions {
      * @return return the data directory
      */
     public static String getDataDirectory() {
-        return THE_PREFS.get("dataDirectory", DEFAULT_DIR);
+        try {
+            return SimbrainPreferences
+                    .getString("networkTableDirectory");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**

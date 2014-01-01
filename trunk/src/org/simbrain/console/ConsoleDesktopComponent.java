@@ -32,7 +32,6 @@ import bsh.util.JConsole;
  * Component corresponding to a beanshell window.
  */
 public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
@@ -51,6 +50,7 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
                 .getWorkspaceComponent().getWorkspace());
         add("Center", console);
         new Thread(interprerter).start();
+
     }
 
     /**
@@ -63,8 +63,8 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
     public static Interpreter getSimbrainInterpreter(final JConsole console,
             final Workspace workspace) {
         Interpreter interpreter = new Interpreter(console);
-        interpreter.getNameSpace()
-                .importPackage("org.simbrain.network.neurons");
+        interpreter.getNameSpace().importPackage("org.simbrain.network");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.core");
         interpreter.getNameSpace().importPackage(
                 "org.simbrain.network.connections");
         interpreter.getNameSpace()
@@ -72,10 +72,12 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
         interpreter.getNameSpace().importPackage(
                 "org.simbrain.network.networks");
         interpreter.getNameSpace().importPackage(
-                "org.simbrain.network.interfaces");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
+                "org.simbrain.network.neuron_update_rules");
         interpreter.getNameSpace().importPackage(
-                "org.simbrain.network.synapses");
+                "org.simbrain.network.synapse_update_rules");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.trainers");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
         interpreter.getNameSpace().importPackage("org.simbrain.workspace");
         interpreter.getNameSpace().importCommands(".");
         interpreter.getNameSpace().importCommands(

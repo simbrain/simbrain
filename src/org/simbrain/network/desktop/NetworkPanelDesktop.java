@@ -40,6 +40,8 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.util.ShowHelpAction;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 
@@ -69,28 +71,31 @@ public class NetworkPanelDesktop extends NetworkPanel {
         // stop buttons
         this.getRunToolBar().setVisible(false);
 
-        // TODO: Finish this and clean it up
-        NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences
-                .getLineColor()));
-        NetworkGuiSettings.setBackgroundColor(new Color(NetworkGuiPreferences
-                .getBackgroundColor()));
-        NetworkGuiSettings.setHotColor(NetworkGuiPreferences.getHotColor());
-        NetworkGuiSettings.setCoolColor(NetworkGuiPreferences.getCoolColor());
-        NetworkGuiSettings.setExcitatoryColor(new Color(NetworkGuiPreferences
-                .getExcitatoryColor()));
-        NetworkGuiSettings.setInhibitoryColor(new Color(NetworkGuiPreferences
-                .getInhibitoryColor()));
-        NetworkGuiSettings.setSpikingColor(new Color(NetworkGuiPreferences
-                .getSpikingColor()));
-        NetworkGuiSettings.setZeroWeightColor(new Color(NetworkGuiPreferences
-                .getZeroWeightColor()));
-        NetworkGuiSettings.setMaxDiameter(NetworkGuiPreferences
-                .getMaxDiameter());
-        NetworkGuiSettings.setMinDiameter(NetworkGuiPreferences
-                .getMinDiameter());
-        NetworkGuiSettings.setNudgeAmount(NetworkGuiPreferences
-                .getNudgeAmount());
-        resetColors();
+        try {
+            NetworkGuiSettings.setBackgroundColor(new Color(SimbrainPreferences
+                    .getInt("networkBackgroundColor")));
+            NetworkGuiSettings.setHotColor(SimbrainPreferences
+                    .getFloat("networkHotNodeColor"));
+            NetworkGuiSettings.setCoolColor(SimbrainPreferences
+                    .getFloat("networkCoolNodeColor"));
+            NetworkGuiSettings.setExcitatoryColor(new Color(SimbrainPreferences
+                    .getInt("networkExcitatorySynapseColor")));
+            NetworkGuiSettings.setInhibitoryColor(new Color(SimbrainPreferences
+                    .getInt("networkInhibitorySynapseColor")));
+            NetworkGuiSettings.setSpikingColor(new Color(SimbrainPreferences
+                    .getInt("networkSpikingColor")));
+            NetworkGuiSettings.setZeroWeightColor(new Color(SimbrainPreferences
+                    .getInt("networkZeroWeightColor")));
+            NetworkGuiSettings.setMaxDiameter(SimbrainPreferences
+                    .getInt("networkSynapseMaxSize"));
+            NetworkGuiSettings.setMinDiameter(SimbrainPreferences
+                    .getInt("networkSynapseMinSize"));
+            NetworkGuiSettings.setNudgeAmount(SimbrainPreferences
+                    .getDouble("networkNudgeAmount"));
+            resetColors();
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

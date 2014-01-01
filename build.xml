@@ -108,9 +108,7 @@
 
 	<!--  Javadocs. -->
 	<target name="javadocs" description="Create API documentation">
-		<javadoc encoding="ISO-8859-1" packagenames="org.*" sourcepath="${src}" classpathref="lib.path" destdir="${build}/apidocs/" author="true" version="true" use="true" source="1.5" package="true" overview="${src}/overview.html" windowtitle="Simbrain API" doctitle="Simbrain API">
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false" />
-			<link href="http://www.cs.umd.edu/hcil/piccolo/learn/piccolo/doc-1.1/api/" offline="false" />
+		<javadoc encoding="ISO-8859-1" packagenames="org.*" sourcepath="${src}" classpathref="lib.path" destdir="${build}/apidocs/" author="true" version="true" use="true" source="1.7" package="true" overview="${src}/overview.html" windowtitle="Simbrain API" doctitle="Simbrain API">
 		</javadoc>
 	</target>
 

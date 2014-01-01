@@ -44,8 +44,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.world.visionworld.PixelMatrix;
-import org.simbrain.world.visionworld.VisionWorldPreferences;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 /**
@@ -94,8 +95,7 @@ public final class BufferedImagePixelMatrixEditor extends JPanel implements
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
     /** Current file directory. */
-    private String currentDirectory = VisionWorldPreferences
-            .getCurrentDirectory();
+    private String currentDirectory;
 
     /**
      * Create a new buffered image pixel matrix editor.
@@ -151,6 +151,14 @@ public final class BufferedImagePixelMatrixEditor extends JPanel implements
         width = new JTextField();
         imageFileName = new JTextField();
         imageFileName.setEnabled(false);
+
+        // Get vision world directory
+        try {
+            currentDirectory = SimbrainPreferences
+                    .getString("visionWorldDirectory");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
 
         openImageFile = new AbstractAction("...") {
             /** {@inheritDoc} */
@@ -306,6 +314,6 @@ public final class BufferedImagePixelMatrixEditor extends JPanel implements
     // TODO: protected? this class is final
     protected void setCurrentDirectory(final String dir) {
         this.currentDirectory = dir;
-        VisionWorldPreferences.setCurrentDirectory(dir);
+        SimbrainPreferences.putString("visionWorldDirectory", dir);
     }
 }

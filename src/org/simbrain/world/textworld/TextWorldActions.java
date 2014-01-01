@@ -37,7 +37,9 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -49,13 +51,6 @@ import org.simbrain.util.table.TextTable;
  * @author jyoshimi
  */
 public class TextWorldActions {
-
-    /** Directory where text files for dictionaries are stored. */
-    private static String DICTIONARY_DIR = ".";
-
-    /** User preference object. */
-    private static final Preferences THE_PREFS = Preferences.userRoot().node(
-            "org/simbrain/network/textworld");
 
     /**
      * Action for loading a dictionary, by finding every distinct word and
@@ -214,22 +209,29 @@ public class TextWorldActions {
     }
 
     /**
-     * Sets the current dictionaryDirectory directory in user preferences
-     * (memory for file chooser).
+     * Sets the current directory for the dictionary file (memory for file
+     * chooser).
      *
      * @param dir directory to set
      */
     public static void setDictionaryDirectory(final String dir) {
-        THE_PREFS.put("dictionaryDirectory", dir);
+        SimbrainPreferences.putString("textWorldDictionaryDirectory",
+                dir);
     }
 
     /**
-     * Return the current dictionary directory.
+     * Return the current directory for the dictionary file.
      *
-     * @return return the dictionaryDirectory directory
+     * @return return the dictionary directory
      */
     public static String getDictionaryDirectory() {
-        return THE_PREFS.get("dictionaryDirectory", DICTIONARY_DIR);
+        try {
+            return SimbrainPreferences
+                    .getString("textWorldDictionaryDirectory");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

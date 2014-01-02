@@ -55,7 +55,9 @@ import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ShowHelpAction;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.IterableProjectionMethod;
@@ -64,7 +66,6 @@ import org.simbrain.util.projection.ProjectSammon;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.util.projection.ProjectorListener;
-import org.simbrain.util.projection.ProjectorPreferences;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -140,8 +141,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     private Box sammonStepSizePanel = Box.createHorizontalBox();
 
     /** Shows the step size for Sammon map. */
-    private JTextField sammonStepSize = new JTextField(""
-            + ProjectorPreferences.getEpsilon());
+    private JTextField sammonStepSize;
 
     /** Combo box for first dimension of coordinate projection. */
     private JComboBox<Integer> adjustDimension1 = new JComboBox<Integer>();
@@ -290,6 +290,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         JLabel stepSizeLabel = new JLabel("Step Size");
         stepSizeLabel.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(stepSizeLabel);
+        try {
+            sammonStepSize = new JTextField(""
+                    + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
+        } catch (PropertyNotFoundException e1) {
+            e1.printStackTrace();
+        }
         sammonStepSize.setColumns(3);
         sammonStepSize.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(sammonStepSize);
@@ -383,7 +389,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         // Init the adjust dimension combo boxes
         updateCoordinateProjectionComboBoxes();
         adjustDimension1.setModel(adjustDimension1Model);
-        adjustDimension1.setSelectedIndex(ProjectorPreferences.getHiDim1());
+        try {
+            adjustDimension1.setSelectedIndex(SimbrainPreferences
+                    .getInt("projectorHiD1"));
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
         adjustDimension1.addActionListener(new ActionListener() {
 
             @Override
@@ -403,7 +414,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         });
         adjustDimension2.setModel(adjustDimension2Model);
-        adjustDimension2.setSelectedIndex(ProjectorPreferences.getHiDim2());
+        try {
+            adjustDimension2.setSelectedIndex(SimbrainPreferences
+                    .getInt("projectorHiD2"));
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
         adjustDimension2.addActionListener(new ActionListener() {
 
             @Override

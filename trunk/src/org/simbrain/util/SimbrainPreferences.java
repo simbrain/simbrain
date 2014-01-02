@@ -20,12 +20,12 @@ import java.util.prefs.Preferences;
 /**
  * A wrapper for Java's preference framework, which encapsulates the main needs
  * of preferences in Simbrain:
- * <ul>
+ * <ol>
  * <li>Getting a preference value for a property</li>
  * <li>Setting a preference value for a property</li>
  * <li>Restoring a property's value to its default setting</li>
  * <li>Setting default values for a property</li>
- * </ul>
+ * </ol>
  * To do the last item 4 use the static initializer here. 1-3 as done using the
  * static methods of this class.
  * <p>
@@ -33,8 +33,8 @@ import java.util.prefs.Preferences;
  * {@link org.simbrain.network.desktop.DesktopNetworkDialog}
  * <p>
  * Note that if no default value is found in the default map no exception is
- * thrown and a "default" for the default value is assigned, e.g. a 0 for
- * numbers or an empty string for strings.
+ * thrown and a "default-default" (a default for the default value) is assigned.
+ * This is 0 for numbers and an empty string for string.
  *
  * @author Jeff Yoshimi
  *
@@ -53,6 +53,16 @@ public class SimbrainPreferences {
 
     /** Initialize default map */
     static {
+        DEFAULT_MAP.put("workspaceBaseDirectory", "." + FS
+                + "simulations");
+        DEFAULT_MAP.put("workspaceSimulationDirectory", "." + FS
+                + "simulations" + FS + "workspaces");
+        DEFAULT_MAP.put("workspaceNetworkDirectory", "." + FS + "simulations"
+                + FS + "networks");
+        DEFAULT_MAP.put("workspaceOdorWorldDirectory", "." + FS + "simulations"
+                + FS + "worlds");
+        DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations"
+                + FS + "tables");
         DEFAULT_MAP.put("networkBackgroundColor", Color.WHITE.getRGB());
         DEFAULT_MAP.put("networkLineColor", Color.BLACK.getRGB());
         DEFAULT_MAP.put("networkHotNodeColor",
@@ -67,7 +77,12 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkSynapseMaxSize", 20);
         DEFAULT_MAP.put("networkNudgeAmount", 2d);
         DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
-                + "networks" + FS + "bp" + FS + "training");
+                + "tables");
+        DEFAULT_MAP.put("projectorTolerance", .1);
+        DEFAULT_MAP.put("projectorHiD1", 1);
+        DEFAULT_MAP.put("projectorHiD2", 2);
+        DEFAULT_MAP.put("projectorSammonPerturbationAmount", .1);
+        DEFAULT_MAP.put("projectorSammonEpsilon", .5);
         DEFAULT_MAP.put("textWorldDictionaryDirectory", ".");
         DEFAULT_MAP.put("visionWorldDirectory", ".");
     }

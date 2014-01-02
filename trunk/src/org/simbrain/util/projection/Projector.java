@@ -27,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -68,11 +70,14 @@ public class Projector {
      */
     private final static int DEFAULT_NUMBER_OF_DIMENSIONS = 25;
 
+    /** Default projection method. */
+    private final static String DEFAULT_PROJECTION_METHOD = "PCA";
+
     /**
      * Distance within which added points are considered old and are thus not
      * added.
      */
-    protected double tolerance = ProjectorPreferences.getTolerance();
+    protected double tolerance;
 
     /** References to projection objects. */
     private ProjectionMethod projectionMethod;
@@ -90,6 +95,12 @@ public class Projector {
         projectionMethods.put(ProjectPCA.class, "PCA");
         projectionMethods.put(ProjectTriangulate.class, "Triangulation");
         projectionMethods.put(ProjectSammon.class, "Sammon Map");
+
+        try {
+            tolerance = SimbrainPreferences.getDouble("projectorTolerance");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /** Manages coloring the datapoints. */
@@ -99,8 +110,7 @@ public class Projector {
      * Default constructor for projector.
      */
     public Projector() {
-        this.setProjectionMethod(ProjectorPreferences
-                .getDefaultProjectionMethod());
+        setProjectionMethod(DEFAULT_PROJECTION_METHOD);
         init(DEFAULT_NUMBER_OF_DIMENSIONS);
     }
 
@@ -110,8 +120,7 @@ public class Projector {
      * @param dimension dimensionality of data to be projected
      */
     public Projector(int dimension) {
-        this.setProjectionMethod(ProjectorPreferences
-                .getDefaultProjectionMethod());
+        setProjectionMethod(DEFAULT_PROJECTION_METHOD);
         init(dimension);
     }
 

@@ -20,6 +20,9 @@ package org.simbrain.util.projection;
 
 import java.util.ArrayList;
 
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+
 /**
  * <B>ProjectSammon.java</B> implements gradient descent to compute image of
  * Sammon projection.
@@ -32,13 +35,12 @@ public class ProjectSammon extends IterableProjectionMethod {
     private ArrayList<DataPoint> yArray;
 
     /** Amount by which to perturb overlapping points. */
-    protected double perturbationAmount = ProjectorPreferences
-            .getPerturbationAmount();
+    protected double perturbationAmount;
 
     /**
      * Sammon Map Settings. epsilon or "magic factor".
      */
-    private double epsilon = ProjectorPreferences.getEpsilon();
+    private double epsilon;
 
     /** Temporary variables. */
     private double[] xI;
@@ -88,6 +90,12 @@ public class ProjectSammon extends IterableProjectionMethod {
 
     @Override
     public void init() {
+        try {
+            perturbationAmount = SimbrainPreferences.getDouble("projectorSammonPerturbationAmount");
+            perturbationAmount = SimbrainPreferences.getDouble("projectorSammonEpsilon");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
         dstar = projector.getUpstairs().getDistances();
         dstarSum = projector.getUpstairs().getSumDistances();
         projector.getDownstairs().perturbOverlappingPoints(perturbationAmount);
@@ -163,6 +171,7 @@ public class ProjectSammon extends IterableProjectionMethod {
      * @param epsilon the epsilon to set
      */
     public void setEpsilon(double epsilon) {
+        SimbrainPreferences.putDouble("projectorSammonEpsilon", epsilon);
         this.epsilon = epsilon;
     }
 

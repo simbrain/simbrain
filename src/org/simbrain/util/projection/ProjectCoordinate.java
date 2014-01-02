@@ -18,6 +18,9 @@
  */
 package org.simbrain.util.projection;
 
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+
 /**
  * <b>Project Coordinate</b> is perhaps the simplest possible projection
  * algorithm; It simply takes two specified dimensions in the high dimensional
@@ -27,13 +30,13 @@ package org.simbrain.util.projection;
 public class ProjectCoordinate extends ProjectionMethod {
 
     /** Coordinate Projection Settings. */
-    private int hiD1 = ProjectorPreferences.getHiDim1();
+    private int hiD1;
 
     /** Coordinate Projection Settings. */
-    private int hiD2 = ProjectorPreferences.getHiDim2();
+    private int hiD2;
 
     /** Automatically use most variant dimensions. */
-    private boolean autoFind = ProjectorPreferences.getAutoFind();
+    private boolean autoFind = true;
 
     /**
      * Default projector coordinate constructor.
@@ -45,6 +48,12 @@ public class ProjectCoordinate extends ProjectionMethod {
     @Override
     public void init() {
         // super.init(up, down);
+        try {
+            hiD1 = SimbrainPreferences.getInt("projectorHiD1");
+            hiD2 = SimbrainPreferences.getInt("projectorHiD2");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
 
         if ((projector.getUpstairs().getNumPoints() > 1) && (autoFind)) {
             hiD1 = projector.getUpstairs().getKthVariantDimension(1);
@@ -98,7 +107,7 @@ public class ProjectCoordinate extends ProjectionMethod {
      * @param hiD1 the hiD1 to set
      */
     public void setHiD1(int hiD1) {
-        ProjectorPreferences.setHiDim1(hiD1);
+        SimbrainPreferences.putInt("projectorHiD1", hiD1);
         this.hiD1 = hiD1;
     }
 
@@ -113,7 +122,7 @@ public class ProjectCoordinate extends ProjectionMethod {
      * @param hiD2 the hiD2 to set
      */
     public void setHiD2(int hiD2) {
-        ProjectorPreferences.setHiDim2(hiD2);
+        SimbrainPreferences.putInt("projectorHiD2", hiD2);
         this.hiD2 = hiD2;
     }
 
@@ -130,7 +139,6 @@ public class ProjectCoordinate extends ProjectionMethod {
     public void setAutoFind(boolean autoFind) {
         // If preferences aren't set these values do not persist when the
         // projector is changed and reset
-        ProjectorPreferences.setAutoFind(autoFind);
         this.autoFind = autoFind;
         if (autoFind) {
             init();

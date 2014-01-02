@@ -31,13 +31,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.WorkspacePreferences;
+import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -77,9 +81,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
-        chooser = new SFileChooser(
-                WorkspacePreferences.getCurrentDirectory(workspaceComponent
-                        .getClass()), null);
+        String defaultDirectory = getDefaultDirectory(workspaceComponent.getClass());
+
+        chooser = new SFileChooser(defaultDirectory, null);
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
@@ -152,8 +156,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public void showOpenFileDialog() {
 
         SFileChooser chooser = new SFileChooser(
-                WorkspacePreferences.getCurrentDirectory(workspaceComponent
-                        .getClass()), null);
+                getDefaultDirectory(workspaceComponent.getClass()), null);
 
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -173,7 +176,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                                 SFileChooser.getExtension(theFile));
                 workspace.addWorkspaceComponent(workspaceComponent);
                 workspaceComponent.setCurrentFile(theFile);
-                WorkspacePreferences.setCurrentDirectory(workspaceComponent
+                setDefaultDirectory(workspaceComponent
                         .getClass(), theFile.getParentFile().getAbsolutePath());
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
                 GuiComponent desktopComponent = desktop
@@ -216,7 +219,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
             // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
             // .getAbsolutePath());
-            WorkspacePreferences.setCurrentDirectory(workspaceComponent
+            setDefaultDirectory(workspaceComponent
                     .getClass(), theFile.getParentFile().getAbsolutePath());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
@@ -376,6 +379,54 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     public void setDesktop(SimbrainDesktop desktop) {
         this.desktop = desktop;
+    }
+
+    /**
+     * Returns the default directory for specific component types.
+     *
+     * @param componentType the component type
+     * @return the directory
+     */
+    private String getDefaultDirectory(
+            Class<? extends WorkspaceComponent> componentType) {
+        String defaultDirectory = ".";
+        try {
+            if (componentType == OdorWorldComponent.class) {
+                defaultDirectory = SimbrainPreferences
+                        .getString("workspaceOdorWorldDirectory");
+            } else if (componentType == DataWorldComponent.class) {
+                defaultDirectory = SimbrainPreferences
+                        .getString("workspaceTableDirectory");
+            } else if (componentType == NetworkComponent.class) {
+                defaultDirectory = SimbrainPreferences
+                        .getString("workspaceNetworkDirectory");
+            } else {
+                defaultDirectory = SimbrainPreferences
+                        .getString("workspaceBaseDirectory");
+            }
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
+        return defaultDirectory;
+    }
+
+    /**
+     * Set the default directory for specific component types.
+     *
+     * @param componentType the component type
+     * @param dir the directory to set
+     */
+    private void setDefaultDirectory(
+            Class<? extends WorkspaceComponent> componentType, String dir) {
+        if (componentType == OdorWorldComponent.class) {
+            SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir);
+        } else if (componentType == DataWorldComponent.class) {
+            SimbrainPreferences.putString("workspaceTableDirectory", dir);
+        } else if (componentType == NetworkComponent.class) {
+            SimbrainPreferences.putString("workspaceNetworkDirectory", dir);
+        } else {
+            SimbrainPreferences.putString("workspaceBaseDirectory", dir);
+        }
     }
 
 }

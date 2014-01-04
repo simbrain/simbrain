@@ -23,6 +23,8 @@ import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
@@ -34,10 +36,7 @@ import org.simbrain.network.gui.dialogs.connect.SparsePanel;
  * Apply specified connection either from selected neurons to themselves
  * ("self connect") or form source to target.
  */
-public final class ApplyConnectionAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     /** If true, connect selected neurons to themselves. */
     private boolean isSelfConnect;
@@ -60,16 +59,13 @@ public final class ApplyConnectionAction extends AbstractAction {
     public ApplyConnectionAction(final NetworkPanel networkPanel,
             ConnectNeurons connection, String name, boolean isSelfConnect) {
 
-        super(name);
+        super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGETS);
+
+        putValue(SHORT_DESCRIPTION, "Use " + name
+                + " method to connect source to target neurons");
 
         this.isSelfConnect = isSelfConnect;
         this.connection = connection;
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
 
     }
 

@@ -46,7 +46,7 @@ public final class StopNetworkAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
-        putValue(SHORT_DESCRIPTION, "Stop iterate network update algorithm");
+        putValue(SHORT_DESCRIPTION, "Stop iterating the network");
     }
 
     /** @see AbstractAction */

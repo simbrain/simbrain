@@ -70,7 +70,6 @@ public class AllToAll extends ConnectNeurons {
         int numConnects = 0;
 
         numConnects = sourceNeurons.size() * targetNeurons.size();
-
         int numEx = (int) (excitatoryRatio * numConnects);
         int numIn = numConnects - numEx;
 

@@ -47,6 +47,9 @@ public final class SetTextPropertiesAction extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        putValue(SHORT_DESCRIPTION,
+                "Set the properties of this text, e.g. font and size");
+
 
         this.networkPanel = networkPanel;
         updateAction();

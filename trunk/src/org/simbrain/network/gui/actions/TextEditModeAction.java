@@ -37,6 +37,7 @@ public class TextEditModeAction extends EditModeAction {
         super("Text", networkPanel, EditMode.TEXT);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
         putValue(SHORT_DESCRIPTION, "Text Mode (t)");
+        putValue(SHORT_DESCRIPTION, "Enter mode for editing text objects");
     }
 
 }

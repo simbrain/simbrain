@@ -19,8 +19,6 @@
 package org.simbrain.network.desktop;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -30,13 +28,13 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.gui.NetworkGuiSettings;
+import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
-import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.util.ShowHelpAction;
@@ -46,7 +44,13 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 
 /**
- * Extension of Network Panel with functions used in a desktop setting.
+ * Extension of Network Panel with functions used in a desktop setting. This is
+ * separate mainly so that network panel can also be used in applets, which do
+ * not talk to other workspace components. Thus in this subclass static values
+ * are updated using simbrain preferences, and special menus with component
+ * level references are built.
+ * <p>
+ * Applet menus are handled in {@link org.simbrain.network.gui.NetworkMenuBar}
  *
  * @author Jeff Yoshimi
  */
@@ -56,7 +60,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     NetworkDesktopComponent component;
 
     /**
-     * Construct the desktop extension of network panel.
+     * Construct the desktop extension of network panel.  The main thing
      *
      * @param component the component level representation of the desktop
      * @param Network the neural network model
@@ -71,27 +75,40 @@ public class NetworkPanelDesktop extends NetworkPanel {
         // stop buttons
         this.getRunToolBar().setVisible(false);
 
+        // Set relevant network settings to the user's current preferences
+        applyUserPrefsToNetwork();
+
+    }
+
+    /**
+     * Push settings from user preferences to Simbrain objects. Note that the
+     * relevant static fields have default values (e.g in NetworkPanel) for
+     * cases where NetworkPanel is used by itself.
+     */
+    public void applyUserPrefsToNetwork() {
         try {
-            NetworkGuiSettings.setBackgroundColor(new Color(SimbrainPreferences
+            NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences
                     .getInt("networkBackgroundColor")));
-            NetworkGuiSettings.setHotColor(SimbrainPreferences
-                    .getFloat("networkHotNodeColor"));
-            NetworkGuiSettings.setCoolColor(SimbrainPreferences
-                    .getFloat("networkCoolNodeColor"));
-            NetworkGuiSettings.setExcitatoryColor(new Color(SimbrainPreferences
-                    .getInt("networkExcitatorySynapseColor")));
-            NetworkGuiSettings.setInhibitoryColor(new Color(SimbrainPreferences
-                    .getInt("networkInhibitorySynapseColor")));
-            NetworkGuiSettings.setSpikingColor(new Color(SimbrainPreferences
-                    .getInt("networkSpikingColor")));
-            NetworkGuiSettings.setZeroWeightColor(new Color(SimbrainPreferences
-                    .getInt("networkZeroWeightColor")));
-            NetworkGuiSettings.setMaxDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMaxSize"));
-            NetworkGuiSettings.setMinDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMinSize"));
-            NetworkGuiSettings.setNudgeAmount(SimbrainPreferences
+            EditMode.setWandRadius(SimbrainPreferences
+                    .getInt("networkWandRadius"));
+            NetworkPanel.setNudgeAmount(SimbrainPreferences
                     .getDouble("networkNudgeAmount"));
+            NeuronNode.setHotColor(SimbrainPreferences
+                    .getFloat("networkHotNodeColor"));
+            NeuronNode.setCoolColor(SimbrainPreferences
+                    .getFloat("networkCoolNodeColor"));
+            NeuronNode.setSpikingColor(new Color(SimbrainPreferences
+                    .getInt("networkSpikingColor")));
+            SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences
+                    .getInt("networkExcitatorySynapseColor")));
+            SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences
+                    .getInt("networkInhibitorySynapseColor")));
+            SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences
+                    .getInt("networkZeroWeightColor")));
+            SynapseNode.setMaxDiameter(SimbrainPreferences
+                    .getInt("networkSynapseMaxSize"));
+            SynapseNode.setMinDiameter(SimbrainPreferences
+                    .getInt("networkSynapseMinSize"));
             resetColors();
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
@@ -107,16 +124,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         JMenu editMenu = new JMenu("Edit");
 
-        ActionListener listener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-        };
-
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());
@@ -124,38 +131,17 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.addSeparator();
         editMenu.add(actionManager.getClearSourceNeuronsAction());
         editMenu.add(actionManager.getSetSourceNeuronsAction());
-        editMenu.addSeparator();
         editMenu.add(actionManager.getConnectionMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getSetRandomizerPropsAction());
-        editMenu.add(actionManager.getShowAdjustSynapsesDialog());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getShowQuickConnectDialogAction());
-        editMenu.addSeparator();
         editMenu.add(actionManager.getLayoutMenu());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getShowWeightMatrixAction());
-        editMenu.add(actionManager.getShowAdjustConnectivityDialog());
-        // editMenu.add(actionManager.getShowTrainerAction());
-        editMenu.addSeparator();
-        // editMenu.add(actionManager.getGroupAction());
-        // editMenu.add(actionManager.getUngroupAction());
         editMenu.add(actionManager.getGroupMenu());
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getTestInputAction());
-        editMenu.addSeparator();
-        // editMenu.add(actionManager.getShowIOInfoMenuItem());
-        editMenu.add(actionManager.getSetAutoZoomMenuItem());
-        editMenu.addSeparator();
-        editMenu.add(new ShowEditModeDialogAction(this));
-        editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getZeroSelectedObjectsAction());
         editMenu.add(createSelectionMenu());
 
         return editMenu;
@@ -169,11 +155,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createInsertMenu() {
 
         JMenu insertMenu = new JMenu("Insert");
-
         insertMenu.add(actionManager.getNewNeuronAction());
+        insertMenu.addSeparator();
         insertMenu.add(new AddNeuronsAction(this));
+        insertMenu.addSeparator();
         insertMenu.add(actionManager.getNewGroupMenu());
         insertMenu.add(actionManager.getNewNetworkMenu());
+        insertMenu.addSeparator();
+        insertMenu.add(actionManager.getTestInputAction());
+        insertMenu.add(actionManager.getShowWeightMatrixAction());
         return insertMenu;
     }
 
@@ -184,14 +174,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
-
         JMenu toolbarMenu = new JMenu("Toolbars");
         toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getShowGUIAction());
+        viewMenu.add(actionManager.getSetAutoZoomMenuItem());
+        viewMenu.addSeparator();
+        // viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowPrioritiesAction());
         // viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
         viewMenu.add(actionManager.getShowWeightsAction());
@@ -255,6 +246,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * Creates group nodes with coupling menus.
      *
      * @param group the group node to extend
+     * @return the group node with coupling menu added
      */
     @Override
     protected GroupNode createGroupNode(Group group) {
@@ -272,7 +264,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * Adorn synpasegroup node with coupling menus.
      *
      * @param node the group node to extend
-     *
+     * @return the synapse groupwith coupling menu added
      */
     @Override
     public SynapseGroupNode addMenuToSynapseGroupNode(SynapseGroupNode node) {
@@ -282,6 +274,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * This version adds the script menu.
+     *
+     * @return the context menu with script menu added
      */
     public JPopupMenu createContextMenu() {
         JPopupMenu contextMenu = super.createContextMenu();

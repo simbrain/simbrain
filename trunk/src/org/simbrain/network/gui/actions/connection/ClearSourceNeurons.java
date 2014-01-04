@@ -20,17 +20,13 @@ package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 
 /**
  * Clear source neurons action.
  */
-public final class ClearSourceNeurons extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class ClearSourceNeurons extends ConditionallyEnabledAction {
 
     /**
      * Construct action.
@@ -38,19 +34,14 @@ public final class ClearSourceNeurons extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public ClearSourceNeurons(final NetworkPanel networkPanel) {
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
-        putValue(NAME, "Clear Source Neuron(s)");
+        super(networkPanel, "Clear Source Neurons", EnablingCondition.SOURCE_NEURONS);
+        putValue(NAME, "Clear Source Neurons");
+        putValue(SHORT_DESCRIPTION, "Remove all source neurons (neurons with red"
+                + " squares around them)");
     }
 
-    /** @see AbstractAction */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-
-        // Perform action
         networkPanel.clearSourceElements();
 
     }

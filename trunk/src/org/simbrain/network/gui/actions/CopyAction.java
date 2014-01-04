@@ -28,15 +28,13 @@ import javax.swing.KeyStroke;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.resource.ResourceManager;
 
 /**
  * Copy action.
  */
-public final class CopyAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class CopyAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new copy action with the specified network panel.
@@ -44,13 +42,7 @@ public final class CopyAction extends AbstractAction {
      * @param networkPanel network panel, must not be null
      */
     public CopyAction(final NetworkPanel networkPanel) {
-        super("Copy");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Copy", EnablingCondition.NEURONS);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C,
@@ -58,28 +50,9 @@ public final class CopyAction extends AbstractAction {
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
+        putValue(SHORT_DESCRIPTION,
+                "Copy selected neurons, (connected) synapses, and neuron groups");
 
-        updateAction();
-        // add a selection listener to update state based on selection
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-
-            /** @see NetworkSelectionListener */
-            public void selectionChanged(final NetworkSelectionEvent event) {
-                updateAction();
-            }
-        });
-    }
-
-    /**
-     * Set action text based on number of selected neurons.
-     */
-    private void updateAction() {
-        int numSelected = networkPanel.getSelectedModelElements().size();
-        if (numSelected > 0) {
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
     }
 
     /** @see AbstractAction */

@@ -16,32 +16,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions;
+package org.simbrain.util.widgets;
 
-import java.awt.event.ActionEvent;
+import java.awt.Dimension;
 
-import javax.swing.AbstractAction;
-
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
- * Space vertical.
+ * Simple utility for making rows with a label and a component.
  */
-public final class SpaceVerticalAction extends ConditionallyEnabledAction {
+public class LabelledItem extends JPanel {
 
     /**
-     * Create a new space vertical action with the specified network panel.
+     * Construct the labelled item.
      *
-     * @param networkPanel networkPanel, must not be null
+     * @param labelText the text for the label
+     * @param component the labelled component
      */
-    public SpaceVerticalAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Space Vertical", EnablingCondition.NEURONS);
-        putValue(SHORT_DESCRIPTION, "Space selected neurons vertically");
+    public LabelledItem(String labelText, JComponent component) {
+        Box itemBox = Box.createHorizontalBox();
+        itemBox.setAlignmentX(Box.LEFT_ALIGNMENT);
+        JLabel label = new JLabel(labelText);
+        label.setPreferredSize(new Dimension(100, 10));
+        itemBox.add(label);
+        itemBox.add(Box.createHorizontalStrut(10));
+        component.setPreferredSize(new Dimension(110, 25));
+        itemBox.add(component);
+        add(itemBox);
     }
 
-    /** @see AbstractAction */
-    public void actionPerformed(final ActionEvent event) {
-        networkPanel.spaceVertical();
-    }
 }

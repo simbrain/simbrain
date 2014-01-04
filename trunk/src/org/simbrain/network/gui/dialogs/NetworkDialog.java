@@ -18,30 +18,21 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.SelectionHandle;
-import org.simbrain.network.gui.nodes.SelectionMarquee;
-import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
+import org.simbrain.util.randomizer.RandomizerPanel;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the
@@ -49,104 +40,22 @@ import org.simbrain.util.Utils;
  * defaults restores to original values. When canceling out the values prior to
  * making any changes are restored.
  */
-public class NetworkDialog extends StandardDialog implements ActionListener,
-        ChangeListener {
-
-    /** Background. */
-    private static final String BACKGROUND = "Background";
-
-    /** Line. */
-    private static final String LINE = "Line";
-
-    /** Hot node. */
-    private static final String HOTNODE = "Hot node";
-
-    /** Cool node. */
-    private static final String COOLNODE = "Cool node";
-
-    /** Excitatory weight. */
-    private static final String EXCITATORY = "Excitatory weight";
-
-    /** Inhibitory weight. */
-    private static final String INHIBITORY = "Inhibitory weight";
-
-    /** Lasso. */
-    private static final String LASSO = "Lasso";
-
-    /** Selection. */
-    private static final String SELECTION = "Selection";
-
-    /** Signal. */
-    private static final String SIGNAL = "Signal Synapse";
-
-    /** Spike. */
-    private static final String SPIKE = "Spike";
-
-    /** Zero weight. */
-    private static final String ZERO = "Zero weight";
+public class NetworkDialog extends StandardDialog {
 
     /** Network panel. */
     protected NetworkPanel networkPanel;
 
-    /** List of items for combo box. */
-    private String[] objectColorList = { BACKGROUND, HOTNODE, COOLNODE,
-            EXCITATORY, INHIBITORY, SPIKE, ZERO};
-
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Color panel displays current color of item selected in combo box. */
-    private JPanel colorPanel = new JPanel();
+    /** Main properties panel. */
+    protected NetworkPropertiesPanel networkPropertiesPanel;
 
-    /** Graphics tab. */
-    private JPanel tabGraphics = new JPanel();
+    /** Connection preferences panel. */
+    private QuickConnectPreferencesPanel quickConnectPanel;
 
-    /** Miscellaneous tab. */
-    private JPanel tabMisc = new JPanel();
-
-    /** Grahpics panel. */
-    private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
-
-    /** Miscellaneous panel. */
-    private LabelledItemPanel miscPanel = new LabelledItemPanel();
-
-    /** Change color combo box. */
-    private JComboBox cbChangeColor = new JComboBox(objectColorList);
-
-    /** Change color of the item selected in combo box. */
-    private JButton changeColorButton = new JButton("Set");
-
-    /** Color indicator. */
-    private JPanel colorIndicator = new JPanel();
-
-    /** Maximum size of weight slider. */
-    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5,
-            50, 10);
-
-    /** Minimum size of weight slider. */
-    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5,
-            50, 10);
-
-    /** Precision text field. */
-    private JTextField precisionField = new JTextField();
-
-    /**
-     * Threshold above which subnetworks or groups with that many synapses stop
-     * displaying them.
-     */
-    private JTextField tfSynapseVisibilityThreshold = new JTextField();
-
-    /** Rounding check box. */
-    private JCheckBox isRoundingBox = new JCheckBox();
-
-    /** Nudge amount text field. */
-    private JTextField nudgeAmountField = new JTextField();
-
-    /** Show subnet outline check box. */
-    private JCheckBox showSubnetOutlineBox = new JCheckBox();
-
-    /** Show time check box. */
-    private JCheckBox showTimeBox = new JCheckBox();
+    /** Random panel. */
+    private NetworkRandomizerPanel randomPanel;
 
     /**
      * This method is the default constructor.
@@ -159,61 +68,28 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     }
 
     /**
-     * This method initialises the components on the panel.
+     * This method initializes the components on the panel.
      */
     private void init() {
+
         // Initialize Dialog
         setTitle("Network Dialog");
-        fillFieldValues();
-        checkRounding();
-        graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
-        precisionField.setColumns(3);
-        nudgeAmountField.setColumns(3);
 
-        // Set up sliders
-        weightSizeMaxSlider.setMajorTickSpacing(25);
-        weightSizeMaxSlider.setPaintTicks(true);
-        weightSizeMaxSlider.setPaintLabels(true);
-        weightSizeMinSlider.setMajorTickSpacing(25);
-        weightSizeMinSlider.setPaintTicks(true);
-        weightSizeMinSlider.setPaintLabels(true);
+        // Main properties tab
+        networkPropertiesPanel = new NetworkPropertiesPanel(networkPanel);
+        tabbedPane.addTab("Main", networkPropertiesPanel);
 
-        // Add Action Listeners
-        showTimeBox.addActionListener(this);
-        showSubnetOutlineBox.addActionListener(this);
-        changeColorButton.addActionListener(this);
-        isRoundingBox.addActionListener(this);
-        weightSizeMaxSlider.addChangeListener(this);
-        weightSizeMinSlider.addChangeListener(this);
-        cbChangeColor.addActionListener(this);
-        cbChangeColor.setActionCommand("moveSelector");
+        // Quick-connect properties
+        quickConnectPanel = new QuickConnectPreferencesPanel(networkPanel, this);
+        tabbedPane.addTab("Connections", quickConnectPanel);
 
-        // Set up color pane
-        colorPanel.add(cbChangeColor);
-        colorIndicator.setSize(20, 20);
-        colorPanel.add(colorIndicator);
-        colorPanel.add(changeColorButton);
-        setIndicatorColor();
+        // Randomizer properties
+        randomPanel = new NetworkRandomizerPanel();
+        // randomPanel.fillFieldValues(networkPanel.getNetwork()
+        // .getWeightRandomizer());
+        tabbedPane.addTab("Randomizer", randomPanel);
 
-        // Set up grapics panel
-        graphicsPanel.addItem("Color:", colorPanel);
-        graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
-        graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
-        //graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
-        graphicsPanel.addItem("Show time", showTimeBox);
-
-        // Set up Misc Panel
-        miscPanel.addItem("Synapse visibility threshold",
-                tfSynapseVisibilityThreshold);
-        miscPanel.addItem("Round off neuron values", isRoundingBox);
-        miscPanel.addItem("Precision of round-off", precisionField);
-        miscPanel.addItem("Nudge Amount", nudgeAmountField);
-
-        // Set up tab panels
-        tabGraphics.add(graphicsPanel);
-        tabMisc.add(miscPanel);
-        tabbedPane.addTab("Graphics", tabGraphics);
-        tabbedPane.addTab("Misc.", tabMisc);
+        // Set main panel
         setContentPane(tabbedPane);
 
         // Add help button
@@ -224,239 +100,94 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         this.addButton(helpButton);
     }
 
-    @Override
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        this.commitChanges();
-        this.setAsDefault();
-    }
-
-    @Override
-    protected void closeDialogCancel() {
-        super.closeDialogCancel();
-        this.returnToCurrentPrefs();
-    }
-
-    /**
-     * Respond to button pressing events with immediate changes to network
-     * panel, where relevant.
-     *
-     * @param e action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        Object o = e.getSource();
-
-        if (o == isRoundingBox) {
-            checkRounding();
-            networkPanel.getNetwork()
-                    .setRoundingOff(isRoundingBox.isSelected());
-        } else if (o == changeColorButton) {
-            Color theColor = getColor();
-            if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setBackgroundColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setLineColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString()
-                    .equals(HOTNODE)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings
-                            .setHotColor(Utils.colorToFloat(theColor));
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString()
-                    .equals(COOLNODE)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setCoolColor(Utils
-                            .colorToFloat(theColor));
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString()
-                    .equals(EXCITATORY)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setExcitatoryColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString()
-                    .equals(INHIBITORY)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setInhibitoryColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
-
-                if (theColor != null) {
-                    SelectionMarquee.setMarqueeColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString()
-                    .equals(SELECTION)) {
-
-                if (theColor != null) {
-                    SelectionHandle.setSelectionColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setSpikingColor(theColor);
-                }
-
-            } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setZeroWeightColor(theColor);
-                }
-
-            }
-            networkPanel.resetColors();
-            setIndicatorColor();
-        } else if (e.getActionCommand().equals("moveSelector")) {
-            setIndicatorColor();
-        } else if (o == showTimeBox) {
-            networkPanel.setShowTime(showTimeBox.isSelected());
-            networkPanel.repaint();
-        } else if (o == showSubnetOutlineBox) {
-            networkPanel
-                    .setShowSubnetOutline(showSubnetOutlineBox.isSelected());
-        }
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-        showTimeBox.setSelected(networkPanel.getShowTime());
-        showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
-        precisionField.setText(Integer.toString(networkPanel.getNetwork()
-                .getPrecision()));
-        tfSynapseVisibilityThreshold.setText(Integer.toString(networkPanel
-                .getNetwork().getSynapseVisibilityThreshold()));
-        nudgeAmountField.setText(Double.toString(NetworkGuiSettings
-                .getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
-        weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
-        weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
-    }
-
     /**
      * Commits changes not handled in action performed.
      */
     private void commitChanges() {
-        NetworkGuiSettings.setNudgeAmount(Double.parseDouble(nudgeAmountField
-                .getText()));
-        networkPanel.getNetwork().setPrecision(
-                Integer.parseInt(precisionField.getText()));
-        networkPanel.getNetwork().setSynapseVisibilityThreshold(
-                Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
+        networkPropertiesPanel.commitChanges();
+        quickConnectPanel.commitChanges();
+        randomPanel.commitChanges();
+    }
+
+    @Override
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
     }
 
     /**
-     * Listens and responds to slider state changes.
-     *
-     * @param e change event
+     * Panel for selecting which network randomizer to edit.
      */
-    public void stateChanged(final ChangeEvent e) {
-        JSlider j = (JSlider) e.getSource();
+    private class NetworkRandomizerPanel extends JPanel {
 
-        if (j == weightSizeMaxSlider) {
-            NetworkGuiSettings.setMaxDiameter(j.getValue());
-        } else if (j == weightSizeMinSlider) {
-            NetworkGuiSettings.setMinDiameter(j.getValue());
+        /** Selects which randomizer to edit. */
+        private JComboBox comboBox;
+
+        /** Panel which holds the randomizer panel. */
+        private JPanel randomizerHolder = new JPanel();
+
+        /** The activation randomizer panel. */
+        private RandomizerPanel activationRandomizer;
+
+        /** The weight randomizer panel. */
+        private RandomizerPanel weightRandomizer;
+
+        /**
+         * Construct the panel.
+         */
+        public NetworkRandomizerPanel() {
+            Box  mainPanel = Box.createVerticalBox();
+            mainPanel.add(Box.createVerticalStrut(10));
+            comboBox = new JComboBox(new String[] { "Activation Randomizer",
+                    "Weight Randomizer" });
+            comboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initPanel();
+                }
+            });
+
+            activationRandomizer = new RandomizerPanel(false);
+            activationRandomizer.fillFieldValues(networkPanel.getNetwork()
+                    .getActivationRandomizer());
+            weightRandomizer = new RandomizerPanel(false);
+            weightRandomizer.fillFieldValues(networkPanel.getNetwork()
+                    .getWeightRandomizer());
+            initPanel();
+
+            mainPanel.add(comboBox);
+            mainPanel.add(Box.createVerticalStrut(10));
+            mainPanel.add(new JSeparator(JSeparator.HORIZONTAL));
+            mainPanel.add(Box.createVerticalStrut(10));
+            mainPanel.add(randomizerHolder);
+
+            add(mainPanel);
+
         }
 
-        networkPanel.resetSynapseDiameters();
-    }
-
-    /**
-     * Show the color pallette and get a color.
-     *
-     * @return selected color
-     */
-    public Color getColor() {
-        JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color",
-                colorIndicator.getBackground());
-        colorChooser.setLocation(200, 200); // Set location of color chooser
-        return theColor;
-    }
-
-    /**
-     * Enable or disable the precision field depending on state of rounding
-     * button.
-     */
-    private void checkRounding() {
-        if (!isRoundingBox.isSelected()) {
-            precisionField.setEnabled(false);
-        } else {
-            precisionField.setEnabled(true);
+        /**
+         * Re-initialize the panel every time the combo box is changed.
+         */
+        private void initPanel() {
+            randomizerHolder.removeAll();
+            if (comboBox.getSelectedIndex() == 0) {
+                randomizerHolder.add(activationRandomizer);
+            } else {
+                randomizerHolder.add(weightRandomizer);
+            }
+            repaint();
+            pack();
         }
-    }
 
-    /**
-     * Set the color indicator based on the current selection in the combo box.
-     */
-    protected void setIndicatorColor() {
-        if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings
-                    .getBackgroundColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings.getLineColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
-
-            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings
-                    .getHotColor()));
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
-
-            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings
-                    .getCoolColor()));
-
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(EXCITATORY)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings
-                    .getExcitatoryColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString()
-                .equals(INHIBITORY)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings
-                    .getInhibitoryColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
-
-            colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
-
-            colorIndicator.setBackground(SelectionHandle.getSelectionColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings.getSpikingColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
-
-            colorIndicator.setBackground(NetworkGuiSettings
-                    .getZeroWeightColor());
-
+        /**
+         * Apply changes to randomizer when parent dialogs closed.
+         */
+        public void commitChanges() {
+            activationRandomizer.commitRandom(networkPanel.getNetwork()
+                    .getActivationRandomizer());
+            weightRandomizer.commitRandom(networkPanel.getNetwork()
+                    .getWeightRandomizer());
         }
-    }
 
+    }
 }

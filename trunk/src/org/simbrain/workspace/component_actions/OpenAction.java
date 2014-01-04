@@ -54,6 +54,7 @@ public final class OpenAction extends AbstractAction {
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 KeyEvent.VK_O, Toolkit.getDefaultToolkit()
                         .getMenuShortcutKeyMask()));
+        putValue(SHORT_DESCRIPTION, "Open a new component");
 
         this.guiComponent = guiComponent;
     }

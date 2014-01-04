@@ -76,6 +76,7 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkSynapseMinSize", 7);
         DEFAULT_MAP.put("networkSynapseMaxSize", 20);
         DEFAULT_MAP.put("networkNudgeAmount", 2d);
+        DEFAULT_MAP.put("networkWandRadius", 40);
         DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
                 + "tables");
         DEFAULT_MAP.put("projectorTolerance", .1);
@@ -94,6 +95,7 @@ public class SimbrainPreferences {
      */
     public static void restoreDefaultSetting(String key) {
         Object object = DEFAULT_MAP.get(key);
+        //System.out.println(key + "--" + object);
         if (object != null) {
             if (object instanceof String) {
                 SIMBRAIN_PREFERENCES.put(key, (String) object);

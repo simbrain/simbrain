@@ -66,6 +66,7 @@ public final class AddNeuronsAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
+        putValue(SHORT_DESCRIPTION, "Add a set of neurons to the network");
         // putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
         // putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
         // networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);

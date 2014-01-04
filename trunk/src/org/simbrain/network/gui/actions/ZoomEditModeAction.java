@@ -36,6 +36,7 @@ public final class ZoomEditModeAction extends EditModeAction {
         super("Zoom in", networkPanel, EditMode.ZOOM_IN);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomIn.png"));
         putValue(SHORT_DESCRIPTION, "Zoom mode (z)");
+        putValue(SHORT_DESCRIPTION, "Enter zoom mode");
 
     }
 

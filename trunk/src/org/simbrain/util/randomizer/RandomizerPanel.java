@@ -18,20 +18,18 @@
  */
 package org.simbrain.util.randomizer;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.simbrain.util.widgets.LabelledItem;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
@@ -63,9 +61,7 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     /** Standard deviation field. */
     private JFormattedTextField tfStandardDeviation = new JFormattedTextField();
 
-    // /** Clipping combo box. */
-    // private TristateDropDown tsClipping = new TristateDropDown();
-
+    /** Clipping combo box. */
     private JCheckBox tsClipping = new JCheckBox();
 
     /**
@@ -75,40 +71,18 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      */
     public RandomizerPanel(final boolean useLocalBounds) {
 
-        GridLayout gl = new GridLayout(0, 2);
-        gl.setVgap(5);
-        JPanel center = new JPanel(gl);
-
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        Box mainPanel = Box.createVerticalBox();
         cbDistribution.addActionListener(this);
+        mainPanel.add(new LabelledItem("Distribution", cbDistribution));
+        mainPanel.add(new LabelledItem("Ceiling", tfUpBound));
+        mainPanel.add(new LabelledItem("Floor", tfLowBound));
+        mainPanel.add(new LabelledItem("Mean", tfMean));
+        mainPanel.add(new LabelledItem("Std. Dev.", tfStandardDeviation));
         tsClipping.addActionListener(this);
         tsClipping.setActionCommand("useBounds");
+        mainPanel.add(new LabelledItem("Clipping", tsClipping));
 
-        center.add(new JLabel("Distribution"));
-        center.add(cbDistribution);
-
-        center.add(new JLabel("Ceiling:"));
-        center.add(tfUpBound);
-
-        center.add(new JLabel("Floor:"));
-        center.add(tfLowBound);
-
-        center.add(new JLabel("Mean:"));
-        center.add(tfMean);
-
-        center.add(new JLabel("Std. Dev.:"));
-        center.add(tfStandardDeviation);
-
-        center.add(new JLabel("Clipping"));
-        center.add(tsClipping);
-
-        this.add(center, gbc);
+        this.add(mainPanel);
         init();
     }
 
@@ -197,7 +171,7 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     /**
      * Called externally when dialog is being closed.
      *
-     * @param rand Random soruce
+     * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
         rand.setDistributionIndex(cbDistribution.getSelectedIndex());

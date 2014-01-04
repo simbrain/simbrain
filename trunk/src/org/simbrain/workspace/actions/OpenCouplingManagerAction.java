@@ -41,7 +41,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
      * Create an open data world with the specified workspace.
      */
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
-        super("Open coupling manager");
+        super("Open Coupling Manager...");
         this.desktop = desktop;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Coupling.png"));
         putValue(SHORT_DESCRIPTION, "Open coupling manager");

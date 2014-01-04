@@ -86,7 +86,6 @@ import org.simbrain.network.gui.actions.ZoomEditModeAction;
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
-import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
@@ -226,9 +225,6 @@ public final class NetworkActionManager {
 
     /** Sets the source neurons for neuron connections. */
     private Action setSourceNeuronsAction;
-
-    /** Show the quick connect dialog. */
-    private final Action showQuickConnectDialogAction;
 
     /** Create a neuron group. */
     private final Action neuronGroupAction;
@@ -397,7 +393,6 @@ public final class NetworkActionManager {
                 networkPanel);
         lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
 
-        showQuickConnectDialogAction = new ShowConnectDialogAction(networkPanel);
         setSourceNeuronsAction = new SetSourceNeurons(networkPanel);
         clearSourceNeuronsAction = new ClearSourceNeurons(networkPanel);
 
@@ -959,13 +954,6 @@ public final class NetworkActionManager {
      */
     public Action getSelectOutgoingWeightsAction() {
         return selectOutgoingWeightsAction;
-    }
-
-    /**
-     * @return the showConnectDialogAction.
-     */
-    public Action getShowQuickConnectDialogAction() {
-        return showQuickConnectDialogAction;
     }
 
     /**

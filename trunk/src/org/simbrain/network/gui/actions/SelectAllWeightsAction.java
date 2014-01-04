@@ -50,6 +50,8 @@ public final class SelectAllWeightsAction extends AbstractAction {
         this.networkPanel = networkPanel;
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('w'), this);
+        putValue(SHORT_DESCRIPTION,
+                "Select all weights (w)");
         networkPanel.getActionMap().put(this, this);
     }
 

@@ -42,12 +42,6 @@ import org.simbrain.resource.ResourceManager;
  */
 public class TestInputAction extends AbstractAction {
 
-    {
-        putValue(NAME, "Test network...");
-        putValue(SHORT_DESCRIPTION, "Test network...");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
-    }
-
     /** Network panel. */
     private NetworkPanel networkPanel;
 
@@ -64,15 +58,17 @@ public class TestInputAction extends AbstractAction {
      */
     public TestInputAction(NetworkPanel networkPanel) {
 
-        super("Test inputs...");
-
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        putValue(NAME, "Create Input Table...");
+        putValue(SHORT_DESCRIPTION,
+                "Create a table whose rows provide input to selected neurons");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
 
         this.networkPanel = networkPanel;
 
-        // add a selection listener to update state based on selection
+        // Enable / disable and set inputs based on selected neurons
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
             /** @see NetworkSelectionListener */
             public void selectionChanged(NetworkSelectionEvent event) {
@@ -82,7 +78,7 @@ public class TestInputAction extends AbstractAction {
     }
 
     /**
-     * Set test input panel based on number of selected neurons.
+     * Set properties of test input panel based on number of selected neurons.
      */
     private void updateAction() {
         int numNeurons = networkPanel.getSelectedNeurons().size();

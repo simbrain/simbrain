@@ -51,10 +51,10 @@ public final class CloseAction extends AbstractAction {
 
         this.workspaceComponent = workspaceComponent;
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+        putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 KeyEvent.VK_W, Toolkit.getDefaultToolkit()
                         .getMenuShortcutKeyMask()));
-
+        putValue(SHORT_DESCRIPTION, "Close this component");
     }
 
     /** @see AbstractAction */

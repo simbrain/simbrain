@@ -42,7 +42,7 @@ public final class ShowPropertyDialogAction extends AbstractAction {
      * @param desktop reference to simbrain desktop.
      */
     public ShowPropertyDialogAction(final Workspace workspace) {
-        super("Workspace properties...");
+        super("Workspace Properties...");
         this.workspace = workspace;
         putValue(SHORT_DESCRIPTION, "Show workspace properties dialog.");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));

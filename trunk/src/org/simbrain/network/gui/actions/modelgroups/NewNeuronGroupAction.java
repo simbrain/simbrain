@@ -26,14 +26,14 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 
 /**
  * Convert selected neurons to a neuron group.
  */
-public final class NewNeuronGroupAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new new neuron group network action with the specified network
@@ -42,14 +42,11 @@ public final class NewNeuronGroupAction extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public NewNeuronGroupAction(final NetworkPanel networkPanel) {
+        super(networkPanel, "Convert to Neuron Group", EnablingCondition.NEURONS);
 
-        super("Neuron group");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("NetworkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        putValue(NAME, "Convert Neurons to Neuron Group");
+        putValue(SHORT_DESCRIPTION,
+                "Convert selected neurons to a neuron group");
 
     }
 
@@ -62,4 +59,5 @@ public final class NewNeuronGroupAction extends AbstractAction {
             networkPanel.getNetwork().addGroup(group);
         }
     }
+
 }

@@ -33,10 +33,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Cut action.
  */
-public final class CutAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class CutAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new cut action with the specified network panel.
@@ -44,13 +41,7 @@ public final class CutAction extends AbstractAction {
      * @param networkPanel network panel, must not be null
      */
     public CutAction(final NetworkPanel networkPanel) {
-        super("Cut");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Cut", EnablingCondition.NEURONS);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_X,
@@ -58,29 +49,11 @@ public final class CutAction extends AbstractAction {
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Cut.png"));
+        putValue(SHORT_DESCRIPTION,
+                "Cut selected neurons, (connected) synapses, and neuron groups");
 
-        updateAction();
-        // add a selection listener to update state based on selection
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-
-            /** @see NetworkSelectionListener */
-            public void selectionChanged(final NetworkSelectionEvent event) {
-                updateAction();
-            }
-        });
     }
 
-    /**
-     * Set action text based on number of selected neurons.
-     */
-    private void updateAction() {
-        int numSelected = networkPanel.getSelectedModelElements().size();
-        if (numSelected > 0) {
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
-    }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

@@ -54,6 +54,7 @@ public final class SaveAction extends AbstractAction {
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, Toolkit.getDefaultToolkit()
                         .getMenuShortcutKeyMask()));
+        putValue(SHORT_DESCRIPTION, "Save this component");
 
         this.guiComponent = guiComponent;
     }

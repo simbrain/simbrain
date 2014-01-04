@@ -50,6 +50,8 @@ public final class SelectAllNeuronsAction extends AbstractAction {
         this.networkPanel = networkPanel;
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('n'), this);
+        putValue(SHORT_DESCRIPTION,
+                "Select all neurons (n)");
         networkPanel.getActionMap().put(this, this);
     }
 

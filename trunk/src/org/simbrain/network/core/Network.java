@@ -90,6 +90,11 @@ public class Network {
     /**
      * The weight randomizer.
      */
+    private Randomizer activationRandomizer = new Randomizer();
+
+    /**
+     * The activation randomizer.
+     */
     private Randomizer weightRandomizer = new Randomizer();
 
     /**
@@ -1718,6 +1723,19 @@ public class Network {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
         }
+    }
+
+
+    /**
+     * Returns the activation randomizer for this network.
+     *
+     * @return the activationRandomizer randomizer
+     */
+    public Randomizer getActivationRandomizer() {
+        if (activationRandomizer == null) {
+            activationRandomizer = new Randomizer();
+        }
+        return activationRandomizer;
     }
 
     /**

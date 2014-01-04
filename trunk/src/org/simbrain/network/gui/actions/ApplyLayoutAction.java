@@ -28,10 +28,7 @@ import org.simbrain.network.layouts.Layout;
 /**
  * Apply specified layout to selected neurons.
  */
-public final class ApplyLayoutAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel panel;
+public final class ApplyLayoutAction extends ConditionallyEnabledAction {
 
     /** The connection to apply. */
     private Layout layout;
@@ -45,23 +42,16 @@ public final class ApplyLayoutAction extends AbstractAction {
      */
     public ApplyLayoutAction(final NetworkPanel networkPanel, Layout layout,
             String name) {
-
-        super(name);
-
+        super(networkPanel, name, EnablingCondition.NEURONS);
         this.layout = layout;
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.panel = networkPanel;
-
+        putValue(SHORT_DESCRIPTION, "Apply the " + name
+                + " layout to selected neurons");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        layout.setInitialLocation(panel.getLastClickedPosition());
-        layout.layoutNeurons(panel.getSelectedModelNeurons());
-        panel.repaint();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
+        networkPanel.repaint();
     }
 }

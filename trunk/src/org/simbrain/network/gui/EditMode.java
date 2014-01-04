@@ -61,12 +61,18 @@ public final class EditMode {
     /** Default wand radius. */
     private static final int DEFAULT_WAND_RADIUS = 40;
 
+    /** Default wand radius. */
+    private static final int MINIMUM_WAND_RADIUS = 15;
+
     /** Wand mode mode. */
     public static final EditMode WAND = new EditMode("wand",
             DEFAULT_WAND_RADIUS);
 
     /** Radius of wand in wand mode. */
-    private int wandRadius = DEFAULT_WAND_RADIUS;
+    private static int wandRadius = DEFAULT_WAND_RADIUS;
+
+    /** The image used for the cursor. */
+    private BufferedImage cursorImage;
 
     /**
      * Create a new edit mode with the specified name.
@@ -84,8 +90,6 @@ public final class EditMode {
             this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);
         }
     }
-
-    BufferedImage image;
 
     /**
      * Construct a "wand" edit mode. TODO: Is this the right place for this?
@@ -175,25 +179,29 @@ public final class EditMode {
     /**
      * @return the current wand radius
      */
-    public int getWandRadius() {
+    public static int getWandRadius() {
         return wandRadius;
     }
 
     /**
+     * Set the new wand radius.
+     *
      * @param wandRadius the wandRadius to set
      */
-    public void setWandRadius(int wandRadius) {
-        this.wandRadius = wandRadius;
-        resetWandCursor();
+    public static void setWandRadius(int newWandRadius) {
+        if (newWandRadius < MINIMUM_WAND_RADIUS) {
+            wandRadius = MINIMUM_WAND_RADIUS;
+        }
+        wandRadius = newWandRadius;
     }
 
     /**
      * Reset the wand cursor (must happen when its size is reset).
      */
-    protected void resetWandCursor() {
-        image = new BufferedImage(wandRadius + 1, wandRadius + 1,
+    public void resetWandCursor() {
+        cursorImage = new BufferedImage(wandRadius + 1, wandRadius + 1,
                 BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D) image.getGraphics();
+        Graphics2D g2 = (Graphics2D) cursorImage.getGraphics();
 
         // Draw stroke around wand
         int stroke = 1;
@@ -211,7 +219,7 @@ public final class EditMode {
         // g2.fillRect(0, 0, radius, radius);
 
         Toolkit tk = Toolkit.getDefaultToolkit();
-        Cursor newCursor = tk.createCustomCursor(image, CENTER_POINT, "wand");
+        Cursor newCursor = tk.createCustomCursor(cursorImage, CENTER_POINT, "wand");
         this.cursor = newCursor;
     }
 

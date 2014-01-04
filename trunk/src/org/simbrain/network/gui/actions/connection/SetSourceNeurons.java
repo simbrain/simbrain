@@ -20,17 +20,14 @@ package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 
 /**
  * Set source neurons.
  */
-public final class SetSourceNeurons extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class SetSourceNeurons extends ConditionallyEnabledAction {
 
     /**
      * Construct action.
@@ -38,20 +35,15 @@ public final class SetSourceNeurons extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public SetSourceNeurons(final NetworkPanel networkPanel) {
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
-        putValue(NAME, "Set Source Neuron(s)");
+        super(networkPanel, "Set Source Neurons", EnablingCondition.NEURONS);
+        putValue(NAME, "Set Source Neurons");
+        putValue(
+                SHORT_DESCRIPTION,
+                "Set selected neurons as source neurons.  They can then be connected to target neurons using the connect commands.");
     }
 
-    /** @see AbstractAction */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-
-        // Perform action
         networkPanel.setSourceElements();
-
     }
 }

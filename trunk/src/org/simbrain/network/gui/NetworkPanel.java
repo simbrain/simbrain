@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -63,7 +64,6 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
@@ -79,8 +79,8 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BPTTNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
-import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.CompetitiveGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.CompetitiveNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.InvisibleSynapseGroupNode;
@@ -222,6 +222,12 @@ public class NetworkPanel extends JPanel {
 
     /** Clamp tool bar. */
     private CustomToolBar clampToolBar;
+
+    /** Color of background. */
+    private static Color backgroundColor = Color.white;
+
+    /** How much to nudge objects per key click. */
+    private static double nudgeAmount = 2;
 
     /**
      * Source elements (when setting a source node or group and then connecting
@@ -983,7 +989,6 @@ public class NetworkPanel extends JPanel {
         // Connection actions
         contextMenu.add(actionManager.getClearSourceNeuronsAction());
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
-        contextMenu.add(actionManager.getShowQuickConnectDialogAction());
         contextMenu.addSeparator();
 
         // Preferences
@@ -1065,10 +1070,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createAlignMenu() {
 
         JMenu alignSubMenu = new JMenu("Align");
-
         alignSubMenu.add(actionManager.getAlignHorizontalAction());
         alignSubMenu.add(actionManager.getAlignVerticalAction());
-
         return alignSubMenu;
 
     }
@@ -1081,10 +1084,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createSpacingMenu() {
 
         JMenu spaceSubMenu = new JMenu("Space");
-
         spaceSubMenu.add(actionManager.getSpaceHorizontalAction());
         spaceSubMenu.add(actionManager.getSpaceVerticalAction());
-
         return spaceSubMenu;
 
     }
@@ -1133,6 +1134,7 @@ public class NetworkPanel extends JPanel {
         }
         firePropertyChange("editMode", oldEditMode, this.editMode);
         updateCursor();
+        repaint();
     }
 
     /**
@@ -1331,17 +1333,6 @@ public class NetworkPanel extends JPanel {
      */
     public void showTextPropertyDialog() {
         TextDialog dialog = new TextDialog(getSelectedText());
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-    }
-
-    /**
-     * Creates and displays the connect properties dialog.
-     */
-    public void showConnectProperties() {
-        QuickConnectPreferencesDialog dialog = new QuickConnectPreferencesDialog(
-                this);
-        dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -1685,7 +1676,7 @@ public class NetworkPanel extends JPanel {
      * through screen elements and resets relevant colors.
      */
     public void resetColors() {
-        canvas.setBackground(NetworkGuiSettings.getBackgroundColor());
+        canvas.setBackground(backgroundColor);
         for (Object obj : canvas.getLayer().getChildrenReference()) {
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();
@@ -2106,12 +2097,12 @@ public class NetworkPanel extends JPanel {
     protected void nudge(final int offsetX, final int offsetY) {
         for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
-            node.getNeuron().setX(
-                    node.getNeuron().getX()
-                            + (offsetX * NetworkGuiSettings.getNudgeAmount()));
-            node.getNeuron().setY(
-                    node.getNeuron().getY()
-                            + (offsetY * NetworkGuiSettings.getNudgeAmount()));
+//            node.getNeuron().setX(
+//                    node.getNeuron().getX()
+//                            + (offsetX * NetworkGuiSettings.getNudgeAmount()));
+//            node.getNeuron().setY(
+//                    node.getNeuron().getY()
+//                            + (offsetY * NetworkGuiSettings.getNudgeAmount()));
         }
         repaint();
     }
@@ -2533,6 +2524,34 @@ public class NetworkPanel extends JPanel {
      */
     public UndoManager getUndoManager() {
         return undoManager;
+    }
+
+    /**
+     * @return the backgroundColor
+     */
+    public static Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    /**
+     * @param backgroundColor the backgroundColor to set
+     */
+    public static void setBackgroundColor(Color backgroundColor) {
+        NetworkPanel.backgroundColor = backgroundColor;
+    }
+
+    /**
+     * @return the nudgeAmount
+     */
+    public static double getNudgeAmount() {
+        return nudgeAmount;
+    }
+
+    /**
+     * @param nudgeAmount the nudgeAmount to set
+     */
+    public static void setNudgeAmount(double nudgeAmount) {
+        NetworkPanel.nudgeAmount = nudgeAmount;
     }
 
 }

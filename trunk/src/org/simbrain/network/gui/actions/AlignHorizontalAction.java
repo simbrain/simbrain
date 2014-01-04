@@ -28,10 +28,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Aligns horizontal.
  */
-public final class AlignHorizontalAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class AlignHorizontalAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new align horizontal action with the specified network panel.
@@ -39,20 +36,16 @@ public final class AlignHorizontalAction extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public AlignHorizontalAction(final NetworkPanel networkPanel) {
-
-        super("Align Horizontal");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Align Horizontal", EnablingCondition.NEURONS);
         putValue(SMALL_ICON,
                 ResourceManager.getImageIcon("AlignHorizontal.png"));
+        putValue(SHORT_DESCRIPTION, "Align selected neurons horizontally");
+
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.alignHorizontal();
     }
+
 }

@@ -25,15 +25,15 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.resource.ResourceManager;
 
 /**
  * Delete action.
  */
-public final class DeleteAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class DeleteAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new delete action with the specified network panel.
@@ -41,13 +41,7 @@ public final class DeleteAction extends AbstractAction {
      * @param networkPanel network panel, must not be null
      */
     public DeleteAction(final NetworkPanel networkPanel) {
-        super("Delete");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Delete", EnablingCondition.ALLITEMS);
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteNeuron.png"));
         putValue(SHORT_DESCRIPTION,
@@ -57,10 +51,12 @@ public final class DeleteAction extends AbstractAction {
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke("DELETE"), this);
         networkPanel.getActionMap().put(this, this);
+        
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.deleteSelectedObjects();
     }
+
 }

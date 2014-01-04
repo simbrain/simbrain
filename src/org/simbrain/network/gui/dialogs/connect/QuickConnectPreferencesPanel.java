@@ -13,12 +13,13 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -28,15 +29,13 @@ import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>ConnectionDialog</b> is a dialog box for setting connection types and
+ * <b>QuickConnectPreferencesPanel</b> is a dialog box for setting connection types and
  * properties.
  */
-public class QuickConnectPreferencesDialog extends StandardDialog implements
-        ActionListener {
+public class QuickConnectPreferencesPanel extends JPanel {
 
     /** Select connection type. */
     private JComboBox cbConnectionType = new JComboBox(
@@ -54,40 +53,40 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
     /** Reference to network panel. */
     private NetworkPanel panel;
 
+    /** Parent dialog. */
+    private Window parentWindow;
+
     /**
      * Connection dialog default constructor.
      */
-    public QuickConnectPreferencesDialog(NetworkPanel panel) {
+    public QuickConnectPreferencesPanel(NetworkPanel panel,
+            Window parentWindow) {
         this.panel = panel;
-        init();
-    }
+        this.parentWindow = parentWindow;
 
-    /**
-     * Initialize default constructor.
-     */
-    private void init() {
-        setTitle("Quick Connect Propeties");
-
-        cbConnectionType.addActionListener(this);
-        typePanel.addItem("Connection Type", cbConnectionType);
+        // Set up combo box
         cbConnectionType.setSelectedItem(QuickConnectPreferences
                 .getCurrentConnection());
-        ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Network/connections.html");
-        addButton(new JButton(helpAction));
+        cbConnectionType.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                initPanel();
+            }
+        });
+        typePanel.addItem("Connection Type", cbConnectionType);
+
+        // Set up main panel
         initPanel();
         mainPanel.add(typePanel);
         mainPanel.add(optionsPanel);
-        setContentPane(mainPanel);
+        this.add(mainPanel);
+
+        // Set up help button. TODO
+        //ShowHelpAction helpAction = new ShowHelpAction(
+        //        "Pages/Network/connections.html");
+        //parentDialog.addButton(new JButton(helpAction));
     }
 
-    @Override
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        commitChanges();
-    }
-
-    /**
+     /**
      * Initialize the connection panel based upon the current connection type.
      */
     private void initPanel() {
@@ -114,8 +113,8 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         }
-        pack();
-        setLocationRelativeTo(null);
+        parentWindow.pack();
+        parentWindow.setLocationRelativeTo(null);
     }
 
     /**
@@ -128,15 +127,6 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
     }
 
     /**
-     * Respond to neuron type changes.
-     *
-     * @param e Action event.
-     */
-    public void actionPerformed(final ActionEvent e) {
-        initPanel();
-    }
-
-    /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
@@ -145,4 +135,32 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
                         .getSelectedItem());
         optionsPanel.commitChanges();
     }
+
+    /**
+     * Helper class for embedding this panel in a dialog.
+     */
+    public class QuickConnectDialog extends StandardDialog {
+
+        /** Reference to the preferences panel. */
+        private QuickConnectPreferencesPanel panel;
+
+        /**
+         * Construct the dialog.
+         *
+         * @param panel the embedded panel
+         */
+        public QuickConnectDialog(QuickConnectPreferencesPanel panel) {
+            this.panel = panel;
+            setTitle("Quick Connect Propeties");
+
+        }
+
+        @Override
+        protected void closeDialogOk() {
+            super.closeDialogOk();
+            panel.commitChanges();
+        }
+
+    }
+
 }

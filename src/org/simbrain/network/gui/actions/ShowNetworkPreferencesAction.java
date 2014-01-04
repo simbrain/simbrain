@@ -57,6 +57,8 @@ public final class ShowNetworkPreferencesAction extends AbstractAction {
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit()
                         .getMenuShortcutKeyMask()));
+        putValue(SHORT_DESCRIPTION,
+                "Show the network preference dialog");
 
     }
 

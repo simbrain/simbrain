@@ -25,19 +25,15 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
 
 /**
  * Randomize screen elements action.
- *
- * TODO: rename to RandomizeScreenElementsAction?
  */
-public final class RandomizeObjectsAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new randomize screen elements action with the specified network
@@ -46,13 +42,8 @@ public final class RandomizeObjectsAction extends AbstractAction {
      * @param networkPanel network panel, must not be null
      */
     public RandomizeObjectsAction(final NetworkPanel networkPanel) {
-        super("Randomize selection");
+        super(networkPanel, "Randomize selection", EnablingCondition.ALLITEMS);
 
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
         putValue(SHORT_DESCRIPTION, "Randomize Selected Weights and Nodes (r)");
 

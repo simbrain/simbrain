@@ -43,7 +43,7 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
      */
     public ShowWorkspaceUpdaterDialog(final SimbrainDesktop desktop) {
 
-        super("Workspace update sequence...");
+        super("Edit Update Sequence...");
         if (desktop == null) {
             throw new IllegalArgumentException("desktop must not be null");
         }

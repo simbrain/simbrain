@@ -55,6 +55,8 @@ public final class SetSynapsePropertiesAction extends AbstractAction {
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('e'), this);
+        putValue(SHORT_DESCRIPTION,
+                "Set the properties of selected synapses");
 
         this.networkPanel = networkPanel;
         updateAction();

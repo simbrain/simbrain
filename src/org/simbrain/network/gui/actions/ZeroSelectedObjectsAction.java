@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -33,10 +32,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Clear selected neurons action.
  */
-public final class ZeroSelectedObjectsAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new clear selected neurons action with the specified network
@@ -45,17 +41,11 @@ public final class ZeroSelectedObjectsAction extends AbstractAction {
      * @param networkPanel network panel, must not be null
      */
     public ZeroSelectedObjectsAction(final NetworkPanel networkPanel) {
-        super("Set selected objects to zero");
+        super(networkPanel, "Set selected objects to zero", EnablingCondition.ALLITEMS);
 
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
         putValue(SHORT_DESCRIPTION,
                 "Set selected neurons and synapses to zero (c)");
-
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
@@ -63,14 +53,10 @@ public final class ZeroSelectedObjectsAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i
-                .hasNext();) {
-            NeuronNode node = (NeuronNode) i.next();
+        for (NeuronNode node : networkPanel.getSelectedNeurons()) {
             node.getNeuron().clear();
         }
-        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i
-                .hasNext();) {
-            SynapseNode node = (SynapseNode) i.next();
+        for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
         }
         networkPanel.getNetwork().fireNetworkChanged();

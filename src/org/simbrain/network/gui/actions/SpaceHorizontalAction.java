@@ -23,14 +23,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 
 /**
  * Space horizontal.
  */
-public final class SpaceHorizontalAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class SpaceHorizontalAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new space horizontal action with the specified network panel.
@@ -38,20 +36,12 @@ public final class SpaceHorizontalAction extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public SpaceHorizontalAction(final NetworkPanel networkPanel) {
-
-        super("Space Horizontal");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Space Horizontal", EnablingCondition.NEURONS);
+        putValue(SHORT_DESCRIPTION, "Space selected neurons horizontally");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
         networkPanel.spaceHorizontal();
-
     }
 }

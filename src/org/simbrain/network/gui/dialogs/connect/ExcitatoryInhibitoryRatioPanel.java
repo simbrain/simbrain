@@ -101,7 +101,7 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
     private SwitchableChangeListener sliderListener;
 
     /**
-     * Constructs the excitatory/inhibitory ratio sub-panel
+     * Constructs the excitatory/inhibitory ratio sub-panel.
      *
      * @param connection the connection object which will be edited by
      *            committing changes to this panel.
@@ -281,7 +281,6 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
         eRatio.setValue((int) (exRatio * 100));
         iRatio.setValue((int) ((1 - exRatio) * 100));
         ratioSlider.setValue((int) (exRatio * 100));
-
     }
 
     /**
@@ -298,7 +297,5 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
         f.pack();
         f.setVisible(true);
         f.setLocationRelativeTo(null);
-
     }
-
 }

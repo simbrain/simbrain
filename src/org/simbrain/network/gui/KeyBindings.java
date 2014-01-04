@@ -26,7 +26,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.QuickConnectPreferences;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -192,7 +193,14 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                NeuronGroupNode.showSynpaseGroupDialog(panel);
+                // TODO: Test if groups are being connected
+                // NeuronGroupNode.showSynpaseGroupDialog(panel);
+                ConnectNeurons connection = QuickConnectPreferences
+                        .getCurrentConnection();
+                connection.connectNeurons(panel.getNetwork(),
+                        panel.getSourceModelNeurons(),
+                        panel.getSelectedModelNeurons(), true);
+
             }
         });
 

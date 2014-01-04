@@ -40,13 +40,14 @@ public final class SaveAsAction extends AbstractAction {
      */
     public SaveAsAction(final GuiComponent guiComponent) {
 
-        super("Save as...");
+        super("Save As...");
 
         if (guiComponent == null) {
             throw new IllegalArgumentException("component must not be null");
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+        putValue(SHORT_DESCRIPTION, "Save this component with a new name");
 
         this.guiComponent = guiComponent;
     }

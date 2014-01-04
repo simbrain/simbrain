@@ -40,7 +40,7 @@ public final class ShowPrioritiesAction extends AbstractAction {
      */
     public ShowPrioritiesAction(final NetworkPanel networkPanel) {
 
-        super("Show Priorities");
+        super("Show Neuron Priorities");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

@@ -28,10 +28,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Aligns vertical.
  */
-public final class AlignVerticalAction extends AbstractAction {
-
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
+public final class AlignVerticalAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new align vertical action with the specified network panel.
@@ -39,19 +36,14 @@ public final class AlignVerticalAction extends AbstractAction {
      * @param networkPanel networkPanel, must not be null
      */
     public AlignVerticalAction(final NetworkPanel networkPanel) {
-
-        super("Align Vertical");
-
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-
-        this.networkPanel = networkPanel;
+        super(networkPanel, "Align Vertical", EnablingCondition.NEURONS);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignVertical.png"));
+        putValue(SHORT_DESCRIPTION, "Align selected neurons vertically");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.alignVertical();
     }
+
 }

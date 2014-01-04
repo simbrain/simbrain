@@ -28,7 +28,6 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -74,6 +73,24 @@ public final class SynapseNode extends ScreenElement {
 
     /** Used to approximate zero to prevent divide-by-zero errors. */
     private static final double ZERO_PROXY = .001;
+
+    /** Color of "excitatory" synapses, with positive values. */
+    private static Color excitatoryColor = Color.red;
+
+    /** Color of "inhibitory" synapses, with negative values. */
+    private static Color inhibitoryColor = Color.blue;
+
+    /** Color of "zero" weights. */
+    private static Color zeroWeightColor = Color.gray;
+
+    /** Maximum diameter of the circle representing the synapse. */
+    private static int maxDiameter = 20;
+
+    /** Minimum diameter of the circle representing the synapse. */
+    private static int minDiameter = 7;
+
+    /** Color of lines in synapse representation. */
+    private static Color lineColor = Color.black;
 
     /**
      * Default constructor.
@@ -192,19 +209,19 @@ public final class SynapseNode extends ScreenElement {
     public void updateColor() {
 
         if (synapse.getStrength() < 0) {
-            circle.setPaint(NetworkGuiSettings.getInhibitoryColor());
+            circle.setPaint(inhibitoryColor);
         } else if (synapse.getStrength() == 0) {
-            circle.setPaint(NetworkGuiSettings.getZeroWeightColor());
+            circle.setPaint(zeroWeightColor);
         } else {
-            circle.setPaint(NetworkGuiSettings.getExcitatoryColor());
+            circle.setPaint(excitatoryColor);
         }
 
         if (source.getNeuron().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             if (((SpikingNeuronUpdateRule) source.getNeuron().getUpdateRule())
                     .hasSpiked()) {
-                line.setStrokePaint(NetworkGuiSettings.getSpikingColor());
+                line.setStrokePaint(NeuronNode.getSpikingColor());
             } else {
-                line.setStrokePaint(NetworkGuiSettings.getLineColor());
+                line.setStrokePaint(lineColor);
             }
         }
     }
@@ -240,15 +257,12 @@ public final class SynapseNode extends ScreenElement {
         }
 
         if (synapse.getStrength() == 0) {
-            diameter = NetworkGuiSettings.getMinDiameter();
+            diameter = minDiameter;
         } else if (synapse.getStrength() > 0) {
-            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings
-                    .getMinDiameter()) * (strength / upperBound) + NetworkGuiSettings
-                    .getMinDiameter()));
+            diameter = ((maxDiameter - minDiameter) * (strength / upperBound) + minDiameter);
         } else {
-            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings
-                    .getMinDiameter()) * (Math.abs(strength / lowerBound))) + NetworkGuiSettings
-                    .getMinDiameter());
+            diameter = (((maxDiameter - minDiameter) * (Math.abs(strength
+                    / lowerBound))) + minDiameter);
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;
@@ -424,7 +438,7 @@ public final class SynapseNode extends ScreenElement {
 
     /** @see ScreenElement */
     public void resetColors() {
-        line.setStrokePaint(NetworkGuiSettings.getLineColor());
+        line.setStrokePaint(lineColor);
         updateColor();
         updateDiameter();
     }
@@ -434,6 +448,90 @@ public final class SynapseNode extends ScreenElement {
      */
     public Line2D.Double getLine() {
         return publicLine;
+    }
+
+    /**
+     * @return the excitatoryColor
+     */
+    public static Color getExcitatoryColor() {
+        return excitatoryColor;
+    }
+
+    /**
+     * @param excitatoryColor the excitatoryColor to set
+     */
+    public static void setExcitatoryColor(Color excitatoryColor) {
+        SynapseNode.excitatoryColor = excitatoryColor;
+    }
+
+    /**
+     * @return the inhibitoryColor
+     */
+    public static Color getInhibitoryColor() {
+        return inhibitoryColor;
+    }
+
+    /**
+     * @param inhibitoryColor the inhibitoryColor to set
+     */
+    public static void setInhibitoryColor(Color inhibitoryColor) {
+        SynapseNode.inhibitoryColor = inhibitoryColor;
+    }
+
+    /**
+     * @return the zeroWeightColor
+     */
+    public static Color getZeroWeightColor() {
+        return zeroWeightColor;
+    }
+
+    /**
+     * @param zeroWeightColor the zeroWeightColor to set
+     */
+    public static void setZeroWeightColor(Color zeroWeightColor) {
+        SynapseNode.zeroWeightColor = zeroWeightColor;
+    }
+
+    /**
+     * @return the maxDiameter
+     */
+    public static int getMaxDiameter() {
+        return maxDiameter;
+    }
+
+    /**
+     * @param maxDiameter the maxDiameter to set
+     */
+    public static void setMaxDiameter(int maxDiameter) {
+        SynapseNode.maxDiameter = maxDiameter;
+    }
+
+    /**
+     * @return the minDiameter
+     */
+    public static int getMinDiameter() {
+        return minDiameter;
+    }
+
+    /**
+     * @param minDiameter the minDiameter to set
+     */
+    public static void setMinDiameter(int minDiameter) {
+        SynapseNode.minDiameter = minDiameter;
+    }
+
+    /**
+     * @return the lineColor
+     */
+    public static Color getLineColor() {
+        return lineColor;
+    }
+
+    /**
+     * @param lineColor the lineColor to set
+     */
+    public static void setLineColor(Color lineColor) {
+        SynapseNode.lineColor = lineColor;
     }
 
     // public void paint(PPaintContext aPaintContext) {

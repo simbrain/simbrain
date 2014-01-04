@@ -35,7 +35,7 @@ import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.gui.NetworkGuiSettings;
+import org.simbrain.network.gui.NetworkActionManager;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -58,8 +58,6 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class NeuronNode extends ScreenElement implements PropertyChangeListener {
 
     private static final Logger LOGGER = Logger.getLogger(NeuronNode.class);
-
-    private static final long serialVersionUID = 1L;
 
     /** The logical neuron this screen element represents. */
     protected Neuron neuron;
@@ -109,6 +107,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Whether the node is currently moving or not. */
     private boolean isMoving = false;
 
+    /** Conveinence reference to parent action manager. */
+    private NetworkActionManager actionManager;
+
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
@@ -127,6 +128,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Neuron font very small. */
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial",
             Font.PLAIN, 7);
+
+    /** Color of "active" neurons, with positive values. */
+    private static float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
+
+    /** Color of "inhibited" neurons, with negative values. */
+    private static float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
+
+    /** Color of "spiking" synapse. */
+    private static Color spikingColor = Color.yellow;
 
     /**
      * Create a new neuron node.
@@ -192,6 +202,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         setBounds(bounds);
 
         updateTextLabel();
+
+        actionManager = getNetworkPanel().getActionManager();
     }
 
     /**
@@ -302,70 +314,35 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
-
-        // Cut, copy, paste, delete
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
-
-        // Add Connection Actions
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getClearSourceNeuronsAction());
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getSetSourceNeuronsAction());
+        contextMenu.add(actionManager.getClearSourceNeuronsAction());
+        contextMenu.add(actionManager.getSetSourceNeuronsAction());
+        contextMenu.add(actionManager.getConnectionMenu());
         contextMenu.addSeparator();
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getConnectionMenu());
+        contextMenu.add(actionManager.getLayoutMenu());
+        contextMenu.add(actionManager.getGroupMenu());
         contextMenu.addSeparator();
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getShowQuickConnectDialogAction());
-        contextMenu.addSeparator();
-
-        // Layout actions
-        contextMenu.add(getNetworkPanel().getActionManager().getLayoutMenu());
-        contextMenu.addSeparator();
-
-        // Group action
-        // contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        // contextMenu.addSeparator();
-
-        // Model Group Actions
-        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
-        contextMenu.addSeparator();
-
         // Add align and space menus if objects are selected
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            contextMenu.add(getNetworkPanel().createAlignMenu());
-            contextMenu.add(getNetworkPanel().createSpacingMenu());
+            contextMenu.add(this.getNetworkPanel().createAlignMenu());
+            contextMenu.add(this.getNetworkPanel().createSpacingMenu());
             contextMenu.addSeparator();
         }
-
-        // Test input action
-        contextMenu.add(new TestInputAction(getNetworkPanel()));
-        contextMenu.addSeparator();
-
-        // Add property set item
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
         contextMenu.addSeparator();
-
-        // Show weight trainer and matrix action
-        // contextMenu.add(getNetworkPanel().getActionManager()
-        // .getShowTrainerAction());
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getShowWeightMatrixAction());
-        contextMenu.add(getNetworkPanel().getActionManager()
-                .getShowAdjustConnectivityDialog());
-        contextMenu.addSeparator();
-
-        // Selection options
         JMenu nodeSelectionMenu = new JMenu("Select");
-        nodeSelectionMenu.add(getNetworkPanel().getActionManager()
+        nodeSelectionMenu.add(actionManager
                 .getSelectIncomingWeightsAction());
-        nodeSelectionMenu.add(getNetworkPanel().getActionManager()
+        nodeSelectionMenu.add(actionManager
                 .getSelectOutgoingWeightsAction());
         contextMenu.add(nodeSelectionMenu);
+        contextMenu.addSeparator();
+        contextMenu.add(actionManager.getTestInputAction());
+        contextMenu.add(actionManager.getShowWeightMatrixAction());
         return contextMenu;
     }
 
@@ -425,22 +402,20 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
             float saturation = checkValid((float) Math.abs(activation
                     / neuron.getUpdateRule().getCeiling()));
-            float hotColor = NetworkGuiSettings.getHotColor();
             circle.setPaint(Color.getHSBColor(hotColor, saturation, 1));
         } else if (activation < 0) {
 
             float saturation = checkValid((float) Math.abs(activation
                     / neuron.getUpdateRule().getFloor()));
-            float coolColor = NetworkGuiSettings.getCoolColor();
             circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
         if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             if (((SpikingNeuronUpdateRule) neuron.getUpdateRule()).hasSpiked()) {
-                circle.setStrokePaint(NetworkGuiSettings.getSpikingColor());
+               circle.setStrokePaint(spikingColor);
                 // outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
-                circle.setStrokePaint(NetworkGuiSettings.getLineColor());
+                circle.setStrokePaint(SynapseNode.getLineColor());
                 // outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
         }
@@ -837,8 +812,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     public void resetColors() {
-        circle.setStrokePaint(NetworkGuiSettings.getLineColor());
-        labelBackground.setPaint(NetworkGuiSettings.getBackgroundColor());
+        circle.setStrokePaint(SynapseNode.getLineColor());
+        labelBackground.setPaint(NetworkPanel.getBackgroundColor());
         // inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         // outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         updateColor();
@@ -865,5 +840,47 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             SynapseNode synapseNode = (SynapseNode) i.next();
             synapseNode.setGrouped(isGrouped);
         }
+    }
+
+    /**
+     * @return the hotColor
+     */
+    public static float getHotColor() {
+        return hotColor;
+    }
+
+    /**
+     * @param hotColor the hotColor to set
+     */
+    public static void setHotColor(float hotColor) {
+        NeuronNode.hotColor = hotColor;
+    }
+
+    /**
+     * @return the coolColor
+     */
+    public static float getCoolColor() {
+        return coolColor;
+    }
+
+    /**
+     * @param coolColor the coolColor to set
+     */
+    public static void setCoolColor(float coolColor) {
+        NeuronNode.coolColor = coolColor;
+    }
+
+    /**
+     * @return the spikingColor
+     */
+    public static Color getSpikingColor() {
+        return spikingColor;
+    }
+
+    /**
+     * @param spikingColor the spikingColor to set
+     */
+    public static void setSpikingColor(Color spikingColor) {
+        NeuronNode.spikingColor = spikingColor;
     }
 }

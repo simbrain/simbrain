@@ -38,7 +38,7 @@ public final class AddGroupAction extends AbstractAction {
     private Class<? extends StandardDialog> dialogClass;
 
     /**
-     * Create a new set synapse properties action with the specified network
+     * Create a new add group properties action with the specified network
      * panel.
      *
      * @param networkPanel networkPanel, must not be null
@@ -55,6 +55,9 @@ public final class AddGroupAction extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+
+        putValue(SHORT_DESCRIPTION, "Add " + name
+                + " group to network");
 
     }
 

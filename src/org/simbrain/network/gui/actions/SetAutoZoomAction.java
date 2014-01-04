@@ -45,6 +45,8 @@ public final class SetAutoZoomAction extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        putValue(SHORT_DESCRIPTION,
+                "If autozoom is turned on the network will always set zoom so that all network items are visible");
 
         this.networkPanel = networkPanel;
 

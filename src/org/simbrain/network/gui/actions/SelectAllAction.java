@@ -50,7 +50,8 @@ public final class SelectAllAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
+        putValue(SHORT_DESCRIPTION, "Select all network items");
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('a'), this);

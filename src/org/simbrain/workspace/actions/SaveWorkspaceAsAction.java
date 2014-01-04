@@ -36,7 +36,7 @@ public final class SaveWorkspaceAsAction extends DesktopAction {
      * Create a save workspace as action with the specified workspace.
      */
     public SaveWorkspaceAsAction(SimbrainDesktop desktop) {
-        super("Save Workspace As", desktop);
+        super("Save Workspace As...", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
     }
 

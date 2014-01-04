@@ -15,8 +15,6 @@ package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.layouts.Layout;
@@ -24,16 +22,10 @@ import org.simbrain.network.layouts.Layout;
 /**
  * Show layout dialog action.
  */
-public class ShowLayoutDialogAction extends AbstractAction {
-
-    /** Serial UID. */
-    private static final long serialVersionUID = -3355422356278099294L;
+public class ShowLayoutDialogAction extends ConditionallyEnabledAction {
 
     /** The layout. */
     private Layout layout;
-
-    /** Parent network Panel. */
-    private NetworkPanel networkPanel;
 
     /**
      * Show layout dialog action.
@@ -42,9 +34,10 @@ public class ShowLayoutDialogAction extends AbstractAction {
      * @param networkPanel parent panel
      */
     public ShowLayoutDialogAction(Layout layout, NetworkPanel networkPanel) {
-        super(layout.getDescription());
+        super(networkPanel, layout.getDescription(), EnablingCondition.NEURONS);
         this.layout = layout;
-        this.networkPanel = networkPanel;
+        putValue(SHORT_DESCRIPTION, "Apply the " + layout.getDescription()
+                + " layout to selected neurons");
     }
 
     /** @see ActionEvent. */

@@ -95,13 +95,19 @@ public class Neuron {
      * An auxiliary value associated with a neuron. Getting and setting these
      * values can be useful in scripts.
      */
-    private double auxValue;
+    private long auxValue;
 
     // Temporary properties and init for backwards compatibility and
     // workspace conversion. Also see postunmarshallinit
     // TODO: Remove these before 3.0 release
     private double increment = .1;
 
+    /** 
+     * A flag for whether or not the neuron rule update step of the neuron's
+     * update cycle should be skipped. 
+     */
+    private boolean tempIgnoreUpdateFlag = false;
+    
     /**
      * Construct a specific type of neuron from a string description.
      *
@@ -236,8 +242,10 @@ public class Neuron {
      * @param act Activation
      */
     public void setActivation(final double act) {
-        if (isClamped()) {
-            setBuffer(act);
+        if (isClamped() || isTempIgnoreUpdateFlag()) {
+            if (isTempIgnoreUpdateFlag()) {
+                setTempIgnoreUpdateFlag(false);
+            }
             return;
         }
         activation = act;
@@ -252,6 +260,7 @@ public class Neuron {
      * @param act the new activation value
      */
     public void forceSetActivation(final double act) {
+        setTempIgnoreUpdateFlag(true);
         activation = act;
     }
 
@@ -808,15 +817,33 @@ public class Neuron {
     /**
      * @return the auxValue
      */
-    public double getAuxValue() {
+    public long getAuxValue() {
         return auxValue;
     }
 
     /**
      * @param auxValue the auxValue to set
      */
-    public void setAuxValue(double auxValue) {
+    public void setAuxValue(long auxValue) {
         this.auxValue = auxValue;
+    }
+
+    /**
+     * Is the neuron update rule's update going to be ignored during
+     * the neuron's update rule cycle?
+     * @return temporarily ignore update?
+     */
+    public boolean isTempIgnoreUpdateFlag() {
+        return tempIgnoreUpdateFlag;
+    }
+
+    /**
+     * Set whether or not the neuron update rule's update part of this 
+     * neuron's update cycle should be ignored.
+     * @param tempIgnoreUpdateFlag
+     */
+    public void setTempIgnoreUpdateFlag(boolean tempIgnoreUpdateFlag) {
+        this.tempIgnoreUpdateFlag = tempIgnoreUpdateFlag;
     }
 
 }

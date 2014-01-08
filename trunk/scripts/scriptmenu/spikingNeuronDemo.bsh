@@ -17,7 +17,8 @@ import org.simbrain.plot.timeseries.*;
     network.setTimeStep(.2);
 
     // Input neuron
-    Neuron inputNeuron = new Neuron(network, new ClampedNeuronRule());
+    Neuron inputNeuron = new Neuron(network, new LinearRule());
+    inputNeuron.setClamped(true);
     inputNeuron.setLocation(10,10);
     inputNeuron.setActivation(15);
     inputNeuron.setUpperBound(50);

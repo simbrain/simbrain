@@ -814,6 +814,15 @@ public class Neuron {
     }
 
     /**
+     * Convenience method to set increment on the neuron's update rule.
+     *
+     * @param increment increment to set
+     */
+    public void setIncrement(final double increment) {
+        updateRule.setIncrement(increment);
+    }
+
+    /**
      * @return the auxValue
      */
     public double getAuxValue() {

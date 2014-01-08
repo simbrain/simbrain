@@ -11,8 +11,8 @@ import org.simbrain.workspace.*;
 	// Parameters 
 	int NUM_NEURONS = 100;
 	double GRID_SPACE = 50;
-	double SPARSITY = .05; // Percent of possible connections to make
-	double PERCENT_EXCITATORY = 70;
+	double SPARSITY = .1; // Percent of possible connections to make
+	double PERCENT_EXCITATORY = 20;
 
 	// Build Network
 	NetworkComponent networkComponent = new NetworkComponent("Integrate and Fire Network");
@@ -23,6 +23,8 @@ import org.simbrain.workspace.*;
 	for (int i = 0; i < NUM_NEURONS; i++) {
 	    Neuron neuron = new Neuron(network, "IntegrateAndFireRule");
 	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setTimeConstant(.1);
+	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setResetPotential(2);
+	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setThreshold(11);
 	    network.addNeuron(neuron);
 	}
 	layout.layoutNeurons(network.getNeuronList());

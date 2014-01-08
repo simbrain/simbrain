@@ -97,7 +97,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         addConsumerType(new AttributeType(this, "Synapse", "setStrength",
                 double.class, false));
         addConsumerType(new AttributeType(this, "NeuronGroup",
-                "setActivations", double[].class, true));
+                "setInputValues", double[].class, true));
         addConsumerType(new AttributeType(this, "SynapseGroup",
                 "setWeightVector", double[].class, false));
 
@@ -196,7 +196,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                     if (group instanceof NeuronGroup) {
                         PotentialConsumer consumer = getAttributeManager()
                                 .createPotentialConsumer(group,
-                                        "setActivations", double[].class);
+                                        "setInputValues", double[].class);
                         consumer.setCustomDescription("Neuron Group: "
                                 + group.getLabel());
                         returnList.add(consumer);

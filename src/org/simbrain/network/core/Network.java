@@ -657,7 +657,9 @@ public class Network {
      * Set the activation level of all neurons to zero.
      */
     public void clearActivations() {
-        setActivations(0);
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.clear();
+        }
     }
 
     /**

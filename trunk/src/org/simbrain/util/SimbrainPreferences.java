@@ -63,6 +63,8 @@ public class SimbrainPreferences {
                 + FS + "worlds");
         DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations"
                 + FS + "tables");
+        DEFAULT_MAP.put("workspaceScriptDirectory", "." + FS + "scripts"
+                + FS + "scriptMenu");
         DEFAULT_MAP.put("networkBackgroundColor", Color.WHITE.getRGB());
         DEFAULT_MAP.put("networkLineColor", Color.BLACK.getRGB());
         DEFAULT_MAP.put("networkHotNodeColor",

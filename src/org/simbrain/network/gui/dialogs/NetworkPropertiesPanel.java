@@ -110,17 +110,11 @@ public class NetworkPropertiesPanel extends JPanel {
     private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5,
             50, 10);
 
-    /** Precision text field. */
-    private JTextField precisionField = new JTextField();
-
     /**
      * Threshold above which subnetworks or groups with that many synapses stop
      * displaying them.
      */
     private JTextField tfSynapseVisibilityThreshold = new JTextField();
-
-    /** Rounding check box. */
-    private JCheckBox isRoundingBox = new JCheckBox();
 
     /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
@@ -180,13 +174,9 @@ public class NetworkPropertiesPanel extends JPanel {
 
         // Other properties
         LabelledItemPanel miscPanel = new LabelledItemPanel();
-        updatePrecisionField();
-        precisionField.setColumns(3);
         nudgeAmountField.setColumns(3);
         miscPanel.addItem("Synapse visibility threshold",
                 tfSynapseVisibilityThreshold);
-        miscPanel.addItem("Round off neuron values", isRoundingBox);
-        miscPanel.addItem("Precision of round-off", precisionField);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
         miscPanel.addItem("Wand radius", wandRadiusField);
         // TODO: tooltips for all this
@@ -195,18 +185,6 @@ public class NetworkPropertiesPanel extends JPanel {
         // Add the main panel
         add(mainVertical);
 
-    }
-
-    /**
-     * Enable or disable the precision field depending on state of rounding
-     * button.
-     */
-    private void updatePrecisionField() {
-        if (!isRoundingBox.isSelected()) {
-            precisionField.setEnabled(false);
-        } else {
-            precisionField.setEnabled(true);
-        }
     }
 
     /**
@@ -219,12 +197,6 @@ public class NetworkPropertiesPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateColors();
-            }
-        });
-        isRoundingBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updatePrecisionField();
             }
         });
         weightSizeMaxSlider.addChangeListener(new ChangeListener() {
@@ -304,15 +276,12 @@ public class NetworkPropertiesPanel extends JPanel {
         weightSizeMaxSlider.setValue(SynapseNode.getMaxDiameter());
         weightSizeMinSlider.setValue(SynapseNode.getMinDiameter());
         showTimeBox.setSelected(networkPanel.getShowTime());
-        precisionField.setText(Integer.toString(networkPanel.getNetwork()
-                .getPrecision()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(networkPanel
                 .getNetwork().getSynapseVisibilityThreshold()));
         wandRadiusField.setText(Integer.toString(EditMode
                 .getWandRadius()));
         nudgeAmountField.setText(Double.toString(NetworkPanel
                 .getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
     }
 
     /**
@@ -322,8 +291,6 @@ public class NetworkPropertiesPanel extends JPanel {
     public void commitChanges() {
         NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
-        networkPanel.getNetwork().setPrecision(
-                Integer.parseInt(precisionField.getText()));
         networkPanel.getNetwork().setSynapseVisibilityThreshold(
                 Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(
@@ -333,7 +300,6 @@ public class NetworkPropertiesPanel extends JPanel {
             networkPanel.updateCursor();
         }
         networkPanel.setShowTime(showTimeBox.isSelected());
-        networkPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
         networkPanel.repaint();
     }
 

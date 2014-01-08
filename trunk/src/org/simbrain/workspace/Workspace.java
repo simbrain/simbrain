@@ -46,7 +46,7 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
  * simulation (though at some point it will be possible to link multiple
  * workspaces on different machines together). A workspace can be visualized via
  * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
- * 
+ *
  * @see org.simbrain.workspace.Coupling
  */
 public class Workspace {
@@ -114,7 +114,7 @@ public class Workspace {
 
     /**
      * Adds a listener to the workspace.
-     * 
+     *
      * @param listener the Listener to add.
      */
     public void addListener(final WorkspaceListener listener) {
@@ -123,7 +123,7 @@ public class Workspace {
 
     /**
      * Removes the listener from the workspace.
-     * 
+     *
      * @param listener The listener to remove.
      */
     public void removeListener(final WorkspaceListener listener) {
@@ -150,7 +150,7 @@ public class Workspace {
 
     /**
      * Fire a component added event.
-     * 
+     *
      * @param component the component added
      */
     private void fireWorkspaceComponentAdded(WorkspaceComponent component) {
@@ -161,7 +161,7 @@ public class Workspace {
 
     /**
      * Fire a component removed event.
-     * 
+     *
      * @param component the component added
      */
     private void fireWorkspaceComponentRemoved(WorkspaceComponent component) {
@@ -172,7 +172,7 @@ public class Workspace {
 
     /**
      * Couple each source attribute to all target attributes.
-     * 
+     *
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target consuming attributes
      */
@@ -196,7 +196,7 @@ public class Workspace {
     /**
      * Couple each source attribute to one target attribute, as long as there
      * are target attributes to couple to.
-     * 
+     *
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target consuming attributes
      */
@@ -223,7 +223,7 @@ public class Workspace {
 
     /**
      * Adds a workspace component to the workspace.
-     * 
+     *
      * @param component The component to add.
      */
     public void addWorkspaceComponent(final WorkspaceComponent component) {
@@ -235,7 +235,7 @@ public class Workspace {
 
         /*
          * Handle component naming.
-         * 
+         *
          * If the component has not yet been named, name as follows: (ClassName
          * - "Component") + index where index iterates as new components are
          * added. e.g. Network 1, Network 2, etc.
@@ -257,7 +257,7 @@ public class Workspace {
 
     /**
      * Remove the specified component.
-     * 
+     *
      * @param component The component to remove.
      */
     public void removeWorkspaceComponent(final WorkspaceComponent component) {
@@ -293,7 +293,7 @@ public class Workspace {
 
     /**
      * Iterate for a specified number of steps.
-     * 
+     *
      * @param numIterations number of times to iterate the workspace.
      */
     public void iterate(final int numIterations) {
@@ -305,10 +305,10 @@ public class Workspace {
      * Iterated for a specified number of iterations using a latch. Used in
      * scripts when making a series of events occur, e.g. set some neurons, run
      * for 50 iterations, set some other neurons, run 20 iterations, etc.
-     * 
+     *
      * The latch must be initialized with a count of 1 and must be run from a
      * separate thread. For example:
-     * 
+     *
      * <pre>
      * {@code
      *  Executors.newSingleThreadExecutor().execute(new Runnable() {
@@ -333,7 +333,7 @@ public class Workspace {
      *            });
      * }
      * </pre>
-     * 
+     *
      * @param latch the latch to wait on
      * @param numIterations the number of iteration to run while waiting on the
      *            latch
@@ -349,10 +349,10 @@ public class Workspace {
      * Iterate using a latch, which is counted down after the iteration
      * completes. Use this in applications where it is important to perform
      * additional operations after each workspace update.
-     * 
+     *
      * NOTE-1: The latch must be initialized with a count of 1. NOTE-2: This
      * function should be called from a separate thread.
-     * 
+     *
      * @param latch the latch to count down after successful iteration.
      */
     public void iterate(CountDownLatch latch) {
@@ -412,7 +412,7 @@ public class Workspace {
 
     /**
      * Check whether there have been changes in the workspace or its components.
-     * 
+     *
      * @return true if changes exist, false otherwise
      */
     public boolean changesExist() {
@@ -435,7 +435,7 @@ public class Workspace {
 
     /**
      * Sets whether the workspace has been changed.
-     * 
+     *
      * @param workspaceChanged Has workspace been changed value
      */
     public void setWorkspaceChanged(final boolean workspaceChanged) {
@@ -487,7 +487,7 @@ public class Workspace {
 
     /**
      * Get a component using its name id. Used in terminal mode.
-     * 
+     *
      * @param id name of component
      * @return Workspace Component
      */
@@ -504,7 +504,7 @@ public class Workspace {
 
     /**
      * Returns the coupling associated with a string id.
-     * 
+     *
      * @param id the string id
      * @return the associated coupling
      */
@@ -522,7 +522,7 @@ public class Workspace {
 
     /**
      * Set the task synchronization manager.
-     * 
+     *
      * @param manager
      */
     public void setTaskSynchronizationManager(
@@ -533,7 +533,7 @@ public class Workspace {
     /**
      * Synchronizes on all components and executes task, returning the result of
      * that callable.
-     * 
+     *
      * @param <E> The return type of task.
      * @param task The task to synchronize.
      * @return The result of task.
@@ -580,7 +580,7 @@ public class Workspace {
     /**
      * Recursively synchronizes on the components in the provided iterator and
      * executes the provided task if there are no more components.
-     * 
+     *
      * @param <E> The return type of task.
      * @param iterator The iterator of the remaining components to synchronize
      *            on.
@@ -601,7 +601,7 @@ public class Workspace {
 
     /**
      * Returns the coupling manager for this workspace.
-     * 
+     *
      * @return The coupling manager for this workspace.
      */
     public CouplingManager getCouplingManager() {
@@ -626,7 +626,7 @@ public class Workspace {
 
     /**
      * Adds a coupling to the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
@@ -639,7 +639,7 @@ public class Workspace {
 
     /**
      * Removes a coupling from the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {
@@ -649,7 +649,7 @@ public class Workspace {
     /**
      * Returns all components of the specified type, e.g. all
      * WorkspaceComponents of type NetworkComponent.class.
-     * 
+     *
      * @param componentType the type of the component, in the sense of its class
      * @return list of components
      */
@@ -666,7 +666,7 @@ public class Workspace {
 
     /**
      * Returns global time.
-     * 
+     *
      * @return the time
      */
     public int getTime() {
@@ -693,7 +693,7 @@ public class Workspace {
 
     /**
      * Returns a reference to the workspace updater.
-     * 
+     *
      * @return reference to workspace updater.
      */
     public WorkspaceUpdater getUpdater() {
@@ -734,7 +734,7 @@ public class Workspace {
 
     /**
      * Open a workspace from a file.
-     * 
+     *
      * @param file the file to try to open
      */
     public void openWorkspace(final File theFile) {
@@ -753,12 +753,13 @@ public class Workspace {
     }
 
     /**
-     * Convenience method for setting an update action. Removes all current
-     * actions.
-     * 
+     * Convenience method for adding an update action to the workspace's action
+     * list (the sequence of actions invoked on each iteration of the
+     * workspace).
+     *
      * @param action new action
      */
-    public void setUpdateAction(UpdateAction action) {
+    public void addUpdateAction(UpdateAction action) {
         updater.getUpdateManager().addAction(action);
     }
 

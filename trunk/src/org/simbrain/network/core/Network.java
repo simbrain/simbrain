@@ -104,18 +104,17 @@ public class Network {
     private int synapseVisibilityThreshold = 200;
 
     /**
-     * Two types of time used in simulations. DISCRETE: Network update
-     * iterations are time-steps CONTINUOUS: Simulation of real time. Each
-     * updates advances time by length {@link timeStep}
+     * Two types of time used in simulations.
      */
     public enum TimeType {
         /**
-         *
+         * Network update iterations are time-steps.
          */
         DISCRETE,
 
         /**
-         *
+         * Simulation of real time. Each updates advances time by length
+         * {@link timeStep}.
          */
         CONTINUOUS;
     }
@@ -1604,12 +1603,12 @@ public class Network {
     }
 
     /**
-     * Convenience method for setting an update action. Moves all current
-     * actions to available list.
+     * Add an update action to the network' action list (the sequence of actions
+     * invoked on each iteration of the network).
      *
      * @param action new action
      */
-    public void setUpdateAction(NetworkUpdateAction action) {
+    public void addUpdateAction(NetworkUpdateAction action) {
         updateManager.addAction(action);
     }
 

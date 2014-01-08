@@ -29,7 +29,7 @@ import bsh.Interpreter;
 import bsh.util.JConsole;
 
 /**
- * Component corresponding to a beanshell window.
+ * Desktop graphical component displaying a beanshell interpreter.
  */
 public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
 
@@ -85,7 +85,6 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
         interpreter.getOut();
         interpreter.getErr();
         try {
-            String FS = System.getProperty("file.separator");
             interpreter.set("workspace", workspace);
             interpreter.set("bsh.prompt", ">");
             interpreter.eval("addClassPath(\"scripts/console\");");
@@ -97,11 +96,11 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
+        // No implementation
     }
 
     @Override
     protected void update() {
-        // TODO Auto-generated method stub
+        //  No implementation
     }
 }

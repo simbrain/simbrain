@@ -47,10 +47,11 @@ import org.simbrain.util.genericframe.GenericJDialog;
  * <P>
  * By default, the dialog is modal, and has a JPanel with a BorderLayout for its
  * content pane.
- * </p>
  *
  * @author David Fraser
  * @author Michael Harris
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
  */
 public class StandardDialog extends GenericJDialog {
 
@@ -107,24 +108,6 @@ public class StandardDialog extends GenericJDialog {
         super(parent, title);
 
         init();
-    }
-
-    /**
-     * Commit any changes made.
-     */
-    public void commit() {
-    }
-
-    /**
-     * Returns fields changed to current preferences.
-     */
-    public void returnToCurrentPrefs() {
-    }
-
-    /**
-     * Sets changed fields as current preferences.
-     */
-    public void setAsDefault() {
     }
 
     /**

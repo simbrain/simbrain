@@ -19,8 +19,6 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,7 +37,7 @@ import org.simbrain.workspace.Workspace;
  * <b>WorkspaceDialog</b> is a dialog box for setting the properties of the
  * Workspace.
  */
-public class WorkspaceDialog extends StandardDialog implements ActionListener {
+public class WorkspaceDialog extends StandardDialog  {
 
     /** Reference to workspace. **/
     private Workspace workspace;
@@ -47,13 +45,10 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** Update manager panel. */
-    private WorkspaceUpdateManagerPanel updatePanel;
-
     /**
      * This method is the default constructor.
      *
-     * @param np reference to <code>SimbrainDesktop</code>.
+     * @param workspace reference to parent workspace.
      */
     public WorkspaceDialog(final Workspace workspace) {
         this.workspace = workspace;
@@ -66,7 +61,6 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
     private void init() {
         // Initialize Dialog
         setTitle("Workspace Dialog");
-        fillFieldValues();
 
         // Set up tab panels
         setContentPane(tabbedPane);
@@ -106,36 +100,6 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
                 "Pages/Workspace/Preferences.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
-    }
-
-    @Override
-    protected void closeDialogOk() {
-        super.closeDialogOk();
-        this.commitChanges();
-        this.setAsDefault();
-    }
-
-    @Override
-    protected void closeDialogCancel() {
-        super.closeDialogCancel();
-        this.returnToCurrentPrefs();
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-    }
-
-    /**
-     * Commits changes not handled in action performed.
-     */
-    private void commitChanges() {
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
     }
 
 }

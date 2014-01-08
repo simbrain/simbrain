@@ -76,7 +76,7 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
     public JMenu getConsumerMenu() {
         if (component != null) {
             PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(getGroup(), "setActivations",
+                    .createPotentialConsumer(getGroup(), "setInputValues",
                             double[].class);
             consumer.setCustomDescription("Neuron Group: "
                     + getGroup().getLabel());

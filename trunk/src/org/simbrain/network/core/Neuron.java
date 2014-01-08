@@ -54,7 +54,10 @@ public class Neuron {
     /** Temporary activation value. */
     private double buffer;
 
-    /** Value of any external inputs to neuron. */
+    /**
+     * Value of any external inputs to neuron. See description at
+     * {@link #setInputValue(double)}
+     */
     private double inputValue;
 
     /** Reference to network this neuron is part of. */
@@ -95,19 +98,20 @@ public class Neuron {
      * An auxiliary value associated with a neuron. Getting and setting these
      * values can be useful in scripts.
      */
-    private long auxValue;
+    private double auxValue;
 
     // Temporary properties and init for backwards compatibility and
     // workspace conversion. Also see postunmarshallinit
     // TODO: Remove these before 3.0 release
     private double increment = .1;
 
-    /** 
-     * A flag for whether or not the neuron rule update step of the neuron's
-     * update cycle should be skipped. 
+    /**
+     * A flag for whether or not a neuron should be updated. Set to true by
+     * {@link #forceSetActivation} so that the neuron's update rule does not
+     * override the forced activation.
      */
     private boolean tempIgnoreUpdateFlag = false;
-    
+
     /**
      * Construct a specific type of neuron from a string description.
      *
@@ -236,14 +240,14 @@ public class Neuron {
      * Sets the activation of the neuron if it is not clamped. To unequivocally
      * set the activation use {@link #forceSetActivation(double)
      * forceSetActivation(double)}. Under normal circumstances model classes
-     * usually exclusively, and GUI classes should never use this method to set
-     * neuron activations.
+     * will use this method.
      *
      * @param act Activation
      */
     public void setActivation(final double act) {
         if (isClamped() || isTempIgnoreUpdateFlag()) {
             if (isTempIgnoreUpdateFlag()) {
+                // Reset the flag
                 setTempIgnoreUpdateFlag(false);
             }
             return;
@@ -253,9 +257,9 @@ public class Neuron {
 
     /**
      * Sets the activation of the neuron regardless of the state of the neuron.
-     * Under normal circumstances GUI classes should exclusively, and model
-     * classes usually shouldn't use this method to set neuron activations.
-     * Notable exceptions to this include copy constructors and randomizers.
+     * Overrides clamping and any intrinsic dynamics of the neuron, and forces
+     * the neuron's activation to take a specific value. Used primarily by the
+     * GUI (e.g. when externally setting the values of clamped input neurons).
      *
      * @param act the new activation value
      */
@@ -441,6 +445,10 @@ public class Neuron {
     }
 
     /**
+     * Set the input value of the neuron.  This is used in {@link #getWeightedInputs()} as an
+     * "external input" to the neuron.   When external components (like input tables) send
+     * activation to the network they should use this.
+     * 
      * @param inputValue The inputValue to set.
      */
     public void setInputValue(final double inputValue) {
@@ -817,32 +825,34 @@ public class Neuron {
     /**
      * @return the auxValue
      */
-    public long getAuxValue() {
+    public double getAuxValue() {
         return auxValue;
     }
 
     /**
      * @param auxValue the auxValue to set
      */
-    public void setAuxValue(long auxValue) {
+    public void setAuxValue(double auxValue) {
         this.auxValue = auxValue;
     }
 
     /**
      * Is the neuron update rule's update going to be ignored during
      * the neuron's update rule cycle?
-     * @return temporarily ignore update?
+     *
+     * @return status of flag
      */
-    public boolean isTempIgnoreUpdateFlag() {
+    private boolean isTempIgnoreUpdateFlag() {
         return tempIgnoreUpdateFlag;
     }
 
     /**
-     * Set whether or not the neuron update rule's update part of this 
+     * Set whether or not the neuron update rule's update part of this
      * neuron's update cycle should be ignored.
-     * @param tempIgnoreUpdateFlag
+     *
+     * @param tempIgnoreUpdateFlag the flag
      */
-    public void setTempIgnoreUpdateFlag(boolean tempIgnoreUpdateFlag) {
+    private void setTempIgnoreUpdateFlag(boolean tempIgnoreUpdateFlag) {
         this.tempIgnoreUpdateFlag = tempIgnoreUpdateFlag;
     }
 

@@ -187,4 +187,7 @@ import org.simbrain.util.*;
 	int y = internalFrame.getBounds().getY() + (panel_width/2) - (net_width/2);
 	desktop.getDesktopComponent(networkComponent).getParentFrame()
 		.setBounds(x, y, net_width, net_height);
+		
 }
+
+

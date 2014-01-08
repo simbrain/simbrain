@@ -17,6 +17,7 @@ import org.simbrain.world.odorworld.*;
 import org.simbrain.world.odorworld.sensors.*;
 import org.simbrain.world.odorworld.entities.*;
 import org.simbrain.util.*;
+import org.simbrain.util.math.*;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.plot.projection.*;
 
@@ -100,8 +101,8 @@ import org.simbrain.plot.projection.*;
     LineLayout layout = new LineLayout(-20,350,70, LineOrientation.HORIZONTAL);
     for (int i = 0; i < 5; i++) {
         Neuron neuron = new Neuron(network, "LinearRule");
-        ((LinearRule) neuron.getUpdateRule()).setFloor(0);
-        ((LinearRule) neuron.getUpdateRule()).setCeiling(100);
+        neuron.setLowerBound(0);
+        neuron.setUpperBound(100);
         network.addNeuron(neuron);
         sourceNeurons.add(neuron);
     }

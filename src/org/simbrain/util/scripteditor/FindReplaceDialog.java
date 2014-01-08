@@ -37,6 +37,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
+import org.fife.ui.rtextarea.SearchResult;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -180,9 +181,10 @@ public class FindReplaceDialog extends JPanel {
                 editor.setLastReplaceString(replaceField.getText());
                 SearchContext context = setUpContext();
                 if (context != null) {
-                    int replacements = SearchEngine.replaceAll(textArea,
+                    SearchResult replacements = SearchEngine.replaceAll(textArea,
                             context);
                     // TODO: Display number of replacements made in dialog
+                    // using replacements.getCount()
                 }
             }
         });
@@ -227,8 +229,8 @@ public class FindReplaceDialog extends JPanel {
      */
     private void find(SearchContext context) {
         if (context != null) {
-            boolean found = SearchEngine.find(textArea, context);
-            if (!found) {
+            SearchResult found = SearchEngine.find(textArea, context);
+            if (!found.wasFound()) {
                 if (wrapSearchCB.isSelected()) {
                     if (forwardSearch.isSelected()) {
                         textArea.setCaretPosition(0);

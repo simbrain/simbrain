@@ -128,10 +128,10 @@ public class SynapseAdjustmentPanel extends JPanel {
     private JPanel statsPanel = new JPanel();
 
     /** A random panel for randomizing the synapse strengths. */
-    private RandomPanelNetwork randomPanel = new RandomPanelNetwork(false);
+    private RandomPanelNetwork randomPanel = new RandomPanelNetwork();
 
     /** A random panel for randomizing perturbations to synapse strengths. */
-    private RandomPanelNetwork perturberPanel = new RandomPanelNetwork(false);
+    private RandomPanelNetwork perturberPanel = new RandomPanelNetwork();
 
     /**
      * Fills the fields of the random panels to default values.

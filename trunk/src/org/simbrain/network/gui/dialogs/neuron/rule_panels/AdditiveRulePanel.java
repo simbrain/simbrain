@@ -54,7 +54,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();

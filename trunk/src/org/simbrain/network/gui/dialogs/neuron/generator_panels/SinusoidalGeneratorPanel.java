@@ -52,7 +52,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Random panel. */
-    private RandomPanelNetwork randPanel = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randPanel = new RandomPanelNetwork();
 
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();

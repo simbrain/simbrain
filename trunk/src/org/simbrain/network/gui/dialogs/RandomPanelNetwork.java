@@ -38,11 +38,9 @@ public class RandomPanelNetwork extends RandomizerPanel implements
 
     /**
      * This method is the default constructor.
-     *
-     * @param useLocalBounds Should local bounds be used
      */
-    public RandomPanelNetwork(final boolean useLocalBounds) {
-        super(useLocalBounds);
+    public RandomPanelNetwork() {
+        super();
     }
 
     @Override

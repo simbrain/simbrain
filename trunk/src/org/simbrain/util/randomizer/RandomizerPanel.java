@@ -66,10 +66,8 @@ public class RandomizerPanel extends JPanel implements ActionListener {
 
     /**
      * This method is the default constructor.
-     *
-     * @param useLocalBounds Should local bounds be used
      */
-    public RandomizerPanel(final boolean useLocalBounds) {
+    public RandomizerPanel() {
 
         Box mainPanel = Box.createVerticalBox();
         cbDistribution.addActionListener(this);

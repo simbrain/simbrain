@@ -112,14 +112,6 @@
 		</javadoc>
 	</target>
 
-	<!--  Checkstyle. -->
-	<taskdef resource="checkstyletask.properties" classpath="${etc}/checkstyle-all-5.0.jar" />
-	<target name="checkstyle" description="Generates a report of code convention violations">
-		<checkstyle config="${etc}/checkstyle.xml">
-			<formatter type="xml" tofile="checkstyle_report.xml" />
-			<fileset dir="${src}" includes="**/*.java" />
-		</checkstyle>
-	</target>
 
 	<target name="console" depends="compile">
 		<java classname="org.simbrain.console.SimbrainConsole" fork="yes">

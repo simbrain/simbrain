@@ -25,6 +25,8 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.SimbrainScriptEditor;
@@ -33,13 +35,6 @@ import org.simbrain.workspace.gui.SimbrainScriptEditor;
  * Open a script editor.
  */
 public final class ScriptEditorAction extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
-
-    /** Script directory. */
-    private static final String SCRIPT_MENU_DIRECTORY = "."
-            + System.getProperty("file.separator") + "scripts"
-            + System.getProperty("file.separator") + "scriptmenu";
 
     /** Reference to Simbrain desktop. */
     private SimbrainDesktop desktop;
@@ -56,20 +51,31 @@ public final class ScriptEditorAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        String scriptDirectory = ".";
+        try {
+            scriptDirectory = SimbrainPreferences
+                    .getString("workspaceScriptDirectory");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY,
+        SFileChooser fileChooser = new SFileChooser(scriptDirectory,
                 "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();
+        if (scriptFile != null) {
+            SimbrainPreferences.putString("workspaceScriptDirectory",
+                    fileChooser.getCurrentLocation());
+            GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(
+                    desktop, scriptFile);
+            desktop.addInternalFrame(frame);
+            frame.setResizable(true);
+            frame.setClosable(true);
+            frame.setMaximizable(true);
+            frame.setIconifiable(true);
+            frame.setVisible(true);
+            frame.pack();
+        }
 
-        GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(
-                desktop, scriptFile);
-        desktop.addInternalFrame(frame);
-        frame.setResizable(true);
-        frame.setClosable(true);
-        frame.setMaximizable(true);
-        frame.setIconifiable(true);
-        frame.setVisible(true);
-        frame.pack();
     }
 
 }

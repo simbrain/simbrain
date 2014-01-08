@@ -24,10 +24,9 @@ import java.io.OutputStream;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Component corresponding to a beanshell window.
+ * Workspace component corresponding to a beanshell window.
  */
 public class ConsoleComponent extends WorkspaceComponent {
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
@@ -38,8 +37,7 @@ public class ConsoleComponent extends WorkspaceComponent {
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
-
+        // No implementation
     }
 
     /**
@@ -64,7 +62,6 @@ public class ConsoleComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
-
+        // No implementation
     }
 }

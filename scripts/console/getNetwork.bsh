@@ -1,8 +1,8 @@
 import org.simbrain.network.*;
-import org.simnet.interfaces.*;
+import org.simbrain.network.core.*;
 
-RootNetwork getNetwork(String in) {
+Network getNetwork(String in) {
 
-	return ((NetworkComponent) workspace.getComponent(in)).getRootNetwork();
+	return ((NetworkComponent) workspace.getComponent(in)).getNetwork();
 }
 

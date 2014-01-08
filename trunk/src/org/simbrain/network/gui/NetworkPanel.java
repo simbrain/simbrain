@@ -2087,7 +2087,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Nudge selected object.
+     * Nudge selected objects.
      *
      * @param offsetX amount to nudge in the x direction (multipled by
      *            nudgeAmount)
@@ -2095,14 +2095,11 @@ public class NetworkPanel extends JPanel {
      *            nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
-            NeuronNode node = (NeuronNode) i.next();
-//            node.getNeuron().setX(
-//                    node.getNeuron().getX()
-//                            + (offsetX * NetworkGuiSettings.getNudgeAmount()));
-//            node.getNeuron().setY(
-//                    node.getNeuron().getY()
-//                            + (offsetY * NetworkGuiSettings.getNudgeAmount()));
+        for (NeuronNode node : getSelectedNeurons()) {
+            node.getNeuron().setX(
+                    node.getNeuron().getX() + (offsetX * nudgeAmount));
+            node.getNeuron().setY(
+                    node.getNeuron().getY() + (offsetY * nudgeAmount));
         }
         repaint();
     }

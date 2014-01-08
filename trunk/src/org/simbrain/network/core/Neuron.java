@@ -383,15 +383,6 @@ public class Neuron {
     }
 
     /**
-     * Round the activation level of this neuron off to a specified precision.
-     *
-     * @param precision precision to round this neuron's activation off to
-     */
-    public void round(final int precision) {
-        forceSetActivation(Network.round(getActivation(), precision));
-    }
-
-    /**
      * Sends relevant information about the network to standard output.
      */
     public void debug() {
@@ -448,7 +439,7 @@ public class Neuron {
      * Set the input value of the neuron.  This is used in {@link #getWeightedInputs()} as an
      * "external input" to the neuron.   When external components (like input tables) send
      * activation to the network they should use this.
-     * 
+     *
      * @param inputValue The inputValue to set.
      */
     public void setInputValue(final double inputValue) {

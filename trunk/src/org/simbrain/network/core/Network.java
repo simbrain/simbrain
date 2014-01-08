@@ -173,12 +173,6 @@ public class Network {
     /** Group Id generator. */
     private SimpleId groupIdGenerator = new SimpleId("Group", 1);
 
-    /** Whether to round off neuron values. */
-    private boolean roundOffActivationValues = false;
-
-    /** Degree to which to round off values. */
-    private int precision = 0;
-
     /** Static initializer */
     {
         Properties properties = Utils.getSimbrainProperties();
@@ -555,15 +549,6 @@ public class Network {
     }
 
     /**
-     * Round activations off to integers; for testing.
-     */
-    public void roundAll() {
-        for (Neuron n : neuronList) {
-            n.round(precision);
-        }
-    }
-
-    /**
      * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete
@@ -771,66 +756,6 @@ public class Network {
         for (Neuron neuron : neuronList) {
             neuron.randomizeBias(lower, upper);
         }
-    }
-
-    /**
-     * Round a value off to indicated number of decimal places.
-     *
-     * @param value value to round off
-     * @param decimalPlace degree of precision
-     *
-     * @return rounded number
-     */
-    public static double round(final double value, final int decimalPlace) {
-        return new BigDecimal(value).setScale(decimalPlace,
-                BigDecimal.ROUND_HALF_UP).doubleValue();
-    }
-
-    /**
-     * @return Degree to which to round off values.
-     */
-    public int getPrecision() {
-        return precision;
-    }
-
-    /**
-     * @return Whether to round off neuron values.
-     */
-    public boolean getRoundingOff() {
-        return roundOffActivationValues;
-    }
-
-    /**
-     * Sets the degree to which to round off values.
-     *
-     * @param i Degeree to round off values
-     */
-    public void setPrecision(final int i) {
-        precision = i;
-    }
-
-    /**
-     * Whether to round off neuron values.
-     *
-     * @param b Round off
-     */
-    public void setRoundingOff(final boolean b) {
-        roundOffActivationValues = b;
-    }
-
-    /**
-     * @return Returns the roundOffActivationValues.
-     */
-    public boolean isRoundOffActivationValues() {
-        return roundOffActivationValues;
-    }
-
-    /**
-     * @param roundOffActivationValues The roundOffActivationValues to set.
-     */
-    public void setRoundOffActivationValues(
-            final boolean roundOffActivationValues) {
-        this.roundOffActivationValues = roundOffActivationValues;
     }
 
     /**
@@ -1075,6 +1000,8 @@ public class Network {
         xstream.omitField(Network.class, "textListeners");
         xstream.omitField(Network.class, "updateCompleted");
         xstream.omitField(Network.class, "networkThread");
+        xstream.omitField(Network.class, "roundOffActivationValues");
+        xstream.omitField(Network.class, "precision");
         xstream.omitField(Network.class, "logger");
 
         xstream.omitField(Group.class, "deleteWhenEmpty");
@@ -1181,8 +1108,8 @@ public class Network {
         if (timeType == TimeType.DISCRETE) {
             return "" + (int) time + " " + getUnits()[1];
         } else {
-            return "" + round(time, getTimeStepPrecision()) + " "
-                    + getUnits()[0];
+            return "" + BigDecimal.valueOf((long) time, getTimeStepPrecision())
+                    + " " + getUnits()[0];
         }
     }
 

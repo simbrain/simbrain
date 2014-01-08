@@ -54,7 +54,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
     private JTextField tfRest = new JTextField();
 
     /** Random panel. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();

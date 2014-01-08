@@ -47,7 +47,7 @@ public class ReservoirUtilsPanel extends JPanel {
     private Randomizer randomSource;
 
     /** A panel for setting random values. */
-    private RandomPanelNetwork randomPanel = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randomPanel = new RandomPanelNetwork();
 
     /** Enables noise. */
     private JButton enableNoise = new JButton();

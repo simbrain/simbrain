@@ -63,7 +63,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
     private JTextField tfRestingPotential = new JTextField();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();

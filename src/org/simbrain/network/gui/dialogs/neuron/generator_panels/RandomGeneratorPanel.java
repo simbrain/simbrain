@@ -32,7 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 public class RandomGeneratorPanel extends AbstractNeuronPanel {
 
     /** Random pane. */
-    private RandomPanelNetwork rp = new RandomPanelNetwork(false);
+    private RandomPanelNetwork rp = new RandomPanelNetwork();
 
     /**
      * Creates an instance of this panel.

@@ -99,12 +99,12 @@ public class SynapsePropertiesPanel extends JPanel {
     /**
      * A random panel to set the range and distribution of excitatory strengths.
      */
-    private RandomPanelNetwork exRandPanel = new RandomPanelNetwork(true);
+    private RandomPanelNetwork exRandPanel = new RandomPanelNetwork();
 
     /**
      * A random panel to set the range and distribution of inhibitory strengths.
      */
-    private RandomPanelNetwork inRandPanel = new RandomPanelNetwork(true);
+    private RandomPanelNetwork inRandPanel = new RandomPanelNetwork();
 
     /**
      * A synapse panel, set to the selected synapse learning rule and displayed

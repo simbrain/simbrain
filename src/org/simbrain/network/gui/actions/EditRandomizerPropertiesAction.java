@@ -54,7 +54,7 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final RandomPanelNetwork randomPanel = new RandomPanelNetwork(false);
+        final RandomPanelNetwork randomPanel = new RandomPanelNetwork();
         randomPanel.fillFieldValues(networkPanel.getNetwork()
                 .getWeightRandomizer());
         StandardDialog dialog = new StandardDialog() {

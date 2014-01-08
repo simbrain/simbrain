@@ -147,10 +147,10 @@ public class NetworkDialog extends StandardDialog {
                 }
             });
 
-            activationRandomizer = new RandomizerPanel(false);
+            activationRandomizer = new RandomizerPanel();
             activationRandomizer.fillFieldValues(networkPanel.getNetwork()
                     .getActivationRandomizer());
-            weightRandomizer = new RandomizerPanel(false);
+            weightRandomizer = new RandomizerPanel();
             weightRandomizer.fillFieldValues(networkPanel.getNetwork()
                     .getWeightRandomizer());
             initPanel();

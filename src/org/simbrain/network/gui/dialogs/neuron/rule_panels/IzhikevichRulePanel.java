@@ -63,7 +63,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork(true);
+    private RandomPanelNetwork randTab = new RandomPanelNetwork();
 
     /** A reference to the neuron update rule being edited. */
     private static final IzhikevichRule prototypeRule = new IzhikevichRule();

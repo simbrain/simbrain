@@ -28,6 +28,8 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
+import org.simbrain.util.SceneGraphBrowser;
+import org.simbrain.util.StandardDialog;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -148,6 +150,24 @@ public class KeyBindings {
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(panel.getNetwork().toString());
+            }
+        });
+
+        // Show piccolo scene-graph browser (for debugging piccolo issues)
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK),
+                "scenegraph");
+        panel.getActionMap().put("scenegraph", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                SceneGraphBrowser sgb = new SceneGraphBrowser(panel.getCanvas()
+                        .getRoot());
+                StandardDialog dialog = new StandardDialog();
+                dialog.setContentPane(sgb);
+                dialog.setTitle("Piccolo Scenegraph Browser");
+                dialog.setModal(false);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
             }
         });
 

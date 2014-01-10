@@ -809,7 +809,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Add representation of specified synapse to network panel.
      */
-    public void addSynapse(final Synapse synapse) {
+    private void addSynapse(final Synapse synapse) {
         if (objectNodeMap.get(synapse) != null) {
             return;
         }

@@ -1,5 +1,6 @@
 package org.simbrain.util;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
@@ -7,7 +8,10 @@ import java.text.NumberFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -23,7 +27,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * Piccolo scene graph browser component.
  */
-public class SceneGraphBrowser extends JTree {
+public class SceneGraphBrowser extends JPanel {
 
     /** Root node. */
     private final PRoot root;
@@ -34,6 +38,9 @@ public class SceneGraphBrowser extends JTree {
     /** Refresh action. */
     private final Action refresh;
 
+    /** The main JTree. */
+    private final JTree tree = new JTree();
+
     /**
      * Create a new scene graph browser component with the specified root node.
      *
@@ -41,7 +48,7 @@ public class SceneGraphBrowser extends JTree {
      */
     public SceneGraphBrowser(final PRoot root) {
 
-        super();
+        super(new BorderLayout());
 
         this.root = root;
         this.nf = NumberFormat.getInstance();
@@ -54,12 +61,22 @@ public class SceneGraphBrowser extends JTree {
         refresh = new AbstractAction("Refresh") {
             /** @see AbstractAction */
             public void actionPerformed(final ActionEvent e) {
-                ((Model) getModel()).fireRefresh();
+                ((Model) tree.getModel()).fireRefresh();
             }
         };
 
-        setModel(new Model());
-        setCellRenderer(new Renderer());
+        tree.setModel(new Model());
+        tree.setCellRenderer(new Renderer());
+
+        JScrollPane scroller = new JScrollPane();
+        scroller.setViewportView(tree);
+
+        add("Center", scroller);
+        JPanel southPanel = new JPanel();
+        southPanel.add(new JButton(refresh));
+
+        add("South", southPanel);
+
     }
 
     /**

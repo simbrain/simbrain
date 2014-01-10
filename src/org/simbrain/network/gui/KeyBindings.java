@@ -28,6 +28,8 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
+import org.simbrain.network.gui.actions.AddSynapseGroupAction;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.util.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
 
@@ -213,13 +215,16 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: Test if groups are being connected
-                // NeuronGroupNode.showSynpaseGroupDialog(panel);
-                ConnectNeurons connection = QuickConnectPreferences
-                        .getCurrentConnection();
-                connection.connectNeurons(panel.getNetwork(),
-                        panel.getSourceModelNeurons(),
-                        panel.getSelectedModelNeurons(), true);
+                if (ConditionallyEnabledAction
+                        .sourceAndTargetNeuronGroupsSelected(panel)) {
+                    AddSynapseGroupAction.displaySynapseGroupDialog(panel);
+                } else {
+                    ConnectNeurons connection = QuickConnectPreferences
+                            .getCurrentConnection();
+                    connection.connectNeurons(panel.getNetwork(),
+                            panel.getSourceModelNeurons(),
+                            panel.getSelectedModelNeurons(), true);
+                }
 
             }
         });

@@ -42,7 +42,7 @@ public final class CopyAction extends ConditionallyEnabledAction {
      * @param networkPanel network panel, must not be null
      */
     public CopyAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Copy", EnablingCondition.NEURONS);
+        super(networkPanel, "Copy", EnablingCondition.ALLITEMS);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C,

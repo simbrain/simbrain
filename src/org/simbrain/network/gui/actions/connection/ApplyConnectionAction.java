@@ -59,7 +59,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
     public ApplyConnectionAction(final NetworkPanel networkPanel,
             ConnectNeurons connection, String name, boolean isSelfConnect) {
 
-        super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGETS);
+        super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGET_NEURONS);
 
         putValue(SHORT_DESCRIPTION, "Use " + name
                 + " method to connect source to target neurons");

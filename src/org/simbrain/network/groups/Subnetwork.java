@@ -396,22 +396,6 @@ public class Subnetwork extends Group {
     }
 
     /**
-     * Determine whether synapses should be displayed. If total synapses in the
-     * subnetwork is greater than the parent network's (user set) synpase
-     * visibility threshold, do not display synapses.
-     *
-     * @return whether to display synapses or not.
-     */
-    public boolean displaySynapses() {
-        int threshold = getParentNetwork().getSynapseVisibilityThreshold();
-
-        if (getFlatSynapseList().size() > threshold) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * @return the displayNeuronGroups
      */
     public boolean displayNeuronGroups() {

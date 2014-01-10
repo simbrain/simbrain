@@ -93,6 +93,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
                     .getInt("networkWandRadius"));
             NetworkPanel.setNudgeAmount(SimbrainPreferences
                     .getDouble("networkNudgeAmount"));
+            Network.setSynapseVisibilityThreshold(SimbrainPreferences
+                    .getInt("networkSynapseVisibilityThreshold"));
             NeuronNode.setHotColor(SimbrainPreferences
                     .getFloat("networkHotNodeColor"));
             NeuronNode.setCoolColor(SimbrainPreferences

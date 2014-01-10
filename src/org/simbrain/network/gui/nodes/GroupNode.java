@@ -86,6 +86,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     private final Group group;
 
     /**
+     * Constant for use in group changed events, indicating that the visibility
+     * of synpases in a synapse group has changed.
+     */
+    public static final String SYNAPSE_VISIBILITY_CHANGED = "synapseVisibilityChanged";
+
+    /**
      * Create a PNode representation of a model group.
      *
      * @param networkPanel networkPanel for this subnetwork node, must not be

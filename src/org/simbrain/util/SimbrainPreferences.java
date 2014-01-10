@@ -78,6 +78,7 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkSynapseMinSize", 7);
         DEFAULT_MAP.put("networkSynapseMaxSize", 20);
         DEFAULT_MAP.put("networkNudgeAmount", 2d);
+        DEFAULT_MAP.put("networkSynapseVisibilityThreshold", 200);
         DEFAULT_MAP.put("networkWandRadius", 40);
         DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
                 + "tables");

@@ -40,7 +40,7 @@ public final class ShowWeightsAction extends AbstractAction {
      */
     public ShowWeightsAction(final NetworkPanel networkPanel) {
 
-        super("Show Weights");
+        super("Loose Weights Visible");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

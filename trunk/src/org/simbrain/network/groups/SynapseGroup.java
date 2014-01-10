@@ -48,6 +48,12 @@ public class SynapseGroup extends Group {
     private final NeuronGroup targetNeuronGroup;
 
     /**
+     * Flag for whether synapses should be displayed in a GUI representation of
+     * this object.
+     */
+    private boolean displaySynapses;
+
+    /**
      * Create a new synapse group.
      *
      * @param net parent network
@@ -72,6 +78,7 @@ public class SynapseGroup extends Group {
         for (Synapse synapse : synapses) {
             addSynapse(synapse);
         }
+        initializeSynapseVisibility();
     }
 
     /**
@@ -102,6 +109,7 @@ public class SynapseGroup extends Group {
                 addSynapse(syn);
             }
         }
+        initializeSynapseVisibility();
     }
 
     @Override
@@ -252,25 +260,18 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Determine whether this synpasegroup should have its synapses displayed.
-     * For isolated synapse groups check its number of synapses. For
+     * Determine whether this synpasegroup should initially have its synapses
+     * displayed. For isolated synapse groups check its number of synapses. For
      * synapsegroups inside of subnetworks check the total synapses in the
      * parent subnetwork.
-     *
-     * @return whether to display synapses or not.
      */
-    public boolean displaySynapses() {
-        int threshold = getParentNetwork().getSynapseVisibilityThreshold();
-
-        // Isolated synapse group
-        if (getParentGroup() == null) {
-            if (getSynapseList().size() > threshold) {
-                return false;
-            }
-        } else if (getParentGroup() instanceof Subnetwork) {
-            return ((Subnetwork) getParentGroup()).displaySynapses();
+    private void initializeSynapseVisibility() {
+        int threshold = Network.getSynapseVisibilityThreshold();
+        if (getSynapseList().size() > threshold) {
+            displaySynapses = false;
+        } else {
+            displaySynapses = true;
         }
-        return true;
     }
 
     /**
@@ -356,6 +357,20 @@ public class SynapseGroup extends Group {
     @Override
     public String getUpdateMethodDesecription() {
         return "Update synapses";
+    }
+
+    /**
+     * @return the displaySynapses
+     */
+    public boolean isDisplaySynapses() {
+        return displaySynapses;
+    }
+
+    /**
+     * @param displaySynapses the displaySynapses to set
+     */
+    public void setDisplaySynapses(boolean displaySynapses) {
+        this.displaySynapses = displaySynapses;
     }
 
 }

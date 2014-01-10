@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
@@ -78,6 +79,7 @@ public class DesktopNetworkDialog extends NetworkDialog {
         SimbrainPreferences.restoreDefaultSetting("networkSynapseMaxSize");
         SimbrainPreferences.restoreDefaultSetting("networkSynapseMinSize");
         SimbrainPreferences.restoreDefaultSetting("networkNudgeAmount");
+        SimbrainPreferences.restoreDefaultSetting("networkSynapseVisibilityThreshold");
 
         //Make sure new settings are visible
         ((NetworkPanelDesktop) networkPanel).applyUserPrefsToNetwork();
@@ -97,6 +99,8 @@ public class DesktopNetworkDialog extends NetworkDialog {
                 .getBackgroundColor().getRGB());
         SimbrainPreferences.putDouble("networkNudgeAmount",
                 NetworkPanel.getNudgeAmount());
+        SimbrainPreferences.putInt("networkSynapseVisibilityThreshold",
+                Network.getSynapseVisibilityThreshold());
         SimbrainPreferences.putInt("networkWandRadius",
                 EditMode.getWandRadius());
         SimbrainPreferences.putFloat("networkHotNodeColor",

@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -35,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -276,12 +276,12 @@ public class NetworkPropertiesPanel extends JPanel {
         weightSizeMaxSlider.setValue(SynapseNode.getMaxDiameter());
         weightSizeMinSlider.setValue(SynapseNode.getMinDiameter());
         showTimeBox.setSelected(networkPanel.getShowTime());
-        tfSynapseVisibilityThreshold.setText(Integer.toString(networkPanel
-                .getNetwork().getSynapseVisibilityThreshold()));
         wandRadiusField.setText(Integer.toString(EditMode
                 .getWandRadius()));
         nudgeAmountField.setText(Double.toString(NetworkPanel
                 .getNudgeAmount()));
+        tfSynapseVisibilityThreshold.setText(Integer.toString(Network
+                .getSynapseVisibilityThreshold()));
     }
 
     /**
@@ -291,8 +291,8 @@ public class NetworkPropertiesPanel extends JPanel {
     public void commitChanges() {
         NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
-        networkPanel.getNetwork().setSynapseVisibilityThreshold(
-                Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
+        Network.setSynapseVisibilityThreshold(Integer
+                .parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(
                 Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {

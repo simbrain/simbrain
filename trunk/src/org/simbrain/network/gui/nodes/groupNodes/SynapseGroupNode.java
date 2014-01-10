@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -34,6 +35,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
@@ -43,6 +45,7 @@ import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.PNode;
@@ -194,6 +197,27 @@ public class SynapseGroupNode extends GroupNode {
 
         // Selection stuff
         menu.addSeparator();
+        final JCheckBoxMenuItem tsvCheckBox =  new JCheckBoxMenuItem();
+        Action toggleSynapseVisibility = new AbstractAction("Synapses Visible") {
+            public void actionPerformed(final ActionEvent event) {
+                if (group.isDisplaySynapses()) {
+                    group.setDisplaySynapses(false);
+                } else {
+                    group.setDisplaySynapses(true);
+                }
+                group.getParentNetwork().fireGroupChanged(
+                        new NetworkEvent<Group>(group.getParentNetwork(),
+                                group, group),
+                        GroupNode.SYNAPSE_VISIBILITY_CHANGED);
+                tsvCheckBox.setSelected(group.isDisplaySynapses());
+            }
+        };
+        tsvCheckBox.setAction(toggleSynapseVisibility);
+        tsvCheckBox.setSelected(group.isDisplaySynapses());
+        menu.add(tsvCheckBox);
+
+        // Selection stuff
+        menu.addSeparator();
         Action selectSynapses = new AbstractAction("Select Synapses") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
@@ -295,5 +319,4 @@ public class SynapseGroupNode extends GroupNode {
     public SynapseGroup getSynapseGroup() {
         return (SynapseGroup) getGroup();
     }
-
 }

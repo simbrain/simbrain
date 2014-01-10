@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -41,8 +40,9 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.SimpleId;
-import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 
 import com.thoughtworks.xstream.XStream;
@@ -96,12 +96,6 @@ public class Network {
      * The activation randomizer.
      */
     private Randomizer weightRandomizer = new Randomizer();
-
-    /**
-     * If a subnetwork or synapse group has more than this many synapses,
-     * synapses won't be displayed.
-     */
-    private int synapseVisibilityThreshold = 200;
 
     /**
      * Two types of time used in simulations.
@@ -172,14 +166,20 @@ public class Network {
     /** Group Id generator. */
     private SimpleId groupIdGenerator = new SimpleId("Group", 1);
 
+    /**
+     * If a subnetwork or synapse group has more than this many synapses,
+     * then the initial synapse visibility flag is set false.
+     */
+    private static int synapseVisibilityThreshold = 200;
+
     /** Static initializer */
     {
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("defaultSynapseVisibilityThreshold")) {
-            synapseVisibilityThreshold = Integer.parseInt(properties
-                    .getProperty("defaultSynapseVisibilityThreshold"));
+        try {
+            synapseVisibilityThreshold = SimbrainPreferences
+                    .getInt("networkSynapseVisibilityThreshold");
+        } catch (PropertyNotFoundException e) {
+            e.printStackTrace();
         }
-
     }
 
     /**
@@ -284,6 +284,10 @@ public class Network {
     }
 
     /**
+     * Return the list of synapses. These are "loose" neurons. For the full set
+     * of neurons, including neurons inside of subnetworks and groups, use
+     * {@link #getFlatNeuronList()}.
+     *
      * @return List of neurons in network.
      */
     public List<? extends Neuron> getNeuronList() {
@@ -291,6 +295,10 @@ public class Network {
     }
 
     /**
+     * Return the list of synapses. These are "loose" synapses. For the full set
+     * of synapses, including synapses inside of subnetworks and groups, use
+     * {@link #getFlatSynapseList()}.
+     *
      * @return List of synapses in network.
      */
     public List<Synapse> getSynapseList() {
@@ -1679,20 +1687,6 @@ public class Network {
     }
 
     /**
-     * @return the synapseVisibilityThreshold
-     */
-    public int getSynapseVisibilityThreshold() {
-        return synapseVisibilityThreshold;
-    }
-
-    /**
-     * @param synapseVisibilityThreshold the synapseVisibilityThreshold to set
-     */
-    public void setSynapseVisibilityThreshold(int synapseVisibilityThreshold) {
-        this.synapseVisibilityThreshold = synapseVisibilityThreshold;
-    }
-
-    /**
      * Connect a source neuron group to a target neuron group using a connection
      * object.
      *
@@ -1760,6 +1754,20 @@ public class Network {
             }
         }
         return retList;
+    }
+
+    /**
+     * @return the synapseVisibilityThreshold
+     */
+    public static int getSynapseVisibilityThreshold() {
+        return synapseVisibilityThreshold;
+    }
+
+    /**
+     * @param synapseVisibilityThreshold the synapseVisibilityThreshold to set
+     */
+    public static void setSynapseVisibilityThreshold(int svt) {
+        Network.synapseVisibilityThreshold = svt;
     }
 
 }

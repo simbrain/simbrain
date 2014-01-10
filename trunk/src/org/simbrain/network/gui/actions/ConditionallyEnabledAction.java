@@ -43,13 +43,15 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
      * <li>ALLITEMS: if at least one synapse or neuron is selected</li>
      * <li>SOURCE_NEURONS: if at least one neuron is designated as source neuron
      * </li>
-     * <li>SOURCE_AND_TARGETS: if at least one synapse is designated as source
-     * and one is selected (i.e. there is at least one source and one target)</li>
+     * <li>SOURCE_AND_TARGET_NEURONS: if at least one neuron is designated as
+     * source and one neuron is designated as target.</li>
+     * <li>SOURCE_AND_TARGET_NEURON_GROUPS: if at least one neuron group is
+     * designated as source and one neuron group is designated as target.</li>
      * </ul>
      *
      */
     public static enum EnablingCondition {
-        NEURONS, SYNAPSES, ALLITEMS, SOURCE_NEURONS, SOURCE_AND_TARGETS
+        NEURONS, SYNAPSES, ALLITEMS, SOURCE_NEURONS, SOURCE_AND_TARGET_NEURONS, SOURCE_AND_TARGET_NEURON_GROUPS
     };
 
     /** Under what condition should this action be enabled. */
@@ -102,13 +104,45 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
             if (networkPanel.getSourceModelNeurons().size() > 0) {
                 enabled = true;
             }
-        } else if (enableCondition == EnablingCondition.SOURCE_AND_TARGETS) {
-            if ((networkPanel.getSourceModelNeurons().size() > 0)
-                    && (networkPanel.getSelectedModelNeurons().size() > 0)) {
-                enabled = true;
-            }
+        } else if (enableCondition == EnablingCondition.SOURCE_AND_TARGET_NEURONS) {
+            enabled = sourceAndTargetNeuronSelected(networkPanel);
+        } else if (enableCondition == EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS) {
+            enabled = sourceAndTargetNeuronGroupsSelected(networkPanel);
         }
         setEnabled(enabled);
     }
+
+    /**
+     * True if at least one source and one target neuron group are selected.
+     *
+     * @param networkPanel the network panel to check.
+     * @return true if the condition is met, false otherwise.
+     */
+    public static boolean sourceAndTargetNeuronGroupsSelected(
+            NetworkPanel networkPanel) {
+        // Available as a method here since it is reused elsewhere.  Can
+        // do something similar for other conditions as needed.
+        if ((networkPanel.getSourceModelGroups().size() > 0)
+                && (networkPanel.getSelectedModelNeuronGroups().size() > 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * True if at least one source and one target neuron are selected.
+     *
+     * @param networkPanel the network panel to check.
+     * @return true if the condition is met, false otherwise.
+     */
+    public static boolean sourceAndTargetNeuronSelected(
+            NetworkPanel networkPanel) {
+        if ((networkPanel.getSourceModelNeurons().size() > 0)
+                && (networkPanel.getSelectedModelNeurons().size() > 0)) {
+            return true;
+        }
+        return false;
+    }
+
 
 }

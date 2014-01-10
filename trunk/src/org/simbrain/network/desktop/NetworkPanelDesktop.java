@@ -20,6 +20,7 @@ package org.simbrain.network.desktop;
 
 import java.awt.Color;
 
+import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -134,6 +135,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getClearSourceNeuronsAction());
         editMenu.add(actionManager.getSetSourceNeuronsAction());
         editMenu.add(actionManager.getConnectionMenu());
+        editMenu.add(actionManager.getAddSynapseGroupAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getLayoutMenu());
         editMenu.add(actionManager.getGroupMenu());

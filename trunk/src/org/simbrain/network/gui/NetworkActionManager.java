@@ -30,6 +30,7 @@ import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.gui.actions.AddSynapseGroupAction;
 import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -284,8 +285,11 @@ public final class NetworkActionManager {
     /** Shows dialog to adjust updater. */
     private final Action showUpdaterDialog;
 
-    /** Test inputs to selected neurons */
+    /** Test inputs to selected neurons. */
     private Action testInputAction;
+
+    /** Add a synapse group between neuron groups. */
+    private final Action addSynapseGroupAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -412,6 +416,7 @@ public final class NetworkActionManager {
                 networkPanel);
         showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
         testInputAction = new TestInputAction(networkPanel);
+        addSynapseGroupAction = new AddSynapseGroupAction(networkPanel);
     }
 
     /**
@@ -1045,5 +1050,12 @@ public final class NetworkActionManager {
      */
     public Action getTestInputAction() {
         return testInputAction;
+    }
+
+    /**
+     * @return the addSynapseGroupAction
+     */
+    public Action getAddSynapseGroupAction() {
+        return addSynapseGroupAction;
     }
 }

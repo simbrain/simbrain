@@ -133,7 +133,7 @@ public class SynapseGroupDialog extends StandardDialog {
             mainPanel.addItem("Id:", new JLabel(synapseGroup.getId()));
         }
         mainPanel.addItem("Label:", tfSynapseGroupLabel);
-        tfSynapseGroupLabel.setColumns(5);
+        tfSynapseGroupLabel.setColumns(12);
         // TODO: As more synapse group types are added generalize
         if (synapseGroup instanceof SynapseGroupWithLearningRate) {
             mainPanel.addItem("Learning Rate:", tfRateLabel);
@@ -190,6 +190,8 @@ public class SynapseGroupDialog extends StandardDialog {
                         + ((SynapseGroupWithLearningRate) synapseGroup)
                                 .getLearningRate());
             }
+        } else {
+            tfSynapseGroupLabel.setText("Synapse group");
         }
     }
 

@@ -216,16 +216,8 @@ public class NeuronGroupNode extends GroupNode {
             }
         };
         menu.add(clearSource);
-        Action makeConnection = new AbstractAction(
-                "Connect with Synapse Group...") {
-            public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(
-                        Collections.singleton(NeuronGroupNode.this
-                                .getInteractionBox()));
-                showSynpaseGroupDialog(getNetworkPanel());
-            }
-        };
+        Action makeConnection = getNetworkPanel().getActionManager()
+                .getAddSynapseGroupAction();
         menu.add(makeConnection);
 
         // Add any custom menus for this type
@@ -243,24 +235,6 @@ public class NeuronGroupNode extends GroupNode {
 
         // Add the menu...
         return menu;
-    }
-
-    /**
-     * Show the dialo for creating new synapse groups.
-     *
-     * @param np parent network panel
-     */
-    public static void showSynpaseGroupDialog(final NetworkPanel np) {
-        if ((np.getSourceModelGroups().size() > 0)
-                && (np.getSelectedModelNeuronGroups().size() > 0)) {
-            NeuronGroup src = np.getSourceModelGroups().get(0);
-            NeuronGroup tar = np.getSelectedModelNeuronGroups().get(0);
-            JDialog dialog = new SynapseGroupDialog(np, src, tar);
-            dialog.setLocationRelativeTo(null);
-            dialog.pack();
-            dialog.setVisible(true);
-        }
-
     }
 
     /**

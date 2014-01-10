@@ -1010,6 +1010,7 @@ public class Network {
         xstream.omitField(Network.class, "roundOffActivationValues");
         xstream.omitField(Network.class, "precision");
         xstream.omitField(Network.class, "logger");
+        xstream.omitField(Network.class, "synapseVisibilityThreshold");
 
         xstream.omitField(Group.class, "deleteWhenEmpty");
 

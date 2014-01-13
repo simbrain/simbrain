@@ -2360,6 +2360,8 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Beginning position used in calculating offsets for multiple pastes.
+     *
      * @param beginPosition The beginPosition to set.
      */
     public void setBeginPosition(final Point2D beginPosition) {

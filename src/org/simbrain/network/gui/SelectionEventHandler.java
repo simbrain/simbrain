@@ -46,14 +46,19 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
- * Selection event handler.
+ * Selection event handler. Creates the selection "lasso", handles selection and
+ * toggle selection, drags objects as appropriate, updates relevant graphics
+ * parameters like "last clicked position".
+ *
+ * @author Michael Heuer
+ * @author Jeff Yoshimi
  */
 final class SelectionEventHandler extends PDragSequenceEventHandler {
 
     /** Selection marquee. */
     private SelectionMarquee marquee;
 
-    /** Picked node, if any. */
+    /** Picked node, if any, at the beginning of this drag sequence. */
     private PNode pickedNode;
 
     /** Marquee selection start position. */
@@ -80,26 +85,32 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         this.networkPanel = networkPanel;
     }
 
-    /** @see PDragSequenceEventHandler */
+    @Override
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
+
+        // Set last clicked position, used in many areas for "placement" of
+        // objects in the last clicked position on screen.
         networkPanel.setLastClickedPosition(event.getPosition());
+
+        // Set pressed position for use in double clicking
         if (event.getPath().getPickedNode() instanceof PCamera) {
             networkPanel.setBeginPosition(event.getPosition());
         }
     }
 
-    /** @see PDragSequenceEventHandler */
+    @Override
     public void mouseClicked(final PInputEvent event) {
 
         // System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
 
+        // Set picked node
         PNode node = event.getPath().getPickedNode();
 
+        // Double click on text objects to edit them
         if (event.getClickCount() != 1) {
             if (node instanceof PStyledText) {
-                // For now, since the editor has a different size
                 networkPanel.clearSelection();
                 networkPanel.getTextHandle().startEditing(event,
                         ((PStyledText) node));
@@ -107,6 +118,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
+        // Clicking in empty parts of the canvas removes green selections.
         if (node instanceof PCamera) {
             if (!event.isShiftDown()) {
                 networkPanel.clearSelection();
@@ -114,16 +126,31 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    /** @see PDragSequenceEventHandler */
+    @Override
     protected void startDrag(final PInputEvent event) {
 
         super.startDrag(event);
 
         marqueeStartPosition = event.getPosition();
+
+        // Set the initially picked node
         pickedNode = event.getPath().getPickedNode();
 
-        if (pickedNode instanceof PCamera) {
-            pickedNode = null;
+        // Cases where nothing was clicked on
+        if (noObjectWasClickedOn()) {
+            if (event.isShiftDown()) {
+                priorSelection = new ArrayList(networkPanel.getSelection());
+            } else {
+                networkPanel.clearSelection();
+            }
+
+            // Create a new selection marquee at the mouse position
+            marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
+                    (float) marqueeStartPosition.getY());
+
+            // Add marquee as child of the network panel's layer
+            networkPanel.getCanvas().getLayer().addChild(marquee);
+            return;
         }
 
         // Clicking on text objects picks the underlying text object
@@ -131,68 +158,50 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             pickedNode = pickedNode.getParent();
         }
 
-        if (pickedNode == null) {
+        if (pickedNode instanceof NeuronNode) {
+            networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
+            // To ensure fire neuron moving events don't affect these
+            // neurons
+            ((NeuronNode) pickedNode).setMoving(true);
+        }
 
+        // Either start dragging selected node(s) or toggle selection (if shift
+        // is pressed).
+        if (networkPanel.isSelected(pickedNode)) {
             if (event.isShiftDown()) {
-                priorSelection = new ArrayList(networkPanel.getSelection());
-            } else {
-                networkPanel.clearSelection();
+                networkPanel.toggleSelection(pickedNode);
             }
-
-            // create a new selection marquee at the mouse position
-            marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                    (float) marqueeStartPosition.getY());
-
-            // add marquee as child of the network panel's layer
-            networkPanel.getCanvas().getLayer().addChild(marquee);
         } else {
-            if (pickedNode instanceof NeuronNode) {
-                networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
-                // To ensure fire neuron moving events don't affect these
-                // neurons
-                ((NeuronNode) pickedNode).setMoving(true);
-            }
-
-            // start dragging selected node(s)
-            if (networkPanel.isSelected(pickedNode)) {
-                if (event.isShiftDown()) {
-                    networkPanel.toggleSelection(pickedNode);
-                }
+            if (event.isShiftDown()) {
+                networkPanel.toggleSelection(pickedNode);
             } else {
-                if (event.isShiftDown()) {
-                    networkPanel.toggleSelection(pickedNode);
-                } else {
-                    networkPanel
-                            .setSelection(Collections.singleton(pickedNode));
-                }
+                networkPanel.setSelection(Collections.singleton(pickedNode));
             }
         }
     }
 
-    /** @see PDragSequenceEventHandler */
+    @Override
     protected void drag(final PInputEvent event) {
 
         super.drag(event);
 
-        if (pickedNode == null) {
+        // The case where nothing was clicked on initially. So draw the lasso
+        // and select things.
+        if (noObjectWasClickedOn()) {
 
-            // continue marquee selection
+            // Select lassoed nodes
             Point2D position = event.getPosition();
             PBounds rect = new PBounds();
             rect.add(marqueeStartPosition);
             rect.add(position);
-
             marquee.globalToLocal(rect);
-
             marquee.setPathToRectangle((float) rect.getX(),
                     (float) rect.getY(), (float) rect.getWidth(),
                     (float) rect.getHeight());
-
             boundsFilter.setBounds(rect);
-
             Collection highlightedNodes = networkPanel.getCanvas().getLayer()
                     .getRoot().getAllNodes(boundsFilter, null);
-
+            // Toggle things if shift is being pressed
             if (event.isShiftDown()) {
                 Collection selection = Utils.union(priorSelection,
                         highlightedNodes);
@@ -202,82 +211,88 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             } else {
                 networkPanel.setSelection(highlightedNodes);
             }
+            return;
 
-        } else {
+        }
 
-            // continue to drag selected node(s)
-            PDimension delta = event.getDeltaRelativeTo(pickedNode);
-
-            for (Iterator i = networkPanel.getSelection().iterator(); i
-                    .hasNext();) {
-                PNode node = (PNode) i.next();
-                if (node instanceof ScreenElement) {
-
-                    if (pickedNode instanceof NeuronNode) {
-                        ((NeuronNode) pickedNode).pushViewPositionToModel();
-                    } else if (pickedNode instanceof NeuronNode) {
-                        ((TextNode) pickedNode).pushViewPositionToModel();
-                    }
-
-                    ScreenElement screenElement = (ScreenElement) node;
-                    if (screenElement.isDraggable()) {
-                        screenElement.localToParent(delta);
-                        screenElement.offset(delta.getWidth(),
-                                delta.getHeight());
-                    }
+        // Continue to drag node that have already been selected
+        PDimension delta = event.getDeltaRelativeTo(pickedNode);
+        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            if (node instanceof ScreenElement) {
+                if (pickedNode instanceof NeuronNode) {
+                    ((NeuronNode) pickedNode).pushViewPositionToModel();
+                } else if (pickedNode instanceof NeuronNode) {
+                    ((TextNode) pickedNode).pushViewPositionToModel();
+                }
+                ScreenElement screenElement = (ScreenElement) node;
+                if (screenElement.isDraggable()) {
+                    screenElement.localToParent(delta);
+                    screenElement.offset(delta.getWidth(), delta.getHeight());
                 }
             }
         }
+
     }
 
-    /** @see PDragSequenceEventHandler */
+    @Override
     protected void endDrag(final PInputEvent event) {
 
         super.endDrag(event);
 
         // Nothing was being dragged
-        if (pickedNode == null) {
-            // end marquee selection
+        if (noObjectWasClickedOn()) {
+            // End lasso selection
             marquee.removeFromParent();
             marquee = null;
             marqueeStartPosition = null;
-        } else {
-            // Something was being dragged
+            return;
+        }
 
-            // To ensure fire neuron moving events don't affect these neurons
-            for (Iterator i = networkPanel.getSelection().iterator(); i
-                    .hasNext();) {
-                PNode node = (PNode) i.next();
-                if (node instanceof NeuronNode) {
-                    ((NeuronNode) node).setMoving(false);
-                    ((NeuronNode) node).pushViewPositionToModel();
-                } else if (node instanceof TextNode) {
-                    ((TextNode) node).pushViewPositionToModel();
-                }
+        // To ensure fire neuron moving events don't affect these neurons
+        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            if (node instanceof NeuronNode) {
+                ((NeuronNode) node).setMoving(false);
+                ((NeuronNode) node).pushViewPositionToModel();
+            } else if (node instanceof TextNode) {
+                ((TextNode) node).pushViewPositionToModel();
             }
+        }
 
-            // end drag selected node(s)
-            pickedNode = null;
-
-            // Reset the beginning of a sequence of pastes, but keep the old
-            // paste-offset
-            // This occurs when pasting a sequence, and moving one set of
-            // objects to a new location
-            if (networkPanel.getNumberOfPastes() != 1) {
-                networkPanel.setBeginPosition(SimnetUtils
-                        .getUpperLeft((ArrayList) networkPanel
-                                .getSelectedModelElements()));
-            }
-            networkPanel.setEndPosition(SimnetUtils
+        // Reset the beginning of a sequence of pastes, but keep the old
+        // paste-offset. This occurs when pasting a sequence, and moving one set
+        // of objects to a new location
+        if (networkPanel.getNumberOfPastes() != 1) {
+            networkPanel.setBeginPosition(SimnetUtils
                     .getUpperLeft((ArrayList) networkPanel
                             .getSelectedModelElements()));
         }
+
+        // End drag selected node(s)
+        pickedNode = null;
+        networkPanel.setEndPosition(SimnetUtils
+                .getUpperLeft((ArrayList) networkPanel
+                        .getSelectedModelElements()));
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();
     }
 
     /**
-     * Bounds filter.
+     * Encapsulate logic for determining the case where no object (neuron node,
+     * synpase node, etc) was clicked on at the beginning of this drag sequence.
+     *
+     * @return true if no object was clicked on, false otherwise.
+     */
+    private boolean noObjectWasClickedOn() {
+        boolean pickedNodeNull = (pickedNode == null);
+        boolean cameraPicked = (pickedNode instanceof PCamera);
+        return (pickedNodeNull || cameraPicked);
+    }
+
+    /**
+     * A filter that determines whether a given pnode is selectable or not.
+     * Bounds are updated as the lasso tool is dragged.
      */
     private class BoundsFilter implements PNodeFilter {
 

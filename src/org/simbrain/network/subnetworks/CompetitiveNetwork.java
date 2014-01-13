@@ -58,7 +58,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     public CompetitiveNetwork(Network net, int numCompetitiveNeurons,
             int numInputNeurons) {
         super(net);
-        this.setLabel("Competitie Network");
+        this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
         inputLayer = new NeuronGroup(net, competitive.getPosition(),
                 numInputNeurons);

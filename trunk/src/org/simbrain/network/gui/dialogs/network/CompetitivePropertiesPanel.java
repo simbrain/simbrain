@@ -36,6 +36,7 @@ import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveGroup.UpdateMethod;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.widgets.CommittablePanel;
 
 /**
  * <b>CompetitivePropertiesDialog</b> is a panel box for setting the properties
@@ -43,7 +44,7 @@ import org.simbrain.util.LabelledItemPanel;
  * network or to edit an existing competitive network.
  */
 public class CompetitivePropertiesPanel extends JPanel implements
-        ActionListener, GroupPropertiesPanel {
+        ActionListener, GroupPropertiesPanel, CommittablePanel {
 
     /** Default number of competitive neurons. */
     private static final int DEFAULT_NUM_COMPETITIVE_NEURONS = 5;
@@ -249,6 +250,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /**
      * @see java.awt.event.ActionListener
      */
+    @Override
     public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();
 
@@ -285,21 +287,28 @@ public class CompetitivePropertiesPanel extends JPanel implements
         return "Pages/Network/network/competitivenetwork.html";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Group commitChanges() {
-        if (panelType == CompetitivePropsPanelType.CREATE_GROUP) {
-            competitive = new CompetitiveGroup(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumCompetitiveNeurons.getText()));
-            commitCompetitiveGroupFieldValues();
-        } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
-            competitive = new CompetitiveNetwork(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumCompetitiveNeurons.getText()),
-                    Integer.parseInt(tfNumInputNeurons.getText()));
-            commitCompetitiveNetworkFieldValues();
-        } else if (panelType == CompetitivePropsPanelType.EDIT_GROUP) {
-            commitCompetitiveGroupFieldValues();
+    public boolean commitChanges() {
+        try {
+            if (panelType == CompetitivePropsPanelType.CREATE_GROUP) {
+                competitive = new CompetitiveGroup(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumCompetitiveNeurons.getText()));
+                commitCompetitiveGroupFieldValues();
+            } else if (panelType == CompetitivePropsPanelType.CREATE_NETWORK) {
+                competitive = new CompetitiveNetwork(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumCompetitiveNeurons.getText()),
+                        Integer.parseInt(tfNumInputNeurons.getText()));
+                commitCompetitiveNetworkFieldValues();
+            } else if (panelType == CompetitivePropsPanelType.EDIT_GROUP) {
+                commitCompetitiveGroupFieldValues();
+            }
+        } catch (NumberFormatException nfe) {
+            return false; // Failure
         }
-        return competitive;
+        return true; // Success
     }
 
     /**
@@ -346,6 +355,22 @@ public class CompetitivePropertiesPanel extends JPanel implements
                 .setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         ((CompetitiveNetwork) competitive).getCompetitive().setNormalizeInputs(
                 cbNormalizeInputs.isSelected());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Group getGroup() {
+        return competitive;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

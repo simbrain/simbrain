@@ -91,9 +91,11 @@ public class CompetitiveCreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-        CompetitiveGroup competitive = (CompetitiveGroup) compPropertiesPanel
-                .commitChanges();
+        compPropertiesPanel.commitChanges();
+        CompetitiveGroup competitive =
+                (CompetitiveGroup) compPropertiesPanel.getGroup();
         networkPanel.getNetwork().addGroup(competitive);
         layoutPanel.commitChanges();
         competitive.setLayout(layoutPanel.getCurrentLayout());

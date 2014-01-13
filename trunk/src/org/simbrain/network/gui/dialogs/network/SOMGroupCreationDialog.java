@@ -91,8 +91,10 @@ public class SOMGroupCreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-        SOMGroup som = (SOMGroup) somPanel.commitChanges();
+        somPanel.commitChanges();
+        SOMGroup som = (SOMGroup) somPanel.getGroup();
         networkPanel.getNetwork().addGroup(som);
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());

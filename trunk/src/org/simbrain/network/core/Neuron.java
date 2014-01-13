@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
@@ -35,6 +36,13 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
  * override update and duplicate (for copy / paste) and cloning generally.
  */
 public class Neuron {
+
+    /**
+     * The default neuron update rule. Neurons which are constructed without a
+     * specified update rule will default to the rule specified here:
+     * Linear with default parameters.
+     */
+    public static final NeuronUpdateRule DEFAULT_UPDATE_RULE = new LinearRule();
 
     /**
      * The update method of this neuron, which corresponds to what kind of
@@ -113,6 +121,17 @@ public class Neuron {
     private boolean tempIgnoreUpdateFlag = false;
 
     /**
+     * Construct a neuron with all default values in the specified network.
+     * Usually this is used as the basis for a template neuron which will be
+     * edited and then copied.
+     * @param parent The parent network of this neuron.
+     */
+    public Neuron (final Network parent) {
+        this.parent = parent;
+        setUpdateRule(DEFAULT_UPDATE_RULE);
+    }
+
+    /**
      * Construct a specific type of neuron from a string description.
      *
      * @param parent The parent network. Be careful not to set this to root
@@ -156,6 +175,14 @@ public class Neuron {
     }
 
     /**
+     * Provides a deep copy of this neuron.
+     * @return a deep copy of this neuron.
+     */
+    public Neuron deepCopy() {
+        return new Neuron(parent, this);
+    }
+
+    /**
      * Perform any initialization required when creating a neuron, but after the
      * parent network has been added.
      */
@@ -183,6 +210,15 @@ public class Neuron {
      */
     public NeuronUpdateRule getUpdateRule() {
         return updateRule;
+    }
+
+    /**
+     * Returns the current update rule's description (name).
+     *
+     * @return the neuronUpdateRule's description
+     */
+    public String getUpdateRuleDescription() {
+        return updateRule.getDescription();
     }
 
     /**

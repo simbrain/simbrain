@@ -19,7 +19,6 @@ package org.simbrain.network.groups;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -30,7 +29,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -42,6 +40,8 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class NeuronGroup extends Group {
 
+    public static final int DEFAULT_GROUP_SIZE = 10;
+
     /** The neurons in this group. */
     private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
 
@@ -51,6 +51,10 @@ public class NeuronGroup extends Group {
 
     /** The layout for the neurons in this group. */
     private Layout layout = DEFAULT_LAYOUT;
+
+    private SynapseGroup incomingSg;
+
+    private SynapseGroup outgoingSg;
 
     /**
      * Construct a new neuron group from a list of neurons.
@@ -78,12 +82,25 @@ public class NeuronGroup extends Group {
         super(net);
 
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(net, new LinearRule()), false);
+            addNeuron(new Neuron(net), false);
         }
 
         layout.setInitialLocation(initialPosition);
         layout.layoutNeurons(this.getNeuronList());
         // Collections.sort(neuronList, Comparators.X_ORDER);
+    }
+
+    /**
+     * Create a neuron group without any initial neurons and an initial
+     * position.
+     *
+     * @param network parent network
+     * @param initialPosition the starting position from which to lay-out the
+     * neurons in the group whenever they are added.
+     */
+    public NeuronGroup(final Network network, Point2D initialPosition) {
+        super(network);
+        layout.setInitialLocation(initialPosition);
     }
 
     /**
@@ -100,6 +117,7 @@ public class NeuronGroup extends Group {
      * one network to another
      *
      * @param network parent network
+     * @param toCopy the neuron group this will become a (deep) copy of.
      */
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
@@ -137,7 +155,7 @@ public class NeuronGroup extends Group {
      * @return the neurons in this group.
      */
     public List<Neuron> getNeuronList() {
-        return Collections.unmodifiableList(neuronList);
+        return neuronList;
     }
 
     /**
@@ -649,6 +667,32 @@ public class NeuronGroup extends Group {
     public void applyLayout() {
         layout.setInitialLocation(getPosition());
         layout.layoutNeurons(getNeuronList());
+    }
+
+    /**
+     * Apply this group's layout to its neurons based on a specified initial
+     * position.
+     * @param initialPosition the position from which to begin the layout.
+     */
+    public void applyLayout(Point2D initialPosition) {
+        layout.setInitialLocation(initialPosition);
+        layout.layoutNeurons(getNeuronList());
+    }
+
+    public SynapseGroup getIncomingSg() {
+        return incomingSg;
+    }
+
+    public void setIncomingSg(SynapseGroup incomingSg) {
+        this.incomingSg = incomingSg;
+    }
+
+    public SynapseGroup getOutgoingSg() {
+        return outgoingSg;
+    }
+
+    public void setOutgoingSg(SynapseGroup outgoingSg) {
+        this.outgoingSg = outgoingSg;
     }
 
 }

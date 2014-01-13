@@ -71,7 +71,8 @@ public class SOMNetworkCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New SOM Network");
-        somPanel = new SOMPropertiesPanel(networkPanel, SOMPropsPanelType.CREATE_NETWORK);
+        somPanel = new SOMPropertiesPanel(networkPanel,
+                SOMPropsPanelType.CREATE_NETWORK);
 
         // Set up tab panels
         tabLogic.add(somPanel);
@@ -91,8 +92,10 @@ public class SOMNetworkCreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-        SOMNetwork somNet =  (SOMNetwork) somPanel.commitChanges();
+        somPanel.commitChanges();
+        SOMNetwork somNet =  (SOMNetwork) somPanel.getGroup();
         SOMGroup som = somNet.getSom();
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());
@@ -101,7 +104,6 @@ public class SOMNetworkCreationDialog extends StandardDialog {
         networkPanel.getNetwork().addGroup(somNet);
         networkPanel.getNetwork().fireNetworkChanged();
         super.closeDialogOk();
-
     }
 
 }

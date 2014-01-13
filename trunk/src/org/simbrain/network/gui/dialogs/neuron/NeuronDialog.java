@@ -18,21 +18,16 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
@@ -48,24 +43,11 @@ public class NeuronDialog extends StandardDialog {
     /** Null string. */
     public static final String NULL_STRING = "...";
 
-    /** Main panel. */
-    private final Box mainPanel = Box.createVerticalBox();
-
     /**
-     * Top panel. Contains fields for displaying/editing basic neuron
-     * information.
-     *
-     * @see org.simbrain.network.gui.dialogs.neuron.BasicNeuronInfoPanel.java
+     * A data panel containing both the basic neuron info and neuron update
+     * settings.
      */
-    private final BasicNeuronInfoPanel topPanel;
-
-    /**
-     * Bottom panel. Contains fields for displaying/editing neuron update rule
-     * parameters.
-     *
-     * @see org.simbrain.network.gui.dialogs.neuron.NeuronUpdateSettingsPanel.java
-     */
-    private final NeuronUpdateSettingsPanel bottomPanel;
+    private final CombinedNeuronInfoPanel neuronDataPanel;
 
     /**
      * Help Button. Links to information about the currently selected neuron
@@ -84,9 +66,7 @@ public class NeuronDialog extends StandardDialog {
      */
     public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
         neuronList = getNeuronList(selectedNeurons);
-        topPanel = new BasicNeuronInfoPanel(neuronList, this);
-        bottomPanel = new NeuronUpdateSettingsPanel(neuronList, this, false);
-        bottomPanel.getNeuronPanel().setReplace(false);
+        neuronDataPanel = new CombinedNeuronInfoPanel(neuronList, this, false);
         init();
         addListeners();
         updateHelp();
@@ -94,6 +74,9 @@ public class NeuronDialog extends StandardDialog {
 
     /**
      * Get the logical neurons from the NeuronNodes.
+     * @param selectedNeurons the selected gui neurons (pnodes) from which
+     * the neuron model objects will be extracted and then edited by this panel
+     * @return the neuron model objects represented by the selected pnodes
      */
     private static ArrayList<Neuron> getNeuronList(
             final Collection<NeuronNode> selectedNeurons) {
@@ -109,19 +92,18 @@ public class NeuronDialog extends StandardDialog {
      */
     private void init() {
         setTitle("Neuron Dialog");
-        mainPanel.add(topPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainPanel.add(bottomPanel);
-        setContentPane(mainPanel);
+        setContentPane(neuronDataPanel);
         this.addButton(helpButton);
     }
 
     /**
-     * Add listeners to the components of the dialog
+     * Add listeners to the components of the dialog. Specifically alters the
+     * destination of the help button to reflect the currently selected
+     * neuron update rule.
      */
     private void addListeners() {
-        bottomPanel.getCbNeuronType().addActionListener(new ActionListener() {
-
+        neuronDataPanel.getUpdateInfoPanel().getCbNeuronType()
+        .addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
@@ -129,14 +111,10 @@ public class NeuronDialog extends StandardDialog {
                     @Override
                     public void run() {
                         updateHelp();
-                        AbstractNeuronPanel np = bottomPanel.getNeuronPanel();
-                        topPanel.getExtraDataPanel().fillDefaultValues(
-                                np.getPrototypeRule());
                     }
                 });
             }
         });
-
     }
 
     /**
@@ -152,11 +130,13 @@ public class NeuronDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
-        if (bottomPanel.getCbNeuronType().getSelectedItem() == NULL_STRING) {
+        if (neuronDataPanel.getUpdateInfoPanel()
+                .getCbNeuronType().getSelectedItem() == NULL_STRING)
+        {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
-            String name = (String) bottomPanel.getCbNeuronType()
-                    .getSelectedItem();
+            String name = (String) neuronDataPanel.getUpdateInfoPanel()
+                    .getCbNeuronType().getSelectedItem();
             helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
                     + ".html");
         }
@@ -167,35 +147,26 @@ public class NeuronDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-
-        // Commit changes specific to the neuron type
-        // This must be the first change committed, as other neuron panels
-        // make assumptions about the type of the neuron update rule being
-        // edited that can result in ClassCastExceptions otherwise.
-        bottomPanel.commitChanges();
-
-        topPanel.commitChanges();
+        neuronDataPanel.commitChanges();
 
         // Notify the network that changes have been made
         neuronList.get(0).getNetwork().fireNetworkChanged();
-
     }
 
-    /**
-     * Test Main: For fast prototyping
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        Neuron n = new Neuron(new Network(), new LinearRule());
-        ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
-        arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
-        NeuronDialog nd = new NeuronDialog(arr);
-
-        nd.pack();
-        nd.setVisible(true);
-
-    }
-
+//    /**
+//     * Test Main: For fast prototyping
+//     *
+//     * @param args
+//     */
+//    public static void main(String[] args) {
+//
+//        Neuron n = new Neuron(new Network(), new LinearRule());
+//        ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
+//        arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
+//        NeuronDialog nd = new NeuronDialog(arr);
+//
+//        nd.pack();
+//        nd.setVisible(true);
+//
+//    }
 }

@@ -30,13 +30,14 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.widgets.CommittablePanel;
 
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * winner take all network.
  */
 public class WTAPropertiesPanel extends JPanel implements
-    GroupPropertiesPanel {
+    GroupPropertiesPanel, CommittablePanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_NEURONS = 5;
@@ -105,12 +106,13 @@ public class WTAPropertiesPanel extends JPanel implements
         mainPanel.addItem("Set winner randomly (with some probability)",
                 useRandomBox);
         mainPanel
-                .addItem("Probability of choosing a random winner", randomProb);
+        .addItem("Probability of choosing a random winner", randomProb);
 
         // Enable / disable random prob box based on state of use random
         // checkbox
         randomProb.setEnabled(useRandomBox.isSelected());
         useRandomBox.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 randomProb.setEnabled(useRandomBox.isSelected());
             }
@@ -119,16 +121,20 @@ public class WTAPropertiesPanel extends JPanel implements
     }
 
     @Override
-    public Group commitChanges() {
-        if (isCreationPanel) {
-            wta = new WinnerTakeAll(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumNeurons.getText()));
+    public boolean commitChanges() {
+        try {
+            if (isCreationPanel) {
+                wta = new WinnerTakeAll(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumNeurons.getText()));
+            }
+            wta.setWinValue(Double.parseDouble(winnerValue.getText()));
+            wta.setLoseValue(Double.parseDouble(loserValue.getText()));
+            wta.setUseRandom(useRandomBox.isSelected());
+            wta.setRandomProb(Double.parseDouble(randomProb.getText()));
+        } catch (NumberFormatException nfe) {
+            return false; // Failure
         }
-        wta.setWinValue(Double.parseDouble(winnerValue.getText()));
-        wta.setLoseValue(Double.parseDouble(loserValue.getText()));
-        wta.setUseRandom(useRandomBox.isSelected());
-        wta.setRandomProb(Double.parseDouble(randomProb.getText()));
-        return wta;
+        return true; // Success
     }
 
     @Override
@@ -148,6 +154,19 @@ public class WTAPropertiesPanel extends JPanel implements
     @Override
     public String getHelpPath() {
         return "Pages/Network/network/winnerTakeAll.html";
+    }
+
+    @Override
+    public Group getGroup() {
+        return wta;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

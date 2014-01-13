@@ -5,13 +5,14 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: Simbrain Checkstyle
+    Checkstyle-Configuration: simbrain-checkstyle
     Description: none
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
+    <module name="FileContentsHolder"/>
     <module name="AvoidStarImport"/>
     <module name="ConstantName"/>
     <module name="EmptyBlock"/>
@@ -90,25 +91,30 @@
     <module name="EqualsAvoidNull"/>
     <module name="CyclomaticComplexity">
       <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="NestedIfDepth">
       <property name="max" value="3"/>
     </module>
     <module name="NestedTryDepth"/>
-    <module name="ExplicitInitialization"/>
+    <module name="ExplicitInitialization">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="AnnotationUseStyle"/>
     <module name="MissingDeprecated"/>
     <module name="MissingOverride">
       <property name="javaFiveCompatibility" value="true"/>
     </module>
-    <module name="PackageAnnotation"/>
     <module name="SuppressWarnings"/>
     <module name="MagicNumber">
       <property name="severity" value="ignore"/>
       <property name="ignoreHashCodeMethod" value="true"/>
       <property name="ignoreAnnotation" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
   </module>
+  <module name="SuppressionCommentFilter"/>
   <module name="JavadocPackage"/>
   <module name="Translation">
     <property name="severity" value="warning"/>
@@ -118,4 +124,8 @@
   <module name="RegexpSingleline">
     <property name="format" value="\s+$"/>
   </module>
+  <module name="SeverityMatchFilter"/>
+  <module name="SuppressionFilter"/>
+  <module name="SuppressionCommentFilter"/>
+  <module name="SuppressWithNearbyCommentFilter"/>
 </module>

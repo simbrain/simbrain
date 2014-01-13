@@ -94,8 +94,10 @@ public class HopfieldCreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-        Hopfield hopfield = (Hopfield) hopPropertiesPanel.commitChanges();
+        hopPropertiesPanel.commitChanges();
+        Hopfield hopfield = (Hopfield) hopPropertiesPanel.getGroup();
         layoutPanel.commitChanges();
         layoutPanel.getCurrentLayout().setInitialLocation(
                 networkPanel.getLastClickedPosition());

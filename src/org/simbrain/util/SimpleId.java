@@ -49,4 +49,16 @@ public class SimpleId {
         String id = rootName + "_" + index++;
         return id;
     }
+
+    /**
+     * Returns what the simple identifier would be if a hypothetical construct
+     * requiring such an id were constructed and put into the network.
+     * @return a hypothetical unique identification
+     */
+    public String getHypotheticalId() {
+        int ind = index;
+        String id = rootName + "_" + ind;
+        return id;
+    }
+
 }

@@ -39,6 +39,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.widgets.CommittablePanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -49,7 +50,9 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * @author ztosi
  * @author jyoshimi
  */
-public class NeuronUpdateSettingsPanel extends JPanel {
+@SuppressWarnings("serial")
+public class NeuronUpdateSettingsPanel extends JPanel
+    implements CommittablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
@@ -223,10 +226,12 @@ public class NeuronUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     * Called on exit to write changes in the dialog to the underlying model.
+     * {@inheritDoc}
      */
-    public void commitChanges() {
+    @Override
+    public boolean commitChanges() {
         neuronPanel.commitChanges(neuronList);
+        return true; //TODO:Finish implementation of CommittablePanel interface
     }
 
     /**
@@ -272,19 +277,25 @@ public class NeuronUpdateSettingsPanel extends JPanel {
     }
 
     /**
-     *
-     * @param neuronPanel
+     * @param neuronPanel the desired neuron update rule panel to be displayed
      */
     public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
         this.neuronPanel = neuronPanel;
     }
 
     /**
-     *
-     * @return
+     * @return the neuron update settings options combo box
      */
     public JComboBox<String> getCbNeuronType() {
         return cbNeuronType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
     /**
@@ -293,6 +304,7 @@ public class NeuronUpdateSettingsPanel extends JPanel {
      *
      * @author ztosi
      */
+    @SuppressWarnings("serial")
     private class EmptyRulePanel extends AbstractNeuronPanel {
 
         @Override

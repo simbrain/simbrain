@@ -74,7 +74,8 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Associations between names of rules and panels for editing them. */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
+            new LinkedHashMap<String, AbstractNeuronPanel>();
 
     // Populate the Rule Map
     static {

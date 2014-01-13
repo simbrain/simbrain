@@ -89,9 +89,10 @@ public class WTACreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-
-        WinnerTakeAll wta = (WinnerTakeAll) wtaPanel.commitChanges();
+        wtaPanel.commitChanges();
+        WinnerTakeAll wta = (WinnerTakeAll) wtaPanel.getGroup();
         layoutPanel.commitChanges();
         wta.setLayout(layoutPanel.getCurrentLayout());
         wta.applyLayout();

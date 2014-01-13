@@ -46,6 +46,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * @author ztosi
  *
  */
+@SuppressWarnings("serial")
 public class MainLayoutPanel extends JPanel {
 
     /** Default Visibility of layout parameters. */
@@ -59,21 +60,22 @@ public class MainLayoutPanel extends JPanel {
     private AbstractLayoutPanel layoutPanel;
 
     /** A map tying layout panels to their names for use in a combo box . */
-    private final LinkedHashMap<String, AbstractLayoutPanel> panel_map = new LinkedHashMap<String, AbstractLayoutPanel>();
+    private final LinkedHashMap<String, AbstractLayoutPanel> panelMap =
+            new LinkedHashMap<String, AbstractLayoutPanel>();
 
     {
         // Populate the panel map
-        panel_map.put(new GridLayout().getDescription(), new GridLayoutPanel(
+        panelMap.put(new GridLayout().getDescription(), new GridLayoutPanel(
                 new GridLayout()));
-        panel_map.put(new HexagonalGridLayout().getDescription(),
+        panelMap.put(new HexagonalGridLayout().getDescription(),
                 new HexagonalGridLayoutPanel(new HexagonalGridLayout()));
-        panel_map.put(new LineLayout().getDescription(), new LineLayoutPanel(
+        panelMap.put(new LineLayout().getDescription(), new LineLayoutPanel(
                 new LineLayout()));
     }
 
     /** A combo box for selecting the type of layout. */
-    private final JComboBox<String> layoutCb = new JComboBox<String>(panel_map
-            .keySet().toArray(new String[panel_map.size()]));
+    private final JComboBox<String> layoutCb = new JComboBox<String>(panelMap
+            .keySet().toArray(new String[panelMap.size()]));
 
     /**
      * A drop-down triangle for showing or hiding the layout parameters.
@@ -109,6 +111,7 @@ public class MainLayoutPanel extends JPanel {
 
     /**
      * Creates the main layout panel with default values.
+     * @param parent the parent window, used for resizing
      */
     public MainLayoutPanel(Window parent) {
         this(DEFAULT_DP_TRIANGLE_VISIBILITY, parent);
@@ -120,6 +123,7 @@ public class MainLayoutPanel extends JPanel {
      *
      * @param revealOption if false, then everything shows up; if true then it's
      *            hidden with a drop-down triangle to reveal
+     * @param parent the parent window, used for resizing
      */
     public MainLayoutPanel(boolean revealOption, Window parent) {
         this(DEFAULT_INITIAL_LAYOUT, revealOption, parent);
@@ -131,6 +135,7 @@ public class MainLayoutPanel extends JPanel {
      * @param initialLayout the initially selected layout
      * @param revealOption whether or not displaying layout parameters is
      *            optional
+     * @param parent the parent window, used for resizing
      */
     public MainLayoutPanel(String initialLayout, boolean revealOption,
             Window parent) {
@@ -139,7 +144,7 @@ public class MainLayoutPanel extends JPanel {
         layoutParameterReveal = new DropDownTriangle(UpDirection.LEFT, false,
                 "Settings", "Settings", parent);
         layoutCb.setSelectedItem(initialLayout);
-        layoutPanel = panel_map.get(initialLayout);
+        layoutPanel = panelMap.get(initialLayout);
 
         initializeLayout();
         addListeners();
@@ -200,7 +205,7 @@ public class MainLayoutPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                layoutPanel = panel_map.get(layoutCb.getSelectedItem());
+                layoutPanel = panelMap.get(layoutCb.getSelectedItem());
                 repaintPanel();
                 parent.pack();
             }
@@ -264,7 +269,7 @@ public class MainLayoutPanel extends JPanel {
      */
     public void setCurrentLayout(final Layout layout) {
         layoutCb.setSelectedItem(layout.getDescription());
-        panel_map.get(layoutCb.getSelectedItem()).setNeuronLayout(layout);
+        panelMap.get(layoutCb.getSelectedItem()).setNeuronLayout(layout);
     }
 
     /**

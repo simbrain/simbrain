@@ -30,13 +30,15 @@ import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.widgets.CommittablePanel;
 
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
  * Self organizing map.
  *
  */
-public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
+public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
+    CommittablePanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_SOM_NEURONS = 16;
@@ -132,7 +134,7 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
         mainPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
         mainPanel
-                .addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+        .addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
         add(mainPanel);
     }
 
@@ -183,21 +185,28 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Group commitChanges() {
-        if (panelType == SOMPropsPanelType.CREATE_GROUP) {
-            som = new SOMGroup(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumSOMNeurons.getText()));
-            commitSOMGroupFieldValues();
-        } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-            som = new SOMNetwork(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumSOMNeurons.getText()),
-                    Integer.parseInt(tfNumInputNeurons.getText()));
-            commitSOMNetworkFieldValues();
-        } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
-            commitSOMGroupFieldValues();
+    public boolean commitChanges() {
+        try {
+            if (panelType == SOMPropsPanelType.CREATE_GROUP) {
+                som = new SOMGroup(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumSOMNeurons.getText()));
+                commitSOMGroupFieldValues();
+            } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
+                som = new SOMNetwork(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumSOMNeurons.getText()),
+                        Integer.parseInt(tfNumInputNeurons.getText()));
+                commitSOMNetworkFieldValues();
+            } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
+                commitSOMGroupFieldValues();
+            }
+        } catch (NumberFormatException nfe) {
+            return false; // Failure
         }
-        return som;
+        return true; // Success
     }
 
     /**
@@ -228,9 +237,28 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel {
                 Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getHelpPath() {
         return "Pages/Network/network/som.html";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Group getGroup() {
+        return som;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

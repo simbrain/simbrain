@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -26,6 +25,7 @@ import org.simbrain.util.StandardDialog;
  * <b>NeuronGroupCreationDialog</b> is a dialog box for creating a bare neuron
  * group.
  */
+@SuppressWarnings("serial")
 public class NeuronGroupCreationDialog extends StandardDialog {
 
     /** The panel representing the neuron group to be created. */
@@ -49,11 +49,15 @@ public class NeuronGroupCreationDialog extends StandardDialog {
     /**
      * Called when dialog closes.
      */
+    @Override
     protected void closeDialogOk() {
-        NeuronGroup group = neuronGroupPanel.commitChanges();
-        networkPanel.getNetwork().addGroup(group);
+        boolean success = neuronGroupPanel.commitChanges();
+        if (!success) { // Something went wrong...
+            return; // Do not close the panel or add the group (do not pass go)
+        }
+        networkPanel.getNetwork().addGroup(neuronGroupPanel.getGroup());
         networkPanel.repaint();
         super.closeDialogOk();
-
     }
+
 }

@@ -57,8 +57,8 @@ public class HopfieldPropertiesPanel extends JPanel implements
     public static final int RANDOM = 1;
 
     /** Network type combo box. */
-    private JComboBox cbUpdateOrder = new JComboBox(new String[] {
-            "Sequential", "Random" });
+    private JComboBox<String> cbUpdateOrder = new JComboBox<String>(
+            new String[] {"Sequential", "Random", });
 
     /** The model subnetwork. */
     private Hopfield hopfield;
@@ -118,8 +118,9 @@ public class HopfieldPropertiesPanel extends JPanel implements
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
+    @Override
     public void fillFieldValues() {
         if (isCreationPanel) {
             hopfield = new Hopfield(null, 1);
@@ -128,19 +129,37 @@ public class HopfieldPropertiesPanel extends JPanel implements
         cbUpdateOrder.setSelectedIndex(hopfield.getUpdateOrder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Group commitChanges() {
-        if (isCreationPanel) {
-            hopfield = new Hopfield(networkPanel.getNetwork(),
-                    Integer.parseInt(tfNumNeurons.getText()));
+    public boolean commitChanges() {
+        try {
+            if (isCreationPanel) {
+                hopfield = new Hopfield(networkPanel.getNetwork(),
+                        Integer.parseInt(tfNumNeurons.getText()));
+            }
+            hopfield.setUpdateOrder(getUpdateType());
+        } catch (NumberFormatException nfe) {
+            return false; // Failure
         }
-        hopfield.setUpdateOrder(getUpdateType());
-        return hopfield;
+        return true; // Success
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getHelpPath() {
         return "Pages/Network/network/hopfieldnetwork.html";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Group getGroup() {
+        return hopfield;
     }
 
 }

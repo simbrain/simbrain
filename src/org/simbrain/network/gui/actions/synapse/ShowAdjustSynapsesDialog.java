@@ -89,7 +89,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
 
         final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                networkPanel);
+                networkPanel, networkPanel.getSelectedModelSynapses());
         JDialog dialog = new JDialog();
         dialog.setTitle("Adjust selected synapses");
         dialog.setContentPane(synapsePanel);

@@ -33,6 +33,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
@@ -160,9 +161,9 @@ public class SynapseGroupDialog extends StandardDialog {
 
         // Adjust weights tab. TODO: Add back once SynapseAdjustmentPanel worked
         // out
-        // tabbedPane.addTab("Adjust weights", tabAdjust);
-        // tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
-        // .getSynapseList()));
+         tabbedPane.addTab("Adjust weights", tabAdjust);
+         tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
+         .getSynapseList()));
 
         if (!isCreationPanel) {
             // Weight Matrix

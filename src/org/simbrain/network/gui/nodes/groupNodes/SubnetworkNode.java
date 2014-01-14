@@ -23,23 +23,44 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
-import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.nodes.OutlinedObjects;
+import org.simbrain.network.trainers.Trainable;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * PNode representation of a subnetwork.
+ * PNode representation of a subnetwork. This class contains an interaction box
+ * an {@link OutlinedObjects} node (containing neuron groups and synapse groups)
+ * as children. The outlinedobjects node draws the boundary around the contained
+ * nodes. The interaction box is the point of contact. Layout happens in the
+ * overridden layoutchildren method.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends GroupNode {
+public class SubnetworkNode extends PPath {
+
+    /** Parent network panel. */
+    private final NetworkPanel networkPanel;
+
+    /** Reference to the subnet being represented. */
+    private final Subnetwork subnetwork;
+
+    /** The interaction box for this neuron group. */
+    private SubnetworkNodeInteractionBox interactionBox;
+
+    /** The outlined objects (neuron and synapse groups) for this node. */
+    private final OutlinedObjects outlinedObjects;
 
     /**
      * Create a subnetwork node.
@@ -48,34 +69,71 @@ public class SubnetworkNode extends GroupNode {
      * @param group the layered network
      */
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
-        super(networkPanel, group);
-        setInteractionBox(new SubnetworkNodeInteractionBox(networkPanel));
+        this.networkPanel = networkPanel;
+        this.subnetwork = group;
+        outlinedObjects = new OutlinedObjects();
+        outlinedObjects.setFillBackground(false);
+        interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
+        interactionBox.setText(group.getLabel());
+        addChild(outlinedObjects);
+        addChild(interactionBox);
+        // Must do this after it's added to properly locate the text
+        interactionBox.updateText();
     }
 
+    /**
+     * Override pnode layoutChildren to get objects placed in correct spots.
+     */
     @Override
-    public void updateBounds() {
+    public void layoutChildren() {
+        interactionBox.setOffset(
+                outlinedObjects.getFullBounds().getX(),
+                outlinedObjects.getFullBounds().getY()
+                        - interactionBox.getHeight() + 1);
+    }
 
-        PBounds bounds = new PBounds();
-        for (PNode node : getOutlinedObjects()) {
-            if (node.getVisible()) {
-                bounds.add(node.getGlobalBounds());
-            }
+    /**
+     * Add a node (neuron or synapse group to the subnetwork's outline)
+     * and move synapsegroup nodes to the back.
+     *
+     * @param node the node to add
+     */
+    public void addNode(PNode node) {
+        outlinedObjects.addChild(node);
+        if (node instanceof SynapseGroupNode) {
+            node.moveToBack();
         }
+    }
 
-        if (((Subnetwork) getGroup()).displayNeuronGroups()) {
-            // Add a little extra height at top
-            double inset = getOutlinePadding();
-            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset - 15,
-                    bounds.getWidth() + (2 * inset), bounds.getHeight()
-                            + (2 * inset) + 15);
+    /**
+     * Update the text in the interaction box.
+     */
+    public void updateText() {
+        interactionBox.setText(subnetwork.getLabel());
+        interactionBox.updateText();
+    };
 
-            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                    (float) bounds.getWidth(), (float) bounds.getHeight());
+    /**
+     * @return the networkPanel
+     */
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
 
-            updateInteractionBox();
-        } else {
-            super.updateBounds();
-        }
+    /**
+     * Get reference to model subnetwork.
+     *
+     * @return the subnetwork represented here.
+     */
+    public Subnetwork getSubnetwork() {
+        return subnetwork;
+    }
+
+    /**
+     * @return the outlinedObjects
+     */
+    public OutlinedObjects getOutlinedObjects() {
+        return outlinedObjects;
     }
 
     /**
@@ -85,7 +143,7 @@ public class SubnetworkNode extends GroupNode {
     private class SubnetworkNodeInteractionBox extends InteractionBox {
 
         public SubnetworkNodeInteractionBox(NetworkPanel net) {
-            super(net, SubnetworkNode.this);
+            super(net);
         }
 
         @Override
@@ -101,7 +159,8 @@ public class SubnetworkNode extends GroupNode {
     };
 
     /**
-     * Helper class to create the subnetwork dialog.
+     * Helper class to create the subnetwork dialog. Subclasses override this
+     * class to create custom property dialogs.
      *
      * @return the neuron group property dialog.
      */
@@ -111,7 +170,7 @@ public class SubnetworkNode extends GroupNode {
             private final SubnetworkPanel panel;
             {
                 panel = new SubnetworkPanel(getNetworkPanel(),
-                        (Subnetwork) SubnetworkNode.this.getGroup(), this);
+                        (Subnetwork) SubnetworkNode.this.getSubnetwork(), this);
                 setContentPane(panel);
             }
 
@@ -123,12 +182,37 @@ public class SubnetworkNode extends GroupNode {
         return dialog;
     }
 
+
     /**
-     * Action for invoking the edit menu. Currently this is always also a
-     * training menu. If this is not the case for other subnetworks then the
-     * name can be changed and separate actions made.
+     * Set a custom context menu for the interaction box.
+     *
+     * @param menu the menu to set
      */
-    protected Action editGroup = new AbstractAction("Edit / Train...") {
+    public void setContextMenu(final JPopupMenu menu) {
+        interactionBox.setContextMenu(menu);
+    }
+
+    /**
+     * Creates default actions for all model group nodes.
+     *
+     * @return context menu populated with default actions.
+     */
+    protected JPopupMenu getDefaultContextMenu() {
+        JPopupMenu ret = new JPopupMenu();
+
+        ret.add(renameGroup);
+        ret.add(removeGroup);
+        if (subnetwork instanceof Trainable) {
+            ret.addSeparator();
+            ret.add(testInputAction);
+        }
+        return ret;
+    }
+
+    /**
+     * Action for invoking the default edit and properties menu.
+     */
+    protected Action editGroup = new AbstractAction("Edit...") {
         public void actionPerformed(final ActionEvent event) {
             StandardDialog dialog = getPropertyDialog();
             dialog.pack();
@@ -137,5 +221,55 @@ public class SubnetworkNode extends GroupNode {
         }
     };
 
+    /** Action for editing the group name. */
+    protected Action renameGroup = new AbstractAction("Rename group...") {
+        public void actionPerformed(final ActionEvent event) {
+            String newName = JOptionPane.showInputDialog("Name:",
+                    subnetwork.getLabel());
+            subnetwork.setLabel(newName);
+        }
+    };
+
+    /**
+     * Action for removing this group
+     */
+    protected Action removeGroup = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(NAME, "Remove group...");
+            putValue(SHORT_DESCRIPTION, "Remove subnetwork...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            getNetworkPanel().getNetwork().removeGroup(subnetwork);
+        }
+    };
+
+    /**
+     * Action for testing inputs to trainable networks.
+     */
+    private Action testInputAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
+            putValue(NAME, "Test network...");
+            putValue(SHORT_DESCRIPTION, "Test network...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            if (subnetwork instanceof Trainable) {
+                TestInputPanel testInputPanel = new TestInputPanel(
+                        getNetworkPanel(),
+                        ((Trainable) subnetwork).getInputNeurons(),
+                        ((Trainable) subnetwork).getTrainingSet()
+                                .getInputData());
+                getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
+
+            }
+        }
+    };
 
 }

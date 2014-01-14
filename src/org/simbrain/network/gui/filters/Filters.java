@@ -18,13 +18,14 @@
  */
 package org.simbrain.network.gui.filters;
 
-import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -61,7 +62,8 @@ public final class Filters {
     private static final AbstractFilter MODEL_GROUP_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return (node instanceof GroupNode);
+            return ((node instanceof NeuronGroupNode)
+                    || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
         }
     };
 
@@ -108,7 +110,8 @@ public final class Filters {
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return (node instanceof GroupNode);
+            return ((node instanceof NeuronGroupNode)
+                    || (node instanceof SynapseGroupNode) || (node instanceof SubnetworkNode));
         }
     };
 

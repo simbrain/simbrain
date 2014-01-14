@@ -51,7 +51,7 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
     @Override
     protected StandardDialog getPropertyDialog() {
         return new CompetitiveTrainingDialog(getNetworkPanel(),
-                (CompetitiveNetwork) getGroup());
+                (CompetitiveNetwork) getSubnetwork());
 
     }
 
@@ -66,8 +66,8 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveNetwork) getGroup()).update();
-                ((CompetitiveNetwork) getGroup()).getParentNetwork()
+                ((CompetitiveNetwork) getSubnetwork()).update();
+                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };
@@ -75,9 +75,9 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveNetwork) getGroup()).getCompetitive()
+                ((CompetitiveNetwork) getSubnetwork()).getCompetitive()
                         .randomize();
-                ((CompetitiveNetwork) getGroup()).getParentNetwork()
+                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };

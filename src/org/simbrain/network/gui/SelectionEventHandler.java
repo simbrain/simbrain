@@ -26,11 +26,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
+import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
@@ -49,6 +52,10 @@ import edu.umd.cs.piccolox.nodes.PStyledText;
  * Selection event handler. Creates the selection "lasso", handles selection and
  * toggle selection, drags objects as appropriate, updates relevant graphics
  * parameters like "last clicked position".
+ *
+ * Coding this properly requires tracking picked nodes and their parents fairly
+ * closely. To see the scene graph hierarchy for debugging this use ctrl-c while
+ * a network panel is open.
  *
  * @author Michael Heuer
  * @author Jeff Yoshimi
@@ -153,15 +160,22 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        // Clicking on text objects picks the underlying text object
-        if (pickedNode instanceof PStyledText) {
+        //System.out.println("start:" + pickedNode);
+        //System.out.println("start-parent:" + pickedNode.getParent());
+
+        // Set picked node to parent node in some cases
+        if (pickedNode.getParent() instanceof TextNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof NeuronNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof InteractionBox) {
             pickedNode = pickedNode.getParent();
         }
 
         if (pickedNode instanceof NeuronNode) {
             networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
             // To ensure fire neuron moving events don't affect these
-            // neurons
+            // neurons. TODO: Is this still needed?
             ((NeuronNode) pickedNode).setMoving(true);
         }
 
@@ -215,16 +229,42 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
 
         }
 
-        // Continue to drag node that have already been selected
+        // Where is the drag in relation to the initially clicked on object
         PDimension delta = event.getDeltaRelativeTo(pickedNode);
+
+        //System.out.println("Drag:" + pickedNode);
+
+        // Handle interaction box dragging
+        if (pickedNode instanceof InteractionBox) {
+            if (pickedNode.getParent() instanceof NeuronGroupNode) {
+
+                // Move the neurongroupnode
+                pickedNode.getParent().offset(delta.getWidth(),
+                        delta.getHeight());
+
+                // Update model.  Need to do this so that attached synapse group
+                //  nodes are updated properly
+                ((NeuronGroupNode) pickedNode.getParent())
+                        .pushViewPositionToModel();
+            } else if (pickedNode.getParent() instanceof SubnetworkNode) {
+                pickedNode.getParent().offset(delta.getWidth(),
+                        delta.getHeight());
+            }
+        }
+
+        // Continue to drag node that have already been selected
         for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof ScreenElement) {
-                if (pickedNode instanceof NeuronNode) {
-                    ((NeuronNode) pickedNode).pushViewPositionToModel();
-                } else if (pickedNode instanceof NeuronNode) {
-                    ((TextNode) pickedNode).pushViewPositionToModel();
-                }
+                //TODO: If parent is being dragged don't drag this?
+
+                // //TODO: Check if these ever happens or is needed
+                // if (pickedNode instanceof NeuronNode) {
+                // ((NeuronNode) pickedNode)
+                // .pushViewPositionToModel();
+                // } else if (pickedNode instanceof TextNode) {
+                // ((TextNode) pickedNode).pushViewPositionToModel();
+                // }
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.isDraggable()) {
                     screenElement.localToParent(delta);
@@ -249,14 +289,32 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             return;
         }
 
-        // To ensure fire neuron moving events don't affect these neurons
-        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
-            PNode node = (PNode) i.next();
+        // Write changes to model nodes
+        for (PNode node : networkPanel.getSelection()) {
             if (node instanceof NeuronNode) {
+                // Ensure fire neuron moving events don't affect moved neurons
                 ((NeuronNode) node).setMoving(false);
                 ((NeuronNode) node).pushViewPositionToModel();
             } else if (node instanceof TextNode) {
                 ((TextNode) node).pushViewPositionToModel();
+            } else if (node instanceof InteractionBox) {
+                if (pickedNode.getParent() instanceof NeuronGroupNode) {
+                    ((NeuronGroupNode) pickedNode.getParent())
+                            .pushViewPositionToModel();
+                } else if (pickedNode.getParent() instanceof SubnetworkNode) {
+                    // TODO: Dragging subnetwork does not properly update neuron groups
+                    // When dragging subnets at end of drag update neuron group positions
+//                    for (Object subnetNode : ((SubnetworkNode) pickedNode
+//                            .getParent()).getOutlinedObjects()
+//                            .getChildrenReference()) {
+//                        if (subnetNode instanceof NeuronGroupNode) {
+//                            ((NeuronGroupNode) subnetNode)
+//                                    .pushViewPositionToModel();
+//                        }
+//                    }
+
+                }
+
             }
         }
 

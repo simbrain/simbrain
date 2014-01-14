@@ -48,9 +48,9 @@ public class SOMGroupNode extends NeuronGroupNode {
     public SOMGroupNode(final NetworkPanel networkPanel, final SOMGroup group) {
         super(networkPanel, group);
         // setStrokePaint(Color.green);
-        setCustomMenu();
+        setCustomMenuItems();
         setInteractionBox(new SOMInteractionBox(networkPanel));
-        setOutlinePadding(15f);
+        // setOutlinePadding(15f);
         networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
@@ -59,39 +59,25 @@ public class SOMGroupNode extends NeuronGroupNode {
                         + Utils.round(group.getNeighborhoodSize(), 2) + ")");
             }
 
-            public void neuronClampToggled() {
-            }
-
-            public void synapseClampToggled() {
-            }
-
         });
     }
 
     /**
      * Custom interaction box for SOM group node.
      */
-    private class SOMInteractionBox extends InteractionBox {
+    private class SOMInteractionBox extends NeuronGroupInteractionBox {
         public SOMInteractionBox(NetworkPanel net) {
-            super(net, SOMGroupNode.this);
+            super(net);
         }
 
         @Override
         protected String getToolTipText() {
             return "Current learning rate: "
-                    + Utils.round(((SOMGroup) getGroup()).getAlpha(), 2)
+                    + Utils.round(((SOMGroup) getNeuronGroup()).getAlpha(), 2)
                     + "  Current neighborhood size: "
-                    + Utils.round(((SOMGroup) getGroup()).getNeighborhoodSize(), 2);
-        }
-
-        @Override
-        protected boolean hasPropertyDialog() {
-            return false;
-        }
-
-        @Override
-        protected JDialog getPropertyDialog() {
-            return null;
+                    + Utils.round(
+                            ((SOMGroup) getNeuronGroup()).getNeighborhoodSize(),
+                            2);
         }
 
         @Override
@@ -103,28 +89,31 @@ public class SOMGroupNode extends NeuronGroupNode {
     /**
      * Sets custom menu for SOM node.
      */
-    protected void setCustomMenu() {
-        JMenu customMenuItems = new JMenu("SOM Actions");
-        customMenuItems.add(new JMenuItem(new AbstractAction("Reset Network") {
+    protected void setCustomMenuItems() {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+                "Reset SOM Network") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getGroup()).reset();
-                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getNeuronGroup()).reset();
+                ((SOMGroup) getNeuronGroup()).getParentNetwork()
+                        .fireNetworkChanged();
             }
         }));
-        customMenuItems.add(new JMenuItem(new AbstractAction("Recall") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+                "Recall SOM Memory") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getGroup()).recall();
-                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getNeuronGroup()).recall();
+                ((SOMGroup) getNeuronGroup()).getParentNetwork()
+                        .fireNetworkChanged();
             }
         }));
-        customMenuItems.add(new JMenuItem(new AbstractAction(
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
                 "Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getGroup()).randomizeIncomingWeights();
-                ((SOMGroup) getGroup()).getParentNetwork().fireNetworkChanged();
+                ((SOMGroup) getNeuronGroup()).randomizeIncomingWeights();
+                ((SOMGroup) getNeuronGroup()).getParentNetwork()
+                        .fireNetworkChanged();
             }
         }));
-        setCustomMenu(customMenuItems);
     }
 
 }

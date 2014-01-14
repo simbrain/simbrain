@@ -51,50 +51,50 @@ public class SRNNetworkNode extends SubnetworkNode {
     public SRNNetworkNode(final NetworkPanel networkPanel,
             final SimpleRecurrentNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new SRNInteractionBox(networkPanel));
+        //setInteractionBox(new SRNInteractionBox(networkPanel));
         setContextMenu();
 
     }
 
-    /**
-     * Custom interaction box for SRN's.
-     */
-    private class SRNInteractionBox extends InteractionBox {
-        public SRNInteractionBox(NetworkPanel net) {
-            super(net, SRNNetworkNode.this);
-        }
-
-        // @Override
-        // protected JDialog getPropertyDialog() {
-        // TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-        // getTrainer());
-        // JDialog dialog = new JDialog();
-        // dialog.setContentPane(panel);
-        // return dialog;
-        // }
-        //
-        // @Override
-        // protected boolean hasPropertyDialog() {
-        // return true;
-        // }
-
-        @Override
-        protected String getToolTipText() {
-            return "SRN...";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-    };
+//    /**
+//     * Custom interaction box for SRN's.
+//     */
+//    private class SRNInteractionBox extends InteractionBox {
+//        public SRNInteractionBox(NetworkPanel net) {
+//            super(net, SRNNetworkNode.this);
+//        }
+//
+//        // @Override
+//        // protected JDialog getPropertyDialog() {
+//        // TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
+//        // getTrainer());
+//        // JDialog dialog = new JDialog();
+//        // dialog.setContentPane(panel);
+//        // return dialog;
+//        // }
+//        //
+//        // @Override
+//        // protected boolean hasPropertyDialog() {
+//        // return true;
+//        // }
+//
+//        @Override
+//        protected String getToolTipText() {
+//            return "SRN...";
+//        }
+//
+//        @Override
+//        protected boolean hasToolTipText() {
+//            return true;
+//        }
+//
+//    };
 
     /**
      * Sets custom menu.
      */
     private void setContextMenu() {
-        final SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getGroup();
+        final SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
@@ -128,7 +128,7 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getGroup();
+            SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
             IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new SRNTrainer(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

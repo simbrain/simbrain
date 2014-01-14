@@ -68,7 +68,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         menu.add(removeGroup);
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
-        final LMSNetwork network = (LMSNetwork) getGroup();
+        final LMSNetwork network = (LMSNetwork) getSubnetwork();
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
                 getNetworkPanel(), network));
         dataActions.addSeparator();
@@ -86,7 +86,7 @@ public class LMSNetworkNode extends SubnetworkNode {
     @Override
     protected StandardDialog getPropertyDialog() {
         return new LMSEditorDialog(this.getNetworkPanel(),
-                (LMSNetwork) getGroup());
+                (LMSNetwork) getSubnetwork());
     }
 
     /**
@@ -103,7 +103,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            LMSNetwork network = (LMSNetwork) getGroup();
+            LMSNetwork network = (LMSNetwork) getSubnetwork();
             IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new LMSIterative(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
@@ -126,7 +126,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            LMSNetwork network = (LMSNetwork) getGroup();
+            LMSNetwork network = (LMSNetwork) getSubnetwork();
             LMSOfflineTrainingPanel trainingPanel = new LMSOfflineTrainingPanel(
                     getNetworkPanel(), new LMSOffline(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

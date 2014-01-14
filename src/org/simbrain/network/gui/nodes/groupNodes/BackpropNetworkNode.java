@@ -65,7 +65,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.add(renameGroup);
         menu.add(removeGroup);
         menu.addSeparator();
-        final BackpropNetwork network = (BackpropNetwork) getGroup();
+        final BackpropNetwork network = (BackpropNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
                 getNetworkPanel(), network));
@@ -85,7 +85,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     protected StandardDialog getPropertyDialog() {
 
         return new BackpropEditorDialog(this.getNetworkPanel(),
-                (BackpropNetwork) getGroup());
+                (BackpropNetwork) getSubnetwork());
     }
 
     /**
@@ -102,7 +102,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            BackpropNetwork network = (BackpropNetwork) getGroup();
+            BackpropNetwork network = (BackpropNetwork) getSubnetwork();
             IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new BackpropTrainer(network,
                             network.getNeuronGroupsAsList()));

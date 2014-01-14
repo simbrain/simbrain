@@ -49,7 +49,7 @@ public class SOMNetworkNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getGroup());
+        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getSubnetwork());
     }
 
 
@@ -64,8 +64,8 @@ public class SOMNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getGroup()).update();
-                ((SOMNetwork) getGroup()).getParentNetwork()
+                ((SOMNetwork) getSubnetwork()).update();
+                ((SOMNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };
@@ -73,8 +73,8 @@ public class SOMNetworkNode extends SubnetworkNode {
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getGroup()).getSom().randomizeIncomingWeights();
-                ((SOMNetwork) getGroup()).getParentNetwork()
+                ((SOMNetwork) getSubnetwork()).getSom().randomizeIncomingWeights();
+                ((SOMNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };

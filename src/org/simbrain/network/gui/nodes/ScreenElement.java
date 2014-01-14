@@ -27,10 +27,10 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.gui.NetworkPanel;
 
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
+import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,
@@ -62,19 +62,13 @@ import edu.umd.cs.piccolo.event.PInputEventFilter;
  *
  * </p>
  */
-public abstract class ScreenElement extends PNode {
+public abstract class ScreenElement extends PPath {
 
     /** Network panel. */
     private NetworkPanel networkPanel;
 
     /** Is this element a member of a view group?. */
     private boolean isGrouped = false;
-
-    /**
-     * Default Constructor.
-     */
-    public ScreenElement() {
-    }
 
     /**
      * Create a new abstract screen element with the specified network panel.

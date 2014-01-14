@@ -50,50 +50,16 @@ public class BPTTNode extends SubnetworkNode {
      */
     public BPTTNode(final NetworkPanel networkPanel, final BPTTNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new BackpropInteractionBox(networkPanel));
+        //setInteractionBox(new BackpropInteractionBox(networkPanel));
         setContextMenu();
 
     }
 
     /**
-     * Custom interaction box for Synapse group node.
-     */
-    private class BackpropInteractionBox extends InteractionBox {
-        public BackpropInteractionBox(NetworkPanel net) {
-            super(net, BPTTNode.this);
-        }
-
-        // @Override
-        // protected JDialog getPropertyDialog() {
-        // TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-        // getTrainer());
-        // JDialog dialog = new JDialog();
-        // dialog.setContentPane(panel);
-        // return dialog;
-        // }
-        //
-        // @Override
-        // protected boolean hasPropertyDialog() {
-        // return true;
-        // }
-
-        @Override
-        protected String getToolTipText() {
-            return "Backprop through time...";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-    };
-
-    /**
      * Sets custom menu.
      */
     private void setContextMenu() {
-        final BPTTNetwork network = (BPTTNetwork) getGroup();
+        final BPTTNetwork network = (BPTTNetwork) getSubnetwork();
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainAction));
@@ -127,7 +93,7 @@ public class BPTTNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            BPTTNetwork network = (BPTTNetwork) getGroup();
+            BPTTNetwork network = (BPTTNetwork) getSubnetwork();
             IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
                     getNetworkPanel(), new BPTTTrainer(network));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

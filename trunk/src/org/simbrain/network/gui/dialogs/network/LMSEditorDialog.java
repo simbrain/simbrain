@@ -31,7 +31,7 @@ import javax.swing.SwingConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
-import org.simbrain.network.gui.trainer.LMSOfflineControlPanel;
+import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.LMSOfflineControlPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;

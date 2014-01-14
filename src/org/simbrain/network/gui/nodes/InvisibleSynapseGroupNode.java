@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes.groupNodes;
+package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
 import java.awt.geom.Line2D;
@@ -29,8 +29,6 @@ import javax.swing.JDialog;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.nodes.OutlinedObjects;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;

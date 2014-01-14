@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes.groupNodes;
+package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import java.awt.event.ActionEvent;
 
@@ -25,36 +25,39 @@ import javax.swing.Action;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
-import org.simbrain.network.subnetworks.SOMNetwork;
+import org.simbrain.network.gui.dialogs.network.CompetitiveTrainingDialog;
+import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
 
 /**
- * PNode representation of SOM Network.
+ * PNode representation of competitive network.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
-public class SOMNetworkNode extends SubnetworkNode {
+public class CompetitiveNetworkNode extends SubnetworkNode {
 
     /**
-     * Create a SOM Network PNode.
+     * Create a competitive Network PNode.
      *
      * @param networkPanel parent panel
-     * @param group the SOM network
+     * @param group the competitive network
      */
-    public SOMNetworkNode(NetworkPanel networkPanel, SOMNetwork group) {
+    public CompetitiveNetworkNode(NetworkPanel networkPanel,
+            CompetitiveNetwork group) {
         super(networkPanel, group);
         setContextMenu();
     }
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getSubnetwork());
+        return new CompetitiveTrainingDialog(getNetworkPanel(),
+                (CompetitiveNetwork) getSubnetwork());
+
     }
 
-
     /**
-     * Sets custom menu for SOM Network node.
+     * Sets custom menu for Competitive Network node.
      */
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
@@ -64,8 +67,8 @@ public class SOMNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getSubnetwork()).update();
-                ((SOMNetwork) getSubnetwork()).getParentNetwork()
+                ((CompetitiveNetwork) getSubnetwork()).update();
+                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };
@@ -73,8 +76,9 @@ public class SOMNetworkNode extends SubnetworkNode {
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getSubnetwork()).getSom().randomizeIncomingWeights();
-                ((SOMNetwork) getSubnetwork()).getParentNetwork()
+                ((CompetitiveNetwork) getSubnetwork()).getCompetitive()
+                        .randomize();
+                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
                         .fireNetworkChanged();
             }
         };

@@ -1,4 +1,5 @@
 /*
+ * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes.groupNodes;
+package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import java.awt.event.ActionEvent;
 
@@ -26,70 +27,86 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.ESNOfflineTrainingPanel;
+import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
+import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
-import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * PNode representation of an Echo State Network.
+ * PNode representation of a group of a backprop network.
+ *
+ * @author jyoshimi
  */
-public class ESNNetworkNode extends SubnetworkNode {
+public class BackpropNetworkNode extends SubnetworkNode {
 
     /**
-     * Create an ESN network.
+     * Create a layered network.
      *
      * @param networkPanel parent panel
-     * @param group the ESN
+     * @param group the layered network
      */
-    public ESNNetworkNode(NetworkPanel networkPanel, EchoStateNetwork group) {
+    public BackpropNetworkNode(final NetworkPanel networkPanel,
+            final BackpropNetwork group) {
         super(networkPanel, group);
         setContextMenu();
+
     }
 
     /**
      * Sets custom menu.
      */
     private void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(editGroup);
+        menu.add(renameGroup);
+        menu.add(removeGroup);
         menu.addSeparator();
-        menu.add(new JMenuItem(trainOfflineAction));
-        menu.addSeparator();
-
-        final EchoStateNetwork esn = (EchoStateNetwork) getSubnetwork();
-        final TrainingSet trainingSet = new TrainingSet(esn.getInputData(),
-                esn.getTargetData());
-
+        final BackpropNetwork network = (BackpropNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");
+        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
+                getNetworkPanel(), network));
+        dataActions.addSeparator();
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                esn.getInputLayer().getNeuronList(),
-                trainingSet.getInputDataMatrix(), "Input"));
+                network.getInputNeurons(), network.getTrainingSet()
+                        .getInputDataMatrix(), "Input"));
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                esn.getOutputLayer().getNeuronList(),
-                trainingSet.getTargetDataMatrix(), "Target"));
+                network.getOutputNeurons(), network.getTrainingSet()
+                        .getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
+
         setContextMenu(menu);
     }
 
+    @Override
+    protected StandardDialog getPropertyDialog() {
+
+        return new BackpropEditorDialog(this.getNetworkPanel(),
+                (BackpropNetwork) getSubnetwork());
+    }
+
     /**
-     * Action to train ESN Offline
+     * Action to train Backprop.  No longer used.
      */
-    Action trainOfflineAction = new AbstractAction() {
+    private Action trainAction = new AbstractAction() {
 
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-            putValue(NAME, "Train offline...");
-            putValue(SHORT_DESCRIPTION, "Train offline...");
+            putValue(NAME, "Train network...");
+            putValue(SHORT_DESCRIPTION, "Train network...");
         }
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            EchoStateNetwork network = (EchoStateNetwork) getSubnetwork();
-            ESNOfflineTrainingPanel trainingPanel = new ESNOfflineTrainingPanel(
-                    getNetworkPanel(), network);
+            BackpropNetwork network = (BackpropNetwork) getSubnetwork();
+            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
+                    getNetworkPanel(), new BackpropTrainer(network,
+                            network.getNeuronGroupsAsList()));
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
                     "Trainer");
             trainingPanel.setFrame(frame);

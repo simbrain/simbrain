@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes.groupNodes;
+package org.simbrain.network.gui.nodes;
 
 import java.awt.BasicStroke;
 import java.awt.event.ActionEvent;
@@ -38,10 +38,6 @@ import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
-import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.OutlinedObjects;
-import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 

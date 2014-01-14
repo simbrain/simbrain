@@ -30,7 +30,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.AddNeuronsAction;
+import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.InvisibleSynapseGroupNode;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;

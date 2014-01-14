@@ -30,65 +30,58 @@ import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.gui.actions.AddSynapseGroupAction;
-import org.simbrain.network.gui.actions.AlignHorizontalAction;
-import org.simbrain.network.gui.actions.AlignVerticalAction;
-import org.simbrain.network.gui.actions.CopyAction;
-import org.simbrain.network.gui.actions.CutAction;
-import org.simbrain.network.gui.actions.DeleteAction;
-import org.simbrain.network.gui.actions.EditRandomizerPropertiesAction;
 import org.simbrain.network.gui.actions.GroupAction;
-import org.simbrain.network.gui.actions.IterateNetworkAction;
-import org.simbrain.network.gui.actions.NewCompetitiveNetworkAction;
-import org.simbrain.network.gui.actions.NewHopfieldNetworkAction;
-import org.simbrain.network.gui.actions.NewKwtaNetworkAction;
-import org.simbrain.network.gui.actions.NewNeuronAction;
-import org.simbrain.network.gui.actions.NewSOMNetworkAction;
-import org.simbrain.network.gui.actions.NewWTANetworkAction;
-import org.simbrain.network.gui.actions.PanEditModeAction;
-import org.simbrain.network.gui.actions.PasteAction;
-import org.simbrain.network.gui.actions.RandomizeObjectsAction;
-import org.simbrain.network.gui.actions.RunNetworkAction;
-import org.simbrain.network.gui.actions.SelectAllAction;
-import org.simbrain.network.gui.actions.SelectAllNeuronsAction;
-import org.simbrain.network.gui.actions.SelectAllWeightsAction;
-import org.simbrain.network.gui.actions.SelectIncomingWeightsAction;
-import org.simbrain.network.gui.actions.SelectOutgoingWeightsAction;
-import org.simbrain.network.gui.actions.SelectionEditModeAction;
-import org.simbrain.network.gui.actions.SetAutoZoomAction;
-import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
-import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
-import org.simbrain.network.gui.actions.ShowAdjustConnectivityDialog;
-import org.simbrain.network.gui.actions.ShowAdjustSynapsesDialog;
 import org.simbrain.network.gui.actions.ShowDebugAction;
-import org.simbrain.network.gui.actions.ShowEditToolBarAction;
-import org.simbrain.network.gui.actions.ShowGUIAction;
-import org.simbrain.network.gui.actions.ShowIOInfoAction;
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
-import org.simbrain.network.gui.actions.ShowMainToolBarAction;
-import org.simbrain.network.gui.actions.ShowNetworkHierarchyPanel;
-import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
-import org.simbrain.network.gui.actions.ShowNetworkUpdaterDialog;
-import org.simbrain.network.gui.actions.ShowPrioritiesAction;
-import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.ShowTrainerAction;
-import org.simbrain.network.gui.actions.ShowWeightMatrixAction;
-import org.simbrain.network.gui.actions.ShowWeightsAction;
-import org.simbrain.network.gui.actions.SpaceHorizontalAction;
-import org.simbrain.network.gui.actions.SpaceVerticalAction;
-import org.simbrain.network.gui.actions.StopNetworkAction;
 import org.simbrain.network.gui.actions.TestInputAction;
-import org.simbrain.network.gui.actions.TextEditModeAction;
 import org.simbrain.network.gui.actions.UngroupAction;
-import org.simbrain.network.gui.actions.WandEditModeAction;
-import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
-import org.simbrain.network.gui.actions.ZoomEditModeAction;
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
+import org.simbrain.network.gui.actions.edit.AlignHorizontalAction;
+import org.simbrain.network.gui.actions.edit.AlignVerticalAction;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.EditRandomizerPropertiesAction;
+import org.simbrain.network.gui.actions.edit.PanEditModeAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.edit.RandomizeObjectsAction;
+import org.simbrain.network.gui.actions.edit.SelectionEditModeAction;
+import org.simbrain.network.gui.actions.edit.SetAutoZoomAction;
+import org.simbrain.network.gui.actions.edit.SpaceHorizontalAction;
+import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
+import org.simbrain.network.gui.actions.edit.TextEditModeAction;
+import org.simbrain.network.gui.actions.edit.WandEditModeAction;
+import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
+import org.simbrain.network.gui.actions.edit.ZoomEditModeAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
+import org.simbrain.network.gui.actions.network.IterateNetworkAction;
+import org.simbrain.network.gui.actions.network.RunNetworkAction;
+import org.simbrain.network.gui.actions.network.ShowNetworkHierarchyPanel;
+import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
+import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
+import org.simbrain.network.gui.actions.network.StopNetworkAction;
+import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
+import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
+import org.simbrain.network.gui.actions.selection.SelectAllAction;
+import org.simbrain.network.gui.actions.selection.SelectAllNeuronsAction;
+import org.simbrain.network.gui.actions.selection.SelectAllWeightsAction;
+import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
+import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
+import org.simbrain.network.gui.actions.synapse.ShowAdjustConnectivityDialog;
+import org.simbrain.network.gui.actions.synapse.ShowAdjustSynapsesDialog;
+import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction;
+import org.simbrain.network.gui.actions.synapse.ShowWeightsAction;
+import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
@@ -179,9 +172,6 @@ public final class NetworkActionManager {
     /** Space horizontal action. */
     private final Action spaceHorizontalAction;
 
-    /** Show IO information action. */
-    private final Action showIOInfoAction;
-
     /** Set auto zoom action. */
     private final Action setAutoZoomAction;
 
@@ -196,21 +186,6 @@ public final class NetworkActionManager {
 
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
-
-    /** New competitive network action. */
-    private final Action newCompetitiveNetworkAction;
-
-    /** New discrete Hopfield network action. */
-    private final Action newHopfieldNetworkAction;
-
-    /** New winner take all network action. */
-    private final Action newWTANetworkAction;
-
-    /** New Self-organizing Map network action. */
-    private final Action newSOMNetworkAction;
-
-    /** New Kwta network action. */
-    private final Action newKwtaNetworkAction;
 
     /** Determines if main tool bar is to be shown. */
     private final Action showMainToolBarAction;
@@ -236,12 +211,6 @@ public final class NetworkActionManager {
 
     /** Layout types. */
     private Action gridLayout, hexagonalLayout, lineLayout;
-
-    /**
-     * Sets the GUI to be used while running networks. Note that the action is
-     * wrapped in CheckBoxMenuItem.
-     */
-    private final JCheckBoxMenuItem showGUIAction;
 
     /** Whether weights should be shown or not. */
     private final JCheckBoxMenuItem showWeightsAction;
@@ -341,7 +310,6 @@ public final class NetworkActionManager {
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showRunToolBarAction = new ShowRunToolBarAction(networkPanel);
 
-        showGUIAction = new JCheckBoxMenuItem(new ShowGUIAction(networkPanel));
         showWeightsAction = new JCheckBoxMenuItem(new ShowWeightsAction(
                 networkPanel));
         showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(
@@ -349,7 +317,6 @@ public final class NetworkActionManager {
         showNetworkHierarchyAction = new JCheckBoxMenuItem(
                 new ShowNetworkHierarchyPanel(networkPanel));
 
-        showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
@@ -363,13 +330,6 @@ public final class NetworkActionManager {
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(
                 networkPanel);
         setTextPropertiesAction = new SetTextPropertiesAction(networkPanel);
-
-        newCompetitiveNetworkAction = new NewCompetitiveNetworkAction(
-                networkPanel);
-        newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
-        newWTANetworkAction = new NewWTANetworkAction(networkPanel);
-        newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
-        newKwtaNetworkAction = new NewKwtaNetworkAction(networkPanel);
 
         allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(),
                 "All to all", false);
@@ -780,20 +740,6 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Return the show IO information check box menu item.
-     *
-     * @return the show IO information check box menu item
-     */
-    public JCheckBoxMenuItem getShowIOInfoMenuItem() {
-        // TODO: Creating the wrapper in the getter is problematic. Remove where
-        // it occurs.
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                showIOInfoAction);
-        actionWrapper.setSelected(networkPanel.getInOutMode());
-        return actionWrapper;
-    }
-
-    /**
      * Return the set auto zoom check box menu item.
      *
      * @return the set auto zoom check box menu item
@@ -839,42 +785,6 @@ public final class NetworkActionManager {
      */
     public Action getSelectAllWeightsAction() {
         return selectAllWeightsAction;
-    }
-
-    /**
-     * Return the new competitive network action.
-     *
-     * @return the new competitive network action
-     */
-    public Action getNewCompetitiveNetworkAction() {
-        return newCompetitiveNetworkAction;
-    }
-
-    /**
-     * Return the new discrete hopfield network action.
-     *
-     * @return the new discrete hopfield network action
-     */
-    public Action getNewHopfieldNetworkAction() {
-        return newHopfieldNetworkAction;
-    }
-
-    /**
-     * Return the new winner take all network action.
-     *
-     * @return the new winner take all network action
-     */
-    public Action getNewWTANetworkAction() {
-        return newWTANetworkAction;
-    }
-
-    /**
-     * Return the new SOM network action.
-     *
-     * @return the new SOM network action.
-     */
-    public Action getNewSOMNetworkAction() {
-        return newSOMNetworkAction;
     }
 
     /**
@@ -927,16 +837,6 @@ public final class NetworkActionManager {
      */
     public Action getClearSourceNeuronsAction() {
         return clearSourceNeuronsAction;
-    }
-
-    /**
-     * Return the show GUI action. TODO: This is not an action.
-     *
-     * @return show GUI action
-     */
-    public JCheckBoxMenuItem getShowGUIAction() {
-        showGUIAction.setSelected(networkPanel.isGuiOn());
-        return showGUIAction;
     }
 
     /**

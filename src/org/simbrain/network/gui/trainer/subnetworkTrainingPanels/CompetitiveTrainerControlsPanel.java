@@ -1,5 +1,4 @@
-package org.simbrain.network.gui.dialogs.network;
-
+package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
@@ -13,41 +12,37 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.subnetworks.SOMNetwork;
-import org.simbrain.network.trainers.SOMTrainer;
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
+import org.simbrain.network.trainers.CompetitiveTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
- * Training panel for SOM Network
+ * Training panel for Competitive Network
  */
-public class SOMTrainerControlsPanel extends JPanel {
-	
-	private NetworkPanel panel;
-	
-	private SOMNetwork network;
+public class CompetitiveTrainerControlsPanel extends JPanel {
 
 	/** Reference to trainer. */
-	private SOMTrainer trainer;
+	private CompetitiveTrainer trainer;
 
 	/** Current number of iterations. */
 	private JLabel iterationsLabel = new JLabel("--- ");
 
-	/** Current Learning Rate. */
-	private JLabel lLearningRate = new JLabel();
+	/** Reference to network panel. */
+	private NetworkPanel panel;
 
-	/** Current Neighborhood Size. */
-	private JLabel lNeighborhoodSize = new JLabel();
+	/** Reference to the Competitive Network. */
+	private CompetitiveNetwork network;
 
 	/**
-	 * Construct the SOM Training Controls Panel.
+	 * Construct the Competitive Training Controls Panel.
 	 *
-	 * @param trainer reference to the SOM trainer
+	 * @param trainer reference to the Competitive trainer
 	 */
-	public SOMTrainerControlsPanel(final NetworkPanel panel, final SOMTrainer trainer, final SOMNetwork network) {
+	public CompetitiveTrainerControlsPanel(final NetworkPanel panel,
+			final CompetitiveTrainer trainer, final CompetitiveNetwork network) {
 		this.panel = panel;
 		this.trainer = trainer;
 		this.network = network;
@@ -82,22 +77,6 @@ public class SOMTrainerControlsPanel extends JPanel {
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
 		propsBox.add(separator);
 
-		// Properties
-		Box lrBox = Box.createHorizontalBox();
-		lrBox.add(new JLabel("Learning Rate:"));
-		lrBox.add(Box.createHorizontalStrut(10));
-		lrBox.add(lLearningRate);
-		propsBox.add(lrBox);
-		Box nbBox = Box.createHorizontalBox();
-		nbBox.add(new JLabel("Neighborhood Size:"));
-		nbBox.add(Box.createHorizontalStrut(10));
-		nbBox.add(lNeighborhoodSize);
-		propsBox.add(nbBox);
-
-		// Separator
-		JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
-		propsBox.add(separator2);
-
 		// Labels
 		LabelledItemPanel labelPanel = new LabelledItemPanel();
 		labelPanel.addItem("Iterations:", iterationsLabel);
@@ -113,9 +92,10 @@ public class SOMTrainerControlsPanel extends JPanel {
 	 * Update internal labels.
 	 */
 	private void update() {
-		lLearningRate.setText("" + network.getSom().getAlpha());
-		lNeighborhoodSize.setText(""
-				+ network.getSom().getNeighborhoodSize());
+		//TODO
+		//            lLearningRate.setText("" + network.getCompetitive().getAlpha());
+		//            lNeighborhoodSize.setText(""
+		//                    + network.getCompetitive().getNeighborhoodSize());
 		iterationsLabel.setText("" + trainer.getIteration());
 	}
 
@@ -178,6 +158,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 			} else {
 				// Stop running
 				trainer.setUpdateCompleted(true);
+				update();
 				panel.getNetwork().fireNetworkChanged();
 				putValue(SMALL_ICON,
 						ResourceManager.getImageIcon("Play.png"));
@@ -209,6 +190,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 			try {
 				trainer.apply();
 				update();
+				panel.getNetwork().fireNetworkChanged();
 			} catch (DataNotInitializedException e) {
 				JOptionPane.showOptionDialog(null, e.getMessage(),
 						"Warning", JOptionPane.DEFAULT_OPTION,
@@ -234,7 +216,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 		 * {@inheritDoc}
 		 */
 		public void actionPerformed(ActionEvent arg0) {
-			network.getSom().reset();
+			network.getCompetitive().randomize();
 			trainer.setIteration(0);
 			panel.getNetwork().fireNetworkChanged();
 		}
@@ -255,9 +237,10 @@ public class SOMTrainerControlsPanel extends JPanel {
 		 * {@inheritDoc}
 		 */
 		public void actionPerformed(ActionEvent arg0) {
-			network.getSom().randomizeIncomingWeights();
+			network.getCompetitive().randomize();
 			update();
 			panel.getNetwork().fireNetworkChanged();
 		}
 	};
 }
+

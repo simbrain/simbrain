@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.trainer;
+package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.util.genericframe.GenericFrame;
 

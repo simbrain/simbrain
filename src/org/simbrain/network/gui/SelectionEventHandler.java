@@ -27,13 +27,13 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
+import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
-import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 

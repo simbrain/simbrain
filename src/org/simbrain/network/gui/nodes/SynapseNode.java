@@ -29,11 +29,11 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.CopyAction;
-import org.simbrain.network.gui.actions.CutAction;
-import org.simbrain.network.gui.actions.DeleteAction;
-import org.simbrain.network.gui.actions.PasteAction;
-import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 import edu.umd.cs.piccolo.PNode;

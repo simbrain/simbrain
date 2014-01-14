@@ -62,7 +62,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
-import org.simbrain.network.gui.actions.AddNeuronsAction;
+import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -2477,7 +2477,8 @@ public class NetworkPanel extends JPanel {
      * @param guiOn The guiOn to set.
      */
     public void setGuiOn(final boolean guiOn) {
-        actionManager.getShowGUIAction().setState(guiOn);
+    	//TODO: Revive from dead?
+//        actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
                     .hasNext();) {

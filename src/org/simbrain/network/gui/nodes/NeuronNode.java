@@ -37,12 +37,12 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.gui.NetworkActionManager;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.CopyAction;
-import org.simbrain.network.gui.actions.CutAction;
-import org.simbrain.network.gui.actions.DeleteAction;
-import org.simbrain.network.gui.actions.PasteAction;
-import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.TestInputAction;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 

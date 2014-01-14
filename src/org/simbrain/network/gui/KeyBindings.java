@@ -28,8 +28,8 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
-import org.simbrain.network.gui.actions.AddSynapseGroupAction;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.SceneGraphBrowser;
 import org.simbrain.util.StandardDialog;
 

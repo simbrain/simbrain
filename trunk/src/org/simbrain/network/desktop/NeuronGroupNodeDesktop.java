@@ -20,7 +20,7 @@ package org.simbrain.network.desktop;
 
 import javax.swing.JMenu;
 
-import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;

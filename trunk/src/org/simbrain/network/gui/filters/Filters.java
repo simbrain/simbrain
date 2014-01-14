@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.gui.filters;
 
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
+import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
-import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
-import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 
 import edu.umd.cs.piccolo.PNode;
 

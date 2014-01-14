@@ -22,7 +22,7 @@ import javax.swing.JMenu;
 
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;

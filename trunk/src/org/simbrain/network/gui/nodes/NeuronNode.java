@@ -193,7 +193,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         update();
 
         setPickable(true);
-        setChildrenPickable(false);
+        //setChildrenPickable(false);
 
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 

@@ -34,14 +34,11 @@ import edu.umd.cs.piccolo.nodes.PText;
  */
 public class InteractionBox extends ScreenElement {
 
-    /** Width of interaction box. */
+    /** Width of interaction  */
     private final static float DEFAULT_WIDTH = 20;
 
-    /** Height of interaction box. */
+    /** Height of interaction  */
     private final static float DEFAULT_HEIGHT = 10;
-
-    /** Main circle of node. */
-    private PPath box;
 
     /** Text label. */
     private PText textLabel;
@@ -49,24 +46,18 @@ public class InteractionBox extends ScreenElement {
     /** Context menu. */
     private JPopupMenu contextMenu;
 
-    /** Reference to associated groupNode. */
-    private GroupNode groupNode;
-
     /**
      * Create a new tab node.
      */
-    public InteractionBox(final NetworkPanel net, final GroupNode node) {
+    public InteractionBox(final NetworkPanel net) {
         super(net);
-        groupNode = node;
-        box = PPath.createRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        setPathToRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         Color color = new Color(248, 252, 184);
-        box.setPaint(color);
-        // box.setTransparency(.2f);
-        box.setStrokePaint(java.awt.Color.GRAY);
-        setBounds(box.getBounds());
-        addChild(box);
+        setPaint(color);
+        // setTransparency(.2f);
+        setStrokePaint(java.awt.Color.GRAY);
         textLabel = new PText();
-        box.addChild(textLabel);
+        addChild(textLabel);
     }
 
     /**
@@ -79,8 +70,8 @@ public class InteractionBox extends ScreenElement {
             return;
         }
         if (textLabel.getScale() == 1) {
-            textLabel.scaleAboutPoint(.8, box.getBounds().getCenter2D().getX(),
-                    box.getBounds().getCenter2D().getY());
+            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(),
+                    getBounds().getCenter2D().getY());
         }
         textLabel.setText(text);
         textLabel.resetBounds();
@@ -92,16 +83,15 @@ public class InteractionBox extends ScreenElement {
      */
     public void updateText() {
         // Reset box bounds
-        textLabel.centerFullBoundsOnPoint(box.getBounds().getCenter2D().getX(),
-                box.getBounds().getCenter2D().getY());
-        box.setBounds(textLabel.getBounds());
-        setBounds(box.getBounds());
+        textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(),
+                getBounds().getCenter2D().getY());
+        setBounds(textLabel.getBounds());
         getNetworkPanel().repaint();
     }
 
     @Override
     protected void singleClickEvent() {
-        groupNode.selectAllNodes();
+        //groupNode.selectAllNodes();
     }
 
     @Override
@@ -136,7 +126,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     public boolean isDraggable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -161,10 +151,5 @@ public class InteractionBox extends ScreenElement {
         this.contextMenu = contextMenu;
     }
 
-    @Override
-    public void setPaint(Paint arg0) {
-        super.setPaint(arg0);
-        box.setPaint(arg0);
-    }
 
 }

@@ -29,7 +29,10 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Extends NeuronGroupNode and adds a coupling menu.
- *
+ * 
+ * TODO: workspace couplings for group nodes not yet working properly. Once
+ * they are it may be possible to remove this class.
+ * 
  * @author Jeff Yoshimi
  */
 public class NeuronGroupNodeDesktop extends NeuronGroupNode {
@@ -52,40 +55,40 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
         // different subclass at the same level. The main thing lost in the
         // process
         // is a custom menu, which is passed along here.
-        this.setCustomMenu(node.getCustomMenu());
+        //this.setCustomMenu(node.getCustomMenu());
     }
-
-    @Override
-    public JMenu getProducerMenu() {
-        if (component != null) {
-            PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(getGroup(), "getActivations",
-                            double[].class);
-            producer.setCustomDescription("Neuron Group: "
-                    + getGroup().getLabel());
-            JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component.getWorkspace(),
-                    producer);
-            return producerMenu;
-        }
-        return null;
-
-    }
-
-    @Override
-    public JMenu getConsumerMenu() {
-        if (component != null) {
-            PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(getGroup(), "setInputValues",
-                            double[].class);
-            consumer.setCustomDescription("Neuron Group: "
-                    + getGroup().getLabel());
-            JMenu menu = new CouplingMenuConsumer(
-                    "Receive Vector Coupling from", component.getWorkspace(),
-                    consumer);
-            return menu;
-        }
-        return null;
-    }
+//
+//    @Override
+//    public JMenu getProducerMenu() {
+//        if (component != null) {
+//            PotentialProducer producer = component.getAttributeManager()
+//                    .createPotentialProducer(getGroup(), "getActivations",
+//                            double[].class);
+//            producer.setCustomDescription("Neuron Group: "
+//                    + getGroup().getLabel());
+//            JMenu producerMenu = new CouplingMenuProducer(
+//                    "Send Vector Coupling to", component.getWorkspace(),
+//                    producer);
+//            return producerMenu;
+//        }
+//        return null;
+//
+//    }
+//
+//    @Override
+//    public JMenu getConsumerMenu() {
+//        if (component != null) {
+//            PotentialConsumer consumer = component.getAttributeManager()
+//                    .createPotentialConsumer(getGroup(), "setInputValues",
+//                            double[].class);
+//            consumer.setCustomDescription("Neuron Group: "
+//                    + getGroup().getLabel());
+//            JMenu menu = new CouplingMenuConsumer(
+//                    "Receive Vector Coupling from", component.getWorkspace(),
+//                    consumer);
+//            return menu;
+//        }
+//        return null;
+//    }
 
 }

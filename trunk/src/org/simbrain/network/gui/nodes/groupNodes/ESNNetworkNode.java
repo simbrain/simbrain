@@ -58,7 +58,7 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.add(new JMenuItem(trainOfflineAction));
         menu.addSeparator();
 
-        final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
+        final EchoStateNetwork esn = (EchoStateNetwork) getSubnetwork();
         final TrainingSet trainingSet = new TrainingSet(esn.getInputData(),
                 esn.getTargetData());
 
@@ -87,7 +87,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            EchoStateNetwork network = (EchoStateNetwork) getGroup();
+            EchoStateNetwork network = (EchoStateNetwork) getSubnetwork();
             ESNOfflineTrainingPanel trainingPanel = new ESNOfflineTrainingPanel(
                     getNetworkPanel(), network);
             GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,

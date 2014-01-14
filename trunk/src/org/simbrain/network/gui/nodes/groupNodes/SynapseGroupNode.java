@@ -18,10 +18,11 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -41,25 +44,55 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.OutlinedObjects;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * PNode representation of a group of synapses.
+ * PNode representation of a group of synapses. Superclass of two more specific
+ * types of synapsegroupnodes, where the contained synapses are either
+ * individually visible or only visible through a single line representing the
+ * whole group. For a sense of the design of this class (in to an interaction
+ * box and outlined objects) see {@link SubnetworkNode}.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends GroupNode {
+public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
+
+    /** Parent network panel. */
+    protected final NetworkPanel networkPanel;
 
     /** Reference to represented group node. */
-    private final SynapseGroup group;
+    protected final SynapseGroup synapseGroup;
+
+    /** The outlined objects (synapses) for this node. */
+    protected final OutlinedObjects outlinedObjects;
+
+    /** The interaction box for this neuron group. */
+    protected SynapseGroupInteractionBox interactionBox;
+
+    /**
+     * Constant for use in group changed events, indicating that the visibility
+     * of synpases in a synapse group has changed.
+     */
+    public static final String SYNAPSE_VISIBILITY_CHANGED = "synapseVisibilityChanged";
+
+    /**
+     * Menu for consumer actions. Set at the workspace level by
+     * {@link NetworkPanelDesktop}.
+     */
+    private JMenu consumerMenu;
+
+    /**
+     * Menu for producer actions. Set at the workspace level by
+     * {@link NetworkPanelDesktop}.
+     */
+    private JMenu producerMenu;
 
     /**
      * Create a Synapse Group PNode.
@@ -67,72 +100,40 @@ public class SynapseGroupNode extends GroupNode {
      * @param networkPanel parent panel
      * @param group the synapse group
      */
-    public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
-        super(networkPanel, group);
-        this.group = group;
-        setStroke(null); // Comment this out to see outline
-        // getInteractionBox().setPaint(Color.white);
-        // setOutlinePadding(-30);
-        setPickable(false);
-        setInteractionBox(new SynapseGroupNodeInteractionBox(networkPanel));
-        setContextMenu(getDefaultContextMenu());
+    protected SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
+        this.networkPanel = networkPanel;
+        this.synapseGroup = group;
+        // Note the children pnodes to outlined objects are created in
+        // networkpanel and added externally to outlined objects
+        outlinedObjects = new OutlinedObjects();
+        outlinedObjects.setDrawOutline(false);
+        interactionBox = new SynapseGroupInteractionBox(networkPanel);
+        interactionBox.setText(synapseGroup.getLabel());
+        addChild(outlinedObjects);
+        addChild(interactionBox);
+        // Must do this after it's added to properly locate it
+        interactionBox.updateText();
     }
 
-    @Override
-    public void updateBounds() {
-        PBounds bounds = new PBounds();
-        if (getOutlinedObjects().size() > 0) {
-            for (PNode node : getOutlinedObjects()) {
-                PBounds childBounds = node.getGlobalBounds();
-                bounds.add(childBounds);
-                if (node instanceof SynapseNode) {
-                    // Recurrent synapses screw things up when they have area 0
-                    Rectangle synapseBounds = ((SynapseNode) node).getLine()
-                            .getBounds();
-                    double area = synapseBounds.getHeight()
-                            * synapseBounds.getWidth();
-                    if (area > 0) {
-                        bounds.add(((SynapseNode) node).getLine().getBounds());
-                    }
-                }
-            }
 
-            double inset = getOutlinePadding();
-            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
-                    bounds.getWidth() + (2 * inset), bounds.getHeight()
-                            + (2 * inset));
-
-            // Can also use setPathToEllipse
-            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                    (float) bounds.getWidth(), (float) bounds.getHeight());
-
-        } else {
-            // TODO Need to get reference to parent nodes.
-            System.err.println("Bounds are null");
-            bounds = null;
-        }
-
-        updateInteractionBox();
-    }
 
     /**
-     * Custom interaction box for Synapse Group node.
+     * Custom interaction box for Synapse Group nodes.
      */
-    private class SynapseGroupNodeInteractionBox extends InteractionBox {
+    protected class SynapseGroupInteractionBox extends InteractionBox {
 
         /**
          * Construct the custom interaction box
          *
          * @param net parent network panel
          */
-        public SynapseGroupNodeInteractionBox(NetworkPanel net) {
-            super(net, SynapseGroupNode.this);
+        public SynapseGroupInteractionBox(NetworkPanel net) {
+            super(net);
         }
 
         @Override
         protected JDialog getPropertyDialog() {
-            selectSynapses(); // TODO: Adjust synapses should not rely on this
-            return new SynapseGroupDialog(getNetworkPanel(), group);
+            return new SynapseGroupDialog(getNetworkPanel(), synapseGroup);
         }
 
         @Override
@@ -141,28 +142,65 @@ public class SynapseGroupNode extends GroupNode {
         }
 
         @Override
+        public boolean isDraggable() {
+            return false;
+        }
+
+        @Override
         protected JPopupMenu getContextMenu() {
             return getDefaultContextMenu();
         }
 
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        layoutChildren();
     };
+
+    /**
+     * @return the networkPanel
+     */
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
+
+
+    /**
+     * @return the interactionBox
+     */
+    public SynapseGroupInteractionBox getInteractionBox() {
+        return interactionBox;
+    }
+
+    /**
+     * @return the synapseGroup
+     */
+    public SynapseGroup getSynapseGroup() {
+        return synapseGroup;
+    }
+
+
+    /**
+     * @return the outlinedObjects
+     */
+    public OutlinedObjects getOutlinedObjects() {
+        return outlinedObjects;
+    }
 
     /**
      * Returns default actions for a context menu.
      *
      * @return the default context menu
      */
-    @Override
-    public JPopupMenu getDefaultContextMenu() {
+    protected JPopupMenu getDefaultContextMenu() {
         JPopupMenu menu = new JPopupMenu();
 
         // Edit
         Action editGroup = new AbstractAction("Edit...") {
             public void actionPerformed(final ActionEvent event) {
-                selectSynapses(); // TODO: Adjust synapses should not rely on
-                                  // this
                 JDialog dialog = new SynapseGroupDialog(getNetworkPanel(),
-                        group);
+                        synapseGroup);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -177,7 +215,7 @@ public class SynapseGroupNode extends GroupNode {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
                 final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                        getNetworkPanel(), group.getSynapseList());
+                        getNetworkPanel(), synapseGroup.getSynapseList());
                 JDialog dialog = new JDialog();
                 dialog.setTitle("Adjust selected synapses");
                 dialog.setContentPane(synapsePanel);
@@ -192,7 +230,6 @@ public class SynapseGroupNode extends GroupNode {
             }
         };
         menu.add(adjustSynapses);
-        ((SynapseGroup) this.getGroup()).getSynapseList();
         menu.add(new JMenuItem(showWeightMatrixAction));
 
         // Selection stuff
@@ -200,20 +237,20 @@ public class SynapseGroupNode extends GroupNode {
         final JCheckBoxMenuItem tsvCheckBox =  new JCheckBoxMenuItem();
         Action toggleSynapseVisibility = new AbstractAction("Synapses Visible") {
             public void actionPerformed(final ActionEvent event) {
-                if (group.isDisplaySynapses()) {
-                    group.setDisplaySynapses(false);
+                if (synapseGroup.isDisplaySynapses()) {
+                    synapseGroup.setDisplaySynapses(false);
                 } else {
-                    group.setDisplaySynapses(true);
+                    synapseGroup.setDisplaySynapses(true);
                 }
-                group.getParentNetwork().fireGroupChanged(
-                        new NetworkEvent<Group>(group.getParentNetwork(),
-                                group, group),
-                        GroupNode.SYNAPSE_VISIBILITY_CHANGED);
-                tsvCheckBox.setSelected(group.isDisplaySynapses());
+                synapseGroup.getParentNetwork().fireGroupChanged(
+                        new NetworkEvent<Group>(synapseGroup.getParentNetwork(),
+                                synapseGroup, synapseGroup),
+                        SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+                tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
             }
         };
         tsvCheckBox.setAction(toggleSynapseVisibility);
-        tsvCheckBox.setSelected(group.isDisplaySynapses());
+        tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
         menu.add(tsvCheckBox);
 
         // Selection stuff
@@ -228,7 +265,7 @@ public class SynapseGroupNode extends GroupNode {
                 "Select Incoming Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> incomingNodes = new ArrayList<NeuronNode>();
-                for (Neuron neuron : group.getSourceNeurons()) {
+                for (Neuron neuron : synapseGroup.getSourceNeurons()) {
                     incomingNodes.add((NeuronNode) getNetworkPanel()
                             .getObjectNodeMap().get(neuron));
 
@@ -242,7 +279,7 @@ public class SynapseGroupNode extends GroupNode {
                 "Select Outgoing Neurons") {
             public void actionPerformed(final ActionEvent event) {
                 List<NeuronNode> outgoingNodes = new ArrayList<NeuronNode>();
-                for (Neuron neuron : group.getTargetNeurons()) {
+                for (Neuron neuron : synapseGroup.getTargetNeurons()) {
                     outgoingNodes.add((NeuronNode) getNetworkPanel()
                             .getObjectNodeMap().get(neuron));
 
@@ -268,7 +305,7 @@ public class SynapseGroupNode extends GroupNode {
      */
     private void selectSynapses() {
         List<SynapseNode> nodes = new ArrayList<SynapseNode>();
-        for (Synapse synapse : group.getSynapseList()) {
+        for (Synapse synapse : synapseGroup.getSynapseList()) {
             nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(
                     synapse));
 
@@ -292,9 +329,9 @@ public class SynapseGroupNode extends GroupNode {
         @Override
         public void actionPerformed(ActionEvent event) {
             List<Neuron> sourceNeurons = ((SynapseGroup) SynapseGroupNode.this
-                    .getGroup()).getSourceNeurons();
+                    .synapseGroup).getSourceNeurons();
             List<Neuron> targetNeurons = ((SynapseGroup) SynapseGroupNode.this
-                    .getGroup()).getTargetNeurons();
+                    .synapseGroup).getTargetNeurons();
             JPanel panel = WeightMatrixViewer
                     .getWeightMatrixPanel(new WeightMatrixViewer(sourceNeurons,
                             targetNeurons, SynapseGroupNode.this
@@ -303,20 +340,59 @@ public class SynapseGroupNode extends GroupNode {
         }
     };
 
-    @Override
-    protected void updateInteractionBox() {
-        InteractionBox interactionBox = getInteractionBox();
-        interactionBox.setOffset(
-                this.getBounds().getCenterX() - interactionBox.getWidth() / 2,
-                this.getBounds().getCenterY() - interactionBox.getHeight() / 2);
+    /** Action for editing the group name. */
+    protected Action renameGroup = new AbstractAction("Rename group...") {
+        public void actionPerformed(final ActionEvent event) {
+            String newName = JOptionPane.showInputDialog("Name:",
+                    synapseGroup.getLabel());
+            synapseGroup.setLabel(newName);
+        }
+    };
+
+    /**
+     * Action for removing this group
+     */
+    protected Action removeGroup = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(NAME, "Remove group...");
+            putValue(SHORT_DESCRIPTION, "Remove synapse group...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            getNetworkPanel().getNetwork().removeGroup(synapseGroup);
+        }
+    };
+
+    /**
+     * @return the consumerMenu
+     */
+    public JMenu getConsumerMenu() {
+        return consumerMenu;
     }
 
     /**
-     * Returns the SynapseGroup to this SynapseGroupNode.
-     *
-     * @return the synapse group
+     * @param consumerMenu the consumerMenu to set
      */
-    public SynapseGroup getSynapseGroup() {
-        return (SynapseGroup) getGroup();
+    public void setConsumerMenu(JMenu consumerMenu) {
+        this.consumerMenu = consumerMenu;
     }
+
+    /**
+     * @return the producerMenu
+     */
+    public JMenu getProducerMenu() {
+        return producerMenu;
+    }
+
+    /**
+     * @param producerMenu the producerMenu to set
+     */
+    public void setProducerMenu(JMenu producerMenu) {
+        this.producerMenu = producerMenu;
+    }
+
 }
+

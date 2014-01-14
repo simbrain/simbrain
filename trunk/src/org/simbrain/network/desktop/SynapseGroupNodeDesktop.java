@@ -32,6 +32,9 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
 /**
  * Extends SynapseGroupNode and adds a coupling menu.
  *
+ * TODO: workspace couplings for group nodes not yet working properly. Once
+ * they are it may be possible to remove this class.
+ *
  * @author Jeff Yoshimi
  */
 public class SynapseGroupNodeDesktop extends SynapseGroupNode {
@@ -52,14 +55,13 @@ public class SynapseGroupNodeDesktop extends SynapseGroupNode {
         this.component = component;
     }
 
-    @Override
     public JMenu getProducerMenu() {
         if (component != null) {
             PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(getGroup(), "getWeightVector",
+                    .createPotentialProducer(getSynapseGroup(), "getWeightVector",
                             double[].class);
             producer.setCustomDescription("Synapse Group: "
-                    + getGroup().getLabel());
+                    + getSynapseGroup().getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
                     "Send Vector Coupling to", component.getWorkspace(),
                     producer);
@@ -68,14 +70,13 @@ public class SynapseGroupNodeDesktop extends SynapseGroupNode {
         return null;
     }
 
-    @Override
     public JMenu getConsumerMenu() {
         if (component != null) {
             PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(getGroup(), "setWeightVector",
+                    .createPotentialConsumer(getSynapseGroup(), "setWeightVector",
                             double[].class);
             consumer.setCustomDescription("Synapse Group: "
-                    + getGroup().getLabel());
+                    + getSynapseGroup().getLabel());
 
             JMenu menu = new CouplingMenuConsumer(
                     "Receive Vector Coupling from", component.getWorkspace(),

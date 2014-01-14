@@ -93,12 +93,6 @@ public final class SynapseNode extends ScreenElement {
     private static Color lineColor = Color.black;
 
     /**
-     * Default constructor.
-     */
-    public SynapseNode() {
-    }
-
-    /**
      * Create a new synapse node connecting a source and target neuron.
      *
      * @param net Reference to NetworkPanel

@@ -43,42 +43,16 @@ public class CompetitiveGroupNode extends NeuronGroupNode {
     public CompetitiveGroupNode(final NetworkPanel networkPanel,
             final CompetitiveGroup group) {
         super(networkPanel, group);
-        setCustomMenu();
 
-        // setOutlinePadding(15f);
-        // networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
-        //
-        // public void networkChanged() {
-        // group.setLabel("SOM - Learning rate:"
-        // + Utils.round(group.getAlpha(), 2) + " N-size:"
-        // + Utils.round(group.getNeighborhoodSize(), 2));
-        // }
-        //
-        // public void networkUpdateMethodChanged() {
-        // }
-        //
-        // public void neuronClampToggled() {
-        // }
-        //
-        // public void synapseClampToggled() {
-        // }
-        //
-        // });
-    }
-
-    /**
-     * Sets the custom menu for competitive networks.
-     */
-    private void setCustomMenu() {
-        JMenu customMenu = new JMenu("Competitive Net");
-        customMenu.add(new JMenuItem(new AbstractAction("Randomize Weights") {
+        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
+                "Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveGroup) getGroup()).randomize();
-                ((CompetitiveGroup) getGroup()).getParentNetwork()
+                ((CompetitiveGroup) getNeuronGroup()).randomize();
+                ((CompetitiveGroup) getNeuronGroup()).getParentNetwork()
                         .fireNetworkChanged();
             }
         }));
-        setCustomMenu(customMenu);
+
     }
 
 }

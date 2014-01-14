@@ -52,7 +52,7 @@ public class HopfieldNode extends SubnetworkNode {
     @Override
     protected StandardDialog getPropertyDialog() {
         return new HopfieldEditTrainDialog(
-                getNetworkPanel(), (Hopfield) getGroup());
+                getNetworkPanel(), (Hopfield) getSubnetwork());
     }
 
 
@@ -67,21 +67,21 @@ public class HopfieldNode extends SubnetworkNode {
         menu.addSeparator();
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getGroup()).trainOnCurrentPattern();
+                ((Hopfield) getSubnetwork()).trainOnCurrentPattern();
             }
         };
         menu.add(trainNet);
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses symmetrically") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getGroup()).randomize();
+                ((Hopfield) getSubnetwork()).randomize();
             }
         };
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction(
                 "Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getGroup()).getSynapseGroup().setStrengths(0);
+                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrengths(0);
             }
         };
         menu.add(clearWeights);

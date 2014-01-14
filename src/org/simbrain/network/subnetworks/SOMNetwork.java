@@ -75,7 +75,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, som,
-                Direction.NORTH, 250);
+                Direction.NORTH, 150);
     }
 
     @Override

@@ -19,22 +19,22 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.PLayer;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PDragSequenceEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PNodeFilter;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.world.visionworld.node.SensorNode;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /**
  * Sensor selection event handler.
@@ -129,8 +129,10 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
 
         marquee.globalToLocal(rect);
 
-        marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                (float) rect.getWidth(), (float) rect.getHeight());
+        marquee.append(
+                new Rectangle2D.Float((float) rect.getX(), (float) rect.getY(),
+                        (float) rect.getWidth(), (float) rect.getHeight()),
+                false);
     }
 
     /** {@inheritDoc} */

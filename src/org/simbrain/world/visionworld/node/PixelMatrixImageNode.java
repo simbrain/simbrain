@@ -26,11 +26,11 @@ import java.awt.geom.Point2D;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PDragSequenceEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
 
 /**
  * Pixel matrix image node.

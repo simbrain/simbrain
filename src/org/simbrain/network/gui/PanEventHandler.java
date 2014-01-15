@@ -20,9 +20,9 @@ package org.simbrain.network.gui;
 
 import java.awt.event.InputEvent;
 
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.event.PPanEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.event.PPanEventHandler;
 
 /**
  * Pan event handler.

@@ -25,12 +25,11 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
+import org.piccolo2d.PNode;
+import org.piccolo2d.extras.util.PFixedWidthStroke;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.PixelMatrix;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PPaintContext;
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Abstract pixel matrix node.

@@ -19,19 +19,12 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.geom.QuadCurve2D;
 
-import javax.swing.JDialog;
-
+import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
  * PNode representation of a group of synapses, where the synapses themselves
@@ -42,7 +35,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 public class SynapseGroupNodeSimple extends SynapseGroupNode {
 
     /** Line connecting nodes. */
-    private PPath line;
+    private PPath.Float curve;
 
     /**
      * Create a Synapse Group PNode.
@@ -53,10 +46,10 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
     public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
             final SynapseGroup group) {
         super(networkPanel, group);
-        line = new PPath();
-        this.addChild(line);
-        line.setStrokePaint(Color.BLACK);
-        line.moveToBack();
+        curve = new PPath.Float();
+        this.addChild(curve);
+        curve.setStrokePaint(Color.BLACK);
+        curve.lowerToBottom();
     }
 
     /**
@@ -65,17 +58,24 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
      */
     @Override
     public void layoutChildren() {
-        double srcX = synapseGroup.getSourceNeuronGroup().getCenterX();
-        double srcY = synapseGroup.getSourceNeuronGroup().getCenterY();
-        double tarX = synapseGroup.getTargetNeuronGroup().getCenterX();
-        double tarY = synapseGroup.getTargetNeuronGroup().getCenterY();
-        double x = (srcX + tarX) / 2;
-        double y = (srcY + tarY) / 2;
+        float srcX = (float) synapseGroup.getSourceNeuronGroup().getCenterX();
+        float srcY = (float) synapseGroup.getSourceNeuronGroup().getCenterY();
+        float tarX = (float) synapseGroup.getTargetNeuronGroup().getCenterX();
+        float tarY = (float) synapseGroup.getTargetNeuronGroup().getCenterY();
+        float x = (srcX + tarX) / 2;
+        float y = (srcY + tarY) / 2;
+        float slope = (tarY - srcY) / (tarX - srcX);
+        float distanceToMidpoint = (float) Point2D.distance(srcX, srcY, x, y);
+        float bez_x = (float) Math.sqrt(Math.pow(distanceToMidpoint, 2)
+                / (1 + Math.pow(1 / slope, 2)));
+        float bez_y = bez_x * 1 / slope;
+
+        QuadCurve2D.Float theCurve = new QuadCurve2D.Float(srcX, srcY, x
+                + bez_x, y + bez_y, tarX, tarY);
+        curve.append(theCurve, false);
+
         interactionBox.setOffset(x - interactionBox.getWidth() / 2, y
                 - interactionBox.getHeight() / 2);
-        Point2D.Double srcPoint = new Point2D.Double(srcX, srcY);
-        Point2D.Double tarPoint = new Point2D.Double(tarX, tarY);
-        line.setPathToPolyline(new Point2D.Double[] { srcPoint, tarPoint });
     }
 
 }

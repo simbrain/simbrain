@@ -32,11 +32,10 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import org.piccolo2d.extras.util.PFixedWidthStroke;
 import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
-
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Pixel matrix node table editor.

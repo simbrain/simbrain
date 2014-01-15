@@ -20,8 +20,8 @@ package org.simbrain.network.gui.filters;
 
 import org.simbrain.util.Predicate;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PNodeFilter;
+import org.piccolo2d.PNode;
+import org.piccolo2d.util.PNodeFilter;
 
 /**
  * Abstract filter, implements both <code>PNodeFilter</code> and

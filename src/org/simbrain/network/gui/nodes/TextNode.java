@@ -31,6 +31,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.piccolo2d.extras.nodes.PStyledText;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
@@ -38,8 +39,6 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-
-import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * An editable text element, which wraps a PStyledText object.

@@ -20,14 +20,14 @@ package org.simbrain.network.gui;
 
 import java.awt.event.InputEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.event.PDragSequenceEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * Zoom event handler.
@@ -113,8 +113,10 @@ final class ZoomEventHandler extends PDragSequenceEventHandler {
         rect.add(position);
 
         marquee.globalToLocal(rect);
-        marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                (float) rect.getWidth(), (float) rect.getHeight());
+        marquee.append(
+                new Rectangle2D.Float((float) rect.getX(), (float) rect.getY(),
+                        (float) rect.getWidth(), (float) rect.getHeight()),
+                false);
         rect = null;
     }
 

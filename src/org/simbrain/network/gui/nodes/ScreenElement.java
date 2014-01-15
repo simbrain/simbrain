@@ -27,10 +27,10 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.gui.NetworkPanel;
 
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.nodes.PPath;
+import org.piccolo2d.event.PBasicInputEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.nodes.PPath;
 
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,
@@ -62,7 +62,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
  *
  * </p>
  */
-public abstract class ScreenElement extends PPath {
+public abstract class ScreenElement extends PPath.Float {
 
     /** Network panel. */
     private NetworkPanel networkPanel;
@@ -153,8 +153,8 @@ public abstract class ScreenElement extends PPath {
      * <code>getPickable()</code> method.
      * </p>
      *
-     * @see edu.umd.cs.piccolo.PNode#getPickable
-     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @see org.piccolo2d.PNode#getPickable
+     * @see org.piccolo2d.PNode#setPickable
      * @return true if this screen element is selectable
      */
     public abstract boolean isSelectable();
@@ -175,8 +175,8 @@ public abstract class ScreenElement extends PPath {
      * <code>isSelectable()</code> method.
      * </p>
      *
-     * @see edu.umd.cs.piccolo.PNode#getPickable
-     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @see org.piccolo2d.PNode#getPickable
+     * @see org.piccolo2d.PNode#setPickable
      * @see #isSelectable
      * @return true if this screen element should show a selection handle
      */
@@ -196,8 +196,8 @@ public abstract class ScreenElement extends PPath {
      * returns <code>true</code> for its <code>isSelectable()</code> method.
      * </p>
      *
-     * @see edu.umd.cs.piccolo.PNode#getPickable
-     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @see org.piccolo2d.PNode#getPickable
+     * @see org.piccolo2d.PNode#setPickable
      * @see #isSelectable
      * @return true if this screen element is draggable
      */

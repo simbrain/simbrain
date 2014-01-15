@@ -30,17 +30,16 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PBasicInputEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.extras.util.PFixedWidthStroke;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
-
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PPaintContext;
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Abstract sensor node.

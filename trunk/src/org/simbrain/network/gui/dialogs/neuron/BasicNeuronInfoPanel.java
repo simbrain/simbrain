@@ -255,7 +255,10 @@ public class BasicNeuronInfoPanel extends JPanel implements CommittablePanel {
                 neuronList.get(i).setLabel(tfNeuronLabel.getText());
             }
         }
-
+        if (!neuronList.isEmpty()) {
+        	neuronList.get(0).getNetwork().fireNetworkChanged();
+        }
+        
         success &= extraDataPanel.commitChanges();
 
         return success;

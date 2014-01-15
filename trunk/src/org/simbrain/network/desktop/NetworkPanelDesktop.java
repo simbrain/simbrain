@@ -32,11 +32,11 @@ import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.nodes.InvisibleSynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.gui.nodes.VisibleSynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
@@ -311,10 +311,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     @Override
-    protected VisibleSynapseGroupNode createVisibleSynapseGroup(
+    protected SynapseGroupNodeFull createSynapseGroupFull(
             SynapseGroup synapseGroup) {
-        VisibleSynapseGroupNode ret = super
-                .createVisibleSynapseGroup(synapseGroup);
+        SynapseGroupNodeFull ret = super
+                .createSynapseGroupFull(synapseGroup);
         ret.setProducerMenu(getSGProducerMenu(
                 component.getWorkspaceComponent(), synapseGroup));
         ret.setConsumerMenu(getSGConsumerMenu(
@@ -323,10 +323,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     @Override
-    protected InvisibleSynapseGroupNode createInvisibleSynapseGroup(
+    protected SynapseGroupNodeSimple createSynapseGroupSimple(
             SynapseGroup synapseGroup) {
-        InvisibleSynapseGroupNode ret = super
-                .createInvisibleSynapseGroup(synapseGroup);
+        SynapseGroupNodeSimple ret = super
+                .createSynapseGroupSimple(synapseGroup);
         ret.setProducerMenu(getSGProducerMenu(
                 component.getWorkspaceComponent(), synapseGroup));
         ret.setConsumerMenu(getSGConsumerMenu(

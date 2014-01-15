@@ -994,7 +994,7 @@ public class Network {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = new XStream(new DomDriver("UTF-8"));
         xstream.omitField(Network.class, "synapseRouter");
         xstream.omitField(Network.class, "logger");
         xstream.omitField(Network.class, "component");

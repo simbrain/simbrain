@@ -24,15 +24,14 @@ import java.awt.event.InputEvent;
 
 import javax.swing.text.BadLocationException;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.extras.event.PStyledTextEventHandler;
+import org.piccolo2d.extras.nodes.PStyledText;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.nodes.TextNode;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolox.event.PStyledTextEventHandler;
-import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * Event handler for text nodes, so that they can be edited directly on the

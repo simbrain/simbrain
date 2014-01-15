@@ -34,8 +34,8 @@ import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -46,7 +46,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends PPath {
+public class SubnetworkNode extends PPath.Float {
 
     /** Parent network panel. */
     private final NetworkPanel networkPanel;
@@ -99,7 +99,7 @@ public class SubnetworkNode extends PPath {
     public void addNode(PNode node) {
         outlinedObjects.addChild(node);
         if (node instanceof SynapseGroupNode) {
-            node.moveToBack();
+            node.lowerToBottom();
         }
     }
 

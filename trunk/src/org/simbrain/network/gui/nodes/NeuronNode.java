@@ -45,11 +45,11 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.nodes.PText;
+import org.piccolo2d.nodes.PPath.Float;
+import org.piccolo2d.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -449,7 +449,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @see org.simbrain.sim.world
      */
     private PPath createOutArrow() {
-        PPath path = new PPath();
+        PPath path = new PPath.Float();
         GeneralPath arrow = new GeneralPath();
         Point2D p = this.globalToLocal(this.getOffset());
         float cx = (float) p.getX() + DIAMETER / 2;
@@ -502,7 +502,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @see org.simbrain.sim.world
      */
     private PPath createInArrow() {
-        PPath path = new PPath();
+        PPath path = new PPath.Float();
         GeneralPath arrow = new GeneralPath();
         Point2D p = this.globalToLocal(this.getOffset());
         float cx = (float) p.getX() + DIAMETER / 2;

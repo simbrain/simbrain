@@ -36,8 +36,8 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -55,7 +55,7 @@ public final class SynapseNode extends ScreenElement {
     private PNode circle;
 
     /** Line connecting nodes. */
-    private PPath line;
+    private Float line;
 
     /**
      * Line2D representation of the PPath, currently used by selection event
@@ -121,7 +121,7 @@ public final class SynapseNode extends ScreenElement {
         this.addChild(circle);
         this.addChild(line);
         line.setStrokePaint(Color.BLACK);
-        line.moveToBack();
+        line.lowerToBottom();
 
         updateColor();
         updateDiameter();
@@ -186,12 +186,12 @@ public final class SynapseNode extends ScreenElement {
      * @param center the center of the synapse
      * @return the line
      */
-    private PPath getLine(final Point2D center) {
+    private PPath.Float getLine(final Point2D center) {
         if (isSelfConnection()) {
-            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1,
-                    355, Arc2D.OPEN));
+            return new PPath.Float(new Arc2D.Float((float) getX(),
+                    (float) getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
         } else {
-            return new PPath(new Line2D.Double(
+            return new PPath.Float(new Line2D.Float(
                     globalToLocal(source.getCenter()), center));
         }
     }

@@ -12,8 +12,8 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.UngroupAction;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
+import org.piccolo2d.PNode;
+import org.piccolo2d.util.PBounds;
 
 /**
  * A group of screen elements.

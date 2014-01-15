@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.EventObject;
 import java.util.Set;
 
-import edu.umd.cs.piccolo.PNode;
+import org.piccolo2d.PNode;
 
 /**
  * An event object representing a change in network selection.

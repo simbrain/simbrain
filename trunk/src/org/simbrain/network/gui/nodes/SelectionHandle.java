@@ -19,13 +19,14 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolox.handles.PHandle;
-import edu.umd.cs.piccolox.util.PNodeLocator;
+import org.piccolo2d.PNode;
+import org.piccolo2d.extras.handles.PHandle;
+import org.piccolo2d.extras.util.PNodeLocator;
 
 /**
  * Selection handle.
@@ -101,7 +102,10 @@ public final class SelectionHandle extends PHandle {
         double height = parentNode.getBounds().getHeight() + 2
                 * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
 
-        setPathToRectangle((float) x, (float) y, (float) width, (float) height);
+        append(
+                new Rectangle2D.Float((float) x, (float) y,
+                        (float) width, (float) height),
+                false);
     }
 
     /**

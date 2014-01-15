@@ -21,11 +21,22 @@ package org.simbrain.network.gui;
 import java.awt.event.InputEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PLayer;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PDragSequenceEventHandler;
+import org.piccolo2d.event.PInputEvent;
+import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.extras.nodes.PStyledText;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PDimension;
+import org.piccolo2d.util.PNodeFilter;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -36,17 +47,6 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PDimension;
-import edu.umd.cs.piccolo.util.PNodeFilter;
-import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * Selection event handler. Creates the selection "lasso", handles selection and
@@ -209,9 +209,9 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             rect.add(marqueeStartPosition);
             rect.add(position);
             marquee.globalToLocal(rect);
-            marquee.setPathToRectangle((float) rect.getX(),
+            marquee.append(new Rectangle2D.Float((float) rect.getX(),
                     (float) rect.getY(), (float) rect.getWidth(),
-                    (float) rect.getHeight());
+                    (float) rect.getHeight()), false);
             boundsFilter.setBounds(rect);
             Collection highlightedNodes = networkPanel.getCanvas().getLayer()
                     .getRoot().getAllNodes(boundsFilter, null);

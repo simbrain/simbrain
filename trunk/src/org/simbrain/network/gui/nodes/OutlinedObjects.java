@@ -22,10 +22,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
 
 /**
  * A node that draws an outline around its children nodes. To use create an
@@ -36,7 +36,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * @author Lance Good
  * @author Jeff Yoshimi
  */
-public class OutlinedObjects extends PPath {
+public class OutlinedObjects extends PPath.Float {
 
     /**
      * Whether to draw an outline around entire set of grouped objects or not.

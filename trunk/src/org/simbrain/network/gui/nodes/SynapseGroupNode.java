@@ -47,7 +47,7 @@ import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
 
-import edu.umd.cs.piccolo.PNode;
+import org.piccolo2d.PNode;
 
 /**
  * PNode representation of a group of synapses. Superclass of two more specific

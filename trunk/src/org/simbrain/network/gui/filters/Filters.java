@@ -27,7 +27,7 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 
-import edu.umd.cs.piccolo.PNode;
+import org.piccolo2d.PNode;
 
 /**
  * Filters.

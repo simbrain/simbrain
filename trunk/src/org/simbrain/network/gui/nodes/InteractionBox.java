@@ -19,15 +19,13 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
-import java.awt.Paint;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.piccolo2d.nodes.PText;
 import org.simbrain.network.gui.NetworkPanel;
-
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * Interaction Box: graphical element for interacting with a group.
@@ -51,7 +49,8 @@ public class InteractionBox extends ScreenElement {
      */
     public InteractionBox(final NetworkPanel net) {
         super(net);
-        setPathToRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.append(new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT),
+                false);
         Color color = new Color(248, 252, 184);
         setPaint(color);
         // setTransparency(.2f);

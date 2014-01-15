@@ -20,6 +20,8 @@ package org.simbrain.network.gui.nodes;
 
 import java.awt.BasicStroke;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +42,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
-
-import edu.umd.cs.piccolo.PNode;
+import org.piccolo2d.PNode;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -49,7 +50,7 @@ import edu.umd.cs.piccolo.PNode;
  *
  * @author Jeff Yoshimi
  */
-public class NeuronGroupNode extends PNode {
+public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /** Parent network panel. */
     private final NetworkPanel networkPanel;
@@ -99,6 +100,7 @@ public class NeuronGroupNode extends PNode {
         addChild(interactionBox);
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
+
     }
 
     /**
@@ -411,6 +413,12 @@ public class NeuronGroupNode extends PNode {
             getNetworkPanel().getNetwork().removeGroup(neuronGroup);
         }
     };
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        layoutChildren();
+    };
+
 
 
 }

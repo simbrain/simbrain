@@ -48,6 +48,12 @@ import javax.swing.JToolBar;
 import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.PNode;
+import org.piccolo2d.event.PInputEventListener;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.core.Network;
@@ -69,7 +75,6 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
 import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
@@ -77,10 +82,11 @@ import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
-import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.subnetworkNodes.BPTTNode;
@@ -115,13 +121,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.widgets.ToggleButton;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PInputEventListener;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * Network panel where the logical neural network is displayed.
@@ -749,7 +748,7 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());
-        node.moveToBack();
+        node.lowerToBottom();
     }
 
     /**
@@ -898,23 +897,23 @@ public class NetworkPanel extends JPanel {
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
                 .get(synapseGroup);
 
-        // TODO: Clean up listeners if the synpasegroup is removed.
-        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
-                .get(synapseGroup.getSourceNeuronGroup());
-        // System.out.println("Source" + srcNode);
-        if (srcNode != null) {
-            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-                    synapseGroupNode);
-        }
-        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
-                .get(synapseGroup.getTargetNeuronGroup());
-        // System.out.println("Target" + tarNode);
-        if (tarNode != null) {
-            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-                    synapseGroupNode);
-        }
+//        // TODO: Clean up listeners if the synpasegroup is removed.
+//        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
+//                .get(synapseGroup.getSourceNeuronGroup());
+//        // System.out.println("Source" + srcNode);
+//        if (srcNode != null) {
+//            synapseGroupNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+//                    srcNode);
+//        }
+//        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
+//                .get(synapseGroup.getTargetNeuronGroup());
+//        // System.out.println("Target" + tarNode);
+//        if (tarNode != null) {
+//            synapseGroupNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+//                    tarNode);
+//        }
 
-        synapseGroupNode.moveToBack();
+        synapseGroupNode.lowerToBottom();
     }
 
     /**

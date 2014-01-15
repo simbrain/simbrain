@@ -20,9 +20,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.PRoot;
-import edu.umd.cs.piccolo.util.PBounds;
+import org.piccolo2d.PNode;
+import org.piccolo2d.PRoot;
+import org.piccolo2d.util.PBounds;
 
 /**
  * Piccolo scene graph browser component.

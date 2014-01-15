@@ -24,17 +24,18 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 
+import org.piccolo2d.extras.util.PFixedWidthStroke;
+import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.util.Utils;
-
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PPaintContext;
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Selection marquee node.
  */
-public final class SelectionMarquee extends PPath {
+public final class SelectionMarquee extends PPath.Float {
 
     /** Default paint. */
     private static final Paint DEFAULT_PAINT = Color.WHITE;
@@ -59,7 +60,7 @@ public final class SelectionMarquee extends PPath {
     public SelectionMarquee(final float x, final float y) {
         super();
 
-        setPathToRectangle(x, y, 0.0f, 0.0f);
+        append(new Rectangle2D.Float(x, y, 0.0f, 0.0f), false);
 
         setPaint(DEFAULT_PAINT);
         setStroke(DEFAULT_STROKE);
@@ -72,7 +73,7 @@ public final class SelectionMarquee extends PPath {
         Paint p = getPaint();
         Stroke stroke = getStroke();
         Paint strokePaint = getStrokePaint();
-        GeneralPath path = getPathReference();
+        Path2D path = getPathReference();
         Graphics2D g2 = paintContext.getGraphics();
 
         if (p != null) {

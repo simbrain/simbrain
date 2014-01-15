@@ -22,8 +22,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
+import org.piccolo2d.event.PBasicInputEventHandler;
+import org.piccolo2d.event.PInputEvent;
 
 /**
  * Context menu event handler.

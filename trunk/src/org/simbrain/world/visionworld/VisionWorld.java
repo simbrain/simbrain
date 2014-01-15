@@ -32,6 +32,12 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JToolTip;
 
+import org.piccolo2d.PCamera;
+import org.piccolo2d.PCanvas;
+import org.piccolo2d.PLayer;
+import org.piccolo2d.PNode;
+import org.piccolo2d.util.PBounds;
+import org.piccolo2d.util.PPaintContext;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
@@ -50,13 +56,6 @@ import org.simbrain.world.visionworld.dialog.EditSensorsDialog;
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.node.SensorMatrixNode;
 import org.simbrain.world.visionworld.node.SensorNode;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * Vision world main canvas.
@@ -294,8 +293,8 @@ public final class VisionWorld extends PCanvas {
     public void paintView() {
         sensorMatrixNode.setVisible(false);
         sensorMatrixNode.setOffset(0.0d, 0.0d);
-        sensorMatrixNode.moveToBack();
-        pixelMatrixNode.moveToFront();
+        sensorMatrixNode.lowerToBottom();
+        pixelMatrixNode.raiseToTop();
         pixelMatrixNode.setFocus(true);
         if (selectionEventHandlerInstalled) {
             selectionEventHandlerInstalled = false;
@@ -309,7 +308,7 @@ public final class VisionWorld extends PCanvas {
      */
     public void normalView() {
         sensorMatrixNode.setVisible(true);
-        sensorMatrixNode.moveToFront();
+        sensorMatrixNode.raiseToTop();
         sensorMatrixNode.setOffset(0.0d, 0.0d);
         if (pixelMatrixNode.hasFocus()) {
             pixelMatrixNode.setFocus(false);
@@ -326,7 +325,7 @@ public final class VisionWorld extends PCanvas {
      */
     public void stackedView() {
         sensorMatrixNode.setVisible(true);
-        sensorMatrixNode.moveToFront();
+        sensorMatrixNode.raiseToTop();
         sensorMatrixNode.setOffset(sensorMatrixNode.getWidth() * -0.1d,
                 sensorMatrixNode.getHeight() * 0.1d);
         if (pixelMatrixNode.hasFocus()) {
@@ -344,7 +343,7 @@ public final class VisionWorld extends PCanvas {
      */
     public void sideBySideView() {
         sensorMatrixNode.setVisible(true);
-        sensorMatrixNode.moveToFront();
+        sensorMatrixNode.raiseToTop();
         double x = sensorMatrixNode.getWidth()
                 + (sensorMatrixNode.getWidth() * 0.1d);
         sensorMatrixNode.setOffset(-x, 0.0d);
@@ -363,7 +362,7 @@ public final class VisionWorld extends PCanvas {
      */
     public void isometricView() {
         sensorMatrixNode.setVisible(true);
-        sensorMatrixNode.moveToFront();
+        sensorMatrixNode.raiseToTop();
         sensorMatrixNode.setOffset(0.0d, sensorMatrixNode.getHeight() * -0.1d);
         if (pixelMatrixNode.hasFocus()) {
             pixelMatrixNode.setFocus(false);

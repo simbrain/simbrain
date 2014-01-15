@@ -44,13 +44,11 @@ import javax.swing.filechooser.FileFilter;
  */
 public class SFileChooser {
 
-    /** Default serial version id */
-    private static final long serialVersionUID = 1L;
-
     /**
-     * Whether to use the native file chooser, or the Swing file chooser.
+     * Whether to use the native file chooser, or the Swing file chooser. Set in
+     * the properties file {simbrain}/etc/config.properties.
      */
-    private boolean useNativeFileChooser = true;
+    private static boolean useNativeFileChooser;
 
     /**
      * The map of extensions and their descriptions in the order of their
@@ -75,7 +73,7 @@ public class SFileChooser {
     private static final String FS = System.getProperty("file.separator");
 
     /** Static initializer */
-    {
+    static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("useNativeFileChooser")) {
             useNativeFileChooser = Boolean.parseBoolean(properties
@@ -116,7 +114,7 @@ public class SFileChooser {
     }
 
     /**
-     * Adds an extension with the provided description.
+     * Adds an extension with the provided description to the filenamefilter.
      *
      * @param extension the extension
      * @param description the description
@@ -126,7 +124,7 @@ public class SFileChooser {
     }
 
     /**
-     * Adds an extension with the default description.
+     * Adds an extension with the default description to the filenamefilter.
      *
      * @param extension the extension to add
      */
@@ -175,6 +173,7 @@ public class SFileChooser {
         FileDialog chooser = new FileDialog(new JFrame(), "Open",
                 FileDialog.LOAD);
         chooser.setDirectory(getCurrentLocation());
+
         if (exts.size() >= 1) {
             chooser.setFilenameFilter(new ExtensionSetFileFilter(exts.keySet(),
                     description));
@@ -252,7 +251,7 @@ public class SFileChooser {
     /**
      * Native save dialog.
      *
-     * @return Name of file saved
+     * @return the saved file, or null if cancel, etc.
      */
     private File showSaveDialogNative(final File file) {
         FileDialog chooser = new FileDialog(new JFrame(), "Save",
@@ -260,25 +259,26 @@ public class SFileChooser {
         chooser.setDirectory(getCurrentLocation());
         if (file != null) {
             if (exts.size() >= 1) {
+                chooser.setFilenameFilter(new ExtensionSetFileFilter(exts
+                        .keySet(), description));
                 chooser.setFile(addExtension(file,
                         new ExtensionSetFileFilter(exts.keySet(), description))
-                        .getName());
+                            .getName());
             } else {
                 chooser.setFile(file.getName());
             }
         }
         chooser.setVisible(true);
 
+        // Don't use confirmOverwrite because most native file choosers do this.
+
         if (chooser.getFile() == null) {
             return null;
+        } else {
+            currentDirectory = chooser.getDirectory();
+            return new File(chooser.getDirectory() + FS + chooser.getFile());
         }
 
-        File tmpFile = new File(chooser.getDirectory() + FS + chooser.getFile());
-        if (tmpFile.exists() && !confirmOverwrite(tmpFile)) {
-            return null;
-        }
-        currentDirectory = chooser.getDirectory();
-        return tmpFile;
     }
 
     /**

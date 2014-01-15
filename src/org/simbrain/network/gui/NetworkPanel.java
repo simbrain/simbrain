@@ -69,7 +69,7 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
 import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.nodes.InvisibleSynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
@@ -80,7 +80,7 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
-import org.simbrain.network.gui.nodes.VisibleSynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode;
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode;
 import org.simbrain.network.gui.nodes.subnetworkNodes.BPTTNode;
@@ -891,9 +891,9 @@ public class NetworkPanel extends JPanel {
     protected void addSynapseGroup(SynapseGroup synapseGroup) {
         // Create visible or invisible synapse group depending on settings
         if (synapseGroup.isDisplaySynapses()) {
-            addVisibleSynapseGroup(synapseGroup);
+            addSynapseGroupFull(synapseGroup);
         } else {
-            addInvisibleSynapseGroup(synapseGroup);
+            addSynapseGroupSimple(synapseGroup);
         }
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
                 .get(synapseGroup);
@@ -923,7 +923,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param synapseGroup the model synapse group being represented
      */
-    private void addVisibleSynapseGroup(SynapseGroup synapseGroup) {
+    private void addSynapseGroupFull(SynapseGroup synapseGroup) {
         // List of neuron and synapse nodes
         List<PNode> nodes = new ArrayList<PNode>();
         // Add synapse nodes to canvas
@@ -934,7 +934,7 @@ public class NetworkPanel extends JPanel {
             nodes.add(node);
         }
         // Add synapse nodes to group node
-        VisibleSynapseGroupNode synapseGroupNode = createVisibleSynapseGroup(synapseGroup);
+        SynapseGroupNodeFull synapseGroupNode = createSynapseGroupFull(synapseGroup);
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
         for (PNode node : nodes) {
@@ -943,16 +943,16 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Create the VisibleSynapseGroupNode associated with this synapse group.
+     * Create the SynapseGroupNodeFull associated with this synapse group.
      * Overridden by {@link org.simbrain.network.desktop.NetworkPanelDesktop}
      * which adds a workspace level menu to the group.
      *
      * @param synapseGroup the neuron group to create a piccolo node for
      * @return the gui node
      */
-    protected VisibleSynapseGroupNode createVisibleSynapseGroup(
+    protected SynapseGroupNodeFull createSynapseGroupFull(
             SynapseGroup synapseGroup) {
-        return new VisibleSynapseGroupNode(this, synapseGroup);
+        return new SynapseGroupNodeFull(this, synapseGroup);
     }
 
     /**
@@ -961,24 +961,24 @@ public class NetworkPanel extends JPanel {
      *
      * @param synapseGroup the model synapse group being represented
      */
-    private void addInvisibleSynapseGroup(SynapseGroup synapseGroup) {
+    private void addSynapseGroupSimple(SynapseGroup synapseGroup) {
         // System.out.println("Add invisible synapse group");
-        InvisibleSynapseGroupNode synapseGroupNode = createInvisibleSynapseGroup(synapseGroup);
+        SynapseGroupNodeSimple synapseGroupNode = createSynapseGroupSimple(synapseGroup);
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
     }
 
     /**
-     * Create the InvisibleSynapseGroupNode associated with this synapse group.
+     * Create the SynapseGroupNodeSimple associated with this synapse group.
      * Overridden by {@link org.simbrain.network.desktop.NetworkPanelDesktop}
      * which adds a workspace level menu to the group.
      *
      * @param synapseGroup the neuron group to create a piccolo node for
      * @return the gui node
      */
-    protected InvisibleSynapseGroupNode createInvisibleSynapseGroup(
+    protected SynapseGroupNodeSimple createSynapseGroupSimple(
             SynapseGroup synapseGroup) {
-        return new InvisibleSynapseGroupNode(this, synapseGroup);
+        return new SynapseGroupNodeSimple(this, synapseGroup);
     }
 
     /**

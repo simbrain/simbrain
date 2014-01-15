@@ -18,31 +18,16 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Color;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JDialog;
-
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
  * PNode representation of a group of synapses, where the synapses themselves
- * are not visible.
+ * are visible.
  *
  * @author jyoshimi
  */
-public class InvisibleSynapseGroupNode extends SynapseGroupNode {
-
-    /** Line connecting nodes. */
-    private PPath line;
+public class SynapseGroupNodeFull extends SynapseGroupNode {
 
     /**
      * Create a Synapse Group PNode.
@@ -50,14 +35,11 @@ public class InvisibleSynapseGroupNode extends SynapseGroupNode {
      * @param networkPanel parent panel
      * @param group the synapse group
      */
-    public InvisibleSynapseGroupNode(final NetworkPanel networkPanel,
+    public SynapseGroupNodeFull(final NetworkPanel networkPanel,
             final SynapseGroup group) {
         super(networkPanel, group);
-        line = new PPath();
-        this.addChild(line);
-        line.setStrokePaint(Color.BLACK);
-        line.moveToBack();
     }
+
 
     /**
      * Override PNode layoutChildren method in order to properly set the
@@ -73,9 +55,40 @@ public class InvisibleSynapseGroupNode extends SynapseGroupNode {
         double y = (srcY + tarY) / 2;
         interactionBox.setOffset(x - interactionBox.getWidth() / 2, y
                 - interactionBox.getHeight() / 2);
-        Point2D.Double srcPoint = new Point2D.Double(srcX, srcY);
-        Point2D.Double tarPoint = new Point2D.Double(tarX, tarY);
-        line.setPathToPolyline(new Point2D.Double[] { srcPoint, tarPoint });
+
+        // Old layout code.  Some maybe useful so not removing it yet.
+//          PBounds bounds = new PBounds();
+//          if (getOutlinedObjects().size() > 0) {
+//              for (PNode node : getOutlinedObjects()) {
+//                  PBounds childBounds = node.getGlobalBounds();
+//                  bounds.add(childBounds);
+//                  if (node instanceof SynapseNode) {
+//                      // Recurrent synapses screw things up when they have area 0
+//                      Rectangle synapseBounds = ((SynapseNode) node).getLine()
+//                              .getBounds();
+//                      double area = synapseBounds.getHeight()
+//                              * synapseBounds.getWidth();
+//                      if (area > 0) {
+//                          bounds.add(((SynapseNode) node).getLine().getBounds());
+//                      }
+//                  }
+//              }
+  //
+//              double inset = getOutlinePadding();
+//              bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
+//                      bounds.getWidth() + (2 * inset), bounds.getHeight()
+//                              + (2 * inset));
+  //
+//              // Can also use setPathToEllipse
+//              setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+//                      (float) bounds.getWidth(), (float) bounds.getHeight());
+  //
+//          } else {
+//              // TODO Need to get reference to parent nodes.
+//              System.err.println("Bounds are null");
+//              bounds = null;
+//          }
+
     }
 
 }

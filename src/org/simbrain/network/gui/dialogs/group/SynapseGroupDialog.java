@@ -159,13 +159,12 @@ public class SynapseGroupDialog extends StandardDialog {
         editSynapses.add(editSynapseType);
         tabbedPane.addTab("Edit Synapses", editSynapses);
 
-        // Adjust weights tab. TODO: Add back once SynapseAdjustmentPanel worked
-        // out
-         tabbedPane.addTab("Adjust weights", tabAdjust);
-         tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
-         .getSynapseList()));
 
         if (!isCreationPanel) {
+            // Synapse Adjustment Panel
+            tabbedPane.addTab("Adjust weights", tabAdjust);
+            tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup.getSynapseList()));
+
             // Weight Matrix
             tabbedPane.addTab("Matrix", tabMatrix);
             tabMatrix.add(WeightMatrixViewer

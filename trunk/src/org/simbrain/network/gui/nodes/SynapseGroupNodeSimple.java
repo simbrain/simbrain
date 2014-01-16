@@ -21,10 +21,12 @@ package org.simbrain.network.gui.nodes;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Polygon;
+import java.awt.geom.Arc2D;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
 
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 
@@ -38,7 +40,11 @@ import org.simbrain.network.gui.NetworkPanel;
 public class SynapseGroupNodeSimple extends SynapseGroupNode {
 
     private static final float DEFAULT_ARROW_DISTANCE = 30;
-
+    
+    private static final float DEFAULT_ARROW_THICKNESS = 30;
+    
+    private static final Color DEFAULT_COLOR = Color.GREEN;
+    
     /** Line connecting nodes. */
     private PPath.Float curve;
 
@@ -58,11 +64,11 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
         arrow = new PPath.Float();
         this.addChild(curve);
         this.addChild(arrow);
-        curve.setStroke(new BasicStroke(30, BasicStroke.CAP_ROUND,
+        curve.setStroke(new BasicStroke(DEFAULT_ARROW_THICKNESS, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_MITER));
-        curve.setStrokePaint(Color.GREEN);
+        curve.setStrokePaint(DEFAULT_COLOR);
         curve.raiseToTop();
-        arrow.setPaint(Color.GREEN);
+        arrow.setPaint(DEFAULT_COLOR);
         arrow.setStroke(null);
         arrow.raiseToTop();
     }
@@ -128,11 +134,14 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
         float distanceToMidpoint = (float) Point2D.distance(srcX, srcY, x, y);
         float bez_x = (float) Math.sqrt(Math.pow(distanceToMidpoint, 2)
                 / (1 + Math.pow(1 / slope, 2)));
+
+        float bez_y = bez_x * 1 / slope;
         if (srcX <= tarX) {
             bez_x = -bez_x;
         }
-        float bez_y = bez_x * 1 / slope;
-
+        if (srcX >= tarX) {
+        	bez_y = -bez_y;
+        }
         CubicCurve2D.Float theCurve = new CubicCurve2D.Float(srcX, srcY, x
                 + bez_x, y + bez_y, b2X, b2Y, endX, endY);
         curve.reset();

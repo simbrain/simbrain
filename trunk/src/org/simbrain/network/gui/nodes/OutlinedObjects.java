@@ -39,6 +39,12 @@ import org.piccolo2d.util.PPaintContext;
 public class OutlinedObjects extends PPath.Float {
 
     /**
+     * The width and height of the arc in the rounded rectangle that surrounds
+     * the outlined objects.
+     */
+    public static final int ROUNDING_WIDTH_HEIGHT = 20;
+
+    /**
      * Whether to draw an outline around entire set of grouped objects or not.
      * In some cases a fill is enough.
      */
@@ -78,6 +84,7 @@ public class OutlinedObjects extends PPath.Float {
      * Change the default paint to fill an expanded bounding box based on its
      * children's bounds.
      */
+    @Override
     public void paint(final PPaintContext ppc) {
         final Paint paint = getPaint();
         if (paint != null) {
@@ -94,10 +101,11 @@ public class OutlinedObjects extends PPath.Float {
 
             if (drawOutline) {
                 g2.setPaint(lineColor);
-                g2.drawRect((int) bounds.getX() - outlinePadding,
+                g2.drawRoundRect((int) bounds.getX() - outlinePadding,
                         (int) bounds.getY() - outlinePadding,
                         (int) bounds.getWidth() + 2 * outlinePadding,
-                        (int) bounds.getHeight() + 2 * outlinePadding);
+                        (int) bounds.getHeight() + 2 * outlinePadding,
+                        ROUNDING_WIDTH_HEIGHT, ROUNDING_WIDTH_HEIGHT);
             }
             // if (backgroundColor != null) {
             // g2.setPaint(backgroundColor);

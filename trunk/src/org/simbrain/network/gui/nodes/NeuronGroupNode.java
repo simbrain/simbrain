@@ -112,7 +112,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     @Override
     public void layoutChildren() {
         interactionBox.setOffset(
-                outlinedObjects.getFullBounds().getX(),
+                outlinedObjects.getFullBounds().getX() + OutlinedObjects.ROUNDING_WIDTH_HEIGHT/2,
                 outlinedObjects.getFullBounds().getY()
                         - interactionBox.getHeight() + 1);
     }

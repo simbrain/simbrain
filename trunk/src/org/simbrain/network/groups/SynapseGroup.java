@@ -181,6 +181,15 @@ public class SynapseGroup extends Group {
 //    }
 
     /**
+     * Check whether this synapse group connects a neuron group to itself.
+     *
+     * @return true if this connects a neuron group to itself, false otherwise.
+     */
+    public boolean isRecurrent() {
+        return sourceNeuronGroup == targetNeuronGroup ? true : false;
+    }
+
+    /**
      * Remove the provided synapse.
      *
      * @param toDelete the synapse to delete

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import org.piccolo2d.extras.handles.PHandle;
 import org.piccolo2d.extras.util.PNodeLocator;
 
 /**
- * Selection handle.
+ * The graphical handle drawn around selected PNodes.
  *
  * <p>
  * Usage:
@@ -53,8 +54,11 @@ import org.piccolo2d.extras.util.PNodeLocator;
  */
 public final class SelectionHandle extends PHandle {
 
-    /** Extend factor. */
-    private static final double EXTEND_FACTOR = 0.075d;
+    /**
+     * Amount of space to add between the selected object and the selection
+     * handle.
+     */
+    private static final float DEFAULT_EXTEND_FACTOR = 0.075f;
 
     /** Color of selection boxes. */
     private static Color selectionColor = Color.green;
@@ -65,7 +69,17 @@ public final class SelectionHandle extends PHandle {
      * @param locator locator
      */
     private SelectionHandle(final PNodeLocator locator) {
+        this(locator, DEFAULT_EXTEND_FACTOR);
+    }
 
+    /**
+     * Create a selection handle with a specified extend factor (distance between selected
+     * PNode and the selection handle).
+     *
+     * @param locator the locator
+     * @param extendFactor extension factor (see above).
+     */
+    private SelectionHandle(final PNodeLocator locator, final float extendFactor) {
         super(locator);
 
         reset();
@@ -77,14 +91,14 @@ public final class SelectionHandle extends PHandle {
         setPaint(null);
         setStrokePaint(selectionColor);
 
-        // force handle to check its location and size
-        updateBounds();
+        // Force handle to check its location and size
+        updateBounds(extendFactor);
         relocateHandle();
     }
 
     /** @see PHandle */
     public void parentBoundsChanged() {
-        updateBounds();
+        updateBounds(DEFAULT_EXTEND_FACTOR);
         super.parentBoundsChanged();
     }
 
@@ -92,20 +106,19 @@ public final class SelectionHandle extends PHandle {
      * Update the bounds of this selection handle based on the size of its
      * parent plus an extension factor.
      */
-    private void updateBounds() {
+    private void updateBounds(float extendFactor) {
         PNode parentNode = ((PNodeLocator) getLocator()).getNode();
 
-        double x = 0.0d - (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
-        double y = 0.0d - (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
+        double x = 0.0f - (parentNode.getBounds().getWidth() * extendFactor);
+        double y = 0.0f - (parentNode.getBounds().getHeight() * extendFactor);
         double width = parentNode.getBounds().getWidth() + 2
-                * (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
+                * (parentNode.getBounds().getWidth() * extendFactor);
         double height = parentNode.getBounds().getHeight() + 2
-                * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
+                * (parentNode.getBounds().getHeight() * extendFactor);
 
-        append(
-                new Rectangle2D.Float((float) x, (float) y,
-                        (float) width, (float) height),
-                false);
+        this.reset(); // TODO: Check with Heuer
+        append(new Rectangle2D.Float((float) x, (float) y, (float) width,
+                (float) height), false);
     }
 
     /**
@@ -115,10 +128,8 @@ public final class SelectionHandle extends PHandle {
      * @return true if the specified node has a selection handle as a child
      */
     private static boolean hasSelectionHandle(final PNode node) {
-
         for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
             PNode n = (PNode) i.next();
-
             if (n instanceof SelectionHandle) {
                 return true;
             }
@@ -143,7 +154,17 @@ public final class SelectionHandle extends PHandle {
         }
 
         PNodeLocator nodeLocator = new PNodeLocator(node);
-        SelectionHandle selectionHandle = new SelectionHandle(nodeLocator);
+
+        // Special treatment for interaction boxes
+        if (node instanceof InteractionBox) {
+            SelectionHandle selectionHandle = new SelectionHandle(nodeLocator,
+                    0);
+            selectionHandle.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND));
+        } else {
+            SelectionHandle selectionHandle = new SelectionHandle(nodeLocator);
+        }
+
     }
 
     /**

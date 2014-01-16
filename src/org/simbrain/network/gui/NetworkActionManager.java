@@ -519,9 +519,9 @@ public final class NetworkActionManager {
                 .asList(new Action[] {
                         new AddGroupAction(networkPanel,
                                 BackpropCreationDialog.class, "Backprop"),
-                        new AddGroupAction(networkPanel,
-                                BPTTCreationDialog.class,
-                                "Backprop Through Time"),
+                        //new AddGroupAction(networkPanel,
+                        //        BPTTCreationDialog.class,
+                        //        "Backprop Through Time"),
                         new AddGroupAction(networkPanel,
                                 CompetitiveNetworkCreationDialog.class,
                                 "Competitive Network"),

@@ -62,9 +62,10 @@ public class BackpropNetworkNode extends SubnetworkNode {
      */
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
-        menu.add(editGroup);
-        menu.add(renameGroup);
-        menu.add(removeGroup);
+        editAction.putValue("Name", "Edit / Train Backprop...");
+        menu.add(editAction);
+        menu.add(renameAction);
+        menu.add(removeAction);
         menu.addSeparator();
         final BackpropNetwork network = (BackpropNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");

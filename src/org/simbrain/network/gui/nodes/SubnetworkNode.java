@@ -28,6 +28,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
@@ -35,8 +37,6 @@ import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PPath;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -78,6 +78,9 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
         addChild(interactionBox);
         // Must do this after it's added to properly locate the text
         interactionBox.updateText();
+
+        setContextMenu(this.getDefaultContextMenu());
+
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
     }
@@ -157,7 +160,7 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     }
 
     /**
-     * Custom interaction box for Subnetwork node. Ensures a property dialog
+     * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
     private class SubnetworkNodeInteractionBox extends InteractionBox {
@@ -220,8 +223,8 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     protected JPopupMenu getDefaultContextMenu() {
         JPopupMenu ret = new JPopupMenu();
 
-        ret.add(renameGroup);
-        ret.add(removeGroup);
+        ret.add(renameAction);
+        ret.add(removeAction);
         if (subnetwork instanceof Trainable) {
             ret.addSeparator();
             ret.add(testInputAction);
@@ -232,7 +235,7 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     /**
      * Action for invoking the default edit and properties menu.
      */
-    protected Action editGroup = new AbstractAction("Edit...") {
+    protected Action editAction = new AbstractAction("Edit...") {
         public void actionPerformed(final ActionEvent event) {
             StandardDialog dialog = getPropertyDialog();
             dialog.pack();
@@ -242,7 +245,7 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     };
 
     /** Action for editing the group name. */
-    protected Action renameGroup = new AbstractAction("Rename group...") {
+    protected Action renameAction = new AbstractAction("Rename...") {
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:",
                     subnetwork.getLabel());
@@ -253,12 +256,12 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     /**
      * Action for removing this group
      */
-    protected Action removeGroup = new AbstractAction() {
+    protected Action removeAction = new AbstractAction() {
 
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
-            putValue(NAME, "Remove group...");
-            putValue(SHORT_DESCRIPTION, "Remove subnetwork...");
+            putValue(NAME, "Remove Network...");
+            putValue(SHORT_DESCRIPTION, "Remove this subnetwork...");
         }
 
         @Override

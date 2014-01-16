@@ -1309,35 +1309,46 @@ public class NetworkPanel extends JPanel {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());
                 deletedObjects.add(selectedTextNode.getTextObject());
+            } else if (selectedNode instanceof InteractionBox) {
+                if (selectedNode.getParent() instanceof NeuronGroupNode) {
+                    network.removeGroup(((NeuronGroupNode) selectedNode
+                            .getParent()).getNeuronGroup());
+                } else if (selectedNode.getParent() instanceof SynapseGroupNode) {
+                    network.removeGroup(((SynapseGroupNode) selectedNode
+                            .getParent()).getSynapseGroup());
+                } else if (selectedNode.getParent() instanceof SubnetworkNode) {
+                    network.removeGroup(((SubnetworkNode) selectedNode
+                            .getParent()).getSubnetwork());
+                }
             }
         }
-        undoManager.addUndoableAction(new UndoableAction() {
-
-            @Override
-            public void undo() {
-                for (Object object : deletedObjects) {
-                    if (object instanceof Neuron) {
-                        network.addNeuron((Neuron) object);
-                    } else if (object instanceof NetworkTextObject) {
-                        network.addText((NetworkTextObject) object);
-                    }
-                }
-                // System.out.println("Delete Selected Objects:undo - Add those objects");
-            }
-
-            @Override
-            public void redo() {
-                for (Object object : deletedObjects) {
-                    if (object instanceof Neuron) {
-                        network.removeNeuron((Neuron) object);
-                    } else if (object instanceof NetworkTextObject) {
-                        network.deleteText((NetworkTextObject) object);
-                    }
-                }
-                // System.out.println("Delete Selected Objects:redo - Re-Remove those objects");
-            }
-
-        });
+//        undoManager.addUndoableAction(new UndoableAction() {
+//
+//            @Override
+//            public void undo() {
+//                for (Object object : deletedObjects) {
+//                    if (object instanceof Neuron) {
+//                        network.addNeuron((Neuron) object);
+//                    } else if (object instanceof NetworkTextObject) {
+//                        network.addText((NetworkTextObject) object);
+//                    }
+//                }
+//                // System.out.println("Delete Selected Objects:undo - Add those objects");
+//            }
+//
+//            @Override
+//            public void redo() {
+//                for (Object object : deletedObjects) {
+//                    if (object instanceof Neuron) {
+//                        network.removeNeuron((Neuron) object);
+//                    } else if (object instanceof NetworkTextObject) {
+//                        network.deleteText((NetworkTextObject) object);
+//                    }
+//                }
+//                // System.out.println("Delete Selected Objects:redo - Re-Remove those objects");
+//            }
+//
+//        });
 
     }
 
@@ -1728,6 +1739,11 @@ public class NetworkPanel extends JPanel {
             } else if (e instanceof InteractionBox) {
                 if (e.getParent() instanceof NeuronGroupNode) {
                     ret.add(((NeuronGroupNode) e.getParent()).getNeuronGroup());
+                } else if (e.getParent() instanceof SynapseGroupNode) {
+                    ret.add(((SynapseGroupNode) e.getParent())
+                            .getSynapseGroup());
+                } else if (e.getParent() instanceof SubnetworkNode) {
+                    ret.add(((SubnetworkNode) e.getParent()).getSubnetwork());
                 }
             }
         }

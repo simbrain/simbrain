@@ -209,6 +209,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             rect.add(marqueeStartPosition);
             rect.add(position);
             marquee.globalToLocal(rect);
+            marquee.reset(); //todo: better way?
             marquee.append(new Rectangle2D.Float((float) rect.getX(),
                     (float) rect.getY(), (float) rect.getWidth(),
                     (float) rect.getHeight()), false);

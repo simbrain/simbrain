@@ -73,6 +73,13 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
      */
     @Override
     public void layoutChildren() {
+        if ((curve == null) || (arrow == null)) {
+            return;
+        }
+        if (this.getSynapseGroup().isRecurrent()) {
+            return;
+        }
+
         float srcX = (float) synapseGroup.getSourceNeuronGroup().getCenterX();
         float srcY = (float) synapseGroup.getSourceNeuronGroup().getCenterY();
         float tarX = (float) synapseGroup.getTargetNeuronGroup().getCenterX();
@@ -130,17 +137,24 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode {
                 + bez_x, y + bez_y, b2X, b2Y, endX, endY);
         curve.reset();
         curve.append(theCurve, false);
-        curve.raiseToTop();
 
         Polygon polyArrow = new Polygon(triPtx, triPty, numSides);
         arrow.reset();
         arrow.append(polyArrow, false);
-        arrow.raiseToTop();
 
         interactionBox.setOffset(x + bez_x / 2 - interactionBox.getWidth() / 2,
                 y - interactionBox.getHeight() / 2);
         interactionBox.raiseToTop();
 
+    }
+
+    // TODO: Not sure why below is needed.  Without the explicit null sets
+    //  a fatal error occurs in the JRE.
+    @Override
+    public void removeFromParent() {
+        curve = null;
+        arrow = null;
+        super.removeFromParent();
     }
 
 }

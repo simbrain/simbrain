@@ -94,6 +94,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         this.networkPanel = networkPanel;
         this.neuronGroup = group;
         outlinedObjects = new OutlinedObjects();
+        outlinedObjects.setFillBackground(false);
         interactionBox = new NeuronGroupInteractionBox(networkPanel);
         interactionBox.setText(neuronGroup.getLabel());
         addChild(outlinedObjects);
@@ -162,6 +163,24 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
      */
     public OutlinedObjects getOutlinedObjects() {
         return outlinedObjects;
+    }
+
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        updateSynapseNodePositions();
+    };
+
+    /**
+     * Call update synapse node positions on all constituent neuron nodes.
+     * Ensures synapse nodes are updated properly when this is moved.
+     */
+    public void updateSynapseNodePositions() {
+        for (Object node : outlinedObjects.getChildrenReference()) {
+            if (node instanceof NeuronNode) {
+                ((NeuronNode) node).updateSynapseNodePositions();
+            }
+        }
     }
 
 
@@ -414,16 +433,5 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             getNetworkPanel().getNetwork().removeGroup(neuronGroup);
         }
     };
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        for (Object node : outlinedObjects.getChildrenReference()) {
-            if (node instanceof NeuronNode) {
-                ((NeuronNode) node).updateSynapseNodePositions();
-            }
-        }
-    };
-
-
 
 }

@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -33,7 +35,6 @@ import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 
@@ -46,7 +47,7 @@ import org.piccolo2d.nodes.PPath;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends PPath.Float {
+public class SubnetworkNode extends PPath.Float implements PropertyChangeListener {
 
     /** Parent network panel. */
     private final NetworkPanel networkPanel;
@@ -77,6 +78,8 @@ public class SubnetworkNode extends PPath.Float {
         addChild(interactionBox);
         // Must do this after it's added to properly locate the text
         interactionBox.updateText();
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+
     }
 
     /**
@@ -132,6 +135,24 @@ public class SubnetworkNode extends PPath.Float {
      */
     public OutlinedObjects getOutlinedObjects() {
         return outlinedObjects;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        updateSynapseNodePositions();
+    };
+
+    /**
+     * Call update synapse node positions on all constituent neuron group nodes,
+     * which does the same on all constituent neuron nodes. Ensures synapse
+     * nodes are updated properly when this is moved.
+     */
+    public void updateSynapseNodePositions() {
+        for (Object node : outlinedObjects.getChildrenReference()) {
+            if (node instanceof NeuronGroupNode) {
+                ((NeuronGroupNode) node).updateSynapseNodePositions();
+            }
+        }
     }
 
     /**

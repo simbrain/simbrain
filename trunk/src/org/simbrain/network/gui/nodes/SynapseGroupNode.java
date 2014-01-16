@@ -193,7 +193,7 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
         JPopupMenu menu = new JPopupMenu();
 
         // Edit
-        Action editGroup = new AbstractAction("Edit...") {
+        Action editGroup = new AbstractAction("Edit Synapse Group...") {
             public void actionPerformed(final ActionEvent event) {
                 JDialog dialog = new SynapseGroupDialog(getNetworkPanel(),
                         synapseGroup);
@@ -203,51 +203,7 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
             }
         };
         menu.add(editGroup);
-        menu.add(removeGroup);
-
-        // Weight adjustment stuff
-        menu.addSeparator();
-        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
-            public void actionPerformed(final ActionEvent event) {
-                selectSynapses();
-                final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                        getNetworkPanel(), synapseGroup.getSynapseList());
-                JDialog dialog = new JDialog();
-                dialog.setTitle("Adjust selected synapses");
-                dialog.setContentPane(synapsePanel);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        synapsePanel.removeListeners();
-                    }
-                });
-            }
-        };
-        menu.add(adjustSynapses);
-        menu.add(new JMenuItem(showWeightMatrixAction));
-
-        // Selection stuff
-        menu.addSeparator();
-        final JCheckBoxMenuItem tsvCheckBox =  new JCheckBoxMenuItem();
-        Action toggleSynapseVisibility = new AbstractAction("Synapses Visible") {
-            public void actionPerformed(final ActionEvent event) {
-                if (synapseGroup.isDisplaySynapses()) {
-                    synapseGroup.setDisplaySynapses(false);
-                } else {
-                    synapseGroup.setDisplaySynapses(true);
-                }
-                synapseGroup.getParentNetwork().fireGroupChanged(
-                        new NetworkEvent<Group>(synapseGroup.getParentNetwork(),
-                                synapseGroup, synapseGroup),
-                        SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
-                tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
-            }
-        };
-        tsvCheckBox.setAction(toggleSynapseVisibility);
-        tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
-        menu.add(tsvCheckBox);
+        menu.add(removeAction);
 
         // Selection stuff
         menu.addSeparator();
@@ -285,6 +241,53 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
             }
         };
         menu.add(selectOutgoingNodes);
+        
+        
+
+        // Weight adjustment stuff
+        menu.addSeparator();
+        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
+            public void actionPerformed(final ActionEvent event) {
+                selectSynapses();
+                final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
+                        getNetworkPanel(), synapseGroup.getSynapseList());
+                JDialog dialog = new JDialog();
+                dialog.setTitle("Adjust selected synapses");
+                dialog.setContentPane(synapsePanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                dialog.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e) {
+                        synapsePanel.removeListeners();
+                    }
+                });
+            }
+        };
+        menu.add(adjustSynapses);
+        menu.add(new JMenuItem(showWeightMatrixAction));
+
+        // Synapse Visibility
+        menu.addSeparator();
+        final JCheckBoxMenuItem tsvCheckBox =  new JCheckBoxMenuItem();
+        Action toggleSynapseVisibility = new AbstractAction(
+                "Toggle Synapse Visibility") {
+            public void actionPerformed(final ActionEvent event) {
+                if (synapseGroup.isDisplaySynapses()) {
+                    synapseGroup.setDisplaySynapses(false);
+                } else {
+                    synapseGroup.setDisplaySynapses(true);
+                }
+                synapseGroup.getParentNetwork().fireGroupChanged(
+                        new NetworkEvent<Group>(synapseGroup.getParentNetwork(),
+                                synapseGroup, synapseGroup),
+                        SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+                tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
+            }
+        };
+        tsvCheckBox.setAction(toggleSynapseVisibility);
+        tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
+        menu.add(tsvCheckBox);
 
         // Coupling menu
         if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
@@ -337,7 +340,7 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
     };
 
     /** Action for editing the group name. */
-    protected Action renameGroup = new AbstractAction("Rename group...") {
+    protected Action renameAction = new AbstractAction("Rename Group...") {
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:",
                     synapseGroup.getLabel());
@@ -348,11 +351,11 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
     /**
      * Action for removing this group
      */
-    protected Action removeGroup = new AbstractAction() {
+    protected Action removeAction = new AbstractAction() {
 
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
-            putValue(NAME, "Remove group...");
+            putValue(NAME, "Remove Group...");
             putValue(SHORT_DESCRIPTION, "Remove synapse group...");
         }
 

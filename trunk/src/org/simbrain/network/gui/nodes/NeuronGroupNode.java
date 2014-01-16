@@ -237,8 +237,8 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             }
         };
         menu.add(editGroup);
-        menu.add(renameGroup);
-        menu.add(removeGroup);
+        menu.add(renameAction);
+        menu.add(removeAction);
 
         // Selection submenu
         menu.addSeparator();
@@ -409,7 +409,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /** Action for editing the group name. */
-    protected Action renameGroup = new AbstractAction("Rename group...") {
+    protected Action renameAction = new AbstractAction("Rename Group...") {
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:",
                     neuronGroup.getLabel());
@@ -420,11 +420,11 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Action for removing this group
      */
-    protected Action removeGroup = new AbstractAction() {
+    protected Action removeAction = new AbstractAction() {
 
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
-            putValue(NAME, "Remove group...");
+            putValue(NAME, "Remove Group...");
             putValue(SHORT_DESCRIPTION, "Remove neuron group...");
         }
 

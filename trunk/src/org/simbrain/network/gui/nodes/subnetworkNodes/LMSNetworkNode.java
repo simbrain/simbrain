@@ -64,9 +64,10 @@ public class LMSNetworkNode extends SubnetworkNode {
      */
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
-        menu.add(editGroup);
-        menu.add(renameGroup);
-        menu.add(removeGroup);
+        editAction.putValue("Name", "Edit / Train LMS...");
+        menu.add(editAction);
+        menu.add(renameAction);
+        menu.add(removeAction);
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
         final LMSNetwork network = (LMSNetwork) getSubnetwork();

@@ -897,21 +897,21 @@ public class NetworkPanel extends JPanel {
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
                 .get(synapseGroup);
 
-//        // TODO: Clean up listeners if the synpasegroup is removed.
-//        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
-//                .get(synapseGroup.getSourceNeuronGroup());
-//        // System.out.println("Source" + srcNode);
-//        if (srcNode != null) {
-//            synapseGroupNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-//                    srcNode);
-//        }
-//        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
-//                .get(synapseGroup.getTargetNeuronGroup());
-//        // System.out.println("Target" + tarNode);
-//        if (tarNode != null) {
-//            synapseGroupNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-//                    tarNode);
-//        }
+        // TODO: Clean up listeners if the synpasegroup is removed.
+        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
+                .get(synapseGroup.getSourceNeuronGroup());
+        // System.out.println("Source" + srcNode);
+        if (srcNode != null) {
+            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+                    synapseGroupNode);
+        }
+        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
+                .get(synapseGroup.getTargetNeuronGroup());
+        // System.out.println("Target" + tarNode);
+        if (tarNode != null) {
+            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+                    synapseGroupNode);
+        }
 
         synapseGroupNode.lowerToBottom();
     }

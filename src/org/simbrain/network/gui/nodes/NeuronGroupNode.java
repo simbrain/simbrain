@@ -100,6 +100,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         addChild(interactionBox);
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
     }
 
@@ -416,7 +417,11 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        layoutChildren();
+        for (Object node : outlinedObjects.getChildrenReference()) {
+            if (node instanceof NeuronNode) {
+                ((NeuronNode) node).updateSynapseNodePositions();
+            }
+        }
     };
 
 

@@ -57,8 +57,6 @@ import org.piccolo2d.util.PBounds;
  */
 public class NeuronNode extends ScreenElement implements PropertyChangeListener {
 
-    private static final Logger LOGGER = Logger.getLogger(NeuronNode.class);
-
     /** The logical neuron this screen element represents. */
     protected Neuron neuron;
 
@@ -87,10 +85,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private PPath circle;
 
     /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
-    private HashSet connectedSynapses = new HashSet();
-
-    /** Id reference to model neuron; used in persistence. */
-    private String id;
+    private HashSet<SynapseNode> connectedSynapses = new HashSet<SynapseNode>();
 
     /** Number text inside neuron. */
     private PText activationText;
@@ -720,9 +715,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /**
      * @return Connected synapses.
      */
-    public Set getConnectedSynapses() {
-        // TODO:
-        // may want to make this set unmodifiable
+    public Set<SynapseNode> getConnectedSynapses() {
         return connectedSynapses;
     }
 
@@ -730,30 +723,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * Update connected synapse node positions.
      */
     public void updateSynapseNodePositions() {
-
-        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
-            SynapseNode synapseNode = (SynapseNode) i.next();
+        for (SynapseNode synapseNode : connectedSynapses) {
             synapseNode.updatePosition();
         }
-    }
-
-    /**
-     * Synapse node position updater, called in response to changes in this
-     * neuron node's fullBounds property.
-     */
-    private class SynapseNodePositionUpdater implements PropertyChangeListener {
-
-        /** @see PropertyChangeListener */
-        public void propertyChange(final PropertyChangeEvent event) {
-            updateSynapseNodePositions();
-        }
-    }
-
-    /**
-     * @param id The id to set.
-     */
-    public void setId(final String id) {
-        this.id = id;
     }
 
     /**
@@ -836,8 +808,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** @see ScreenElement. */
     public void setGrouped(final boolean isGrouped) {
         super.setGrouped(isGrouped);
-        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
-            SynapseNode synapseNode = (SynapseNode) i.next();
+        for (SynapseNode synapseNode : connectedSynapses) {
             synapseNode.setGrouped(isGrouped);
         }
     }

@@ -18,9 +18,11 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
 
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.SynapseGroup;
@@ -34,48 +36,100 @@ import org.simbrain.network.gui.NetworkPanel;
  */
 public class SynapseGroupNodeSimple extends SynapseGroupNode {
 
-    /** Line connecting nodes. */
-    private PPath.Float curve;
+	private static final float DEFAULT_ARROW_DISTANCE = 30; //px
 
-    /**
-     * Create a Synapse Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group the synapse group
-     */
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
-            final SynapseGroup group) {
-        super(networkPanel, group);
-        curve = new PPath.Float();
-        this.addChild(curve);
-        curve.setStrokePaint(Color.BLACK);
-        curve.lowerToBottom();
-    }
+	/** Line connecting nodes. */
+	private PPath.Float curve;
 
-    /**
-     * Override PNode layoutChildren method in order to properly set the
-     * positions of children nodes.
-     */
-    @Override
-    public void layoutChildren() {
-        float srcX = (float) synapseGroup.getSourceNeuronGroup().getCenterX();
-        float srcY = (float) synapseGroup.getSourceNeuronGroup().getCenterY();
-        float tarX = (float) synapseGroup.getTargetNeuronGroup().getCenterX();
-        float tarY = (float) synapseGroup.getTargetNeuronGroup().getCenterY();
-        float x = (srcX + tarX) / 2;
-        float y = (srcY + tarY) / 2;
-        float slope = (tarY - srcY) / (tarX - srcX);
-        float distanceToMidpoint = (float) Point2D.distance(srcX, srcY, x, y);
-        float bez_x = (float) Math.sqrt(Math.pow(distanceToMidpoint, 2)
-                / (1 + Math.pow(1 / slope, 2)));
-        float bez_y = bez_x * 1 / slope;
+	private PPath.Float arrow;
 
-        QuadCurve2D.Float theCurve = new QuadCurve2D.Float(srcX, srcY, x
-                + bez_x, y + bez_y, tarX, tarY);
-        curve.append(theCurve, false);
+	/**
+	 * Create a Synapse Group PNode.
+	 *
+	 * @param networkPanel parent panel
+	 * @param group the synapse group
+	 */
+	public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
+			final SynapseGroup group) {
+		super(networkPanel, group);
+		curve = new PPath.Float();
+		arrow = new PPath.Float();
+		this.addChild(curve);
+		this.addChild(arrow);
+		curve.setStroke(new BasicStroke(30, BasicStroke.CAP_ROUND,
+				BasicStroke.JOIN_MITER));
+		curve.setStrokePaint(Color.GREEN);
+		curve.raiseToTop();
+		arrow.setPaint(Color.GREEN);
+		arrow.setStroke(new BasicStroke(0));
+		arrow.raiseToTop();
+	}
 
-        interactionBox.setOffset(x - interactionBox.getWidth() / 2, y
-                - interactionBox.getHeight() / 2);
-    }
+	/**
+	 * Override PNode layoutChildren method in order to properly set the
+	 * positions of children nodes.
+	 */
+	@Override
+	public void layoutChildren() {
+		float srcX = (float) synapseGroup.getSourceNeuronGroup().getCenterX();
+		float srcY = (float) synapseGroup.getSourceNeuronGroup().getCenterY();
+		float tarX = (float) synapseGroup.getTargetNeuronGroup().getCenterX();
+		float tarY = (float) synapseGroup.getTargetNeuronGroup().getCenterY();
+
+		float diffX = tarX - srcX;
+		float diffY = tarY - srcY;
+
+		int numSides = 3;
+		int [] triPtx = new int[numSides];
+		int [] triPty = new int[numSides];
+
+		double theta = Math.atan(diffY /diffX);
+		double phi = Math.PI/6;
+		
+		int negCont = diffX < 0 ? -1 : 1;
+
+		triPtx[0] = (int) (tarX - negCont * (DEFAULT_ARROW_DISTANCE * Math.cos(theta)));
+		triPty[0] = (int) (tarY - negCont * (DEFAULT_ARROW_DISTANCE * Math.sin(theta)));
+
+		triPtx[1] = (int) (tarX - negCont * (2*DEFAULT_ARROW_DISTANCE * Math.cos(theta + phi)));
+		triPty[1] = (int) (tarY - negCont * (2*DEFAULT_ARROW_DISTANCE * Math.sin(theta + phi)));
+
+		triPtx[2] = (int) (tarX - negCont * (2*DEFAULT_ARROW_DISTANCE * Math.cos(theta - phi)));
+		triPty[2] = (int) (tarY - negCont * (2*DEFAULT_ARROW_DISTANCE * Math.sin(theta - phi)));
+
+		float endX = (float) (tarX - negCont * (Math.sqrt(3) * DEFAULT_ARROW_DISTANCE * Math.cos(theta)));
+		float endY = (float) (tarY - negCont * (Math.sqrt(3) * DEFAULT_ARROW_DISTANCE * Math.sin(theta)));
+		
+		float b2X = (float) (tarX - negCont * (3 * DEFAULT_ARROW_DISTANCE * Math.cos(theta)));
+		float b2Y = (float) (tarY - negCont * (3 * DEFAULT_ARROW_DISTANCE * Math.sin(theta)));
+		
+		float x = (srcX + endX) / 2;
+		float y = (srcY + endY) / 2;
+		float slope = (endY - srcY) / (endX - srcX);
+		float distanceToMidpoint = (float) Point2D.distance(srcX, srcY, x, y);
+		float bez_x = (float) Math.sqrt(Math.pow(distanceToMidpoint, 2)
+				/ (1 + Math.pow(1 / slope, 2)));
+		        if (srcX <= tarX) {
+			        	bez_x = -bez_x;
+			        }
+		float bez_y = bez_x * 1 / slope;
+
+		CubicCurve2D.Float theCurve = new CubicCurve2D.Float(srcX, srcY, x
+				+ bez_x, y + bez_y, b2X, b2Y, endX, endY);
+		curve.reset();
+		curve.append(theCurve, false);
+		curve.raiseToTop();
+		
+		Polygon polyArrow = new Polygon(triPtx, triPty, numSides);
+		arrow.reset();
+		arrow.append(polyArrow, false);
+		arrow.raiseToTop();
+
+		interactionBox.setOffset(x + bez_x/2 - interactionBox.getWidth() / 2, y
+				- interactionBox.getHeight() / 2);
+		interactionBox.raiseToTop();
+		
+
+	}
 
 }

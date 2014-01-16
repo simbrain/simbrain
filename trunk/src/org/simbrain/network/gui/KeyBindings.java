@@ -147,7 +147,7 @@ public class KeyBindings {
 
         // Print debug info
         inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.SHIFT_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
                 "debug");
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

@@ -217,6 +217,8 @@ public final class SynapseNode extends ScreenElement {
             } else {
                 line.setStrokePaint(lineColor);
             }
+        } else {
+            line.setStrokePaint(lineColor);
         }
     }
 

@@ -913,7 +913,6 @@ public class NetworkPanel extends JPanel {
                     synapseGroupNode);
         }
 
-        synapseGroupNode.lowerToBottom();
     }
 
     /**
@@ -1847,18 +1846,18 @@ public class NetworkPanel extends JPanel {
         repaint();
     }
 
-    /**
-     * Returns information about the Network in String form.
-     *
-     * @return String description about this NeuronNode.
-     */
-    public String toString() {
-        String ret = new String();
-        for (PNode node : getPersistentNodes()) {
-            ret += node.toString();
-        }
-        return ret;
-    }
+//    /**
+//     * Returns information about the Network in String form.
+//     *
+//     * @return String description about this NeuronNode.
+//     */
+//    public String toString() {
+//        String ret = new String();
+//        for (PNode node : getPersistentNodes()) {
+//            ret += node.toString();
+//        }
+//        return ret;
+//    }
 
     /**
      * @return Returns the Network.

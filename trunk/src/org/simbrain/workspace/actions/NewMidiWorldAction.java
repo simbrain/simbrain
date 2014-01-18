@@ -3,7 +3,6 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.midiworld.MidiWorldComponent;
 
 /**
  * Add MIDI world to workspace.
@@ -21,7 +20,7 @@ public final class NewMidiWorldAction extends WorkspaceAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        MidiWorldComponent world = new MidiWorldComponent("");
-        workspace.addWorkspaceComponent(world);
+//        MidiWorldComponent world = new MidiWorldComponent("");
+//        workspace.addWorkspaceComponent(world);
     }
 }

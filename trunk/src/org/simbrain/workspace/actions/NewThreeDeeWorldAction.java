@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.threedee.ThreeDeeComponent;
 
 /**
  * Add odor world to workspace.
@@ -41,7 +40,7 @@ public final class NewThreeDeeWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ThreeDeeComponent component = new ThreeDeeComponent("");
-        workspace.addWorkspaceComponent(component);
+//        ThreeDeeComponent component = new ThreeDeeComponent("");
+//        workspace.addWorkspaceComponent(component);
     }
 }

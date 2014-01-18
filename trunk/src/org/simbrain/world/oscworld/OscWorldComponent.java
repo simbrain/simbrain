@@ -25,9 +25,6 @@ import java.net.UnknownHostException;
 
 import org.simbrain.workspace.WorkspaceComponent;
 
-import com.illposed.osc.OSCPortIn;
-import com.illposed.osc.OSCPortOut;
-
 /**
  * OSC world component.
  *
@@ -36,11 +33,11 @@ import com.illposed.osc.OSCPortOut;
  */
 public final class OscWorldComponent extends WorkspaceComponent {
 
-    /** OSC port in. */
-    private final OSCPortIn oscPortIn;
-
-    /** OSC port out. */
-    private final OSCPortOut oscPortOut;
+//    /** OSC port in. */
+//    private final OSCPortIn oscPortIn;
+//
+//    /** OSC port out. */
+//    private final OSCPortOut oscPortOut;
 
     /** Default OSC out host. */
     private static final InetAddress DEFAULT_OSC_OUT_HOST;
@@ -67,27 +64,27 @@ public final class OscWorldComponent extends WorkspaceComponent {
      */
     public OscWorldComponent(final String name) {
         super(name);
-        try {
-            oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
-            oscPortIn.startListening();
-        } catch (SocketException e) {
-            throw new RuntimeException("could not create OSC port in", e);
-        }
-        try {
-            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST,
-                    DEFAULT_OSC_OUT_PORT);
-        } catch (SocketException e) {
-            throw new RuntimeException("could not create OSC port out", e);
-        }
+//        try {
+//            oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
+//            oscPortIn.startListening();
+//        } catch (SocketException e) {
+//            throw new RuntimeException("could not create OSC port in", e);
+//        }
+//        try {
+//            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST,
+//                    DEFAULT_OSC_OUT_PORT);
+//        } catch (SocketException e) {
+//            throw new RuntimeException("could not create OSC port out", e);
+//        }
     }
 
     /** {@inheritDoc} */
     public void closing() {
-        oscPortIn.stopListening();
-        // TODO: always throws SocketException; wrote email to JavaOSC author
-        oscPortIn.close();
-        oscPortOut.close();
-        // TODO: remove list event listeners
+//        oscPortIn.stopListening();
+//        // TODO: always throws SocketException; wrote email to JavaOSC author
+//        oscPortIn.close();
+//        oscPortOut.close();
+//        // TODO: remove list event listeners
     }
 
     /** {@inheritDoc} */
@@ -137,23 +134,23 @@ public final class OscWorldComponent extends WorkspaceComponent {
         return DEFAULT_OSC_OUT_PORT;
     }
 
-    /**
-     * Return the OSC port in for this OSC world component.
-     *
-     * @return the OSC port in for this OSC world component
-     */
-    OSCPortIn getOscPortIn() {
-        return oscPortIn;
-    }
-
-    /**
-     * Return the OSC port out for this OSC world component.
-     *
-     * @return the OSC port out for this OSC world component
-     */
-    OSCPortOut getOscPortOut() {
-        return oscPortOut;
-    }
+//    /**
+//     * Return the OSC port in for this OSC world component.
+//     *
+//     * @return the OSC port in for this OSC world component
+//     */
+//    OSCPortIn getOscPortIn() {
+//        return oscPortIn;
+//    }
+//
+//    /**
+//     * Return the OSC port out for this OSC world component.
+//     *
+//     * @return the OSC port out for this OSC world component
+//     */
+//    OSCPortOut getOscPortOut() {
+//        return oscPortOut;
+//    }
 
     // TODO: Moving consumer, producer lists to top level breaks this stuff
     // which uses glazed lists..

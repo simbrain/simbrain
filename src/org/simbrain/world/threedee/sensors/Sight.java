@@ -8,34 +8,33 @@ import java.util.concurrent.Semaphore;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedee.Sensor;
-import org.simbrain.world.threedee.gui.AgentView;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {
-    final AgentView agent;
+//    final AgentView agent;
     int height;
     int width;
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
     List<WeakReference<VisionWorldComponent>> components = new ArrayList<WeakReference<VisionWorldComponent>>();
-    final Workspace workspace;
+//    final Workspace workspace;
 
-    public Sight(final AgentView agent, final String name,
-            final Workspace workspace) {
-        this.agent = agent;
-        this.workspace = workspace;
-
-        // width = agent.getWidth();
-        // height = agent.getHeight();
-
-        // int rWidth = width / 5;
-        // int rHeight = height / 5;
-        image = new BufferedImagePixelMatrix(agent.getSnapshot());
-
-        createVisionWorld();
-    }
+//    public Sight(final AgentView agent, final String name,
+//            final Workspace workspace) {
+//        this.agent = agent;
+//        this.workspace = workspace;
+//
+//        // width = agent.getWidth();
+//        // height = agent.getHeight();
+//
+//        // int rWidth = width / 5;
+//        // int rHeight = height / 5;
+//        image = new BufferedImagePixelMatrix(agent.getSnapshot());
+//
+//        createVisionWorld();
+//    }
 
     public void createVisionWorld() {
         final Semaphore semaphore = new Semaphore(1);
@@ -85,8 +84,8 @@ public class Sight {
     public Collection<Sensor> getProducingAttributes() {
         Collection<Sensor> attributes = new ArrayList<Sensor>();
 
-        int width = agent.getWidth();
-        int height = agent.getHeight();
+//        int width = agent.getWidth();
+//        int height = agent.getHeight();
 
         if (this.height != height || this.width != width) {
             this.height = height;
@@ -101,8 +100,8 @@ public class Sight {
             if (image == null) {
                 new Thread(new Runnable() {
                     public void run() {
-                        image = new BufferedImagePixelMatrix(
-                                agent.getSnapshot());
+//                        image = new BufferedImagePixelMatrix(
+//                                agent.getSnapshot());
                     }
                 }).start();
             }
@@ -126,7 +125,7 @@ public class Sight {
         if (next == null) {
             next = new Runnable() {
                 public void run() {
-                    image.setImage(agent.getSnapshot());
+//                    image.setImage(agent.getSnapshot());
                     next = null;
                 }
             };

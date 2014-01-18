@@ -21,16 +21,13 @@ package org.simbrain.world.visionworld.sensormatrix;
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.Sensor;
 
-import cern.colt.matrix.ObjectMatrix2D;
-import cern.colt.matrix.impl.SparseObjectMatrix2D;
-
 /**
  * Sparse sensor matrix.
  */
 public final class SparseSensorMatrix extends AbstractSensorMatrix {
 
     /** 2D object matrix of sensors. */
-    private final ObjectMatrix2D sensors;
+	private final Object [][] sensors;
 
     /**
      * Create a new sparse sensor matrix with the specified filter.
@@ -53,21 +50,21 @@ public final class SparseSensorMatrix extends AbstractSensorMatrix {
         if (columns < 1) {
             throw new IllegalArgumentException("columns must be >= 1");
         }
-        sensors = new SparseObjectMatrix2D(rows, columns);
+        sensors = new Object[rows][columns];
     }
 
     /** {@inheritDoc} */
     public int rows() {
-        return sensors.rows();
+        return sensors.length;
     }
 
     /** {@inheritDoc} */
     public int columns() {
-        return sensors.columns();
+        return sensors[0].length;
     }
 
     /** {@inheritDoc} */
     public Sensor getSensor(final int row, final int column) {
-        return (Sensor) sensors.get(row, column);
+        return (Sensor) sensors[row][column];
     }
 }

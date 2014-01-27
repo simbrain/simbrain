@@ -23,8 +23,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
- * A wrapping widget with an apply button. Mean to wrap around committable
- * panels and provide an apply button that immediately commits their changes.
+ * A widget that contains an apply button, for cases when it should be possible
+ * to immediately apply changes in an editing panel (as opposed to waiting to
+ * press ok in the parent dialog). Implements {@link CommittablePanel}, since
+ * the apply can fail.
  *
  * @author ztosi
  */

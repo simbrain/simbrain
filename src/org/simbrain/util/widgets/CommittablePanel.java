@@ -24,10 +24,20 @@ import javax.swing.JPanel;
  * Any panel which commits changes to some model object and fills values based
  * on a model object should implement this interface.
  *
+ * JPanels that edit the properties of an object can implement this interface to
+ * achieve standard behaviors associated with editing properties. For example,
+ * when committing changes made in such a panel, it useful to know whether the
+ * commit succeeded (it can fail, for example if someone fills a numerical field
+ * with text).
+ *
+ *
  * @author ztosi
  *
  */
 public interface CommittablePanel {
+
+    //TODO: If this interface is expanded consider name change to EditablePanel, and
+    // remove GroupPropertiesPanel.
 
     /**
      * Uses the data in the fields of the panel which implements this to alter
@@ -42,6 +52,7 @@ public interface CommittablePanel {
      * model values. However, if some class wants to have an instance of
      * this interface, there must be some way to retrieve the panel it
      * corresponds to.
+     *
      * @return the panel implementing this interface
      */
     JPanel getPanel();

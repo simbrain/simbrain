@@ -72,7 +72,7 @@ public class DocViewerComponent extends WorkspaceComponent {
     }
 
     /**
-     * Constructa new document viewer component.
+     * Construct a new document viewer component.
      */
     public DocViewerComponent(String name) {
         super(name);

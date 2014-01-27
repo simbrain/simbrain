@@ -407,7 +407,7 @@ public class Neuron {
      * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomize() {
-        forceSetActivation(parent.getActivationRandomizer().getRandom());
+        forceSetActivation(this.getUpdateRule().getRandomValue());
         getNetwork().fireNeuronChanged(this);
     }
 

@@ -274,7 +274,7 @@ public class SynapseGroup extends Group {
      * synapsegroups inside of subnetworks check the total synapses in the
      * parent subnetwork.
      */
-    private void initializeSynapseVisibility() {
+    public void initializeSynapseVisibility() {
         int threshold = Network.getSynapseVisibilityThreshold();
         if (getSynapseList().size() > threshold) {
             displaySynapses = false;

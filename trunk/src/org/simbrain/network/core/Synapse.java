@@ -608,6 +608,15 @@ public class Synapse {
     public void setEnabled(final boolean enabled) {
         setSendWeightedInput(enabled);
     }
+    
+    /**
+     * Whether this synapse is enabled or not.
+     *
+     * @return true if enabled, false otherwise.
+     */
+    public boolean isEnabled() {
+        return this.isSendWeightedInput();
+    }
 
     /**
      * @param sendWeightedInput to set.

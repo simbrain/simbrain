@@ -58,7 +58,7 @@ import org.piccolo2d.PNode;
  *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
+public class SynapseGroupNode extends PNode implements PropertyChangeListener {
 
     /** Parent network panel. */
     protected final NetworkPanel networkPanel;
@@ -111,8 +111,6 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
         interactionBox.updateText();
     }
 
-
-
     /**
      * Custom interaction box for Synapse Group nodes.
      */
@@ -161,7 +159,6 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
         return networkPanel;
     }
 
-
     /**
      * @return the interactionBox
      */
@@ -175,7 +172,6 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
     public SynapseGroup getSynapseGroup() {
         return synapseGroup;
     }
-
 
     /**
      * @return the outlinedObjects
@@ -241,8 +237,6 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
             }
         };
         menu.add(selectOutgoingNodes);
-        
-        
 
         // Weight adjustment stuff
         menu.addSeparator();
@@ -267,9 +261,21 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
         menu.add(adjustSynapses);
         menu.add(new JMenuItem(showWeightMatrixAction));
 
+        // Freezing actions
+        menu.addSeparator();
+        setFreezeActionsEnabled();
+        menu.add(freezeSynapsesAction);
+        menu.add(unfreezeSynapsesAction);
+
+        // Synapse Enabling actions
+        menu.addSeparator();
+        setSynapseEnablingActionsEnabled();
+        menu.add(enableSynapsesAction);
+        menu.add(disableSynapsesAction);
+
         // Synapse Visibility
         menu.addSeparator();
-        final JCheckBoxMenuItem tsvCheckBox =  new JCheckBoxMenuItem();
+        final JCheckBoxMenuItem tsvCheckBox = new JCheckBoxMenuItem();
         Action toggleSynapseVisibility = new AbstractAction(
                 "Toggle Synapse Visibility") {
             public void actionPerformed(final ActionEvent event) {
@@ -279,8 +285,9 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
                     synapseGroup.setDisplaySynapses(true);
                 }
                 synapseGroup.getParentNetwork().fireGroupChanged(
-                        new NetworkEvent<Group>(synapseGroup.getParentNetwork(),
-                                synapseGroup, synapseGroup),
+                        new NetworkEvent<Group>(
+                                synapseGroup.getParentNetwork(), synapseGroup,
+                                synapseGroup),
                         SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
                 tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
             }
@@ -327,10 +334,10 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            List<Neuron> sourceNeurons = ((SynapseGroup) SynapseGroupNode.this
-                    .synapseGroup).getSourceNeurons();
-            List<Neuron> targetNeurons = ((SynapseGroup) SynapseGroupNode.this
-                    .synapseGroup).getTargetNeurons();
+            List<Neuron> sourceNeurons = ((SynapseGroup) SynapseGroupNode.this.synapseGroup)
+                    .getSourceNeurons();
+            List<Neuron> targetNeurons = ((SynapseGroup) SynapseGroupNode.this.synapseGroup)
+                    .getTargetNeurons();
             JPanel panel = WeightMatrixViewer
                     .getWeightMatrixPanel(new WeightMatrixViewer(sourceNeurons,
                             targetNeurons, SynapseGroupNode.this
@@ -366,6 +373,111 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
     };
 
     /**
+     * Sets whether the freezing actions are enabled based on whether the
+     * synapses are all frozen or not.
+     *
+     * If all synapses are frozen already, then "freeze synapses" is disabled.
+     *
+     * If all synapses are unfrozen already, then "unfreeze synapses" is
+     * disabled.
+     */
+    private void setFreezeActionsEnabled() {
+        freezeSynapsesAction.setEnabled(!synapseGroup.isAllFrozen());
+        unfreezeSynapsesAction.setEnabled(!synapseGroup.isAllUnfrozen());
+    }
+
+    /**
+     * Action for freezing synapses
+     */
+    protected Action freezeSynapsesAction = new AbstractAction() {
+
+        {
+            // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Freeze Synapses");
+            putValue(SHORT_DESCRIPTION,
+                    "Freeze all synapses in this group (prevent learning)");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            synapseGroup.setFrozen(true);
+        }
+    };
+
+    /**
+     * Action for unfreezing synapses
+     */
+    protected Action unfreezeSynapsesAction = new AbstractAction() {
+
+        {
+            // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Unfreeze Synapses");
+            putValue(SHORT_DESCRIPTION,
+                    "Unfreeze all synapses in this group (allow learning)");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            synapseGroup.setFrozen(false);
+        }
+    };
+
+    /**
+     * Sets whether the synapse-enabling actions are enabled based on whether
+     * the synapses themselves are all enabled or not. Of course, "enable" means
+     * two things here, (1) a property of synapses whereby the let current pass
+     * or not and (2) a property of swing actions where being disabled means
+     * being grayed out and unusable.
+     *
+     * If all synapses are enabled already, then the "enable synapses" action is
+     * disabled.
+     *
+     * If all synapses are disabled already, then the "disable synapses" actions
+     * is disabled.
+     */
+    private void setSynapseEnablingActionsEnabled() {
+        enableSynapsesAction.setEnabled(!synapseGroup.isAllEnabled());
+        disableSynapsesAction.setEnabled(!synapseGroup.isAllDisabled());
+    }
+
+    /**
+     * Action for enabling synapses
+     */
+    protected Action enableSynapsesAction = new AbstractAction() {
+
+        {
+            // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Enable Synapses");
+            putValue(SHORT_DESCRIPTION,
+                    "Enable all synapses in this group (allow activation to pass through synapses)");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            synapseGroup.setEnabled(true);
+        }
+    };
+
+    /**
+     * Action for disabling synapses
+     */
+    protected Action disableSynapsesAction = new AbstractAction() {
+
+        {
+            // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Disable Synapses");
+            putValue(
+                    SHORT_DESCRIPTION,
+                    "Disable all synapses in this group (don't allow activation to pass through synapses)");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            synapseGroup.setEnabled(false);
+        }
+    };
+
+    /**
      * @return the consumerMenu
      */
     public JMenu getConsumerMenu() {
@@ -394,4 +506,3 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener  {
     }
 
 }
-

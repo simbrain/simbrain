@@ -277,6 +277,12 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         };
         menu.add(selectOutgoingNodes);
 
+        // Clamping actions
+        menu.addSeparator();
+        setClampActionsEnabled();
+        menu.add(clampNeuronsAction);
+        menu.add(unclampNeuronsAction);
+
         // Connect neuron groups
         menu.addSeparator();
         Action setSource = new AbstractAction("Set Group as Source") {
@@ -431,6 +437,54 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             getNetworkPanel().getNetwork().removeGroup(neuronGroup);
+        }
+    };
+
+
+    /**
+     * Sets whether the clamping actions are enabled based on whether the
+     * neurons are all clamped or not.
+     *
+     * If all neurons are clamped already, then "clamp neurons" is disabled.
+     *
+     * If all neurons are unclamped already, then "unclamp neurons" is disabled.
+     */
+    private void setClampActionsEnabled() {
+        clampNeuronsAction.setEnabled(!neuronGroup.isAllClamped());
+        unclampNeuronsAction.setEnabled(!neuronGroup.isAllUnclamped());
+    }
+
+    /**
+     * Action for clamping neurons
+     */
+    protected Action clampNeuronsAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Clamp Neurons");
+            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            neuronGroup.setClamped(true);
+        }
+    };
+
+    /**
+     * Action for unclamping neurons
+     */
+    protected Action unclampNeuronsAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Unclamp Neurons");
+            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            neuronGroup.setClamped(false);
         }
     };
 

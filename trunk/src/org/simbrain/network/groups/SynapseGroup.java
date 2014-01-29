@@ -363,6 +363,66 @@ public class SynapseGroup extends Group {
         }
     }
 
+    /**
+     * Returns true if all the synapses in this group are frozen.
+     *
+     * @return true if all synapses are frozen, false otherwise
+     */
+    public boolean isAllFrozen() {
+        boolean ret = true;
+        for (Synapse s : getSynapseList()) {
+            if (!s.isFrozen()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns true if all the synapses in this group are unfrozen.
+     *
+     * @return true if all synapses are unfrozen, false otherwise
+     */
+    public boolean isAllUnfrozen() {
+        boolean ret = true;
+        for (Synapse s : getSynapseList()) {
+            if (s.isFrozen()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns true if all the synapses in this group are enabled.
+     *
+     * @return true if all synapses are enabled, false otherwise
+     */
+    public boolean isAllEnabled() {
+        boolean ret = true;
+        for (Synapse s : getSynapseList()) {
+            if (!s.isEnabled()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns true if all the synapses in this group are disabled.
+     *
+     * @return true if all synapses are disabled, false otherwise
+     */
+    public boolean isAllDisabled() {
+        boolean ret = true;
+        for (Synapse s : getSynapseList()) {
+            if (s.isEnabled()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
     @Override
     public String getUpdateMethodDesecription() {
         return "Update synapses";

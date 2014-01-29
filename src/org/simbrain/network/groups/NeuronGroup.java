@@ -695,4 +695,34 @@ public class NeuronGroup extends Group {
         this.outgoingSg = outgoingSg;
     }
 
+    /**
+     * Returns true if all the neurons in this group are clamped.
+     *
+     * @return true if all neurons are clamped, false otherwise
+     */
+    public boolean isAllClamped() {
+        boolean ret = true;
+        for (Neuron n : getNeuronList()) {
+            if (!n.isClamped()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns true if all the neurons in this group are unclamped.
+     *
+     * @return true if all neurons are unclamped, false otherwise
+     */
+    public boolean isAllUnclamped() {
+        boolean ret = true;
+        for (Neuron n : getNeuronList()) {
+            if (n.isClamped()) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
 }

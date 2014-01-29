@@ -14,15 +14,16 @@ import java.awt.Color;
 
     // PARAMETERS
     int numNeurons = 8;
-    double sparsity = .5;
-    double excitatoryRatio = .9;
+    double sparsity = .2;
+    double excitatoryRatio = .5;
 
     // BUILD NETWORK
     NetworkComponent networkComponent = new NetworkComponent("Simple Recurrent Network");
     workspace.addWorkspaceComponent(networkComponent);
     Network network = networkComponent.getNetwork();
     for (int i = 0; i < numNeurons; i++) {
-        Neuron neuron = new Neuron(network, "NakaRushtonRule");
+        Neuron neuron = new Neuron(network, "DecayRule");
+        neuron.setUpperBound(10);
         network.addNeuron(neuron);
     }
 
@@ -44,7 +45,7 @@ import java.awt.Color;
     BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network", numNeurons);
     barChart.getModel().setBarColor(Color.blue);
     barChart.getModel().setAutoRange(false);
-    barChart.getModel().setUpperBound(100);
+    barChart.getModel().setUpperBound(10);
     workspace.addWorkspaceComponent(barChart);
     desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
 

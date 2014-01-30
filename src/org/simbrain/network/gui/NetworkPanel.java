@@ -875,6 +875,7 @@ public class NetworkPanel extends JPanel {
         removeSynapseGroupNodes(synapseGroup);
 
         addSynapseGroup(synapseGroup);
+
         // System.out.println("Number of pnodes:"
         // + this.getCanvas().getLayer().getChildrenCount());
         // `System.out.println("Size of objectNodeMap:" + objectNodeMap.size());
@@ -938,6 +939,7 @@ public class NetworkPanel extends JPanel {
         for (PNode node : nodes) {
             synapseGroupNode.getOutlinedObjects().addChild(node);
         }
+        synapseGroupNode.lowerToBottom();
     }
 
     /**

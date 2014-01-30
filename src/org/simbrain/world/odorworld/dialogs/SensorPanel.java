@@ -124,7 +124,10 @@ public class SensorPanel extends JPanel {
         table.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
                     public void valueChanged(ListSelectionEvent e) {
-                        selectedSensor = model.getSensor(table.getSelectedRow());
+                        if (table.getSelectedRow() > 0) {
+                            selectedSensor = model.getSensor(table
+                                    .getSelectedRow());
+                        }
                     }
                 });
         for (Sensor sensor : entity.getSensors()) {

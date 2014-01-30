@@ -123,8 +123,11 @@ public class EffectorPanel extends JPanel {
         table.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
                     public void valueChanged(ListSelectionEvent e) {
-                        selectedEffector = model.getEffector(table
-                                .getSelectedRow());
+                        if (table.getSelectedRow() > 0) {
+                            selectedEffector = model.getEffector(table
+                                    .getSelectedRow());
+                        }
+
                     }
                 });
         for (Effector effector : entity.getEffectors()) {

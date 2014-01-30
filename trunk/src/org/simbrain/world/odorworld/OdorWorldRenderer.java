@@ -109,7 +109,7 @@ public class OdorWorldRenderer {
                                 getSpeechBalloon((Speech) effector),
                                 null,
                                 getBalloonLocationX((RotatingEntity) entity),
-                                (int) (entity.getY() - 60 + entity.getHeight() / 3));
+                                getBalloonLocationY((RotatingEntity) entity));
                     }
                 }
 
@@ -128,8 +128,7 @@ public class OdorWorldRenderer {
                                         getHearingSensorImage((Hearing) sensor),
                                         null,
                                         getBalloonLocationX(rotatingEntity),
-                                        (int) (entity.getY() - 60 + entity
-                                                .getHeight() / 3));
+                                        getBalloonLocationY((RotatingEntity) entity));
                             }
                         } else if (sensor instanceof SmellSensor) {
 
@@ -171,8 +170,8 @@ public class OdorWorldRenderer {
         BufferedImage vocalize = new BufferedImage(80, 60,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
-        if (((RotatingEntity) effector.getParent()).getHeading() > 90
-                && ((RotatingEntity) effector.getParent()).getHeading() <= 270) {
+        if (((RotatingEntity) effector.getParent()).getHeading() >= 90
+                && ((RotatingEntity) effector.getParent()).getHeading() < 270) {
             g.drawImage(
                     OdorWorldResourceManager.getImage("SpeechBalloonLeft.png"),
                     0, 0, null);
@@ -209,8 +208,8 @@ public class OdorWorldRenderer {
         BufferedImage vocalize = new BufferedImage(80, 60,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = vocalize.createGraphics();
-        if (((RotatingEntity) sensor.getParent()).getHeading() > 90
-                && ((RotatingEntity) sensor.getParent()).getHeading() <= 270) {
+        if (((RotatingEntity) sensor.getParent()).getHeading() >= 90
+                && ((RotatingEntity) sensor.getParent()).getHeading() < 270) {
             g.drawImage(
                     OdorWorldResourceManager.getImage("HearingSensorLeft.png"),
                     0, 0, null);
@@ -265,11 +264,100 @@ public class OdorWorldRenderer {
      */
     public int getBalloonLocationX(RotatingEntity entity) {
         int x = 0;
-        if (entity.getHeading() > 90 && entity.getHeading() <= 270) {
-            x = (int) entity.getX() - 80;
+        if (entity.getHeading() >= 90 && entity.getHeading() < 270) {
+            switch(entity.getEntityType().toString()) {
+            case "Mouse":
+                if (entity.getHeading() < 112.5 || entity.getHeading() >= 247.5) {
+                    x = (int) (entity.getX() - 70);
+                } else {
+                    x = (int) (entity.getX() - 80);
+                }
+                break;
+            case "Cow":
+                if (entity.getHeading() < 127.5 || entity.getHeading() >= 232.5) {
+                    x = (int) (entity.getX() - 50);
+                } else {
+                    x = (int) (entity.getX() - 70);
+                }
+                break;
+            case "Lion":
+                if (entity.getHeading() < 142.5 || entity.getHeading() >= 187.5) {
+                    x = (int) (entity.getX() - 40);
+                } else {
+                    x = (int) (entity.getX() - 50);
+                }
+                break;
+            default:
+                x = (int) (entity.getX() - 40);
+            }
         } else {
-            x = (int) (entity.getX() + entity.getWidth());
+            switch(entity.getEntityType().toString()) {
+            case "Mouse":
+                if (entity.getHeading() >= 67.5 || entity.getHeading() < 292.5) {
+                    x = (int) (entity.getX() + entity.getWidth() - 10);
+                } else {
+                    x = (int) (entity.getX() + entity.getWidth());
+                }
+                break;
+            case "Cow":
+                if ((entity.getHeading() >= 52.5 && entity.getHeading() < 90) || (entity.getHeading() < 277.5 && entity.getHeading() >= 270)) {
+                    x = (int) (entity.getX() + entity.getWidth() - 30);
+                } else {
+                    x = (int) (entity.getX() + entity.getWidth() - 10);
+                }
+                break;
+            case "Lion":
+                if ((entity.getHeading() >= 7.5 && entity.getHeading() < 90) || (entity.getHeading() < 322.5 && entity.getHeading() >= 270)) {
+                    x = (int) (entity.getX() + entity.getWidth() - 40);
+                } else {
+                    x = (int) (entity.getX() + entity.getWidth() - 30);
+                }
+                break;
+            default:
+                x = (int) (entity.getX() + entity.getWidth() - 40);
+            }
         }
         return x;
+    }
+
+    /**
+     * @param entity the entity to be rendered.
+     * @return the appropriate Y coordinate to render speech balloons and
+     *         thought bubbles.
+     */
+    public int getBalloonLocationY(RotatingEntity entity) {
+        int y = 0;
+        switch (entity.getEntityType().toString()) {
+        case "Mouse":
+            if (entity.getHeading() >= 52.5 && entity.getHeading() < 127.5) {
+                y = (int) (entity.getY() - 50);
+            } else if (entity.getHeading() >= 232.5 && entity.getHeading() < 307.5) {
+                y = (int) (entity.getY() - 20);
+            } else {
+                y = (int) (entity.getY() - 35);
+            }
+            break;
+        case "Cow":
+            if (entity.getHeading() >= 7.5 && entity.getHeading() < 172.5) {
+                y = (int) (entity.getY() - 26);
+            } else if (entity.getHeading() >= 187.5 && entity.getHeading() < 322.5) {
+                y = (int) (entity.getY());
+            } else {
+                y = (int) (entity.getY() - 13);
+            }
+            break;
+        case "Lion":
+            if (entity.getHeading() >= 7.5 && entity.getHeading() < 172.5) {
+                y = (int) (entity.getY() - 13);
+            } else if (entity.getHeading() >= 187.5 && entity.getHeading() < 322.5) {
+                y = (int) (entity.getY() + 16);
+            } else {
+                y = (int) (entity.getY() + 3);
+            }
+            break;
+        default:
+            y = (int) (entity.getY() - 25);
+        }
+        return y;
     }
 }

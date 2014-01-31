@@ -54,6 +54,7 @@ public class NeuronGroupNodeDesktop extends NeuronGroupNode {
         super(panel, node.getNeuronGroup());
         this.neuronGroup = node.getNeuronGroup();
         this.component = component;
+        this.addChildren(node.getChildrenReference());
     }
 
     @Override

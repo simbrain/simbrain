@@ -22,7 +22,7 @@ import javax.swing.JMenu;
 
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.SynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -32,12 +32,9 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
 /**
  * Extends SynapseGroupNode and adds a coupling menu.
  *
- * TODO: workspace couplings for group nodes not yet working properly. Once
- * they are it may be possible to remove this class.
- *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNodeDesktop extends SynapseGroupNode {
+public class SynapseGroupNodeDesktopFull extends SynapseGroupNodeFull {
 
     /** Reference to workspace component. */
     private final WorkspaceComponent component;
@@ -49,38 +46,64 @@ public class SynapseGroupNodeDesktop extends SynapseGroupNode {
      * @param networkPanel network panel reference
      * @param group the synapse group being represented by this node
      */
-    public SynapseGroupNodeDesktop(WorkspaceComponent component,
+    public SynapseGroupNodeDesktopFull(WorkspaceComponent component,
             NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
         this.component = component;
     }
 
+    @Override
     public JMenu getProducerMenu() {
-        if (component != null) {
-            PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(getSynapseGroup(), "getWeightVector",
+        return getProducerMenu(component, synapseGroup);
+    }
+
+    @Override
+    public JMenu getConsumerMenu() {
+        return getConsumerMenu(component, synapseGroup);
+    }
+
+    /**
+     * Creates a producer menu for a synapse group. Static method so that
+     * SynapseGroupNodeSimple can also use this.
+     *
+     * @param theComponent workspace component references
+     * @param sg the synapse group
+     * @return the decorated menu
+     */
+    static JMenu getProducerMenu(WorkspaceComponent theComponent,
+            SynapseGroup sg) {
+        if (theComponent != null) {
+            PotentialProducer producer = theComponent.getAttributeManager()
+                    .createPotentialProducer(sg, "getWeightVector",
                             double[].class);
-            producer.setCustomDescription("Synapse Group: "
-                    + getSynapseGroup().getLabel());
+            producer.setCustomDescription("Synapse Group: " + sg.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component.getWorkspace(),
+                    "Send Vector Coupling to", theComponent.getWorkspace(),
                     producer);
             return producerMenu;
         }
         return null;
     }
 
-    public JMenu getConsumerMenu() {
-        if (component != null) {
-            PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(getSynapseGroup(), "setWeightVector",
+    /**
+     * Creates a consumer menu for a synapse group. Static method so that
+     * SynapseGroupNodeSimple can also use this.
+     *
+     * @param theComponent workspace component references
+     * @param sg the synapse group
+     * @return the decorated menu
+     */
+    static JMenu getConsumerMenu(WorkspaceComponent theComponent,
+            SynapseGroup sg) {
+        if (theComponent != null) {
+            PotentialConsumer consumer = theComponent.getAttributeManager()
+                    .createPotentialConsumer(sg, "setWeightVector",
                             double[].class);
-            consumer.setCustomDescription("Synapse Group: "
-                    + getSynapseGroup().getLabel());
+            consumer.setCustomDescription("Synapse Group: " + sg.getLabel());
 
             JMenu menu = new CouplingMenuConsumer(
-                    "Receive Vector Coupling from", component.getWorkspace(),
-                    consumer);
+                    "Receive Vector Coupling from",
+                    theComponent.getWorkspace(), consumer);
             return menu;
         }
         return null;

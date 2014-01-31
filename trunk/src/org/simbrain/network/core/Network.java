@@ -635,6 +635,13 @@ public class Network {
      * Remove the given neurons from the neuron list (without firing an event)
      * and add them to the provided group.
      *
+     * This is only needed in cases where the neurons have already been added,
+     * and must be transferred in to a group. This is what happens in converting
+     * loose neurons to a neuron group. It also happens to be the way the add
+     * neurons dialog does things (it defaults to adding neurons, but if a user
+     * wants they can be put in a group) This is not part of the standard neuron
+     * group creation process.
+     *
      * @param list the list of neurons to transfer
      * @param group the group to transfer them to
      */

@@ -74,7 +74,7 @@ public class SynapseGroup extends Group {
         AllToAll connection = new AllToAll(net);
         List<Synapse> synapses = connection.connectNeurons(net,
                 sourceNeuronGroup.getNeuronList(),
-                targetNeuronGroup.getNeuronList(), true);
+                targetNeuronGroup.getNeuronList(), false);
         for (Synapse synapse : synapses) {
             addSynapse(synapse);
         }

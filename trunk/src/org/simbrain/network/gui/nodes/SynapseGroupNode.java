@@ -481,28 +481,15 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener {
      * @return the consumerMenu
      */
     public JMenu getConsumerMenu() {
-        return consumerMenu;
-    }
-
-    /**
-     * @param consumerMenu the consumerMenu to set
-     */
-    public void setConsumerMenu(JMenu consumerMenu) {
-        this.consumerMenu = consumerMenu;
+        return networkPanel.getSynapseGroupConsumerMenu(synapseGroup);
     }
 
     /**
      * @return the producerMenu
      */
     public JMenu getProducerMenu() {
-        return producerMenu;
+        return networkPanel.getSynapseGroupProducerMenu(synapseGroup);
     }
 
-    /**
-     * @param producerMenu the producerMenu to set
-     */
-    public void setProducerMenu(JMenu producerMenu) {
-        this.producerMenu = producerMenu;
-    }
 
 }

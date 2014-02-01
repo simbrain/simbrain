@@ -61,7 +61,7 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
     /** @see PBasicInputEventHandler */
     public void mousePressed(final PInputEvent event) {
         if (event.isPopupTrigger()) {
-            networkPanel.createContextMenu();
+            networkPanel.createNetworkContextMenu();
             showContextMenu(event);
         }
     }
@@ -69,7 +69,7 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
     /** @see PBasicInputEventHandler */
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {
-            networkPanel.createContextMenu();
+            networkPanel.createNetworkContextMenu();
             showContextMenu(event);
         }
     }

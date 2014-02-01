@@ -21,13 +21,9 @@ package org.simbrain.network.gui.nodes.neuronGroupNodes;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
-import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.subnetworks.SOMGroup;
@@ -58,6 +54,7 @@ public class SOMGroupNode extends NeuronGroupNode {
                 group.setStateInfo("Learning rate ("
                         + Utils.round(group.getAlpha(), 2) + ") N-size ("
                         + Utils.round(group.getNeighborhoodSize(), 2) + ")");
+                SOMGroupNode.this.updateText();
             }
 
         });
@@ -85,6 +82,13 @@ public class SOMGroupNode extends NeuronGroupNode {
         protected boolean hasToolTipText() {
             return true;
         }
+    };
+
+    @Override
+    public void updateText() {
+        getInteractionBox().setText(
+                ((SOMGroup) getNeuronGroup()).getStateInfo());
+        getInteractionBox().updateText();
     };
 
     /**

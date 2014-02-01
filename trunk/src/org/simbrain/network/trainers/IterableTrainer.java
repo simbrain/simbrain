@@ -41,7 +41,7 @@ public abstract class IterableTrainer extends Trainer {
     private boolean stochasticIteration = false;
 
     /** If used, stopped iterating if validation error is below this. */
-    private double validationErrorThreshold = .2;
+    //private double validationErrorThreshold = .2;
 
     /** If used, stop iterating if error is below this value. */
     private double errorThreshold = .2;
@@ -310,19 +310,19 @@ public abstract class IterableTrainer extends Trainer {
                 .getCurrentObject());
     }
 
-    /**
-     * @return the validationErrorThreshold
-     */
-    public double getValidationErrorThreshold() {
-        return validationErrorThreshold;
-    }
-
-    /**
-     * @param validationErrorThreshold the validationErrorThreshold to set
-     */
-    public void setValidationErrorThreshold(double validationErrorThreshold) {
-        this.validationErrorThreshold = validationErrorThreshold;
-    }
+//    /**
+//     * @return the validationErrorThreshold
+//     */
+//    public double getValidationErrorThreshold() {
+//        return validationErrorThreshold;
+//    }
+//
+//    /**
+//     * @param validationErrorThreshold the validationErrorThreshold to set
+//     */
+//    public void setValidationErrorThreshold(double validationErrorThreshold) {
+//        this.validationErrorThreshold = validationErrorThreshold;
+//    }
 
     /**
      * @return the errorThreshold

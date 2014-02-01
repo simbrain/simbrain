@@ -42,6 +42,11 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting. This is
@@ -235,56 +240,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * This version of a NeuronNode has a coupling context menu.
-     *
-     * @param net network panel
-     * @param neuron neuron to show in Gui
-     * @return desktop version of NeuronNode, with context menu
-     */
-    @Override
-    public NeuronNode createNeuronNode(final NetworkPanel net,
-            final Neuron neuron) {
-        return new NeuronNodeDesktop(component.getWorkspaceComponent(), net,
-                neuron);
-    }
-
-    /**
-     * This version of a NeuronGroupNode has a coupling context menu.
-     */
-    @Override
-    public NeuronGroupNode createNeuronGroupNode(final NeuronGroup neuronGroup) {
-        NeuronGroupNode node = super.createNeuronGroupNode(neuronGroup);
-        return new NeuronGroupNodeDesktop(component.getWorkspaceComponent(),
-                this, node);
-    }
-
-    /**
-     * This version of a NeuronGroupNode has a coupling context menu.
-     */
-    @Override
-    public SynapseGroupNodeFull createSynapseGroupFull(
-            final SynapseGroup synapseGroup) {
-        return new SynapseGroupNodeDesktopFull(
-                component.getWorkspaceComponent(), this, synapseGroup);
-    }
-
-    /**
-     * This version of a NeuronGroupNode has a coupling context menu.
-     */
-    @Override
-    public SynapseGroupNodeSimple createSynapseGroupSimple(
-            final SynapseGroup synapseGroup) {
-        return new SynapseGroupNodeDesktopSimple(
-                component.getWorkspaceComponent(), this, synapseGroup);
-    }
-
-    /**
      * This version adds the script menu.
      *
      * @return the context menu with script menu added
      */
-    public JPopupMenu createContextMenu() {
-        JPopupMenu contextMenu = super.createContextMenu();
+    public JPopupMenu createNetworkContextMenu() {
+        JPopupMenu contextMenu = super.createNetworkContextMenu();
 
         // Add script menus
         contextMenu.addSeparator();
@@ -306,6 +267,106 @@ public class NetworkPanelDesktop extends NetworkPanel {
         frame.setTitle(title);
         frame.setVisible(true);
         return frame;
+    }
+
+    @Override
+    public JPopupMenu getNeuronContextMenu(Neuron neuron) {
+        JPopupMenu contextMenu = super.getNeuronContextMenu(neuron);
+
+        // Add coupling menus
+        Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+        if (getSelectedNeurons().size() == 1) {
+            contextMenu.addSeparator();
+            PotentialProducer producer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(neuron, "getActivation",
+                            double.class);
+            PotentialConsumer consumer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialConsumer(neuron, "setInputValue",
+                            double.class);
+            JMenu producerMenu = new CouplingMenuProducer(
+                    "Send Scalar Coupling to", workspace, producer);
+            contextMenu.add(producerMenu);
+            JMenu consumerMenu = new CouplingMenuConsumer(
+                    "Receive Scalar Coupling from", workspace, consumer);
+            contextMenu.add(consumerMenu);
+        }
+        return contextMenu;
+    }
+
+    @Override
+    public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
+
+        if (component.getWorkspaceComponent() != null) {
+            PotentialProducer producer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(neuronGroup, "getActivations",
+                            double[].class);
+            producer.setCustomDescription("Neuron Group: "
+                    + neuronGroup.getLabel());
+            JMenu producerMenu = new CouplingMenuProducer(
+                    "Send Vector Coupling to", component
+                            .getWorkspaceComponent().getWorkspace(), producer);
+            return producerMenu;
+        }
+        return null;
+    }
+
+    @Override
+    public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
+        if (component.getWorkspaceComponent() != null) {
+            PotentialConsumer consumer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialConsumer(neuronGroup, "setInputValues",
+                            double[].class);
+            consumer.setCustomDescription("Neuron Group: "
+                    + neuronGroup.getLabel());
+            JMenu menu = new CouplingMenuConsumer(
+                    "Receive Vector Coupling from", component
+                            .getWorkspaceComponent().getWorkspace(), consumer);
+            return menu;
+        }
+        return null;
+    }
+
+    @Override
+    public JMenu getSynapseGroupProducerMenu(SynapseGroup sg) {
+        if (component.getWorkspaceComponent() != null) {
+            PotentialProducer producer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(sg, "getWeightVector",
+                            double[].class);
+            producer.setCustomDescription("Synapse Group: " + sg.getLabel());
+            JMenu producerMenu = new CouplingMenuProducer(
+                    "Send Vector Coupling to", component
+                            .getWorkspaceComponent().getWorkspace(), producer);
+            return producerMenu;
+        }
+        return null;
+    }
+
+    @Override
+    public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
+        if (component.getWorkspaceComponent() != null) {
+            PotentialConsumer consumer = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialConsumer(synapseGroup, "setWeightVector",
+                            double[].class);
+            consumer.setCustomDescription("Synapse Group: " + synapseGroup.getLabel());
+
+            JMenu menu = new CouplingMenuConsumer(
+                    "Receive Vector Coupling from", component
+                            .getWorkspaceComponent().getWorkspace(), consumer);
+            return menu;
+        }
+        return null;
     }
 
 }

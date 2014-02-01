@@ -381,37 +381,21 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     };
 
     /**
+     * Return the consumer menu.
+     *
      * @return the consumerMenu
      */
     public JMenu getConsumerMenu() {
-        return consumerMenu;
+        return networkPanel.getNeuronGroupConsumerMenu(neuronGroup);
     }
 
     /**
-     * Set at the workspace level by
-     * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
+     * Return the producer menu.
      *
-     * @param consumerMenu the consumerMenu to set
-     */
-    public void setConsumerMenu(JMenu consumerMenu) {
-        this.consumerMenu = consumerMenu;
-    }
-
-    /**
      * @return the producerMenu
      */
     public JMenu getProducerMenu() {
-        return producerMenu;
-    }
-
-    /**
-     * Set at the workspace level by
-     * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     *
-     * @param producerMenu the producerMenu to set
-     */
-    public void setProducerMenu(JMenu producerMenu) {
-        this.producerMenu = producerMenu;
+        return networkPanel.getNeuronGroupProducerMenu(neuronGroup);
     }
 
     /** Action for editing the group name. */

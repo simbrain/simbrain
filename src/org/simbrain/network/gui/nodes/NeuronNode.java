@@ -307,38 +307,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     protected JPopupMenu getContextMenu() {
-
-        JPopupMenu contextMenu = new JPopupMenu();
-        contextMenu.add(new CutAction(getNetworkPanel()));
-        contextMenu.add(new CopyAction(getNetworkPanel()));
-        contextMenu.add(new PasteAction(getNetworkPanel()));
-        contextMenu.add(new DeleteAction(getNetworkPanel()));
-        contextMenu.addSeparator();
-        contextMenu.add(actionManager.getClearSourceNeuronsAction());
-        contextMenu.add(actionManager.getSetSourceNeuronsAction());
-        contextMenu.add(actionManager.getConnectionMenu());
-        contextMenu.addSeparator();
-        contextMenu.add(actionManager.getLayoutMenu());
-        contextMenu.add(actionManager.getGroupMenu());
-        contextMenu.addSeparator();
-        // Add align and space menus if objects are selected
-        if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            contextMenu.add(this.getNetworkPanel().createAlignMenu());
-            contextMenu.add(this.getNetworkPanel().createSpacingMenu());
-            contextMenu.addSeparator();
-        }
-        contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
-        contextMenu.addSeparator();
-        JMenu nodeSelectionMenu = new JMenu("Select");
-        nodeSelectionMenu.add(actionManager
-                .getSelectIncomingWeightsAction());
-        nodeSelectionMenu.add(actionManager
-                .getSelectOutgoingWeightsAction());
-        contextMenu.add(nodeSelectionMenu);
-        contextMenu.addSeparator();
-        contextMenu.add(actionManager.getTestInputAction());
-        contextMenu.add(actionManager.getShowWeightMatrixAction());
-        return contextMenu;
+        return getNetworkPanel().getNeuronContextMenu(neuron);
     }
 
     /** @see ScreenElement */

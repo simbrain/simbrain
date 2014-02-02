@@ -22,6 +22,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -39,10 +40,16 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 public class FeedForward extends Subnetwork {
 
     /** Space to put between layers. */
-    private int betweenLayerInterval = 100;
+    private int betweenLayerInterval = 150;
 
     /** Space between neurons within a layer. */
     private int betweenNeuronInterval = 50;
+
+    /**
+     * If a layer has more than this many neurons, use grid layout instead of
+     * line layout.
+     */
+    private int useGridThreshold = 20;
 
     /** Initial position of network (from bottom left). */
     Point2D initialPosition = new Point2D.Double(0, 0);
@@ -103,9 +110,11 @@ public class FeedForward extends Subnetwork {
         this.initialPosition = initialPosition;
         setLabel("Layered Network");
 
-        // Layout
-        LineLayout layout = new LineLayout(betweenNeuronInterval,
+        // Layouts
+        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
+        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
+                betweenNeuronInterval, 10);
 
         // Set up input layer
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
@@ -119,9 +128,15 @@ public class FeedForward extends Subnetwork {
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0, 0);
         }
-        layout.setInitialLocation(new Point((int) initialPosition.getX(),
-                (int) initialPosition.getY()));
-        layout.layoutNeurons(inputLayerNeurons);
+        if (inputLayerNeurons.size() < useGridThreshold) {
+            lineLayout.setInitialLocation(new Point((int) initialPosition
+                    .getX(), (int) initialPosition.getY()));
+            lineLayout.layoutNeurons(inputLayerNeurons);
+        } else {
+            gridLayout.setInitialLocation(new Point((int) initialPosition
+                    .getX(), (int) initialPosition.getY()));
+            gridLayout.layoutNeurons(inputLayerNeurons);
+        }
 
         // Prepare base synapse for connecting layers
         Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
@@ -142,9 +157,13 @@ public class FeedForward extends Subnetwork {
                 hiddenLayerNeurons.add(neuron);
             }
 
-            layout.layoutNeurons(hiddenLayerNeurons);
             NeuronGroup hiddenLayer = new NeuronGroup(network,
                     hiddenLayerNeurons);
+            if (hiddenLayerNeurons.size() < useGridThreshold) {
+                lineLayout.layoutNeurons(hiddenLayerNeurons);
+            } else {
+                gridLayout.layoutNeurons(hiddenLayerNeurons);
+            }
             addNeuronGroup(hiddenLayer);
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,
                     Direction.NORTH, betweenLayerInterval);

@@ -13,6 +13,7 @@
 
 
 
+
   
 
   
@@ -106,37 +107,37 @@ nodes, and 4 output nodes.<br>
 </p><p style="text-align: left;">3) Now you have to create some a
 training set: set
 of input vectors and a set of target vectors which you want the network
-to associate.&nbsp; &nbsp; To do this right-click on the backprop tab
-and select "Edit combined
-data..."&nbsp;&nbsp; A pair of tables will open up, which you can use
-to edit the training data.&nbsp; <br>
+to associate.&nbsp; &nbsp; To do either double click on the backprop tab or&nbsp; right-click on it
+and select "Edit / Train Backprop...".&nbsp; <br>
 </p>
-<p style="text-align: left;">4) Edit the cells of the tables to create a pattern assocation task.<br>
-</p>
-
-
-
-<p style="text-align: left;">5) Now all that's left to do is to actually
-train the network.&nbsp; To do this, open up the trainer dialog, by
-right clicking on the backprop tab and selecting "Train backprop
-net...". <br>
+<p style="text-align: left;">4) In the input data and target data tabs,
+edit the cells of the tables to create a pattern assocation task.&nbsp;
+Row 1 of input will be associated with row 1 of target, row 2 with row
+2, etc.<br>
 </p>
 
-<p style="text-align: left;">6) Press run in the training dialog &nbsp;
-This runs the algorithm, which adjusts
+
+
+<p style="text-align: left;">5) Now all that's left to do is to
+actually
+train the network.&nbsp; To do this,&nbsp; go to the train tab and
+press the run button.&nbsp;&nbsp; This runs the algorithm, which
+adjusts
 the weights to try to achieve the desired input output
 mapping.&nbsp;&nbsp; As the trainer runs, the error should go
 down.&nbsp; Once the error gets to an acceptable level (often something
-below .1), press the stop button.&nbsp; If you have trouble getting a low
-value you can press the randomize button and try again. Note: Depending on the associate task
-you set up in step 4 you may not be able to achieve a sufficiently low error value.<br>
+below .1), press the stop button.&nbsp; If you have trouble getting a
+low
+value you can press the randomize button and try again. Note: Depending
+on the associate task
+you set up in step 4 you may not be able to achieve a sufficiently low
+error value.<br>
 </p>
 <p style="text-align: left;">7) Now you can test your network to see
-how well it did.&nbsp; At this point it helps to have the "edit
-combined data" dialog open to see what patterns your network was
-trained to associate.&nbsp; Hand input one of the input patterns into
-the input nodes of the network, iterate the workspace, and see if you
-the correct output results.<br>
+how well it did.&nbsp; To do this go to the test data tab, and click
+the test row button.&nbsp; This will send each row of data to the
+network.&nbsp;&nbsp; The target data you trained it on should appear
+with each click of the test row button.<br>
 </p>
 
 

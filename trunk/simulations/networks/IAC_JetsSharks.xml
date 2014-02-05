@@ -2,6 +2,7 @@
   <neuronList>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -23,24 +24,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_1</id>
       <label></label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>114.02007090597961</x>
       <y>152.12510723087073</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -62,24 +67,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_2</id>
       <label></label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>52.90592408875036</x>
-      <y>102.48191811391374</y>
+      <generator>false</generator>
+      <x>56.42402155763697</x>
+      <y>101.77829862013641</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -101,24 +110,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_3</id>
       <label></label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>55.02398701443938</x>
       <y>152.86722062079295</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -140,24 +153,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_4</id>
       <label></label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>109.32785465196301</x>
       <y>101.23001872030109</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -179,24 +196,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_5</id>
       <label>20&apos;s</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>219.79700828246803</x>
       <y>-38.705682163802756</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -218,24 +239,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_6</id>
       <label>40&apos;s</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>236.82475880436556</x>
       <y>11.484863986488069</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -257,24 +282,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_7</id>
       <label>30&apos;s</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>260.66864622402346</x>
       <y>-37.67168033386106</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -296,24 +325,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_9</id>
       <label>Burglar</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>267.85801771106475</x>
       <y>228.97514365278604</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -335,24 +368,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_10</id>
       <label>Pusher</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>242.87216481956702</x>
       <y>280.4343665008403</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -374,24 +411,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_12</id>
       <label>Bookie</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>287.87216481956705</x>
       <y>280.4343665008403</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -413,24 +454,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_13</id>
       <label>Shark</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>-1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
-      <x>0.9077193954970189</x>
-      <y>279.7005724489942</y>
+      <generator>false</generator>
+      <x>2.037052869354671</x>
+      <y>278.57123897513657</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -452,24 +497,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_16</id>
       <label>Jet</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>-56.538467109508844</x>
       <y>259.4932473588176</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -491,24 +540,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_17</id>
       <label>Rick</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>-87.84799586327924</x>
       <y>14.540424730671365</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -530,24 +583,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_18</id>
       <label>Ralph</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>-88.34491554425244</x>
       <y>-36.23088518951884</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -569,24 +626,28 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_19</id>
       <label>Sam</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>-36.36267070779073</x>
       <y>-35.45957526932866</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
     <org.simbrain.network.core.Neuron>
       <updateRule class="org.simbrain.network.neuron_update_rules.IACRule">
+        <increment>1.0</increment>
         <decay>0.0</decay>
         <rest>0.0</rest>
         <noiseGenerator>
@@ -608,21 +669,24 @@
         </noiseGenerator>
         <addNoise>false</addNoise>
         <clipping>true</clipping>
+        <ceiling>1.0</ceiling>
+        <floor>-1.0</floor>
       </updateRule>
       <id>Neuron_20</id>
       <label>Lance</label>
       <activation>0.0</activation>
-      <lowerBound>-1.0</lowerBound>
-      <upperBound>1.0</upperBound>
-      <increment>1.0</increment>
-      <buffer>0.0</buffer>
+      <buffer>1.0</buffer>
       <inputValue>0.0</inputValue>
       <parent reference="../../.."/>
+      <generator>false</generator>
       <x>-36.36267070779073</x>
       <y>14.540424730671361</y>
       <clamped>false</clamped>
       <targetValue>0.0</targetValue>
       <updatePriority>0</updatePriority>
+      <auxValue>0.0</auxValue>
+      <increment>1.0</increment>
+      <tempIgnoreUpdateFlag>true</tempIgnoreUpdateFlag>
     </org.simbrain.network.core.Neuron>
   </neuronList>
   <synapseList>
@@ -635,11 +699,13 @@
       </learningRule>
       <id>Synapse_17</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -650,11 +716,13 @@
       </learningRule>
       <id>Synapse_18</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -665,11 +733,13 @@
       </learningRule>
       <id>Synapse_19</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -680,11 +750,13 @@
       </learningRule>
       <id>Synapse_20</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -695,11 +767,13 @@
       </learningRule>
       <id>Synapse_21</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -710,11 +784,13 @@
       </learningRule>
       <id>Synapse_22</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -725,11 +801,13 @@
       </learningRule>
       <id>Synapse_23</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -740,11 +818,13 @@
       </learningRule>
       <id>Synapse_24</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -755,11 +835,13 @@
       </learningRule>
       <id>Synapse_25</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -770,11 +852,13 @@
       </learningRule>
       <id>Synapse_26</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -785,11 +869,13 @@
       </learningRule>
       <id>Synapse_27</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -800,11 +886,13 @@
       </learningRule>
       <id>Synapse_28</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -815,11 +903,13 @@
       </learningRule>
       <id>Synapse_30</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -830,11 +920,13 @@
       </learningRule>
       <id>Synapse_31</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -845,11 +937,13 @@
       </learningRule>
       <id>Synapse_34</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -860,11 +954,13 @@
       </learningRule>
       <id>Synapse_37</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -875,11 +971,13 @@
       </learningRule>
       <id>Synapse_38</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -890,11 +988,13 @@
       </learningRule>
       <id>Synapse_39</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -905,11 +1005,13 @@
       </learningRule>
       <id>Synapse_40</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -920,11 +1022,13 @@
       </learningRule>
       <id>Synapse_42</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -935,11 +1039,13 @@
       </learningRule>
       <id>Synapse_44</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -950,11 +1056,13 @@
       </learningRule>
       <id>Synapse_46</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -965,11 +1073,13 @@
       </learningRule>
       <id>Synapse_47</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -980,11 +1090,13 @@
       </learningRule>
       <id>Synapse_49</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -995,11 +1107,13 @@
       </learningRule>
       <id>Synapse_107</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1010,11 +1124,13 @@
       </learningRule>
       <id>Synapse_138</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1025,11 +1141,13 @@
       </learningRule>
       <id>Synapse_139</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1040,11 +1158,13 @@
       </learningRule>
       <id>Synapse_140</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1055,11 +1175,13 @@
       </learningRule>
       <id>Synapse_141</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1070,11 +1192,13 @@
       </learningRule>
       <id>Synapse_142</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1085,11 +1209,13 @@
       </learningRule>
       <id>Synapse_143</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1100,11 +1226,13 @@
       </learningRule>
       <id>Synapse_144</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1115,11 +1243,13 @@
       </learningRule>
       <id>Synapse_145</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1130,11 +1260,13 @@
       </learningRule>
       <id>Synapse_146</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1145,11 +1277,13 @@
       </learningRule>
       <id>Synapse_147</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1160,11 +1294,13 @@
       </learningRule>
       <id>Synapse_148</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1175,11 +1311,13 @@
       </learningRule>
       <id>Synapse_149</id>
       <strength>-1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1190,11 +1328,13 @@
       </learningRule>
       <id>Synapse_150</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1205,11 +1345,13 @@
       </learningRule>
       <id>Synapse_151</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1220,11 +1362,13 @@
       </learningRule>
       <id>Synapse_152</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1235,11 +1379,13 @@
       </learningRule>
       <id>Synapse_153</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1250,11 +1396,13 @@
       </learningRule>
       <id>Synapse_154</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1265,11 +1413,13 @@
       </learningRule>
       <id>Synapse_155</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1280,11 +1430,13 @@
       </learningRule>
       <id>Synapse_156</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1295,11 +1447,13 @@
       </learningRule>
       <id>Synapse_157</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1310,11 +1464,13 @@
       </learningRule>
       <id>Synapse_158</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1325,11 +1481,13 @@
       </learningRule>
       <id>Synapse_159</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1340,11 +1498,13 @@
       </learningRule>
       <id>Synapse_160</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1355,11 +1515,13 @@
       </learningRule>
       <id>Synapse_161</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1370,11 +1532,13 @@
       </learningRule>
       <id>Synapse_162</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1385,11 +1549,13 @@
       </learningRule>
       <id>Synapse_163</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1400,11 +1566,13 @@
       </learningRule>
       <id>Synapse_164</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1415,11 +1583,13 @@
       </learningRule>
       <id>Synapse_165</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1430,11 +1600,13 @@
       </learningRule>
       <id>Synapse_166</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1445,11 +1617,13 @@
       </learningRule>
       <id>Synapse_167</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1460,11 +1634,13 @@
       </learningRule>
       <id>Synapse_168</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1475,11 +1651,13 @@
       </learningRule>
       <id>Synapse_169</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1490,11 +1668,13 @@
       </learningRule>
       <id>Synapse_170</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1505,11 +1685,13 @@
       </learningRule>
       <id>Synapse_171</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1520,11 +1702,13 @@
       </learningRule>
       <id>Synapse_172</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1535,11 +1719,13 @@
       </learningRule>
       <id>Synapse_173</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1550,11 +1736,13 @@
       </learningRule>
       <id>Synapse_174</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1565,11 +1753,13 @@
       </learningRule>
       <id>Synapse_175</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1580,11 +1770,13 @@
       </learningRule>
       <id>Synapse_176</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1595,11 +1787,13 @@
       </learningRule>
       <id>Synapse_177</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1610,11 +1804,13 @@
       </learningRule>
       <id>Synapse_178</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1625,11 +1821,13 @@
       </learningRule>
       <id>Synapse_179</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1640,11 +1838,13 @@
       </learningRule>
       <id>Synapse_180</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
     <org.simbrain.network.core.Synapse>
       <parentNetwork reference="../../.."/>
@@ -1655,11 +1855,13 @@
       </learningRule>
       <id>Synapse_181</id>
       <strength>1.0</strength>
+      <psr>0.0</psr>
       <increment>1.0</increment>
       <upperBound>10.0</upperBound>
       <lowerBound>-10.0</lowerBound>
       <delay>0</delay>
       <sendWeightedInput>true</sendWeightedInput>
+      <frozen>false</frozen>
     </org.simbrain.network.core.Synapse>
   </synapseList>
   <groupList/>
@@ -1670,19 +1872,8 @@
         <network reference="../../../.."/>
       </org.simbrain.network.update__actions.BufferedUpdate>
     </actionList>
-    <availableActionList>
-      <org.simbrain.network.update__actions.PriorityUpdate>
-        <network reference="../../../.."/>
-      </org.simbrain.network.update__actions.PriorityUpdate>
-    </availableActionList>
     <network reference="../.."/>
   </updateManager>
-  <synapseRouter>
-    <routingMap/>
-    <incomingUnified/>
-    <outgoingUnified/>
-    <autoRouting>false</autoRouting>
-  </synapseRouter>
   <time>0.0</time>
   <timeStep>0.2</timeStep>
   <timeType>DISCRETE</timeType>
@@ -1704,6 +1895,4 @@
     <rootName>Group</rootName>
     <index>1</index>
   </groupIdGenerator>
-  <roundOffActivationValues>false</roundOffActivationValues>
-  <precision>0</precision>
 </org.simbrain.network.core.Network>

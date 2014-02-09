@@ -43,6 +43,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.SimnetUtils;
@@ -114,6 +115,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
 
         // Set picked node
         PNode node = event.getPath().getPickedNode();
+        //System.out.println("Mouse clicked / Picked node: " + node);
 
         // Double click on text objects to edit them
         if (event.getClickCount() != 1) {
@@ -167,6 +169,8 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         if (pickedNode.getParent() instanceof TextNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof NeuronNode) {
+            pickedNode = pickedNode.getParent();
+        } else if (pickedNode.getParent() instanceof SynapseNode) {
             pickedNode = pickedNode.getParent();
         } else if (pickedNode.getParent() instanceof InteractionBox) {
             pickedNode = pickedNode.getParent();
@@ -302,19 +306,19 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
                 if (pickedNode.getParent() instanceof NeuronGroupNode) {
                     ((NeuronGroupNode) pickedNode.getParent())
                             .pushViewPositionToModel();
-                } else if (pickedNode.getParent() instanceof SubnetworkNode) {
-                    // TODO: Dragging subnetwork does not properly update neuron groups
-                    // When dragging subnets at end of drag update neuron group positions
-//                    for (Object subnetNode : ((SubnetworkNode) pickedNode
+                }
+//                else if (pickedNode.getParent() instanceof SubnetworkNode) {
+//                    for (Object subnetChildNode : ((SubnetworkNode) pickedNode
 //                            .getParent()).getOutlinedObjects()
 //                            .getChildrenReference()) {
-//                        if (subnetNode instanceof NeuronGroupNode) {
-//                            ((NeuronGroupNode) subnetNode)
+//                        //System.out.println(subnetChildNode);
+//                        if (subnetChildNode instanceof NeuronGroupNode) {
+//                            ((NeuronGroupNode) subnetChildNode)
 //                                    .pushViewPositionToModel();
 //                        }
 //                    }
-
-                }
+//
+//                }
 
             }
         }

@@ -127,7 +127,8 @@ public final class SynapseNode extends ScreenElement {
         updateDiameter();
 
         setPickable(true);
-        setChildrenPickable(false);
+        circle.setPickable(true);
+        line.setPickable(false);
     }
 
     /**

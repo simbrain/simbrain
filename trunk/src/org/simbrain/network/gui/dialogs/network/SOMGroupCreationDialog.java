@@ -69,7 +69,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
      */
     private void init() {
 
-        setTitle("New SOM Network");
+        setTitle("New SOM Group");
         somPanel = new SOMPropertiesPanel(networkPanel,
                 SOMPropsPanelType.CREATE_GROUP);
 

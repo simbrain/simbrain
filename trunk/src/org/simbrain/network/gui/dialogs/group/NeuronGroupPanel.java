@@ -211,18 +211,18 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         setLayout(new BorderLayout());
         this.setMinimumSize(new Dimension(200, 300));
 
+        specificNeuronGroupPanel = getSpecificGroup();
+
         if (isCreationPanel) {
 
             if (parent instanceof StandardDialog) {
-                ((StandardDialog) parent).setTitle("Create Neuron Group");
+                ((StandardDialog) parent).setTitle("Create neuron group");
             }
             neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
                     networkPanel.getLastClickedPosition(),
                     NeuronGroup.DEFAULT_GROUP_SIZE);
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
-
-            specificNeuronGroupPanel = getSpecificGroup();
 
             combinedNeuronInfoPanel = new CombinedNeuronInfoPanel(
                     neuronGroup.getNeuronList(), parent);
@@ -231,14 +231,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             layoutPanelWrapper.add(layoutPanel);
 
         } else {
-
             if (parent instanceof StandardDialog) {
-                if (specificNeuronGroupPanel == null) {
-                    ((StandardDialog) parent).setTitle("Edit Neuron Group");
-                } else {
-                    ((StandardDialog) parent).setTitle("Edit "
-                            + neuronGroup.getClass().getSimpleName());
-                }
+                ((StandardDialog) parent).setTitle("Edit "
+                        + neuronGroup.getTypeDescription());
             }
             editWrapComponents();
         }

@@ -184,6 +184,7 @@ public class SRNCreationDialog extends StandardDialog {
                     panel.getLastClickedPosition());
 
             srn.getParentNetwork().addGroup(srn);
+            srn.getParentNetwork().fireNetworkChanged();
             dispose();
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"

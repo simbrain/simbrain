@@ -33,7 +33,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>CompetitiveDialog</b>. Create competitive networks.
  */
-public class CompetitiveCreationDialog extends StandardDialog {
+public class CompetitiveGroupCreationDialog extends StandardDialog {
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -58,7 +58,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
+    public CompetitiveGroupCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         init();
     }
@@ -68,7 +68,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
      */
     private void init() {
 
-        setTitle("New Competitive Network");
+        setTitle("New Competitive Group");
         compPropertiesPanel = new CompetitivePropertiesPanel(networkPanel,
                 CompetitivePropsPanelType.CREATE_GROUP);
 

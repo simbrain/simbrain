@@ -107,6 +107,11 @@ public class SOMGroup extends NeuronGroup {
         setLabel("SOM");
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Self Organizing Map";
+    }
+
 
     /**
      * Randomize all weights coming in to this network. The weights will be

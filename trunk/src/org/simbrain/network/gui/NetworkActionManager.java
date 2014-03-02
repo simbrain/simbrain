@@ -85,7 +85,7 @@ import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
-import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
+import org.simbrain.network.gui.dialogs.network.CompetitiveGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveNetworkCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
 import org.simbrain.network.gui.dialogs.network.FeedForwardCreationDialog;
@@ -552,7 +552,7 @@ public final class NetworkActionManager {
                                 NeuronGroupCreationDialog.class,
                                 "(Bare) Neuron Group"),
                         new AddGroupAction(networkPanel,
-                                CompetitiveCreationDialog.class,
+                                CompetitiveGroupCreationDialog.class,
                                 "Competitive (Group only)"),
                         new AddGroupAction(networkPanel,
                                 SOMGroupCreationDialog.class,

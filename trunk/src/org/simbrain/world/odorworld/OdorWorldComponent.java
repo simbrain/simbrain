@@ -60,7 +60,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     AttributeType absoluteMovementType = (new AttributeType(this,
             "Absolute-movement", double.class, false));
     AttributeType smellSensorScalars = (new AttributeType(this, "Smell Scalar",
-            double.class, false));
+            double.class, true));
     AttributeType smellSensorVectors = (new AttributeType(this, "Smell Vector",
             double[].class, true));
     AttributeType tileSensorType = (new AttributeType(this, "Tile",

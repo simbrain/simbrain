@@ -18,19 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
-
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -40,9 +30,6 @@ import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.CompetitiveTrainerControlsPanel;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.trainers.CompetitiveTrainer;
-import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
@@ -78,16 +65,19 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         this.panel = np;
         this.network = network;
 
+        setTitle("Edit / Train Competitive Network");
+
         // Set to modeless so the dialog can be left open
         setModalityType(ModalityType.MODELESS);
 
         // Set up properties tab
-        competitivePropsPanel = new CompetitivePropertiesPanel(np, network.getCompetitive());
+        competitivePropsPanel = new CompetitivePropertiesPanel(np,
+                network.getCompetitive());
         tabbedPane.addTab("Network Properties", competitivePropsPanel);
 
         // Set up training tab
-        CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(panel,
-                new CompetitiveTrainer(network), network);
+        CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(
+                panel, new CompetitiveTrainer(network), network);
         tabbedPane.addTab("Train Network", controlPanel);
 
         // Input data tab
@@ -139,6 +129,5 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         super.closeDialogOk();
         competitivePropsPanel.commitChanges();
     }
-
 
 }

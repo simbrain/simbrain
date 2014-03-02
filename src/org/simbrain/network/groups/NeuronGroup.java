@@ -40,6 +40,7 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class NeuronGroup extends Group {
 
+    /** The default number of neurons in a neuron group. */
     public static final int DEFAULT_GROUP_SIZE = 10;
 
     /** The neurons in this group. */
@@ -52,8 +53,10 @@ public class NeuronGroup extends Group {
     /** The layout for the neurons in this group. */
     private Layout layout = DEFAULT_LAYOUT;
 
+    /** The incoming synapse group. */
     private SynapseGroup incomingSg;
 
+    /** The outgoing synapse group. */
     private SynapseGroup outgoingSg;
 
     /**
@@ -167,6 +170,17 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : neuronList) {
             neuron.setUpdateRule(base.deepCopy());
         }
+    }
+
+    /**
+     * Return a human-readable name for this type of neuron group.
+     * Subclasses should override this.   Used in the Gui for various
+     * purposes.
+     *
+     * @return the name of this type of neuron group.
+     */
+    public String getTypeDescription() {
+        return "Neuron Group";
     }
 
     /**
@@ -600,6 +614,17 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Force set all activations to a specified value.
+     *
+     * @param value the value to set the neurons to
+     */
+    public void forceSetActivationLevels(final double value) {
+        for (Neuron n : getNeuronList()) {
+            n.forceSetActivation(value);
+        }
+    }
+
+    /**
      * Copy activations from one neuron group to this one.
      *
      * @param toCopy the group to copy activations from.
@@ -723,6 +748,39 @@ public class NeuronGroup extends Group {
             }
         }
         return ret;
+    }
+
+    /**
+     * Set the lower bound on all neurons in this group.
+     *
+     * @param lb the lower bound to set.
+     */
+    public void setLowerBound(double lb) {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.setLowerBound(lb);
+        }
+    }
+
+    /**
+     * Set the upper bound on all neurons in this group.
+     *
+     * @param ub the upper bound to set.
+     */
+    public void setUpperBound(double ub) {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.setUpperBound(ub);
+        }
+    }
+
+    /**
+     * Set the increment on all neurons in this group.
+     *
+     * @param increment the increment to set.
+     */
+    public void setIncrement(double increment) {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.setIncrement(increment);
+        }
     }
 
 }

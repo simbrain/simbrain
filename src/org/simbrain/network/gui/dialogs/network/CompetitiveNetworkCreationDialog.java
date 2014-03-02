@@ -72,7 +72,7 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
      */
     private void init() {
 
-        setTitle("New SOM Network");
+        setTitle("New Competitive Network");
         competitivePanel = new CompetitivePropertiesPanel(networkPanel,
                 CompetitivePropsPanelType.CREATE_NETWORK);
 

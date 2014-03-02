@@ -62,6 +62,9 @@ public class HopfieldEditTrainDialog extends StandardDialog {
         // Set to modeless so the dialog can be left open
         setModalityType(ModalityType.MODELESS);
 
+        // Set title
+        setTitle("Edit / Train Hopfield Network");
+
         // Set up properties tab
         Box propsBox = Box.createVerticalBox();
         propsBox.setOpaque(true);

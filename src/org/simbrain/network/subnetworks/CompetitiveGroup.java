@@ -112,6 +112,11 @@ public class CompetitiveGroup extends NeuronGroup {
         setLabel("Competitive Group");
     }
 
+    @Override
+    public String getTypeDescription() {
+        return "Competitive Group";
+    }
+
     // /**
     // * Copy constructor.
     // *

@@ -30,6 +30,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -73,11 +74,22 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     private int betweenNeuronInterval = 50;
 
     /**
+     * If a layer has more than this many neurons, use grid layout instead of
+     * line layout.
+     */
+    private int useGridThreshold = 20;
+
+    /**
      * Training set.
      */
     private final TrainingSet trainingSet = new TrainingSet();
 
-    // TODO: Add a simpler constructor without neurontypes.
+    //TODO
+    private final LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
+            LineOrientation.HORIZONTAL);
+
+    private final GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
+            betweenNeuronInterval, 10);
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
@@ -100,62 +112,55 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         setLabel("SRN");
 
-        // TODO: implement new connectNeuronGroups method
-        // Initialize layers
+        // Initialize layers and set node types.  TODO: Can this be done at group level?
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
         List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
         List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
-
-        // TODO: Think about these defaults...
         initializeLayer(inputLayerNeurons, new LinearRule(), numInputNodes);
         initializeLayer(hiddenLayerNeurons, hiddenNeuronType, numHiddenNodes);
-        initializeLayer(outputLayerNeurons, outputNeuronType, numOutputNodes);
         initializeLayer(contextLayerNeurons, new LinearRule(), numHiddenNodes);
+        initializeLayer(outputLayerNeurons, outputNeuronType, numOutputNodes);
 
         // Input Layer
-        LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
-        layerLayout.setInitialLocation(new Point((int) initialPosition.getX(),
-                (int) initialPosition.getY()));
-        layerLayout.layoutNeurons(inputLayerNeurons);
         inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-        inputLayer.setLabel("Inputs");
+        inputLayer.setLabel("Input layer");
+        inputLayer.setClamped(true);
+        inputLayer.setIncrement(1);
         addNeuronGroup(inputLayer);
+        if (initialPosition == null) {
+            initialPosition = new Point2D.Double(0, 0);
+        }
+        layoutLayer(inputLayerNeurons);
 
         // Hidden Layer
-        layerLayout.layoutNeurons(hiddenLayerNeurons);
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
         hiddenLayer.setLabel("Hidden layer");
         addNeuronGroup(hiddenLayer);
+        hiddenLayer.setLowerBound(-1);
+        hiddenLayer.setUpperBound(1);
+        layoutLayer(hiddenLayerNeurons);
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
                 Direction.NORTH, betweenLayerInterval);
 
         // Context Layer
-        // Initial context layer values set to 0.5 (as in Elman 1991)
-        layerLayout.layoutNeurons(contextLayerNeurons);
+        // Initial context layer values set to 0.5 (as in Elman 1991). TODO
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         contextLayer.setLabel("Context nodes");
         addNeuronGroup(contextLayer);
+        layoutLayer(contextLayerNeurons);
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
                 Direction.EAST, betweenLayerInterval);
 
         // Output layer
-        layerLayout.layoutNeurons(outputLayerNeurons);
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
+        layoutLayer(outputLayerNeurons);
         NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
                 Direction.NORTH, betweenLayerInterval);
 
-        // Connect the laid-out layers
-        connect();
-
-    }
-
-    /** Connects SRN layers. */
-    private void connect() {
-        // Standard all to all connections
+        // Connect the layers
         AllToAll connect = new AllToAll(this.getParentNetwork());
         connect.setAllowSelfConnection(false);
         connect.setExcitatoryRatio(.5);
@@ -167,15 +172,18 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         connectNeuronGroups(inputLayer, hiddenLayer, connect);
         connectNeuronGroups(contextLayer, hiddenLayer, connect);
         connectNeuronGroups(hiddenLayer, outputLayer, connect);
+
+        // Initialize activations
+        initNetwork();
+
     }
 
     /**
-     * Initializes a layer by adding the desired number of neurons with the
-     * desired neuron update rule to the List of neurons.
+     * Helper method to initialize a layer by adding the desired number of
+     * neurons with the desired neuron update rule.
      *
      * @param layer the list of neurons
      * @param nodeType the desired neuron update rule
-     * @param lowerBound lower bound for neurons in this layer
      * @param nodes the desired number of nodes
      */
     private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
@@ -183,22 +191,37 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);
-            nodeType.setIncrement(1);
             layer.add(node);
+        }
+    }
+
+    /**
+     * Helper method to layout the neurons in the provided layer
+     *
+     * @param neurons the neurons to lay out
+     */
+    private void layoutLayer(final List<Neuron> neurons) {
+        if (neurons.size() < useGridThreshold) {
+            lineLayout.setInitialLocation(new Point((int) initialPosition
+                    .getX(), (int) initialPosition.getY()));
+            lineLayout.layoutNeurons(neurons);
+        } else {
+            gridLayout.setInitialLocation(new Point((int) initialPosition
+                    .getX(), (int) initialPosition.getY()));
+            gridLayout.layoutNeurons(neurons);
         }
     }
 
     @Override
     public void initNetwork() {
         clearActivations();
-        // TODO: Do this once there is a GUI hook to make sure this is done
-        // when the user tests the network
-        // contextLayer.setActivationLevels(.5);
+        contextLayer.forceSetActivationLevels(.5);
     }
 
     @Override
     public void update() {
 
+        // Update input then hidden layers
         inputLayer.update();
         hiddenLayer.update();
 
@@ -209,6 +232,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
             contextLayer.getNeuronList().get(index).setActivation(act);
         }
 
+        // Update output layer
         outputLayer.update();
     }
 

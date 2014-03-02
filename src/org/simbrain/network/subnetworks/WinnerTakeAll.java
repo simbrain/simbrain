@@ -82,6 +82,11 @@ public class WinnerTakeAll extends NeuronGroup {
     }
 
     @Override
+    public String getTypeDescription() {
+        return "Winner Take All Group";
+    }
+
+    @Override
     public void update() {
 
         // Determine the winning neuron

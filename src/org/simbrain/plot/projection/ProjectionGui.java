@@ -56,9 +56,10 @@ import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.Utils;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.IterableProjectionMethod;
 import org.simbrain.util.projection.ProjectCoordinate;
@@ -173,8 +174,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         public Paint getItemPaint(int row, int column) {
             Projector projector = getWorkspaceComponent().getProjectionModel()
                     .getProjector();
-            return ((DataPointColored) projector.getUpstairs().getPoint(column))
-                    .getColor();
+            DataPointColored point = ((DataPointColored) projector
+                    .getUpstairs().getPoint(column));
+            if (point != null) {
+                return point.getColor();
+            } else {
+                return Color.green;
+            }
         }
 
     }
@@ -186,8 +192,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
     private class CustomToolTipGenerator extends CustomXYToolTipGenerator {
         @Override
         public String generateToolTip(XYDataset data, int series, int item) {
-            return Utils.doubleArrayToString(getWorkspaceComponent()
-                    .getProjector().getUpstairs().getPoint(item).getVector());
+            DataPoint point = getWorkspaceComponent()
+                    .getProjector().getUpstairs().getPoint(item);
+            if (point != null) {
+                return Utils.doubleArrayToString(point.getVector());
+            } else {
+                return "null";
+            }
         }
     }
 
@@ -239,7 +250,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
             @Override
             public void actionPerformed(ActionEvent e) {
                 getWorkspaceComponent().getWorkspace().stop();
-                getWorkspaceComponent().clearData();
+                Executors.newSingleThreadExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        getWorkspaceComponent().clearData();
+                    }
+                });
             }
         });
         playBtn.addActionListener(new ActionListener() {

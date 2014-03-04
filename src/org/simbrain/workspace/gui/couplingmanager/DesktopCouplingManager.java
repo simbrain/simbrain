@@ -126,6 +126,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         frame.getRootPane().setDefaultButton(okButton);
 
+        frame.pack();
+
     }
 
     /**

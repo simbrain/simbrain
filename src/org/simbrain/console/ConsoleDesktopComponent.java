@@ -20,6 +20,7 @@ package org.simbrain.console;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.concurrent.Executors;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
@@ -40,17 +41,13 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
             ConsoleComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
-    }
-
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
         JConsole console = new JConsole();
-        Interpreter interprerter = getSimbrainInterpreter(console, super
+        Interpreter interpreter = getSimbrainInterpreter(console, super
                 .getWorkspaceComponent().getWorkspace());
+        Executors.newSingleThreadExecutor().execute(
+                interpreter);
         add("Center", console);
-        new Thread(interprerter).start();
-
     }
 
     /**

@@ -63,7 +63,7 @@ public class LayoutDialog extends StandardDialog {
         super.closeDialogOk();
         commitChanges();
         mainPanel.getCurrentLayout().setInitialLocation(
-                networkPanel.getLastClickedPosition());
+                networkPanel.getLastClickedPosition()); //TODO: Think
         mainPanel.getCurrentLayout().layoutNeurons(
                 networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();

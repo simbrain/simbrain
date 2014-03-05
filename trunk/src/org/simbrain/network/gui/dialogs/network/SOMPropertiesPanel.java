@@ -40,6 +40,9 @@ import org.simbrain.util.widgets.CommittablePanel;
 public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
     CommittablePanel {
 
+    // TODO: This class takes care of SOM network and group. Not sure that's
+    // good.  Some things are conflated, e.g. help page.
+
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_SOM_NEURONS = 16;
 
@@ -147,7 +150,7 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             fillSOMGroupFieldValues();
         } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-            som = new SOMNetwork(null, 1, 1);
+            som = new SOMNetwork(null, 1, 1, networkPanel.getWhereToAdd());
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);
             fillSOMNetworkFieldValues();
@@ -198,7 +201,8 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
             } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
                 som = new SOMNetwork(networkPanel.getNetwork(),
                         Integer.parseInt(tfNumSOMNeurons.getText()),
-                        Integer.parseInt(tfNumInputNeurons.getText()));
+                        Integer.parseInt(tfNumInputNeurons.getText()),
+                        networkPanel.getWhereToAdd());
                 commitSOMNetworkFieldValues();
             } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
                 commitSOMGroupFieldValues();

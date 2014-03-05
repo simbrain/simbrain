@@ -50,7 +50,6 @@ public final class ApplyLayoutAction extends ConditionallyEnabledAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
         layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
     }

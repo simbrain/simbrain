@@ -156,7 +156,7 @@ public class NetworkPanel extends JPanel {
     private static final int DEFAULT_NEWPOINT_OFFSET = 100;
 
     /** Default spacing for new points. */
-    private static final int DEFAULT_SPACING = 45;
+    public static final int DEFAULT_SPACING = 45;
 
     /** Offset for update label. */
     private static final int UPDATE_LABEL_OFFSET = 20;
@@ -291,6 +291,23 @@ public class NetworkPanel extends JPanel {
 
     /** Map associating network model objects with Piccolo Pnodes. */
     private final HashMap<Object, PNode> objectNodeMap = new HashMap<Object, PNode>();
+
+    /**
+     * Point where new neurons, neurongroups, and subnetworks should be added.
+     * Reset when the user clicks anywhere on screen, to the location clicked.
+     * Neurons are placed to the right of one another, groups and nets are
+     * placed diagonally below one another. The setup is not ideal, because
+     * objects are not always built up from an initial location in the same way,
+     * but works well enough for now.
+     *
+     * This is not the same as the paste apparatus, which handles multiple
+     * pastes, as opposed to adding multiple instances of a new object.
+     *
+     */
+    // Perhaps there is a better solution. Would be nice to translate stuff
+    // after placing it. Annoying that every network has to have an argument for
+    // "initial position". Cries out for some more encapsulated solution.
+    private Point2D.Double whereToAdd = new Point2D.Double(0, 0);
 
     /**
      * Create a new Network panel.
@@ -566,25 +583,17 @@ public class NetworkPanel extends JPanel {
      */
     public void addNeuron() {
 
-        Point2D p;
-        // If a neuron is selected, put this neuron to its left
-        if (getSelectedNeurons().size() == 1) {
-            NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
-            p = new Point((int) node.getNeuron().getX() + DEFAULT_SPACING,
-                    (int) node.getNeuron().getY());
-        } else {
-            p = getLastClickedPosition();
-            // Put nodes at last left clicked position, if any
-            if (p == null) {
-                p = new Point(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
-            }
-        }
-
         final Neuron neuron = new Neuron(getNetwork(), new LinearRule());
+        Point2D p = whereToAdd;
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.forceSetActivation(0);
         getNetwork().addNeuron(neuron);
+        // New objects are added to the right of the last neuron added.
+        // Convenient for quickly making "lines" of neurons by repeatedly
+        // adding neurons.
+        whereToAdd.setLocation(neuron.getX() + DEFAULT_SPACING, neuron.getY());
+
         undoManager.addUndoableAction(new UndoableAction() {
 
             @Override
@@ -644,10 +653,14 @@ public class NetworkPanel extends JPanel {
 
         setSelection(nodes);
 
-        layout.setInitialLocation(getLastClickedPosition());
+        layout.setInitialLocation(whereToAdd);
 
         layout.layoutNeurons(getSelectedModelNeurons());
 
+        // New objects are added to the right of the last group of
+        // neurons added.
+        whereToAdd.setLocation(neurons.get(neurons.size() - 1).getX()
+                + DEFAULT_SPACING + 10, whereToAdd.getY());
         repaint();
 
         // No Implementation
@@ -791,11 +804,22 @@ public class NetworkPanel extends JPanel {
         // Add an appropriate piccolo representation based on what type of group
         // it is.
         if (group instanceof NeuronGroup) {
-            addNeuronGroup((NeuronGroup) group);
+            NeuronGroup ng = (NeuronGroup) group;
+            addNeuronGroup(ng);
+            // New objects are added diagonally below and to the right of the
+            // last neuron group added
+            if (ng.isTopLevelGroup()) {
+                whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING,
+                        whereToAdd.getY() + DEFAULT_SPACING);
+            }
         } else if (group instanceof SynapseGroup) {
             addSynapseGroup((SynapseGroup) group);
         } else if (group instanceof Subnetwork) {
             addSubnetwork((Subnetwork) group);
+            // New objects are added diagonally below and to the right of the
+            // last subnetwork added
+            whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING,
+                    whereToAdd.getY() + DEFAULT_SPACING);
         }
         clearSelection();
     }
@@ -2743,8 +2767,8 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates the producer menu for synapse groups. Null if the network panel is
-     * not in a desktop environment. Overridden by
+     * Creates the producer menu for synapse groups. Null if the network panel
+     * is not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
      *
@@ -2757,8 +2781,8 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates the consumer menu for synapse groups. Null if the network panel is
-     * not in a desktop environment. Overridden by
+     * Creates the consumer menu for synapse groups. Null if the network panel
+     * is not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
      *
@@ -2768,6 +2792,13 @@ public class NetworkPanel extends JPanel {
      */
     public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
         return null;
+    }
+
+    /**
+     * @return the whereToAdd
+     */
+    public Point2D.Double getWhereToAdd() {
+        return whereToAdd;
     }
 
 }

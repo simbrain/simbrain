@@ -176,6 +176,7 @@ public class EchoStateNetwork extends Subnetwork {
                 LineOrientation.HORIZONTAL);
 
         // Input Layer
+        lineLayout.setInitialLocation(initialPosition);
         lineLayout.layoutNeurons(inputLayerNeurons);
         inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
         inputLayer.setLabel("Inputs");
@@ -193,7 +194,6 @@ public class EchoStateNetwork extends Subnetwork {
                 Direction.NORTH, betweenLayerInterval);
 
         // Output Layer
-        lineLayout.setInitialLocation(initialPosition);
         lineLayout.layoutNeurons(outputLayerNeurons);
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         outputLayer.setLabel("Outputs");

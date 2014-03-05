@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.simbrain.network.core.Network;
@@ -53,12 +54,14 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
      * @param net parent network
      * @param numSOMNeurons number of neurons in the SOM layer
      * @param numInputNeurons number of neurons in the input layer
+     * @param initialPosition bottom corner where network will be placed.
      */
-    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons) {
+    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons,
+            Point2D initialPosition) {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
-        inputLayer = new NeuronGroup(net, som.getPosition(), numInputNeurons);
+        inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
         this.addNeuronGroup(som);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {

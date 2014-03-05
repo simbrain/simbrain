@@ -68,13 +68,10 @@ public class LMSCreationDialog extends StandardDialog {
      */
     protected void closeDialogOk() {
 
-        // Get last clicked position in the panel
-        Point2D lastClicked = networkPanel.getLastClickedPosition();
-
         // Create the layered network
         LMSNetwork lms =   new LMSNetwork(networkPanel.getNetwork(), inputLayer
                 .getNumNeurons(), outputLayer.getNumNeurons(),
-                lastClicked);
+                networkPanel.getWhereToAdd());
         lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
         lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
         networkPanel.getNetwork().addGroup(lms);

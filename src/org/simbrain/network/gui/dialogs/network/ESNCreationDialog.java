@@ -418,7 +418,7 @@ public class ESNCreationDialog extends StandardDialog implements
             int numRes = Integer.parseInt(tfNumReservoir.getText());
             int numOut = Integer.parseInt(tfNumOutputs.getText());
             EchoStateNetwork esn = new EchoStateNetwork(panel.getNetwork(),
-                    numInputs, numRes, numOut, panel.getLastClickedPosition());
+                    numInputs, numRes, numOut, panel.getWhereToAdd());
 
             esn.setSpectralRadius(Double.parseDouble(maxEigenValue.getText()));
             esn.setRecurrentOutWeights(recurrentOutputWeights.isSelected());

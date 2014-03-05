@@ -21,6 +21,8 @@ package org.simbrain.network.gui;
 import java.awt.event.InputEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.awt.geom.Point2D.Float;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,6 +102,9 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         // Set last clicked position, used in many areas for "placement" of
         // objects in the last clicked position on screen.
         networkPanel.setLastClickedPosition(event.getPosition());
+
+        networkPanel.getWhereToAdd().setLocation(event.getPosition());
+
 
         // Set pressed position for use in double clicking
         if (event.getPath().getPickedNode() instanceof PCamera) {
@@ -337,6 +342,12 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         networkPanel.setEndPosition(SimnetUtils
                 .getUpperLeft((ArrayList) networkPanel
                         .getSelectedModelElements()));
+
+        // Reset the place new neurons and groups should be added
+        networkPanel.getWhereToAdd().setLocation(
+                event.getPosition().getX() + NetworkPanel.DEFAULT_SPACING,
+                event.getPosition().getY());
+
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();
     }

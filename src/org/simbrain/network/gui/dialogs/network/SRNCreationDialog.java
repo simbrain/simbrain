@@ -181,7 +181,7 @@ public class SRNCreationDialog extends StandardDialog {
                     Integer.parseInt(tfNumInputs.getText()),
                     Integer.parseInt(tfNumHidden.getText()),
                     Integer.parseInt(tfNumOutputs.getText()), hidType, outType,
-                    panel.getLastClickedPosition());
+                    panel.getWhereToAdd());
 
             srn.getParentNetwork().addGroup(srn);
             srn.getParentNetwork().fireNetworkChanged();

@@ -95,10 +95,12 @@ public class SOMGroupCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         somPanel.commitChanges();
         SOMGroup som = (SOMGroup) somPanel.getGroup();
-        networkPanel.getNetwork().addGroup(som);
         layoutPanel.commitChanges();
         som.setLayout(layoutPanel.getCurrentLayout());
         som.applyLayout();
+        som.offset(networkPanel.getWhereToAdd().getX(), networkPanel
+                .getWhereToAdd().getY());
+        networkPanel.getNetwork().addGroup(som);
         networkPanel.getNetwork().fireNetworkChanged();
         super.closeDialogOk();
 

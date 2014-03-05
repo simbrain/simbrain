@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.simbrain.network.core.Network;
@@ -54,13 +55,14 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
      * @param net parent network
      * @param numCompetitiveNeurons number of neurons in the Competitive layer
      * @param numInputNeurons number of neurons in the input layer
+     * @param initialPosition bottom corner where network will be placed.
      */
     public CompetitiveNetwork(Network net, int numCompetitiveNeurons,
-            int numInputNeurons) {
+            int numInputNeurons, Point2D initialPosition) {
         super(net);
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
-        inputLayer = new NeuronGroup(net, competitive.getPosition(),
+        inputLayer = new NeuronGroup(net, initialPosition,
                 numInputNeurons);
         this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);

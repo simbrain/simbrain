@@ -15,6 +15,7 @@ package org.simbrain.network.groups;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,9 +52,6 @@ public class FeedForward extends Subnetwork {
      */
     private int useGridThreshold = 20;
 
-    /** Initial position of network (from bottom left). */
-    Point2D initialPosition = new Point2D.Double(0, 0);
-
     /**
      * Construct a feed-forward network.
      *
@@ -62,7 +60,7 @@ public class FeedForward extends Subnetwork {
      * @param nodesPerLayer an array of integers which determines the number of
      *            layers and neurons in each layer. Integers 1...n in the array
      *            correspond to the number of nodes in layers 1...n.
-     * @param initialPosition upper left corner where network will be placed.
+     * @param initialPosition bottom corner where network will be placed.
      * @param inputNeuronTemplate the type of Neuron to use for the input layer
      */
     public FeedForward(final Network network, int[] nodesPerLayer,
@@ -101,13 +99,12 @@ public class FeedForward extends Subnetwork {
      * @param nodesPerLayer an array of integers which determines the number of
      *            layers and neurons in each layer. Integers 1...n in the array
      *            correspond to the number of nodes in layers 1...n.
-     * @param initialPosition upper left corner where network will be placed.
+     * @param initialPosition bottom corner where network will be placed.
      * @param inputNeuronTemplate the type of Neuron to use for the input layer
      */
     private void buildNetwork(final Network network, int[] nodesPerLayer,
             Point2D initialPosition, final Neuron inputNeuronTemplate) {
 
-        this.initialPosition = initialPosition;
         setLabel("Layered Network");
 
         // Layouts

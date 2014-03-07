@@ -131,7 +131,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         add(listScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
         couplingFrame.setContentPane(this);
-        couplingFrame.pack();
     }
 
     /**

@@ -131,7 +131,6 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         }
         // Initialize frame
         parentFrame.setContentPane(this);
-        parentFrame.pack();
     }
 
     /**

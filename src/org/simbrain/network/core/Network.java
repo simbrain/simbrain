@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -1018,6 +1019,8 @@ public class Network {
         xstream.omitField(Network.class, "precision");
         xstream.omitField(Network.class, "logger");
         xstream.omitField(Network.class, "synapseVisibilityThreshold");
+
+        xstream.omitField(FeedForward.class, "initialPosition");
 
         xstream.omitField(Group.class, "deleteWhenEmpty");
 

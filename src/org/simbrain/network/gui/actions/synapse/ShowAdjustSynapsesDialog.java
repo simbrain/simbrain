@@ -96,10 +96,10 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                synapsePanel.removeListeners();
-            }
-        });
+//        dialog.addWindowListener(new WindowAdapter() {
+//            public void windowClosing(WindowEvent e) {
+//                synapsePanel.removeListeners();
+//            }
+//        });
     }
 }

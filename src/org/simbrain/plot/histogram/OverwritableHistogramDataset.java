@@ -15,6 +15,7 @@ import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.util.ObjectUtilities;
 import org.jfree.util.PublicCloneable;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * A modification of the JFreeChart class HistogramDataset that allows data to
@@ -78,10 +79,10 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param values the values (<code>null</code> not permitted).
      * @param bins the number of bins (must be at least 1).
      */
-    public void addSeries(Comparable key, double[] values, int bins) {
+    public void addSeries(Comparable key, Number[] values, int bins) {
         // defer argument checking...
-        double minimum = getMinimum(values);
-        double maximum = getMaximum(values);
+        double minimum = SimbrainMath.getMinimum(values);
+        double maximum = SimbrainMath.getMaximum(values);
         addSeries(key, values, bins, minimum, maximum);
     }
 
@@ -94,7 +95,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param minimum the lower bound of the bin range.
      * @param maximum the upper bound of the bin range.
      */
-    public void overwrriteSeries(int index, Comparable key, double[] values,
+    public void overwrriteSeries(int index, Comparable key, Number[] values,
             int bins, double minimum, double maximum) {
 
         if (key == null) {
@@ -140,8 +141,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         // fill the bins
         for (int i = 0; i < values.length; i++) {
             int binIndex = bins - 1;
-            if (values[i] < maximum) {
-                double fraction = (values[i] - minimum) / (maximum - minimum);
+            if (values[i].doubleValue() < maximum) {
+                double fraction = (values[i].doubleValue() - minimum) / (maximum - minimum);
                 if (fraction < 0.0) {
                     fraction = 0.0;
                 }
@@ -176,7 +177,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param minimum the lower bound of the bin range.
      * @param maximum the upper bound of the bin range.
      */
-    public void addSeries(Comparable key, double[] values, int bins,
+    public void addSeries(Comparable key, Number[] values, int bins,
             double minimum, double maximum) {
 
         if (key == null) {
@@ -210,8 +211,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         // fill the bins
         for (int i = 0; i < values.length; i++) {
             int binIndex = bins - 1;
-            if (values[i] < maximum) {
-                double fraction = (values[i] - minimum) / (maximum - minimum);
+            if (values[i].doubleValue() < maximum) {
+                double fraction = (values[i].doubleValue() - minimum) / (maximum - minimum);
                 if (fraction < 0.0) {
                     fraction = 0.0;
                 }

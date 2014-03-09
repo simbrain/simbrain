@@ -65,6 +65,8 @@ public class SynapseGroup extends Group {
         super(net);
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
+        source.addOutgoingSg(this);
+        target.addIncomingSg(this);
         pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
                 * sourceNeuronGroup.getNeuronList().size());
         for (Neuron n : sourceNeuronGroup.getNeuronList()) {
@@ -94,6 +96,8 @@ public class SynapseGroup extends Group {
         super(net);
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
+        source.addOutgoingSg(this);
+        target.addIncomingSg(this);
         pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
                 * sourceNeuronGroup.getNeuronList().size());
         for (Neuron n : sourceNeuronGroup.getNeuronList()) {
@@ -130,6 +134,12 @@ public class SynapseGroup extends Group {
                 // System.out.println("SynapseGroup.delete");
                 getParentNetwork().removeGroup(getParentGroup());
             }
+        }
+        if (!targetNeuronGroup.isMarkedForDeletion()) {
+            targetNeuronGroup.removeIncomingSg(this);
+        }
+        if (!sourceNeuronGroup.isMarkedForDeletion()) {
+            sourceNeuronGroup.removeOutgoingSg(this);
         }
     }
 

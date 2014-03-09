@@ -206,7 +206,7 @@ public abstract class Group {
     /**
      * @return the markedForDeletion
      */
-    protected boolean isMarkedForDeletion() {
+    public boolean isMarkedForDeletion() {
         return markedForDeletion;
     }
 

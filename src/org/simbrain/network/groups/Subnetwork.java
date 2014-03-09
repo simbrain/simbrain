@@ -27,7 +27,7 @@ import org.simbrain.network.core.Synapse;
  * A collection of neuron groups and synapse groups which functions as a
  * subnetwork within the main root network, with its own update rules.
  */
-public class Subnetwork extends Group {
+public abstract class Subnetwork extends Group {
 
     /** List of neuron groups. */
     private final List<NeuronGroup> neuronGroupList = new CopyOnWriteArrayList<NeuronGroup>();

@@ -46,6 +46,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import org.piccolo2d.PCamera;
@@ -86,8 +87,11 @@ import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.SynapseGroupArrow;
 import org.simbrain.network.gui.nodes.SynapseGroupNode;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeBidirectional;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
+import org.simbrain.network.gui.nodes.SynapseGroupNodeRecurrent;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
@@ -794,7 +798,7 @@ public class NetworkPanel extends JPanel {
      *
      * @param group the group to add
      */
-    private void addGroup(Group group) {
+    public void addGroup(Group group) {
 
         // If the object has already been added don't keep going.
         if (objectNodeMap.get(group) != null) {
@@ -813,6 +817,7 @@ public class NetworkPanel extends JPanel {
                         whereToAdd.getY() + DEFAULT_SPACING);
             }
         } else if (group instanceof SynapseGroup) {
+
             addSynapseGroup((SynapseGroup) group);
         } else if (group instanceof Subnetwork) {
             addSubnetwork((Subnetwork) group);
@@ -824,6 +829,39 @@ public class NetworkPanel extends JPanel {
         clearSelection();
     }
 
+    private void addSynapseGroupBidirectional(SynapseGroup sg1, SynapseGroup sg2) {
+        SynapseGroupNodeBidirectional synGBD =
+                new SynapseGroupNodeBidirectional(this, sg1,
+                        sg2);
+        canvas.getLayer().addChild(synGBD);
+        objectNodeMap.put(sg1, synGBD);
+        objectNodeMap.put(sg2, synGBD);
+        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
+                .get(sg1.getSourceNeuronGroup());
+        if (srcNode != null) {
+            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+                    synGBD);
+        }
+        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
+                .get(sg1.getTargetNeuronGroup());
+        // System.out.println("Target" + tarNode);
+        if (tarNode != null) {
+            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+                    synGBD);
+        }
+    }
+    
+    private void addSynapseGroupRecurrent(SynapseGroup sg) {
+        SynapseGroupNodeRecurrent synGNR = new SynapseGroupNodeRecurrent(this, sg);
+        objectNodeMap.put(sg, synGNR);
+        canvas.getLayer().addChild(synGNR);
+        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
+                .get(sg.getSourceNeuronGroup());
+        if (srcNode != null) {
+            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+                    synGNR);
+        }
+    }
     /**
      * Add a Piccolo representation of a neuron group to the canvas.
      *
@@ -894,18 +932,36 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Adds a gui representation of a synapsegroup object. The resulting node
+     * Adds a gui representation of a SynapseGroup object. The resulting node
      * will be a different type depending on whether a display flag is turned on
      * or not.
      *
-     * @param synapseGroup the synpasegroup to add
+     * @param synapseGroup the SynapseGroup to add
      */
-    protected void addSynapseGroup(SynapseGroup synapseGroup) {
+    protected void addSynapseGroup(final SynapseGroup synapseGroup) {
         // Create visible or invisible synapse group depending on settings
         if (synapseGroup.isDisplaySynapses()) {
             addSynapseGroupFull(synapseGroup);
         } else {
-            addSynapseGroupSimple(synapseGroup);
+            Set<SynapseGroup> targetGroupOutgoing = synapseGroup.getTargetNeuronGroup().getOutgoingSg();
+            Set<SynapseGroup> sourceGroupIncoming = synapseGroup.getSourceNeuronGroup().getIncomingSgs();
+            targetGroupOutgoing.retainAll(sourceGroupIncoming);
+            if (synapseGroup.getTargetNeuronGroup().equals(synapseGroup.getSourceNeuronGroup())) {
+                addSynapseGroupRecurrent(synapseGroup);
+            } else if (targetGroupOutgoing.size() != 0) {
+                final SynapseGroup reverse = (SynapseGroup)targetGroupOutgoing.toArray()[0];
+                removeGroup(reverse);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        addSynapseGroupBidirectional(synapseGroup, reverse);
+                    }
+                });
+
+                return;
+            } else {
+                addSynapseGroupSimple(synapseGroup);
+            }
         }
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
                 .get(synapseGroup);
@@ -1068,19 +1124,20 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Remove a group from the network panel.
+     * Removes a group from the network panel, but not necessarily the network
+     * model.
      *
      * @param group the group to remove
      */
     private void removeGroup(Group group) {
-        PNode node = null;
-        if (group instanceof NeuronGroup) {
-            node = (NeuronGroupNode) objectNodeMap.get(group);
-        } else if (group instanceof SynapseGroup) {
-            node = (SynapseGroupNode) objectNodeMap.get(group);
-        } else if (group instanceof Subnetwork) {
-            node = (SubnetworkNode) objectNodeMap.get(group);
-        }
+        PNode node = objectNodeMap.get(group);
+//        if (group instanceof NeuronGroup) {
+//            node = (NeuronGroupNode) objectNodeMap.get(group);
+//        } else if (group instanceof SynapseGroup) {
+//            node = (SynapseGroupNode) objectNodeMap.get(group);
+//        } else if (group instanceof Subnetwork) {
+//            node = (SubnetworkNode) objectNodeMap.get(group);
+//        }
         if (node != null) {
             node.removeFromParent();
             objectNodeMap.remove(group);

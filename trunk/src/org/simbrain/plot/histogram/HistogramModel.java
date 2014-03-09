@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
@@ -42,7 +43,7 @@ public class HistogramModel extends ChartModel {
      * with the dataset object for JFreeChart, but must be kept in case the
      * number of bins is changed.
      */
-    private List<double[]> data = new ArrayList<double[]>();
+    private List<Number[]> data = new ArrayList<Number[]>();
 
     /** The data set used to generate the histogram. */
     private OverwritableHistogramDataset dataSet = new OverwritableHistogramDataset();
@@ -85,7 +86,7 @@ public class HistogramModel extends ChartModel {
      * @param dataNames the name(s) of the data set(s)
      * @param bins the number of bins used in the histogram
      */
-    public HistogramModel(List<double[]> data, List<String> dataNames, int bins) {
+    public HistogramModel(List<Number[]> data, List<String> dataNames, int bins) {
         this(data, dataNames, bins, "", "", "");
     }
 
@@ -100,7 +101,7 @@ public class HistogramModel extends ChartModel {
      * @param xAxisName the title of the x axis
      * @param yAxisName the title of the y axis
      */
-    public HistogramModel(List<double[]> data, List<String> dataNames,
+    public HistogramModel(List<Number[]> data, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName) {
         this(data, dataNames, bins, title, xAxisName, yAxisName, null);
     }
@@ -117,7 +118,7 @@ public class HistogramModel extends ChartModel {
      * @param yAxisName the title of the y axis
      * @param colorPallet a custom color pallete
      */
-    public HistogramModel(List<double[]> newData, List<String> dataNames,
+    public HistogramModel(List<Number[]> newData, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName,
             Color[] colorPallet) {
         this.bins = bins;
@@ -133,8 +134,9 @@ public class HistogramModel extends ChartModel {
         for (int i = 0, n = data.size(); i < n; i++) {
             if (data.get(i).length != 0) {
                 sort(data.get(i));
-                double min = minValue(data.get(i));
-                double max = maxValue(data.get(i));
+                SimbrainMath.max(1, 2);
+                double min = SimbrainMath.getMinimum(data.get(i));
+                double max = SimbrainMath.getMaximum(data.get(i));
                 setSortedFlag(false);
                 ((OverwritableHistogramDataset) dataSet).overwrriteSeries(i,
                         dataNames.get(i), data.get(i), getBins(), min, max);
@@ -152,7 +154,7 @@ public class HistogramModel extends ChartModel {
      * @param index data index
      * @param histData the data to add at that index
      */
-    public void addData(double[] histData, Integer index) {
+    public void addData(Number[] histData, Integer index) {
         data.remove(index.intValue());
         data.add(index.intValue(), histData);
         redraw();
@@ -167,8 +169,8 @@ public class HistogramModel extends ChartModel {
             // ","));
             // System.out.println(i + ":" + dataNames.get(i));
             sort(data.get(i));
-            double min = minValue(data.get(i));
-            double max = maxValue(data.get(i));
+            double min = SimbrainMath.getMinimum(data.get(i));
+            double max = SimbrainMath.getMaximum(data.get(i));
             setSortedFlag(false);
             ((OverwritableHistogramDataset) dataSet).overwrriteSeries(i,
                     dataNames.get(i), data.get(i), getBins(), min, max);
@@ -181,7 +183,7 @@ public class HistogramModel extends ChartModel {
      *
      * @param dataSeries the data set to be sorted.
      */
-    public void sort(double dataSeries[]) {
+    public void sort(Number [] dataSeries) {
         Arrays.sort(dataSeries);
         sortedFlag = true;
     }
@@ -235,7 +237,7 @@ public class HistogramModel extends ChartModel {
     /**
      * @param data the data to set
      */
-    public void resetData(List<double[]> data, List<String> names) {
+    public void resetData(List<Number[]> data, List<String> names) {
         this.data = data;
         this.dataNames = names;
         redraw();
@@ -259,7 +261,7 @@ public class HistogramModel extends ChartModel {
      */
     public void resetData() {
         for (int i = 0; i < data.size(); i++) {
-            addData(new double[] { 0 }, i);
+            addData(new Number[] { 0 }, i);
         }
     }
 
@@ -280,7 +282,7 @@ public class HistogramModel extends ChartModel {
      */
     public void addDataSource() {
 
-        data.add(new double[] { 0 });
+        data.add(new Number[] { 0 });
         dataNames.add("Hist " + data.size());
         this.fireDataSourceAdded(data.size());
         redraw();
@@ -313,7 +315,7 @@ public class HistogramModel extends ChartModel {
     /**
      * @return the data
      */
-    public List<double[]> getData() {
+    public List<Number[]> getData() {
         return data;
     }
 

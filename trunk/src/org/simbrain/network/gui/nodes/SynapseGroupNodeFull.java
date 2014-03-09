@@ -38,6 +38,7 @@ public class SynapseGroupNodeFull extends SynapseGroupNode {
     public SynapseGroupNodeFull(final NetworkPanel networkPanel,
             final SynapseGroup group) {
         super(networkPanel, group);
+        this.setPaint(null);
     }
 
 

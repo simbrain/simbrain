@@ -277,35 +277,35 @@ public class HistogramPanel extends JPanel {
         this.colorPallet = colorPallet;
     }
 
-    /**
-     * Main method for testing.
-     */
-    public static void main(String[] args) {
-
-        List<double[]> histograms = new ArrayList<double[]>();
-        Random random = new Random(3141592L);
-        double[] r = new double[1000];
-        for (int i = 0; i < 1000; i++) {
-            r[i] = random.nextGaussian() + 100;
-        }
-        histograms.add(r);
-        double[] r2 = new double[1000];
-        for (int i = 0; i < 1000; i++) {
-            r2[i] = random.nextGaussian() + 102;
-        }
-        histograms.add(r2);
-
-        List<String> names = Arrays.asList("Joe", "Jane");
-
-        JFrame bob = new JFrame();
-
-        HistogramModel h = new HistogramModel(histograms, names, 50);
-
-        bob.setContentPane(new HistogramPanel(h));
-        bob.pack();
-        RefineryUtilities.centerFrameOnScreen(bob);
-        bob.setVisible(true);
-    }
+//    /**
+//     * Main method for testing.
+//     */
+//    public static void main(String[] args) {
+//
+//        List<double[]> histograms = new ArrayList<double[]>();
+//        Random random = new Random(3141592L);
+//        double[] r = new double[1000];
+//        for (int i = 0; i < 1000; i++) {
+//            r[i] = random.nextGaussian() + 100;
+//        }
+//        histograms.add(r);
+//        double[] r2 = new double[1000];
+//        for (int i = 0; i < 1000; i++) {
+//            r2[i] = random.nextGaussian() + 102;
+//        }
+//        histograms.add(r2);
+//
+//        List<String> names = Arrays.asList("Joe", "Jane");
+//
+//        JFrame bob = new JFrame();
+//
+//        HistogramModel h = new HistogramModel(histograms, names, 50);
+//
+//        bob.setContentPane(new HistogramPanel(h));
+//        bob.pack();
+//        RefineryUtilities.centerFrameOnScreen(bob);
+//        bob.setVisible(true);
+//    }
 
     /**
      * Return reference to underlying data.

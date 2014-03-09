@@ -143,12 +143,17 @@ public class InteractionBox extends ScreenElement {
         return true;
     }
 
+    @Override
+    public void setScale(double scale) {
+        super.setScale(scale);
+//        textLabel.setScale(scale);
+    }
+    
     /**
      * @param contextMenu the contextMenu to set
      */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
     }
-
 
 }

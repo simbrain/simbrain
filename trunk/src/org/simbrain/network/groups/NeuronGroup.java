@@ -19,6 +19,7 @@ package org.simbrain.network.groups;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,7 +41,6 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class NeuronGroup extends Group {
 
-    /** The default number of neurons in a neuron group. */
     public static final int DEFAULT_GROUP_SIZE = 10;
 
     /** The neurons in this group. */
@@ -53,11 +53,11 @@ public class NeuronGroup extends Group {
     /** The layout for the neurons in this group. */
     private Layout layout = DEFAULT_LAYOUT;
 
-    /** The incoming synapse group. */
-    private SynapseGroup incomingSg;
+    private final HashSet<SynapseGroup> incomingSgs =
+            new HashSet<SynapseGroup>();
 
-    /** The outgoing synapse group. */
-    private SynapseGroup outgoingSg;
+    private final HashSet<SynapseGroup> outgoingSgs =
+            new HashSet<SynapseGroup>();
 
     /**
      * Construct a new neuron group from a list of neurons.
@@ -464,25 +464,7 @@ public class NeuronGroup extends Group {
         return min + (max - min) / 2;
     }
 
-    /**
-     * Return the width of this group, based on the positions of the neurons
-     * that comprise it.
-     *
-     * @return the width of the group
-     */
-    public double getWidth() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return max - min;
-    }
+
 
     /**
      * Returns the maximum X position of this group based on the neurons that
@@ -549,6 +531,26 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Return the width of this group, based on the positions of the neurons
+     * that comprise it.
+     *
+     * @return the width of the group
+     */
+    public double getWidth() {
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
+        for (Neuron neuron : neuronList) {
+            if (neuron.getX() < min) {
+                min = neuron.getX();
+            }
+            if (neuron.getX() > max) {
+                max = neuron.getX();
+            }
+        }
+        return max - min;
+    }
+    
+    /**
      * Return the height of this group, based on the positions of the neurons
      * that comprise it.
      *
@@ -566,6 +568,32 @@ public class NeuronGroup extends Group {
             }
         }
         return max - min;
+    }
+
+    public double getMaxDim() {
+        if (getWidth() > getHeight()) {
+            return getHeight();
+        } else {
+            return getWidth();
+        }
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Point2D [] getFourCorners() {
+        double centerX = getCenterX();
+        double centerY = getCenterY();
+        
+        Point2D [] corners  = new Point2D [4];
+        
+        corners[0] = new Point2D.Double(getMaxX() - centerX, getMaxY() - centerY);
+        corners[3] = new Point2D.Double(getMaxX() - centerX, getMinY() - centerY);
+        corners[2] = new Point2D.Double(getMinX() - centerX, getMinY() - centerY);
+        corners[1] = new Point2D.Double(getMinX() - centerX, getMaxY() - centerY);
+        
+        return corners;
     }
 
     /**
@@ -704,20 +732,38 @@ public class NeuronGroup extends Group {
         layout.layoutNeurons(getNeuronList());
     }
 
-    public SynapseGroup getIncomingSg() {
-        return incomingSg;
+    public HashSet<SynapseGroup> getIncomingSgs() {
+        return incomingSgs;
     }
 
-    public void setIncomingSg(SynapseGroup incomingSg) {
-        this.incomingSg = incomingSg;
+
+
+    public HashSet<SynapseGroup> getOutgoingSg() {
+        return outgoingSgs;
     }
 
-    public SynapseGroup getOutgoingSg() {
-        return outgoingSg;
+    public boolean containsAsIncoming(SynapseGroup sg) {
+        return incomingSgs.contains(sg);
     }
-
-    public void setOutgoingSg(SynapseGroup outgoingSg) {
-        this.outgoingSg = outgoingSg;
+    
+    public boolean containsAsOutgoing(SynapseGroup sg) {
+        return outgoingSgs.contains(sg);
+    }
+    
+    public void addIncomingSg(SynapseGroup sg) {
+        incomingSgs.add(sg);
+    }
+    
+    public void addOutgoingSg(SynapseGroup sg) {
+        outgoingSgs.add(sg);
+    }
+    
+    public boolean removeIncomingSg(SynapseGroup sg) {
+        return incomingSgs.remove(sg);
+    }
+    
+    public boolean removeOutgoingSg(SynapseGroup sg) {
+        return outgoingSgs.remove(sg);
     }
 
     /**

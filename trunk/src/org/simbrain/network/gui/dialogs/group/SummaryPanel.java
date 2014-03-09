@@ -242,28 +242,28 @@ public class SummaryPanel extends JPanel implements CommittablePanel {
         }
         parentGroupField.setText(ng.getParentGroup() == null ? "None"
                 : ng.getParentGroup().getLabel());
-        if (ng.getIncomingSg() == null) {
-            if (ng.getIncomingWeights() != null
-                    && ng.getIncomingWeights().size() > 0)
-            {
-                incomingField.setText("Loose (un-grouped) synapses");
-            } else {
-                incomingField.setText("None");
-            }
-        } else {
-            incomingField.setText(ng.getIncomingSg().getLabel());
-        }
-        if (ng.getOutgoingSg() == null) {
-            if (ng.getOutgoingWeights() != null
-                    && ng.getOutgoingWeights().size() > 0)
-            {
-                outgoingField.setText("Loose (un-grouped) synapses");
-            } else {
-                outgoingField.setText("None");
-            }
-        } else {
-            outgoingField.setText(ng.getIncomingSg().getLabel());
-        }
+//        if (ng.getIncomingSg() == null) {
+//            if (ng.getIncomingWeights() != null
+//                    && ng.getIncomingWeights().size() > 0)
+//            {
+//                incomingField.setText("Loose (un-grouped) synapses");
+//            } else {
+//                incomingField.setText("None");
+//            }
+//        } else {
+//            incomingField.setText(ng.getIncomingSg().getLabel());
+//        }
+//        if (ng.getOutgoingSg() == null) {
+//            if (ng.getOutgoingWeights() != null
+//                    && ng.getOutgoingWeights().size() > 0)
+//            {
+//                outgoingField.setText("Loose (un-grouped) synapses");
+//            } else {
+//                outgoingField.setText("None");
+//            }
+//        } else {
+//            outgoingField.setText(ng.getIncomingSg().getLabel());
+//        }
     }
 
     /**

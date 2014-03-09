@@ -65,11 +65,11 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         NORTH, SOUTH, EAST, WEST,;
         public static Port opposite(Port p) {
             switch(p) {
-            case NORTH : return SOUTH;
-            case SOUTH : return NORTH;
-            case EAST : return WEST;
-            case WEST : return EAST;
-            default : throw new IllegalArgumentException("No such port");
+                case NORTH : return SOUTH;
+                case SOUTH : return NORTH;
+                case EAST : return WEST;
+                case WEST : return EAST;
+                default : throw new IllegalArgumentException("No such port");
             }
         }
     }
@@ -201,7 +201,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
         HashMap<Point2D, SynapseGroupArrow> terminaMap =
                 generateTerminaMappings(groups);
-        
+
         map = untangle(map, terminaMap);
 
 
@@ -281,7 +281,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             }
         }
 
-        
+
         for (SynapseGroupArrow sga : groups) {
             if(crunch) {
                 start += crunchSpace / 2;
@@ -423,7 +423,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                     }
                     Point2D endPtA = map.get(startPtA);
                     Point2D endPtB = map.get(startPtB);
-                    
+
                     Point2D params = SimbrainMath.intersectParam(
                             startPtA, endPtA, startPtB, endPtB);
 
@@ -439,7 +439,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                         double sdc = startPtA.distance(startPtB);
                         Point2D intersectPt = new java.awt.geom.Point2D.Double(startPtA.getX()
                                 + (endPtA.getX() * params.getX()), startPtA.getY() + (endPtA.getY()
-                                * params.getX()));
+                                        * params.getX()));
                         double sda = startPtA.distance(intersectPt);
                         Point2D intersectPt2 = new java.awt.geom.Point2D.Double(startPtB.getX()
                                 + (endPtB.getX() * params.getY()),
@@ -519,7 +519,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
      */
     @Override
     public void layoutChildren() {
-        
+
         interactionBox.setOffset(
                 outlinedObjects.getFullBounds().getX() + OutlinedObjects
                 .ROUNDING_WIDTH_HEIGHT/2,
@@ -691,6 +691,12 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         };
         menu.add(selectOutgoingNodes);
 
+        // Clamping actions         
+        menu.addSeparator();        
+        setClampActionsEnabled();       
+        menu.add(clampNeuronsAction);       
+        menu.add(unclampNeuronsAction);
+
         // Connect neuron groups
         menu.addSeparator();
         Action setSource = new AbstractAction("Set Group as Source") {
@@ -850,5 +856,50 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             getNetworkPanel().getNetwork().removeGroup(neuronGroup);
         }
     };
+    /**         
+     * Sets whether the clamping actions are enabled based on whether the        
+     * neurons are all clamped or not.       
+     *       
+     * If all neurons are clamped already, then "clamp neurons" is disabled.         
+     *       
+     * If all neurons are unclamped already, then "unclamp neurons" is disabled.         
+     */      
+    private void setClampActionsEnabled() {         
+        clampNeuronsAction.setEnabled(!neuronGroup.isAllClamped());         
+        unclampNeuronsAction.setEnabled(!neuronGroup.isAllUnclamped());         
+    }       
 
+    /**         
+     * Action for clamping neurons       
+     */      
+    protected Action clampNeuronsAction = new AbstractAction() {        
+
+        {       
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));        
+            putValue(NAME, "Clamp Neurons");        
+            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");        
+        }       
+
+        @Override       
+        public void actionPerformed(ActionEvent arg0) {         
+            neuronGroup.setClamped(true);       
+        }       
+    };      
+
+    /**         
+     * Action for unclamping neurons         
+     */      
+    protected Action unclampNeuronsAction = new AbstractAction() {      
+
+        {       
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));        
+            putValue(NAME, "Unclamp Neurons");      
+            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");      
+        }       
+
+        @Override       
+        public void actionPerformed(ActionEvent arg0) {         
+            neuronGroup.setClamped(false);      
+        }       
+    };
 }

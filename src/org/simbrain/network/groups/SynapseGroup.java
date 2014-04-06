@@ -451,5 +451,12 @@ public class SynapseGroup extends Group {
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
     }
+    
+    public void postUnmarshallingInit() {
+        System.out.println("here");
+        // TODO Auto-generated method stub
+        
+    }
+
 
 }

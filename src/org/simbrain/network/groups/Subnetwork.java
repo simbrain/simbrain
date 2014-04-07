@@ -217,6 +217,37 @@ public abstract class Subnetwork extends Group {
     }
 
     /**
+     * Find neuron group with a given label, or null if none found.
+     *
+     * @param label label to search for.
+     * @return neurongroup with that label found, null otherwise
+     */
+    public NeuronGroup getNeuronGroupByLabel(final String label) {
+        for (NeuronGroup group : getNeuronGroupList()) {
+            if (group.getLabel().equalsIgnoreCase(label)) {
+                System.out.println(group);
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find synapse group with a given label, or null if none found.
+     *
+     * @param label label to search for.
+     * @return synapsegroup with that label found, null otherwise
+     */
+    public SynapseGroup getSynapseGroupByLabel(final String label) {
+        for (SynapseGroup group : getSynapseGroupList()) {
+            if (group.getLabel().equalsIgnoreCase(label)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the first neuron group in the list. Convenience method when there is
      * just one neuron group.
      *

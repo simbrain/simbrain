@@ -25,6 +25,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -39,7 +40,7 @@ import org.simbrain.util.randomizer.Randomizer;
  */
 public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-        BoundedUpdateRule {
+        BoundedUpdateRule, NoisyUpdateRule {
 
     /** Default time constant (ms). */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;

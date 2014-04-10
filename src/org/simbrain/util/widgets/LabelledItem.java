@@ -43,6 +43,7 @@ public class LabelledItem extends JPanel {
         label.setPreferredSize(new Dimension(100, 10));
         itemBox.add(label);
         itemBox.add(Box.createHorizontalStrut(10));
+        itemBox.add(Box.createHorizontalGlue());
         component.setPreferredSize(new Dimension(110, 25));
         itemBox.add(component);
         add(itemBox);

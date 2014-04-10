@@ -20,6 +20,8 @@ package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +32,8 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
@@ -42,7 +44,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  * <b>DecayNeuronPanel</b>.
  */
 public class DecayRulePanel extends AbstractNeuronPanel implements
-        ActionListener {
+        ActionListener, PropertyChangeListener {
 
     /** Relative absolute combo box. */
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative",
@@ -64,7 +66,11 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork();
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
+    
+    {
+        randTab.addPropertyChangeListener(this);
+    }
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
@@ -90,7 +96,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
         tabbedPane.add(randTab, "Noise");
         checkBounds();
     }
-
+    
     /**
      * Responds to actions performed.
      *
@@ -99,6 +105,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("relAbs")) {
             checkBounds();
+            this.firePropertyChange("dummy", null, null);
         }
     }
 
@@ -270,16 +277,11 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
             for (int i = 0; i < numNeurons; i++) {
                 ((DecayRule) neurons.get(i).getUpdateRule())
                         .setAddNoise(addNoise);
-
             }
             if (addNoise) {
-                for (int i = 0; i < numNeurons; i++) {
-                    randTab.commitRandom(((DecayRule) neurons.get(i)
-                            .getUpdateRule()).getNoiseGenerator());
-                }
+                randTab.commitRandom(neurons);
             }
         }
-
     }
 
     /**
@@ -287,6 +289,11 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
      */
     protected DecayRule getPrototypeRule() {
         return prototypeRule.deepCopy();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        this.firePropertyChange("", null, null);
     }
 
 }

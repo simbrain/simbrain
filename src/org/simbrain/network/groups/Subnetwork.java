@@ -351,6 +351,20 @@ public abstract class Subnetwork extends Group {
     }
 
     /**
+     * Returns a "flat" list containing every neuron in every neuron
+     * group in this subnetwork. This list <b>is</b> modifiable, but
+     * this method is protected... use with care.
+     * @return
+     */
+    protected List<Neuron> getModifiableNeuronList() {
+        List<Neuron> ret = new ArrayList<Neuron>();
+        for (NeuronGroup group : neuronGroupList) {
+            ret.addAll(group.getNeuronList());
+        }
+        return ret;
+    }
+    
+    /**
      * Return a "flat" list containing every synapse in every synapse group in
      * this subnetwork.
      *

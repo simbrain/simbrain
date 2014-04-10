@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -118,7 +119,12 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         this.add(label);
         this.add(Box.createHorizontalStrut(10));
         this.add(ddTriangle);
-        parent.pack();
+        SwingUtilities.invokeLater(new Runnable(){
+            @Override
+            public void run() {
+                parent.pack();                
+            }
+        });
     }
 
     /**

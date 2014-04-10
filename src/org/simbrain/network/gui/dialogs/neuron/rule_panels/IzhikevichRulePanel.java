@@ -28,8 +28,8 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
@@ -63,7 +63,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork();
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
 
     /** A reference to the neuron update rule being edited. */
     private static final IzhikevichRule prototypeRule = new IzhikevichRule();
@@ -232,10 +232,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 
             }
             if (addNoise) {
-                for (int i = 0; i < numNeurons; i++) {
-                    randTab.commitRandom(((IzhikevichRule) neurons.get(i)
-                            .getUpdateRule()).getNoiseGenerator());
-                }
+                randTab.commitRandom(neurons);
             }
         }
     }

@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -30,7 +31,8 @@ import org.simbrain.util.randomizer.Randomizer;
  *
  * TODO: Add custom tooltip
  */
-public class IntegrateAndFireRule extends SpikingNeuronUpdateRule {
+public class IntegrateAndFireRule extends SpikingNeuronUpdateRule 
+implements NoisyUpdateRule  {
 
     /** Resistance (MΩ). */
     private double resistance = 1;

@@ -23,13 +23,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -42,7 +38,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.ui.RefineryUtilities;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a
@@ -231,33 +226,6 @@ public class HistogramPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
         mainPanel = new ChartPanel(mainChart);
-
-    }
-
-    /**
-     * Initializes all listeners. At present this includes only the plot button
-     * which redraws the histogram.
-     */
-    private void initializeListeners() {
-
-        binButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                HistogramModel model = HistogramPanel.this.getModel();
-                try {
-                    model.setBins(Integer.parseInt(numBins.getText()));
-                    // reDraw();
-                } catch (NumberFormatException nfe) {
-                    nfe.printStackTrace();
-                    JOptionPane.showMessageDialog(getParent(),
-                            "Non-Integer number of bins.", "Error",
-                            JOptionPane.ERROR);
-                }
-
-            }
-
-        });
 
     }
 

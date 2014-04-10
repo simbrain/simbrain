@@ -52,7 +52,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  */
 @SuppressWarnings("serial")
 public class NeuronUpdateSettingsPanel extends JPanel
-    implements CommittablePanel {
+implements CommittablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
@@ -166,6 +166,7 @@ public class NeuronUpdateSettingsPanel extends JPanel
      * Adds the listeners to this dialog.
      */
     private void addListeners() {
+
         displayNPTriangle.addMouseListener(new MouseListener() {
 
             @Override
@@ -218,7 +219,6 @@ public class NeuronUpdateSettingsPanel extends JPanel
 
                 repaintPanel();
                 parent.pack();
-
             }
 
         });
@@ -333,5 +333,7 @@ public class NeuronUpdateSettingsPanel extends JPanel
         }
 
     }
+
+
 
 }

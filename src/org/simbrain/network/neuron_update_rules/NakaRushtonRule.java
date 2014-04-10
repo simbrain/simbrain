@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -30,7 +31,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Spikes, Decisions, and Action.
  */
 public class NakaRushtonRule extends NeuronUpdateRule implements
-        BoundedUpdateRule {
+        BoundedUpdateRule, NoisyUpdateRule {
 
     /** The default activation ceiling. */
     public static final int DEFAULT_CEILING = 100;

@@ -31,13 +31,14 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
@@ -75,7 +76,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork();
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
@@ -356,13 +357,9 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
                         .setAddNoise(addNoise);
             }
             if (addNoise) {
-                for (int i = 0; i < numNeurons; i++) {
-                    randTab.commitRandom(((ContinuousSigmoidalRule) neurons
-                            .get(i).getUpdateRule()).getNoiseGenerator());
-                }
+                randTab.commitRandom(neurons);
             }
         }
-
     }
 
     /**

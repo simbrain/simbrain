@@ -39,12 +39,12 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.plot.histogram.HistogramModel;
 import org.simbrain.plot.histogram.HistogramPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 
 /**
  * Panel for editing collections of synapses.
@@ -134,10 +134,10 @@ public class SynapseAdjustmentPanel extends JPanel {
     private JPanel statsPanel = new JPanel();
 
     /** A random panel for randomizing the synapse strengths. */
-    private RandomPanelNetwork randomPanel = new RandomPanelNetwork();
+    private RandomizerPanel randomPanel = new RandomizerPanel();
 
     /** A random panel for randomizing perturbations to synapse strengths. */
-    private RandomPanelNetwork perturberPanel = new RandomPanelNetwork();
+    private RandomizerPanel perturberPanel = new RandomizerPanel();
 
     /**
      * Fills the fields of the random panels to default values.
@@ -431,7 +431,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 if (w > 0) {
                     weights[0][exWeights++] = w;
                 } else {
-                    weights[1][inWeights++] = Math.abs(w);
+                    weights[1][inWeights++] = w;
                 }
             }
 
@@ -468,27 +468,18 @@ public class SynapseAdjustmentPanel extends JPanel {
             // The absolute value of all the weights are combined into a
             // single row.
             case "All": {
-                // Combine all weight values into one data series for the
-                // histogram.
-                int tot = weights[0].length + weights[1].length;
-                Number [] hist = new Number[tot];
-                int c = 0;
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0, m = weights[i].length; j < m; j++) {
-                        Number val = weights[i][j];
-                        hist[c] = val;
-                        c++;
-                    }
-                }
-
-                names.add("Weights");
-                names.add("---");
-                data.add(hist);
-                data.add(new Number[] { 0 });
-
-                // Use the default pallet.
+                // Send the histogram the excitatory and absolute inhibitory
+                // synapse values as separate data series.
+                Number [] hist1 = Arrays.copyOf(weights[0], weights[0].length);
+                Number[] hist2 = Arrays.copyOf(weights[1], weights[1].length);
+                // The names of both series
+                names.add("Excitatory  ");
+                names.add("Inhibitory ");
+                // Use the default pallet
                 SynapseAdjustmentPanel.this.histogramPanel
                 .setColorPallet(HistogramPanel.DEFAULT_PALLET);
+                data.add(hist1);
+                data.add(hist2);
             }
             ;
             break;
@@ -499,9 +490,11 @@ public class SynapseAdjustmentPanel extends JPanel {
                 // Send the histogram the excitatory and absolute inhibitory
                 // synapse values as separate data series.
                 Number [] hist1 = Arrays.copyOf(weights[0], weights[0].length);
-                // Note: stored as absolute values...
-                Number[] hist2 = Arrays.copyOf(weights[1], weights[1].length);
 
+                Number[] hist2 = Arrays.copyOf(weights[1], weights[1].length);
+                for(int i = 0, n = hist2.length; i < n; i++) {
+                    hist2[i] = Math.abs(hist2[i].doubleValue());
+                }
                 // The names of both series
                 names.add("Excitatory  ");
                 names.add("Inhibitory ");
@@ -615,7 +608,20 @@ public class SynapseAdjustmentPanel extends JPanel {
         }
 
         // Determine selected type(s) and collect data accordingly...
-        if (type == "All" || type == "I/E Overlay") {
+        if (type == "All") {
+            tot = weights[0].length + weights[1].length;
+            data = new double[tot];
+            int c = 0;
+            System.out.println("All happens");
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0, m = weights[i].length; j < m; j++) {
+                    double val = weights[i][j].doubleValue();
+                    runningVal += val;
+                    data[c] = val;
+                    c++;
+                }
+            }
+        } else if (type == "I/E Overlay") {
             tot = weights[0].length + weights[1].length;
             data = new double[tot];
             int c = 0;
@@ -627,9 +633,10 @@ public class SynapseAdjustmentPanel extends JPanel {
                     c++;
                 }
             }
-        } else if (type == "Excitatory Only" && weights[0].length != 0) {
+        }else if (type == "Excitatory Only" && weights[0].length != 0) {
             tot = weights[0].length;
             data = new double[tot];
+            System.out.println("I happen");
             for (int j = 0; j < tot; j++) {
                 double val = Math.abs(weights[0][j].doubleValue());
                 runningVal += val;

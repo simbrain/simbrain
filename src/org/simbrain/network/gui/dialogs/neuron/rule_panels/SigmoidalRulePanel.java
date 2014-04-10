@@ -31,8 +31,8 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
@@ -70,7 +70,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork();
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
@@ -316,10 +316,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
                         .setAddNoise(addNoise);
             }
             if (addNoise) {
-                for (int i = 0; i < numNeurons; i++) {
-                    randTab.commitRandom(((SigmoidalRule) neurons.get(i)
-                                .getUpdateRule()).getNoiseGenerator());
-                }
+                randTab.commitRandom(neurons);
             }
         }
     }

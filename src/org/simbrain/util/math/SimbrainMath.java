@@ -127,6 +127,62 @@ public class SimbrainMath {
     }
 
     /**
+     * Sums all the values in an array
+     * @param arr the array to sum
+     * @return the sum of the values in the array
+     */
+    public static double sum(double [] arr) {
+        double tot = 0;
+        for (int i = 0, n = arr.length; i < n; i++) {
+            tot += arr[i];
+        }
+        return tot;
+    }
+
+    /**
+     * An exponential sum of an array
+     * @param arr the array to exponential sum
+     * @return the exponential sum of the array
+     */
+    public static double exp_sum(double [] arr) {
+        double tot = 0;
+        for (int i = 0, n = arr.length; i < n; i++) {
+            tot += Math.exp(arr[i]);
+        }
+        return tot;
+    }
+
+    /**
+     * A normalized version of the vector, i.e. a scalar multiple of the
+     * vector which sums to one. In this case each element is divided by the sum
+     * of the array.
+     * @param vec the vector to normalize
+     * @return a scalar multiple of the vector which sums to one
+     */
+    public static double [] normalizeVec(double [] vec) {
+        double sum = sum(vec);
+        double [] normVec = new double[vec.length];
+        for (int i = 0, n = vec.length; i < n; i++) {
+            normVec[i] = vec[i] / sum;
+        }
+        return normVec;
+    }
+
+    /**
+     * The soft-max of the vector
+     * @param vec the vector to soft-max
+     * @return
+     */
+    public static double [] softMax(double [] vec) {
+        double expSum = exp_sum(vec);
+        double [] retSm = new double [vec.length]; 
+        for (int i = 0, n = vec.length; i < n; i++) {
+            retSm[i] = Math.exp(vec[i]) / expSum;
+        }
+        return retSm;
+    }
+
+    /**
      * Add these vectors. If one is larger than the other return a vector with
      * zeros in the difference.
      *
@@ -214,7 +270,7 @@ public class SimbrainMath {
         return midpoint(midpoint(midpoint(src, ctrl1), midpoint(ctrl1, ctrl2)),
                 midpoint(midpoint(tar, ctrl1), midpoint(ctrl1, ctrl2)));
     }
-    
+
     /**
      * A fast determinant utility to find the determinant of the 2 by 2 matrix
      * made up of the vectors (stored as 2D points) v0 and v1, i.e. :
@@ -237,53 +293,53 @@ public class SimbrainMath {
     }
 
     /**
-    * Returns the intersection parameters for two line segments. Unlike the
-    * Line2D function which just checks for intersection between two line 
-    * segments, this function provides more information by returning the
-    * intersection parameters. These parameters effectively determine how close 
-    * to their start points the line segments intersect. If either parameter is
-    * not on [0, 1], the line segments do not intersect. If all that is needed
-    * is information on <ul>if</ul> the line segments intersect, then
-    * Lin2D.linesIntersect(...) is preferred. It is up to whoever calls this
-    * function to determine if an intersection actually occurs by checking the
-    * returned vector (as a Point2D) of parameters.
-    * @param u0 the start point of the first line segment
-    * @param v0 the end point of the first line segment
-    * @param u1 the start point of the second line segment
-    * @param v1 the end point of the second line segment
-    * @return the intersection parameters for the two line segments. If null,
-    * the line segments are parallel, else the parameterized equations of the
-    * two lines intersect at the vector contained in the returned Point2D. If
-    * the either of the returned parameters is not on [0, 1], then the line
-    * <i>segments</i> do not intersect over their respective ranges. The X value
-    * in the point returned represents where the first line intersects the
-    * second and the Y value represents where the second line intersects the 
-    * first.
-    */
-   public static Point2D intersectParam(Point2D u0, Point2D v0,
-           Point2D u1, Point2D v1) {
-       
-       double det = determinant2by2(v1, v0);
-       
-       if (Double.isNaN(det) || det == 0) {
-           return null;
-       }
+     * Returns the intersection parameters for two line segments. Unlike the
+     * Line2D function which just checks for intersection between two line 
+     * segments, this function provides more information by returning the
+     * intersection parameters. These parameters effectively determine how close 
+     * to their start points the line segments intersect. If either parameter is
+     * not on [0, 1], the line segments do not intersect. If all that is needed
+     * is information on <ul>if</ul> the line segments intersect, then
+     * Lin2D.linesIntersect(...) is preferred. It is up to whoever calls this
+     * function to determine if an intersection actually occurs by checking the
+     * returned vector (as a Point2D) of parameters.
+     * @param u0 the start point of the first line segment
+     * @param v0 the end point of the first line segment
+     * @param u1 the start point of the second line segment
+     * @param v1 the end point of the second line segment
+     * @return the intersection parameters for the two line segments. If null,
+     * the line segments are parallel, else the parameterized equations of the
+     * two lines intersect at the vector contained in the returned Point2D. If
+     * the either of the returned parameters is not on [0, 1], then the line
+     * <i>segments</i> do not intersect over their respective ranges. The X value
+     * in the point returned represents where the first line intersects the
+     * second and the Y value represents where the second line intersects the 
+     * first.
+     */
+    public static Point2D intersectParam(Point2D u0, Point2D v0,
+            Point2D u1, Point2D v1) {
 
-       double x00 = u0.getX();
-       double y00 = u0.getY();
-       double x10 = u1.getX();
-       double y10 = u1.getY();
-       double x01 = v0.getX();
-       double y01 = v0.getY();
-       double x11 = v1.getX();
-       double y11 = v1.getY();
+        double det = determinant2by2(v1, v0);
 
-       double s = (1/det) * ((x00 - x10)*y01 - (y00 - y10)*x01);
-       double t = (1/det) * -(-(x00-x10)*y11 + (y00 - y10)*x11);
+        if (Double.isNaN(det) || det == 0) {
+            return null;
+        }
 
-       return new java.awt.geom.Point2D.Double(t, s);
-   }
-    
+        double x00 = u0.getX();
+        double y00 = u0.getY();
+        double x10 = u1.getX();
+        double y10 = u1.getY();
+        double x01 = v0.getX();
+        double y01 = v0.getY();
+        double x11 = v1.getX();
+        double y11 = v1.getY();
+
+        double s = (1/det) * ((x00 - x10)*y01 - (y00 - y10)*x01);
+        double t = (1/det) * -(-(x00-x10)*y11 + (y00 - y10)*x11);
+
+        return new java.awt.geom.Point2D.Double(t, s);
+    }
+
     /**
      * Calculates the inverse of the error function. Originally written by S.C.
      * Pohlig, adapted by J.N. Sanders
@@ -391,7 +447,7 @@ public class SimbrainMath {
         }
         return max;
     }
-    
+
     /**
      * Returns the minimum value of an array of numbers. 
      * Warning: comparisons are done using the numbers' double
@@ -408,7 +464,7 @@ public class SimbrainMath {
         }
         return min;
     }
-    
+
     /**
      * Add noise to a vector.
      *

@@ -2,9 +2,8 @@ package org.simbrain.plot.histogram;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.statistics.HistogramBin;
@@ -15,7 +14,6 @@ import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.util.ObjectUtilities;
 import org.jfree.util.PublicCloneable;
-import org.simbrain.util.math.SimbrainMath;
 
 /**
  * A modification of the JFreeChart class HistogramDataset that allows data to
@@ -29,13 +27,12 @@ import org.simbrain.util.math.SimbrainMath;
  * @author Jeff Yoshimi
  */
 public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
-        implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
+implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -6341668077370231153L;
 
-    /** A list of maps. */
-    private List list;
+    private List<SeriesStruct> dataMap = new ArrayList<SeriesStruct>();
 
     /** The histogram type. */
     private HistogramType type;
@@ -45,7 +42,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * {@link HistogramType}.FREQUENCY.
      */
     public OverwritableHistogramDataset() {
-        this.list = new ArrayList();
         this.type = HistogramType.FREQUENCY;
     }
 
@@ -73,21 +69,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     }
 
     /**
-     * Adds a series to the dataset, using the specified number of bins.
-     *
-     * @param key the series key (<code>null</code> not permitted).
-     * @param values the values (<code>null</code> not permitted).
-     * @param bins the number of bins (must be at least 1).
-     */
-    public void addSeries(Comparable key, Number[] values, int bins) {
-        // defer argument checking...
-        double minimum = SimbrainMath.getMinimum(values);
-        double maximum = SimbrainMath.getMaximum(values);
-        addSeries(key, values, bins, minimum, maximum);
-    }
-
-    /**
      * Add new values to an existing series. Overwrites the old data.
+     * The value set will be sorted after this method completes.
      *
      * @param key the series key (<code>null</code> not permitted).
      * @param values the raw observations.
@@ -95,8 +78,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param minimum the lower bound of the bin range.
      * @param maximum the upper bound of the bin range.
      */
-    public void overwrriteSeries(int index, Comparable key, Number[] values,
-            int bins, double minimum, double maximum) {
+    public void overwriteSeries(int index, Comparable key, Number[] values,
+            int bins) {
 
         if (key == null) {
             throw new IllegalArgumentException("Null 'key' argument.");
@@ -109,60 +92,13 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         }
 
         // If the series does not already exist create the series.
-        if (index >= list.size()) {
-            addSeries(key, values, bins, minimum, maximum);
-            return;
-        }
-        Map map = (Map) list.get(index);
-        if (map == null) {
-            addSeries(key, values, bins, minimum, maximum);
-            return;
+        if (index >= dataMap.size()) {
+            addSeries(key, values, bins);
+        } else {
+            addSeriesAtIndex(index, key, values, bins);
+            this.fireDatasetChanged();
         }
 
-        double binWidth = (maximum - minimum) / bins;
-
-        double lower = minimum;
-        double upper;
-        List binList = new ArrayList(bins);
-        for (int i = 0; i < bins; i++) {
-            HistogramBin bin;
-            // make sure bins[bins.length]'s upper boundary ends at maximum
-            // to avoid the rounding issue. the bins[0] lower boundary is
-            // guaranteed start from min
-            if (i == bins - 1) {
-                bin = new HistogramBin(lower, maximum);
-            } else {
-                upper = minimum + (i + 1) * binWidth;
-                bin = new HistogramBin(lower, upper);
-                lower = upper;
-            }
-            binList.add(bin);
-        }
-        // fill the bins
-        for (int i = 0; i < values.length; i++) {
-            int binIndex = bins - 1;
-            if (values[i].doubleValue() < maximum) {
-                double fraction = (values[i].doubleValue() - minimum) / (maximum - minimum);
-                if (fraction < 0.0) {
-                    fraction = 0.0;
-                }
-                binIndex = (int) (fraction * bins);
-                // rounding could result in binIndex being equal to bins
-                // which will cause an IndexOutOfBoundsException - see bug
-                // report 1553088
-                if (binIndex >= bins) {
-                    binIndex = bins - 1;
-                }
-            }
-            HistogramBin bin = (HistogramBin) binList.get(binIndex);
-            bin.incrementCount();
-        }
-
-        map.put("bins", binList);
-        map.put("key", key);
-        map.put("values.length", new Integer(values.length));
-        map.put("bin width", new Double(binWidth));
-        this.fireDatasetChanged();
     }
 
     /**
@@ -170,6 +106,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * assigned to the first bin, and any data value greater than maximum will
      * be assigned to the last bin. Values falling on the boundary of adjacent
      * bins will be assigned to the higher indexed bin.
+     * 
+     * The values array passed to this method will be sorted upon completion. 
      *
      * @param key the series key (<code>null</code> not permitted).
      * @param values the raw observations.
@@ -177,9 +115,12 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param minimum the lower bound of the bin range.
      * @param maximum the upper bound of the bin range.
      */
-    public void addSeries(Comparable key, Number[] values, int bins,
-            double minimum, double maximum) {
+    public void addSeries(Comparable key, Number[] values, int bins) {
+        addSeriesAtIndex(dataMap.size(), key, values, bins);
+    }
 
+    private void addSeriesAtIndex(int series, Comparable key, Number[] values,
+            int bins) {
         if (key == null) {
             throw new IllegalArgumentException("Null 'key' argument.");
         }
@@ -189,95 +130,48 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
             throw new IllegalArgumentException(
                     "The 'bins' value must be at least 1.");
         }
-        double binWidth = (maximum - minimum) / bins;
 
-        double lower = minimum;
-        double upper;
-        List binList = new ArrayList(bins);
-        for (int i = 0; i < bins; i++) {
+        HistogramBin [] histBins = new HistogramBin[0];
+        double binWidth = 0;
+        if (values.length != 0) {
+            Arrays.sort(values);
+
+            binWidth = (values[values.length - 1].doubleValue()
+                    - values[0].doubleValue()) / bins;
+
+            if (binWidth == 0) binWidth = 1;
+
+            histBins = new HistogramBin[bins];
+
+            int index = 0;
             HistogramBin bin;
-            // make sure bins[bins.length]'s upper boundary ends at maximum
-            // to avoid the rounding issue. the bins[0] lower boundary is
-            // guaranteed start from min
-            if (i == bins - 1) {
-                bin = new HistogramBin(lower, maximum);
-            } else {
-                upper = minimum + (i + 1) * binWidth;
-                bin = new HistogramBin(lower, upper);
-                lower = upper;
-            }
-            binList.add(bin);
-        }
-        // fill the bins
-        for (int i = 0; i < values.length; i++) {
-            int binIndex = bins - 1;
-            if (values[i].doubleValue() < maximum) {
-                double fraction = (values[i].doubleValue() - minimum) / (maximum - minimum);
-                if (fraction < 0.0) {
-                    fraction = 0.0;
+            double endVal = 0;
+            double startVal = values[0].doubleValue();
+            for (int i = 0; i < bins; i++) {
+                if (index < values.length) {
+                    endVal = startVal + binWidth;
+                    bin = new HistogramBin(startVal, endVal);
+                    while(index < values.length
+                            && values[index].doubleValue() <= endVal) {
+                        bin.incrementCount();
+                        index++;
+                    }
+                    startVal = endVal;
+                } else {
+                    bin = new HistogramBin(0, 0); //Empty bin
                 }
-                binIndex = (int) (fraction * bins);
-                // rounding could result in binIndex being equal to bins
-                // which will cause an IndexOutOfBoundsException - see bug
-                // report 1553088
-                if (binIndex >= bins) {
-                    binIndex = bins - 1;
-                }
+                histBins[i] = bin;
             }
-            HistogramBin bin = (HistogramBin) binList.get(binIndex);
-            bin.incrementCount();
-        }
-        // generic map for each series
-        Map map = new HashMap();
-        map.put("key", key);
-        map.put("bins", binList);
-        map.put("values.length", new Integer(values.length));
-        map.put("bin width", new Double(binWidth));
-        this.list.add(map);
-    }
+        } 
 
-    /**
-     * Returns the minimum value in an array of values.
-     *
-     * @param values the values (<code>null</code> not permitted and zero-length
-     *            array not permitted).
-     *
-     * @return The minimum value.
-     */
-    private double getMinimum(double[] values) {
-        if (values == null || values.length < 1) {
-            throw new IllegalArgumentException(
-                    "Null or zero length 'values' argument.");
-        }
-        double min = Double.MAX_VALUE;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] < min) {
-                min = values[i];
-            }
-        }
-        return min;
-    }
+        SeriesStruct packet = new SeriesStruct(key, histBins,
+                values.length, binWidth);
 
-    /**
-     * Returns the maximum value in an array of values.
-     *
-     * @param values the values (<code>null</code> not permitted and zero-length
-     *            array not permitted).
-     *
-     * @return The maximum value.
-     */
-    private double getMaximum(double[] values) {
-        if (values == null || values.length < 1) {
-            throw new IllegalArgumentException(
-                    "Null or zero length 'values' argument.");
+        if (dataMap.size() - 1 < series) {
+            dataMap.add(packet);
+        } else {
+            dataMap.set(series, packet);
         }
-        double max = -Double.MAX_VALUE;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] > max) {
-                max = values[i];
-            }
-        }
-        return max;
     }
 
     /**
@@ -291,9 +185,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @throws IndexOutOfBoundsException if <code>series</code> is outside the
      *             specified range.
      */
-    List getBins(int series) {
-        Map map = (Map) this.list.get(series);
-        return (List) map.get("bins");
+    List<HistogramBin> getBins(int series) {
+        return Arrays.asList(dataMap.get(series).bins);
     }
 
     /**
@@ -304,8 +197,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @return The total.
      */
     private int getTotal(int series) {
-        Map map = (Map) this.list.get(series);
-        return ((Integer) map.get("values.length")).intValue();
+        return dataMap.get(series).length;
     }
 
     /**
@@ -316,8 +208,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @return The bin width.
      */
     private double getBinWidth(int series) {
-        Map map = (Map) this.list.get(series);
-        return ((Double) map.get("bin width")).doubleValue();
+        return dataMap.get(series).binWidth;
     }
 
     /**
@@ -326,7 +217,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @return The series count.
      */
     public int getSeriesCount() {
-        return this.list.size();
+        return this.dataMap.size();
     }
 
     /**
@@ -341,8 +232,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      *             specified range.
      */
     public Comparable getSeriesKey(int series) {
-        Map map = (Map) this.list.get(series);
-        return (Comparable) map.get("key");
+        return dataMap.get(series).key;
     }
 
     /**
@@ -377,7 +267,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     public Number getX(int series, int item) {
         List bins = getBins(series);
         HistogramBin bin = (HistogramBin) bins.get(item);
-        double x = (bin.getStartBoundary() + bin.getEndBoundary()) / 2.;
+        double x = (bin.getStartBoundary() + bin.getEndBoundary()) / 2.0;
         return new Double(x);
     }
 
@@ -494,17 +384,26 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof OverwritableHistogramDataset)) {
+        if (!(obj.getClass().equals(this.getClass()))) {
             return false;
         }
         OverwritableHistogramDataset that = (OverwritableHistogramDataset) obj;
         if (!ObjectUtilities.equal(this.type, that.type)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.list, that.list)) {
+        if (!ObjectUtilities.equal(this.dataMap, that.dataMap)) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode() {
+        final int p1 = 13;
+        final int p2 = 89;
+        return p1 * this.type.hashCode() + p2 * this.dataMap.hashCode();
     }
 
     /**
@@ -516,6 +415,32 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    /**
+     * Mimics the "struct" construct in C/C++. In this case used to store and
+     * represent values about a data series for a histogram. 
+     * 
+     * @author zach
+     *
+     */
+    private class SeriesStruct {
+
+        public final Comparable key;
+
+        public final HistogramBin [] bins;
+
+        public final int length;
+
+        public final double binWidth;
+
+        public SeriesStruct(final Comparable key, final HistogramBin [] bins,
+                final int length, final double binWidth) {
+            this.key = key;
+            this.bins = bins;
+            this.length = length;
+            this.binWidth = binWidth;
+        }
     }
 
 }

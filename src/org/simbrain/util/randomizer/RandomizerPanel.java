@@ -18,105 +18,117 @@
  */
 package org.simbrain.util.randomizer;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import javax.swing.Box;
-import javax.swing.JCheckBox;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.widgets.LabelledItem;
+import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
  * object.
+ * 
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  */
-public class RandomizerPanel extends JPanel implements ActionListener {
+public class RandomizerPanel extends JPanel {
+
+    /** TODO: REALLY need to find somewhere (<b>one place</b>) to put this....*/
+    public static final String NULL_STRING = "..."; 
+
+    /** 
+     * The underlying model for the Combobox allowing for dynamic editing of
+     * the item list.
+     */
+    private DefaultComboBoxModel probOptions =
+            new DefaultComboBoxModel(ProbDistribution.values());
 
     /** Distribution combo box. */
-    private JComboBox cbDistribution = new JComboBox(
-            Randomizer.getFunctionList()) {
+    private JComboBox cbDistribution = new JComboBox(probOptions);
 
-        @Override
-        public void setSelectedIndex(int index) {
-            this.setSelectedItem(Randomizer.getFunctionList()[index]);
-            this.firePropertyChange("Distribution", null, null);
-        }
+    /** 
+     * A map between probability distributions and specific distribution
+     * panels.
+     */
+    private HashMap<ProbDistribution, ProbDistPanel> cardMap =
+            new HashMap<ProbDistribution, ProbDistPanel>();
 
-    };
-
-    /** Upper bound field. */
-    private JFormattedTextField tfUpBound = new JFormattedTextField();
-
-    /** Lower bound field. */
-    private JFormattedTextField tfLowBound = new JFormattedTextField();
-
-    /** Mean value field. */
-    private JFormattedTextField tfMean = new JFormattedTextField();
-
-    /** Standard deviation field. */
-    private JFormattedTextField tfStandardDeviation = new JFormattedTextField();
-
-    /** Clipping combo box. */
-    private JCheckBox tsClipping = new JCheckBox();
+    /** 
+     * The main panel where all the different probability distribution panels
+     * are stored as cards.
+     */
+    private JPanel cardPanel;
 
     /**
      * This method is the default constructor.
      */
     public RandomizerPanel() {
-
-        Box mainPanel = Box.createVerticalBox();
-        cbDistribution.addActionListener(this);
-        mainPanel.add(new LabelledItem("Distribution", cbDistribution));
-        mainPanel.add(new LabelledItem("Ceiling", tfUpBound));
-        mainPanel.add(new LabelledItem("Floor", tfLowBound));
-        mainPanel.add(new LabelledItem("Mean", tfMean));
-        mainPanel.add(new LabelledItem("Std. Dev.", tfStandardDeviation));
-        tsClipping.addActionListener(this);
-        tsClipping.setActionCommand("useBounds");
-        mainPanel.add(new LabelledItem("Clipping", tsClipping));
-
-        this.add(mainPanel);
-        init();
+        cbDistribution.setSelectedItem(Randomizer.DEFAULT_DISTRIBUTION);
+        this.setLayout(new BorderLayout());
+        initializeRandomPanels();
+        layoutPanel();
+        addInternalListeners();
+    }
+    
+    /**
+     * Lays out the panel...
+     */
+    private void layoutPanel() {
+        setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        setLayout(new BorderLayout());
+        cardPanel.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+        add(cardPanel, BorderLayout.CENTER);
+        add(new LabelledItem("Distribution: ", cbDistribution),
+                BorderLayout.NORTH);
+        repaint();
+        revalidate();
     }
 
     /**
-     * Initializes the panel.
+     * Adds all the possible probability distribution panels to the cardPanel
+     * as cards (one on top of the other).
      */
-    public void init() {
-        if (cbDistribution.getSelectedIndex() == Randomizer.UNIFORM) {
-            tfUpBound.setEnabled(true);
-            tfLowBound.setEnabled(true);
-            tfMean.setEnabled(false);
-            tfStandardDeviation.setEnabled(false);
-            tsClipping.setEnabled(false);
-        } else if (cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN) {
-            tfMean.setEnabled(true);
-            tfStandardDeviation.setEnabled(true);
-            tsClipping.setEnabled(true);
-            checkBounds();
+    private void initializeRandomPanels() {
+        cardPanel = new JPanel(new CardLayout());
+        for (ProbDistribution pd : ProbDistribution.values()) {
+            ProbDistPanel rp = new ProbDistPanel(pd);
+            cardMap.put(pd, rp);
+            cardPanel.add(rp.getPanel(), pd.toString());
         }
     }
 
     /**
-     * Enable or disable the upper and lower bounds fields depending on state of
-     * rounding button.
+     * Adds all internal listeners. Currently this just consists of an
+     * item listener for the combo-box which switches to the correct "card"
+     * for the given probability distribution.
      */
-    public void checkBounds() {
-        tfLowBound.setEnabled(tsClipping.isSelected());
-        tfUpBound.setEnabled(tsClipping.isSelected());
-    }
-
-    /** @see ActionListener */
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getActionCommand().equals("useBounds")) {
-            checkBounds();
-        }
-        init();
+    private void addInternalListeners() {
+        cbDistribution.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent arg0) {
+                CardLayout cl = (CardLayout) cardPanel.getLayout();
+                ProbDistPanel rp = null;
+                String str = NULL_STRING;
+                if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+                    rp = cardMap.get(cbDistribution.getSelectedItem());
+                    str = rp.getPdf().toString();
+                }
+                cl.show(cardPanel, str);
+            }
+        });
     }
 
     /**
@@ -124,16 +136,24 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      *
      * @param randomizers List of randomizers
      */
-    public void fillFieldValues(final ArrayList randomizers) {
+    public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
         Randomizer rand = (Randomizer) randomizers.get(0);
+        if (randomizers.size() == 1) {
+            fillFieldValues(rand);
+            return;
+        }
 
-        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-        tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
-        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setValue(Double.toString(rand
-                .getStandardDeviation()));
-        tfMean.setValue(Double.toString(rand.getMean()));
+        if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
+                "getPdf")) {
+            probOptions.addElement(NULL_STRING);
+            cbDistribution.setSelectedItem(NULL_STRING);
+            NullRandPanel nrp = new NullRandPanel();
+            cardMap.put(null, nrp);
+            cardPanel.add(nrp.getPanel(), NULL_STRING);
+        } else {
+            cbDistribution.setSelectedItem(rand.getPdf());
+            cardMap.get(rand.getPdf()).fillFieldValues(randomizers);
+        }
 
     }
 
@@ -143,27 +163,18 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      * @param rand
      */
     public void fillFieldValues(Randomizer rand) {
-        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-        tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
-        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setValue(Double.toString(rand
-                .getStandardDeviation()));
-        tfMean.setValue(Double.toString(rand.getMean()));
+        ProbDistPanel rp = cardMap.get(rand.getPdf());
+        cbDistribution.setSelectedItem(rand.getPdf());
+        rp.fillFieldValues(rand);
     }
 
     /**
      * Fills fields with default values.
      */
     public void fillDefaultValues() {
-        Randomizer rand = new Randomizer();
-        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-        tsClipping.setSelected(rand.getClipping());
-        tfLowBound.setValue(Double.toString(rand.getLowerBound()));
-        tfUpBound.setValue(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setValue(Double.toString(rand
-                .getStandardDeviation()));
-        tfMean.setValue(Double.toString(rand.getMean()));
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardMap.get(Randomizer.DEFAULT_DISTRIBUTION).getPanel(),
+                Randomizer.DEFAULT_DISTRIBUTION.toString());
     }
 
     /**
@@ -172,33 +183,19 @@ public class RandomizerPanel extends JPanel implements ActionListener {
      * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
-        rand.setDistributionIndex(cbDistribution.getSelectedIndex());
-        rand.setLowerBound(Double.parseDouble(tfLowBound.getText()));
-        rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
-        if (tfStandardDeviation.isEnabled()) {
-            rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation
-                    .getText()));
+        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            ProbDistribution pdf =
+                    (ProbDistribution) cbDistribution.getSelectedItem();
+            cardMap.get(pdf).commitRandom(rand);
         }
-        rand.setMean(Double.parseDouble(tfMean.getText()));
-        rand.setClipping(tsClipping.isSelected());
     }
 
     public void setEnabled(boolean enabled) {
-
-        boolean gaussConditions = enabled
-                && (cbDistribution.getSelectedIndex() == Randomizer.GAUSSIAN);
-        boolean roundingConditions = (tsClipping.isSelected() || (cbDistribution
-                .getSelectedIndex() == Randomizer.UNIFORM)) && enabled;
-
         cbDistribution.setEnabled(enabled);
-
-        tfUpBound.setEnabled(roundingConditions);
-        tfLowBound.setEnabled(roundingConditions);
-
-        tfMean.setEnabled(gaussConditions);
-        tfStandardDeviation.setEnabled(gaussConditions);
-        tsClipping.setEnabled(gaussConditions);
-
+        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            cardMap.get((ProbDistribution) cbDistribution.getSelectedItem())
+            .setEnabled(enabled);
+        }
     }
 
     /**
@@ -209,103 +206,75 @@ public class RandomizerPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * @param cbDistribution The cbDistribution to set.
-     */
-    public void setCbDistribution(final JComboBox cbDistribution) {
-        this.cbDistribution = cbDistribution;
-    }
-
-    // /**
-    // * @return Returns the isUseBoundsBox.
-    // */
-    // public TristateDropDown getTsClipping() {
-    // return tsClipping;
-    // }
-
-    /**
      * @return Returns the isUseBoundsBox.
      */
-    public JCheckBox getTsClipping() {
-        return tsClipping;
-    }
-
-    // /**
-    // * @param isUseBoundsBox The isUseBoundsBox to set.
-    // */
-    // public void setTsClipping(final TristateDropDown isUseBoundsBox) {
-    // this.tsClipping = isUseBoundsBox;
-    // }
-
-    /**
-     * @param isUseBoundsBox The isUseBoundsBox to set.
-     */
-    public void setTsClipping(final JCheckBox isUseBoundsBox) {
-        this.tsClipping = isUseBoundsBox;
+    public TristateDropDown getTsClipping() {
+        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            return null;
+        }
+        return cardMap.get((ProbDistribution)cbDistribution
+                .getSelectedItem()).getTsClipping();
     }
 
     /**
      * @return Returns the tfLowBound.
      */
-    public JFormattedTextField getTfLowBound() {
-        return tfLowBound;
-    }
-
-    /**
-     * @param tfLowBound The tfLowBound to set.
-     */
-    public void setTfLowBound(final JFormattedTextField tfLowBound) {
-        this.tfLowBound = tfLowBound;
-    }
-
-    /**
-     * @return Returns the tfMean.
-     */
-    public JFormattedTextField getTfMean() {
-        return tfMean;
-    }
-
-    /**
-     * @param tfMean The tfMean to set.
-     */
-    public void setTfMean(final JFormattedTextField tfMean) {
-        this.tfMean = tfMean;
-    }
-
-    /**
-     * @return Returns the tfStandardDeviation.
-     */
-    public JFormattedTextField getTfStandardDeviation() {
-        return tfStandardDeviation;
-    }
-
-    /**
-     * @param tfStandardDeviation The tfStandardDeviation to set.
-     */
-    public void setTfStandardDeviation(
-            final JFormattedTextField tfStandardDeviation) {
-        this.tfStandardDeviation = tfStandardDeviation;
+    public JTextField getTfLowBound() {
+        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            return null;
+        }
+        return cardMap.get((ProbDistribution)cbDistribution
+                .getSelectedItem()).getTfLowBound();
     }
 
     /**
      * @return Returns the tfUpBound.
      */
-    public JFormattedTextField getTfUpBound() {
-        return tfUpBound;
+    public JTextField getTfUpBound() {
+        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            return null;
+        }
+        return cardMap.get((ProbDistribution)cbDistribution
+                .getSelectedItem()).getTfUpBound();
     }
 
     /**
-     * @param tfUpBound The tfUpBound to set.
+     * 
+     * @param pc
      */
-    public void setTfUpBound(final JFormattedTextField tfUpBound) {
-        this.tfUpBound = tfUpBound;
-    }
-
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
         cbDistribution.addPropertyChangeListener(pc);
-        tfUpBound.addPropertyChangeListener(pc);
-        tfLowBound.addPropertyChangeListener(pc);
-        tfMean.addPropertyChangeListener(pc);
-        tfStandardDeviation.addPropertyChangeListener(pc);
-        tsClipping.addPropertyChangeListener(pc);
+        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+            cardMap.get(cbDistribution.getSelectedItem())
+            .addPropertyChangeListenerToFields(pc);
+        }
+    }
+
+    /**
+     * A null ProbDist panel which cannot under any circumstance actually
+     * edit anything. It displays nothing and serves only as a place holder
+     * in instances where multiple randomizers are selected with different
+     * probability density functions.
+     * 
+     * @author Zach Tosi
+     */
+    private class NullRandPanel extends ProbDistPanel {
+
+        public NullRandPanel() {
+            super();
+        }
+
+        public void fillFieldValues(Randomizer rand) {
+            // Do nothing...
+        }
+        public void fillFieldValues(ArrayList<Randomizer> rands) {
+            // Do nothing...
+        }
+        public void fillDefaultValues() {
+            // Do nothing...
+        }
+        public void commitRandom(Randomizer rand) {
+            // Do nothing...
+        }
     }
 }

@@ -153,6 +153,8 @@ public class RandomizerPanel extends JPanel {
         } else {
             cbDistribution.setSelectedItem(rand.getPdf());
             cardMap.get(rand.getPdf()).fillFieldValues(randomizers);
+            CardLayout cl = (CardLayout) cardPanel.getLayout();
+            cl.show(cardPanel, rand.getPdf().toString());
         }
 
     }
@@ -173,7 +175,7 @@ public class RandomizerPanel extends JPanel {
      */
     public void fillDefaultValues() {
         CardLayout cl = (CardLayout) cardPanel.getLayout();
-        cl.show(cardMap.get(Randomizer.DEFAULT_DISTRIBUTION).getPanel(),
+        cl.show(cardPanel,
                 Randomizer.DEFAULT_DISTRIBUTION.toString());
     }
 

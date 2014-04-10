@@ -18,25 +18,25 @@
  */
 package org.simbrain.util.randomizer;
 
-import java.util.Random;
+import org.simbrain.util.math.ProbDistribution;
 
 /**
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
+ * 
  * <b>Randomizer</b> produces numbers drawn from a probability distribution
  * according to a set of user-specified parameters.
  */
 public class Randomizer {
 
-    /** Labels used by combo boxes. */
-    private static String[] functionList = { "Uniform", "Gaussian" };
+    public static final ProbDistribution DEFAULT_DISTRIBUTION =
+            ProbDistribution.UNIFORM;
+    
+    private ProbDistribution pdf = DEFAULT_DISTRIBUTION;
 
-    /** A uniform distribution. */
-    public static final int UNIFORM = 0;
+    private double param1 = 0;
 
-    /** A Gaussian distribution. */
-    public static final int GAUSSIAN = 1;
-
-    /** Which distribution is currently chosen. */
-    private int distributionIndex = 0;
+    private double param2 = 1;
 
     /** Upper bound of the random distribution. */
     private double upperBound = 1;
@@ -44,20 +44,11 @@ public class Randomizer {
     /** Lower bound of the random distribution. */
     private double lowerBound = -1;
 
-    /** Mean value for Gaussian distribution. */
-    private double mean = .5;
-
-    /** Standard deviation for Gaussian distribution. */
-    private double standardDeviation = .5;
-
     /**
      * Whether the Gaussian distribution should be clipped at upper / lower
      * bound values.
      */
     private boolean clipping = false;
-
-    /** Object which produces random values. */
-    private Random randomGenerator = new Random();
 
     /**
      * Default constructor.
@@ -72,33 +63,33 @@ public class Randomizer {
      * @return the duplicated <code>RandomSource</code> object.
      */
     public Randomizer(final Randomizer dup) {
-        setLowerBound(getLowerBound());
-        setUpperBound(getUpperBound());
-        setMean(getMean());
-        setStandardDeviation(getStandardDeviation());
+        setPdf(dup.getPdf());
+        setParams(dup.getParam1(), dup.getParam2());
+        setUpperBound(dup.getUpperBound());
+        setLowerBound(dup.getLowerBound());
         setClipping(getClipping());
     }
 
-    /**
-     * Creates a "mirrored" copy of this randomizer, wherein the mirror's lower
-     * bound is set to the additive inverse of the original's upper bound and
-     * likewise the mirror's upper bound is set to the additive inverse of the
-     * original's lower bound. The mean of the mirror is the additive inverse of
-     * the mean of the original. The standard deviation and clipping are
-     * directly copied.
-     *
-     * @return a mirrored copy of this randomizer
-     */
-    public Randomizer mirrorCopy() {
-        Randomizer mirror = new Randomizer();
-        mirror.setDistributionIndex(this.getDistributionIndex());
-        mirror.setLowerBound(-this.getUpperBound());
-        mirror.setUpperBound(-this.getLowerBound());
-        mirror.setMean(-this.getMean());
-        mirror.setStandardDeviation(this.getStandardDeviation());
-        mirror.setClipping(this.getClipping());
-        return mirror;
-    }
+    //    /**
+    //     * Creates a "mirrored" copy of this randomizer, wherein the mirror's lower
+    //     * bound is set to the additive inverse of the original's upper bound and
+    //     * likewise the mirror's upper bound is set to the additive inverse of the
+    //     * original's lower bound. The mean of the mirror is the additive inverse of
+    //     * the mean of the original. The standard deviation and clipping are
+    //     * directly copied.
+    //     *
+    //     * @return a mirrored copy of this randomizer
+    //     */
+    //    public Randomizer mirrorCopy() {
+    //        Randomizer mirror = new Randomizer();
+    //        mirror.setDistributionIndex(this.getDistributionIndex());
+    //        mirror.setLowerBound(-this.getUpperBound());
+    //        mirror.setUpperBound(-this.getLowerBound());
+    //        mirror.setMean(-this.getMean());
+    //        mirror.setStandardDeviation(this.getStandardDeviation());
+    //        mirror.setClipping(this.getClipping());
+    //        return mirror;
+    //    }
 
     /**
      * Returns a random number.
@@ -106,17 +97,10 @@ public class Randomizer {
      * @return the next random number
      */
     public double getRandom() {
-        if (getDistributionIndex() == UNIFORM) {
-            return ((upperBound - lowerBound) * Math.random()) + lowerBound;
+        if (clipping) {
+            return clip(pdf.nextRand(param1, param2));
         } else {
-            double val = randomGenerator.nextGaussian();
-            val = (val * standardDeviation) + mean;
-
-            if (clipping) {
-                val = clip(val);
-            }
-
-            return val;
+            return pdf.nextRand(param1, param2);
         }
     }
 
@@ -139,34 +123,6 @@ public class Randomizer {
     }
 
     /**
-     * @return Returns the mean.
-     */
-    public double getMean() {
-        return mean;
-    }
-
-    /**
-     * @param mean The mean to set.
-     */
-    public void setMean(final double mean) {
-        this.mean = mean;
-    }
-
-    /**
-     * @return Returns the standardDeviation.
-     */
-    public double getStandardDeviation() {
-        return standardDeviation;
-    }
-
-    /**
-     * @param standardDeviation The standardDeviation to set.
-     */
-    public void setStandardDeviation(final double standardDeviation) {
-        this.standardDeviation = standardDeviation;
-    }
-
-    /**
      * @return Returns the clipping.
      */
     public boolean getClipping() {
@@ -181,64 +137,105 @@ public class Randomizer {
     }
 
     /**
-     * @return Returns the functionList.
-     */
-    public static String[] getFunctionList() {
-        return functionList;
-    }
-
-    /**
-     * @return Returns the distributionIndex.
-     */
-    public int getDistributionIndex() {
-        return distributionIndex;
-    }
-
-    /**
      * Returns the string name of the distribution.
      *
      * @return the distribution name.
      */
     public String getDistributionName() {
-        if (distributionIndex == 1) {
-            return "Gaussian";
-        } else {
-            return "Uniform";
+        return pdf.toString();
+    }
+
+    /**
+     * @return the pdf
+     */
+    public ProbDistribution getPdf() {
+        return pdf;
+    }
+
+    /**
+     * @param pdf the pdf to set
+     */
+    public void setPdf(ProbDistribution pdf) {
+        this.pdf = pdf;
+    }
+
+    /**
+     * @return the param1
+     */
+    public double getParam1() {
+        return param1;
+    }
+
+    /**
+     * @return the param2
+     */
+    public double getParam2() {
+        return param2;
+    }
+
+    /**
+     * 
+     * @param param1
+     * @param param2
+     */
+    protected void setParams(double param1, double param2) {
+        this.param1 = param1;
+        this.param2 = param2;
+    }
+
+    public void setParamsConsistent(String p1Name, double param1,
+            String p2Name, double param2) {
+        if(!p1Name.equals(pdf.getParam1Name())
+                || !p2Name.equals(pdf.getParam2Name())) {
+            throw new IllegalArgumentException("Parameter name/Distribution" +
+                    " mismatch.");
         }
+        setParams(param1, param2);
     }
 
-    /**
-     * @param distributionIndex The distributionIndex to set.
-     */
-    public void setDistributionIndex(final int distributionIndex) {
-        this.distributionIndex = distributionIndex;
+    public void setParam1Consistent(String p1Name, double param1) {
+        if (!p1Name.equals(pdf.getParam1Name())) {
+            throw new IllegalArgumentException("Parameter name/Distribution" +
+                    " mismatch.");
+        }
+        this.param1 = param1;
     }
-
-    /**
-     * @return Returns the lowerBound.
-     */
-    public double getLowerBound() {
-        return lowerBound;
+    
+    public void setParam2Consistent(String p2Name, double param2) {
+        if (p2Name == null) return; //TODO think about this, it's a hack
+        if (!p2Name.equals(pdf.getParam2Name())) {
+            throw new IllegalArgumentException("Parameter name/Distribution" +
+                    " mismatch.");
+        }
+        this.param2 = param2;
     }
-
+    
     /**
-     * @param lowerBound The lowerBound to set.
-     */
-    public void setLowerBound(final double lowerBound) {
-        this.lowerBound = lowerBound;
-    }
-
-    /**
-     * @return Returns the upperBound.
+     * @return the upperBound
      */
     public double getUpperBound() {
         return upperBound;
     }
 
     /**
-     * @param upperBound The upperBound to set.
+     * @param upperBound the upperBound to set
      */
-    public void setUpperBound(final double upperBound) {
+    public void setUpperBound(double upperBound) {
         this.upperBound = upperBound;
     }
+
+    /**
+     * @return the lowerBound
+     */
+    public double getLowerBound() {
+        return lowerBound;
+    }
+
+    /**
+     * @param lowerBound the lowerBound to set
+     */
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
 }

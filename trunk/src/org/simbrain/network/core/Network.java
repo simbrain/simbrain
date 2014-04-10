@@ -585,7 +585,7 @@ public class Network {
         if (toDelete.getParentGroup() != null) {
             if (toDelete.getParentGroup() instanceof NeuronGroup) {
                 ((NeuronGroup) toDelete.getParentGroup())
-                        .removeNeuron(toDelete);
+                .removeNeuron(toDelete);
             }
             if (toDelete.getParentGroup().isEmpty()) {
                 removeGroup(toDelete.getParentGroup());
@@ -1163,6 +1163,16 @@ public class Network {
         } else {
             time += 1;
         }
+    }
+
+    /**
+     * TODO: Resolve priority update issue.
+     * Here as a hack to make the list available to groups that want to update
+     * via priorities WITHIN the group... To be resolved.
+     * @return the prioritySortedNeuronList
+     */
+    public List<Neuron> getPrioritySortedNeuronList() {
+        return prioritySortedNeuronList;
     }
 
     /**

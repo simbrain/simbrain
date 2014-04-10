@@ -29,10 +29,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 
 /**
  * Panel displaying controls specific to reservoir computing.
@@ -47,7 +47,7 @@ public class ReservoirUtilsPanel extends JPanel {
     private Randomizer randomSource;
 
     /** A panel for setting random values. */
-    private RandomPanelNetwork randomPanel = new RandomPanelNetwork();
+    private RandomizerPanel randomPanel = new RandomizerPanel();
 
     /** Enables noise. */
     private JButton enableNoise = new JButton();

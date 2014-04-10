@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -28,7 +29,8 @@ import org.simbrain.util.randomizer.Randomizer;
  * different types. Students could just look it up, but this would be
  * faster/cooler. Just a thought.
  */
-public class IzhikevichRule extends SpikingNeuronUpdateRule {
+public class IzhikevichRule extends SpikingNeuronUpdateRule
+implements NoisyUpdateRule  {
 
     /** Recovery. */
     private double recovery;

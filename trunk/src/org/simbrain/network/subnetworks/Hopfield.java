@@ -18,8 +18,9 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -36,14 +37,123 @@ import org.simbrain.network.trainers.TrainingSet;
  */
 public class Hopfield extends Subnetwork implements Trainable {
 
-    /** Random update. */
-    public static final int RANDOM_UPDATE = 1;
+    public enum HopfieldUpdate {
+        RAND {
 
-    /** Sequential update. */
-    public static final int SEQUENTIAL_UPDATE = 0;
+            @Override
+            public void update(Hopfield hop) {
+                List<Neuron> neurons = hop.getModifiableNeuronList();
+                Neuron neuron = null;
+                Collections.shuffle(neurons);
+                for (int i = 0, n = neurons.size(); i < n; i++) {
+                    neuron = neurons.get(i);
+                    neuron.update();
+                    neuron.setActivation(neuron.getBuffer());
+                }
+            }
 
-    /** Update order. */
-    private int updateOrder = SEQUENTIAL_UPDATE;
+            @Override
+            public String getDescription() {
+                return "Randomly ordered sequential update (different every" +
+                		" time)";
+            }
+
+            @Override
+            public String getName() {
+                return "Random";
+            }
+           
+        },
+        SEQ {
+            
+            @Override
+            public void update(Hopfield hop) {
+                List<Neuron> neurons;
+                if (hop.isByPriority()) {
+                    neurons = hop.getParentNetwork()
+                            .getPrioritySortedNeuronList();
+                    for (Neuron n : neurons) {
+                        //TODO: Hack to allow hopfield networks to be updated
+                        // within based on priority, without having to sort
+                        // the list every iteration.
+                        if (hop.getNeuronSet().contains(n)) {
+                            n.update();
+                            n.setActivation(n.getBuffer());
+                        }
+                    }
+                } else {
+                    neurons = hop.getFlatNeuronList();
+                    for (Neuron n : neurons) {
+                        n.update();
+                        n.setActivation(n.getBuffer());
+                    }
+                }
+
+            }
+
+            @Override
+            public String getDescription() {
+                return "Sequential update of neurons (same seqence every time)";
+            }
+
+            @Override
+            public String getName() {
+                return "Sequential";
+            }
+            
+        },
+        SYNC {
+
+            @Override
+            public void update(Hopfield hop) {
+                List<Neuron> neurons = hop.getFlatNeuronList();
+                for (Neuron n : neurons) {
+                    n.update();
+                }
+                for(Neuron n : neurons) {
+                    n.setActivation(n.getBuffer());
+                }
+            }
+
+            @Override
+            public String getDescription() {
+                return "Synchronous update of neurons";
+            }
+
+            @Override
+            public String getName() {
+                return "Synchronous";
+            }
+            
+        };
+        
+        public static HopfieldUpdate getUpdateFuncFromName(String name) {
+            for (HopfieldUpdate hu : HopfieldUpdate.values()) {
+                if (name.equals(hu.getName())) {
+                    return hu;
+                }
+            }
+            throw new IllegalArgumentException("No such Hopfield update" +
+            		"function");
+        }
+        
+        public static String [] getUpdateFuncNames() {
+            String [] names = new String [HopfieldUpdate.values().length];
+            for (int i = 0; i < HopfieldUpdate.values().length; i++) {
+                names[i] = HopfieldUpdate.values()[i].getName();
+            }
+            return names;
+        }
+        
+        public abstract void update(Hopfield hop);
+        
+        public abstract String getDescription();
+        
+        public abstract String getName();
+    }
+    
+    /** Default update mechanism. */
+    public static final HopfieldUpdate DEFAULT_UPDATE = HopfieldUpdate.SEQ;
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_UNITS = 9;
@@ -51,25 +161,37 @@ public class Hopfield extends Subnetwork implements Trainable {
     /** Number of neurons. */
     private int numUnits = DEFAULT_NUM_UNITS;
 
-    /** Random integer generator. */
-    private Random randInt;
-
+    /** The update function used by this Hopfield network. */
+    private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
+    
+    /** 
+     * If true, if the network's update order is sequential, it will update
+     * in order of priority.
+     */
+    private boolean byPriority = false;
+    
+    /** 
+     * The set of neurons... here as a hack while the priority update within
+     * groups issue is being resolved.
+     */
+    private HashSet<Neuron> neuronSet = new HashSet<Neuron>();
+    
     /**
      * Training set.
      */
     private final TrainingSet trainingSet = new TrainingSet();
 
-    /**
-     * Copy constructor.
-     *
-     * @param newRoot new root network
-     * @param oldNet old network.
-     */
-    public Hopfield(Network newRoot, Hopfield oldNet) {
-        super(newRoot);
-        this.setUpdateOrder(oldNet.getUpdateOrder());
-        setLabel("Hopfield network");
-    }
+//    /**
+//     * Copy constructor.
+//     *
+//     * @param newRoot new root network
+//     * @param oldNet old network.
+//     */
+//    public Hopfield(Network newRoot, Hopfield oldNet) {
+//        super(newRoot);
+//        setUpdateFunc(oldNet.getUpdateFunc());
+//        setLabel("Hopfield network");
+//    }
 
     /**
      * Creates a new Hopfield network.
@@ -83,7 +205,6 @@ public class Hopfield extends Subnetwork implements Trainable {
         NeuronGroup hopfieldGroup = new NeuronGroup(root);
         this.addNeuronGroup(hopfieldGroup);
         this.connectNeuronGroups(hopfieldGroup, hopfieldGroup);
-
         this.setDisplayNeuronGroups(false);
 
         // Create the neurons
@@ -91,10 +212,11 @@ public class Hopfield extends Subnetwork implements Trainable {
             BinaryRule binary = new BinaryRule();
             binary.setThreshold(0);
             binary.setCeiling(1);
-            binary.setFloor(0);
+            binary.setFloor(-1);
             binary.setIncrement(1);
             Neuron n = new Neuron(root, binary);
             getNeuronGroup().addNeuron(n);
+            neuronSet.add(n);
         }
 
         // Add the synapses
@@ -111,6 +233,15 @@ public class Hopfield extends Subnetwork implements Trainable {
 
         getSynapseGroup().initializeSynapseVisibility();
 
+    }
+    
+    /**
+     * Randomizes the update sequence by shuffling the neuron list associated
+     * with this Hopfield network. Only has an effect if the update function
+     * is sequential.
+     */
+    public void randomizeSequence() {
+        Collections.shuffle(this.getModifiableNeuronList());
     }
 
     /**
@@ -138,24 +269,7 @@ public class Hopfield extends Subnetwork implements Trainable {
 
     @Override
     public void update() {
-
-        int nCount = getNeuronGroup().getNeuronList().size();
-        Neuron n;
-
-        if (updateOrder == RANDOM_UPDATE) {
-            if (randInt == null) {
-                randInt = new Random();
-            }
-            for (int i = 0; i < nCount; i++) {
-                n = getNeuronGroup().getNeuronList().get(
-                        randInt.nextInt(nCount));
-                n.update();
-                n.setActivation(n.getBuffer());
-            }
-        } else {
-            getNeuronGroup().update();
-        }
-
+        updateFunc.update(this);
     }
 
     /**
@@ -165,29 +279,9 @@ public class Hopfield extends Subnetwork implements Trainable {
         return numUnits;
     }
 
-    /**
-     * @return The update order.
-     */
-    public int getUpdateOrder() {
-        return updateOrder;
-    }
-
-    /**
-     * Sets the update order.
-     *
-     * @param updateOrder The value to set
-     */
-    public void setUpdateOrder(final int updateOrder) {
-        this.updateOrder = updateOrder;
-    }
-
     @Override
     public String getUpdateMethodDesecription() {
-        if (updateOrder == RANDOM_UPDATE) {
-            return "Random update of neurons";
-        } else {
-            return "Sequential update of neurons";
-        }
+        return updateFunc.getDescription();
     }
 
     @Override
@@ -224,4 +318,40 @@ public class Hopfield extends Subnetwork implements Trainable {
         getParentNetwork().fireNetworkChanged();
     }
 
+    /**
+     * @return the updateFunc
+     */
+    public HopfieldUpdate getUpdateFunc() {
+        return updateFunc;
+    }
+
+    /**
+     * @param updateFunc the updateFunc to set
+     */
+    public void setUpdateFunc(HopfieldUpdate updateFunc) {
+        this.updateFunc = updateFunc;
+    }
+
+    /**
+     * @return the neuronSet
+     */
+    public HashSet<Neuron> getNeuronSet() {
+        return neuronSet;
+    }
+
+    /**
+     * @param neuronSet the neuronSet to set
+     */
+    public void setNeuronSet(HashSet<Neuron> neuronSet) {
+        this.neuronSet = neuronSet;
+    }
+
+    public boolean isByPriority() {
+        return byPriority;
+    }
+
+    public void setByPriority(boolean byPriority) {
+        this.byPriority = byPriority;
+    }
+    
 }

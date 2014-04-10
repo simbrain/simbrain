@@ -28,12 +28,12 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
@@ -54,7 +54,7 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Random tab. */
-    private RandomPanelNetwork randTab = new RandomPanelNetwork();
+    private RandomizerPanel randTab = new RandomizerPanel();
 
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();

@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -74,6 +77,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         // Logic Panel
         hopPropertiesPanel = new HopfieldPropertiesPanel(networkPanel);
         hopPropertiesPanel.fillFieldValues();
+        tabLogic.setLayout(new FlowLayout());
         tabLogic.add(hopPropertiesPanel);
 
         // Layout panel

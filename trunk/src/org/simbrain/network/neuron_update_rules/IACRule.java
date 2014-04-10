@@ -24,13 +24,14 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
 public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
-        ClippableUpdateRule {
+        ClippableUpdateRule, NoisyUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_CEILING = 1.0;

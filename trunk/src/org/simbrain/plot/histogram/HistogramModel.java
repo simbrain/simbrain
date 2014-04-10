@@ -14,7 +14,6 @@ package org.simbrain.plot.histogram;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jfree.data.xy.IntervalXYDataset;
@@ -53,12 +52,6 @@ public class HistogramModel extends ChartModel {
 
     /** The default number of bins used by the histogram. */
     private int bins = DEFAULT_BINS;
-
-    /**
-     * This flag is used for safety, minimum and maximum values are determined
-     * assuming sorted data series.
-     */
-    private boolean sortedFlag;
 
     /**
      * Creates a blank histogram. Used in de-serializing.
@@ -133,13 +126,8 @@ public class HistogramModel extends ChartModel {
 
         for (int i = 0, n = data.size(); i < n; i++) {
             if (data.get(i).length != 0) {
-                sort(data.get(i));
-                SimbrainMath.max(1, 2);
-                double min = SimbrainMath.getMinimum(data.get(i));
-                double max = SimbrainMath.getMaximum(data.get(i));
-                setSortedFlag(false);
-                ((OverwritableHistogramDataset) dataSet).overwrriteSeries(i,
-                        dataNames.get(i), data.get(i), getBins(), min, max);
+                ((OverwritableHistogramDataset) dataSet).overwriteSeries(i,
+                        dataNames.get(i), data.get(i), getBins());
             }
 
         }
@@ -168,69 +156,8 @@ public class HistogramModel extends ChartModel {
             // System.out.println(i + ":" + Utils.getVectorString(data.get(i),
             // ","));
             // System.out.println(i + ":" + dataNames.get(i));
-            sort(data.get(i));
-            double min = SimbrainMath.getMinimum(data.get(i));
-            double max = SimbrainMath.getMaximum(data.get(i));
-            setSortedFlag(false);
-            ((OverwritableHistogramDataset) dataSet).overwrriteSeries(i,
-                    dataNames.get(i), data.get(i), getBins(), min, max);
-        }
-    }
-
-    /**
-     * Sorts the data set. This must be used before getMaxValue(...) or
-     * getMinValue(...) is used.
-     *
-     * @param dataSeries the data set to be sorted.
-     */
-    public void sort(Number [] dataSeries) {
-        Arrays.sort(dataSeries);
-        sortedFlag = true;
-    }
-
-    /**
-     * Returns the max value from the data set by returning the last element of
-     * the sorted data set.
-     *
-     * @param dataSeries the data series being queried.
-     * @return the maximum value of the data set, according to their natural
-     *         ordering as double-precision floating point values.
-     * @throws IllegalStateException if the sorted flag has not been set to true
-     *             (indicating the data set is unsorted or data is being
-     *             manipulated in a way that breaks the contract of this class).
-     */
-    public double maxValue(double[] dataSeries) throws IllegalStateException {
-        if (dataSeries.length == 0) {
-            return 0;
-        }
-        if (sortedFlag) {
-            return dataSeries[dataSeries.length - 1];
-        } else {
-            throw new IllegalStateException("Unsorted Dataset or Improper"
-                    + "Dataset Manipulation Exception");
-        }
-    }
-
-    /**
-     * Returns the minimum value from the data set by returning the first
-     * element of the sorted data set.
-     *
-     * @param dataSeries the data series being queried.
-     * @return the minimum value of the data set, according to their natural
-     *         ordering as double-precision floating point values.
-     * @throws IllegalStateException if the sorted flag has not been set to true
-     *             (indicating the data set is unsorted or data is being
-     *             manipulated in a way that breaks the contract of this class).
-     */
-    public double minValue(double[] dataSeries) throws IllegalStateException {
-        if (dataSeries.length == 0) {
-            return 0;
-        }
-        if (sortedFlag) {
-            return dataSeries[0];
-        } else {
-            throw new IllegalStateException("Unsorted Dataset or Improper"
-                    + "Dataset Manipulation Exception");
+            ((OverwritableHistogramDataset) dataSet).overwriteSeries(i,
+                    dataNames.get(i), data.get(i), getBins());
         }
     }
 
@@ -242,19 +169,20 @@ public class HistogramModel extends ChartModel {
         this.dataNames = names;
         redraw();
     }
-
-    /**
-     * Replaces data names with blank strings. A bit of a hack needed because
-     * there is no way currently to dynamically change the labels of the
-     * datasets.
-     */
-    private void resetDataNames() {
-        // Replace names with blank strings
-        for (int i = 0; i < dataNames.size(); i++) {
-            dataNames.remove(i);
-            dataNames.add(i, "---");
-        }
-    }
+    
+//  TODO: Review for removal, Unused.
+//    /**
+//     * Replaces data names with blank strings. A bit of a hack needed because
+//     * there is no way currently to dynamically change the labels of the
+//     * datasets.
+//     */
+//    private void resetDataNames() {
+//        // Replace names with blank strings
+//        for (int i = 0; i < dataNames.size(); i++) {
+//            dataNames.remove(i);
+//            dataNames.add(i, "---");
+//        }
+//    }
 
     /**
      * Clears the data. Currently just adds a single vector to each data source.
@@ -296,20 +224,6 @@ public class HistogramModel extends ChartModel {
      */
     public void setBins(int bins) {
         this.bins = bins;
-    }
-
-    /**
-     * @return the sortedFlag
-     */
-    public boolean isSortedFlag() {
-        return sortedFlag;
-    }
-
-    /**
-     * @param sortedFlag the sortedFlag to set
-     */
-    public void setSortedFlag(boolean sortedFlag) {
-        this.sortedFlag = sortedFlag;
     }
 
     /**

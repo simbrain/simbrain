@@ -18,15 +18,24 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 
@@ -36,7 +45,7 @@ import org.simbrain.util.ShowHelpAction;
  * editing.
  */
 public class HopfieldPropertiesPanel extends JPanel implements
-        GroupPropertiesPanel {
+GroupPropertiesPanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_NEURONS = 9;
@@ -47,18 +56,19 @@ public class HopfieldPropertiesPanel extends JPanel implements
     /** Number of neurons field. */
     private JTextField tfNumNeurons = new JTextField();
 
-    /** Main Panel. */
-    private LabelledItemPanel mainPanel = new LabelledItemPanel();
-
-    /** Sequential network update order. */
-    public static final int SEQUENTIAL = 0;
-
-    /** Random network update order. */
-    public static final int RANDOM = 1;
-
     /** Network type combo box. */
     private JComboBox<String> cbUpdateOrder = new JComboBox<String>(
-            new String[] {"Sequential", "Random", });
+            HopfieldUpdate.getUpdateFuncNames());
+
+    private JCheckBox priorityChkBx = new JCheckBox();
+
+    private JCheckBox shuffleUpdateOrder = new JCheckBox();
+
+    {
+        shuffleUpdateOrder.setToolTipText("Randomizes the order of the neuron" +
+                " updates: \nThis random seqence is the same for \neach" +
+                " update.");
+    }
 
     /** The model subnetwork. */
     private Hopfield hopfield;
@@ -80,7 +90,6 @@ public class HopfieldPropertiesPanel extends JPanel implements
     public HopfieldPropertiesPanel(final NetworkPanel np) {
         this.networkPanel = np;
         isCreationPanel = true;
-        mainPanel.addItem("Number of neurons", tfNumNeurons);
         initPanel();
     }
 
@@ -101,20 +110,69 @@ public class HopfieldPropertiesPanel extends JPanel implements
      * Initialize the panel.
      */
     private void initPanel() {
+        repaintPanel();
         fillFieldValues();
-        mainPanel.addItem("Update order", cbUpdateOrder);
-        add(mainPanel);
+        addListeners();
     }
 
     /**
      * @return the update order.
      */
-    public int getUpdateType() {
-        if (cbUpdateOrder.getSelectedIndex() == 0) {
-            return SEQUENTIAL;
-        } else {
-            return RANDOM;
+    public HopfieldUpdate getUpdateType() {
+        return HopfieldUpdate.getUpdateFuncFromName((String)
+                cbUpdateOrder.getSelectedItem());
+    }
+
+    private void repaintPanel() {
+        removeAll();
+        GridLayout lay = new GridLayout(0, 2);
+        lay.setHgap(5);
+        lay.setVgap(15);
+        this.setLayout(lay);
+        this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layoutPanel();
+        repaint();
+        revalidate();
+    }
+    
+    private synchronized void layoutPanel() {
+        if (isCreationPanel) {
+            add(new JLabel("Number of Neurons"));
+            add(tfNumNeurons);
         }
+        add(new JLabel("Update Order"));
+        add(cbUpdateOrder);
+        switch (getUpdateType()) {
+            case SEQ : 
+                add(new JLabel("By Priority"));
+                add(priorityChkBx);
+                add(new JLabel("Shuffle Order"));
+                add(shuffleUpdateOrder);
+                break;
+            case SYNC :
+                // No extra items needed
+                break;
+            case RAND :
+                // No extra items needed
+                break;
+            default :
+                throw new IllegalArgumentException("No such update function.");
+        }
+    }
+
+    private void addListeners() {
+        cbUpdateOrder.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                repaintPanel();
+            }
+        });
+        priorityChkBx.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                shuffleUpdateOrder.setEnabled(!priorityChkBx.isSelected());
+            }
+        });
     }
 
     /**
@@ -123,10 +181,13 @@ public class HopfieldPropertiesPanel extends JPanel implements
     @Override
     public void fillFieldValues() {
         if (isCreationPanel) {
-            hopfield = new Hopfield(null, 1);
+            hopfield = new Hopfield(null, DEFAULT_NUM_NEURONS);
             tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
         }
-        cbUpdateOrder.setSelectedIndex(hopfield.getUpdateOrder());
+        cbUpdateOrder.setSelectedItem(hopfield.getUpdateFunc().getName());
+        priorityChkBx.setSelected(hopfield.isByPriority());
+        shuffleUpdateOrder.setEnabled(!hopfield.isByPriority());
+        shuffleUpdateOrder.setSelected(false);
     }
 
     /**
@@ -139,7 +200,13 @@ public class HopfieldPropertiesPanel extends JPanel implements
                 hopfield = new Hopfield(networkPanel.getNetwork(),
                         Integer.parseInt(tfNumNeurons.getText()));
             }
-            hopfield.setUpdateOrder(getUpdateType());
+            hopfield.setUpdateFunc(getUpdateType());
+            if (getUpdateType().equals(HopfieldUpdate.SEQ)) {
+                hopfield.setByPriority(priorityChkBx.isSelected());
+                if (!priorityChkBx.isSelected()) {
+                    hopfield.randomizeSequence();
+                }
+            }
         } catch (NumberFormatException nfe) {
             return false; // Failure
         }

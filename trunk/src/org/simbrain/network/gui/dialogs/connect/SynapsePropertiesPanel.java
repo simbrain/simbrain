@@ -22,13 +22,13 @@ import javax.swing.JPanel;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwitchableActionListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 import org.simbrain.util.widgets.LinkIcon;
 
 /**
@@ -99,12 +99,12 @@ public class SynapsePropertiesPanel extends JPanel {
     /**
      * A random panel to set the range and distribution of excitatory strengths.
      */
-    private RandomPanelNetwork exRandPanel = new RandomPanelNetwork();
+    private RandomizerPanel exRandPanel = new RandomizerPanel();
 
     /**
      * A random panel to set the range and distribution of inhibitory strengths.
      */
-    private RandomPanelNetwork inRandPanel = new RandomPanelNetwork();
+    private RandomizerPanel inRandPanel = new RandomizerPanel();
 
     /**
      * A synapse panel, set to the selected synapse learning rule and displayed
@@ -470,7 +470,7 @@ public class SynapsePropertiesPanel extends JPanel {
         Randomizer dummy = new Randomizer();
         exRandPanel.commitRandom(dummy);
         randInListener.disable();
-        inRandPanel.fillFieldValues(dummy.mirrorCopy());
+//        inRandPanel.fillFieldValues(dummy.mirrorCopy());
         inRandCheck.setSelected(exRandCheck.isSelected());
         inRandPanel.setEnabled(exRandCheck.isSelected());
         randInListener.enable();
@@ -484,7 +484,7 @@ public class SynapsePropertiesPanel extends JPanel {
         Randomizer dummy = new Randomizer();
         inRandPanel.commitRandom(dummy);
         randExListener.disable();
-        exRandPanel.fillFieldValues(dummy.mirrorCopy());
+//        exRandPanel.fillFieldValues(dummy.mirrorCopy());
         exRandCheck.setSelected(inRandCheck.isSelected());
         exRandPanel.setEnabled(inRandCheck.isSelected());
         randExListener.enable();

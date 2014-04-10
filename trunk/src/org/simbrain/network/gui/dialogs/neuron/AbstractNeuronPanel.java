@@ -39,7 +39,6 @@ import org.simbrain.network.gui.dialogs.neuron.rule_panels.IntegrateAndFireRuleP
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.IzhikevichRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.LinearRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.NakaRushtonRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.PointNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
@@ -51,7 +50,6 @@ import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
-import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;

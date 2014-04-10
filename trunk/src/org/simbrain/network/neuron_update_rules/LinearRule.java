@@ -25,13 +25,15 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
 public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
-        DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule {
+        DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule,
+        NoisyUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_UPPER_BOUND = 1.0;

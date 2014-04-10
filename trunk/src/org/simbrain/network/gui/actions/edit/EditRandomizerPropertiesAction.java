@@ -23,9 +23,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.randomizer.RandomizerPanel;
 
 /**
  * Edit properties of randomizer object for network.
@@ -54,7 +54,7 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final RandomPanelNetwork randomPanel = new RandomPanelNetwork();
+        final RandomizerPanel randomPanel = new RandomizerPanel();
         randomPanel.fillFieldValues(networkPanel.getNetwork()
                 .getWeightRandomizer());
         StandardDialog dialog = new StandardDialog() {

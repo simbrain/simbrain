@@ -27,11 +27,11 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanelNetwork;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.randomizer.Randomizer;
+import org.simbrain.util.randomizer.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
@@ -52,7 +52,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Random panel. */
-    private RandomPanelNetwork randPanel = new RandomPanelNetwork();
+    private RandomizerPanel randPanel = new RandomizerPanel();
 
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();

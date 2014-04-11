@@ -41,7 +41,7 @@ import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 /**
  * The main controller panel for iterative learning, with buttons etc. to run

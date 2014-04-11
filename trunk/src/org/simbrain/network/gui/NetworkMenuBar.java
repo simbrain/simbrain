@@ -24,7 +24,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.simbrain.util.ShowHelpAction;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Menu bar that appears inside of JPanel; for use in Applets.

@@ -1,7 +1,7 @@
 <?xml  version="1.0" encoding="UTF-8"?>
 <project name="Simbrain" default="jar" basedir=".">
 
-	<property name="version" location="Simbrain3_beta_1" />
+	<property name="version" location="Simbrain3_beta_2" />
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
@@ -159,7 +159,6 @@
 	</target>
 
 	<!-- =================== FOR BUILDING SEPARATE JARS ============================= -->
-	<!-- TODO: Use build.jar and dist as indicated in comments above -->
 
 	<!-- Replace references to "log4j" with references to internal Logger 
 	proxy.  Removes dependency on log4j jar file for lightweight distributions. -->
@@ -180,6 +179,12 @@
 		<javac srcdir="${removelogger}/org/simbrain/util" destdir="${build}" includeAntRuntime="no" classpathref="lib.path" debug="${comple.debug}">
 			<exclude name="environment/**" />
 			<exclude name="projection/**" />
+			<exclude name="widgets/**" />
+			<exclude name="table/**" />
+			<exclude name="scripteditor/**" />
+			<exclude name="propertyeditor/gui/**" /> 
+			<exclude name="randomizer/gui/**" />
+
 		</javac>
 	</target>
 
@@ -208,6 +213,7 @@
 	</target>
 
 	<!-- Create a minimal network jar. -->
+	<!-- Depends on util via network. Check that's up to date if issues. -->
 	<target name="networkjar" depends="clean, network " description="Create the bare network jar">
 		<mkdir dir="${dist}" />
 		<mkdir dir="${build}" />

@@ -29,8 +29,8 @@ import javax.swing.JTabbedPane;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete Hopfield

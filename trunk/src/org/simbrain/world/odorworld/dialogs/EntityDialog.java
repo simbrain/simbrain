@@ -30,10 +30,10 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 

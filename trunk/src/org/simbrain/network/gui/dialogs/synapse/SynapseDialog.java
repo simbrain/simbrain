@@ -33,8 +33,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * The <b>SynapseDialog</b> is initialized with a list of synapses. When the

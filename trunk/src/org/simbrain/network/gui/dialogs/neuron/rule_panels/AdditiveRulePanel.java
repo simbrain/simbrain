@@ -33,7 +33,7 @@ import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**

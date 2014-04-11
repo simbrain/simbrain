@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.propertyeditor;
+package org.simbrain.util.propertyeditor.gui;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -46,6 +46,8 @@ import javax.swing.table.DefaultTableModel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import org.simbrain.util.propertyeditor.DisplayOrder;
 
 /**
  * ReflectivePropertyEditor.

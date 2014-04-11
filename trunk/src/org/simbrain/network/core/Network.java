@@ -1037,6 +1037,7 @@ public class Network {
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
+
         return xstream;
     }
 

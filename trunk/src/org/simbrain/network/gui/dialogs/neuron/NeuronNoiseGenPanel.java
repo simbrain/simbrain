@@ -23,7 +23,7 @@ import java.util.List;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * A panel specifically for the randomizers used by neurons... a higher level

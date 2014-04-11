@@ -27,7 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 /**

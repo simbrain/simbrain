@@ -44,10 +44,10 @@ import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.NetworkUpdateManager.UpdateManagerListener;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Panel for display the current network updates, and editing them (adding,

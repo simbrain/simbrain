@@ -46,10 +46,10 @@ import org.simbrain.network.gui.dialogs.neuron.CombinedNeuronInfoPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Main tabbed panel for editing all neuron groups. Specific neuron panels are

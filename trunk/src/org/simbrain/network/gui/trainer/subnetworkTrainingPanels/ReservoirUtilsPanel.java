@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * Panel displaying controls specific to reservoir computing.

@@ -31,9 +31,9 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.projection.DataColoringManager;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * DataPointColoringDialog is a dialog box for making changes to the coloring

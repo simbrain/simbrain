@@ -27,8 +27,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
 import org.simbrain.network.subnetworks.SOMGroup;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.

@@ -23,7 +23,7 @@ import java.util.List;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * <b>RandomNeuronPanel</b> Currently unimplemented pending decisions about

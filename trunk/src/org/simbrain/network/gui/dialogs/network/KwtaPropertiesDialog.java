@@ -23,8 +23,8 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a

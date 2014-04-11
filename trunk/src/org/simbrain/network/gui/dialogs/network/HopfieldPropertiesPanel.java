@@ -37,7 +37,7 @@ import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the

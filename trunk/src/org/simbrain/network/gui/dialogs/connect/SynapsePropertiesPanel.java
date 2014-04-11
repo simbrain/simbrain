@@ -28,7 +28,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwitchableActionListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.LinkIcon;
 
 /**

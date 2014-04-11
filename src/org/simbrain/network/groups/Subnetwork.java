@@ -225,7 +225,6 @@ public abstract class Subnetwork extends Group {
     public NeuronGroup getNeuronGroupByLabel(final String label) {
         for (NeuronGroup group : getNeuronGroupList()) {
             if (group.getLabel().equalsIgnoreCase(label)) {
-                System.out.println(group);
                 return group;
             }
         }

@@ -29,8 +29,8 @@ import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel.Compe
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>CompetitiveDialog</b> is used as an assistant to create Competitive

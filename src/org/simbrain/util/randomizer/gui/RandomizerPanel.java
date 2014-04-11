@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.randomizer;
+package org.simbrain.util.randomizer.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -34,22 +34,23 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
  * object.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
 public class RandomizerPanel extends JPanel {
 
     /** TODO: REALLY need to find somewhere (<b>one place</b>) to put this....*/
-    public static final String NULL_STRING = "..."; 
+    public static final String NULL_STRING = "...";
 
-    /** 
+    /**
      * The underlying model for the Combobox allowing for dynamic editing of
      * the item list.
      */
@@ -59,14 +60,19 @@ public class RandomizerPanel extends JPanel {
     /** Distribution combo box. */
     private JComboBox cbDistribution = new JComboBox(probOptions);
 
-    /** 
+    // Initialize distribution.
+    {
+        cbDistribution.setSelectedItem(Randomizer.DEFAULT_DISTRIBUTION);
+    }
+    
+    /**
      * A map between probability distributions and specific distribution
      * panels.
      */
     private HashMap<ProbDistribution, ProbDistPanel> cardMap =
             new HashMap<ProbDistribution, ProbDistPanel>();
 
-    /** 
+    /**
      * The main panel where all the different probability distribution panels
      * are stored as cards.
      */
@@ -76,13 +82,12 @@ public class RandomizerPanel extends JPanel {
      * This method is the default constructor.
      */
     public RandomizerPanel() {
-        cbDistribution.setSelectedItem(Randomizer.DEFAULT_DISTRIBUTION);
         this.setLayout(new BorderLayout());
         initializeRandomPanels();
         layoutPanel();
         addInternalListeners();
     }
-    
+
     /**
      * Lays out the panel...
      */
@@ -241,7 +246,7 @@ public class RandomizerPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @param pc
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
@@ -257,7 +262,7 @@ public class RandomizerPanel extends JPanel {
      * edit anything. It displays nothing and serves only as a place holder
      * in instances where multiple randomizers are selected with different
      * probability density functions.
-     * 
+     *
      * @author Zach Tosi
      */
     private class NullRandPanel extends ProbDistPanel {

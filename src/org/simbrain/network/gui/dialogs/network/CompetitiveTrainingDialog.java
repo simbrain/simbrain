@@ -30,9 +30,9 @@ import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.CompetitiveTrainerControlsPanel;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.trainers.CompetitiveTrainer;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for training a Competitive network.

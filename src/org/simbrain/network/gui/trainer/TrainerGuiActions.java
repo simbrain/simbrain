@@ -34,7 +34,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.NumericTable.TableDataException;
 import org.simbrain.util.table.SimbrainJTable;

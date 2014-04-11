@@ -44,7 +44,7 @@ import org.simbrain.plot.histogram.HistogramPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * Panel for editing collections of synapses.

@@ -27,8 +27,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 

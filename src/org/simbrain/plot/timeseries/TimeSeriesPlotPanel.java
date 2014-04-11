@@ -30,7 +30,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartSettingsListener;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the

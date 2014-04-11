@@ -38,7 +38,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**

@@ -43,9 +43,9 @@ import org.simbrain.network.trainers.SOMTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for training a SOM network.

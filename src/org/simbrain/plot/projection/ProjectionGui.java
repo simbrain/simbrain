@@ -54,7 +54,6 @@ import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.Utils;
@@ -67,6 +66,7 @@ import org.simbrain.util.projection.ProjectSammon;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.util.projection.ProjectorListener;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 

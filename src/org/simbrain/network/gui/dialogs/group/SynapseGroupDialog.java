@@ -38,8 +38,8 @@ import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for editing synapse groups.

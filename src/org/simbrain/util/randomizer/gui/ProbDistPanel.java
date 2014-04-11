@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.randomizer;
+package org.simbrain.util.randomizer.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
 import org.simbrain.util.widgets.TristateDropDown;
 

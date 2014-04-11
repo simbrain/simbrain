@@ -1,4 +1,4 @@
-package org.simbrain.util.propertyeditor;
+package org.simbrain.util.propertyeditor.gui;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**
  * For testing ReflectivePropertyEditor.

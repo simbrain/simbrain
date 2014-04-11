@@ -28,8 +28,8 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>NeuronDialog</b> is a dialog box for setting the properties of a Neuron.

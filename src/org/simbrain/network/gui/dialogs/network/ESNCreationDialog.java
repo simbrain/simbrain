@@ -45,9 +45,9 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.util.widgets.StopLight;
 
 /**

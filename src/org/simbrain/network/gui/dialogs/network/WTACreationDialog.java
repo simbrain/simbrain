@@ -26,8 +26,8 @@ import javax.swing.JTabbedPane;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>WTADialog</b> is a dialog box for setting the properties of the Network

@@ -25,8 +25,8 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Default subnetwork panel that displays basic info. Most subnetworks should

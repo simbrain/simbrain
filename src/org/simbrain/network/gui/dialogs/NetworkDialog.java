@@ -30,9 +30,9 @@ import javax.swing.JTabbedPane;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the

@@ -33,9 +33,9 @@ import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.SimpleTrainerControlPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.trainers.HopfieldTrainer;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for setting the properties of Hopfield networks and training them.

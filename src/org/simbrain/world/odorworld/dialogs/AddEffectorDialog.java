@@ -21,8 +21,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 

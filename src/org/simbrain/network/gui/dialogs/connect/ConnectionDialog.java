@@ -22,8 +22,8 @@ import javax.swing.JButton;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  *

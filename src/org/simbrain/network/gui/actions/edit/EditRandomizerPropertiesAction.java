@@ -25,7 +25,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.randomizer.RandomizerPanel;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * Edit properties of randomizer object for network.

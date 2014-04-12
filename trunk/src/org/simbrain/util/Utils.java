@@ -130,10 +130,10 @@ public class Utils {
 
     /**
      * Helper method to create a relative path for use in saving simulation
-     * files which refer to files within directories. Substracts the
+     * files which refer to files within directories. Subtracts the
      * absolutePath of the local user directory from the absolute path of the
      * file to be saved, and converts file-separators into forward slashes,
-     * which are used for saving simualtion files.
+     * which are used for saving simulation files.
      *
      * @param baseDir absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
@@ -256,6 +256,36 @@ public class Utils {
             ret[i] = Double.parseDouble(line[i]);
         }
 
+        return ret;
+    }
+
+    /**
+     * Converts an array of doubles into an array of Strings of those doubles.
+     *
+     * @param line the array of doubles
+     * @return the array of strings
+     */
+    public static String[] doubleArrayToStringArray(final double[] line) {
+        String[] ret = new String[line.length];
+
+        for (int i = 0; i < line.length; i++) {
+            ret[i] = "" + line[i];
+        }
+        return ret;
+    }
+
+    /**
+     * Converts a matrix of doubles into a matrix of Strings representing those
+     * doubles. Used with writeMatrix.
+     *
+     * @param matrix the matrix of doubles
+     * @return the matrix of Strings
+     */
+    public static String[][] doubleMatrixToStringMatrix(final double[][] matrix) {
+        String[][] ret = new String[matrix.length][matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            ret[i] = doubleArrayToStringArray(matrix[i]);
+        }
         return ret;
     }
 

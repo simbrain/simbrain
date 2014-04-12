@@ -34,6 +34,7 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -84,12 +85,34 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
      */
     private final TrainingSet trainingSet = new TrainingSet();
 
-    //TODO
+    /**
+     * Line layout for building the SRN (when there are fewer numbers of neurons
+     * in a layer).
+     */
     private final LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
             LineOrientation.HORIZONTAL);
 
+    /**
+     * Grid layout for building the SRN (when there are large numbers of neurons
+     * in a layer).
+     */
     private final GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
             betweenNeuronInterval, 10);
+
+    /**
+     * Build an SRN with default activation rules and initial position.
+     *
+     * @param network underlying network
+     * @param numInputNodes number of nodes in the input layer
+     * @param numHiddenNodes number of nodes in the hidden and context layers
+     * @param numOutputNodes number of output nodes
+     */
+    public SimpleRecurrentNetwork(final Network network, int numInputNodes,
+            int numHiddenNodes, int numOutputNodes) {
+        this(network, numInputNodes, numHiddenNodes, numOutputNodes,
+                new SigmoidalRule(), new SigmoidalRule(), new Point2D.Double(0,
+                        0));
+    }
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
@@ -112,7 +135,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         setLabel("SRN");
 
-        // Initialize layers and set node types.  TODO: Can this be done at group level?
+        // Initialize layers and set node types. TODO: Can this be done at group
+        // level?
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
         List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();

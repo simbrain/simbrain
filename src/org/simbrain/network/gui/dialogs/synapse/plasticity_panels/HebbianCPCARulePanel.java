@@ -28,6 +28,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -77,7 +78,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
                 "getLearningRate")) {
-            tfLearningRate.setText(NULL_STRING);
+            tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
                     .setText(Double.toString(synapseRef.getLearningRate()));
@@ -85,7 +86,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
 
         // Handle M
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) {
-            tfM.setText(NULL_STRING);
+            tfM.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfM.setText(Double.toString(synapseRef.getM()));
         }
@@ -93,7 +94,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
         // Handle Theta
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
                 "getTheta")) {
-            tfTheta.setText(NULL_STRING);
+            tfTheta.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTheta.setText(Double.toString(synapseRef.getTheta()));
         }
@@ -101,7 +102,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
         // Handle Lambda
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
                 "getLambda")) {
-            tfLambda.setText(NULL_STRING);
+            tfLambda.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLambda.setText(Double.toString(synapseRef.getLambda()));
         }

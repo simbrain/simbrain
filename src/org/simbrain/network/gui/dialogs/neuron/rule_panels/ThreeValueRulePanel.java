@@ -29,6 +29,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -87,7 +88,7 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
         // Handle Lower Threshold
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getLowerThreshold"))
-            tfLowerThreshold.setText(NULL_STRING);
+            tfLowerThreshold.setText(SimbrainConstants.NULL_STRING);
         else
             tfLowerThreshold.setText(Double.toString(neuronRef
                     .getLowerThreshold()));
@@ -95,7 +96,7 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
         // Handle Upper Threshold
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getUpperThreshold"))
-            tfUpperThreshold.setText(NULL_STRING);
+            tfUpperThreshold.setText(SimbrainConstants.NULL_STRING);
         else
             tfUpperThreshold.setText(Double.toString(neuronRef
                     .getUpperThreshold()));
@@ -103,28 +104,28 @@ public class ThreeValueRulePanel extends AbstractNeuronPanel {
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getBias"))
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         else
             tfBias.setText(Double.toString(neuronRef.getBias()));
 
         // Handle Lower Value
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getLowerValue"))
-            tfLowerValue.setText(NULL_STRING);
+            tfLowerValue.setText(SimbrainConstants.NULL_STRING);
         else
             tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
 
         // Handle Middle Value
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getMiddleValue"))
-            tfMiddleValue.setText(NULL_STRING);
+            tfMiddleValue.setText(SimbrainConstants.NULL_STRING);
         else
             tfMiddleValue.setText(Double.toString(neuronRef.getMiddleValue()));
 
         // Handle Upper Value
         if (!NetworkUtils.isConsistent(ruleList, ThreeValueRule.class,
                 "getUpperValue"))
-            tfUpperValue.setText(NULL_STRING);
+            tfUpperValue.setText(SimbrainConstants.NULL_STRING);
         else
             tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
 

@@ -39,6 +39,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.CommittablePanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
@@ -251,7 +252,7 @@ implements CommittablePanel {
     private void initNeuronType() {
 
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getType")) {
-            cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
+            cbNeuronType.addItem(SimbrainConstants.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
             neuronPanel = new EmptyRulePanel();
         } else {

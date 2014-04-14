@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -69,7 +70,7 @@ public class ProbabilisticSpikeResponderPanel extends
         // Handle Activation Probability
         if (!NetworkUtils.isConsistent(spikeResponderList,
                 ProbabilisticResponder.class, "getActivationProbability")) {
-            tfActivationProbability.setText(NULL_STRING);
+            tfActivationProbability.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfActivationProbability.setText(Double.toString(spikeResponder
                     .getActivationProbability()));
@@ -78,7 +79,7 @@ public class ProbabilisticSpikeResponderPanel extends
         // Handle Response Value
         if (!NetworkUtils.isConsistent(spikeResponderList,
                 ProbabilisticResponder.class, "getResponseValue")) {
-            tfResponseValue.setText(NULL_STRING);
+            tfResponseValue.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfResponseValue.setText(Double.toString(spikeResponder
                     .getResponseValue()));

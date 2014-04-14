@@ -28,6 +28,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -87,7 +88,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
         // Handle Base Line Strength
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
                 "getBaseLineStrength")) {
-            tfBaseLineStrength.setText(NULL_STRING);
+            tfBaseLineStrength.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBaseLineStrength.setText(Double.toString(synapseRef
                     .getBaseLineStrength()));
@@ -96,7 +97,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
         // Handle Firing Threshold
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
                 "getFiringThreshold")) {
-            tfFiringThreshold.setText(NULL_STRING);
+            tfFiringThreshold.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfFiringThreshold.setText(Double.toString(synapseRef
                     .getFiringThreshold()));
@@ -105,7 +106,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
         // Handle Bump Rate
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
                 "getBumpRate")) {
-            tfBumpRate.setText(NULL_STRING);
+            tfBumpRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
         }
@@ -113,7 +114,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
         // Handle Decay Rate
         if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticityRule.class,
                 "getDecayRate")) {
-            tfDecayRate.setText(NULL_STRING);
+            tfDecayRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
         }
@@ -126,7 +127,8 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapsePanel {
     public void fillDefaultValues() {
 
         cbPlasticityType
-                .setSelectedIndex(ShortTermPlasticityRule.DEFAULT_PLASTICITY_TYPE);
+                .setSelectedIndex(ShortTermPlasticityRule
+                        .DEFAULT_PLASTICITY_TYPE);
         tfBaseLineStrength.setText(Double
                 .toString(ShortTermPlasticityRule.DEFAULT_BASE_LINE_STRENGTH));
         tfFiringThreshold.setText(Double

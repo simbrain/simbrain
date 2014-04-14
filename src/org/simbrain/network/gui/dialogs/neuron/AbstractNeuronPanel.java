@@ -68,9 +68,6 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
  */
 public abstract class AbstractNeuronPanel extends JPanel {
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
-
     /** Associations between names of rules and panels for editing them. */
     public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
             new LinkedHashMap<String, AbstractNeuronPanel>();

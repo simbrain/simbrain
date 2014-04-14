@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -96,25 +97,25 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
 
         // Handle A
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getA"))
-            tfA.setText(NULL_STRING);
+            tfA.setText(SimbrainConstants.NULL_STRING);
         else
             tfA.setText(Double.toString(neuronRef.getA()));
 
         // Handle B
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getB"))
-            tfB.setText(NULL_STRING);
+            tfB.setText(SimbrainConstants.NULL_STRING);
         else
             tfB.setText(Double.toString(neuronRef.getB()));
 
         // Handle C
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getC"))
-            tfC.setText(NULL_STRING);
+            tfC.setText(SimbrainConstants.NULL_STRING);
         else
             tfC.setText(Double.toString(neuronRef.getC()));
 
         // Handle D
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getD"))
-            tfD.setText(NULL_STRING);
+            tfD.setText(SimbrainConstants.NULL_STRING);
         else
             tfD.setText(Double.toString(neuronRef.getD()));
 

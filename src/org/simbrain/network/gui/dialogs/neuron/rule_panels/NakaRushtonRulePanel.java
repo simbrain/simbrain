@@ -34,6 +34,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -130,7 +131,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         // Handle Time Constant
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getTimeConstant"))
-            tfTimeConstant.setText(NULL_STRING);
+            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         else
             tfTimeConstant
                     .setText(Double.toString(neuronRef.getTimeConstant()));
@@ -138,7 +139,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         // Handle Semi-Saturation Constant
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getSemiSaturationConstant"))
-            tfSemiSaturation.setText(NULL_STRING);
+            tfSemiSaturation.setText(SimbrainConstants.NULL_STRING);
         else
             tfSemiSaturation.setText(Double.toString(neuronRef
                     .getSemiSaturationConstant()));
@@ -146,21 +147,21 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         // Handle Steepness
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getSteepness"))
-            tfSteepness.setText(NULL_STRING);
+            tfSteepness.setText(SimbrainConstants.NULL_STRING);
         else
             tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
 
         // Handle Lower Value
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getFloor"))
-            tfLowbound.setText(NULL_STRING);
+            tfLowbound.setText(SimbrainConstants.NULL_STRING);
         else
             tfLowbound.setText(Double.toString(neuronRef.getFloor()));
 
         // Handle Upper Value
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getCeiling"))
-            tfUpbound.setText(NULL_STRING);
+            tfUpbound.setText(SimbrainConstants.NULL_STRING);
         else
             tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
 
@@ -181,7 +182,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         // Handle Adaptation Time
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getAdaptationTimeConstant"))
-            tfAdaptationTime.setText(NULL_STRING);
+            tfAdaptationTime.setText(SimbrainConstants.NULL_STRING);
         else
             tfAdaptationTime.setText(Double.toString(neuronRef
                     .getAdaptationTimeConstant()));
@@ -189,7 +190,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         // Handle Adaptation Parameter
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
                 "getAdaptationParameter"))
-            tfAdaptationParam.setText(NULL_STRING);
+            tfAdaptationParam.setText(SimbrainConstants.NULL_STRING);
         else
             tfAdaptationParam.setText(Double.toString(neuronRef
                     .getAdaptationParameter()));

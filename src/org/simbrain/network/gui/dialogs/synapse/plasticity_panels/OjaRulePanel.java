@@ -28,6 +28,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.OjaRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -64,7 +65,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         // Handle Normalization Factor
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
                 "getNormalizationFactor")) {
-            tfNormalize.setText(NULL_STRING);
+            tfNormalize.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfNormalize.setText(Double.toString(synapseRef
                     .getNormalizationFactor()));
@@ -73,7 +74,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
                 "getLearningRate")) {
-            tfLearningRate.setText(NULL_STRING);
+            tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
                     .setText(Double.toString(synapseRef.getLearningRate()));

@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
@@ -46,9 +47,6 @@ import org.simbrain.util.widgets.TristateDropDown;
  * @author Jeff Yoshimi
  */
 public class RandomizerPanel extends JPanel {
-
-    /** TODO: REALLY need to find somewhere (<b>one place</b>) to put this....*/
-    public static final String NULL_STRING = "...";
 
     /**
      * The underlying model for the Combobox allowing for dynamic editing of
@@ -126,8 +124,8 @@ public class RandomizerPanel extends JPanel {
             public void itemStateChanged(ItemEvent arg0) {
                 CardLayout cl = (CardLayout) cardPanel.getLayout();
                 ProbDistPanel rp = null;
-                String str = NULL_STRING;
-                if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+                String str = SimbrainConstants.NULL_STRING;
+                if (!cbDistribution.getSelectedItem().equals(str)) {
                     rp = cardMap.get(cbDistribution.getSelectedItem());
                     str = rp.getPdf().toString();
                 }
@@ -150,11 +148,11 @@ public class RandomizerPanel extends JPanel {
 
         if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
                 "getPdf")) {
-            probOptions.addElement(NULL_STRING);
-            cbDistribution.setSelectedItem(NULL_STRING);
+            probOptions.addElement(SimbrainConstants.NULL_STRING);
+            cbDistribution.setSelectedItem(SimbrainConstants.NULL_STRING);
             NullRandPanel nrp = new NullRandPanel();
             cardMap.put(null, nrp);
-            cardPanel.add(nrp.getPanel(), NULL_STRING);
+            cardPanel.add(nrp.getPanel(), SimbrainConstants.NULL_STRING);
         } else {
             cbDistribution.setSelectedItem(rand.getPdf());
             cardMap.get(rand.getPdf()).fillFieldValues(randomizers);
@@ -190,7 +188,8 @@ public class RandomizerPanel extends JPanel {
      * @param rand Random source
      */
     public void commitRandom(final Randomizer rand) {
-        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (!cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             ProbDistribution pdf =
                     (ProbDistribution) cbDistribution.getSelectedItem();
             cardMap.get(pdf).commitRandom(rand);
@@ -199,7 +198,8 @@ public class RandomizerPanel extends JPanel {
 
     public void setEnabled(boolean enabled) {
         cbDistribution.setEnabled(enabled);
-        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (!cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             cardMap.get((ProbDistribution) cbDistribution.getSelectedItem())
             .setEnabled(enabled);
         }
@@ -216,7 +216,8 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the isUseBoundsBox.
      */
     public TristateDropDown getTsClipping() {
-        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
         return cardMap.get((ProbDistribution)cbDistribution
@@ -227,7 +228,8 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the tfLowBound.
      */
     public JTextField getTfLowBound() {
-        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
         return cardMap.get((ProbDistribution)cbDistribution
@@ -238,7 +240,8 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the tfUpBound.
      */
     public JTextField getTfUpBound() {
-        if (cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
         return cardMap.get((ProbDistribution)cbDistribution
@@ -251,7 +254,8 @@ public class RandomizerPanel extends JPanel {
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
         cbDistribution.addPropertyChangeListener(pc);
-        if (!cbDistribution.getSelectedItem().equals(NULL_STRING)) {
+        if (!cbDistribution.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             cardMap.get(cbDistribution.getSelectedItem())
             .addPropertyChangeListenerToFields(pc);
         }

@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.Randomizer;
@@ -42,9 +43,6 @@ import org.simbrain.util.widgets.TristateDropDown;
  * @author Jeff Yoshimi
  */
 public class ProbDistPanel {
-
-    /** TODO: REALLY need to find somewhere (<b>one place</b>) to put this....*/
-    public static final String NULL_STRING = "..."; 
 
     /** The default number of spaces given to each text field. */
     private static final int DEFAULT_TF_SIZE = 20;
@@ -124,14 +122,14 @@ public class ProbDistPanel {
                 Randomizer.class, "getParam1")) {
             tfParam1.setText(Double.toString(rand.getParam1()));
         } else {
-            tfParam1.setText(NULL_STRING);
+            tfParam1.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (NetworkUtils.isConsistent(randomizers,
                 Randomizer.class, "getParam2")) {
             tfParam2.setText(Double.toString(rand.getParam2()));
         } else {
-            tfParam2.setText(NULL_STRING);
+            tfParam2.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (!pdf.equals(ProbDistribution.UNIFORM)) {
@@ -139,13 +137,13 @@ public class ProbDistPanel {
                     Randomizer.class, "getLowerBound")) {
                 tfLowBound.setText(Double.toString(rand.getLowerBound()));
             } else {
-                tfLowBound.setText(NULL_STRING);
+                tfLowBound.setText(SimbrainConstants.NULL_STRING);
             }
             if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
                     "getUpperBound")) {
                 tfUpBound.setText(Double.toString(rand.getUpperBound()));
             } else {
-                tfUpBound.setText(NULL_STRING);
+                tfUpBound.setText(SimbrainConstants.NULL_STRING);
             }
             if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
                     "getClipping")) {

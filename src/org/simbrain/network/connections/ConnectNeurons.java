@@ -25,6 +25,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -71,10 +73,10 @@ public abstract class ConnectNeurons {
     protected Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     /** A source of random numbers for inhibitory connections. */
-    protected Randomizer inhibitoryRandomizer = new Randomizer();
+    protected PolarizedRandomizer inhibitoryRandomizer = new PolarizedRandomizer(Polarity.INHIBITORY);
 
     /** A source of random numbers for excitatory connections. */
-    protected Randomizer excitatoryRandomizer = new Randomizer();
+    protected PolarizedRandomizer excitatoryRandomizer = new PolarizedRandomizer(Polarity.EXCITATORY);
 
     /** A switch for enabling randomized excitatory connections. */
     protected boolean enableExcitatoryRandomization;
@@ -211,8 +213,7 @@ public abstract class ConnectNeurons {
     /**
      * Sets the ratio of excitatory to inhibitory connections. The inhibitory
      * part of the ratio is assumed to be 1- excitatoryRatio. So, 1 is all
-     * excitatory (1:0), 0 is all inhibitory (0:1), .7 is 70% excitatory
-     * (.7:.3), etc.
+     * excitatory (1:0), 0 is all inhibitory (0:1), etc...
      *
      * @param excitatoryRatio ratio of excitatory to inhibitory connections
      */
@@ -223,6 +224,17 @@ public abstract class ConnectNeurons {
         this.excitatoryRatio = excitatoryRatio;
     }
 
+    /**
+     * Sets the ratio of inhibitory to excitatory connections. The excitatory
+     * part of the ratio is assumed to be 1- inhibitoryRatio. So, 0 is all
+     * excitatory (1:0), 1 is all inhibitory (0:1), etc...
+     * 
+     * @param inhibitoryRatio
+     */
+    public void setInhibitoryRatio(double inhibitoryRatio) {
+        setExcitatoryRatio(1 - inhibitoryRatio);
+    }
+    
     /**
      * Helper method for setting excitatory ratio using an excitatory
      * percentage.
@@ -247,12 +259,12 @@ public abstract class ConnectNeurons {
         return DEFAULT_EXCITATORY_RATIO;
     }
 
-    public Randomizer getInhibitoryRandomizer() {
-        return inhibitoryRandomizer;
+    public PolarizedRandomizer getInhibitoryRandomizer() {
+        return new PolarizedRandomizer(inhibitoryRandomizer);
     }
 
     public Randomizer getExcitatoryRandomizer() {
-        return excitatoryRandomizer;
+        return new PolarizedRandomizer(excitatoryRandomizer);
     }
 
     public void setEnableExcitatoryRandomization(boolean enableExRand) {
@@ -330,11 +342,13 @@ public abstract class ConnectNeurons {
         this.targetNeurons = target;
     }
 
-    public void setInhibitoryRandomizer(Randomizer inhibitoryRandomizer) {
+    public void setInhibitoryRandomizer(
+            PolarizedRandomizer inhibitoryRandomizer) {
         this.inhibitoryRandomizer = inhibitoryRandomizer;
     }
 
-    public void setExcitatoryRandomizer(Randomizer excitatoryRandomizer) {
+    public void setExcitatoryRandomizer(
+            PolarizedRandomizer excitatoryRandomizer) {
         this.excitatoryRandomizer = excitatoryRandomizer;
     }
 

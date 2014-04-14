@@ -32,28 +32,29 @@ public class Randomizer {
     public static final ProbDistribution DEFAULT_DISTRIBUTION =
             ProbDistribution.UNIFORM;
     
-    private ProbDistribution pdf = DEFAULT_DISTRIBUTION;
+    protected ProbDistribution pdf = DEFAULT_DISTRIBUTION;
 
-    private double param1 = 0;
+    protected double param1 = 0;
 
-    private double param2 = 1;
+    protected double param2 = 1;
 
     /** Upper bound of the random distribution. */
-    private double upperBound = 1;
+    protected double upperBound = 1;
 
     /** Lower bound of the random distribution. */
-    private double lowerBound = -1;
+    protected double lowerBound = 0;
 
     /**
      * Whether the Gaussian distribution should be clipped at upper / lower
      * bound values.
      */
-    private boolean clipping = false;
-
+    protected boolean clipping = false;
+    
     /**
      * Default constructor.
      */
     public Randomizer() {
+        
     }
 
     /**

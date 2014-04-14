@@ -28,6 +28,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -61,7 +62,7 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList,
                 SubtractiveNormalizationRule.class, "getLearningRate")) {
-            tfLearningRate.setText(NULL_STRING);
+            tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
                     .setText(Double.toString(synapseRef.getLearningRate()));
@@ -83,7 +84,8 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapsePanel {
     @Override
     public void commitChanges(Synapse synapse) {
 
-        if (!(synapse.getLearningRule() instanceof SubtractiveNormalizationRule)) {
+        if (!(synapse.getLearningRule() instanceof
+                SubtractiveNormalizationRule)) {
             synapse.setLearningRule(prototypeRule.deepCopy());
         }
 

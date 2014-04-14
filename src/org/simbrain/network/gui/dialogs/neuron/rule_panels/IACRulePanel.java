@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IACRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -88,13 +89,13 @@ public class IACRulePanel extends AbstractNeuronPanel {
 
         // Handle Decay
         if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getDecay"))
-            tfDecay.setText(NULL_STRING);
+            tfDecay.setText(SimbrainConstants.NULL_STRING);
         else
             tfDecay.setText(Double.toString(neuronRef.getDecay()));
 
         // Handle Rest
         if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getRest"))
-            tfRest.setText(NULL_STRING);
+            tfRest.setText(SimbrainConstants.NULL_STRING);
         else
             tfRest.setText(Double.toString(neuronRef.getRest()));
 

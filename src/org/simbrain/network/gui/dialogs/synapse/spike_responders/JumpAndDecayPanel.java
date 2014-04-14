@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -70,7 +71,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle Jump Height
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
                 "getJumpHeight")) {
-            tfJumpHeight.setText(NULL_STRING);
+            tfJumpHeight.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfJumpHeight
                     .setText(Double.toString(spikeResponder.getJumpHeight()));
@@ -79,7 +80,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle Baseline
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
                 "getBaseLine")) {
-            tfBaseLine.setText(NULL_STRING);
+            tfBaseLine.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBaseLine.setText(Double.toString(spikeResponder.getBaseLine()));
         }
@@ -87,7 +88,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle Decay Rate
         if (!NetworkUtils.isConsistent(spikeResponderList, JumpAndDecay.class,
                 "getTimeConstant")) {
-            tfTimeConstant.setText(NULL_STRING);
+            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTimeConstant.setText(Double.toString(spikeResponder
                     .getTimeConstant()));

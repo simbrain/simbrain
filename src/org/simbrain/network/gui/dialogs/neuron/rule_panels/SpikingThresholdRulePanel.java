@@ -30,6 +30,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -69,7 +70,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
         // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, SpikingThresholdRule.class,
                 "getThreshold")) {
-            tfThreshold.setText(NULL_STRING);
+            tfThreshold.setText(SimbrainConstants.NULL_STRING);
         }
     }
 

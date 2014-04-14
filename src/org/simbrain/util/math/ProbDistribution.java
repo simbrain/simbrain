@@ -85,7 +85,7 @@ public enum ProbDistribution {
 
         @Override
         public double getDefaultParam1() {
-            return -1;
+            return 0;
         }
 
         @Override
@@ -100,7 +100,7 @@ public enum ProbDistribution {
 
         @Override
         public double getDefaultLowBound() {
-            return -1;
+            return 0;
         }
 
     }, NORMAL{
@@ -152,7 +152,7 @@ public enum ProbDistribution {
 
         @Override
         public double getDefaultParam1() {
-            return 0;
+            return 1;
         }
 
         @Override

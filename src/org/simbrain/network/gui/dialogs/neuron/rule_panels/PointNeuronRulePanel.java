@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -122,28 +123,28 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handle Excitatory Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getExcitatoryReversal"))
-            tfER.setText(NULL_STRING);
+            tfER.setText(SimbrainConstants.NULL_STRING);
         else
             tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
 
         // Handle Inhibitory Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getInhibitoryReversal"))
-            tfIR.setText(NULL_STRING);
+            tfIR.setText(SimbrainConstants.NULL_STRING);
         else
             tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
 
         // Handle Leak Reversal
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getLeakReversal"))
-            tfLR.setText(NULL_STRING);
+            tfLR.setText(SimbrainConstants.NULL_STRING);
         else
             tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
 
         // Handle Leak Conductance
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getLeakConductance"))
-            tfLC.setText(NULL_STRING);
+            tfLC.setText(SimbrainConstants.NULL_STRING);
         else
             tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
 
@@ -151,7 +152,7 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handle Output Function
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getOutputFunction")) {
-            cbOutputFunction.addItem(NULL_STRING);
+            cbOutputFunction.addItem(SimbrainConstants.NULL_STRING);
             cbOutputFunction.setSelectedIndex(cbOutputFunction.getItemCount());
         } else
             cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
@@ -159,7 +160,7 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handles Threshold Potential
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getThresholdPotential"))
-            tfThreshold.setText(NULL_STRING);
+            tfThreshold.setText(SimbrainConstants.NULL_STRING);
         else
             tfThreshold.setText(Double.toString(neuronRef
                     .getThresholdPotential()));
@@ -167,14 +168,14 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handle Gain
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getGain"))
-            tfGain.setText(NULL_STRING);
+            tfGain.setText(SimbrainConstants.NULL_STRING);
         else
             tfGain.setText(Double.toString(neuronRef.getGain()));
 
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getBias"))
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         else
             tfBias.setText(Double.toString(neuronRef.getBias()));
 
@@ -182,7 +183,7 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         // Handle Time Averaging
         if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
                 "getNetTimeConstant"))
-            tfTimeAveraging.setText(NULL_STRING);
+            tfTimeAveraging.setText(SimbrainConstants.NULL_STRING);
         else
             tfTimeAveraging.setText(Double.toString(neuronRef
                     .getNetTimeConstant()));
@@ -282,7 +283,8 @@ public class PointNeuronRulePanel extends AbstractNeuronPanel {
         }
 
         // Output function
-        if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
+        if (!cbOutputFunction.getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((PointNeuronRule) neurons.get(i).getUpdateRule())
                         .setOutputFunction((OutputFunction) cbOutputFunction

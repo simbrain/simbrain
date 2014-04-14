@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.util.math.SimbrainMath;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double

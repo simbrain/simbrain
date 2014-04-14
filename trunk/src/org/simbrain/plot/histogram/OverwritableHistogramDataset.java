@@ -139,8 +139,6 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
             binWidth = (values[values.length - 1].doubleValue()
                     - values[0].doubleValue()) / bins;
 
-            if (binWidth == 0) binWidth = 1;
-
             histBins = new HistogramBin[bins];
 
             int index = 0;

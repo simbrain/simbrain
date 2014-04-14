@@ -35,6 +35,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
@@ -151,7 +152,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils
                 .isConsistent(ruleList, SigmoidalRule.class, "getBias"))
         {
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBias.setText(Double.toString(neuronRef.getBias()));
         }
@@ -159,7 +160,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
                 "getSlope"))
         {
-            tfSlope.setText(NULL_STRING);
+            tfSlope.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfSlope.setText(Double.toString(neuronRef.getSlope()));
         }
@@ -167,7 +168,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
                 "getFloor"))
         {
-            tfLowbound.setText(NULL_STRING);
+            tfLowbound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowbound.setText(Double.toString(neuronRef.getFloor()));
         }
@@ -175,7 +176,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
                 "getCeiling"))
         {
-            tfUpbound.setText(NULL_STRING);
+            tfUpbound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
         }

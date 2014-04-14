@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -86,13 +87,13 @@ public class LinearRulePanel extends AbstractNeuronPanel {
 
         // Handle Slope
         if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getSlope"))
-            tfSlope.setText(NULL_STRING);
+            tfSlope.setText(SimbrainConstants.NULL_STRING);
         else
             tfSlope.setText(Double.toString(neuronRef.getSlope()));
 
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getBias"))
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         else
             tfBias.setText(Double.toString(neuronRef.getBias()));
 

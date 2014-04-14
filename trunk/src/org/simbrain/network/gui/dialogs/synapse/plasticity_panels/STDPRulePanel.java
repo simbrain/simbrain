@@ -28,6 +28,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.STDPRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -77,28 +78,28 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         // Handle Tau Minus
         if (!NetworkUtils
                 .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
-            tfTauMinus.setText(NULL_STRING);
+            tfTauMinus.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
         }
 
         // Handle Tau Plus
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getTau_plus")) {
-            tfTauPlus.setText(NULL_STRING);
+            tfTauPlus.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTauPlus.setText(Double.toString(synapseRef.getTau_plus()));
         }
 
         // Handle W Minus
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_minus")) {
-            tfWMinus.setText(NULL_STRING);
+            tfWMinus.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfWMinus.setText(Double.toString(synapseRef.getW_minus()));
         }
 
         // Handle W Plus
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus")) {
-            tfWPlus.setText(NULL_STRING);
+            tfWPlus.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfWPlus.setText(Double.toString(synapseRef.getW_plus()));
         }
@@ -106,7 +107,7 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
                 "getLearningRate")) {
-            tfLearningRate.setText(NULL_STRING);
+            tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
                     .setText(Double.toString(synapseRef.getLearningRate()));

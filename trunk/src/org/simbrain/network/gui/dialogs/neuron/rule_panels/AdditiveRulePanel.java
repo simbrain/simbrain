@@ -31,6 +31,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
@@ -93,12 +94,12 @@ public class AdditiveRulePanel extends AbstractNeuronPanel {
         // Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
                 "getLambda")) {
-            tfLambda.setText(NULL_STRING);
+            tfLambda.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,
                 "getResistance")) {
-            tfResistance.setText(NULL_STRING);
+            tfResistance.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (!NetworkUtils.isConsistent(ruleList, AdditiveRule.class,

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
@@ -49,7 +50,8 @@ public class NeuronNoiseGenPanel extends RandomizerPanel {
      */
     public void commitRandom(List<Neuron> noiseyNeurons)
             throws ClassCastException {
-        if (!getCbDistribution().getSelectedItem().equals(NULL_STRING)) {
+        if (!getCbDistribution().getSelectedItem()
+                .equals(SimbrainConstants.NULL_STRING)) {
             Randomizer rand = new Randomizer();
             super.commitRandom(rand);
             for (Neuron n : noiseyNeurons) {

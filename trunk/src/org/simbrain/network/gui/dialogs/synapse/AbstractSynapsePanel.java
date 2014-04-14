@@ -61,9 +61,6 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public abstract class AbstractSynapsePanel extends JPanel {
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
-
     /**
      * A mapping of available update rules to their respective panels. Used as a
      * reference (especially for combo-boxes) by GUI classes.

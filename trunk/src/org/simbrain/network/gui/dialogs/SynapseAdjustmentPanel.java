@@ -612,7 +612,6 @@ public class SynapseAdjustmentPanel extends JPanel {
             tot = weights[0].length + weights[1].length;
             data = new double[tot];
             int c = 0;
-            System.out.println("All happens");
             for (int i = 0; i < 2; i++) {
                 for (int j = 0, m = weights[i].length; j < m; j++) {
                     double val = weights[i][j].doubleValue();
@@ -636,7 +635,6 @@ public class SynapseAdjustmentPanel extends JPanel {
         }else if (type == "Excitatory Only" && weights[0].length != 0) {
             tot = weights[0].length;
             data = new double[tot];
-            System.out.println("I happen");
             for (int j = 0; j < tot; j++) {
                 double val = Math.abs(weights[0][j].doubleValue());
                 runningVal += val;
@@ -808,34 +806,34 @@ public class SynapseAdjustmentPanel extends JPanel {
         return true;
     }
 
-    private class SynapseWeight extends Number {
-
-        private final Synapse s;
-
-        public SynapseWeight(Synapse s) {
-            this.s = s;
-        }
-
-        @Override
-        public double doubleValue() {
-            return s.getStrength();
-        }
-
-        @Override
-        public float floatValue() {
-            return (float) s.getStrength();
-        }
-
-        @Override
-        public int intValue() {
-            return (int) s.getStrength();
-        }
-
-        @Override
-        public long longValue() {
-            return (long) s.getStrength();
-        }
-
-    }
+//    private class SynapseWeight extends Number {
+//
+//        private final Synapse s;
+//
+//        public SynapseWeight(Synapse s) {
+//            this.s = s;
+//        }
+//
+//        @Override
+//        public double doubleValue() {
+//            return s.getStrength();
+//        }
+//
+//        @Override
+//        public float floatValue() {
+//            return (float) s.getStrength();
+//        }
+//
+//        @Override
+//        public int intValue() {
+//            return (int) s.getStrength();
+//        }
+//
+//        @Override
+//        public long longValue() {
+//            return (long) s.getStrength();
+//        }
+//
+//    }
 
 }

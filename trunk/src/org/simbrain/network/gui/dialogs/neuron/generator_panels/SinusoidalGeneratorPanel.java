@@ -30,6 +30,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -86,14 +87,14 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
         // Handle Frequency
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
                 "getFrequency"))
-            tfFrequency.setText(NULL_STRING);
+            tfFrequency.setText(SimbrainConstants.NULL_STRING);
         else
             tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
 
         // Handle Phase
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
                 "getPhase"))
-            tfPhase.setText(NULL_STRING);
+            tfPhase.setText(SimbrainConstants.NULL_STRING);
         else
             tfPhase.setText(Double.toString(neuronRef.getPhase()));
 
@@ -145,11 +146,11 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
         }
 
         // Phase
-        if (!tfPhase.getText().equals(NULL_STRING))
+        if (!tfPhase.getText().equals(SimbrainConstants.NULL_STRING))
             neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
 
         // Frequency
-        if (!tfFrequency.getText().equals(NULL_STRING))
+        if (!tfFrequency.getText().equals(SimbrainConstants.NULL_STRING))
             neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
 
         // Noise
@@ -167,11 +168,11 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
     public void commitChanges(List<Neuron> neurons) {
 
         // Phase
-        if (!tfPhase.getText().equals(NULL_STRING))
+        if (!tfPhase.getText().equals(SimbrainConstants.NULL_STRING))
             neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
 
         // Frequency
-        if (!tfFrequency.getText().equals(NULL_STRING))
+        if (!tfFrequency.getText().equals(SimbrainConstants.NULL_STRING))
             neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
 
         // Noise

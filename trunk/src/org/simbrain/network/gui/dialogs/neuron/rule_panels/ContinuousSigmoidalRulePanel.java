@@ -35,10 +35,10 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
@@ -160,7 +160,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
                 "getTimeConstant"))
         {
-            tfTimeConstant.setText(NULL_STRING);
+            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTimeConstant
                     .setText(Double.toString(neuronRef.getTimeConstant()));
@@ -170,7 +170,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
                 "getBias"))
         {
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfBias.setText(Double.toString(neuronRef.getBias()));
         }
@@ -179,7 +179,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
                 "getSlope"))
         {
-            tfSlope.setText(NULL_STRING);
+            tfSlope.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfSlope.setText(Double.toString(neuronRef.getSlope()));
         }
@@ -188,7 +188,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
                 "getFloor"))
         {
-            tfLowbound.setText(NULL_STRING);
+            tfLowbound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowbound.setText(Double.toString(neuronRef.getFloor()));
         }
@@ -197,7 +197,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
                 "getCeiling"))
         {
-            tfUpbound.setText(NULL_STRING);
+            tfUpbound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
         }

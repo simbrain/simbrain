@@ -29,6 +29,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -77,7 +78,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
                 "getLearningRate")) {
-            tfLearningRate.setText(NULL_STRING);
+            tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
                     .setText(Double.toString(synapseRef.getLearningRate()));
@@ -86,7 +87,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         // Handle Threshold Momentum
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
                 "getOutputThresholdMomentum")) {
-            tfOutputThresholdMomentum.setText(NULL_STRING);
+            tfOutputThresholdMomentum.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfOutputThresholdMomentum.setText(Double.toString(synapseRef
                     .getOutputThresholdMomentum()));
@@ -95,7 +96,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
         // Handle Output Threshold
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
                 "getOutputThreshold")) {
-            tfOutputThreshold.setText(NULL_STRING);
+            tfOutputThreshold.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfOutputThreshold.setText(Double.toString(synapseRef
                     .getOutputThreshold()));

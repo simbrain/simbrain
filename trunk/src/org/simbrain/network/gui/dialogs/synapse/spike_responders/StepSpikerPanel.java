@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -82,7 +83,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
         // Handle Response Height
         if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
                 "getResponseHeight")) {
-            tfResponseHeight.setText(NULL_STRING);
+            tfResponseHeight.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfResponseHeight.setText(Double.toString(spikeResponder
                     .getResponseHeight()));
@@ -91,7 +92,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
         // Handle Response Duration
         if (!NetworkUtils.isConsistent(spikeResponderList, Step.class,
                 "getResponseDuration")) {
-            tfResponseDuration.setText(NULL_STRING);
+            tfResponseDuration.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfResponseDuration.setText(Double.toString(spikeResponder
                     .getResponseDuration()));

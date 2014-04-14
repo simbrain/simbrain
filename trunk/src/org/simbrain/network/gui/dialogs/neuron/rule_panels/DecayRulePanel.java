@@ -36,6 +36,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -140,14 +141,14 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
         // Handle Baseline
         if (!NetworkUtils
                 .isConsistent(ruleList, DecayRule.class, "getBaseLine"))
-            tfBaseLine.setText(NULL_STRING);
+            tfBaseLine.setText(SimbrainConstants.NULL_STRING);
         else
             tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
 
         // Handle Decay Fraction
         if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
                 "getDecayFraction"))
-            tfDecayFraction.setText(NULL_STRING);
+            tfDecayFraction.setText(SimbrainConstants.NULL_STRING);
         else
             tfDecayFraction.setText(Double.toString(neuronRef
                     .getDecayFraction()));
@@ -155,7 +156,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
         // Handle Decay Amount
         if (!NetworkUtils.isConsistent(ruleList, DecayRule.class,
                 "getDecayAmount"))
-            tfDecayAmount.setText(NULL_STRING);
+            tfDecayAmount.setText(SimbrainConstants.NULL_STRING);
         else
             tfDecayAmount.setText(Double.toString(neuronRef.getDecayAmount()));
 

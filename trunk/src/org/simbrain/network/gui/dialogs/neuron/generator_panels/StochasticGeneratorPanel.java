@@ -29,6 +29,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
+import org.simbrain.util.SimbrainConstants;
 
 /**
  * <b>StochasticNeuronPanel</b>.
@@ -66,7 +67,7 @@ public class StochasticGeneratorPanel extends AbstractNeuronPanel {
         // Handle Firing Probability
         if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class,
                 "getFiringProbability"))
-            tfFiringProbability.setText(NULL_STRING);
+            tfFiringProbability.setText(SimbrainConstants.NULL_STRING);
         else
             tfFiringProbability.setText(Double.toString(neuronRef
                     .getFiringProbability()));
@@ -95,7 +96,8 @@ public class StochasticGeneratorPanel extends AbstractNeuronPanel {
         }
 
         // Firing Probability
-        if (!tfFiringProbability.getText().equals(NULL_STRING))
+        if (!tfFiringProbability.getText()
+                .equals(SimbrainConstants.NULL_STRING))
             neuronRef.setFiringProbability(Double
                     .parseDouble(tfFiringProbability.getText()));
 
@@ -108,7 +110,8 @@ public class StochasticGeneratorPanel extends AbstractNeuronPanel {
     public void commitChanges(List<Neuron> neurons) {
 
         // Firing Probability
-        if (!tfFiringProbability.getText().equals(NULL_STRING))
+        if (!tfFiringProbability.getText()
+                .equals(SimbrainConstants.NULL_STRING))
             neuronRef.setFiringProbability(Double
                     .parseDouble(tfFiringProbability.getText()));
 

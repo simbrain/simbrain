@@ -18,20 +18,14 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Float;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode.Port;
-import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.widgets.DirectedCubicArrow;
 import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
@@ -357,8 +351,6 @@ SynapseGroupArrow {
         }
     }
 
-
-
     /**
      * {@inheritDoc}
      * TODO: Not sure why below is needed.  Without the explicit null sets
@@ -367,8 +359,12 @@ SynapseGroupArrow {
     @Override
     public synchronized void removeFromParent() {
         halt.getAndSet(true);
-        sourceNode.removeSynapseDock(startPort, this);
-        targetNode.removeSynapseDock(endPort, this);
+        if (startPort != null) {
+            sourceNode.removeSynapseDock(startPort, this);
+        }
+        if (endPort != null) {
+            targetNode.removeSynapseDock(endPort, this);
+        }
         arrow = null;
         super.removeFromParent();
     }

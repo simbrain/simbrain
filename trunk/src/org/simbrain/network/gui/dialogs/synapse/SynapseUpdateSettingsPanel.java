@@ -38,6 +38,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -48,9 +49,6 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  */
 @SuppressWarnings("serial")
 public class SynapseUpdateSettingsPanel extends JPanel {
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -236,7 +234,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
     private void initSynapseType() {
 
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
-            cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
+            cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
             cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
             // Simply to serve as an empty panel
             synapsePanel = new StaticSynapsePanel();

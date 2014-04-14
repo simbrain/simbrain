@@ -32,6 +32,7 @@ import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -99,7 +100,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
         // Handle Resting Potential
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
                 "getRestingPotential"))
-            tfRestingPotential.setText(NULL_STRING);
+            tfRestingPotential.setText(SimbrainConstants.NULL_STRING);
         else
             tfRestingPotential.setText(Double.toString(neuronRef
                     .getRestingPotential()));
@@ -107,7 +108,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
         // Handle Resistance
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
                 "getResistance"))
-            tfResistance.setText(NULL_STRING);
+            tfResistance.setText(SimbrainConstants.NULL_STRING);
         else
             tfResistance.setText(Double.toString(neuronRef.getResistance()));
 
@@ -121,14 +122,14 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
         // Handle Reset Potential
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
                 "getResetPotential"))
-            tfReset.setText(NULL_STRING);
+            tfReset.setText(SimbrainConstants.NULL_STRING);
         else
             tfReset.setText(Double.toString(neuronRef.getResetPotential()));
 
         // Handle Time Constant
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
                 "getTimeConstant"))
-            tfTimeConstant.setText(NULL_STRING);
+            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         else
             tfTimeConstant
                     .setText(Double.toString(neuronRef.getTimeConstant()));
@@ -136,7 +137,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronPanel {
         // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
                 "getThreshold"))
-            tfThreshold.setText(NULL_STRING);
+            tfThreshold.setText(SimbrainConstants.NULL_STRING);
         else
             tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 

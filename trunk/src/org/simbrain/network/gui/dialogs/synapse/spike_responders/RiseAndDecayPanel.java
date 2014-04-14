@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.synapse.AbstractSpikeResponsePanel;
 import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -81,7 +82,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle Maximum Response
         if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
                 "getMaximumResponse")) {
-            tfMaximumResponse.setText(NULL_STRING);
+            tfMaximumResponse.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfMaximumResponse.setText(Double.toString(spikeResponder
                     .getMaximumResponse()));
@@ -90,7 +91,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         // Handle Decay Rate
         if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
                 "getTimeConstant")) {
-            tfTimeConstant.setText(NULL_STRING);
+            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTimeConstant.setText(Double.toString(spikeResponder
                     .getTimeConstant()));

@@ -30,6 +30,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -82,26 +83,26 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
         // Handle Threshold
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
                 "getThreshold"))
-            tfThreshold.setText(NULL_STRING);
+            tfThreshold.setText(SimbrainConstants.NULL_STRING);
         else
             tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 
         // Handle Lower Value
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getFloor"))
-            tfLowbound.setText(NULL_STRING);
+            tfLowbound.setText(SimbrainConstants.NULL_STRING);
         else
             tfLowbound.setText(Double.toString(neuronRef.getFloor()));
 
         // Handle Upper Value
         if (!NetworkUtils
                 .isConsistent(ruleList, BinaryRule.class, "getCeiling"))
-            tfUpbound.setText(NULL_STRING);
+            tfUpbound.setText(SimbrainConstants.NULL_STRING);
         else
             tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
 
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias"))
-            tfBias.setText(NULL_STRING);
+            tfBias.setText(SimbrainConstants.NULL_STRING);
         else
             tfBias.setText(Double.toString(neuronRef.getBias()));
 

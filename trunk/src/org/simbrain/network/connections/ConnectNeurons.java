@@ -260,11 +260,11 @@ public abstract class ConnectNeurons {
     }
 
     public PolarizedRandomizer getInhibitoryRandomizer() {
-        return new PolarizedRandomizer(inhibitoryRandomizer);
+        return inhibitoryRandomizer;
     }
 
     public Randomizer getExcitatoryRandomizer() {
-        return new PolarizedRandomizer(excitatoryRandomizer);
+        return excitatoryRandomizer;
     }
 
     public void setEnableExcitatoryRandomization(boolean enableExRand) {

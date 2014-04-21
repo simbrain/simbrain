@@ -64,6 +64,7 @@ public class SOMNetworkNode extends SubnetworkNode {
         menu.add(renameAction);
         menu.add(removeAction);
         menu.addSeparator();
+        menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
                 ((SOMNetwork) getSubnetwork()).update();
@@ -72,6 +73,7 @@ public class SOMNetworkNode extends SubnetworkNode {
             }
         };
         menu.add(trainNet);
+        menu.addSeparator();
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {

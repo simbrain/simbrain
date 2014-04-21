@@ -22,6 +22,7 @@ import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.trainers.Trainable;
 
 /**
  * A collection of neuron groups and synapse groups which functions as a
@@ -465,6 +466,22 @@ public abstract class Subnetwork extends Group {
     @Override
     public String getUpdateMethodDesecription() {
         return "Unspecified";
+    }
+
+    /**
+     * If this subnetwork is trainable, then add the current activation of the
+     * "input" neuron group to the input data of the training set. Assumes the
+     * input neuron group is that last in the list of neuron groups (as is the
+     * case with Hopfield, Competitive, and SOM). Only makes sense with
+     * unsupervised learning, since only input data (and no target data) are
+     * added.
+     */
+    public void addRowToTrainingSet() {
+        if (this instanceof Trainable) {
+            ((Trainable) this).getTrainingSet().addRow(
+                    getNeuronGroupList().get(getNeuronGroupList().size() - 1)
+                            .getActivations());
+        }
     }
 
 }

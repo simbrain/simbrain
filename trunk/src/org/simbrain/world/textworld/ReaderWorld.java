@@ -21,7 +21,10 @@ package org.simbrain.world.textworld;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+
+import cern.colt.Arrays;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -39,7 +42,7 @@ public class ReaderWorld extends TextWorld {
     };
 
     /** The current parsing style. */
-    private ParseStyle parseStyle = ParseStyle.CHARACTER;
+    private ParseStyle parseStyle = ParseStyle.WORD;
 
     /** For use with word parsing. */
     private String delimeter = "";
@@ -269,6 +272,21 @@ public class ReaderWorld extends TextWorld {
         } else {
             return 0;
         }
+    }
+
+    
+    public double[] getVector(String text) {
+        if(dictionary2.containsKey(text)) {
+            return dictionary2.get(text);
+        } else {
+            return SimbrainMath.zeroVector(5); //todo; size
+        }
+    }
+
+    public double[] getCurrentVector() {
+      //  System.out.println(Arrays.toString(this.getVector(this.getCurrentItem()
+      //          .getText())));
+        return this.getVector(this.getCurrentItem().getText());
     }
 
     /**

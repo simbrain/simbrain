@@ -271,6 +271,22 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
     };
 
     /**
+     * Action for adding the current pattern in the network to the training data
+     */
+    protected Action addInputRowAction = new AbstractAction() {
+
+        {
+            putValue(NAME, "Add current pattern to input data...");
+            putValue(SHORT_DESCRIPTION, "Add current pattern to input data...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            subnetwork.addRowToTrainingSet();
+        }
+    };
+
+    /**
      * Action for testing inputs to trainable networks.
      */
     private Action testInputAction = new AbstractAction() {

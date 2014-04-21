@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
 
 /**
@@ -177,6 +178,25 @@ public class TrainingSet {
      */
     public void setPercentValidation(double percentValidation) {
         this.percentValidation = percentValidation;
+    }
+
+    /**
+     * Add a row of values to the input data table.
+     *
+     * @param newRow the new values to add.
+     */
+    public void addRow(double[] newRow) {
+        double[][] matActivations = new double[1][newRow.length];
+        matActivations[0] = newRow;
+
+        if (inputData == null) {
+            inputData = new double[1][newRow.length];
+            inputData = matActivations;
+        } else {
+            double newInputData[][] = Utils.concatenate(inputData,
+                    matActivations);
+            inputData = newInputData;
+        }
     }
 
 }

@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +55,7 @@ public class Utils {
     public static double[][] getDoubleMatrix(final File theFile) {
         String[][] stringMatrix = getStringMatrix(theFile);
 
-        // convert strings to doubles
+        // Convert strings to doubles
         double[][] ret = new double[stringMatrix.length][stringMatrix[0].length];
 
         for (int i = 0; i < stringMatrix.length; i++) {
@@ -96,6 +97,16 @@ public class Utils {
         }
 
         return stringMatrix;
+    }
+
+    /**
+     * Write a matrix of doubles to a file.
+     *
+     * @param data the matrix of doubles to write
+     * @param theFile the file to write to
+     */
+    public static void writeMatrix(final double[][] data, final File theFile) {
+        writeMatrix(Utils.doubleMatrixToStringMatrix(data), theFile);
     }
 
     /**
@@ -244,7 +255,7 @@ public class Utils {
     }
 
     /**
-     * Converts an array of strings containing doubles into an array of values.
+     * Converts an array of strings containing doubles into an array of doubles.
      *
      * @param line the array of strings
      * @return the array of doubles
@@ -273,6 +284,8 @@ public class Utils {
         }
         return ret;
     }
+
+
 
     /**
      * Converts a matrix of doubles into a matrix of Strings representing those
@@ -361,7 +374,7 @@ public class Utils {
     }
 
     /**
-     * returns the Hue associated with a Color.
+     * Returns the Hue associated with a Color.
      *
      * @param clr Color
      * @return Hue, saturation and brightness
@@ -507,4 +520,25 @@ public class Utils {
         return scriptText.toString();
     }
 
+    /**
+     * Concatenate two arrays A, B to produce a third array A + B. From Jean
+     * Nicolas https://chocolatapp.com/
+     *
+     * @param <T> type of the arrays to concatenate
+     * @param A first array
+     * @param B second array
+     * @return A + B array consisting of first followed by second.
+     */
+    public static <T> T[] concatenate(final T[] A, final T[] B) {
+        int aLen = A.length;
+        int bLen = B.length;
+
+        @SuppressWarnings("unchecked")
+        T[] C = (T[]) Array.newInstance(A.getClass().getComponentType(), aLen
+                + bLen);
+        System.arraycopy(A, 0, C, 0, aLen);
+        System.arraycopy(B, 0, C, aLen, bLen);
+
+        return C;
+    }
 }

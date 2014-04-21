@@ -59,6 +59,10 @@ public class NeuronGroup extends Group {
     private final HashSet<SynapseGroup> outgoingSgs =
             new HashSet<SynapseGroup>();
 
+    /** Data (input vectors) for testing the network.*/
+    private double[][] testData;
+
+
     /**
      * Construct a new neuron group from a list of neurons.
      *
@@ -71,6 +75,16 @@ public class NeuronGroup extends Group {
             addNeuron(neuron);
         }
         // Collections.sort(neuronList, Comparators.X_ORDER);
+    }
+    /**
+     * Construct a new neuron group with a specified number of neurons.
+     *
+     * @param net parent network
+     * @param numNeurons how many neurons it will have
+     */
+    public NeuronGroup(final Network net,
+            final int numNeurons) {
+        this(net, new Point2D.Double(0,0), numNeurons);
     }
 
     /**
@@ -169,6 +183,17 @@ public class NeuronGroup extends Group {
     public void setNeuronType(NeuronUpdateRule base) {
         for (Neuron neuron : neuronList) {
             neuron.setUpdateRule(base.deepCopy());
+        }
+    }
+
+    /**
+     * Set the string update rule for the neurons in this group.
+     *
+     * @param rule the neuron update rule to set.
+     */
+    public void setNeuronType(String rule) {
+        for (Neuron neuron : neuronList) {
+            neuron.setUpdateRule(rule);
         }
     }
 
@@ -549,7 +574,7 @@ public class NeuronGroup extends Group {
         }
         return max - min;
     }
-    
+
     /**
      * Return the height of this group, based on the positions of the neurons
      * that comprise it.
@@ -577,22 +602,22 @@ public class NeuronGroup extends Group {
             return getWidth();
         }
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public Point2D [] getFourCorners() {
         double centerX = getCenterX();
         double centerY = getCenterY();
-        
+
         Point2D [] corners  = new Point2D [4];
-        
+
         corners[0] = new Point2D.Double(getMaxX() - centerX, getMaxY() - centerY);
         corners[3] = new Point2D.Double(getMaxX() - centerX, getMinY() - centerY);
         corners[2] = new Point2D.Double(getMinX() - centerX, getMinY() - centerY);
         corners[1] = new Point2D.Double(getMinX() - centerX, getMaxY() - centerY);
-        
+
         return corners;
     }
 
@@ -745,23 +770,23 @@ public class NeuronGroup extends Group {
     public boolean containsAsIncoming(SynapseGroup sg) {
         return incomingSgs.contains(sg);
     }
-    
+
     public boolean containsAsOutgoing(SynapseGroup sg) {
         return outgoingSgs.contains(sg);
     }
-    
+
     public void addIncomingSg(SynapseGroup sg) {
         incomingSgs.add(sg);
     }
-    
+
     public void addOutgoingSg(SynapseGroup sg) {
         outgoingSgs.add(sg);
     }
-    
+
     public boolean removeIncomingSg(SynapseGroup sg) {
         return incomingSgs.remove(sg);
     }
-    
+
     public boolean removeOutgoingSg(SynapseGroup sg) {
         return outgoingSgs.remove(sg);
     }
@@ -827,6 +852,20 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : this.getNeuronList()) {
             neuron.setIncrement(increment);
         }
+    }
+
+    /**
+     * @return the testData
+     */
+    public double[][] getTestData() {
+        return testData;
+    }
+
+    /**
+     * @param testData the testData to set
+     */
+    public void setTestData(double[][] testData) {
+        this.testData = testData;
     }
 
 }

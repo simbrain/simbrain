@@ -46,6 +46,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -726,6 +727,10 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                 menu.add(item);
             }
         }
+        
+        // Test Inputs action
+        menu.addSeparator();        
+        menu.add(testInputsAction);
 
         // Coupling menu
         if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
@@ -900,4 +905,27 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             neuronGroup.setClamped(false);      
         }       
     };
+    
+    /**
+     * Open a window for sending inputs to this neuron group.
+     */
+    protected Action testInputsAction = new AbstractAction() {      
+
+        {       
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));        
+            putValue(NAME, "Send inputs to this group");      
+            putValue(SHORT_DESCRIPTION, "Send inputs to this group");      
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            final TestInputPanel testInputPanel = new TestInputPanel(
+                    networkPanel, neuronGroup.getNeuronList(),
+                    neuronGroup.getTestData());
+            networkPanel.displayPanel(testInputPanel,
+                    "Inputs for neuron group: " + neuronGroup.getLabel());
+        }
+    };
+    
+    
 }

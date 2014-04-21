@@ -217,6 +217,9 @@ public class Synapse {
      * @return Value
      */
     public double getValue() {
+        if (spikeResponder == null) {
+            spikeResponder = new JumpAndDecay();
+        }
         if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             spikeResponder.update(this);
         } else {

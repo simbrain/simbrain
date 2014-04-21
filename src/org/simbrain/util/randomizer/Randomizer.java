@@ -193,6 +193,8 @@ public class Randomizer {
         }
         setParams(param1, param2);
     }
+    
+    
 
     public void setParam1Consistent(String p1Name, double param1) {
         if (!p1Name.equals(pdf.getParam1Name())) {
@@ -237,6 +239,20 @@ public class Randomizer {
      */
     public void setLowerBound(double lowerBound) {
         this.lowerBound = lowerBound;
+    }
+
+    /**
+     * @param param1 the param1 to set
+     */
+    public void setParam1(double param1) {
+        this.param1 = param1;
+    }
+
+    /**
+     * @param param2 the param2 to set
+     */
+    public void setParam2(double param2) {
+        this.param2 = param2;
     }
 
 }

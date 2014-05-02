@@ -24,8 +24,6 @@ import java.util.regex.Pattern;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
-import cern.colt.Arrays;
-
 import com.thoughtworks.xstream.XStream;
 
 /**

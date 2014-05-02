@@ -18,14 +18,19 @@
  */
 package org.simbrain.world.textworld;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JToolBar;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -35,6 +40,8 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.simbrain.util.table.MutableTable;
+import org.simbrain.util.table.TableActionManager;
 import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
@@ -56,6 +63,7 @@ public class ReaderPanel extends JPanel {
      * @param world the world to represent
      */
     public ReaderPanel(ReaderWorld theWorld) {
+        super(new BorderLayout());
         this.world = theWorld;
         // textArea.addKeyListener(this);
         // textArea.addMouseListener(this);
@@ -114,6 +122,17 @@ public class ReaderPanel extends JPanel {
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(inputScrollPane);
 
+        // Add toolbars
+        JPanel topToolbarPanel = new JPanel();
+        topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        topToolbarPanel.add(getToolbarDictionary());
+        add(topToolbarPanel, BorderLayout.NORTH);
+        
+        JPanel bottomToolbarPanel = new JPanel();
+        bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        bottomToolbarPanel.add(getToolbarModeSelect());
+        add(bottomToolbarPanel, BorderLayout.SOUTH);
+        
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {
             @Override
@@ -209,4 +228,34 @@ public class ReaderPanel extends JPanel {
         return world;
     }
 
+    /**
+     * Return a toolbar with buttons for importing and exporting dictionaries.
+     *
+     * @return the dictionary toolbar
+     */
+    public JToolBar getToolbarDictionary() {
+            JToolBar toolbar = new JToolBar();
+            // add action for opening dictionary files: toolbar.add(ACTION);
+            return toolbar;
+    }
+    
+    /**
+     * Return a toolbar with buttons for switching between word and character mode.
+     *
+     * @return the mode selection toolbar
+     */
+    public JToolBar getToolbarModeSelect() {
+            JToolBar toolbar = new JToolBar();
+            JRadioButton wordButton = new JRadioButton("Word");
+            JRadioButton charButton = new JRadioButton("Character");
+            ButtonGroup selectedMode = new ButtonGroup();
+            selectedMode.add(wordButton);
+            selectedMode.add(charButton);
+            wordButton.setSelected(true);
+            toolbar.add(wordButton);
+            toolbar.add(charButton);
+            
+            // add action listener for switching between char and word buttons: wordButton.addActionListener(a);
+            return toolbar;
+    }
 }

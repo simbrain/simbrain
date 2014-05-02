@@ -28,6 +28,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -65,6 +66,9 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
     /** Opens the help dialog for TextWorld. */
     private JMenu help = new JMenu("Help");
+    
+    /** Help menu item. */
+    private JMenuItem helpItem = new JMenuItem("Reader Help");
 
     /** The pane representing the text world. */
     private ReaderPanel panel;
@@ -133,6 +137,10 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
         // Help Menu
         menuBar.add(help);
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/World.html");
+        helpItem.setAction(helpAction);
+        help.add(helpItem);
 
         // Add menu
         getParentFrame().setJMenuBar(menuBar);

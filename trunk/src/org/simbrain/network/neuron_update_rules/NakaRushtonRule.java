@@ -55,7 +55,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
     private boolean useAdaptation = false;
 
     /** Time constant. */
-    private double timeConstant = .1;
+    private double timeConstant = 1;
 
     /** Noise dialog. */
     private Randomizer noiseGenerator = new Randomizer();

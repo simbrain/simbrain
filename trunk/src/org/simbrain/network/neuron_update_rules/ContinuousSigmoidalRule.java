@@ -171,7 +171,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() - getFloor();
+        return (getCeiling() - getFloor()) * Math.random() + getFloor();
     }
 
     /**

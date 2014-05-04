@@ -130,7 +130,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             addAttributeListener(component);
         }
         // Initialize frame
-        parentFrame.setContentPane(this);
+        //parentFrame.setContentPane(this);
     }
 
     /**

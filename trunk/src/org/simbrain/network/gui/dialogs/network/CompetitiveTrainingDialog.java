@@ -116,7 +116,7 @@ public class CompetitiveTrainingDialog extends StandardDialog {
 
         // Set up help
         Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/CompetitveMnetwork.html");
+                "Pages/Network/network/competitivenetwork.html");
         addButton(new JButton(helpAction));
 
         // Finish configuration

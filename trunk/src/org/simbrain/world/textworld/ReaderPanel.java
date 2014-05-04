@@ -22,9 +22,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -40,8 +43,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
-import org.simbrain.util.table.MutableTable;
-import org.simbrain.util.table.TableActionManager;
+import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
 import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
@@ -64,6 +66,7 @@ public class ReaderPanel extends JPanel {
      */
     public ReaderPanel(ReaderWorld theWorld) {
         super(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         this.world = theWorld;
         // textArea.addKeyListener(this);
         // textArea.addMouseListener(this);
@@ -127,12 +130,12 @@ public class ReaderPanel extends JPanel {
         topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         topToolbarPanel.add(getToolbarDictionary());
         add(topToolbarPanel, BorderLayout.NORTH);
-        
+
         JPanel bottomToolbarPanel = new JPanel();
         bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         bottomToolbarPanel.add(getToolbarModeSelect());
         add(bottomToolbarPanel, BorderLayout.SOUTH);
-        
+
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {
             @Override
@@ -234,28 +237,46 @@ public class ReaderPanel extends JPanel {
      * @return the dictionary toolbar
      */
     public JToolBar getToolbarDictionary() {
-            JToolBar toolbar = new JToolBar();
-            // add action for opening dictionary files: toolbar.add(ACTION);
-            return toolbar;
+        JToolBar toolbar = new JToolBar();
+        toolbar.add(TextWorldActions.getLoadDictionaryAction(world));
+        toolbar.add(TextWorldActions.getShowDictionaryAction(world));
+        // add action for opening dictionary files: toolbar.add(ACTION);
+        return toolbar;
     }
-    
+
     /**
-     * Return a toolbar with buttons for switching between word and character mode.
+     * Return a toolbar with buttons for switching between word and character
+     * mode.
      *
      * @return the mode selection toolbar
      */
     public JToolBar getToolbarModeSelect() {
-            JToolBar toolbar = new JToolBar();
-            JRadioButton wordButton = new JRadioButton("Word");
-            JRadioButton charButton = new JRadioButton("Character");
-            ButtonGroup selectedMode = new ButtonGroup();
-            selectedMode.add(wordButton);
-            selectedMode.add(charButton);
-            wordButton.setSelected(true);
-            toolbar.add(wordButton);
-            toolbar.add(charButton);
-            
-            // add action listener for switching between char and word buttons: wordButton.addActionListener(a);
-            return toolbar;
+        JToolBar toolbar = new JToolBar();
+        JRadioButton wordButton = new JRadioButton("Word");
+        JRadioButton charButton = new JRadioButton("Character");
+        ButtonGroup selectedMode = new ButtonGroup();
+        selectedMode.add(wordButton);
+        selectedMode.add(charButton);
+        wordButton.setSelected(true);
+        toolbar.add(wordButton);
+        toolbar.add(charButton);
+
+        wordButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                world.setParseStyle(ParseStyle.WORD);
+            }
+
+        });
+        charButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                world.setParseStyle(ParseStyle.CHARACTER);
+            }
+        });
+
+        // add action listener for switching between char and word buttons:
+        // wordButton.addActionListener(a);
+        return toolbar;
     }
 }

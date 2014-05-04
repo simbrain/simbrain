@@ -126,7 +126,7 @@ public class SOMTrainingDialog extends StandardDialog {
 
         // Set up help
         Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/SOMnetwork.html");
+                "Pages/Network/network/som.html");
         addButton(new JButton(helpAction));
 
         // Finish configuration

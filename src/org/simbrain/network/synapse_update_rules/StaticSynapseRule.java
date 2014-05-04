@@ -49,7 +49,7 @@ public class StaticSynapseRule extends SynapseUpdateRule {
 
     @Override
     public String getDescription() {
-        return "Static (none)";
+        return "Static";
     }
 
     /**

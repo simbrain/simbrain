@@ -37,6 +37,7 @@ import javax.swing.border.Border;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.UmatchedAttributesException;
@@ -94,6 +95,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        bottomPanel.add(new JButton(new ShowHelpAction(
+                "Pages/Workspace/Couplings.html")));
+
         bottomPanel.add(couplingMethodComboBox);
 
         JButton addCouplingsButton = new JButton("Add Coupling(s)");

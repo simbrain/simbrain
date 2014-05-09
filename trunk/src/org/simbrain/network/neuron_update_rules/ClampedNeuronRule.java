@@ -77,15 +77,6 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getRandomValue() {
-        Random rand = new Random();
-        return rand.nextBoolean() ? getCeiling() : getFloor();
-    }
-
-    /**
      * @return Returns the threshold.
      */
     public double getThreshold() {

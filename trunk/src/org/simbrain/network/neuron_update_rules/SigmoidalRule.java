@@ -145,14 +145,6 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() + getFloor();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public double getDerivative(final double val) {
         double up = getCeiling();
         double lw = getFloor();

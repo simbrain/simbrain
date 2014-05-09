@@ -89,12 +89,12 @@ public class Network {
     private double timeStep = DEFAULT_TIME_STEP;
 
     /**
-     * The weight randomizer.
+     * The activation randomizer.
      */
     private Randomizer activationRandomizer = new Randomizer();
 
     /**
-     * The activation randomizer.
+     * The weight randomizer.
      */
     private Randomizer weightRandomizer = new Randomizer();
 

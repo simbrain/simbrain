@@ -96,7 +96,9 @@ public abstract class NeuronUpdateRule {
      *
      * @return the random value.
      */
-    public abstract double getRandomValue();
+    public double getRandomValue() {
+        return (getCeiling() - getFloor()) * Math.random() + getFloor();
+    }
 
     /**
      * Set activation to 0; override for other "clearing" behavior (e.g. setting

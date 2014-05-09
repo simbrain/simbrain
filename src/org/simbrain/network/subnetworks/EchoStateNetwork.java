@@ -179,6 +179,7 @@ public class EchoStateNetwork extends Subnetwork {
         lineLayout.setInitialLocation(initialPosition);
         lineLayout.layoutNeurons(inputLayerNeurons);
         inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
+        inputLayer.setLayout(lineLayout);
         inputLayer.setLabel("Inputs");
         addNeuronGroup(inputLayer);
 
@@ -188,6 +189,7 @@ public class EchoStateNetwork extends Subnetwork {
         gridLayout.layoutNeurons(reservoirLayerNeurons);
         reservoirLayer = new NeuronGroup(getParentNetwork(),
                 reservoirLayerNeurons);
+        reservoirLayer.setLayout(gridLayout);
         addNeuronGroup(reservoirLayer);
         reservoirLayer.setLabel("Reservoir");
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer,
@@ -196,6 +198,7 @@ public class EchoStateNetwork extends Subnetwork {
         // Output Layer
         lineLayout.layoutNeurons(outputLayerNeurons);
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
+        outputLayer.setLayout(lineLayout);
         outputLayer.setLabel("Outputs");
         addNeuronGroup(outputLayer);
         NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,

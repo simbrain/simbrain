@@ -244,6 +244,7 @@ public class AddNeuronsDialog extends StandardDialog {
         if (ng != null) {
             networkPanel.getNetwork().transferNeuronsToGroup(addedNeurons, ng);
             networkPanel.getNetwork().addGroup(ng);
+            ng.setLayout(selectLayout.getCurrentLayout());
             networkPanel.repaint();
         }
     }

@@ -129,10 +129,12 @@ public class FeedForward extends Subnetwork {
             lineLayout.setInitialLocation(new Point((int) initialPosition
                     .getX(), (int) initialPosition.getY()));
             lineLayout.layoutNeurons(inputLayerNeurons);
+            inputLayer.setLayout(lineLayout);
         } else {
             gridLayout.setInitialLocation(new Point((int) initialPosition
                     .getX(), (int) initialPosition.getY()));
             gridLayout.layoutNeurons(inputLayerNeurons);
+            inputLayer.setLayout(gridLayout);
         }
 
         // Prepare base synapse for connecting layers
@@ -158,8 +160,10 @@ public class FeedForward extends Subnetwork {
                     hiddenLayerNeurons);
             if (hiddenLayerNeurons.size() < useGridThreshold) {
                 lineLayout.layoutNeurons(hiddenLayerNeurons);
+                hiddenLayer.setLayout(lineLayout);
             } else {
                 gridLayout.layoutNeurons(hiddenLayerNeurons);
+                hiddenLayer.setLayout(gridLayout);
             }
             addNeuronGroup(hiddenLayer);
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,

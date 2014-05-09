@@ -74,7 +74,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
     /** Main tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    /** A pannel that provides a high-level summary of the neuron group. */
+    /** A panel that provides a high-level summary of the neuron group. */
     private CommittablePanel summaryPanel;
 
     /** Layout panel. */
@@ -382,7 +382,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                     .getPanel()).commitChanges();
         }
 
-        applyLayout();
+        // Note that layout is handled by the apply button in the layout panel
         networkPanel.repaint();
         return success;
 

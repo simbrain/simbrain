@@ -155,7 +155,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0, 0);
         }
-        layoutLayer(inputLayerNeurons);
+        layoutLayer(inputLayer);
 
         // Hidden Layer
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
@@ -163,7 +163,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         addNeuronGroup(hiddenLayer);
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
-        layoutLayer(hiddenLayerNeurons);
+        layoutLayer(hiddenLayer);
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
                 Direction.NORTH, betweenLayerInterval);
 
@@ -172,7 +172,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         contextLayer.setLabel("Context nodes");
         addNeuronGroup(contextLayer);
-        layoutLayer(contextLayerNeurons);
+        layoutLayer(contextLayer);
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
                 Direction.EAST, betweenLayerInterval);
 
@@ -180,7 +180,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
-        layoutLayer(outputLayerNeurons);
+        layoutLayer(outputLayer);
         NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
                 Direction.NORTH, betweenLayerInterval);
 
@@ -222,17 +222,20 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     /**
      * Helper method to layout the neurons in the provided layer
      *
-     * @param neurons the neurons to lay out
+     * @param group the group to lay out
      */
-    private void layoutLayer(final List<Neuron> neurons) {
+    private void layoutLayer(final NeuronGroup group) {
+        List<Neuron> neurons = group.getNeuronList();
         if (neurons.size() < useGridThreshold) {
             lineLayout.setInitialLocation(new Point((int) initialPosition
                     .getX(), (int) initialPosition.getY()));
             lineLayout.layoutNeurons(neurons);
+            group.setLayout(lineLayout);
         } else {
             gridLayout.setInitialLocation(new Point((int) initialPosition
                     .getX(), (int) initialPosition.getY()));
             gridLayout.layoutNeurons(neurons);
+            group.setLayout(gridLayout);
         }
     }
 

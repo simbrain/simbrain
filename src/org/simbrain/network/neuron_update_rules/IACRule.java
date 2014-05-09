@@ -132,14 +132,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
      * {@inheritDoc}
      */
     @Override
-    public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() - getFloor();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
         if (act >= getCeiling() && isClipped()) {

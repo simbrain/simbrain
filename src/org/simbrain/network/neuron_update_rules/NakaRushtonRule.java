@@ -160,14 +160,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getRandomValue() {
-        return getCeiling() * Math.random();
-    }
-
-    /**
      * @return Returns the semiSaturationConstant.
      */
     public double getSemiSaturationConstant() {

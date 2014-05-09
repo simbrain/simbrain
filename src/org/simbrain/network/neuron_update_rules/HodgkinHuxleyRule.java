@@ -297,15 +297,9 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule {
     }
 
     @Override
-    public double getRandomValue() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public double getCeiling() {
         // TODO Auto-generated method stub
-        return 0;
+        return 1;
     }
 
     @Override

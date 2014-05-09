@@ -189,14 +189,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() - getFloor();
-    }
-
-    /**
      * @return Returns the decayAmount.
      */
     public double getDecayAmount() {

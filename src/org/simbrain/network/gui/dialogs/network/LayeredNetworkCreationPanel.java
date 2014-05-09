@@ -232,7 +232,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
             neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet()
                     .toArray(new String[neuronTypeMap.size()]));
 
-            // Lay out all compoennt horizontally
+            // Lay out all components horizontally
             Box component = Box.createHorizontalBox();
             component.setAlignmentX(Box.LEFT_ALIGNMENT);
             JLabel firstLabel = new JLabel(label);

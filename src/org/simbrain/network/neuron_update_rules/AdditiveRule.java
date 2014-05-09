@@ -160,11 +160,6 @@ public class AdditiveRule extends NeuronUpdateRule {
     }
 
     @Override
-    public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() + getFloor();
-    }
-
-    @Override
     public double getCeiling() {
         return 1.0;
     }

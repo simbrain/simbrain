@@ -92,12 +92,6 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
     }
 
     @Override
-    public double getRandomValue() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public double getCeiling() {
         // TODO Auto-generated method stub
         return 0;

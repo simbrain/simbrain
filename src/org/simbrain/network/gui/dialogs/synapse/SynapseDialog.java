@@ -69,7 +69,7 @@ public class SynapseDialog extends StandardDialog {
     private final SpikeResponderSettingsPanel responderPanel;
 
     /**
-     * A boolean value to store the results of {@link #spikeResponderTest(List)}
+     * A boolean value to store the results of {@link #containsASpikeResponder(List)}
      * which determines whether or not a spike responder panel should be
      * displayed based on the update rules used by the presynaptic neurons to
      * the synapses being edited.
@@ -103,7 +103,7 @@ public class SynapseDialog extends StandardDialog {
         infoPanel = new BasicSynapseInfoPanel(synapseList, this);
         updatePanel = new SynapseUpdateSettingsPanel(synapseList, this);
         responderPanel = new SpikeResponderSettingsPanel(synapseList, this);
-        usesSpikeResponders = spikeResponderTest(synapseList);
+        usesSpikeResponders = containsASpikeResponder(synapseList);
         initializeLayout();
         addListeners();
         updateHelp();
@@ -208,32 +208,38 @@ public class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * Tests to make sure that all the source neurons of each synapse use
-     * spiking neuron update rules. This is used to determine if a spike
-     * responder panel should or shouldn't be displayed. If all the source
-     * neurons use a spiking rule, then the panel ought to appear, conversely if
-     * any of the source neurons do not use a spiking neuron update rule, the
-     * panel ought not to appear.
+     * Tests to make sure that at least one source neuron in the provided list
+     * of synapses is a spiking neuron. . This is used to determine if a spike
+     * responder panel should or shouldn't be displayed.
      *
-     * @param synapses the synapses who's source neurons will be tested.
-     * @return whether or not it would be applicable to display a spike
-     *         responder panel based on the update rules in use by the source
-     *         neurons
+     * @param synapses the synapses whose source neurons will be tested.
+     * @return whether or not at least one of the synapses has a spike responder
      */
-    public static boolean spikeResponderTest(List<Synapse> synapses) {
-        HashSet<SpikingNeuronUpdateRule> snurs = new HashSet<SpikingNeuronUpdateRule>();
+    public static boolean containsASpikeResponder(List<Synapse> synapses) {
         for (Synapse s : synapses) {
             NeuronUpdateRule nur = s.getSource().getUpdateRule();
-            if (!snurs.contains(nur)) {
-                if (!(nur instanceof SpikingNeuronUpdateRule)) {
-                    return false;
-                } else {
-                    snurs.add((SpikingNeuronUpdateRule) nur);
-                }
+            if (nur instanceof SpikingNeuronUpdateRule) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
+
+    // Old version of test that required all synapses were spike responders
+    //    public static boolean spikeResponderTest(List<Synapse> synapses) {
+    //        HashSet<SpikingNeuronUpdateRule> snurs = new HashSet<SpikingNeuronUpdateRule>();
+    //        for (Synapse s : synapses) {
+    //            NeuronUpdateRule nur = s.getSource().getUpdateRule();
+    //            if (!snurs.contains(nur)) {
+    //                if (!(nur instanceof SpikingNeuronUpdateRule)) {
+    //                    return false;
+    //                } else {
+    //                    snurs.add((SpikingNeuronUpdateRule) nur);
+    //                }
+    //            }
+    //        }
+    //        return true;
+    //    }
 
     // /**
     // * Test Main: For fast prototyping.

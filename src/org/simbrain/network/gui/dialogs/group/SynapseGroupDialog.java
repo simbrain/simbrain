@@ -35,6 +35,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
+import org.simbrain.network.gui.dialogs.synapse.SpikeResponderSettingsPanel;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.LabelledItemPanel;
@@ -80,6 +82,9 @@ public class SynapseGroupDialog extends StandardDialog {
 
     /** Panel to edit synapse update rule. */
     private SynapseUpdateSettingsPanel editSynapseType;
+
+    /** Panel to edit spike responders.  */
+    private SpikeResponderSettingsPanel editSpikeResponders;
 
     /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel = false;
@@ -143,12 +148,12 @@ public class SynapseGroupDialog extends StandardDialog {
         // Synapse edit tab
         Box editSynapses = Box.createVerticalBox();
         if (isCreationPanel) {
-            // TODO: Not yet tested. Creation dialog is not accessible yet.
             Synapse baseSynapse = Synapse.getTemplateSynapse();
             editBasicSynapseInfo = new BasicSynapseInfoPanel(
                     Collections.singletonList(baseSynapse), this);
             editSynapseType = new SynapseUpdateSettingsPanel(
                     Collections.singletonList(baseSynapse), this);
+            // Todo: make it possible to edit spike responders at creation time?
         } else {
             editBasicSynapseInfo = new BasicSynapseInfoPanel(
                     synapseGroup.getSynapseList(), this);
@@ -157,13 +162,23 @@ public class SynapseGroupDialog extends StandardDialog {
         }
         editSynapses.add(editBasicSynapseInfo);
         editSynapses.add(editSynapseType);
+        // Set up spike responder panel if any of the synapses are spike
+        // responders
+        if (!isCreationPanel) {
+            if (SynapseDialog.containsASpikeResponder(synapseGroup
+                    .getSynapseList())) {
+                editSpikeResponders = new SpikeResponderSettingsPanel(
+                        synapseGroup.getSynapseList(), this);
+                editSynapses.add(editSpikeResponders);
+            }
+        }
         tabbedPane.addTab("Edit Synapses", editSynapses);
-
 
         if (!isCreationPanel) {
             // Synapse Adjustment Panel
             tabbedPane.addTab("Adjust weights", tabAdjust);
-            tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup.getSynapseList()));
+            tabAdjust.add(new SynapseAdjustmentPanel(networkPanel, synapseGroup
+                    .getSynapseList()));
 
             // Weight Matrix
             tabbedPane.addTab("Matrix", tabMatrix);
@@ -208,10 +223,16 @@ public class SynapseGroupDialog extends StandardDialog {
                     synapseGroup.getSynapseList());
             networkPanel.getNetwork().addGroup(synapseGroup);
         } else {
-            // editBasicSynapseInfo.commitChanges()
-            // editSynapseType.commitChanges()
+            editBasicSynapseInfo.commitChanges(synapseGroup.getSynapseList());
+            editSynapseType.getSynapsePanel().commitChanges(
+                    synapseGroup.getSynapseList());
+            if (editSpikeResponders != null) {
+                editSpikeResponders.getSpikeResponsePanel().commitChanges(
+                        synapseGroup.getSynapseList());
+            }
         }
-        synapseGroup.setLabel(tfSynapseGroupLabel.getText());
+
+        // Special case for synapse groups that have a learning rate
         if (synapseGroup instanceof SynapseGroupWithLearningRate) {
             ((SynapseGroupWithLearningRate) synapseGroup)
                     .setLearningRate(Double.parseDouble(tfRateLabel.getText()));

@@ -93,6 +93,8 @@ public abstract class NeuronUpdateRule {
 
     /**
      * Returns a random value between the upper and lower bounds of this neuron.
+     * Update rules that require special randomization should override this
+     * method.
      *
      * @return the random value.
      */

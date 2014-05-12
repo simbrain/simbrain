@@ -83,11 +83,12 @@ public class NetworkDialog extends StandardDialog {
         quickConnectPanel = new QuickConnectPreferencesPanel(networkPanel, this);
         tabbedPane.addTab("Connections", quickConnectPanel);
 
-        // Randomizer properties
-        randomPanel = new NetworkRandomizerPanel();
+        // Randomizer properties. Not currently used but being left in case
+        //   it is reinstated.
+        //randomPanel = new NetworkRandomizerPanel();
         // randomPanel.fillFieldValues(networkPanel.getNetwork()
         // .getWeightRandomizer());
-        tabbedPane.addTab("Randomizer", randomPanel);
+        //tabbedPane.addTab("Randomizer", randomPanel);
 
         // Set main panel
         setContentPane(tabbedPane);
@@ -106,7 +107,6 @@ public class NetworkDialog extends StandardDialog {
     private void commitChanges() {
         networkPropertiesPanel.commitChanges();
         quickConnectPanel.commitChanges();
-        randomPanel.commitChanges();
     }
 
     @Override
@@ -147,12 +147,12 @@ public class NetworkDialog extends StandardDialog {
                 }
             });
 
-            activationRandomizer = new RandomizerPanel();
-            activationRandomizer.fillFieldValues(networkPanel.getNetwork()
-                    .getActivationRandomizer());
-            weightRandomizer = new RandomizerPanel();
-            weightRandomizer.fillFieldValues(networkPanel.getNetwork()
-                    .getWeightRandomizer());
+            //activationRandomizer = new RandomizerPanel();
+            //activationRandomizer.fillFieldValues(networkPanel.getNetwork()
+            //        .getActivationRandomizer());
+            //weightRandomizer = new RandomizerPanel();
+            //weightRandomizer.fillFieldValues(networkPanel.getNetwork()
+            //        .getWeightRandomizer());
             initPanel();
 
             mainPanel.add(comboBox);
@@ -177,16 +177,6 @@ public class NetworkDialog extends StandardDialog {
             }
             repaint();
             pack();
-        }
-
-        /**
-         * Apply changes to randomizer when parent dialogs closed.
-         */
-        public void commitChanges() {
-            activationRandomizer.commitRandom(networkPanel.getNetwork()
-                    .getActivationRandomizer());
-            weightRandomizer.commitRandom(networkPanel.getNetwork()
-                    .getWeightRandomizer());
         }
 
     }

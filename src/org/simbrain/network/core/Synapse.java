@@ -453,20 +453,9 @@ public class Synapse {
      * Randomize this weight to a value between its upper and lower bounds.
      */
     public void randomize() {
-        strength = getRandomValue();
+        strength = (getUpperBound() - getLowerBound()) * Math.random()
+                + getLowerBound();
         getNetwork().fireSynapseChanged(this);
-    }
-
-    /**
-     * Returns a random value between the upper and lower bounds of this
-     * synapse.
-     *
-     * @return the random value.
-     */
-    public double getRandomValue() {
-        this.getParentNetwork().getWeightRandomizer().setUpperBound(upperBound);
-        this.getParentNetwork().getWeightRandomizer().setLowerBound(lowerBound);
-        return this.getParentNetwork().getWeightRandomizer().getRandom();
     }
 
     /**

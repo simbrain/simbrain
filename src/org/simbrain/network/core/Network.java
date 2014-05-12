@@ -89,16 +89,6 @@ public class Network {
     private double timeStep = DEFAULT_TIME_STEP;
 
     /**
-     * The activation randomizer.
-     */
-    private Randomizer activationRandomizer = new Randomizer();
-
-    /**
-     * The weight randomizer.
-     */
-    private Randomizer weightRandomizer = new Randomizer();
-
-    /**
      * Two types of time used in simulations.
      */
     public enum TimeType {
@@ -755,9 +745,7 @@ public class Network {
      */
     public void randomizeWeights() {
         for (Synapse s : synapseList) {
-            weightRandomizer.setUpperBound(s.getUpperBound());
-            weightRandomizer.setLowerBound(s.getLowerBound());
-            s.setStrength(weightRandomizer.getRandom());
+            s.randomize();
         }
     }
 
@@ -1681,31 +1669,6 @@ public class Network {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
         }
-    }
-
-
-    /**
-     * Returns the activation randomizer for this network.
-     *
-     * @return the activationRandomizer randomizer
-     */
-    public Randomizer getActivationRandomizer() {
-        if (activationRandomizer == null) {
-            activationRandomizer = new Randomizer();
-        }
-        return activationRandomizer;
-    }
-
-    /**
-     * Returns the weight randomizer for this network.
-     *
-     * @return the weight randomizer
-     */
-    public Randomizer getWeightRandomizer() {
-        if (weightRandomizer == null) {
-            weightRandomizer = new Randomizer();
-        }
-        return weightRandomizer;
     }
 
     /**

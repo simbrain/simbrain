@@ -13,9 +13,7 @@
  */
 package org.simbrain.network.groups;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +21,6 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -42,15 +37,6 @@ public class FeedForward extends Subnetwork {
 
     /** Space to put between layers. */
     private int betweenLayerInterval = 150;
-
-    /** Space between neurons within a layer. */
-    private int betweenNeuronInterval = 50;
-
-    /**
-     * If a layer has more than this many neurons, use grid layout instead of
-     * line layout.
-     */
-    private int useGridThreshold = 20;
 
     /**
      * Construct a feed-forward network.
@@ -107,12 +93,6 @@ public class FeedForward extends Subnetwork {
 
         setLabel("Layered Network");
 
-        // Layouts
-        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
-        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
-                betweenNeuronInterval, 10);
-
         // Set up input layer
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
@@ -122,20 +102,7 @@ public class FeedForward extends Subnetwork {
         inputLayer.setClamped(true); // Clamping makes everything easier in the
                                      // GUI. The trainer uses forceset.
         addNeuronGroup(inputLayer);
-        if (initialPosition == null) {
-            initialPosition = new Point2D.Double(0, 0);
-        }
-        if (inputLayerNeurons.size() < useGridThreshold) {
-            lineLayout.setInitialLocation(new Point((int) initialPosition
-                    .getX(), (int) initialPosition.getY()));
-            lineLayout.layoutNeurons(inputLayerNeurons);
-            inputLayer.setLayout(lineLayout);
-        } else {
-            gridLayout.setInitialLocation(new Point((int) initialPosition
-                    .getX(), (int) initialPosition.getY()));
-            gridLayout.layoutNeurons(inputLayerNeurons);
-            inputLayer.setLayout(gridLayout);
-        }
+        inputLayer.setLayoutBasedOnSize(initialPosition);
 
         // Prepare base synapse for connecting layers
         Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
@@ -158,13 +125,7 @@ public class FeedForward extends Subnetwork {
 
             NeuronGroup hiddenLayer = new NeuronGroup(network,
                     hiddenLayerNeurons);
-            if (hiddenLayerNeurons.size() < useGridThreshold) {
-                lineLayout.layoutNeurons(hiddenLayerNeurons);
-                hiddenLayer.setLayout(lineLayout);
-            } else {
-                gridLayout.layoutNeurons(hiddenLayerNeurons);
-                hiddenLayer.setLayout(gridLayout);
-            }
+            hiddenLayer.setLayoutBasedOnSize();
             addNeuronGroup(hiddenLayer);
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,
                     Direction.NORTH, betweenLayerInterval);
@@ -194,20 +155,6 @@ public class FeedForward extends Subnetwork {
      */
     public void setBetweenLayerInterval(int betweenLayerInterval) {
         this.betweenLayerInterval = betweenLayerInterval;
-    }
-
-    /**
-     * @return the betweenNeuronInterval
-     */
-    public int getBetweenNeuronInterval() {
-        return betweenNeuronInterval;
-    }
-
-    /**
-     * @param betweenNeuronInterval the betweenNeuronInterval to set
-     */
-    public void setBetweenNeuronInterval(int betweenNeuronInterval) {
-        this.betweenNeuronInterval = betweenNeuronInterval;
     }
 
     @Override

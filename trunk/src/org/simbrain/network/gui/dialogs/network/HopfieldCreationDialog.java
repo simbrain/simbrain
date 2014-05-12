@@ -105,9 +105,8 @@ public class HopfieldCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         layoutPanel.getCurrentLayout().setInitialLocation(
                 networkPanel.getWhereToAdd());
-        layoutPanel.getCurrentLayout().layoutNeurons(
-                hopfield.getFlatNeuronList());
         hopfield.getNeuronGroup().setLayout(layoutPanel.getCurrentLayout());
+        hopfield.getNeuronGroup().applyLayout();
         networkPanel.getNetwork().addGroup(hopfield);
         networkPanel.repaint();
         super.closeDialogOk();

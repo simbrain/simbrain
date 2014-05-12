@@ -86,20 +86,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
-     * Line layout for building the SRN (when there are fewer numbers of neurons
-     * in a layer).
-     */
-    private final LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
-            LineOrientation.HORIZONTAL);
-
-    /**
-     * Grid layout for building the SRN (when there are large numbers of neurons
-     * in a layer).
-     */
-    private final GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
-            betweenNeuronInterval, 10);
-
-    /**
      * Build an SRN with default activation rules and initial position.
      *
      * @param network underlying network
@@ -152,10 +138,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         inputLayer.setClamped(true);
         inputLayer.setIncrement(1);
         addNeuronGroup(inputLayer);
-        if (initialPosition == null) {
-            initialPosition = new Point2D.Double(0, 0);
-        }
-        layoutLayer(inputLayer);
+        inputLayer.setLayoutBasedOnSize(initialPosition);
 
         // Hidden Layer
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
@@ -163,7 +146,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         addNeuronGroup(hiddenLayer);
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
-        layoutLayer(hiddenLayer);
+        hiddenLayer.setLayoutBasedOnSize();
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
                 Direction.NORTH, betweenLayerInterval);
 
@@ -172,7 +155,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         contextLayer.setLabel("Context nodes");
         addNeuronGroup(contextLayer);
-        layoutLayer(contextLayer);
+        contextLayer.setLayoutBasedOnSize();
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
                 Direction.EAST, betweenLayerInterval);
 
@@ -180,7 +163,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
-        layoutLayer(outputLayer);
+        outputLayer.setLayoutBasedOnSize();
         NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
                 Direction.NORTH, betweenLayerInterval);
 
@@ -216,26 +199,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(getParentNetwork(), nodeType);
             layer.add(node);
-        }
-    }
-
-    /**
-     * Helper method to layout the neurons in the provided layer
-     *
-     * @param group the group to lay out
-     */
-    private void layoutLayer(final NeuronGroup group) {
-        List<Neuron> neurons = group.getNeuronList();
-        if (neurons.size() < useGridThreshold) {
-            lineLayout.setInitialLocation(new Point((int) initialPosition
-                    .getX(), (int) initialPosition.getY()));
-            lineLayout.layoutNeurons(neurons);
-            group.setLayout(lineLayout);
-        } else {
-            gridLayout.setInitialLocation(new Point((int) initialPosition
-                    .getX(), (int) initialPosition.getY()));
-            gridLayout.layoutNeurons(neurons);
-            group.setLayout(gridLayout);
         }
     }
 

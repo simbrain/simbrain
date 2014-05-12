@@ -172,33 +172,25 @@ public class EchoStateNetwork extends Subnetwork {
         List<Neuron> outputLayerNeurons = initializeLayer(outputNeuronType,
                 numOutputs);
 
-        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
 
         // Input Layer
-        lineLayout.setInitialLocation(initialPosition);
-        lineLayout.layoutNeurons(inputLayerNeurons);
         inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-        inputLayer.setLayout(lineLayout);
+        inputLayer.setLayoutBasedOnSize(initialPosition);
         inputLayer.setLabel("Inputs");
         addNeuronGroup(inputLayer);
 
         // Reservoir Layer
-        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
-                betweenNeuronInterval, (int) Math.sqrt(numResNodes));
-        gridLayout.layoutNeurons(reservoirLayerNeurons);
         reservoirLayer = new NeuronGroup(getParentNetwork(),
                 reservoirLayerNeurons);
-        reservoirLayer.setLayout(gridLayout);
+        reservoirLayer.setLayoutBasedOnSize();
         addNeuronGroup(reservoirLayer);
         reservoirLayer.setLabel("Reservoir");
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer,
                 Direction.NORTH, betweenLayerInterval);
 
         // Output Layer
-        lineLayout.layoutNeurons(outputLayerNeurons);
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
-        outputLayer.setLayout(lineLayout);
+        outputLayer.setLayoutBasedOnSize();
         outputLayer.setLabel("Outputs");
         addNeuronGroup(outputLayer);
         NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,

@@ -27,6 +27,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -53,11 +54,23 @@ public class NeuronGroup extends Group {
     /** The layout for the neurons in this group. */
     private Layout layout = DEFAULT_LAYOUT;
 
+    /** Set of incoming synapse groups. */
     private final HashSet<SynapseGroup> incomingSgs =
             new HashSet<SynapseGroup>();
 
+    /** Set of outgoing synapse groups. */
     private final HashSet<SynapseGroup> outgoingSgs =
             new HashSet<SynapseGroup>();
+
+    /**
+     * In method setLayoutBasedOnSize, this is used as the threshold number of
+     * neurons in the group, above which to use grid layout instead of line
+     * layout.
+     */
+    private int gridThreshold = 20;
+
+    /** Space between neurons within a layer. */
+    private int betweenNeuronInterval = 50;
 
     /** Data (input vectors) for testing the network.*/
     private double[][] testData;
@@ -723,6 +736,7 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Set the layout.  Does not apply it.  Call apply layout for that.
      * @param layout the layout to set
      */
     public void setLayout(Layout layout) {
@@ -760,8 +774,6 @@ public class NeuronGroup extends Group {
     public HashSet<SynapseGroup> getIncomingSgs() {
         return incomingSgs;
     }
-
-
 
     public HashSet<SynapseGroup> getOutgoingSg() {
         return outgoingSgs;
@@ -866,6 +878,66 @@ public class NeuronGroup extends Group {
      */
     public void setTestData(double[][] testData) {
         this.testData = testData;
+    }
+
+    /**
+     * If more than gridThreshold neurons use a grid layout, else a horizontal
+     * line layout.
+     */
+    public void setLayoutBasedOnSize() {
+        setLayoutBasedOnSize(new Point2D.Double(0, 0));
+    }
+
+    /**
+     * If more than gridThreshold neurons use a grid layout, else a horizontal
+     * line layout.
+     *
+     * @param initialPosition the initial Position for the layout
+     */
+    public void setLayoutBasedOnSize(Point2D initialPosition) {
+        if (initialPosition == null) {
+            initialPosition = new Point2D.Double(0, 0);
+        }
+        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
+                LineOrientation.HORIZONTAL);
+        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
+                betweenNeuronInterval, 10);
+        if (neuronList.size() < gridThreshold) {
+            lineLayout.setInitialLocation(initialPosition);
+            setLayout(lineLayout);
+        } else {
+            gridLayout.setInitialLocation(initialPosition);
+            setLayout(gridLayout);
+        }
+        // Used rather than apply layout to make sure initial position is used.
+        getLayout().layoutNeurons(neuronList);
+    }
+
+    /**
+     * @return the betweenNeuronInterval
+     */
+    public int getBetweenNeuronInterval() {
+        return betweenNeuronInterval;
+    }
+
+    /**
+     * @param betweenNeuronInterval the betweenNeuronInterval to set
+     */
+    public void setBetweenNeuronInterval(int betweenNeuronInterval) {
+        this.betweenNeuronInterval = betweenNeuronInterval;
+    }
+
+    /**
+     * @return the gridThreshold
+     */
+    public int getGridThreshold() {
+        return gridThreshold;
+    }
+    /**
+     * @param gridThreshold the gridThreshold to set
+     */
+    public void setGridThreshold(int gridThreshold) {
+        this.gridThreshold = gridThreshold;
     }
 
 }

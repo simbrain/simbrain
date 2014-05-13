@@ -156,7 +156,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
         summaryPanel = new ApplyPanel(new SummaryPanel(neuronGroup, false));
 
-        specificNeuronGroupPanel = getSpecificGroup();
+        specificNeuronGroupPanel = getSpecificGroupPanel();
         if (specificNeuronGroupPanel != null) {
             specificNeuronGroupPanel = new ApplyPanel(specificNeuronGroupPanel);
         }
@@ -204,14 +204,14 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
     }
 
     /**
-     *
+     * Initialize the panel's layout.
      */
     private void initializeLayout() {
 
         setLayout(new BorderLayout());
         this.setMinimumSize(new Dimension(200, 300));
 
-        specificNeuronGroupPanel = getSpecificGroup();
+        specificNeuronGroupPanel = getSpecificGroupPanel();
 
         if (isCreationPanel) {
 
@@ -306,7 +306,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
      * @return the committable neuron group panel corresponding to the specific
      * type of the neuron group being edited if it has one.
      */
-    private CommittablePanel getSpecificGroup() {
+    private CommittablePanel getSpecificGroupPanel() {
         if (neuronGroup instanceof CompetitiveGroup) {
             return new CompetitivePropertiesPanel(
                     networkPanel, (CompetitiveGroup) neuronGroup);
@@ -343,9 +343,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
     @Override
     public boolean commitChanges() {
         boolean success = true;
-        success &= summaryPanel.commitChanges();
-        success &= combinedNeuronInfoPanel.commitChanges();
         if (isCreationPanel) {
+            success &= summaryPanel.commitChanges();
+            success &= combinedNeuronInfoPanel.commitChanges();
             Neuron template = neuronGroup.getNeuronList().get(0);
             try {
                 int numNeurons = Integer.parseInt(((SummaryPanel) summaryPanel)
@@ -382,7 +382,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                     .getPanel()).commitChanges();
         }
 
-        // Note that layout is handled by the apply button in the layout panel
         networkPanel.repaint();
         return success;
 

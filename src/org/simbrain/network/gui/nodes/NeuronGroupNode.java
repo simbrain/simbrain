@@ -592,7 +592,6 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         }
     }
 
-
     /**
      * Update positions of all neurons being represented.
      */
@@ -625,6 +624,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                 panel.commitChanges();
             }
         };
+        dialog.setAsDoneDialog();
         return dialog;
     }
 

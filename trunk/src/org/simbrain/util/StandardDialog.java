@@ -80,6 +80,9 @@ public class StandardDialog extends GenericJDialog {
     /** A global okay button for accessibility. */
     private JButton okButton;
 
+    /** A global cancel button for accessibility. */
+    private JButton cancelButton;
+
     /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
 
@@ -166,7 +169,8 @@ public class StandardDialog extends GenericJDialog {
         okButton = new JButton(okAction);
         buttonPanel.add(customButtonPanel);
         buttonPanel.add(okButton);
-        buttonPanel.add(new JButton(cancelAction));
+        cancelButton  = new JButton(cancelAction);
+        buttonPanel.add(cancelButton);
 
         getRootPane().setDefaultButton(okButton);
 
@@ -308,5 +312,14 @@ public class StandardDialog extends GenericJDialog {
      */
     public JButton getOkButton() {
         return okButton;
+    }
+
+    /**
+     * If called then this becomes a "Done" dialog. The cancel button is removed
+     * and "Ok" is renamed "Done".
+     */
+    public void setAsDoneDialog() {
+        okButton.setText("Done");
+        cancelButton.setVisible(false);
     }
 }

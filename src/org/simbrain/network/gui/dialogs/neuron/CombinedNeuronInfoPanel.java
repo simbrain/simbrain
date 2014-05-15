@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * The basic neuron info panel and neuron update settings panel are frequently
@@ -40,7 +40,7 @@ import org.simbrain.util.widgets.CommittablePanel;
  */
 @SuppressWarnings("serial")
 public class CombinedNeuronInfoPanel extends JPanel
-    implements CommittablePanel {
+    implements EditablePanel {
 
     /**
      * The default vertical gap between the basic neuron info panel and the
@@ -196,6 +196,11 @@ public class CombinedNeuronInfoPanel extends JPanel
 
     public void setUpdateInfoPanel(NeuronUpdateSettingsPanel updateInfoPanel) {
         this.updateInfoPanel = updateInfoPanel;
+    }
+
+    @Override
+    public void fillFieldValues() {
+        // Not Currently Used        
     }
 
 }

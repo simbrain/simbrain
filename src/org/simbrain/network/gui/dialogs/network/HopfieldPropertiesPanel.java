@@ -45,7 +45,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * editing.
  */
 public class HopfieldPropertiesPanel extends JPanel implements
-GroupPropertiesPanel {
+        GroupPropertiesPanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_NEURONS = 9;
@@ -227,6 +227,11 @@ GroupPropertiesPanel {
     @Override
     public Group getGroup() {
         return hopfield;
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

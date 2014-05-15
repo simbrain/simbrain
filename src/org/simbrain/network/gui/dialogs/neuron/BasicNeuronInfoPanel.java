@@ -35,7 +35,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  *
  */
 @SuppressWarnings("serial")
-public class BasicNeuronInfoPanel extends JPanel implements CommittablePanel {
+public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";

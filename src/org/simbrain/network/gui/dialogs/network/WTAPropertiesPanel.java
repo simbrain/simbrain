@@ -30,14 +30,14 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
  * winner take all network.
  */
 public class WTAPropertiesPanel extends JPanel implements
-    GroupPropertiesPanel, CommittablePanel {
+    GroupPropertiesPanel, EditablePanel {
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_NEURONS = 5;

@@ -53,28 +53,6 @@ public abstract class TextWorld {
     /** Word list for word parsing in both directions (reading and display). */
     private Set<String> dictionary = new TreeSet<String>();
 
-    public Map<String, double[]> dictionary2 = new HashMap<String, double[]>();
-
-    {
-        dictionary2.put("Jeff", new double[] { 1, 2, 3, 4 });
-        dictionary2.put("Randy", new double[] { 1, 2, 1, 1 });
-        dictionary2.put("Greg", new double[] { -1, 1, 1, -1 });
-        dictionary2.put("Sally", new double[] { 1, 0, 0, -1 });
-
-    }
-
-    public static void main(String[] argv) {
-        ReaderWorld world = new ReaderWorld();
-
-        for (String name : world.dictionary2.keySet()) {
-
-            String key = name.toString();
-            double[] value = world.dictionary2.get(name);
-            System.out.println(key + " " + Arrays.toString(value));
-
-        }
-    }
-
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
 

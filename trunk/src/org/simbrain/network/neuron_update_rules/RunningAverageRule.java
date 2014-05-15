@@ -89,16 +89,4 @@ public class RunningAverageRule extends NeuronUpdateRule {
         return "Running average";
     }
 
-
-    @Override
-    public double getCeiling() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public double getFloor() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 }

@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -34,10 +35,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
         BoundedUpdateRule, NoisyUpdateRule {
 
     /** The default activation ceiling. */
-    public static final int DEFAULT_CEILING = 100;
-
-    /** The default activation floor. */
-    public static final int DEFAULT_FLOOR = 0;
+    public static final int DEFAULT_UPPER_BOUND = 100;
 
     /** Steepness. */
     private double steepness = 2;
@@ -70,10 +68,10 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
     private double a = 0;
 
     /** The upper bound of the activity. */
-    private double ceiling = DEFAULT_CEILING;
+    private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** The lower bound of the activity. */
-    private double floor = DEFAULT_FLOOR;
+    private double lowerBound = 0;
 
     /**
      * Default constructor.
@@ -95,7 +93,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
         NakaRushtonRule rn = new NakaRushtonRule();
         rn.setSteepness(getSteepness());
         rn.setSemiSaturationConstant(getSemiSaturationConstant());
-        rn.setUpperBound(getCeiling());
+        rn.setUpperBound(getUpperBound());
         rn.setAddNoise(getAddNoise());
         rn.setUseAdaptation(getUseAdaptation());
         rn.setAdaptationParameter(getAdaptationParameter());
@@ -123,7 +121,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
         }
 
         if (p > 0) {
-            s = (getCeiling() * Math.pow(p, steepness))
+            s = (getUpperBound() * Math.pow(p, steepness))
                     / (Math.pow(semiSaturationConstant + a, steepness) + Math
                             .pow(p, steepness));
         } else {
@@ -137,22 +135,15 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
             val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
-        if (val < floor) {
-            val = floor;
-        }
-        if (val > ceiling) {
-            val = ceiling;
-        }
-
         neuron.setBuffer(val);
     }
 
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act <= getCeiling()) {
-            if (act + increment > getCeiling()) {
-                act = getCeiling();
+        if (act <= getUpperBound()) {
+            if (act + increment > getUpperBound()) {
+                act = getUpperBound();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -304,23 +295,23 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public double getCeiling() {
-        return ceiling;
+    public double getUpperBound() {
+        return upperBound;
     }
 
     @Override
     public void setUpperBound(double ceiling) {
-        this.ceiling = ceiling;
+        this.upperBound = ceiling;
     }
 
     @Override
-    public double getFloor() {
-        return floor;
+    public double getLowerBound() {
+        return lowerBound;
     }
 
     @Override
     public void setLowerBound(double floor) {
-        this.floor = floor;
+        this.lowerBound = floor;
     }
 
 }

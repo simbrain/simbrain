@@ -87,13 +87,13 @@ public class ExtendedNeuronInfoPanel extends JPanel
      * Label for upper bound text field. Is a class variable so that its
      * visibility can be set alongside the visibility of the text field.
      */
-    private final JLabel ceilL = new JLabel("Upper bound: ");
+    private final JLabel upperBound = new JLabel("Upper bound: ");
 
     /**
      * Label for lower bound text field. Is a class variable so that its
      * visibility can be set alongside the visibility of the text field.
      */
-    private final JLabel floorL = new JLabel("Lower bound: ");
+    private final JLabel lowerBound = new JLabel("Lower bound: ");
 
     /**
      * Label for clipping field.
@@ -168,9 +168,9 @@ public class ExtendedNeuronInfoPanel extends JPanel
         boundsPanel.add(sbp1);
         boundsPanel.add(Box.createVerticalStrut(5));
         JPanel sbp2 = new JPanel(gl);
-        sbp2.add(ceilL);
+        sbp2.add(upperBound);
         sbp2.add(tfCeiling);
-        sbp2.add(floorL);
+        sbp2.add(lowerBound);
         sbp2.add(tfFloor);
         sbp2.setAlignmentX(CENTER_ALIGNMENT);
         boundsPanel.add(sbp2);
@@ -200,7 +200,7 @@ public class ExtendedNeuronInfoPanel extends JPanel
         List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
         boolean h = true;
         for (NeuronUpdateRule r : ruleList) {
-            if (!(r instanceof ClippableUpdateRule)) {
+            if (!(r instanceof BoundedUpdateRule)) {
                 h = false;
                 break;
             }
@@ -210,38 +210,27 @@ public class ExtendedNeuronInfoPanel extends JPanel
 
         if (boundsVisible) {
 
-            // Clipping
-            if (NetworkUtils.isConsistent(ruleList, ClippableUpdateRule.class,
-                    "isClipped"))
-            {
-
-                setBoundsEnabled(((ClippableUpdateRule) neuronRef
-                        .getUpdateRule()).isClipped());
-
-                // Handle Ceiling
-                if (!NetworkUtils.isConsistent(ruleList,
-                        NeuronUpdateRule.class, "getCeiling"))
-                {
-                    tfCeiling.setText(NULL_STRING);
-                } else {
-                    tfCeiling.setText(Double.toString(neuronRef.getUpdateRule()
-                            .getCeiling()));
-                }
-                // Handle Floor
-                if (!NetworkUtils.isConsistent(ruleList,
-                        NeuronUpdateRule.class, "getFloor"))
-                {
-                    tfFloor.setText(NULL_STRING);
-                } else {
-                    tfFloor.setText(Double.toString(neuronRef.getUpdateRule()
-                            .getFloor()));
-                }
-            } else {
-                clipping.setNull();
-                setBoundsEnabled(false);
+            // Handle Ceiling
+            if (!NetworkUtils.isConsistent(ruleList, BoundedUpdateRule.class,
+                    "getUpperBound")) {
                 tfCeiling.setText(NULL_STRING);
-                tfFloor.setText(NULL_STRING);
+            } else {
+                tfCeiling.setText(Double
+                        .toString(((BoundedUpdateRule) neuronRef
+                                .getUpdateRule()).getUpperBound()));
             }
+            // Handle Floor
+            if (!NetworkUtils.isConsistent(ruleList, BoundedUpdateRule.class,
+                    "getLowerBound")) {
+                tfFloor.setText(NULL_STRING);
+            } else {
+                tfFloor.setText(Double.toString(((BoundedUpdateRule) neuronRef
+                        .getUpdateRule()).getLowerBound()));
+            }
+        } else {
+            setBoundsEnabled(false);
+            tfCeiling.setText(NULL_STRING);
+            tfFloor.setText(NULL_STRING);
         }
 
         // Handle Increment
@@ -275,12 +264,13 @@ public class ExtendedNeuronInfoPanel extends JPanel
      * be used to fill field data.
      */
     public void fillDefaultValues(NeuronUpdateRule rule) {
-        setBoundsVisible(rule instanceof BoundedUpdateRule
-                && rule instanceof ClippableUpdateRule);
+        setBoundsVisible(rule instanceof BoundedUpdateRule);
         if (boundsVisible) {
-            tfCeiling.setText(Double.toString(rule.getCeiling()));
-            tfFloor.setText(Double.toString(rule.getFloor()));
-            setBoundsEnabled(((ClippableUpdateRule) rule).isClipped());
+            tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
+                    .getUpperBound()));
+            tfFloor.setText(Double.toString(((BoundedUpdateRule) rule)
+                    .getLowerBound()));
+            setBoundsEnabled(rule instanceof BoundedUpdateRule);
         }
         tfIncrement.setText(Double.toString(rule.getIncrement()));
         tfPriority.setText(Integer.toString(0));
@@ -306,7 +296,7 @@ public class ExtendedNeuronInfoPanel extends JPanel
                             .setClipped(clip);
                 }
 
-                if (clip) {
+                if (boundsVisible) {
                     // Upper Bound
                     double ceiling = Utils.doubleParsable(tfCeiling);
                     if (!Double.isNaN(ceiling)) {
@@ -406,21 +396,22 @@ public class ExtendedNeuronInfoPanel extends JPanel
     }
 
     /**
+     * Are the upper and lower bound fields visible.
      *
-     * @return whether or not boundaries are visible. Only occurs in cases where
-     *         clippable
+     * @return whether or not boundaries are visible. Only occurs for
+     *         BoundedUpdateRules
      *
-     *
-     * @see org.simbrain.network.neuron_update_rules.interfaces.Clippable.java
+     * @see org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule.java
      */
     public boolean isBoundsVisible() {
         return boundsVisible;
     }
 
     /**
+     * Are the upper /lower bound fields enabled.
      *
-     * @return whether or not boundry fields are enabled given the current
-     * neuron update rule
+     * @return whether or not boundary fields are enabled given the current
+     *         neuron update rule
      */
     public boolean isBoundsEnabled() {
         return boundsEnabled;

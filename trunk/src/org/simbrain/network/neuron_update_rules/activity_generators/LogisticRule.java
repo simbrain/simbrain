@@ -45,8 +45,8 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     public LogisticRule(LogisticRule lr, Neuron n) {
         super();
-        this.ceiling = lr.getCeiling();
-        this.floor = lr.getFloor();
+        this.ceiling = lr.getUpperBound();
+        this.floor = lr.getLowerBound();
         this.growthRate = lr.getGrowthRate();
         init(n);
     }
@@ -97,9 +97,9 @@ public class LogisticRule extends NeuronUpdateRule implements
 
         double x = neuron.getActivation();
 
-        double y = (x - getFloor()) / (getCeiling() - getFloor());
+        double y = (x - getLowerBound()) / (getUpperBound() - getLowerBound());
         y = growthRate * y * (1 - y);
-        x = ((getCeiling() - getFloor()) * y) + getFloor();
+        x = ((getUpperBound() - getLowerBound()) * y) + getLowerBound();
 
         neuron.setBuffer(clip(x));
     }
@@ -125,11 +125,11 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     @Override
     public double clip(double val) {
-        if (val < getFloor()) {
-            return getFloor();
+        if (val < getLowerBound()) {
+            return getLowerBound();
         }
-        if (val > getCeiling()) {
-            return getCeiling();
+        if (val > getUpperBound()) {
+            return getUpperBound();
         }
         return val;
     }
@@ -154,12 +154,12 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

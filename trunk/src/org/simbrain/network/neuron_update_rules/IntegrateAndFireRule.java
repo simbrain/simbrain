@@ -31,10 +31,10 @@ import org.simbrain.util.randomizer.Randomizer;
  *
  * TODO: Add custom tooltip
  */
-public class IntegrateAndFireRule extends SpikingNeuronUpdateRule 
-implements NoisyUpdateRule  {
+public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
+        NoisyUpdateRule {
 
-    /** Resistance (MΩ). */
+    /** Resistance. */
     private double resistance = 1;
 
     /** Time constant (ms) */
@@ -263,15 +263,4 @@ implements NoisyUpdateRule  {
     public String getDescription() {
         return "Integrate and Fire";
     }
-
-    @Override
-    public double getCeiling() {
-        return threshold + 0.1;
-    }
-
-    @Override
-    public double getFloor() {
-        return restingPotential;
-    }
-
 }

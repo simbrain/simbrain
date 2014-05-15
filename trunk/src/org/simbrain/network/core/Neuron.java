@@ -850,6 +850,34 @@ public class Neuron {
     }
 
     /**
+     * Return the upper bound for the the underlying rule, if it is bounded.
+     * Else it simply returns 1.  Used to color neuron activations.
+     *
+     * @return the upper bound, if applicable, and 1 otherwise.
+     */
+    public double getUpperBound() {
+        if (updateRule instanceof BoundedUpdateRule) {
+            return ((BoundedUpdateRule) updateRule).getUpperBound();
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     * Return the lower bound for the the underlying rule, if it is bounded.
+     * Else it simply returns -1.  Used to color neuron activations.
+     *
+     * @return the upper bound, if applicable, and -1 otherwise.
+     */
+    public double getLowerBound() {
+        if (updateRule instanceof BoundedUpdateRule) {
+            return ((BoundedUpdateRule) updateRule).getLowerBound();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
      * Convenience method to set increment on the neuron's update rule.
      *
      * @param increment increment to set

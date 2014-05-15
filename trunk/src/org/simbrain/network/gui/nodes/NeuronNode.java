@@ -365,12 +365,12 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         } else if (activation > 0) {
 
             float saturation = checkValid((float) Math.abs(activation
-                    / neuron.getUpdateRule().getCeiling()));
+                    / neuron.getUpperBound()));
             circle.setPaint(Color.getHSBColor(hotColor, saturation, 1));
         } else if (activation < 0) {
 
             float saturation = checkValid((float) Math.abs(activation
-                    / neuron.getUpdateRule().getFloor()));
+                    / neuron.getLowerBound()));
             circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 

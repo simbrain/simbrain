@@ -776,25 +776,25 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     public String getDescription() {
         return "Point Neuron";
     }
-
-    @Override
-    public double getCeiling() {
-        if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
-            return 1.0;
-        } else if (outputFunction == OutputFunction.RATE_CODE) {
-            return 1.0;
-        } else if (outputFunction == OutputFunction.LINEAR) {
-            return gain; // TODO: better value for this?
-        } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
-            return 0; // TODO: COmplete implementation
-        } else {
-            return 1.0;
-        }
-    }
-
-    @Override
-    public double getFloor() {
-        return 0;
-    }
+//
+//    @Override
+//    public double getUpperBound() {
+//        if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
+//            return 1.0;
+//        } else if (outputFunction == OutputFunction.RATE_CODE) {
+//            return 1.0;
+//        } else if (outputFunction == OutputFunction.LINEAR) {
+//            return gain; // TODO: better value for this?
+//        } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
+//            return 0; // TODO: COmplete implementation
+//        } else {
+//            return 1.0;
+//        }
+//    }
+//
+//    @Override
+//    public double getLowerBound() {
+//        return 0;
+//    }
 
 }

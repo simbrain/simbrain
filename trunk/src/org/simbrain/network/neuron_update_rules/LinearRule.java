@@ -81,8 +81,8 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
         ln.setSlope(getSlope());
         ln.setClipped(isClipped());
         ln.setAddNoise(getAddNoise());
-        ln.setUpperBound(getCeiling());
-        ln.setLowerBound(getFloor());
+        ln.setUpperBound(getUpperBound());
+        ln.setLowerBound(getLowerBound());
         ln.noiseGenerator = new Randomizer(noiseGenerator);
         return ln;
     }
@@ -110,10 +110,10 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
      */
     @Override
     public double clip(double val) {
-        if (val > getCeiling()) {
-            return getCeiling();
-        } else if (val < getFloor()) {
-            return getFloor();
+        if (val > getUpperBound()) {
+            return getUpperBound();
+        } else if (val < getLowerBound()) {
+            return getLowerBound();
         } else {
             return val;
         }
@@ -125,7 +125,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act >= getCeiling() && isClipped()) {
+        if (act >= getUpperBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -144,7 +144,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
-        if (act <= getFloor() && isClipped()) {
+        if (act <= getLowerBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -162,9 +162,9 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
      */
     @Override
     public double getDerivative(double val) {
-        if (val >= getCeiling()) {
+        if (val >= getUpperBound()) {
             return 0;
-        } else if (val <= getFloor()) {
+        } else if (val <= getLowerBound()) {
             return 0;
         } else {
             return slope;
@@ -233,12 +233,12 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return upperBound;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return lowerBound;
     }
 

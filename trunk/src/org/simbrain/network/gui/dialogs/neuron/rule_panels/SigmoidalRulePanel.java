@@ -58,12 +58,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
     /** Slope field. */
     private JTextField tfSlope = new JTextField();
 
-    /** Ceiling */
-    private JTextField tfUpbound = new JTextField();
-
-    /** Floor */
-    private JTextField tfLowbound = new JTextField();
-
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -102,8 +96,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         mainTab.addItem("Implementation", cbImplementation);
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Slope", tfSlope);
-        mainTab.addItem("Upper Bound", tfUpbound);
-        mainTab.addItem("Lower Bound", tfLowbound);
         mainTab.addItem("Add Noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
@@ -116,9 +108,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
                 if (!currentFunc.equals(initialSfunction)) {
                     prototypeRule.setSquashFunctionType(currentFunc);
                     fillDefaultValues();
-                } else {
-                    tfUpbound.setText(initialUBound);
-                    tfLowbound.setText(initialLBound);
                 }
                 repaint();
             }
@@ -164,22 +153,7 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         } else {
             tfSlope.setText(Double.toString(neuronRef.getSlope()));
         }
-        // Handle Lower Value
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getFloor"))
-        {
-            tfLowbound.setText(SimbrainConstants.NULL_STRING);
-        } else {
-            tfLowbound.setText(Double.toString(neuronRef.getFloor()));
-        }
-        // Handle Upper Value
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getCeiling"))
-        {
-            tfUpbound.setText(SimbrainConstants.NULL_STRING);
-        } else {
-            tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
-        }
+
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
                 "getAddNoise"))
@@ -189,8 +163,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
             isAddNoise.setSelected(neuronRef.getAddNoise());
         }
         randTab.fillFieldValues(getRandomizers(ruleList));
-        initialUBound = tfUpbound.getText();
-        initialLBound = tfLowbound.getText();
         initialSfunction = (SquashingFunction) cbImplementation.
                 getSelectedItem();
     }
@@ -218,8 +190,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
         cbImplementation.setSelectedItem(prototypeRule.getSquashFunctionType());
         tfBias.setText(Double.toString(prototypeRule.getBias()));
         tfSlope.setText(Double.toString(prototypeRule.getSlope()));
-        tfUpbound.setText(Double.toString(prototypeRule.getCeiling()));
-        tfLowbound.setText(Double.toString(prototypeRule.getFloor()));
         isAddNoise.setSelected(prototypeRule.getAddNoise());
         randTab.fillDefaultValues();
     }
@@ -287,24 +257,6 @@ public class SigmoidalRulePanel extends AbstractNeuronPanel {
             for (int i = 0; i < numNeurons; i++) {
                 ((SigmoidalRule) neurons.get(i).getUpdateRule())
                         .setSlope(slope);
-            }
-        }
-
-        // Lower Value
-        double lv = Utils.doubleParsable(tfLowbound);
-        if (!Double.isNaN(lv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((SigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setLowerBound(lv);
-            }
-        }
-
-        // Upper Value
-        double uv = Utils.doubleParsable(tfUpbound);
-        if (!Double.isNaN(uv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((SigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setUpperBound(uv);
             }
         }
 

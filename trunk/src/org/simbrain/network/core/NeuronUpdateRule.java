@@ -19,6 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.Utils;
 
 /**
@@ -99,7 +100,15 @@ public abstract class NeuronUpdateRule {
      * @return the random value.
      */
     public double getRandomValue() {
-        return (getCeiling() - getFloor()) * Math.random() + getFloor();
+        if (this instanceof BoundedUpdateRule) {
+            return (((BoundedUpdateRule) this).getUpperBound() - ((BoundedUpdateRule) this)
+                    .getLowerBound())
+                    * Math.random()
+                    + ((BoundedUpdateRule) this).getLowerBound();
+        } else {
+            return 2 * Math.random() - 1;
+        }
+
     }
 
     /**
@@ -111,20 +120,6 @@ public abstract class NeuronUpdateRule {
     public void clear(final Neuron neuron) {
         neuron.forceSetActivation(0);
     }
-
-    /**
-     * Upper bound for activation.
-     *
-     * @return the ceiling
-     */
-    public abstract double getCeiling();
-
-    /**
-     * Lower bound for activation.
-     *
-     * @return the floor
-     */
-    public abstract double getFloor();
 
     /**
      * Returns a brief description of this update rule. Used in combo boxes in

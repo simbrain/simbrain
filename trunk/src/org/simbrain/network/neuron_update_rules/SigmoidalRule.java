@@ -41,10 +41,10 @@ public class SigmoidalRule extends NeuronUpdateRule implements
         BoundedUpdateRule, NoisyUpdateRule {
 
     /** The Default upper bound. */
-    private static final double DEFAULT_CEILING = 1.0;
+    private static final double DEFAULT_UPPER_BOUND = 1.0;
 
     /** The Default lower bound. */
-    private static final double DEFAULT_FLOOR = 0.0;
+    private static final double DEFAULT_LOWER_BOUND = 0.0;
 
     /** Current implementation. */
     private SquashingFunction sFunction = SquashingFunction.LOGISTIC;
@@ -62,10 +62,10 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     private boolean addNoise;
 
     /** The upper bound of the activity if clipping is used. */
-    private double ceiling = DEFAULT_CEILING;
+    private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** The lower bound of the activity if clipping is used. */
-    private double floor = DEFAULT_FLOOR;
+    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * Default sigmoidal.
@@ -100,7 +100,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         double val = neuron.getWeightedInputs() + bias;
 
-        val = sFunction.valueOf(val, getCeiling(), getFloor(), getSlope());
+        val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -115,10 +115,10 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act < getCeiling()) {
+        if (act < getUpperBound()) {
             act += getIncrement();
-            if (act > getCeiling()) {
-                act = getCeiling();
+            if (act > getUpperBound()) {
+                act = getUpperBound();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -131,10 +131,10 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
-        if (act > getFloor()) {
+        if (act > getLowerBound()) {
             act -= getIncrement();
-            if (act < getFloor()) {
-                act = getFloor();
+            if (act < getLowerBound()) {
+                act = getLowerBound();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -146,8 +146,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getDerivative(final double val) {
-        double up = getCeiling();
-        double lw = getFloor();
+        double up = getUpperBound();
+        double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.derivVal(val, up, lw, diff);
     }
@@ -157,8 +157,8 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getInverse(double val) {
-        double up = getCeiling();
-        double lw = getFloor();
+        double up = getUpperBound();
+        double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.inverseVal(val, up, lw, diff);
     }
@@ -264,16 +264,16 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public double getCeiling() {
-        return ceiling;
+    public double getUpperBound() {
+        return upperBound;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public double getFloor() {
-        return floor;
+    public double getLowerBound() {
+        return lowerBound;
     }
 
     /**
@@ -281,7 +281,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public void setUpperBound(double ceiling) {
-        this.ceiling = ceiling;
+        this.upperBound = ceiling;
     }
 
     /**
@@ -289,7 +289,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public void setLowerBound(double floor) {
-        this.floor = floor;
+        this.lowerBound = floor;
     }
 
 }

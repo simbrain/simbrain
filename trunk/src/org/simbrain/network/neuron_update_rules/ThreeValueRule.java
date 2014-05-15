@@ -191,14 +191,4 @@ public class ThreeValueRule extends NeuronUpdateRule {
         return "Three Value";
     }
 
-    @Override
-    public double getCeiling() {
-        return upperValue;
-    }
-
-    @Override
-    public double getFloor() {
-        return lowerValue;
-    }
-
 }

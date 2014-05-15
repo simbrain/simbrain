@@ -57,8 +57,8 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
     public ClampedNeuronRule deepCopy() {
         ClampedNeuronRule bn = new ClampedNeuronRule();
         bn.setThreshold(getThreshold());
-        bn.setCeiling(getCeiling());
-        bn.setFloor(getFloor());
+        bn.setCeiling(getUpperBound());
+        bn.setFloor(getLowerBound());
         bn.setIncrement(getIncrement());
         return bn;
     }
@@ -70,9 +70,9 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
         double wtdInput = neuron.getWeightedInputs() + bias;
 
         if (wtdInput > threshold) {
-            neuron.setBuffer(getCeiling());
+            neuron.setBuffer(getUpperBound());
         } else {
-            neuron.setBuffer(getFloor());
+            neuron.setBuffer(getLowerBound());
         }
     }
 
@@ -109,7 +109,7 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
         return "Binary";
     }
 
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
@@ -117,7 +117,7 @@ public class ClampedNeuronRule extends NeuronUpdateRule {
         this.ceiling = ceiling;
     }
 
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

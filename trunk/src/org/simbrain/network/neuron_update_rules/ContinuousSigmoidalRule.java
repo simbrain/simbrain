@@ -124,7 +124,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
         netActivation = (netActivation * (1 - timeVal)) + val;
 
-        val = sFunction.valueOf(netActivation, getCeiling(), getFloor(),
+        val = sFunction.valueOf(netActivation, getUpperBound(), getLowerBound(),
                 getSlope());
 
         if (addNoise) {
@@ -140,10 +140,10 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act < getCeiling()) {
+        if (act < getUpperBound()) {
             act += getIncrement();
-            if (act > getCeiling()) {
-                act = getCeiling();
+            if (act > getUpperBound()) {
+                act = getUpperBound();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -156,10 +156,10 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
-        if (act > getFloor()) {
+        if (act > getLowerBound()) {
             act -= getIncrement();
-            if (act < getFloor()) {
-                act = getFloor();
+            if (act < getLowerBound()) {
+                act = getLowerBound();
             }
             n.setActivation(act);
             n.getNetwork().fireNeuronChanged(n);
@@ -171,8 +171,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getDerivative(final double val) {
-        double up = getCeiling();
-        double lw = getFloor();
+        double up = getUpperBound();
+        double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.derivVal(val, up, lw, diff);
     }
@@ -182,8 +182,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getInverse(double val) {
-        double up = getCeiling();
-        double lw = getFloor();
+        double up = getUpperBound();
+        double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.inverseVal(val, up, lw, diff);
     }
@@ -286,7 +286,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
@@ -294,7 +294,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

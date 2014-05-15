@@ -75,8 +75,8 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
         iac.setDecay(getDecay());
         iac.setRest(getRest());
         iac.setClipped(isClipped());
-        iac.setUpperBound(getCeiling());
-        iac.setLowerBound(getFloor());
+        iac.setUpperBound(getUpperBound());
+        iac.setLowerBound(getLowerBound());
         iac.setAddNoise(getAddNoise());
         iac.noiseGenerator = new Randomizer(noiseGenerator);
         return iac;
@@ -98,9 +98,9 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
         }
 
         if (wtdSum > 0) {
-            val += ((wtdSum * (getCeiling() - val)) - (decay * (val - rest)));
+            val += ((wtdSum * (getUpperBound() - val)) - (decay * (val - rest)));
         } else {
-            val += ((wtdSum * (val - getFloor())) - (decay * (val - rest)));
+            val += ((wtdSum * (val - getLowerBound())) - (decay * (val - rest)));
         }
 
         if (addNoise) {
@@ -119,10 +119,10 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
      */
     @Override
     public double clip(double val) {
-        if (val > getCeiling()) {
-            return getCeiling();
-        } else if (val < getFloor()) {
-            return getFloor();
+        if (val > getUpperBound()) {
+            return getUpperBound();
+        } else if (val < getLowerBound()) {
+            return getLowerBound();
         } else {
             return val;
         }
@@ -134,7 +134,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act >= getCeiling() && isClipped()) {
+        if (act >= getUpperBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -153,7 +153,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
-        if (act <= getFloor() && isClipped()) {
+        if (act <= getLowerBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -228,12 +228,12 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

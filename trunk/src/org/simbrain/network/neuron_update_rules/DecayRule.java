@@ -87,8 +87,8 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
         dn.setDecayAmount(getDecayAmount());
         dn.setDecayFraction(getDecayFraction());
         dn.setClipped(isClipped());
-        dn.setUpperBound(getCeiling());
-        dn.setLowerBound(getFloor());
+        dn.setUpperBound(getUpperBound());
+        dn.setLowerBound(getLowerBound());
         dn.setIncrement(getIncrement());
         dn.setAddNoise(getAddNoise());
         dn.noiseGenerator = new Randomizer(noiseGenerator);
@@ -141,10 +141,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
      */
     @Override
     public double clip(double val) {
-        if (val > getCeiling()) {
-            return getCeiling();
-        } else if (val < getFloor()) {
-            return getFloor();
+        if (val > getUpperBound()) {
+            return getUpperBound();
+        } else if (val < getLowerBound()) {
+            return getLowerBound();
         } else {
             return val;
         }
@@ -156,7 +156,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
-        if (act >= getCeiling() && isClipped()) {
+        if (act >= getUpperBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -175,7 +175,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
-        if (act <= getFloor() && isClipped()) {
+        if (act <= getLowerBound() && isClipped()) {
             return;
         } else {
             if (isClipped()) {
@@ -278,12 +278,12 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

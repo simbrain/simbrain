@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -29,6 +30,8 @@ import org.simbrain.util.randomizer.Randomizer;
  * Hopfield networks.
  */
 public class AdditiveRule extends NeuronUpdateRule {
+
+    //TODO: May need clipping and bounds.
 
     /** Lambda. */
     private double lambda = 1.4;
@@ -157,16 +160,6 @@ public class AdditiveRule extends NeuronUpdateRule {
     @Override
     public String getDescription() {
         return "Additive (Continuous Hopfield)";
-    }
-
-    @Override
-    public double getCeiling() {
-        return 1.0;
-    }
-
-    @Override
-    public double getFloor() {
-        return -1.0;
     }
 
 }

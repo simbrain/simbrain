@@ -524,29 +524,6 @@ public class Network {
     }
 
     /**
-     * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the
-     * neuron has not exceeded its upper bound or gone below its lower bound.
-     * TODO: Add or replace with normalization within bounds? TODO: Does this
-     * make sense anymore after the "clipping" interface change
-     */
-    public void checkAllBounds() {
-        for (Neuron n : neuronList) {
-            double act = n.getActivation();
-            if (act > n.getUpdateRule().getCeiling()) {
-                n.forceSetActivation(n.getUpdateRule().getCeiling());
-            }
-            if (act < n.getUpdateRule().getFloor()) {
-                n.forceSetActivation(n.getUpdateRule().getFloor());
-            }
-        }
-
-        for (int i = 0; i < synapseList.size(); i++) {
-            Synapse w = synapseList.get(i);
-            w.checkBounds();
-        }
-    }
-
-    /**
      * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete

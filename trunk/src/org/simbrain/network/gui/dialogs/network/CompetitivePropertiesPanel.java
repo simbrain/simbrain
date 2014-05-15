@@ -36,7 +36,7 @@ import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveGroup.UpdateMethod;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * <b>CompetitivePropertiesDialog</b> is a panel box for setting the properties
@@ -44,7 +44,7 @@ import org.simbrain.util.widgets.CommittablePanel;
  * network or to edit an existing competitive network.
  */
 public class CompetitivePropertiesPanel extends JPanel implements
-        ActionListener, GroupPropertiesPanel, CommittablePanel {
+        ActionListener, GroupPropertiesPanel, EditablePanel {
 
     /** Default number of competitive neurons. */
     private static final int DEFAULT_NUM_COMPETITIVE_NEURONS = 5;

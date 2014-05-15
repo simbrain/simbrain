@@ -37,7 +37,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
@@ -55,7 +55,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  */
 @SuppressWarnings("serial")
 public class ExtendedNeuronInfoPanel extends JPanel
-    implements CommittablePanel {
+    implements EditablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";

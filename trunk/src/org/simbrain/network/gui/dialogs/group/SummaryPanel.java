@@ -31,7 +31,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * A panel which provides a high level summary of certain groups in Simbrain.
@@ -42,7 +42,7 @@ import org.simbrain.util.widgets.CommittablePanel;
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class SummaryPanel extends JPanel implements CommittablePanel {
+public class SummaryPanel extends JPanel implements EditablePanel {
 
     /** The default name for this type of panel. */
     public static final String DEFAULT_PANEL_NAME = "Summary";
@@ -453,6 +453,11 @@ public class SummaryPanel extends JPanel implements CommittablePanel {
 
     public JLabel getOutgoingGroupLabel() {
         return outgoingGroupLabel;
+    }
+
+    @Override
+    public void fillFieldValues() {
+        // TODO: Merge this with argument based fill field values?        
     }
 
     /*/****************************************************

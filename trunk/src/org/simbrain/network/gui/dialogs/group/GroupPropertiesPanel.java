@@ -14,28 +14,19 @@
 package org.simbrain.network.gui.dialogs.group;
 
 import org.simbrain.network.groups.Group;
-
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
- * Interface for property panels that have fill field and commit change methods.
+ * Interface for panels that allow the properties of neuron groups to be edited.
  * These must often be shared between dialogs for creation and editing of a
- * group, hence the interface.
+ * group, hence the interface. Also there is a generic neuron group dialog, with
+ * a tab for properties specific to a given type of group: that tab refers only
+ * to this interface.
  *
  * @author Jeff Yoshimi
  *
  */
-public interface GroupPropertiesPanel {
-
-    /** Initialize the panel with field value. */
-    void fillFieldValues();
-
-    /**
-     * Take all field values from the panel and use it to create or edit
-     * relevant object.
-     *
-     * @return whether or not the committ was successful.
-     */
-    boolean commitChanges();
+public interface GroupPropertiesPanel extends EditablePanel {
 
     /**
      * @return the group associated with this panel.

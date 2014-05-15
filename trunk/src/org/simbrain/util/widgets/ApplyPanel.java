@@ -25,19 +25,19 @@ import javax.swing.JPanel;
 /**
  * A widget that contains an apply button, for cases when it should be possible
  * to immediately apply changes in an editing panel (as opposed to waiting to
- * press ok in the parent dialog). Implements {@link CommittablePanel}, since
+ * press ok in the parent dialog). Implements {@link EditablePanel}, since
  * the apply can fail.
  *
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class ApplyPanel extends JPanel implements CommittablePanel {
+public class ApplyPanel extends JPanel implements EditablePanel {
 
     /**
      * The committable panel which is being wrapped around, and to which changes
      * will be committed when the apply button is pressed.
      */
-    private final CommittablePanel mainPanel;
+    private final EditablePanel mainPanel;
 
     /** The button used to apply changes. */
     private final JButton applyButton = new JButton("Apply");
@@ -56,7 +56,7 @@ public class ApplyPanel extends JPanel implements CommittablePanel {
      * Constructs the apply panel. Requires a committable panel to wrap around.
      * @param mainPanel the committable panel to which changes may be applied
      */
-    public ApplyPanel(CommittablePanel mainPanel) {
+    public ApplyPanel(EditablePanel mainPanel) {
         this.mainPanel = mainPanel;
         masterLayout();
         addListener();
@@ -136,6 +136,11 @@ public class ApplyPanel extends JPanel implements CommittablePanel {
     @Override
     public JPanel getPanel() {
         return (JPanel) mainPanel;
+    }
+
+    @Override
+    public void fillFieldValues() {
+        // Not currently used        
     }
 
 }

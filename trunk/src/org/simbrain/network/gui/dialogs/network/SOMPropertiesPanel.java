@@ -30,7 +30,7 @@ import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
@@ -38,7 +38,7 @@ import org.simbrain.util.widgets.CommittablePanel;
  *
  */
 public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
-    CommittablePanel {
+    EditablePanel {
 
     // TODO: This class takes care of SOM network and group. Not sure that's
     // good.  Some things are conflated, e.g. help page.

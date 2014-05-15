@@ -43,12 +43,13 @@ import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
 import org.simbrain.network.gui.dialogs.neuron.CombinedNeuronInfoPanel;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
-import org.simbrain.util.widgets.CommittablePanel;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
@@ -58,8 +59,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
-    CommittablePanel {
+public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
     // TODO
     // - Change in a way that prepares for possible future where multiple can be
@@ -75,7 +75,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
     private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** A panel that provides a high-level summary of the neuron group. */
-    private CommittablePanel summaryPanel;
+    private EditablePanel summaryPanel;
 
     /** Layout panel. */
     private MainLayoutPanel layoutPanel;
@@ -84,13 +84,13 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
     private JPanel layoutPanelWrapper;
 
     /** Panel for specific group types. Null for bare neuron group. */
-    private CommittablePanel specificNeuronGroupPanel;
+    private EditablePanel specificNeuronGroupPanel;
 
     /**
      * The neuron group panel containing both a basic neuron info panel and
      * a neuron update settings panel.
      */
-    private CommittablePanel combinedNeuronInfoPanel;
+    private EditablePanel combinedNeuronInfoPanel;
 
     /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel;
@@ -184,7 +184,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             }
         });
 
-        layoutPanelWrapper = new ApplyPanel(new CommittablePanel() {
+        layoutPanelWrapper = new ApplyPanel(new EditablePanel() {
             @Override
             public boolean commitChanges() {
                 try {
@@ -199,6 +199,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             @Override
             public JPanel getPanel() {
                 return layoutPanel;
+            }
+            @Override
+            public void fillFieldValues() {
             }
         });
     }
@@ -220,7 +223,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             }
             neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
                     networkPanel.getWhereToAdd(),
-                    NeuronGroup.DEFAULT_GROUP_SIZE);
+                    9);
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
 
@@ -237,8 +240,6 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             }
             editWrapComponents();
         }
-
-
 
         fillFieldValues();
 
@@ -306,7 +307,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
      * @return the committable neuron group panel corresponding to the specific
      * type of the neuron group being edited if it has one.
      */
-    private CommittablePanel getSpecificGroupPanel() {
+    private EditablePanel getSpecificGroupPanel() {
         if (neuronGroup instanceof CompetitiveGroup) {
             return new CompetitivePropertiesPanel(
                     networkPanel, (CompetitiveGroup) neuronGroup);
@@ -329,12 +330,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 .fillFieldValues();
         }
 
-        // For backwards compatibility
-        if (neuronGroup.getLayout() == null) {
-            neuronGroup.setLayout(NeuronGroup.DEFAULT_LAYOUT);
-        }
-
-        layoutPanel.setCurrentLayout(neuronGroup.getLayout());
+        // Don't use the neuron group's default line layout. When making bare
+        // neuron groups grid layout seems to be nicer.
+        layoutPanel.setCurrentLayout(new GridLayout());
     }
 
     /**
@@ -348,23 +346,17 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             success &= combinedNeuronInfoPanel.commitChanges();
             Neuron template = neuronGroup.getNeuronList().get(0);
             try {
+                neuronGroup.getNeuronList().clear();
                 int numNeurons = Integer.parseInt(((SummaryPanel) summaryPanel)
                         .getEditablePopField().getText());
                 if (numNeurons < 1) {
                     throw new NumberFormatException();
                 }
-                if (numNeurons >= NeuronGroup.DEFAULT_GROUP_SIZE) {
-                    for (int i = NeuronGroup.DEFAULT_GROUP_SIZE;
-                            i < numNeurons; i++)
-                    {
-                        neuronGroup.addNeuron(template.deepCopy());
-                    }
-                } else {
-                    while (neuronGroup.getNeuronList().size() > numNeurons) {
-                        neuronGroup.getNeuronList().remove(neuronGroup
-                                .getNeuronList().size() - 1);
-                    }
+                for (int i = 0; i < numNeurons; i++) {
+                    neuronGroup.addNeuron(template.deepCopy());
                 }
+                neuronGroup.setLayout(layoutPanel.getCurrentLayout());
+                neuronGroup.applyLayout();
             } catch (NumberFormatException nfe) {
                 System.err.println("Class: " + this.getClass().getSimpleName()
                         + " Method: commitChanges "
@@ -375,6 +367,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 repaint();
                 return false;
             }
+            return success;
         }
 
         if (specificNeuronGroupPanel != null) {

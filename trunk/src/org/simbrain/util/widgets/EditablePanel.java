@@ -21,23 +21,19 @@ package org.simbrain.util.widgets;
 import javax.swing.JPanel;
 
 /**
- * Any panel which commits changes to some model object and fills values based
- * on a model object should implement this interface.
- *
  * JPanels that edit the properties of an object can implement this interface to
  * achieve standard behaviors associated with editing properties. For example,
  * when committing changes made in such a panel, it useful to know whether the
  * commit succeeded (it can fail, for example if someone fills a numerical field
  * with text).
  *
- *
  * @author ztosi
  *
  */
-public interface CommittablePanel {
+public interface EditablePanel {
 
-    //TODO: If this interface is expanded consider name change to EditablePanel, and
-    // remove GroupPropertiesPanel.
+    /** Initialize the panel with field values. */
+    void fillFieldValues();
 
     /**
      * Uses the data in the fields of the panel which implements this to alter

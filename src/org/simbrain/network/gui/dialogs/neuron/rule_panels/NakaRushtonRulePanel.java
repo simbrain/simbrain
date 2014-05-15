@@ -48,12 +48,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
     /** Steepness field. */
     private JTextField tfSteepness = new JTextField();
 
-    /** Ceiling */
-    private JTextField tfUpbound = new JTextField();
-
-    /** Floor */
-    private JTextField tfLowbound = new JTextField();
-
     /** Semi saturation field. */
     private JTextField tfSemiSaturation = new JTextField();
 
@@ -93,8 +87,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 
         this.add(tabbedPane);
         mainTab.addItem("Steepness", tfSteepness);
-        mainTab.addItem("Max Value", tfUpbound);
-        mainTab.addItem("Min Value", tfLowbound);
         mainTab.addItem("Semi-saturation constant", tfSemiSaturation);
         mainTab.addItem("Time constant", tfTimeConstant);
         mainTab.addItem("Add noise", tsNoise);
@@ -150,20 +142,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
             tfSteepness.setText(SimbrainConstants.NULL_STRING);
         else
             tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
-
-        // Handle Lower Value
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getFloor"))
-            tfLowbound.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfLowbound.setText(Double.toString(neuronRef.getFloor()));
-
-        // Handle Upper Value
-        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
-                "getCeiling"))
-            tfUpbound.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
 
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, NakaRushtonRule.class,
@@ -223,8 +201,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
         tfSemiSaturation.setText(Double.toString(prototypeRule
                 .getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(prototypeRule.getSteepness()));
-        tfUpbound.setText(Double.toString(prototypeRule.getCeiling()));
-        tfLowbound.setText(Double.toString(prototypeRule.getFloor()));
         tfTimeConstant
                 .setText(Double.toString(prototypeRule.getTimeConstant()));
         tsNoise.setSelected(prototypeRule.getAddNoise());
@@ -280,24 +256,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
             for (int i = 0; i < numNeurons; i++) {
                 ((NakaRushtonRule) neurons.get(i).getUpdateRule())
                         .setSteepness(steepness);
-            }
-        }
-
-        // Lower Value
-        double lv = Utils.doubleParsable(tfLowbound);
-        if (!Double.isNaN(lv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((NakaRushtonRule) neurons.get(i).getUpdateRule())
-                        .setLowerBound(lv);
-            }
-        }
-
-        // Upper Value
-        double uv = Utils.doubleParsable(tfUpbound);
-        if (!Double.isNaN(uv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((NakaRushtonRule) neurons.get(i).getUpdateRule())
-                        .setUpperBound(uv);
             }
         }
 
@@ -368,7 +326,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 
     /**
      * Responds to actions performed.
-     *
+     * 
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {

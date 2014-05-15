@@ -50,8 +50,8 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
     public RandomNeuronRule(Neuron n) {
         super();
         init(n);
-        randomizer.setUpperBound(getCeiling());
-        randomizer.setLowerBound(getFloor());
+        randomizer.setUpperBound(getUpperBound());
+        randomizer.setLowerBound(getLowerBound());
     }
 
     public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
@@ -110,12 +110,12 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 

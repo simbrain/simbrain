@@ -80,14 +80,4 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
         return "Spiking Threshold";
     }
 
-    @Override
-    public double getCeiling() {
-        return 1 + 0.1;
-    }
-
-    @Override
-    public double getFloor() {
-        return 0;
-    }
-
 }

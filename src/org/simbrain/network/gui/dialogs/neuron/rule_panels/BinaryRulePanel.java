@@ -88,17 +88,17 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
             tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 
         // Handle Lower Value
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getFloor"))
+        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getLowerBound"))
             tfLowbound.setText(SimbrainConstants.NULL_STRING);
         else
-            tfLowbound.setText(Double.toString(neuronRef.getFloor()));
+            tfLowbound.setText(Double.toString(neuronRef.getLowerBound()));
 
         // Handle Upper Value
         if (!NetworkUtils
-                .isConsistent(ruleList, BinaryRule.class, "getCeiling"))
+                .isConsistent(ruleList, BinaryRule.class, "getUpperBound"))
             tfUpbound.setText(SimbrainConstants.NULL_STRING);
         else
-            tfUpbound.setText(Double.toString(neuronRef.getCeiling()));
+            tfUpbound.setText(Double.toString(neuronRef.getUpperBound()));
 
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias"))
@@ -113,8 +113,8 @@ public class BinaryRulePanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
-        tfUpbound.setText(Double.toString(prototypeRule.getCeiling()));
-        tfLowbound.setText(Double.toString(prototypeRule.getFloor()));
+        tfUpbound.setText(Double.toString(prototypeRule.getUpperBound()));
+        tfLowbound.setText(Double.toString(prototypeRule.getLowerBound()));
         tfBias.setText(Double.toString(prototypeRule.getBias()));
     }
 

@@ -29,8 +29,8 @@ import org.simbrain.util.randomizer.Randomizer;
  * different types. Students could just look it up, but this would be
  * faster/cooler. Just a thought.
  */
-public class IzhikevichRule extends SpikingNeuronUpdateRule
-implements NoisyUpdateRule  {
+public class IzhikevichRule extends SpikingNeuronUpdateRule implements
+        NoisyUpdateRule {
 
     /** Recovery. */
     private double recovery;
@@ -199,16 +199,6 @@ implements NoisyUpdateRule  {
     @Override
     public String getDescription() {
         return "Izhikevich";
-    }
-
-    @Override
-    public double getCeiling() {
-        return threshold + 0.1;
-    }
-
-    @Override
-    public double getFloor() {
-        return c;
     }
 
 }

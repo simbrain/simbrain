@@ -82,8 +82,8 @@ public class SinusoidalRule extends NeuronUpdateRule implements
      */
     public void update(Neuron neuron) {
 
-        double upperBound = getCeiling();
-        double lowerBound = getFloor();
+        double upperBound = getUpperBound();
+        double lowerBound = getLowerBound();
         double range = upperBound - lowerBound;
         double val = ((range / 2) * Math.sin(frequency
                 * neuron.getNetwork().getTime() + phase))
@@ -170,18 +170,18 @@ public class SinusoidalRule extends NeuronUpdateRule implements
     @Override
     public double getRandomValue() {
         double rand = (2 * Math.PI) * Math.random();
-        double range = getCeiling() - getFloor();
+        double range = getUpperBound() - getLowerBound();
         return ((range / 2) * Math.sin(frequency * rand + phase))
-                + ((getCeiling() + getFloor()) / 2);
+                + ((getUpperBound() + getLowerBound()) / 2);
     }
 
     @Override
-    public double getCeiling() {
+    public double getUpperBound() {
         return ceiling;
     }
 
     @Override
-    public double getFloor() {
+    public double getLowerBound() {
         return floor;
     }
 }

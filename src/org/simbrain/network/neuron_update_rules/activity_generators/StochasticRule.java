@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 
 /**
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
@@ -29,13 +30,19 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
  * probability, and the lower bound otherwise. Ignores inputs.
  */
 public class StochasticRule extends SpikingNeuronUpdateRule implements
-        ActivityGenerator {
+         ActivityGenerator {
 
     /** The default firing probability for the Neuron. */
     private static final double DEFAULT_FIRING_PROBABILITY = .5;
 
     /** Probability the neuron will fire. */
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
+
+    /** Lower value field. */
+    private double lowerValue = -1;
+
+    /** Upper value field. */
+    private double upperValue = 1;
 
     /**
      * {@inheritDoc}
@@ -66,9 +73,9 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
     public void update(Neuron neuron) {
         double rand = Math.random();
         if (rand > firingProbability) {
-            neuron.setBuffer(getFloor());
+            neuron.setBuffer(upperValue);
         } else {
-            neuron.setBuffer(getCeiling());
+            neuron.setBuffer(lowerValue);
         }
     }
 
@@ -91,15 +98,32 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
         return "Stochastic";
     }
 
-    @Override
-    public double getCeiling() {
-        // TODO Auto-generated method stub
-        return 0;
+    /**
+     * @return the lowerValue
+     */
+    public double getLowerValue() {
+        return lowerValue;
     }
 
-    @Override
-    public double getFloor() {
-        // TODO Auto-generated method stub
-        return 0;
+    /**
+     * @param lowerValue the lowerValue to set
+     */
+    public void setLowerValue(double lowerValue) {
+        this.lowerValue = lowerValue;
     }
+
+    /**
+     * @return the upperValue
+     */
+    public double getUpperValue() {
+        return upperValue;
+    }
+
+    /**
+     * @param upperValue the upperValue to set
+     */
+    public void setUpperValue(double upperValue) {
+        this.upperValue = upperValue;
+    }
+
 }

@@ -15,10 +15,11 @@ package org.simbrain.network.neuron_update_rules.interfaces;
 
 /**
  *
- * An interface for rules with no intrinsic boundaries allowing an upper and
- * lower bound for the activation to be set.
+ * An interface for updates rules that make use of an upper and lower bound,
+ * either for clipping or for setting intrinsic bounds.
  *
- * @author zach
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  *
  */
 public interface BoundedUpdateRule {
@@ -36,5 +37,19 @@ public interface BoundedUpdateRule {
      * @param lowerBound the lower bound
      */
     void setLowerBound(double lowerBound);
+
+    /**
+     * Returns the upper bound.
+     *
+     * @return the upper boud
+     */
+    double getUpperBound();
+
+    /**
+     * Returns the lower bound.
+     *
+     * @return the lower bound
+     */
+    double getLowerBound();
 
 }

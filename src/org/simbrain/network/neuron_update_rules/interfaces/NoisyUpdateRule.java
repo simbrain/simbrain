@@ -22,19 +22,39 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * An interface which should be implemented by any neuron update rule that uses
- * a randomizer for any reason.
- * 
+ * a randomizer to provide noise.
+ *
  * @author zach
  *
  */
 public interface NoisyUpdateRule {
-    
+
+    /**
+     * Return the noise generator.
+     *
+     * @return the noise generator.
+     */
     Randomizer getNoiseGenerator();
-    
+
+    /**
+     * Set the noise generator.
+     *
+     * @param rand the generator to set
+     */
     void setNoiseGenerator(Randomizer rand);
-    
+
+    /**
+     * Return true if add noise is turned on.
+     *
+     * @return true if add noise is on; false otherwise.
+     */
     boolean getAddNoise();
-    
+
+    /**
+     * Set whether noise should be used.
+     *
+     * @param noise true if noise should be used; false otherwise.
+     */
     void setAddNoise(boolean noise);
 
 }

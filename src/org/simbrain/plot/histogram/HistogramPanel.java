@@ -41,7 +41,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.simbrain.plot.histogram.OverwritableHistogramDataset.SeriesStruct;
+import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a
@@ -233,11 +233,11 @@ public class HistogramPanel extends JPanel {
                 renderer.setDrawBarOutline(false);
                 renderer.setShadowVisible(false);
 
-                Iterator<SeriesStruct> series = model.getSeriesData()
+                Iterator<ColoredDataSeries> series = model.getSeriesData()
                         .iterator();
                 for (int i = 0; i < model.getData().size(); i++) {
                     if (i < colorPallet.length) {
-                        SeriesStruct s = series.next();
+                        ColoredDataSeries s = series.next();
                         Color c = s.color;
                         if (c == null) {
                             c = assignColor();
@@ -293,10 +293,10 @@ public class HistogramPanel extends JPanel {
     public void reRender() {
         XYPlot plot = (XYPlot) mainChart.getPlot();
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
-        Iterator<SeriesStruct> series = model.getSeriesData().iterator();
+        Iterator<ColoredDataSeries> series = model.getSeriesData().iterator();
         for (int i = 0; i < model.getData().size(); i++) {
             if (i < colorPallet.length) {
-                SeriesStruct s = series.next();
+                ColoredDataSeries s = series.next();
                 Color c = s.color;
                 if (c == null) {
                     c = assignColor();

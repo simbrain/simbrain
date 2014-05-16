@@ -53,10 +53,10 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * allow polarity shifts and keep separate lists of excitatory/inhibitory
  * synapses, also allow to preview and keep values in numerical array and THEN
  * change synapse strengths.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
- * 
+ *
  */
 public class SynapseAdjustmentPanel extends JPanel {
 
@@ -204,7 +204,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      * that this array is only used internally, to display stats and the
      * histogram.
      */
-    private Number[][] weights = new Number[2][];
+    private double[][] weights = new double[2][];
 
     private final List<Synapse> synapses;
 
@@ -229,7 +229,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
     /**
      * Create a synapse adjustment panel with a specified list of synapses.
-     * 
+     *
      * @param networkPanel
      *            parent network panel
      * @param synapses
@@ -475,8 +475,8 @@ public class SynapseAdjustmentPanel extends JPanel {
             }
         }
 
-        weights[0] = new Number[exWeights];
-        weights[1] = new Number[inWeights];
+        weights[0] = new double[exWeights];
+        weights[1] = new double[inWeights];
         exWeights = 0;
         inWeights = 0;
 
@@ -518,7 +518,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      */
     private void updateHistogram() {
 
-        List<Number[]> data = new ArrayList<Number[]>();
+        List<double[]> data = new ArrayList<double[]>();
         List<String> names = new ArrayList<String>();
 
         switch ((SynapseView) synTypeSelector.getSelectedItem()) {
@@ -528,8 +528,8 @@ public class SynapseAdjustmentPanel extends JPanel {
         case ALL: {
             // Send the histogram the excitatory and absolute inhibitory
             // synapse values as separate data series.
-            Number[] hist1 = weights[0];
-            Number[] hist2 = weights[1];
+            double[] hist1 = weights[0];
+            double[] hist2 = weights[1];
             // The names of both series
             names.add(SynapseView.EXCITATORY.toString());
             names.add(SynapseView.INHIBITORY.toString());
@@ -544,10 +544,10 @@ public class SynapseAdjustmentPanel extends JPanel {
         case OVERLAY: {
             // Send the histogram the excitatory and absolute inhibitory
             // synapse values as separate data series.
-            Number[] hist1 = weights[0];
-            Number[] hist2 = new Number[weights[1].length];
+            double[] hist1 = new double[0];
+            double[] hist2 = new double[weights[1].length];
             for (int i = 0, n = hist2.length; i < n; i++) {
-                hist2[i] = Math.abs(weights[1][i].doubleValue());
+                hist2[i] = Math.abs(weights[1][i]);
             }
             // The names of both series
             names.add(SynapseView.EXCITATORY.toString());
@@ -561,7 +561,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         // Data is a single row copy of first row of weights
         case EXCITATORY: {
             // Send the histogram only excitatory weights as a single series
-            Number[] hist = weights[0];
+            double[] hist = weights[0];
             // Name the series
             names.add(SynapseView.EXCITATORY.toString());
             data.add(hist);
@@ -573,7 +573,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         // values are allowed here.
         case INHIBITORY: {
             // Send the histogram only inhibitory weights as a single series
-            Number[] hist = weights[1];
+            double[] hist = weights[1];
             // Name the series
             names.add(SynapseView.INHIBITORY.toString());
             data.add(hist);
@@ -630,9 +630,9 @@ public class SynapseAdjustmentPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @author zach
-     * 
+     *
      */
     private final class StatisticsBlock {
 
@@ -645,7 +645,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         /**
          * Gets the basic statistics: mean, median, and standard deviation of
          * the synapse weights based on which group of synapses is selected.
-         * 
+         *
          * @return an An array where the first element is the mean, the 2nd
          *         element is the median, and the 3rd element is the standard
          *         deviation.
@@ -667,7 +667,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 int c = 0;
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0, m = weights[i].length; j < m; j++) {
-                        double val = weights[i][j].doubleValue();
+                        double val = weights[i][j];
                         runningVal += val;
                         data[c] = val;
                         c++;
@@ -679,7 +679,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 int c = 0;
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0, m = weights[i].length; j < m; j++) {
-                        double val = Math.abs(weights[i][j].doubleValue());
+                        double val = Math.abs(weights[i][j]);
                         runningVal += val;
                         data[c] = val;
                         c++;
@@ -690,7 +690,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 tot = weights[0].length;
                 data = new double[tot];
                 for (int j = 0; j < tot; j++) {
-                    double val = Math.abs(weights[0][j].doubleValue());
+                    double val = Math.abs(weights[0][j]);
                     runningVal += val;
                     data[j] = val;
                 }
@@ -700,7 +700,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 tot = weights[1].length;
                 data = new double[tot];
                 for (int j = 0; j < tot; j++) {
-                    double val = weights[1][j].doubleValue();
+                    double val = weights[1][j];
                     runningVal += val;
                     data[j] = val;
                 }
@@ -754,7 +754,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         /**
          * Construct the scaler panel.
-         * 
+         *
          * @param networkPanel
          *            parent network panel
          */
@@ -815,7 +815,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         /**
          * Construct the panel.
-         * 
+         *
          * @param networkPanel
          *            reference to parent network panel.
          */

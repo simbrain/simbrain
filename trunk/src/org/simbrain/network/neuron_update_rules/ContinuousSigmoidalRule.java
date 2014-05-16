@@ -208,8 +208,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         sn.setSquashFunctionType(getSquashFunctionType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
-        sn.setUpperBound(getCeiling());
-        sn.setLowerBound(getFloor());
+        sn.setUpperBound(getUpperBound());
+        sn.setLowerBound(getLowerBound());
         sn.noiseGenerator = new Randomizer(noiseGenerator);
         return sn;
     }

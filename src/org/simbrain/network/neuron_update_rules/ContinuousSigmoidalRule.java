@@ -33,10 +33,10 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>Continuous Sigmoidal Neuron</b> provides various squashing function
  * implementations of a sigmoidal neuron numerically integrated continuously
  * over time.
- *
+ * 
  * @author Zach Tosi
  * @author Jeff Yoshimi
- *
+ * 
  */
 public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
@@ -107,8 +107,9 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
     /**
      * Construct a sigmoid update with a specified implementation.
-     *
-     * @param sFunction the implementation to use.
+     * 
+     * @param sFunction
+     *            the implementation to use.
      */
     public ContinuousSigmoidalRule(SquashingFunction sFunction) {
         super();
@@ -133,8 +134,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
         netActivation = (netActivation * (1 - timeVal)) + val;
 
-        val = sFunction.valueOf(netActivation, getUpperBound(), getLowerBound(),
-                getSlope());
+        val = sFunction.valueOf(netActivation, getUpperBound(),
+                getLowerBound(), getSlope());
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -223,7 +224,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionY The inflectionY to set.
+     * @param inflectionY
+     *            The inflectionY to set.
      */
     @Override
     public void setBias(final double inflectionY) {
@@ -238,7 +240,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param inflectionPointSlope The inflectionPointSlope to set.
+     * @param inflectionPointSlope
+     *            The inflectionPointSlope to set.
      */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
@@ -252,7 +255,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param noise The noise to set.
+     * @param noise
+     *            The noise to set.
      */
     public void setNoiseGenerator(final Randomizer noise) {
         this.noiseGenerator = noise;
@@ -266,7 +270,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param addNoise The addNoise to set.
+     * @param addNoise
+     *            The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -288,7 +293,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param type the type to set
+     * @param type
+     *            the type to set
      */
     public void setSquashFunctionType(SquashingFunction type) {
         this.sFunction = type;
@@ -334,7 +340,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @param timeConstant the new time constant
+     * @param timeConstant
+     *            the new time constant
      */
     public void setTimeConstant(double timeConstant) {
         this.timeConstant = timeConstant;

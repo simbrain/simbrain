@@ -55,7 +55,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 /**
  * Main tabbed panel for editing all neuron groups. Specific neuron panels are
  * included as part of this.
- * 
+ *
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
@@ -111,7 +111,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Creates a neuron group panel meant for creating neuron groups.
-     * 
+     *
      * @param np
      *            the parent network of the prospective neuron group
      * @param parent
@@ -128,7 +128,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Creates a neuron group panel meant for editing an existing neuron group.
-     * 
+     *
      * @param np
      *            the parent network of the neuron group
      * @param ng
@@ -147,7 +147,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for the case where a neuron group is being created.
-     * 
+     *
      * @param np
      *            Parent network panel
      * @param parent
@@ -162,7 +162,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for case where an existing neuron group is being edited.
-     * 
+     *
      * @param np
      *            Parent network panel
      * @param ng
@@ -251,6 +251,10 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                     @Override
                     public JPanel getPanel() {
                         return layoutPanel;
+                    }
+
+                    @Override
+                    public void fillFieldValues() {
                     }
                 });
     }
@@ -365,7 +369,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Gets the specificNeuronGroupPanel based on the underlying group.
-     * 
+     *
      * @return the committable neuron group panel corresponding to the specific
      *         type of the neuron group being edited if it has one.
      */

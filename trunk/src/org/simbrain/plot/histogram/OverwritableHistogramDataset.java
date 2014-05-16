@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2005,2007 The Authors. See http://www.simbrain.net/credits This
+ * program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
 package org.simbrain.plot.histogram;
 
 import java.awt.Color;
@@ -24,11 +36,12 @@ import org.jfree.util.PublicCloneable;
  * be overridden. The main change is the addition of the method overwrriteSeries
  * I would have extended HistogramDataset but needed access to the internal
  * list.
- * 
+ *
  * @see HistogramDataset
  * @see SimpleHistogramDataset
- * 
+ *
  * @author Jeff Yoshimi
+ * @author Zach Tosi
  */
 public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
@@ -36,7 +49,10 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /** For serialization. */
     private static final long serialVersionUID = -6341668077370231153L;
 
-    private LinkedHashMap<String, SeriesStruct> dataMap = new LinkedHashMap<String, SeriesStruct>();
+    /**
+     * A mapping from the names of data series to the data themselves.
+     */
+    private LinkedHashMap<String, ColoredDataSeries> dataMap = new LinkedHashMap<String, ColoredDataSeries>();
 
     /** The histogram type. */
     private HistogramType type;
@@ -51,7 +67,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the histogram type.
-     * 
+     *
      * @return The type (never <code>null</code>).
      */
     public HistogramType getType() {
@@ -61,9 +77,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /**
      * Sets the histogram type and sends a {@link DatasetChangeEvent} to all
      * registered listeners.
-     * 
-     * @param type
-     *            the type (<code>null</code> not permitted).
+     *
+     * @param type the type (<code>null</code> not permitted).
      */
     public void setType(HistogramType type) {
         if (type == null) {
@@ -76,19 +91,14 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /**
      * Add new values to an existing series. Overwrites the old data. The value
      * set will be sorted after this method completes.
-     * 
-     * @param key
-     *            the series key (<code>null</code> not permitted).
-     * @param values
-     *            the raw observations.
-     * @param bins
-     *            the number of bins (must be at least 1).
-     * @param minimum
-     *            the lower bound of the bin range.
-     * @param maximum
-     *            the upper bound of the bin range.
+     *
+     * @param key the series key (<code>null</code> not permitted).
+     * @param values the raw observations.
+     * @param bins the number of bins (must be at least 1).
+     * @param minimum the lower bound of the bin range.
+     * @param maximum the upper bound of the bin range.
      */
-    public void overwriteSeries(String key, Number[] values, int bins) {
+    public void overwriteSeries(String key, double[] values, int bins) {
         addSeries(key, values, bins);
     }
 
@@ -97,21 +107,16 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * assigned to the first bin, and any data value greater than maximum will
      * be assigned to the last bin. Values falling on the boundary of adjacent
      * bins will be assigned to the higher indexed bin.
-     * 
+     *
      * The values array passed to this method will be sorted upon completion.
-     * 
-     * @param key
-     *            the series key (<code>null</code> not permitted).
-     * @param values
-     *            the raw observations.
-     * @param bins
-     *            the number of bins (must be at least 1).
-     * @param minimum
-     *            the lower bound of the bin range.
-     * @param maximum
-     *            the upper bound of the bin range.
+     *
+     * @param key the series key (<code>null</code> not permitted).
+     * @param values the raw observations.
+     * @param bins the number of bins (must be at least 1).
+     * @param minimum the lower bound of the bin range.
+     * @param maximum the upper bound of the bin range.
      */
-    public void addSeries(String key, Number[] values, int bins) {
+    public void addSeries(String key, double[] values, int bins) {
         if (key == null) {
             throw new IllegalArgumentException("Null 'key' argument.");
         }
@@ -123,7 +128,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         }
 
         if (values.equals(dataMap.get(key))) {
-            if (dataMap.get(key).bins.length == bins) {
+            if (dataMap.get(key).data.length == bins) {
                 // The series hasn't changed and the number
                 // of bins hasn't changed nothing to do here.
                 return;
@@ -135,21 +140,20 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         if (values.length != 0) {
             Arrays.sort(values);
 
-            binWidth = (values[values.length - 1].doubleValue() - values[0]
-                    .doubleValue()) / bins;
+            binWidth = (values[values.length - 1] - values[0]) / bins;
 
             histBins = new HistogramBin[bins];
 
             int index = 0;
             HistogramBin bin;
             double endVal = 0;
-            double startVal = values[0].doubleValue();
+            double startVal = values[0];
             for (int i = 0; i < bins; i++) {
                 if (index < values.length) {
                     endVal = startVal + binWidth;
                     bin = new HistogramBin(startVal, endVal);
                     while (index < values.length
-                            && values[index].doubleValue() <= endVal) {
+                            && values[index] <= endVal) {
                         bin.incrementCount();
                         index++;
                     }
@@ -161,27 +165,27 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
             }
         }
 
-        SeriesStruct packet = new SeriesStruct(histBins);
+        ColoredDataSeries packet = new ColoredDataSeries(histBins);
 
         dataMap.put(key, packet);
         this.fireDatasetChanged();
     }
 
     /**
-     * 
-     * @param names
-     * @param data
-     * @param bins
+     * Reset the data in the data map field.
+     *
+     * @param names List of data series names
+     * @param data The data
+     * @param bins number of bins to use
      */
-    public void conformToNewParams(List<String> names, List<Number[]> data,
-            int bins) {
+    public void resetData(List<String> names, List<double[]> data, int bins) {
         if (names.size() != data.size()) {
             throw new IllegalStateException(
                     "Number of names for series does not"
                             + "equal the number of data series.");
         }
         dataMap.keySet().retainAll(names);
-        Iterator<Number[]> dataIterator = data.iterator();
+        Iterator<double[]> dataIterator = data.iterator();
         for (String str : names) {
             addSeries(str, dataIterator.next(), bins);
         }
@@ -193,7 +197,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     @Override
     public Comparable<String> getSeriesKey(int arg0) {
         int i = 0;
-        for (Entry<String, SeriesStruct> entry : dataMap.entrySet()) {
+        for (Entry<String, ColoredDataSeries> entry : dataMap.entrySet()) {
             if (arg0 == i) {
                 return entry.getKey();
             }
@@ -204,23 +208,22 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the bins for a series.
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * 
+     *
      * @return A list of bins.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     List<HistogramBin> getBins(int series) {
-        return Arrays.asList(dataMap.get(getSeriesKey(series)).bins);
+        return Arrays.asList(dataMap.get(getSeriesKey(series)).data);
     }
 
     /**
      * Returns the number of series in the dataset.
-     * 
+     *
      * @return The series count.
      */
     public int getSeriesCount() {
@@ -229,15 +232,14 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the number of data items for a series.
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * 
+     *
      * @return The item count.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public int getItemCount(int series) {
         return getBins(series).size();
@@ -247,17 +249,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * Returns the X value for a bin. This value won't be used for plotting
      * histograms, since the renderer will ignore it. But other renderers can
      * use it (for example, you could use the dataset to create a line chart).
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The start value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getX(int series, int item) {
         List<HistogramBin> bins = getBins(series);
@@ -269,17 +269,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /**
      * Returns the y-value for a bin (calculated to take into account the
      * histogram type).
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The y-value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getY(int series, int item) {
         List<HistogramBin> bins = getBins(series);
@@ -297,17 +295,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the start value for a bin.
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The start value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getStartX(int series, int item) {
         List<HistogramBin> bins = getBins(series);
@@ -317,17 +313,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the end value for a bin.
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The end value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getEndX(int series, int item) {
         List<HistogramBin> bins = getBins(series);
@@ -339,17 +333,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * Returns the start y-value for a bin (which is the same as the y-value,
      * this method exists only to support the general form of the
      * {@link IntervalXYDataset} interface).
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The y-value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getStartY(int series, int item) {
         return getY(series, item);
@@ -359,17 +351,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * Returns the end y-value for a bin (which is the same as the y-value, this
      * method exists only to support the general form of the
      * {@link IntervalXYDataset} interface).
-     * 
-     * @param series
-     *            the series index (in the range <code>0</code> to
+     *
+     * @param series the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item
-     *            the item index (zero based).
-     * 
+     * @param item the item index (zero based).
+     *
      * @return The Y value.
-     * 
-     * @throws IndexOutOfBoundsException
-     *             if <code>series</code> is outside the specified range.
+     *
+     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
+     *             specified range.
      */
     public Number getEndY(int series, int item) {
         return getY(series, item);
@@ -377,10 +367,9 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Tests this dataset for equality with an arbitrary object.
-     * 
-     * @param obj
-     *            the object to test against (<code>null</code> permitted).
-     * 
+     *
+     * @param obj the object to test against (<code>null</code> permitted).
+     *
      * @return A boolean.
      */
     public boolean equals(Object obj) {
@@ -411,41 +400,57 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns a clone of the dataset.
-     * 
+     *
      * @return A clone of the dataset.
-     * 
-     * @throws CloneNotSupportedException
-     *             if the object cannot be cloned.
+     *
+     * @throws CloneNotSupportedException if the object cannot be cloned.
      */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
+    /**
+     * Set the color of a data series.
+     *
+     * @param seriesName the series name
+     * @param color the color to set
+     */
     public void setSeriesColor(String seriesName, Color color) {
         if (dataMap.get(seriesName) != null) {
             dataMap.get(seriesName).color = color;
         }
     }
 
-    public Collection<SeriesStruct> getSeriesStructs() {
+    /**
+     * Returns the set of colored data series.
+     *
+     * @return the data
+     */
+    public Collection<ColoredDataSeries> getDataSeries() {
         return dataMap.values();
     }
 
     /**
-     * Mimics the "struct" construct in C/C++. In this case used to store and
-     * represent values about a data series for a histogram.
-     * 
+     * A histogram data series associated with a color.
+     *
      * @author zach
-     * 
+     *
      */
-    public static class SeriesStruct {
+    public static class ColoredDataSeries {
 
-        public final HistogramBin[] bins;
+        /** The data in a data series. */
+        public final HistogramBin[] data;
 
+        /** The color of a given data series. */
         public Color color;
 
-        public SeriesStruct(final HistogramBin[] bins) {
-            this.bins = bins;
+        /**
+         * Create the data series.
+         *
+         * @param data the data
+         */
+        public ColoredDataSeries(final HistogramBin[] bins) {
+            this.data = bins;
         }
     }
 

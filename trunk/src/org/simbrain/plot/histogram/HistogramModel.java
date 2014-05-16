@@ -19,16 +19,16 @@ import java.util.List;
 
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.plot.histogram.OverwritableHistogramDataset.SeriesStruct;
+import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
  * arrays, one array per histogram. The histograms are represented by different
  * colors in HistogramPanel. The JFreeChart dataset is also stored here.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
- * 
+ *
  */
 public class HistogramModel extends ChartModel {
 
@@ -43,7 +43,7 @@ public class HistogramModel extends ChartModel {
      * with the dataset object for JFreeChart, but must be kept in case the
      * number of bins is changed.
      */
-    private List<Number[]> data = new ArrayList<Number[]>();
+    private List<double[]> data = new ArrayList<double[]>();
 
     /** The data set used to generate the histogram. */
     private OverwritableHistogramDataset dataSet = new OverwritableHistogramDataset();
@@ -63,7 +63,7 @@ public class HistogramModel extends ChartModel {
 
     /**
      * Creates a histogram with no data and a specified number of datsets.
-     * 
+     *
      * @param numdsources
      *            number of datasets to add
      */
@@ -76,7 +76,7 @@ public class HistogramModel extends ChartModel {
      * Creates a histogram with the provided number of bins, data set(s), and
      * data name(s), but does not include titles for the histogram, the x axis
      * or the y axis.
-     * 
+     *
      * @param data
      *            the data set(s) to be plotted
      * @param dataNames
@@ -84,14 +84,14 @@ public class HistogramModel extends ChartModel {
      * @param bins
      *            the number of bins used in the histogram
      */
-    public HistogramModel(List<Number[]> data, List<String> dataNames, int bins) {
+    public HistogramModel(List<double[]> data, List<String> dataNames, int bins) {
         this(data, dataNames, bins, "", "", "");
     }
 
     /**
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
-     * 
+     *
      * @param data
      *            the data set(s) to be plotted
      * @param dataNames
@@ -105,7 +105,7 @@ public class HistogramModel extends ChartModel {
      * @param yAxisName
      *            the title of the y axis
      */
-    public HistogramModel(List<Number[]> data, List<String> dataNames,
+    public HistogramModel(List<double[]> data, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName) {
         this(data, dataNames, bins, title, xAxisName, yAxisName, null);
     }
@@ -113,7 +113,7 @@ public class HistogramModel extends ChartModel {
     /**
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
-     * 
+     *
      * @param newData
      *            the data set(s) to be plotted
      * @param dataNames
@@ -129,7 +129,7 @@ public class HistogramModel extends ChartModel {
      * @param colorPallet
      *            a custom color pallete
      */
-    public HistogramModel(List<Number[]> newData, List<String> dataNames,
+    public HistogramModel(List<double[]> newData, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName,
             Color[] colorPallet) {
         this.bins = bins;
@@ -153,16 +153,14 @@ public class HistogramModel extends ChartModel {
     }
 
     /**
-     * Add data to a specified data series. This is the main method used to
-     * dynamically add data when the histogram is used as a plot component.
-     * Called via reflection from HistogramComponent.
-     * 
-     * @param index
-     *            data index
-     * @param histData
-     *            the data to add at that index
+     * Add double array data to a specified data series. This is the main method
+     * used to dynamically add data when the histogram is used as a plot
+     * component. Called via reflection from HistogramComponent.
+     *
+     * @param index data index
+     * @param histData the data to add at that index
      */
-    public void addData(Number[] histData, Integer index) {
+    public void addData(double[] histData, Integer index) {
         data.remove(index.intValue());
         data.add(index.intValue(), histData);
         redraw();
@@ -172,14 +170,15 @@ public class HistogramModel extends ChartModel {
      * Re-add the data.
      */
     public void redraw() {
-        dataSet.conformToNewParams(dataNames, data, bins);
+        dataSet.resetData(dataNames, data, bins);
     }
 
     /**
-     * @param data
-     *            the data to set
+     * Reset the data in the model.
+     *
+     * @param data the data to set
      */
-    public void resetData(List<Number[]> data, List<String> names) {
+    public void resetData(List<double[]> data, List<String> names) {
         this.data = data;
         this.dataNames = names;
         redraw();
@@ -191,13 +190,13 @@ public class HistogramModel extends ChartModel {
     public void resetData() {
         data.clear();
         dataNames.clear();
-        dataSet.conformToNewParams(dataNames, data, bins);
+        dataSet.resetData(dataNames, data, bins);
     }
 
     /**
      * Create specified number of set of data sources. Adds these two existing
      * data sources.
-     * 
+     *
      * @param numDataSources
      *            number of data sources to initialize plot with
      */
@@ -212,7 +211,7 @@ public class HistogramModel extends ChartModel {
      */
     public void addDataSource() {
 
-        data.add(new Number[] { 0 });
+        data.add(new double[] { 0 });
         dataNames.add("Hist " + data.size());
         this.fireDataSourceAdded(data.size());
         redraw();
@@ -221,7 +220,7 @@ public class HistogramModel extends ChartModel {
     /**
      * Sets the number of bins. Also automatically updates the number of bins
      * text field, but does NOT redraw the histogram.
-     * 
+     *
      * @param bins
      *            the new number of bins
      */
@@ -232,20 +231,27 @@ public class HistogramModel extends ChartModel {
     /**
      * @return the data
      */
-    public List<Number[]> getData() {
+    public List<double[]> getData() {
         return data;
     }
 
+    /**
+     * Set the color of a data series.
+     *
+     * @param name name of series
+     * @param c the color to set
+     */
     public void setSeriesColor(String name, Color c) {
         dataSet.setSeriesColor(name, c);
     }
 
     /**
-     * 
-     * @return
+     * Return the underlying series data.
+     *
+     * @return the data
      */
-    public Collection<SeriesStruct> getSeriesData() {
-        return dataSet.getSeriesStructs();
+    public Collection<ColoredDataSeries> getSeriesData() {
+        return dataSet.getDataSeries();
     }
 
     /**

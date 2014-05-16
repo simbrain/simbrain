@@ -40,11 +40,11 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 /**
  * Widget to display the synaptic connections between two layers of neurons as a
  * matrix, in a jtable.
- *
+ * 
  * TODO: Better display of non-existent connections (perhaps by disabling those
  * cells for now). What would be super cool is gray for no synapse. and then as
  * added or deleted ungray it.
- *
+ * 
  * @author jyoshimi
  */
 public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
@@ -54,8 +54,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
     /**
      * Embed the scrollpanel in a widget with a toolbar.
-     *
-     * @param scroller the scroller to embed
+     * 
+     * @param scroller
+     *            the scroller to embed
      * @return the formatted jpanel.
      */
     public static JPanel getWeightMatrixPanel(WeightMatrixViewer scroller) {
@@ -71,10 +72,13 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     /**
      * Construct a weight matrix viewer using a specified list of source and
      * target neurons.
-     *
-     * @param sourceList the source neurons
-     * @param targetList the target neurons
-     * @param panel the parent network panel
+     * 
+     * @param sourceList
+     *            the source neurons
+     * @param targetList
+     *            the target neurons
+     * @param panel
+     *            the parent network panel
      */
     public WeightMatrixViewer(List<Neuron> sourceList, List<Neuron> targetList,
             NetworkPanel panel) {
@@ -84,8 +88,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     /**
      * Create a panel for viewing the matrices connecting a set of source and
      * target neuron lists.
-     *
-     * @param panel the panel from which to draw the matrix.
+     * 
+     * @param panel
+     *            the panel from which to draw the matrix.
      */
     public WeightMatrixViewer(NetworkPanel panel) {
 
@@ -97,10 +102,13 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
     /**
      * Initialize the weight matrix viewer.
-     *
-     * @param sourceList the source neurons
-     * @param targetList the target neurons
-     * @param panel the network panel
+     * 
+     * @param sourceList
+     *            the source neurons
+     * @param targetList
+     *            the target neurons
+     * @param panel
+     *            the network panel
      */
     private void init(List<Neuron> sourceList, List<Neuron> targetList,
             NetworkPanel panel) {
@@ -162,8 +170,9 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
     /**
      * Display a warning message if there are empty weights.
-     *
-     * @param weights weight matrix to check
+     * 
+     * @param weights
+     *            weight matrix to check
      */
     private void displayWarningIfEmptyCells(Synapse[][] weights) {
         String warningMessage = "Only fully connected source-target pairs \n"
@@ -193,7 +202,8 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         private Network parentNetwork;
 
         /**
-         * @param weights the weights to set
+         * @param weights
+         *            the weights to set
          */
         public WeightMatrix(Synapse[][] weights) {
             super(weights.length, weights[0].length);

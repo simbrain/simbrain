@@ -32,11 +32,10 @@ import org.simbrain.network.core.Synapse;
 public class SynapseGroup extends Group {
 
     /** The synapses in this group. */
-    private final List<Synapse> synapseList =
-            new CopyOnWriteArrayList<Synapse>();
-//
-//    private final Set<Synapse> synapseSet =
-//            Collections.synchronizedSet(new HashSet<Synapse>());
+    private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
+    //
+    // private final Set<Synapse> synapseSet =
+    // Collections.synchronizedSet(new HashSet<Synapse>());
 
     /** A map of the neuron pairs which already have a synapse between them. */
     private final HashMap<Neuron, HashSet<Neuron>> pairMap;
@@ -55,10 +54,13 @@ public class SynapseGroup extends Group {
 
     /**
      * Create a new synapse group.
-     *
-     * @param net parent network
-     * @param source source neuron group
-     * @param target target neuron group
+     * 
+     * @param net
+     *            parent network
+     * @param source
+     *            source neuron group
+     * @param target
+     *            target neuron group
      */
     public SynapseGroup(final Network net, final NeuronGroup source,
             final NeuronGroup target) {
@@ -70,8 +72,8 @@ public class SynapseGroup extends Group {
         pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
                 * sourceNeuronGroup.getNeuronList().size());
         for (Neuron n : sourceNeuronGroup.getNeuronList()) {
-            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup.
-                    getNeuronList().size() * 1.5)));
+            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup
+                    .getNeuronList().size() * 1.5)));
         }
         AllToAll connection = new AllToAll(net);
         List<Synapse> synapses = connection.connectNeurons(net,
@@ -85,11 +87,15 @@ public class SynapseGroup extends Group {
 
     /**
      * Create a new synapse group using a connection object.
-     *
-     * @param net parent network
-     * @param source source neuron group
-     * @param target target neuron group
-     * @param connection the connection object to use.
+     * 
+     * @param net
+     *            parent network
+     * @param source
+     *            source neuron group
+     * @param target
+     *            target neuron group
+     * @param connection
+     *            the connection object to use.
      */
     public SynapseGroup(final Network net, final NeuronGroup source,
             final NeuronGroup target, final ConnectNeurons connection) {
@@ -101,8 +107,8 @@ public class SynapseGroup extends Group {
         pairMap = new HashMap<Neuron, HashSet<Neuron>>((int) 1.5
                 * sourceNeuronGroup.getNeuronList().size());
         for (Neuron n : sourceNeuronGroup.getNeuronList()) {
-            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup.
-                    getNeuronList().size() * 1.5)));
+            pairMap.put(n, new HashSet<Neuron>((int) (targetNeuronGroup
+                    .getNeuronList().size() * 1.5)));
         }
         List<Synapse> synapses = connection.connectNeurons(net,
                 sourceNeuronGroup.getNeuronList(),
@@ -152,14 +158,14 @@ public class SynapseGroup extends Group {
 
     /**
      * Add a synapse to this synapse group.
-     *
-     * @param synapse synapse to add
+     * 
+     * @param synapse
+     *            synapse to add
      */
     public void addSynapse(final Synapse synapse) {
-        // Don't add the synapse if it conflicts with an existing synapse.
-//        if (conflictsWithExistingSynapse(synapse)) {
-//            return false;
-//        }
+        // if (pairMap.get(synapse.getSource()).contains(synapse.getTarget())) {
+        // return;
+        // }
         synapseList.add(synapse);
         if (getParentNetwork() != null) {
             synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
@@ -167,32 +173,32 @@ public class SynapseGroup extends Group {
         }
     }
 
-//    /**
-//     * Returns true if a synapse with the same source and parent neurons
-    //already
-//     * exists in the synapse group.
-//     *
-//     * @param toCheck the synapse to check
-//     * @return true if a synapse connecting the same neurons already exists,
-//     *         false otherwise
-//     */
-//    private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
-//        for (Synapse synapse : synapseList)
-//
-//
-////        for (Synapse synapse : synapseList) {
-////            if (synapse.getSource() == toCheck.getSource()) {
-////                if (synapse.getTarget() == toCheck.getTarget()) {
-////                    return true;
-////                }
-////            }
-////        }
-//        return false;
-//    }
+    // /**
+    // * Returns true if a synapse with the same source and parent neurons
+    // already
+    // * exists in the synapse group.
+    // *
+    // * @param toCheck the synapse to check
+    // * @return true if a synapse connecting the same neurons already exists,
+    // * false otherwise
+    // */
+    // private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
+    // for (Synapse synapse : synapseList)
+    //
+    //
+    // // for (Synapse synapse : synapseList) {
+    // // if (synapse.getSource() == toCheck.getSource()) {
+    // // if (synapse.getTarget() == toCheck.getTarget()) {
+    // // return true;
+    // // }
+    // // }
+    // // }
+    // return false;
+    // }
 
     /**
      * Check whether this synapse group connects a neuron group to itself.
-     *
+     * 
      * @return true if this connects a neuron group to itself, false otherwise.
      */
     public boolean isRecurrent() {
@@ -201,8 +207,9 @@ public class SynapseGroup extends Group {
 
     /**
      * Remove the provided synapse.
-     *
-     * @param toDelete the synapse to delete
+     * 
+     * @param toDelete
+     *            the synapse to delete
      */
     public void removeSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
@@ -217,7 +224,7 @@ public class SynapseGroup extends Group {
     /**
      * Return a list of source neurons associated with the synapses in this
      * group.
-     *
+     * 
      * @return the source neuron list.
      */
     public List<Neuron> getSourceNeurons() {
@@ -232,7 +239,7 @@ public class SynapseGroup extends Group {
     /**
      * Return a list of target neurons associated with the synapses in this
      * group.
-     *
+     * 
      * @return the target neuron list.
      */
     public List<Neuron> getTargetNeurons() {
@@ -309,7 +316,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Return weight strengths as a double vector.
-     *
+     * 
      * @return weights
      */
     public double[] getWeightVector() {
@@ -324,11 +331,12 @@ public class SynapseGroup extends Group {
     /**
      * Set the weights using an array of doubles. Assumes the order of the items
      * in the array should match the order of items in the synapselist.
-     *
+     * 
      * Does not throw an exception if the provided input array and synapse list
      * do not match in size.
-     *
-     * @param weightVector the weight vector to set.
+     * 
+     * @param weightVector
+     *            the weight vector to set.
      */
     public void setWeightVector(double[] weightVector) {
         int i = 0;
@@ -342,8 +350,9 @@ public class SynapseGroup extends Group {
 
     /**
      * Set all weight strengths to a specified value.
-     *
-     * @param value the value to set the synapses to
+     * 
+     * @param value
+     *            the value to set the synapses to
      */
     public void setStrengths(final double value) {
         for (Synapse s : getSynapseList()) {
@@ -353,8 +362,9 @@ public class SynapseGroup extends Group {
 
     /**
      * Enable or disable all synapses in this group.
-     *
-     * @param enabled true to enable them all; false to disable them all
+     * 
+     * @param enabled
+     *            true to enable them all; false to disable them all
      */
     public void setEnabled(final boolean enabled) {
         for (Synapse synapse : this.getSynapseList()) {
@@ -364,8 +374,9 @@ public class SynapseGroup extends Group {
 
     /**
      * Freeze or unfreeze all synapses in this group.
-     *
-     * @param freeze true to freeze the group; false to unfreeze it
+     * 
+     * @param freeze
+     *            true to freeze the group; false to unfreeze it
      */
     public void setFrozen(final boolean freeze) {
         for (Synapse synapse : this.getSynapseList()) {
@@ -375,7 +386,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are frozen.
-     *
+     * 
      * @return true if all synapses are frozen, false otherwise
      */
     public boolean isAllFrozen() {
@@ -390,7 +401,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are unfrozen.
-     *
+     * 
      * @return true if all synapses are unfrozen, false otherwise
      */
     public boolean isAllUnfrozen() {
@@ -405,7 +416,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are enabled.
-     *
+     * 
      * @return true if all synapses are enabled, false otherwise
      */
     public boolean isAllEnabled() {
@@ -420,7 +431,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are disabled.
-     *
+     * 
      * @return true if all synapses are disabled, false otherwise
      */
     public boolean isAllDisabled() {
@@ -446,7 +457,8 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * @param displaySynapses the displaySynapses to set
+     * @param displaySynapses
+     *            the displaySynapses to set
      */
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;

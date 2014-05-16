@@ -33,7 +33,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>NeuronDialog</b> is a dialog box for setting the properties of a Neuron.
- *
+ * 
  */
 public class NeuronDialog extends StandardDialog {
 
@@ -47,7 +47,7 @@ public class NeuronDialog extends StandardDialog {
      * A data panel containing both the basic neuron info and neuron update
      * settings.
      */
-    private final CombinedNeuronInfoPanel neuronDataPanel;
+    private CombinedNeuronInfoPanel neuronDataPanel;
 
     /**
      * Help Button. Links to information about the currently selected neuron
@@ -62,20 +62,36 @@ public class NeuronDialog extends StandardDialog {
     private final ArrayList<Neuron> neuronList;
 
     /**
-     * @param selectedNeurons the pnode_neurons being adjusted
+     * Creates a neuron dialog from a collection of NeuronNodes
+     * 
+     * @param selectedNeurons
+     * @return
      */
-    public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
+    public static NeuronDialog createNeuronDialog(
+            final Collection<NeuronNode> selectedNeurons) {
+        NeuronDialog nd = new NeuronDialog(selectedNeurons);
+        nd.neuronDataPanel = CombinedNeuronInfoPanel
+                .createCombinedNeuronInfoPanel(nd.neuronList, nd, true);
+        nd.init();
+        nd.addListeners();
+        nd.updateHelp();
+        return nd;
+    }
+
+    /**
+     * @param selectedNeurons
+     *            the pnode_neurons being adjusted
+     */
+    private NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
         neuronList = getNeuronList(selectedNeurons);
-        neuronDataPanel = new CombinedNeuronInfoPanel(neuronList, this, false);
-        init();
-        addListeners();
-        updateHelp();
     }
 
     /**
      * Get the logical neurons from the NeuronNodes.
-     * @param selectedNeurons the selected gui neurons (pnodes) from which
-     * the neuron model objects will be extracted and then edited by this panel
+     * 
+     * @param selectedNeurons
+     *            the selected gui neurons (pnodes) from which the neuron model
+     *            objects will be extracted and then edited by this panel
      * @return the neuron model objects represented by the selected pnodes
      */
     private static ArrayList<Neuron> getNeuronList(
@@ -98,23 +114,23 @@ public class NeuronDialog extends StandardDialog {
 
     /**
      * Add listeners to the components of the dialog. Specifically alters the
-     * destination of the help button to reflect the currently selected
-     * neuron update rule.
+     * destination of the help button to reflect the currently selected neuron
+     * update rule.
      */
     private void addListeners() {
         neuronDataPanel.getUpdateInfoPanel().getCbNeuronType()
-        .addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-
-                SwingUtilities.invokeLater(new Runnable() {
+                .addActionListener(new ActionListener() {
                     @Override
-                    public void run() {
-                        updateHelp();
+                    public void actionPerformed(ActionEvent arg0) {
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateHelp();
+                            }
+                        });
                     }
                 });
-            }
-        });
     }
 
     /**
@@ -130,9 +146,8 @@ public class NeuronDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
-        if (neuronDataPanel.getUpdateInfoPanel()
-                .getCbNeuronType().getSelectedItem() == NULL_STRING)
-        {
+        if (neuronDataPanel.getUpdateInfoPanel().getCbNeuronType()
+                .getSelectedItem() == NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
             String name = (String) neuronDataPanel.getUpdateInfoPanel()
@@ -153,20 +168,20 @@ public class NeuronDialog extends StandardDialog {
         neuronList.get(0).getNetwork().fireNetworkChanged();
     }
 
-//    /**
-//     * Test Main: For fast prototyping
-//     *
-//     * @param args
-//     */
-//    public static void main(String[] args) {
-//
-//        Neuron n = new Neuron(new Network(), new LinearRule());
-//        ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
-//        arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
-//        NeuronDialog nd = new NeuronDialog(arr);
-//
-//        nd.pack();
-//        nd.setVisible(true);
-//
-//    }
+    // /**
+    // * Test Main: For fast prototyping
+    // *
+    // * @param args
+    // */
+    // public static void main(String[] args) {
+    //
+    // Neuron n = new Neuron(new Network(), new LinearRule());
+    // ArrayList<NeuronNode> arr = new ArrayList<NeuronNode>();
+    // arr.add(new NeuronNode(new NetworkPanel(n.getNetwork()), n));
+    // NeuronDialog nd = new NeuronDialog(arr);
+    //
+    // nd.pack();
+    // nd.setVisible(true);
+    //
+    // }
 }

@@ -33,12 +33,13 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
 /**
  * PNode representation of a group of synapses, where the synapses themselves
  * are not visible.
- *
+ * 
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
+@SuppressWarnings("serial")
 public class SynapseGroupNodeSimple extends SynapseGroupNode implements
-SynapseGroupArrow {
+        SynapseGroupArrow {
 
     private static final float DEFAULT_ARROW_THICKNESS = 30;
 
@@ -62,43 +63,46 @@ SynapseGroupArrow {
 
     private final NeuronGroup target;
 
-    //	private final PPath.Float dbLine;
+    // private final PPath.Float dbLine;
 
     private final AtomicBoolean halt = new AtomicBoolean();
 
     private final SynapseGroup group;
 
-    private final double [] srcZoneBoundaries = new double [4];
+    private final double[] srcZoneBoundaries = new double[4];
 
     /**
      * Create a Synapse Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group the synapse group
+     * 
+     * @param networkPanel
+     *            parent panel
+     * @param group
+     *            the synapse group
      */
     public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
             final SynapseGroup group) {
         super(networkPanel, group);
         this.group = group;
-        //		this.dbLine = new PPath.Float(new BasicStroke(5, BasicStroke.CAP_ROUND,
-        //		        BasicStroke.JOIN_MITER));
-        //		dbLine.setStrokePaint(Color.BLACK);
+        // this.dbLine = new PPath.Float(new BasicStroke(5,
+        // BasicStroke.CAP_ROUND,
+        // BasicStroke.JOIN_MITER));
+        // dbLine.setStrokePaint(Color.BLACK);
         source = group.getSourceNeuronGroup();
         target = group.getTargetNeuronGroup();
-        sourceNode = (NeuronGroupNode) getNetworkPanel().
-                getObjectNodeMap().get(group.getSourceNeuronGroup());
-        targetNode = (NeuronGroupNode) getNetworkPanel().
-                getObjectNodeMap().get(group.getTargetNeuronGroup());
+        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
+                .get(group.getSourceNeuronGroup());
+        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
+                .get(group.getTargetNeuronGroup());
         arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR,
                 0.5f, DEFAULT_ARROW_THICKNESS);
         this.addChild(arrow);
-        Point2D [] corners = source.getFourCorners();
+        Point2D[] corners = source.getFourCorners();
         srcZoneBoundaries[0] = Math.atan2(corners[0].getY(), corners[0].getX());
         srcZoneBoundaries[1] = Math.atan2(corners[1].getY(), corners[1].getX());
         srcZoneBoundaries[2] = Math.atan2(corners[2].getY(), corners[2].getX());
         srcZoneBoundaries[3] = Math.atan2(corners[3].getY(), corners[3].getX());
 
-        //		this.addChild(dbLine);
+        // this.addChild(dbLine);
     }
 
     public SynapseGroupNodeSimple(final NetworkPanel networkPanel,
@@ -107,16 +111,14 @@ SynapseGroupArrow {
         this.group = group;
         source = group.getSourceNeuronGroup();
         target = group.getTargetNeuronGroup();
-        sourceNode = (NeuronGroupNode) getNetworkPanel().
-                getObjectNodeMap().get(group.getSourceNeuronGroup());
-        targetNode = (NeuronGroupNode) getNetworkPanel().
-                getObjectNodeMap().get(group.getTargetNeuronGroup());
+        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
+                .get(group.getSourceNeuronGroup());
+        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap()
+                .get(group.getTargetNeuronGroup());
         arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR,
                 0.5f, thickness);
         this.addChild(arrow);
     }
-
-
 
     /**
      * Override PNode layoutChildren method in order to properly set the
@@ -141,7 +143,6 @@ SynapseGroupArrow {
         layout(src, tar);
 
     }
-
 
     /**
      * 
@@ -170,7 +171,7 @@ SynapseGroupArrow {
     }
 
     /**
-     *
+     * 
      * @param src
      * @param tar
      */
@@ -182,12 +183,12 @@ SynapseGroupArrow {
         Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
         Point2D middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
 
-        //		Line2D dbL = new Line2D.Float(src, bez2);
-        //		dbLine.reset();
-        //		dbLine.append(dbL, false);
+        // Line2D dbL = new Line2D.Float(src, bez2);
+        // dbLine.reset();
+        // dbLine.append(dbL, false);
 
-        interactionBox.setOffset(middle.getX() - (interactionBox.getWidth()) / 2,
-                middle.getY() - (interactionBox.getHeight()) / 2);
+        interactionBox.setOffset(middle.getX() - (interactionBox.getWidth())
+                / 2, middle.getY() - (interactionBox.getHeight()) / 2);
         interactionBox.raiseToTop();
 
     }
@@ -204,25 +205,26 @@ SynapseGroupArrow {
         return SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
     }
 
-//    /**
-//     * 
-//     * @return
-//     */
-//    private Point2D closestPoint() {
-//        Point2D [] tarPts = target.getFourCorners();
-//        double min = Double.MAX_VALUE;
-//        Point2D closest = null;
-//        Point2D.Float srcPt = new Point2D.Float((float)source.getCenterX(), (float)source.getCenterY());
-//        for (Point2D pt : tarPts) {
-//            double dist = srcPt.distance(pt);
-//            if (min > dist) {
-//                min = dist;
-//                closest = pt;
-//            }
-//        }
-//        return closest;
-//    }
-//    
+    // /**
+    // *
+    // * @return
+    // */
+    // private Point2D closestPoint() {
+    // Point2D [] tarPts = target.getFourCorners();
+    // double min = Double.MAX_VALUE;
+    // Point2D closest = null;
+    // Point2D.Float srcPt = new Point2D.Float((float)source.getCenterX(),
+    // (float)source.getCenterY());
+    // for (Point2D pt : tarPts) {
+    // double dist = srcPt.distance(pt);
+    // if (min > dist) {
+    // min = dist;
+    // closest = pt;
+    // }
+    // }
+    // return closest;
+    // }
+    //
     /**
      * 
      */
@@ -233,26 +235,13 @@ SynapseGroupArrow {
         float centerXTar = (float) target.getCenterX();
         float centerYTar = (float) target.getCenterY();
 
+        float distance = (float) Point2D.distance(centerXSrc, centerYSrc,
+                centerXTar, centerYTar);
 
-        float distance = (float) Point2D.distance(centerXSrc,
-                centerYSrc, centerXTar, centerYTar);
+        float theta = (float) Math.atan2(centerYSrc - centerYTar, centerXTar
+                - centerXSrc);
 
-
-        float theta = (float)Math.atan2(centerYSrc - centerYTar, centerXTar - centerXSrc);
-
-        float zoneModifier = distance * distance/5000;//(float) (2*(distance - Math.sqrt(source.getMaxDim()*source.getMaxDim() + target.getMaxDim() * target.getMaxDim()))/ Math.log(distance/5));
-        //		System.out.println(zoneModifier);
-        /*/**********************************
-         * 	   \ Ia | I | Ib /
-         * 		\   |   |   /
-         * 	 IVa \  |   |  / IIa
-         * 	______\ |   | /_______
-         *  _IV____  SRC  ___II___
-         *        / |   | \
-         * 	 IVb /  |   |  \ IIb
-         *      /   |   |   \
-         * 	   /IIIa|III|IIIb\
-         ************************************/
+        float zoneModifier = distance * distance / 5000;
 
         if (sourceNode == null || targetNode == null) {
             return;
@@ -277,11 +266,12 @@ SynapseGroupArrow {
                     endPort = Port.WEST;
                 }
             }
-        } else if (theta > srcZoneBoundaries[0] && theta <= srcZoneBoundaries[1]) {
+        } else if (theta > srcZoneBoundaries[0]
+                && theta <= srcZoneBoundaries[1]) {
             startPort = Port.SOUTH;
             if (left || right) {
                 if (left) { // Offset left (I/IIIa)
-                endPort = Port.EAST;
+                    endPort = Port.EAST;
                 } else { // Offset right (I/IIIb)
                     endPort = Port.WEST;
                 }
@@ -305,7 +295,8 @@ SynapseGroupArrow {
                     }
                 }
             }
-        } else if (theta > srcZoneBoundaries[1] || theta <= srcZoneBoundaries[2]) {
+        } else if (theta > srcZoneBoundaries[1]
+                || theta <= srcZoneBoundaries[2]) {
             startPort = Port.WEST;
             if (above || below) {
                 if (above) {
@@ -324,7 +315,7 @@ SynapseGroupArrow {
             startPort = Port.NORTH;
             if (left || right) {
                 if (left) { // Offset left (I/IIIa)
-                endPort = Port.EAST;
+                    endPort = Port.EAST;
                 } else { // Offset right (I/IIIb)
                     endPort = Port.WEST;
                 }
@@ -352,9 +343,8 @@ SynapseGroupArrow {
     }
 
     /**
-     * {@inheritDoc}
-     * TODO: Not sure why below is needed.  Without the explicit null sets
-     * a fatal error occurs in the JRE.
+     * {@inheritDoc} TODO: Not sure why below is needed. Without the explicit
+     * null sets a fatal error occurs in the JRE.
      */
     @Override
     public synchronized void removeFromParent() {
@@ -373,26 +363,21 @@ SynapseGroupArrow {
         return startPt;
     }
 
-
     public void setStartPt(Point2D.Float startPt) {
         this.startPt = startPt;
     }
-
 
     public Point2D getEndPt() {
         return endPt;
     }
 
-
     public void setEndPt(Point2D.Float endPt) {
         this.endPt = endPt;
     }
 
-
     public Port getStartPort() {
         return startPort;
     }
-
 
     public void setStartPort(Port startPort) {
         this.startPort = startPort;
@@ -400,15 +385,15 @@ SynapseGroupArrow {
 
     /**
      * Returns a default position...
-     *
+     * 
      * @param ng
      * @return
      */
     public Point2D getOpposingDefaultPosition(NeuronGroup ng) {
-        if (group.getSourceNeuronGroup() != ng && group.getTargetNeuronGroup()
-                != ng) {
-            throw new IllegalArgumentException("Synapse group does not begin" +
-                    " or end in this group.");
+        if (group.getSourceNeuronGroup() != ng
+                && group.getTargetNeuronGroup() != ng) {
+            throw new IllegalArgumentException("Synapse group does not begin"
+                    + " or end in this group.");
         }
         NeuronGroup opposite;
         Port opPort;

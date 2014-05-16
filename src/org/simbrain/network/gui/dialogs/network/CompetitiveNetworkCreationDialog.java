@@ -58,8 +58,9 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
-     *
-     * @param networkPanel Network panel
+     * 
+     * @param networkPanel
+     *            Network panel
      */
     public CompetitiveNetworkCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
@@ -73,8 +74,9 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
     private void init() {
 
         setTitle("New Competitive Network");
-        competitivePanel = new CompetitivePropertiesPanel(networkPanel,
-                CompetitivePropsPanelType.CREATE_NETWORK);
+        competitivePanel = CompetitivePropertiesPanel
+                .createCompetitivePropertiesPanel(networkPanel,
+                        CompetitivePropsPanelType.CREATE_NETWORK);
 
         // Set up tab panels
         tabLogic.add(competitivePanel);
@@ -97,8 +99,8 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         competitivePanel.commitChanges();
-        CompetitiveNetwork competitiveNet =
-                (CompetitiveNetwork) competitivePanel.getGroup();
+        CompetitiveNetwork competitiveNet = (CompetitiveNetwork) competitivePanel
+                .getGroup();
         CompetitiveGroup competitive = competitiveNet.getCompetitive();
         layoutPanel.commitChanges();
         competitive.setLayout(layoutPanel.getCurrentLayout());

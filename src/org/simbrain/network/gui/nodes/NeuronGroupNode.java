@@ -55,20 +55,25 @@ import org.simbrain.util.math.SimbrainMath;
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
  * outlined objects (neuron nodes) as children. Compare {@link SubnetworkNode}.
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     public enum Port {
-        NORTH, SOUTH, EAST, WEST,;
+        NORTH, SOUTH, EAST, WEST, ;
         public static Port opposite(Port p) {
-            switch(p) {
-                case NORTH : return SOUTH;
-                case SOUTH : return NORTH;
-                case EAST : return WEST;
-                case WEST : return EAST;
-                default : throw new IllegalArgumentException("No such port");
+            switch (p) {
+            case NORTH:
+                return SOUTH;
+            case SOUTH:
+                return NORTH;
+            case EAST:
+                return WEST;
+            case WEST:
+                return EAST;
+            default:
+                throw new IllegalArgumentException("No such port");
             }
         }
     }
@@ -77,8 +82,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     private final int buffer = DEFAULT_BUFFER;
 
-    private final HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> dockingPorts = new
-            HashMap<Port, HashMap<SynapseGroupArrow, Point2D>>();
+    private final HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> dockingPorts = new HashMap<Port, HashMap<SynapseGroupArrow, Point2D>>();
 
     {
         dockingPorts.put(Port.NORTH, new HashMap<SynapseGroupArrow, Point2D>());
@@ -87,8 +91,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         dockingPorts.put(Port.WEST, new HashMap<SynapseGroupArrow, Point2D>());
     }
 
-    public HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> getDockingPorts()
-    {
+    public HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> getDockingPorts() {
         return dockingPorts;
     }
 
@@ -120,9 +123,11 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Create a Neuron Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group the neuron group
+     * 
+     * @param networkPanel
+     *            parent panel
+     * @param group
+     *            the neuron group
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
         this.networkPanel = networkPanel;
@@ -166,12 +171,12 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             boolean wrongPort = p != port;
             boolean wrongPortContains = dockingPorts.get(p).keySet()
                     .contains(synGN);
-            // If not the desired port check if the SGN is currently 
+            // If not the desired port check if the SGN is currently
             // assigned there...
             if (wrongPort && wrongPortContains) {
                 // If so remove it...
                 dockingPorts.get(p).remove(synGN);
-                // and adjust positions of any remaining SGNs on that port 
+                // and adjust positions of any remaining SGNs on that port
                 // now that there is one less SGN there
                 arrangeGroupsOnPort(p, dockingPorts.get(p).keySet());
             }
@@ -195,15 +200,11 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         LinkedHashMap<Point2D, Point2D> map = proposeMapping(dockPoints,
                 groups, port);
 
-        HashMap<SynapseGroupArrow, Point2D> tempMap =
-                new HashMap<SynapseGroupArrow, Point2D>();
+        HashMap<SynapseGroupArrow, Point2D> tempMap = new HashMap<SynapseGroupArrow, Point2D>();
 
-        HashMap<Point2D, SynapseGroupArrow> terminaMap =
-                generateTerminaMappings(groups);
+        HashMap<Point2D, SynapseGroupArrow> terminaMap = generateTerminaMappings(groups);
 
         map = untangle(map, terminaMap);
-
-
 
         for (Point2D pt : map.keySet()) {
             SynapseGroupArrow synGN = terminaMap.get(map.get(pt));
@@ -219,13 +220,12 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             if (!samePoint) {
 
                 dockingPorts.get(port).put(synGN, tempMap.get(synGN));
-                if (neuronGroup.equals(synGN.getGroup().getSourceNeuronGroup()))
-                {
-                    synGN.layoutChildrenQuiet(dockingPorts.get(port).get(synGN),
-                            null);
+                if (neuronGroup.equals(synGN.getGroup().getSourceNeuronGroup())) {
+                    synGN.layoutChildrenQuiet(
+                            dockingPorts.get(port).get(synGN), null);
                 } else {
-                    synGN.layoutChildrenQuiet(null, dockingPorts.get(port)
-                            .get(synGN));
+                    synGN.layoutChildrenQuiet(null,
+                            dockingPorts.get(port).get(synGN));
                 }
 
             }
@@ -234,8 +234,8 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     }
 
-
-    private LinkedList<Point2D> generateDock(Port port, Set<SynapseGroupArrow> groups) {
+    private LinkedList<Point2D> generateDock(Port port,
+            Set<SynapseGroupArrow> groups) {
         int numGroups = groups.size();
         LinkedList<Point2D> dockPoints = new LinkedList<Point2D>();
         float x;
@@ -280,9 +280,8 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             }
         }
 
-
         for (SynapseGroupArrow sga : groups) {
-            if(crunch) {
+            if (crunch) {
                 start += crunchSpace / 2;
             } else {
                 start += sga.getRequiredSpacing() / 2;
@@ -292,7 +291,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             } else {
                 dockPoints.add(new Point2D.Float(start, y));
             }
-            if(crunch) {
+            if (crunch) {
                 start += crunchSpace / 2;
             } else {
                 start += sga.getRequiredSpacing() / 2;
@@ -302,15 +301,14 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     *
+     * 
      * @param dockPoints
      * @param groups
      * @param port
      * @return
      */
     public LinkedHashMap<Point2D, Point2D> proposeMapping(
-            List<Point2D> dockPoints, Set<SynapseGroupArrow> groups,
-            Port port) {
+            List<Point2D> dockPoints, Set<SynapseGroupArrow> groups, Port port) {
 
         TreeMap<Double, Point2D> sortedTermina = new TreeMap<Double, Point2D>();
 
@@ -320,60 +318,59 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
             double area = 0;
             double side1;
-            switch(port) {
-                case NORTH:
-                    side1 = Math.abs(terminus.getY() - neuronGroup.getMaxY());
-                    if(terminus.getX() > neuronGroup.getMaxX()) {
-                        area = side1 * Math.abs(terminus.getX()
-                                - neuronGroup.getMinX());
-                    } else if (terminus.getX() < neuronGroup.getMinX()) {
-                        area = side1 * Math.abs(neuronGroup.getMaxX()
-                                - terminus.getX());
-                    } else {
-                        area = side1 * neuronGroup.getWidth();
-                    }
-                    break;
-                case SOUTH:
-                    side1 = Math.abs(terminus.getY() - neuronGroup.getMinY());
-                    if(terminus.getX() > neuronGroup.getMaxX()) {
-                        area = side1 * Math.abs(terminus.getX()
-                                - neuronGroup.getMinX());
-                    } else if (terminus.getX() < neuronGroup.getMinX()) {
-                        area = side1 * Math.abs(neuronGroup.getMaxX()
-                                - terminus.getX());
-                    } else {
-                        area = side1 * neuronGroup.getWidth();
-                    }
-                    break;
-                case WEST:
-                    side1 = Math.abs(terminus.getX() - neuronGroup.getMaxX());
-                    if(terminus.getY() > neuronGroup.getMaxY()) {
-                        area = side1 * Math.abs(terminus.getY()
-                                - neuronGroup.getMinY());
-                    } else if (terminus.getY() < neuronGroup.getMinY()) {
-                        area = side1 * Math.abs(neuronGroup.getMaxY()
-                                - terminus.getY());
-                    } else {
-                        area = side1 * neuronGroup.getHeight();
-                    }
-                    break;
-                case EAST:
-                    side1 = Math.abs(terminus.getX() - neuronGroup.getMinX());
-                    if(terminus.getY() > neuronGroup.getMaxY()) {
-                        area = side1 * Math.abs(terminus.getY()
-                                - neuronGroup.getMinY());
-                    } else if (terminus.getY() < neuronGroup.getMinY()) {
-                        area = side1 * Math.abs(neuronGroup.getMaxY()
-                                - terminus.getY());
-                    } else {
-                        area = side1 * neuronGroup.getHeight();
-                    }
-                    break;
+            switch (port) {
+            case NORTH:
+                side1 = Math.abs(terminus.getY() - neuronGroup.getMaxY());
+                if (terminus.getX() > neuronGroup.getMaxX()) {
+                    area = side1
+                            * Math.abs(terminus.getX() - neuronGroup.getMinX());
+                } else if (terminus.getX() < neuronGroup.getMinX()) {
+                    area = side1
+                            * Math.abs(neuronGroup.getMaxX() - terminus.getX());
+                } else {
+                    area = side1 * neuronGroup.getWidth();
+                }
+                break;
+            case SOUTH:
+                side1 = Math.abs(terminus.getY() - neuronGroup.getMinY());
+                if (terminus.getX() > neuronGroup.getMaxX()) {
+                    area = side1
+                            * Math.abs(terminus.getX() - neuronGroup.getMinX());
+                } else if (terminus.getX() < neuronGroup.getMinX()) {
+                    area = side1
+                            * Math.abs(neuronGroup.getMaxX() - terminus.getX());
+                } else {
+                    area = side1 * neuronGroup.getWidth();
+                }
+                break;
+            case WEST:
+                side1 = Math.abs(terminus.getX() - neuronGroup.getMaxX());
+                if (terminus.getY() > neuronGroup.getMaxY()) {
+                    area = side1
+                            * Math.abs(terminus.getY() - neuronGroup.getMinY());
+                } else if (terminus.getY() < neuronGroup.getMinY()) {
+                    area = side1
+                            * Math.abs(neuronGroup.getMaxY() - terminus.getY());
+                } else {
+                    area = side1 * neuronGroup.getHeight();
+                }
+                break;
+            case EAST:
+                side1 = Math.abs(terminus.getX() - neuronGroup.getMinX());
+                if (terminus.getY() > neuronGroup.getMaxY()) {
+                    area = side1
+                            * Math.abs(terminus.getY() - neuronGroup.getMinY());
+                } else if (terminus.getY() < neuronGroup.getMinY()) {
+                    area = side1
+                            * Math.abs(neuronGroup.getMaxY() - terminus.getY());
+                } else {
+                    area = side1 * neuronGroup.getHeight();
+                }
+                break;
             }
             sortedTermina.put(area, terminus);
         }
-        LinkedHashMap<Point2D, Point2D> connectionMap =
-                new LinkedHashMap<Point2D, Point2D>();
+        LinkedHashMap<Point2D, Point2D> connectionMap = new LinkedHashMap<Point2D, Point2D>();
         for (Double d : sortedTermina.keySet()) {
             float min = Float.MAX_VALUE;
             float dist = 0;
@@ -395,12 +392,13 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     *
+     * 
      * @param origins
      * @param synGroups
      */
-    public LinkedHashMap<Point2D, Point2D> untangle(LinkedHashMap<Point2D,
-            Point2D> map, HashMap<Point2D, SynapseGroupArrow> terminaMap) {
+    public LinkedHashMap<Point2D, Point2D> untangle(
+            LinkedHashMap<Point2D, Point2D> map,
+            HashMap<Point2D, SynapseGroupArrow> terminaMap) {
         Set<Point2D> originCopy = new HashSet<Point2D>();
         for (Point2D pt : map.keySet()) {
             originCopy.add(pt);
@@ -410,7 +408,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         int count = 0;
         do {
             count++;
-            if (count > 1000){
+            if (count > 1000) {
                 break;
             }
             tradePt = null;
@@ -423,8 +421,8 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                     Point2D endPtA = map.get(startPtA);
                     Point2D endPtB = map.get(startPtB);
 
-                    Point2D params = SimbrainMath.intersectParam(
-                            startPtA, endPtA, startPtB, endPtB);
+                    Point2D params = SimbrainMath.intersectParam(startPtA,
+                            endPtA, startPtB, endPtB);
 
                     if (params == null) {
                         // Line segments are parallel
@@ -436,16 +434,20 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                         continue;
                     } else {
                         double sdc = startPtA.distance(startPtB);
-                        Point2D intersectPt = new java.awt.geom.Point2D.Double(startPtA.getX()
-                                + (endPtA.getX() * params.getX()), startPtA.getY() + (endPtA.getY()
-                                        * params.getX()));
+                        Point2D intersectPt = new java.awt.geom.Point2D.Double(
+                                startPtA.getX()
+                                        + (endPtA.getX() * params.getX()),
+                                startPtA.getY()
+                                        + (endPtA.getY() * params.getX()));
                         double sda = startPtA.distance(intersectPt);
-                        Point2D intersectPt2 = new java.awt.geom.Point2D.Double(startPtB.getX()
-                                + (endPtB.getX() * params.getY()),
-                                startPtB.getY() + (endPtB.getY() * params.getY()));
+                        Point2D intersectPt2 = new java.awt.geom.Point2D.Double(
+                                startPtB.getX()
+                                        + (endPtB.getX() * params.getY()),
+                                startPtB.getY()
+                                        + (endPtB.getY() * params.getY()));
                         double sdb = startPtB.distance(intersectPt2);
-                        double aa = Math.acos( 0.5 * (sdb / sdc) + (sdc / sdb)
-                                - ((sda * sda) / (sdb * sdc))); 
+                        double aa = Math.acos(0.5 * (sdb / sdc) + (sdc / sdb)
+                                - ((sda * sda) / (sdb * sdc)));
                         double dist = Math.sin(aa) * sdb;
                         if (dist < min) {
                             min = dist;
@@ -466,8 +468,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
         return map;
     }
+
     /**
-     *
+     * 
      * @param synGN
      * @return
      */
@@ -488,15 +491,14 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     *
+     * 
      * @param synGroups
      * @return
      */
     public HashMap<Point2D, SynapseGroupArrow> generateTerminaMappings(
             Set<SynapseGroupArrow> synGroups) {
 
-        HashMap<Point2D, SynapseGroupArrow> mappings = new HashMap<Point2D,
-                SynapseGroupArrow>();
+        HashMap<Point2D, SynapseGroupArrow> mappings = new HashMap<Point2D, SynapseGroupArrow>();
         for (SynapseGroupArrow synGN : synGroups) {
             mappings.put(getTerminus(synGN), synGN);
         }
@@ -519,11 +521,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     @Override
     public void layoutChildren() {
 
-        interactionBox.setOffset(
-                outlinedObjects.getFullBounds().getX() + OutlinedObjects
-                .ROUNDING_WIDTH_HEIGHT/2,
-                outlinedObjects.getFullBounds().getY()
-                - interactionBox.getHeight() + 1);
+        interactionBox.setOffset(outlinedObjects.getFullBounds().getX()
+                + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2, outlinedObjects
+                .getFullBounds().getY() - interactionBox.getHeight() + 1);
     }
 
     /**
@@ -547,10 +547,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         return networkPanel;
     }
 
-
     /**
      * Get a reference to the underlying neuron group.
-     *
+     * 
      * @return reference to the neuron group.
      */
     public NeuronGroup getNeuronGroup() {
@@ -559,13 +558,13 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Add a custom menu item to the list.
-     *
-     * @param item the custom item to add
+     * 
+     * @param item
+     *            the custom item to add
      */
     public void addCustomMenuItem(final JMenuItem item) {
         customMenuItems.add(item);
     }
-
 
     /**
      * @return the outlinedObjects
@@ -573,7 +572,6 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     public OutlinedObjects getOutlinedObjects() {
         return outlinedObjects;
     }
-
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -598,7 +596,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     public void pushViewPositionToModel() {
         for (Object object : outlinedObjects.getChildrenReference()) {
             if (object instanceof NeuronNode) {
-                ((NeuronNode)object).pushViewPositionToModel();
+                ((NeuronNode) object).pushViewPositionToModel();
             }
         }
 
@@ -607,14 +605,15 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Helper class to create the neuron group property dialog (since it is
      * needed in two places.)
-     *
+     * 
      * @return the neuron group property dialog.
      */
     private StandardDialog getPropertyDialog() {
         StandardDialog dialog = new StandardDialog() {
             private final NeuronGroupPanel panel;
             {
-                panel = new NeuronGroupPanel(getNetworkPanel(), neuronGroup, this);
+                panel = NeuronGroupPanel.createNeuronGroupPanel(
+                        getNetworkPanel(), neuronGroup, this);
                 setContentPane(panel);
             }
 
@@ -630,7 +629,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Returns default actions for a context menu.
-     *
+     * 
      * @return the default context menu
      */
     public JPopupMenu getDefaultContextMenu() {
@@ -690,10 +689,10 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         };
         menu.add(selectOutgoingNodes);
 
-        // Clamping actions         
-        menu.addSeparator();        
-        setClampActionsEnabled();       
-        menu.add(clampNeuronsAction);       
+        // Clamping actions
+        menu.addSeparator();
+        setClampActionsEnabled();
+        menu.add(clampNeuronsAction);
         menu.add(unclampNeuronsAction);
 
         // Connect neuron groups
@@ -727,9 +726,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                 menu.add(item);
             }
         }
-        
+
         // Test Inputs action
-        menu.addSeparator();        
+        menu.addSeparator();
         menu.add(testInputsAction);
 
         // Coupling menu
@@ -780,8 +779,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Set a custom interaction box.
-     *
-     * @param interactionBox the interactionBox to set.
+     * 
+     * @param interactionBox
+     *            the interactionBox to set.
      */
     protected void setInteractionBox(NeuronGroupInteractionBox newBox) {
         this.removeChild(interactionBox);
@@ -789,7 +789,6 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         this.addChild(interactionBox);
         updateText();
     }
-
 
     /**
      * Update the text in the interaction box.
@@ -809,8 +808,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Set at the workspace level by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     *
-     * @param consumerMenu the consumerMenu to set
+     * 
+     * @param consumerMenu
+     *            the consumerMenu to set
      */
     public void setConsumerMenu(JMenu consumerMenu) {
         this.consumerMenu = consumerMenu;
@@ -826,8 +826,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Set at the workspace level by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     *
-     * @param producerMenu the producerMenu to set
+     * 
+     * @param producerMenu
+     *            the producerMenu to set
      */
     public void setProducerMenu(JMenu producerMenu) {
         this.producerMenu = producerMenu;
@@ -859,62 +860,63 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
             getNetworkPanel().getNetwork().removeGroup(neuronGroup);
         }
     };
-    /**         
-     * Sets whether the clamping actions are enabled based on whether the        
-     * neurons are all clamped or not.       
-     *       
-     * If all neurons are clamped already, then "clamp neurons" is disabled.         
-     *       
-     * If all neurons are unclamped already, then "unclamp neurons" is disabled.         
-     */      
-    private void setClampActionsEnabled() {         
-        clampNeuronsAction.setEnabled(!neuronGroup.isAllClamped());         
-        unclampNeuronsAction.setEnabled(!neuronGroup.isAllUnclamped());         
-    }       
 
-    /**         
-     * Action for clamping neurons       
-     */      
-    protected Action clampNeuronsAction = new AbstractAction() {        
+    /**
+     * Sets whether the clamping actions are enabled based on whether the
+     * neurons are all clamped or not.
+     * 
+     * If all neurons are clamped already, then "clamp neurons" is disabled.
+     * 
+     * If all neurons are unclamped already, then "unclamp neurons" is disabled.
+     */
+    private void setClampActionsEnabled() {
+        clampNeuronsAction.setEnabled(!neuronGroup.isAllClamped());
+        unclampNeuronsAction.setEnabled(!neuronGroup.isAllUnclamped());
+    }
 
-        {       
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));        
-            putValue(NAME, "Clamp Neurons");        
-            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");        
-        }       
+    /**
+     * Action for clamping neurons
+     */
+    protected Action clampNeuronsAction = new AbstractAction() {
 
-        @Override       
-        public void actionPerformed(ActionEvent arg0) {         
-            neuronGroup.setClamped(true);       
-        }       
-    };      
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Clamp Neurons");
+            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");
+        }
 
-    /**         
-     * Action for unclamping neurons         
-     */      
-    protected Action unclampNeuronsAction = new AbstractAction() {      
-
-        {       
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));        
-            putValue(NAME, "Unclamp Neurons");      
-            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");      
-        }       
-
-        @Override       
-        public void actionPerformed(ActionEvent arg0) {         
-            neuronGroup.setClamped(false);      
-        }       
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            neuronGroup.setClamped(true);
+        }
     };
-    
+
+    /**
+     * Action for unclamping neurons
+     */
+    protected Action unclampNeuronsAction = new AbstractAction() {
+
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(NAME, "Unclamp Neurons");
+            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            neuronGroup.setClamped(false);
+        }
+    };
+
     /**
      * Open a window for sending inputs to this neuron group.
      */
-    protected Action testInputsAction = new AbstractAction() {      
+    protected Action testInputsAction = new AbstractAction() {
 
-        {       
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));        
-            putValue(NAME, "Send inputs to this group");      
-            putValue(SHORT_DESCRIPTION, "Send inputs to this group");      
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+            putValue(NAME, "Send inputs to this group");
+            putValue(SHORT_DESCRIPTION, "Send inputs to this group");
         }
 
         @Override
@@ -926,6 +928,5 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
                     "Inputs for neuron group: " + neuronGroup.getLabel());
         }
     };
-    
-    
+
 }

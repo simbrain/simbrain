@@ -42,17 +42,26 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
         BoundedUpdateRule, NoisyUpdateRule {
 
+	/** 
+	 * The default squashing function, informs the default upper and
+	 * lower bounds.
+	 */
+	public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
+			SquashingFunction.LOGISTIC;
+	
     /** Default time constant (ms). */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;
 
     /** The Default upper bound. */
-    public static final double DEFAULT_CEILING = 1.0;
+    public static final double DEFAULT_UPPER_BOUND =
+    		DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
 
     /** The Default lower bound. */
-    public static final double DEFAULT_FLOOR = 0.0;
+    public static final double DEFAULT_LOWER_BOUND =
+    		DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
 
     /** Current implementation. */
-    private SquashingFunction sFunction = SquashingFunction.LOGISTIC;
+    private SquashingFunction sFunction = DEFAULT_SQUASHING_FUNCTION;
 
     /** Bias. */
     private double bias;
@@ -67,10 +76,10 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     private boolean addNoise;
 
     /** The upper bound of the activity if clipping is used. */
-    private double ceiling = DEFAULT_CEILING;
+    private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** The lower bound of the activity if clipping is used. */
-    private double floor = DEFAULT_FLOOR;
+    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * The time constant of these neurons. If the time constant is equal to the
@@ -194,10 +203,13 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     @Override
     public ContinuousSigmoidalRule deepCopy() {
         ContinuousSigmoidalRule sn = new ContinuousSigmoidalRule();
+        sn.setTimeConstant(getTimeConstant());
         sn.setBias(getBias());
         sn.setSquashFunctionType(getSquashFunctionType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
+        sn.setUpperBound(getCeiling());
+        sn.setLowerBound(getFloor());
         sn.noiseGenerator = new Randomizer(noiseGenerator);
         return sn;
     }
@@ -287,7 +299,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getUpperBound() {
-        return ceiling;
+        return upperBound;
     }
 
     /**
@@ -295,7 +307,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public double getLowerBound() {
-        return floor;
+        return lowerBound;
     }
 
     /**
@@ -303,7 +315,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public void setUpperBound(double ceiling) {
-        this.ceiling = ceiling;
+        this.upperBound = ceiling;
     }
 
     /**
@@ -311,7 +323,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      */
     @Override
     public void setLowerBound(double floor) {
-        this.floor = floor;
+        this.lowerBound = floor;
     }
 
     /**

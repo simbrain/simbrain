@@ -29,14 +29,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.group.GroupPropertiesPanel;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
@@ -65,9 +63,9 @@ public class HopfieldPropertiesPanel extends JPanel implements
     private JCheckBox shuffleUpdateOrder = new JCheckBox();
 
     {
-        shuffleUpdateOrder.setToolTipText("Randomizes the order of the neuron" +
-                " updates: \nThis random seqence is the same for \neach" +
-                " update.");
+        shuffleUpdateOrder.setToolTipText("Randomizes the order of the neuron"
+                + " updates: \nThis random seqence is the same for \neach"
+                + " update.");
     }
 
     /** The model subnetwork. */
@@ -84,8 +82,9 @@ public class HopfieldPropertiesPanel extends JPanel implements
 
     /**
      * Constructor for creating Hopfield networks.
-     *
-     * @param np parent network panel
+     * 
+     * @param np
+     *            parent network panel
      */
     public HopfieldPropertiesPanel(final NetworkPanel np) {
         this.networkPanel = np;
@@ -95,9 +94,11 @@ public class HopfieldPropertiesPanel extends JPanel implements
 
     /**
      * Constructor for editing.
-     *
-     * @param np parent network panel
-     * @param hop network being modified.
+     * 
+     * @param np
+     *            parent network panel
+     * @param hop
+     *            network being modified.
      */
     public HopfieldPropertiesPanel(final NetworkPanel np, final Hopfield hop) {
         this.networkPanel = np;
@@ -119,8 +120,8 @@ public class HopfieldPropertiesPanel extends JPanel implements
      * @return the update order.
      */
     public HopfieldUpdate getUpdateType() {
-        return HopfieldUpdate.getUpdateFuncFromName((String)
-                cbUpdateOrder.getSelectedItem());
+        return HopfieldUpdate.getUpdateFuncFromName((String) cbUpdateOrder
+                .getSelectedItem());
     }
 
     private void repaintPanel() {
@@ -134,7 +135,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
         repaint();
         revalidate();
     }
-    
+
     private synchronized void layoutPanel() {
         if (isCreationPanel) {
             add(new JLabel("Number of Neurons"));
@@ -143,31 +144,31 @@ public class HopfieldPropertiesPanel extends JPanel implements
         add(new JLabel("Update Order"));
         add(cbUpdateOrder);
         switch (getUpdateType()) {
-            case SEQ : 
-                add(new JLabel("By Priority"));
-                add(priorityChkBx);
-                add(new JLabel("Shuffle Order"));
-                add(shuffleUpdateOrder);
-                break;
-            case SYNC :
-                // No extra items needed
-                break;
-            case RAND :
-                // No extra items needed
-                break;
-            default :
-                throw new IllegalArgumentException("No such update function.");
+        case SEQ:
+            add(new JLabel("By Priority"));
+            add(priorityChkBx);
+            add(new JLabel("Shuffle Order"));
+            add(shuffleUpdateOrder);
+            break;
+        case SYNC:
+            // No extra items needed
+            break;
+        case RAND:
+            // No extra items needed
+            break;
+        default:
+            throw new IllegalArgumentException("No such update function.");
         }
     }
 
     private void addListeners() {
-        cbUpdateOrder.addActionListener(new ActionListener(){
+        cbUpdateOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 repaintPanel();
             }
         });
-        priorityChkBx.addActionListener(new ActionListener(){
+        priorityChkBx.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 shuffleUpdateOrder.setEnabled(!priorityChkBx.isSelected());

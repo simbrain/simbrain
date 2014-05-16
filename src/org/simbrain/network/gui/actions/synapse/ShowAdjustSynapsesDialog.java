@@ -42,8 +42,9 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
 
     /**
      * Construct the action.
-     *
-     * @param networkPanel networkPanel, must not be null
+     * 
+     * @param networkPanel
+     *            networkPanel, must not be null
      */
     public ShowAdjustSynapsesDialog(final NetworkPanel networkPanel) {
 
@@ -86,18 +87,19 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = new SynapseAdjustmentPanel(
-                networkPanel, networkPanel.getSelectedModelSynapses());
+        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
+                .createSynapseAdjustmentPanel(networkPanel,
+                        networkPanel.getSelectedModelSynapses());
         JDialog dialog = new JDialog();
         dialog.setTitle("Adjust selected synapses");
         dialog.setContentPane(synapsePanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-//        dialog.addWindowListener(new WindowAdapter() {
-//            public void windowClosing(WindowEvent e) {
-//                synapsePanel.removeListeners();
-//            }
-//        });
+        // dialog.addWindowListener(new WindowAdapter() {
+        // public void windowClosing(WindowEvent e) {
+        // synapsePanel.removeListeners();
+        // }
+        // });
     }
 }

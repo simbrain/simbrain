@@ -81,33 +81,67 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
      */
     private final Window parent;
 
-    /** A flag that is automatically set based on the neuron list passed to
-     * this panel. When the flag is true it means that multiple neurons are
-     * being edited or that the neuron list passed to it is null. In either case
-     * the Neuron_Id label and field are omitted from the panel. If only one
-     * neuron is being edited (false), the id fields are laid out.
+    /**
+     * If true, displays ID info and other fields that would only make sense if
+     * multiple neurons are being edited. This value is set automatically unless
+     * otherwise specified at construction.
      */
-    private boolean multiFlag = false;
+    private boolean displayIDInfo;
 
     /**
-     * Construct the panel.
-     *
-     * @param neuronList the neurons being adjusted
-     * @param parent the parent window
+     * Creates a basic neuron info panel. Here whether or not to display
+     * ID info is automatically set based on the state of the neuron 
+     * list.
+     * @param neuronList the neurons whose information is being displayed/made
+     *  available to edit on this panel
+     * @param parent the parent window for dynamic resizing.
+     * @return A basic neuron info panel with the specified parameters
      */
-    public BasicNeuronInfoPanel(final List<Neuron> neuronList, Window parent) {
+    public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
+    		final List<Neuron> neuronList, final Window parent) {
+    	return createBasicNeuronInfoPanel(neuronList, parent,
+    			!(neuronList == null || neuronList.size() != 1));
+    }
+    
+    /**
+     * Creates a basic neuron info panel. Here the whether or not
+     * ID info is displayed is manually set. This is the case when
+     * the number of neurons (such as when adding multiple neurons)
+     * is unknown at the time of display. In fact this is probably 
+     * the only reason to use this factory method over 
+     * {@link #createBasicNeuronInfoPanel(List, Window)}.
+     * @param neuronList the neurons whose information is being displayed/made
+     *  available to edit on this panel
+     * @param parent the parent window for dynamic resizing
+     * @param displayIDInfo whether or not to display ID info
+     * @return A basic neuron info panel with the specified parameters
+     */
+    public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
+    		final List<Neuron> neuronList, final Window parent,
+    		final boolean displayIDInfo) {
+    	BasicNeuronInfoPanel bnip = new BasicNeuronInfoPanel(neuronList,
+    			parent, displayIDInfo);
+    	bnip.addListeners();
+    	return bnip;
+    }
+    
+    /**
+     * 
+     * @param neuronList
+     * @param parent
+     * @param displayIDInfo
+     */
+    private BasicNeuronInfoPanel(final List<Neuron> neuronList,
+    		final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
-        multiFlag = neuronList == null || neuronList.size() != 1;
+        this.displayIDInfo = displayIDInfo;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
                 "Less", parent);
         extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList, parent);
-        addListeners();
         initializeLayout();
         fillFieldValues();
-
     }
-
 
     /**
      * Initialize the basic info panel (generic neuron parameters)
@@ -121,7 +155,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
         GridLayout gL = new GridLayout(0, 2);
         gL.setVgap(2);
         basicStatsPanel.setLayout(gL);
-        if (!multiFlag) {
+        if (displayIDInfo) {
             basicStatsPanel.add(new JLabel("Neuron Id:"));
             basicStatsPanel.add(idLabel);
         }
@@ -167,7 +201,6 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
 
         // Add a listener to display/hide extra editable neuron data
         detailTriangle.addMouseListener(new MouseListener() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Repaint to show/hide extra data
@@ -280,10 +313,10 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @return {@link #multiFlag}
+     * @return {@link #displayIDInfo}
      */
     public boolean isMultiFlag() {
-        return multiFlag;
+        return displayIDInfo;
     }
 
 

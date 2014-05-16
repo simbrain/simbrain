@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -87,7 +86,6 @@ import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.gui.nodes.SynapseGroupArrow;
 import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeBidirectional;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
@@ -831,8 +829,8 @@ public class NetworkPanel extends JPanel {
 
     private void addSynapseGroupBidirectional(SynapseGroup sg1, SynapseGroup sg2) {
         SynapseGroupNodeBidirectional synGBD =
-                new SynapseGroupNodeBidirectional(this, sg1,
-                        sg2);
+                SynapseGroupNodeBidirectional.createBidirectionalSynapseGN(
+                		this, sg1, sg2);
         canvas.getLayer().addChild(synGBD);
         objectNodeMap.put(sg1, synGBD);
         objectNodeMap.put(sg2, synGBD);
@@ -852,7 +850,8 @@ public class NetworkPanel extends JPanel {
     }
     
     private void addSynapseGroupRecurrent(SynapseGroup sg) {
-        SynapseGroupNodeRecurrent synGNR = new SynapseGroupNodeRecurrent(this, sg);
+        SynapseGroupNodeRecurrent synGNR = SynapseGroupNodeRecurrent
+        		.createRecurrentSynapseGN(this, sg);
         objectNodeMap.put(sg, synGNR);
         canvas.getLayer().addChild(synGNR);
         NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
@@ -1513,7 +1512,8 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the neuron properties dialog.
      */
     public void showSelectedNeuronProperties() {
-        NeuronDialog dialog = new NeuronDialog(getSelectedNeurons());
+        NeuronDialog dialog = NeuronDialog.createNeuronDialog(
+        		getSelectedNeurons());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

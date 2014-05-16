@@ -69,7 +69,7 @@ public class Neuron {
     private double inputValue;
 
     /** Reference to network this neuron is part of. */
-    private Network parent;
+    private final Network parent;
 
     /** List of synapses this neuron attaches to. */
     private ArrayList<Synapse> fanOut = new ArrayList<Synapse>();

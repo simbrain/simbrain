@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,31 +37,33 @@ import javax.swing.UIManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.simbrain.plot.histogram.OverwritableHistogramDataset.SeriesStruct;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a
- * resuable component (e.g. in synapse adjustment panel).
- *
+ * reusable component (e.g. in synapse adjustment panel).
+ * 
  * Supports multiple simultaneous data sets represented by different colors,
  * partially transparent to make overlap visible. The histogram takes the form
  * of a chart supported by a panel which is then placed within the final panel.
  * This panel supports dynamically changing the number of histogram bins
  * graphically, but only logically supports the altering of data series, relying
  * on other classes for graphical representations of such.
- *
+ * 
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
 public class HistogramPanel extends JPanel {
 
     /** The default preferred height. */
-    private static final int DEFAULT_PREF_HEIGHT = 200;
+    private static final int DEFAULT_PREF_HEIGHT = 400;
 
     /** The default preferred width. */
-    private static final int DEFAULT_PREF_WIDTH = 350;
+    private static final int DEFAULT_PREF_WIDTH = 600;
 
     /** The preferred dimensions of the histogram. */
     private Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH,
@@ -82,7 +86,15 @@ public class HistogramPanel extends JPanel {
     private static final int DEFAULT_NUM_DATASETS = 4;
 
     /** The color pallete, initialized to the default number of data sets. */
-    public static final Color[] DEFAULT_PALLET = new Color[DEFAULT_NUM_DATASETS];
+    private static final Color[] DEFAULT_PALLET = new Color[DEFAULT_NUM_DATASETS];
+
+    public static Color[] getDefault_Pallet() {
+        Color[] pallet = new Color[DEFAULT_PALLET.length];
+        for (int i = 0; i < DEFAULT_PALLET.length; i++) {
+            pallet[i] = DEFAULT_PALLET[i];
+        }
+        return pallet;
+    }
 
     /**
      * The standard color pallete, Red, Blue, Green, Yellow. Colors are
@@ -92,7 +104,7 @@ public class HistogramPanel extends JPanel {
      * bits are shifted to remove the default alpha value, then shifted back and
      * replaced with ALPHA.
      */
-    {
+    static {
         DEFAULT_PALLET[0] = new Color((Color.RED.getRGB() << 8) >>> 8
                 | DEFAULT_ALPHA << 24, true);
         DEFAULT_PALLET[1] = new Color((Color.BLUE.getRGB() << 8) >>> 8
@@ -101,6 +113,21 @@ public class HistogramPanel extends JPanel {
                 | DEFAULT_ALPHA << 24, true);
         DEFAULT_PALLET[3] = new Color((Color.YELLOW.getRGB() << 8) >>> 8
                 | DEFAULT_ALPHA << 24, true);
+
+    }
+
+    private int index = 0;
+
+    private Color assignColor() {
+        if (index < DEFAULT_PALLET.length) {
+            return DEFAULT_PALLET[index++];
+        } else {
+            int randomColor = 0;
+            Random rand = new Random();
+            randomColor = rand.nextInt() << 8 >>> 8;
+            randomColor = randomColor | DEFAULT_ALPHA << 24;
+            return new Color(randomColor);
+        }
     }
 
     /** The color pallet, initialized to the default number of data sets. */
@@ -136,8 +163,9 @@ public class HistogramPanel extends JPanel {
 
     /**
      * Construct a new histogram panel.
-     *
-     * @param model reference to underlying data
+     * 
+     * @param model
+     *            reference to underlying data
      */
     public HistogramPanel(final HistogramModel model) {
         this.model = model;
@@ -194,15 +222,28 @@ public class HistogramPanel extends JPanel {
                         PlotOrientation.VERTICAL, true, true, false);
                 mainChart.setBackgroundPaint(UIManager
                         .getColor("this.Background"));
+
                 XYPlot plot = (XYPlot) mainChart.getPlot();
                 plot.setForegroundAlpha(0.75F);
+                // Sets y-axis ticks to integers.
+                NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+                rangeAxis.setStandardTickUnits(NumberAxis
+                        .createIntegerTickUnits());
                 XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
                 renderer.setDrawBarOutline(false);
                 renderer.setShadowVisible(false);
 
+                Iterator<SeriesStruct> series = model.getSeriesData()
+                        .iterator();
                 for (int i = 0; i < model.getData().size(); i++) {
                     if (i < colorPallet.length) {
-                        renderer.setSeriesPaint(i, colorPallet[i], true);
+                        SeriesStruct s = series.next();
+                        Color c = s.color;
+                        if (c == null) {
+                            c = assignColor();
+                            s.color = c;
+                        }
+                        renderer.setSeriesPaint(i, c, true);
                     }
                 }
 
@@ -229,55 +270,46 @@ public class HistogramPanel extends JPanel {
 
     }
 
-    /**
-     * Set a custom color pallete for this histogram to allow more data series
-     * to be represented or to alter the default colors. Colors specified in the
-     * pallete should be interpretable as a bitwise representation. That is:
-     * Colors ought to be represented as a single integer where bits 0-7 consist
-     * of the blue component, bits 8-15 consist of the green component, bits
-     * 16-23 consist of the red component, and bits 24-31 consist of the alpha
-     * component. Specified colors must have an alpha component, and should use
-     * the default ALPHA value specified here.
-     *
-     * @param colorPallet the custom color pallete.
-     */
-    public void setColorPallet(Color[] colorPallet) {
-        this.colorPallet = colorPallet;
-    }
+    // /**
+    // * Set a custom color pallete for this histogram to allow more data series
+    // * to be represented or to alter the default colors. Colors specified in
+    // the
+    // * pallete should be interpretable as a bitwise representation. That is:
+    // * Colors ought to be represented as a single integer where bits 0-7
+    // consist
+    // * of the blue component, bits 8-15 consist of the green component, bits
+    // * 16-23 consist of the red component, and bits 24-31 consist of the alpha
+    // * component. Specified colors must have an alpha component, and should
+    // use
+    // * the default ALPHA value specified here.
+    // *
+    // * @param colorPallet
+    // * the custom color pallete.
+    // */
+    // public void setColorPallet(Color[] colorPallet) {
+    // this.colorPallet = colorPallet;
+    // }
 
-//    /**
-//     * Main method for testing.
-//     */
-//    public static void main(String[] args) {
-//
-//        List<double[]> histograms = new ArrayList<double[]>();
-//        Random random = new Random(3141592L);
-//        double[] r = new double[1000];
-//        for (int i = 0; i < 1000; i++) {
-//            r[i] = random.nextGaussian() + 100;
-//        }
-//        histograms.add(r);
-//        double[] r2 = new double[1000];
-//        for (int i = 0; i < 1000; i++) {
-//            r2[i] = random.nextGaussian() + 102;
-//        }
-//        histograms.add(r2);
-//
-//        List<String> names = Arrays.asList("Joe", "Jane");
-//
-//        JFrame bob = new JFrame();
-//
-//        HistogramModel h = new HistogramModel(histograms, names, 50);
-//
-//        bob.setContentPane(new HistogramPanel(h));
-//        bob.pack();
-//        RefineryUtilities.centerFrameOnScreen(bob);
-//        bob.setVisible(true);
-//    }
+    public void reRender() {
+        XYPlot plot = (XYPlot) mainChart.getPlot();
+        XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+        Iterator<SeriesStruct> series = model.getSeriesData().iterator();
+        for (int i = 0; i < model.getData().size(); i++) {
+            if (i < colorPallet.length) {
+                SeriesStruct s = series.next();
+                Color c = s.color;
+                if (c == null) {
+                    c = assignColor();
+                    s.color = c;
+                }
+                renderer.setSeriesPaint(i, c, true);
+            }
+        }
+    }
 
     /**
      * Return reference to underlying data.
-     *
+     * 
      * @return the data
      */
     public HistogramModel getModel() {
@@ -286,7 +318,7 @@ public class HistogramPanel extends JPanel {
 
     /**
      * Returns default number of datasets.
-     *
+     * 
      * @return default num datasets.
      */
     public static int getDefaultNumDatasets() {
@@ -301,7 +333,8 @@ public class HistogramPanel extends JPanel {
     }
 
     /**
-     * @param xAxisName the xAxisName to set
+     * @param xAxisName
+     *            the xAxisName to set
      */
     public void setxAxisName(String xAxisName) {
         this.xAxisName = xAxisName;
@@ -315,10 +348,41 @@ public class HistogramPanel extends JPanel {
     }
 
     /**
-     * @param yAxisName the yAxisName to set
+     * @param yAxisName
+     *            the yAxisName to set
      */
     public void setyAxisName(String yAxisName) {
         this.yAxisName = yAxisName;
     }
+
+    // /**
+    // * Main method for testing.
+    // */
+    // public static void main(String[] args) {
+    //
+    // List<Number[]> histograms = new ArrayList<Number[]>();
+    // Random random = new Random(3141592L);
+    // Number [] r = new Number[1000];
+    // for (int i = 0; i < 1000; i++) {
+    // r[i] = random.nextGaussian() + 100;
+    // }
+    // histograms.add(r);
+    // Number[] r2 = new Number[1000];
+    // for (int i = 0; i < 1000; i++) {
+    // r2[i] = random.nextGaussian() + 102;
+    // }
+    // histograms.add(r2);
+    //
+    // List<String> names = Arrays.asList("Joe", "Jane");
+    //
+    // JFrame bob = new JFrame();
+    //
+    // HistogramModel h = new HistogramModel(histograms, names, 100);
+    //
+    // bob.setContentPane(new HistogramPanel(h));
+    // bob.pack();
+    // RefineryUtilities.centerFrameOnScreen(bob);
+    // bob.setVisible(true);
+    // }
 
 }

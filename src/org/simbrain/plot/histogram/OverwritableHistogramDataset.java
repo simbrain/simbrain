@@ -1,9 +1,13 @@
 package org.simbrain.plot.histogram;
 
+import java.awt.Color;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.statistics.HistogramBin;
@@ -20,19 +24,19 @@ import org.jfree.util.PublicCloneable;
  * be overridden. The main change is the addition of the method overwrriteSeries
  * I would have extended HistogramDataset but needed access to the internal
  * list.
- *
+ * 
  * @see HistogramDataset
  * @see SimpleHistogramDataset
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
-implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
+        implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -6341668077370231153L;
 
-    private List<SeriesStruct> dataMap = new ArrayList<SeriesStruct>();
+    private LinkedHashMap<String, SeriesStruct> dataMap = new LinkedHashMap<String, SeriesStruct>();
 
     /** The histogram type. */
     private HistogramType type;
@@ -47,7 +51,7 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /**
      * Returns the histogram type.
-     *
+     * 
      * @return The type (never <code>null</code>).
      */
     public HistogramType getType() {
@@ -57,8 +61,9 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
     /**
      * Sets the histogram type and sends a {@link DatasetChangeEvent} to all
      * registered listeners.
-     *
-     * @param type the type (<code>null</code> not permitted).
+     * 
+     * @param type
+     *            the type (<code>null</code> not permitted).
      */
     public void setType(HistogramType type) {
         if (type == null) {
@@ -69,36 +74,22 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
     }
 
     /**
-     * Add new values to an existing series. Overwrites the old data.
-     * The value set will be sorted after this method completes.
-     *
-     * @param key the series key (<code>null</code> not permitted).
-     * @param values the raw observations.
-     * @param bins the number of bins (must be at least 1).
-     * @param minimum the lower bound of the bin range.
-     * @param maximum the upper bound of the bin range.
+     * Add new values to an existing series. Overwrites the old data. The value
+     * set will be sorted after this method completes.
+     * 
+     * @param key
+     *            the series key (<code>null</code> not permitted).
+     * @param values
+     *            the raw observations.
+     * @param bins
+     *            the number of bins (must be at least 1).
+     * @param minimum
+     *            the lower bound of the bin range.
+     * @param maximum
+     *            the upper bound of the bin range.
      */
-    public void overwriteSeries(int index, Comparable key, Number[] values,
-            int bins) {
-
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
-        if (values == null) {
-            throw new IllegalArgumentException("Null 'values' argument.");
-        } else if (bins < 1) {
-            throw new IllegalArgumentException(
-                    "The 'bins' value must be at least 1.");
-        }
-
-        // If the series does not already exist create the series.
-        if (index >= dataMap.size()) {
-            addSeries(key, values, bins);
-        } else {
-            addSeriesAtIndex(index, key, values, bins);
-            this.fireDatasetChanged();
-        }
-
+    public void overwriteSeries(String key, Number[] values, int bins) {
+        addSeries(key, values, bins);
     }
 
     /**
@@ -107,20 +98,20 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
      * be assigned to the last bin. Values falling on the boundary of adjacent
      * bins will be assigned to the higher indexed bin.
      * 
-     * The values array passed to this method will be sorted upon completion. 
-     *
-     * @param key the series key (<code>null</code> not permitted).
-     * @param values the raw observations.
-     * @param bins the number of bins (must be at least 1).
-     * @param minimum the lower bound of the bin range.
-     * @param maximum the upper bound of the bin range.
+     * The values array passed to this method will be sorted upon completion.
+     * 
+     * @param key
+     *            the series key (<code>null</code> not permitted).
+     * @param values
+     *            the raw observations.
+     * @param bins
+     *            the number of bins (must be at least 1).
+     * @param minimum
+     *            the lower bound of the bin range.
+     * @param maximum
+     *            the upper bound of the bin range.
      */
-    public void addSeries(Comparable key, Number[] values, int bins) {
-        addSeriesAtIndex(dataMap.size(), key, values, bins);
-    }
-
-    private void addSeriesAtIndex(int series, Comparable key, Number[] values,
-            int bins) {
+    public void addSeries(String key, Number[] values, int bins) {
         if (key == null) {
             throw new IllegalArgumentException("Null 'key' argument.");
         }
@@ -131,13 +122,21 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
                     "The 'bins' value must be at least 1.");
         }
 
-        HistogramBin [] histBins = new HistogramBin[0];
+        if (values.equals(dataMap.get(key))) {
+            if (dataMap.get(key).bins.length == bins) {
+                // The series hasn't changed and the number
+                // of bins hasn't changed nothing to do here.
+                return;
+            }
+        }
+
+        HistogramBin[] histBins = new HistogramBin[0];
         double binWidth = 0;
         if (values.length != 0) {
             Arrays.sort(values);
 
-            binWidth = (values[values.length - 1].doubleValue()
-                    - values[0].doubleValue()) / bins;
+            binWidth = (values[values.length - 1].doubleValue() - values[0]
+                    .doubleValue()) / bins;
 
             histBins = new HistogramBin[bins];
 
@@ -149,69 +148,79 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
                 if (index < values.length) {
                     endVal = startVal + binWidth;
                     bin = new HistogramBin(startVal, endVal);
-                    while(index < values.length
+                    while (index < values.length
                             && values[index].doubleValue() <= endVal) {
                         bin.incrementCount();
                         index++;
                     }
                     startVal = endVal;
                 } else {
-                    bin = new HistogramBin(0, 0); //Empty bin
+                    bin = new HistogramBin(0, 0); // Empty bin
                 }
                 histBins[i] = bin;
             }
-        } 
+        }
 
-        SeriesStruct packet = new SeriesStruct(key, histBins,
-                values.length, binWidth);
+        SeriesStruct packet = new SeriesStruct(histBins);
 
-        if (dataMap.size() - 1 < series) {
-            dataMap.add(packet);
-        } else {
-            dataMap.set(series, packet);
+        dataMap.put(key, packet);
+        this.fireDatasetChanged();
+    }
+
+    /**
+     * 
+     * @param names
+     * @param data
+     * @param bins
+     */
+    public void conformToNewParams(List<String> names, List<Number[]> data,
+            int bins) {
+        if (names.size() != data.size()) {
+            throw new IllegalStateException(
+                    "Number of names for series does not"
+                            + "equal the number of data series.");
+        }
+        dataMap.keySet().retainAll(names);
+        Iterator<Number[]> dataIterator = data.iterator();
+        for (String str : names) {
+            addSeries(str, dataIterator.next(), bins);
         }
     }
 
     /**
+     * {@inheritDoc} A bit expensive...
+     */
+    @Override
+    public Comparable<String> getSeriesKey(int arg0) {
+        int i = 0;
+        for (Entry<String, SeriesStruct> entry : dataMap.entrySet()) {
+            if (arg0 == i) {
+                return entry.getKey();
+            }
+            ++i;
+        }
+        return null;
+    }
+
+    /**
      * Returns the bins for a series.
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     *
+     * 
      * @return A list of bins.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     List<HistogramBin> getBins(int series) {
-        return Arrays.asList(dataMap.get(series).bins);
-    }
-
-    /**
-     * Returns the total number of observations for a series.
-     *
-     * @param series the series index.
-     *
-     * @return The total.
-     */
-    private int getTotal(int series) {
-        return dataMap.get(series).length;
-    }
-
-    /**
-     * Returns the bin width for a series.
-     *
-     * @param series the series index (zero based).
-     *
-     * @return The bin width.
-     */
-    private double getBinWidth(int series) {
-        return dataMap.get(series).binWidth;
+        return Arrays.asList(dataMap.get(getSeriesKey(series)).bins);
     }
 
     /**
      * Returns the number of series in the dataset.
-     *
+     * 
      * @return The series count.
      */
     public int getSeriesCount() {
@@ -219,30 +228,16 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
     }
 
     /**
-     * Returns the key for a series.
-     *
-     * @param series the series index (in the range <code>0</code> to
-     *            <code>getSeriesCount() - 1</code>).
-     *
-     * @return The series key.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
-     */
-    public Comparable getSeriesKey(int series) {
-        return dataMap.get(series).key;
-    }
-
-    /**
      * Returns the number of data items for a series.
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     *
+     * 
      * @return The item count.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public int getItemCount(int series) {
         return getBins(series).size();
@@ -252,19 +247,21 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
      * Returns the X value for a bin. This value won't be used for plotting
      * histograms, since the renderer will ignore it. But other renderers can
      * use it (for example, you could use the dataset to create a line chart).
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The start value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getX(int series, int item) {
-        List bins = getBins(series);
-        HistogramBin bin = (HistogramBin) bins.get(item);
+        List<HistogramBin> bins = getBins(series);
+        HistogramBin bin = bins.get(item);
         double x = (bin.getStartBoundary() + bin.getEndBoundary()) / 2.0;
         return new Double(x);
     }
@@ -272,28 +269,27 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
     /**
      * Returns the y-value for a bin (calculated to take into account the
      * histogram type).
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The y-value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getY(int series, int item) {
-        List bins = getBins(series);
-        HistogramBin bin = (HistogramBin) bins.get(item);
-        double total = getTotal(series);
-        double binWidth = getBinWidth(series);
-
+        List<HistogramBin> bins = getBins(series);
+        HistogramBin bin = bins.get(item);
         if (this.type == HistogramType.FREQUENCY) {
             return new Double(bin.getCount());
         } else if (this.type == HistogramType.RELATIVE_FREQUENCY) {
-            return new Double(bin.getCount() / total);
+            return new Double(bin.getCount() / bins.size());
         } else if (this.type == HistogramType.SCALE_AREA_TO_1) {
-            return new Double(bin.getCount() / (binWidth * total));
+            return new Double(bin.getCount() / bin.getBinWidth());
         } else { // pretty sure this shouldn't ever happen
             throw new IllegalStateException();
         }
@@ -301,37 +297,41 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /**
      * Returns the start value for a bin.
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The start value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getStartX(int series, int item) {
-        List bins = getBins(series);
-        HistogramBin bin = (HistogramBin) bins.get(item);
+        List<HistogramBin> bins = getBins(series);
+        HistogramBin bin = bins.get(item);
         return new Double(bin.getStartBoundary());
     }
 
     /**
      * Returns the end value for a bin.
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The end value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getEndX(int series, int item) {
-        List bins = getBins(series);
-        HistogramBin bin = (HistogramBin) bins.get(item);
+        List<HistogramBin> bins = getBins(series);
+        HistogramBin bin = bins.get(item);
         return new Double(bin.getEndBoundary());
     }
 
@@ -339,15 +339,17 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
      * Returns the start y-value for a bin (which is the same as the y-value,
      * this method exists only to support the general form of the
      * {@link IntervalXYDataset} interface).
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The y-value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getStartY(int series, int item) {
         return getY(series, item);
@@ -357,15 +359,17 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
      * Returns the end y-value for a bin (which is the same as the y-value, this
      * method exists only to support the general form of the
      * {@link IntervalXYDataset} interface).
-     *
-     * @param series the series index (in the range <code>0</code> to
+     * 
+     * @param series
+     *            the series index (in the range <code>0</code> to
      *            <code>getSeriesCount() - 1</code>).
-     * @param item the item index (zero based).
-     *
+     * @param item
+     *            the item index (zero based).
+     * 
      * @return The Y value.
-     *
-     * @throws IndexOutOfBoundsException if <code>series</code> is outside the
-     *             specified range.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             if <code>series</code> is outside the specified range.
      */
     public Number getEndY(int series, int item) {
         return getY(series, item);
@@ -373,9 +377,10 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /**
      * Tests this dataset for equality with an arbitrary object.
-     *
-     * @param obj the object to test against (<code>null</code> permitted).
-     *
+     * 
+     * @param obj
+     *            the object to test against (<code>null</code> permitted).
+     * 
      * @return A boolean.
      */
     public boolean equals(Object obj) {
@@ -406,38 +411,41 @@ implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
 
     /**
      * Returns a clone of the dataset.
-     *
+     * 
      * @return A clone of the dataset.
-     *
-     * @throws CloneNotSupportedException if the object cannot be cloned.
+     * 
+     * @throws CloneNotSupportedException
+     *             if the object cannot be cloned.
      */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
+    public void setSeriesColor(String seriesName, Color color) {
+        if (dataMap.get(seriesName) != null) {
+            dataMap.get(seriesName).color = color;
+        }
+    }
+
+    public Collection<SeriesStruct> getSeriesStructs() {
+        return dataMap.values();
+    }
+
     /**
      * Mimics the "struct" construct in C/C++. In this case used to store and
-     * represent values about a data series for a histogram. 
+     * represent values about a data series for a histogram.
      * 
      * @author zach
-     *
+     * 
      */
-    private class SeriesStruct {
+    public static class SeriesStruct {
 
-        public final Comparable key;
+        public final HistogramBin[] bins;
 
-        public final HistogramBin [] bins;
+        public Color color;
 
-        public final int length;
-
-        public final double binWidth;
-
-        public SeriesStruct(final Comparable key, final HistogramBin [] bins,
-                final int length, final double binWidth) {
-            this.key = key;
+        public SeriesStruct(final HistogramBin[] bins) {
             this.bins = bins;
-            this.length = length;
-            this.binWidth = binWidth;
         }
     }
 

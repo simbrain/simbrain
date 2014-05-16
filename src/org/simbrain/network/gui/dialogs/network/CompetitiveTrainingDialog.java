@@ -36,9 +36,9 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for training a Competitive network.
- *
+ * 
  * @author Jeff Yoshimi
- *
+ * 
  */
 public class CompetitiveTrainingDialog extends StandardDialog {
 
@@ -56,9 +56,11 @@ public class CompetitiveTrainingDialog extends StandardDialog {
 
     /**
      * Construct the dialog.
-     *
-     * @param np parent network panel
-     * @param network the Competitive network
+     * 
+     * @param np
+     *            parent network panel
+     * @param network
+     *            the Competitive network
      */
     public CompetitiveTrainingDialog(NetworkPanel np, CompetitiveNetwork network) {
 
@@ -71,8 +73,8 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         setModalityType(ModalityType.MODELESS);
 
         // Set up properties tab
-        competitivePropsPanel = new CompetitivePropertiesPanel(np,
-                network.getCompetitive());
+        competitivePropsPanel = CompetitivePropertiesPanel
+                .createCompetitivePropertiesPanel(np, network.getCompetitive());
         tabbedPane.addTab("Network Properties", competitivePropsPanel);
 
         // Set up training tab

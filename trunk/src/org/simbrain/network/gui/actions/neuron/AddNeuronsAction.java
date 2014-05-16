@@ -28,6 +28,7 @@ import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog;
 /**
  * Creates a group of neurons.
  */
+@SuppressWarnings("serial")
 public final class AddNeuronsAction extends AbstractAction {
 
     /** Network panel. */
@@ -35,12 +36,12 @@ public final class AddNeuronsAction extends AbstractAction {
 
     /*
      * class ShowNeuronDialog extends AbstractAction{
-     *
+     * 
      * private ArrayList<NeuronNode> nodes;
-     *
+     * 
      * public ShowNeuronDialog(ArrayList<NeuronNode> nodes){
      * super("Neuron Parameters"); this.nodes = nodes; }
-     *
+     * 
      * @Override public void actionPerformed(ActionEvent arg0) { NeuronDialog
      * nDialog = new NeuronDialog(nodes){ protected void closeDialogOk(){
      * super.closeDialogOk(); commitChanges(); LayoutDialog dialog = new
@@ -48,15 +49,16 @@ public final class AddNeuronsAction extends AbstractAction {
      * dialog.setLocationRelativeTo(null); dialog.setVisible(true); } };
      * nDialog.pack(); nDialog.setLocationRelativeTo(null);
      * nDialog.setVisible(true); }
-     *
+     * 
      * }
-     *
+     * 
      * private Action nDialog;
      */
     /**
      * Create a new neuron action with the specified network panel.
-     *
-     * @param networkPanel network panel, must not be null
+     * 
+     * @param networkPanel
+     *            network panel, must not be null
      */
     public AddNeuronsAction(final NetworkPanel networkPanel) {
         super("Add Neurons...");
@@ -76,7 +78,8 @@ public final class AddNeuronsAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        AddNeuronsDialog and = new AddNeuronsDialog(networkPanel);
+        AddNeuronsDialog and = AddNeuronsDialog
+                .createAddNeuronsDialog(networkPanel);
         and.pack();
         and.setLocationRelativeTo(null);
         and.setVisible(true);

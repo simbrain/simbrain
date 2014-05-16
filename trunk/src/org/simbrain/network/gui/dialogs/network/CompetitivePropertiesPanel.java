@@ -43,6 +43,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * of a competitive network. Can either be used to create a new competitive
  * network or to edit an existing competitive network.
  */
+@SuppressWarnings("serial")
 public class CompetitivePropertiesPanel extends JPanel implements
         ActionListener, GroupPropertiesPanel, EditablePanel {
 
@@ -62,8 +63,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** Update method. */
-    private JComboBox updateMethod = new JComboBox(
-            CompetitiveGroup.UpdateMethod.values());
+    private JComboBox<UpdateMethod> updateMethod = new JComboBox<UpdateMethod>(
+            UpdateMethod.values());
 
     /** Number of neurons field. */
     private JTextField tfNumCompetitiveNeurons = new JTextField();
@@ -107,15 +108,66 @@ public class CompetitivePropertiesPanel extends JPanel implements
     private final CompetitivePropsPanelType panelType;
 
     /**
-     * Constructor for the case where a competitive network is being created.
-     *
-     * @param np parent network panel
-     * @param panelType  whether this is a network or group creation panel. Edit
-     *            is not an acceptable argument.
+     * A factory method for creating a competitive properties panel for cases
+     * where the panel is being created.
+     * 
+     * @param np
+     *            the network panel
+     * @param panelType
+     *            the type of panel (CREATE_GROUP or CREATE_NETWORK)
+     * @return a competitive properties panel of the give type
+     * @throws IllegalArgumentException
+     *             if CompetitivePropsPanelType.EDIT_GROUP is passed into this
+     *             constructor as the panelType parameter
      */
-    public CompetitivePropertiesPanel(final NetworkPanel np,
-            final CompetitivePropsPanelType panelType) {
-        // TODO Error if paneltype is edit
+    public static CompetitivePropertiesPanel createCompetitivePropertiesPanel(
+            final NetworkPanel np, final CompetitivePropsPanelType panelType)
+            throws IllegalArgumentException {
+
+        CompetitivePropertiesPanel cpp = new CompetitivePropertiesPanel(np,
+                panelType);
+        cpp.addListeners();
+        return cpp;
+    }
+
+    /**
+     * Creates a competitive properties panel from a CompetitiveGroup allowing
+     * that group to be edited.
+     * 
+     * @param np
+     *            the network panel
+     * @param competitive
+     *            the competitive group being edited
+     * @return a CompetitivePropertiesPanel which can edit values in the
+     *         CompetitiveGroup and whose fields represent its values.
+     */
+    public static CompetitivePropertiesPanel createCompetitivePropertiesPanel(
+            final NetworkPanel np, final CompetitiveGroup competitive) {
+        CompetitivePropertiesPanel cpp = new CompetitivePropertiesPanel(np,
+                competitive);
+        cpp.addListeners();
+        return cpp;
+    }
+
+    /**
+     * Constructor for the case where a competitive network is being created.
+     * 
+     * @param np
+     *            parent network panel
+     * @param panelType
+     *            whether this is a network or group creation panel. Edit is not
+     *            an acceptable argument.
+     * @throws IllegalArgumentException
+     *             if CompetitivePropsPanelType.EDIT_GROUP is passed into this
+     *             constructor as the panelType parameter
+     */
+    private CompetitivePropertiesPanel(final NetworkPanel np,
+            final CompetitivePropsPanelType panelType)
+            throws IllegalArgumentException {
+        if (panelType.equals(CompetitivePropsPanelType.EDIT_GROUP)) {
+            throw new IllegalArgumentException("No competitive group to"
+                    + " edit.");
+        }
         this.networkPanel = np;
         this.panelType = panelType;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -135,11 +187,13 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /**
      * Constructor for the case where an existing competitive network is being
      * edited.
-     *
-     * @param np parent network panel
-     * @param competitive Competitive network being modified.
+     * 
+     * @param np
+     *            parent network panel
+     * @param competitive
+     *            Competitive network being modified.
      */
-    public CompetitivePropertiesPanel(final NetworkPanel np,
+    private CompetitivePropertiesPanel(final NetworkPanel np,
             final CompetitiveGroup competitive) {
         this.networkPanel = np;
         this.competitive = competitive;
@@ -151,9 +205,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
      * Initialize the panel.
      */
     private void initPanel() {
-
         fillFieldValues();
-
         mainPanel.addItem("UpdateMethod", updateMethod);
         mainPanel.addItem("Epsilon", tfEpsilon);
         mainPanel.addItem("Winner Value", tfWinnerValue);
@@ -162,7 +214,15 @@ public class CompetitivePropertiesPanel extends JPanel implements
         mainPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
         mainPanel.addItem("Normalize Inputs", cbNormalizeInputs);
         mainPanel.addItem("Synapse Decay Percent", tfSynpaseDecayPercent);
+        checkLeakyEpsilon();
+        enableFieldBasedOnUpdateMethod();
+        add(mainPanel);
+    }
 
+    /**
+     * Adds internal listeners to the panel.
+     */
+    private void addListeners() {
         updateMethod.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -171,13 +231,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
         });
         cbUseLeakyLearning.addActionListener(this);
         cbUseLeakyLearning.setActionCommand("useLeakyLearning");
-
-        checkLeakyEpsilon();
-        enableFieldBasedOnUpdateMethod();
-
-        add(mainPanel);
     }
-
 
     @Override
     public void fillFieldValues() {
@@ -214,8 +268,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
                 .getWinValue()));
         tfLeakyEpsilon.setText(Double.toString(((CompetitiveGroup) competitive)
                 .getLeakyLearningRate()));
-        tfSynpaseDecayPercent
-                .setText(Double.toString(((CompetitiveGroup) competitive)
+        tfSynpaseDecayPercent.setText(Double
+                .toString(((CompetitiveGroup) competitive)
                         .getSynpaseDecayPercent()));
         cbUseLeakyLearning.setSelected(((CompetitiveGroup) competitive)
                 .getUseLeakyLearning());
@@ -317,8 +371,8 @@ public class CompetitivePropertiesPanel extends JPanel implements
      * Commit values for a competitive group.
      */
     private void commitCompetitiveGroupFieldValues() {
-        ((CompetitiveGroup) competitive).setUpdateMethod((UpdateMethod) updateMethod
-                .getSelectedItem());
+        ((CompetitiveGroup) competitive)
+                .setUpdateMethod((UpdateMethod) updateMethod.getSelectedItem());
         ((CompetitiveGroup) competitive).setLearningRate(Double
                 .parseDouble(tfEpsilon.getText()));
         ((CompetitiveGroup) competitive).setWinValue(Double

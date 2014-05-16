@@ -36,12 +36,13 @@ public class NeuronGroupCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
-     *
-     * @param panel the parent network panel
+     * 
+     * @param panel
+     *            the parent network panel
      */
     public NeuronGroupCreationDialog(final NetworkPanel panel) {
         this.networkPanel = panel;
-        neuronGroupPanel = new NeuronGroupPanel(panel, this);
+        neuronGroupPanel = NeuronGroupPanel.createNeuronGroupPanel(panel, this);
         setContentPane(neuronGroupPanel);
         setTitle("New Neuron Group");
     }

@@ -55,11 +55,12 @@ import org.simbrain.util.widgets.ShowHelpAction;
 /**
  * Main tabbed panel for editing all neuron groups. Specific neuron panels are
  * included as part of this.
- *
+ * 
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
+public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
+        EditablePanel {
 
     // TODO
     // - Change in a way that prepares for possible future where multiple can be
@@ -87,8 +88,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     private EditablePanel specificNeuronGroupPanel;
 
     /**
-     * The neuron group panel containing both a basic neuron info panel and
-     * a neuron update settings panel.
+     * The neuron group panel containing both a basic neuron info panel and a
+     * neuron update settings panel.
      */
     private EditablePanel combinedNeuronInfoPanel;
 
@@ -100,8 +101,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
      * parent to this panel is able to resize according to the displayed tab
      * because all invisible tabs are replaced by dummy panels with the same
      * preferred size as the currently displayed panel. When panels aren't being
-     * displayed, they are stored here and when a new tab is selected it
-     * the appropriate panel from this list is displayed.
+     * displayed, they are stored here and when a new tab is selected it the
+     * appropriate panel from this list is displayed.
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
 
@@ -109,37 +110,73 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     private final Window parent;
 
     /**
-     * Constructor for the case where a neuron group is being created.
-     *
-     * @param np Parent network panel
-     * @param parent parent dialog containing this panel.
+     * Creates a neuron group panel meant for creating neuron groups.
+     * 
+     * @param np
+     *            the parent network of the prospective neuron group
+     * @param parent
+     *            the parent window for resizing
+     * @return a neuron group panel
      */
-    public NeuronGroupPanel(final NetworkPanel np,
-            final Window parent) {
+    public static NeuronGroupPanel createNeuronGroupPanel(
+            final NetworkPanel np, final Window parent) {
+        NeuronGroupPanel ngp = new NeuronGroupPanel(np, parent);
+        ngp.initializeLayout();
+        ngp.addListeners();
+        return ngp;
+    }
+
+    /**
+     * Creates a neuron group panel meant for editing an existing neuron group.
+     * 
+     * @param np
+     *            the parent network of the neuron group
+     * @param ng
+     *            the neuron group the created panel will edit/display
+     * @param parent
+     *            the parent window for easy resizing
+     * @return a neuron group panel to edit the given neuron group
+     */
+    public static NeuronGroupPanel createNeuronGroupPanel(
+            final NetworkPanel np, final NeuronGroup ng, final Window parent) {
+        NeuronGroupPanel ngp = new NeuronGroupPanel(np, ng, parent);
+        ngp.initializeLayout();
+        ngp.addListeners();
+        return ngp;
+    }
+
+    /**
+     * Constructor for the case where a neuron group is being created.
+     * 
+     * @param np
+     *            Parent network panel
+     * @param parent
+     *            parent dialog containing this panel.
+     */
+    private NeuronGroupPanel(final NetworkPanel np, final Window parent) {
         networkPanel = np;
         this.parent = parent;
         isCreationPanel = true;
         layoutPanel = new MainLayoutPanel(false, parent);
-        initializeLayout();
-        addListeners();
     }
 
     /**
      * Constructor for case where an existing neuron group is being edited.
-     *
-     * @param np Parent network panel
-     * @param ng neuron group being edited
-     * @param parent parent dialog containing this panel.
+     * 
+     * @param np
+     *            Parent network panel
+     * @param ng
+     *            neuron group being edited
+     * @param parent
+     *            parent dialog containing this panel.
      */
-    public NeuronGroupPanel(final NetworkPanel np, final NeuronGroup ng,
+    private NeuronGroupPanel(final NetworkPanel np, final NeuronGroup ng,
             final Window parent) {
         networkPanel = np;
         this.parent = parent;
         neuronGroup = ng;
         isCreationPanel = false;
         layoutPanel = new MainLayoutPanel(false, parent);
-        initializeLayout();
-        addListeners();
     }
 
     /**
@@ -154,22 +191,35 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
                     + "editing, not creating a neuron group.");
         }
 
-        summaryPanel = new ApplyPanel(new SummaryPanel(neuronGroup, false));
+        summaryPanel = ApplyPanel.createApplyPanel(new SummaryPanel(
+                neuronGroup, false));
 
         specificNeuronGroupPanel = getSpecificGroupPanel();
         if (specificNeuronGroupPanel != null) {
-            specificNeuronGroupPanel = new ApplyPanel(specificNeuronGroupPanel);
+            specificNeuronGroupPanel = ApplyPanel
+                    .createApplyPanel(specificNeuronGroupPanel);
         }
 
-        combinedNeuronInfoPanel = new ApplyPanel(new CombinedNeuronInfoPanel(
-                neuronGroup.getNeuronList(), parent)) {
-            @Override
-            public boolean commitChanges() {
-                boolean success = super.commitChanges();
-                networkPanel.repaint();
-                return success;
-            }
-        };
+        combinedNeuronInfoPanel = ApplyPanel
+                .createApplyPanel(CombinedNeuronInfoPanel
+                        .createCombinedNeuronInfoPanel(
+                                neuronGroup.getNeuronList(), parent));
+        // {
+        // @Override
+        // public boolean commitChanges() {
+        // boolean success = super.commitChanges();
+        // networkPanel.repaint();
+        // return success;
+        // }
+        // };
+
+        ((ApplyPanel) combinedNeuronInfoPanel)
+                .addListenerToApplyButton(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        networkPanel.repaint();
+                    }
+                });
 
         final ApplyPanel cnip = (ApplyPanel) combinedNeuronInfoPanel;
         final ApplyPanel sp = (ApplyPanel) summaryPanel;
@@ -178,32 +228,31 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 ((SummaryPanel) sp.getPanel()).getTypeField().setText(
-                        (String) ((CombinedNeuronInfoPanel)
-                                cnip.getPanel()).getUpdateInfoPanel()
-                                .getCbNeuronType().getSelectedItem());
+                        (String) ((CombinedNeuronInfoPanel) cnip.getPanel())
+                                .getUpdateInfoPanel().getCbNeuronType()
+                                .getSelectedItem());
             }
         });
 
-        layoutPanelWrapper = new ApplyPanel(new EditablePanel() {
-            @Override
-            public boolean commitChanges() {
-                try {
-                    applyLayout();
-                    networkPanel.repaint();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-                return true;
-            }
-            @Override
-            public JPanel getPanel() {
-                return layoutPanel;
-            }
-            @Override
-            public void fillFieldValues() {
-            }
-        });
+        layoutPanelWrapper = ApplyPanel
+                .createApplyPanel(new EditablePanel() {
+                    @Override
+                    public boolean commitChanges() {
+                        try {
+                            applyLayout();
+                            networkPanel.repaint();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public JPanel getPanel() {
+                        return layoutPanel;
+                    }
+                });
     }
 
     /**
@@ -227,8 +276,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
 
-            combinedNeuronInfoPanel = new CombinedNeuronInfoPanel(
-                    neuronGroup.getNeuronList(), parent);
+            combinedNeuronInfoPanel = CombinedNeuronInfoPanel
+                    .createCombinedNeuronInfoPanel(neuronGroup.getNeuronList(),
+                            parent);
 
             layoutPanelWrapper = new JPanel();
             layoutPanelWrapper.add(layoutPanel);
@@ -245,15 +295,14 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
         storedComponents.add((JPanel) summaryPanel);
         if (specificNeuronGroupPanel != null) {
-            storedComponents.add(specificNeuronGroupPanel.getPanel());
+            storedComponents.add((JPanel) specificNeuronGroupPanel);
         }
         storedComponents.add((JPanel) combinedNeuronInfoPanel);
         storedComponents.add(layoutPanelWrapper);
         tabbedPane.addTab(SummaryPanel.DEFAULT_PANEL_NAME,
                 (JPanel) summaryPanel);
         if (specificNeuronGroupPanel != null) {
-            tabbedPane.addTab("Properties",
-                    specificNeuronGroupPanel.getPanel());
+            tabbedPane.addTab("Properties", (JPanel) specificNeuronGroupPanel);
         }
         tabbedPane.addTab("Neurons", new JPanel()); // Holder
         tabbedPane.addTab("Layout", new JPanel()); // Holder
@@ -291,7 +340,20 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
                         continue;
                     } else {
                         JPanel tmpPanel = new JPanel();
-                        tmpPanel.setPreferredSize(current.getPreferredSize());
+                        // Hack...
+                        // 90 is a guess as to average px length of tabs
+                        // (not their panels, just the tabs)
+                        // This is here to prevent "scrunching" of the
+                        // tabs when one of the panel's widths is too small
+                        // to accommodate all the tabs on one line
+                        int minPx = tabbedPane.getTabCount() * 90;
+                        if (current.getPreferredSize().width < minPx) {
+                            tmpPanel.setPreferredSize(new Dimension(minPx,
+                                    current.getPreferredSize().height));
+                        } else {
+                            tmpPanel.setPreferredSize(current
+                                    .getPreferredSize());
+                        }
                         tabbedPane.setComponentAt(i, tmpPanel);
                     }
                 }
@@ -301,22 +363,21 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
         });
     }
 
-
     /**
      * Gets the specificNeuronGroupPanel based on the underlying group.
+     * 
      * @return the committable neuron group panel corresponding to the specific
-     * type of the neuron group being edited if it has one.
+     *         type of the neuron group being edited if it has one.
      */
     private EditablePanel getSpecificGroupPanel() {
         if (neuronGroup instanceof CompetitiveGroup) {
-            return new CompetitivePropertiesPanel(
+            return CompetitivePropertiesPanel.createCompetitivePropertiesPanel(
                     networkPanel, (CompetitiveGroup) neuronGroup);
         } else if (neuronGroup instanceof WinnerTakeAll) {
             return new WTAPropertiesPanel(networkPanel,
                     (WinnerTakeAll) neuronGroup);
         } else if (neuronGroup instanceof SOMGroup) {
-            return new SOMPropertiesPanel(networkPanel,
-                    (SOMGroup) neuronGroup);
+            return new SOMPropertiesPanel(networkPanel, (SOMGroup) neuronGroup);
         } else {
             return null;
         }
@@ -327,7 +388,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
 
         if (specificNeuronGroupPanel != null) {
             ((GroupPropertiesPanel) specificNeuronGroupPanel.getPanel())
-                .fillFieldValues();
+                    .fillFieldValues();
         }
 
         // Don't use the neuron group's default line layout. When making bare
@@ -352,18 +413,24 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
                 if (numNeurons < 1) {
                     throw new NumberFormatException();
                 }
-                for (int i = 0; i < numNeurons; i++) {
-                    neuronGroup.addNeuron(template.deepCopy());
+                if (numNeurons >= NeuronGroup.DEFAULT_GROUP_SIZE) {
+                    for (int i = NeuronGroup.DEFAULT_GROUP_SIZE; i < numNeurons; i++) {
+                        neuronGroup.addNeuron(template.deepCopy());
+                    }
+                } else {
+                    while (neuronGroup.getNeuronList().size() > numNeurons) {
+                        neuronGroup.getNeuronList().remove(
+                                neuronGroup.getNeuronList().size() - 1);
+                    }
                 }
                 neuronGroup.setLayout(layoutPanel.getCurrentLayout());
                 neuronGroup.applyLayout();
             } catch (NumberFormatException nfe) {
                 System.err.println("Class: " + this.getClass().getSimpleName()
-                        + " Method: commitChanges "
-                        + "NumberFormatException: "
+                        + " Method: commitChanges " + "NumberFormatException: "
                         + nfe.getMessage());
                 ((SummaryPanel) summaryPanel.getPanel()).getPopLabel()
-                    .setForeground(Color.RED);
+                        .setForeground(Color.RED);
                 repaint();
                 return false;
             }
@@ -381,8 +448,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel {
     }
 
     /**
-     * A helper method to perform all the steps necessary to apply a layout
-     * and have those layouts reflected.
+     * A helper method to perform all the steps necessary to apply a layout and
+     * have those layouts reflected.
      */
     private void applyLayout() {
         layoutPanel.commitChanges();

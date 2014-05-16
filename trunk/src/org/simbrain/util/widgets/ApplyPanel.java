@@ -27,7 +27,7 @@ import javax.swing.JPanel;
  * to immediately apply changes in an editing panel (as opposed to waiting to
  * press ok in the parent dialog). Implements {@link EditablePanel}, since
  * the apply can fail.
- *
+ * 
  * @author ztosi
  */
 @SuppressWarnings("serial")
@@ -53,13 +53,26 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
+     * A factory method to create an apply panel
+     * 
+     * @param mainPanel
+     * @return
+     */
+    public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
+        ApplyPanel ap = new ApplyPanel(mainPanel);
+        ap.addListener();
+        return ap;
+    }
+
+    /**
      * Constructs the apply panel. Requires a committable panel to wrap around.
-     * @param mainPanel the committable panel to which changes may be applied
+     * 
+     * @param mainPanel
+     *            the committable panel to which changes may be applied
      */
     public ApplyPanel(EditablePanel mainPanel) {
         this.mainPanel = mainPanel;
         masterLayout();
-        addListener();
     }
 
     /**
@@ -90,17 +103,17 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(20, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridheight = 1;
         gbc.gridwidth = 1;
 
         applyButton.setVisible(true);
+
         this.add(applyButton, gbc);
     }
 
     /**
-     * {@inheritDoc}
-     * Specifically: commits changes to the committable panel
+     * {@inheritDoc} Specifically: commits changes to the committable panel
      * {@link #mainPanel}.
      */
     @Override
@@ -120,18 +133,28 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         });
     }
 
-    /*/CHECKSTYLE:OFF**************************************
-     *                      GETTERS                       *
-     ******************************************************/
+    /**
+     * Adds a listener to the apply button so that actions other than committing
+     * changes can be carried out when the apply button is pressed.
+     * 
+     * @param al
+     */
+    public void addListenerToApplyButton(ActionListener al) {
+        applyButton.addActionListener(al);
+    }
+
+    /*
+     * /CHECKSTYLE:OFF************************************** GETTERS *
+     * ****************************************************
+     */
 
     public JButton getApplyButton() {
         return applyButton;
     }
 
     /**
-     * {@inheritDoc}
-     * <b>Specifically:</b> returns the committable panel this panel wraps
-     * around.
+     * {@inheritDoc} <b>Specifically:</b> returns the committable panel this
+     * panel wraps around.
      */
     @Override
     public JPanel getPanel() {

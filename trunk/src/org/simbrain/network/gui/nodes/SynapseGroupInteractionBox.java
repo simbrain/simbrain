@@ -1,9 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,19 +31,21 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     /**
      * Construct the custom interaction box
-     *
-     * @param net parent network panel
+     * 
+     * @param net
+     *            parent network panel
      */
     public SynapseGroupInteractionBox(NetworkPanel net,
             SynapseGroup synapseGroup) {
         super(net);
         this.synapseGroup = synapseGroup;
-        
+
     }
 
     @Override
     protected JDialog getPropertyDialog() {
-        return new SynapseGroupDialog(getNetworkPanel(), synapseGroup);
+        return SynapseGroupDialog.createSynapseGroupDialog(getNetworkPanel(),
+                synapseGroup);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     /**
      * Returns default actions for a context menu.
-     *
+     * 
      * @return the default context menu
      */
     protected JPopupMenu getDefaultContextMenu() {
@@ -75,8 +74,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         // Edit
         Action editGroup = new AbstractAction("Edit Synapse Group...") {
             public void actionPerformed(final ActionEvent event) {
-                JDialog dialog = new SynapseGroupDialog(getNetworkPanel(),
-                        synapseGroup);
+                JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(
+                        getNetworkPanel(), synapseGroup);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -127,9 +126,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
             public void actionPerformed(final ActionEvent event) {
                 selectSynapses();
-                final SynapseAdjustmentPanel synapsePanel =
-                        new SynapseAdjustmentPanel(
-                                getNetworkPanel(),
+                final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
+                        .createSynapseAdjustmentPanel(getNetworkPanel(),
                                 synapseGroup.getSynapseList());
                 JDialog dialog = new JDialog();
                 dialog.setTitle("Adjust selected synapses");
@@ -137,11 +135,11 @@ public class SynapseGroupInteractionBox extends InteractionBox {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-//                dialog.addWindowListener(new WindowAdapter() {
-//                    public void windowClosing(WindowEvent e) {
-//                        synapsePanel.removeListeners();
-//                    }
-//                });
+                // dialog.addWindowListener(new WindowAdapter() {
+                // public void windowClosing(WindowEvent e) {
+                // synapsePanel.removeListeners();
+                // }
+                // });
             }
         };
         menu.add(adjustSynapses);
@@ -174,7 +172,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
                         new NetworkEvent<Group>(
                                 synapseGroup.getParentNetwork(), synapseGroup,
                                 synapseGroup),
-                                SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
+                        SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED);
                 tsvCheckBox.setSelected(synapseGroup.isDisplaySynapses());
             }
         };
@@ -244,8 +242,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager
-                    .getImageIcon("RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
             putValue(NAME, "Remove Group...");
             putValue(SHORT_DESCRIPTION, "Remove synapse group...");
         }
@@ -259,9 +256,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     /**
      * Sets whether the freezing actions are enabled based on whether the
      * synapses are all frozen or not.
-     *
+     * 
      * If all synapses are frozen already, then "freeze synapses" is disabled.
-     *
+     * 
      * If all synapses are unfrozen already, then "unfreeze synapses" is
      * disabled.
      */
@@ -312,10 +309,10 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * two things here, (1) a property of synapses whereby the let current pass
      * or not and (2) a property of swing actions where being disabled means
      * being grayed out and unusable.
-     *
+     * 
      * If all synapses are enabled already, then the "enable synapses" action is
      * disabled.
-     *
+     * 
      * If all synapses are disabled already, then the "disable synapses" actions
      * is disabled.
      */
@@ -333,8 +330,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Enable Synapses");
             putValue(SHORT_DESCRIPTION,
-                    "Enable all synapses in this group (allow activation " +
-                    "to pass through synapses)");
+                    "Enable all synapses in this group (allow activation "
+                            + "to pass through synapses)");
         }
 
         @Override
@@ -351,10 +348,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         {
             // putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
             putValue(NAME, "Disable Synapses");
-            putValue(
-                    SHORT_DESCRIPTION,
-                    "Disable all synapses in this group (don't allow " +
-                    "activation to pass through synapses)");
+            putValue(SHORT_DESCRIPTION,
+                    "Disable all synapses in this group (don't allow "
+                            + "activation to pass through synapses)");
         }
 
         @Override

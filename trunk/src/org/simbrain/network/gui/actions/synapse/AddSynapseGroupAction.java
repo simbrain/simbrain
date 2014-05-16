@@ -26,7 +26,6 @@ import javax.swing.JDialog;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 
 /**
@@ -39,8 +38,9 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new neuron action with the specified network panel.
-     *
-     * @param networkPanel network panel, must not be null
+     * 
+     * @param networkPanel
+     *            network panel, must not be null
      */
     public AddSynapseGroupAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Connect Neuron Groups with Synapse Group...",
@@ -62,16 +62,18 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
     }
 
     /**
-     * Display the add synapse group dialog. Assumes the enabling condition
-     * (at least one source and target neuron group designated) is in effect.
-     *
-     * @param networkPanel the network panel in which to add the group.
+     * Display the add synapse group dialog. Assumes the enabling condition (at
+     * least one source and target neuron group designated) is in effect.
+     * 
+     * @param networkPanel
+     *            the network panel in which to add the group.
      */
     public static void displaySynapseGroupDialog(NetworkPanel networkPanel) {
         // Placed as a separate method since it is reused elsewhere.
         NeuronGroup src = networkPanel.getSourceModelGroups().get(0);
         NeuronGroup tar = networkPanel.getSelectedModelNeuronGroups().get(0);
-        JDialog dialog = new SynapseGroupDialog(networkPanel, src, tar);
+        JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(
+                networkPanel, src, tar);
         dialog.setLocationRelativeTo(null);
         dialog.pack();
         dialog.setVisible(true);

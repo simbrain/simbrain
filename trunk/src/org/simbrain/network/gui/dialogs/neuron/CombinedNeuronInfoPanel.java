@@ -35,12 +35,11 @@ import org.simbrain.util.widgets.EditablePanel;
  * The basic neuron info panel and neuron update settings panel are frequently
  * used together and depend on each other. This panel combines the two and
  * handles changes to one being applied to the other.
- *
+ * 
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class CombinedNeuronInfoPanel extends JPanel
-    implements EditablePanel {
+public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * The default vertical gap between the basic neuron info panel and the
@@ -61,52 +60,120 @@ public class CombinedNeuronInfoPanel extends JPanel
     private NeuronUpdateSettingsPanel updateInfoPanel;
 
     /**
-     * The initial display state of the neuron update rule panel in
-     * {@link #updateInfoPanel}.
+     * Creates a combined neuron info panel, which includes the basic neuron
+     * info panel and a neuron update settings panel. The panel is automatically
+     * built and laid out, such that it is immediately ready for display.
+     * 
+     * @param neuronList
+     *            the list of neurons either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
      */
-    private boolean nuspExtendedDisplay = DEFAULT_NUSP_DISPLAY_STATE;
-
-    /**
-     * Constructs a combined neuron info panel, which includes the basic neuron
-     * info panel and a neuron update settings panel. The constructor
-     * automatically builds and lays out the panel, such that it is immediately
-     * ready for display. The nusp (neuron update settings panel)'s display
-     * state is that extra data is by default hidden. This constructor adheres
-     * to that behavior.
-     * @param neuronList the list of neurons either being edited (editing) or
-     * being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
-     */
-    public CombinedNeuronInfoPanel(List<Neuron> neuronList, Window parent) {
-        neuroninfoPanel = new BasicNeuronInfoPanel(neuronList, parent);
-        updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
-                nuspExtendedDisplay);
-        initializeLayout();
-        addListeners();
+    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+            final List<Neuron> neuronList, final Window parent) {
+        return createCombinedNeuronInfoPanel(neuronList, parent,
+                DEFAULT_NUSP_DISPLAY_STATE);
     }
 
     /**
-     * Constructs a combined neuron info panel, which includes the basic neuron
-     * info panel and a neuron update settings panel. The constructor
-     * automatically builds and lays out the panel, such that it is immediately
-     * ready for display. The nusp (neuron update settings panel)'s display
-     * state is that extra data is by default hidden. This constructor allows
-     * this behavior to be set manually.
-     *
-     * @param neuronList the list of neurons either being edited (editing) or
-     * being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
-     * @param nuspExtendedDisplay whether or not to display the neuron update
-     * rule's details initially
+     * Creates a combined neuron info panel, which includes the basic neuron
+     * info panel and a neuron update settings panel. The panel is automatically
+     * built and laid out, such that it is immediately ready for display. The
+     * nusp (neuron update settings panel)'s display state is that extra data is
+     * by default hidden.
+     * 
+     * @param neuronList
+     *            the list of neurons either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param nuspExtendedDisplay
+     *            whether or not to display the neuron update rule's details
+     *            initially
      */
-    public CombinedNeuronInfoPanel(List<Neuron> neuronList, Window parent,
-            boolean nuspExtendedDisplay) {
-        this.nuspExtendedDisplay = nuspExtendedDisplay;
-        neuroninfoPanel = new BasicNeuronInfoPanel(neuronList, parent);
+    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+            final List<Neuron> neuronList, final Window parent,
+            final boolean nuspExtendedDisplay) {
+        CombinedNeuronInfoPanel cnip = new CombinedNeuronInfoPanel(neuronList,
+                parent, nuspExtendedDisplay);
+        cnip.initializeLayout();
+        cnip.addListeners();
+        return cnip;
+    }
+
+    /**
+     * Creates a combined neuron info panel, which includes the basic neuron
+     * info panel and a neuron update settings panel. The panel is automatically
+     * built and laid out, such that it is immediately ready for display. The
+     * nusp (neuron update settings panel)'s display state is that extra data is
+     * by default hidden. It is incomprehensible to set displayIDInfo to true if
+     * multiple neurons are going to be displayed. This is here for cases where
+     * the number of neurons is itself a variable and normally ID information
+     * would be displayed because there is only one neuron in the list.
+     * 
+     * @param neuronList
+     *            the list of neurons either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param nuspExtendedDisplay
+     *            whether or not to display the neuron update
+     * @param displayIDInfo
+     *            manually sets whether or not neuron id information is
+     *            displayed. rule's details initially
+     */
+    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+            final List<Neuron> neuronList, final Window parent,
+            final boolean nuspExtendedDisplay, final boolean displayIDInfo) {
+        CombinedNeuronInfoPanel cnip = new CombinedNeuronInfoPanel(neuronList,
+                parent, nuspExtendedDisplay, displayIDInfo);
+        cnip.initializeLayout();
+        cnip.addListeners();
+        return cnip;
+    }
+
+    /**
+     * {@link #createCombinedNeuronInfoPanel(List, Window, boolean)}
+     * 
+     * @param neuronList
+     *            the list of neurons either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param nuspExtendedDisplay
+     *            whether or not to display the neuron update rule's details
+     *            initially
+     */
+    private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
+            final Window parent, final boolean nuspExtendedDisplay) {
+        neuroninfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+                neuronList, parent);
         updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
                 nuspExtendedDisplay);
-        initializeLayout();
-        addListeners();
+    }
+
+    /**
+     * {@link #createCombinedNeuronInfoPanel(List, Window, boolean, boolean)}
+     * 
+     * @param neuronList
+     *            the list of neurons either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param nuspExtendedDisplay
+     *            whether or not to display the neuron update
+     * @param displayIDInfo
+     *            manually sets whether or not neuron id information is
+     *            displayed. rule's details initially
+     */
+    private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
+            final Window parent, final boolean nuspExtendedDisplay,
+            final boolean displayIDInfo) {
+        neuroninfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+                neuronList, parent, displayIDInfo);
+        updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
+                nuspExtendedDisplay);
     }
 
     /**
@@ -129,7 +196,6 @@ public class CombinedNeuronInfoPanel extends JPanel
     private void addListeners() {
         updateInfoPanel.getCbNeuronType().addActionListener(
                 new ActionListener() {
-
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
 
@@ -139,19 +205,18 @@ public class CombinedNeuronInfoPanel extends JPanel
                                 AbstractNeuronPanel np = updateInfoPanel
                                         .getNeuronPanel();
                                 neuroninfoPanel.getExtraDataPanel()
-                                    .fillDefaultValues(np.getPrototypeRule());
+                                        .fillDefaultValues(
+                                                np.getPrototypeRule());
                                 repaint();
                             }
                         });
                     }
                 });
-
     }
 
     /**
-     * {@inheritDoc}
-     * <b>Specifically:</b> Commits changes in the basic neuron info panel and
-     * the neuron update settings panel.
+     * {@inheritDoc} <b>Specifically:</b> Commits changes in the basic neuron
+     * info panel and the neuron update settings panel.
      */
     @Override
     public boolean commitChanges() {
@@ -170,9 +235,10 @@ public class CombinedNeuronInfoPanel extends JPanel
 
     }
 
-    /*/CHECKSTYLE:OFF**************************************
-     *              Getters and Setters                   *
-     ******************************************************/
+    /*
+     * /CHECKSTYLE:OFF************************************** Getters and Setters
+     * *****************************************************
+     */
 
     /**
      * {@inheritDoc}

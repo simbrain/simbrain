@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 /**
  * A panel for setting the neuron type and changing the parameters of the
  * selected update rule.
- *
+ * 
  * @author ztosi
  * @author jyoshimi
  */
@@ -96,9 +96,11 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * Create a the panel with the default starting visibility (visible) for the
      * neuron panel.
-     *
-     * @param neuronList the list of neurons being edited
-     * @param parent the parent window referenced for resizing purposes
+     * 
+     * @param neuronList
+     *            the list of neurons being edited
+     * @param parent
+     *            the parent window referenced for resizing purposes
      */
     public NeuronUpdateSettingsPanel(List<Neuron> neuronList, Window parent) {
         this(neuronList, parent, DEFAULT_NP_DISPLAY_STATE);
@@ -106,11 +108,14 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
 
     /**
      * Create the panel with specified starting visibility.
-     *
-     * @param neuronList the list of neurons being edited
-     * @param parent the parent window referenced for resizing purposes
-     * @param startingState the starting state of whether or not details of the
-     *            rule are initially visible
+     * 
+     * @param neuronList
+     *            the list of neurons being edited
+     * @param parent
+     *            the parent window referenced for resizing purposes
+     * @param startingState
+     *            the starting state of whether or not details of the rule are
+     *            initially visible
      */
     public NeuronUpdateSettingsPanel(List<Neuron> neuronList, Window parent,
             boolean startingState) {
@@ -119,7 +124,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
         ruleMap = AbstractNeuronPanel.RULE_MAP;
         cbNeuronType = new JComboBox<String>(AbstractNeuronPanel.getRulelist());
         displayNPTriangle = new DropDownTriangle(UpDirection.LEFT,
-                !startingState, "Settings", "Settings", parent);
+                startingState, "Settings", "Settings", parent);
         initNeuronType();
         startingPanel = neuronPanel;
         initializeLayout();
@@ -219,6 +224,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
                 neuronPanel.setReplace(replace);
 
                 repaintPanel();
+                repaint();
                 parent.pack();
             }
 
@@ -232,7 +238,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     @Override
     public boolean commitChanges() {
         neuronPanel.commitChanges(neuronList);
-        return true; //TODO:Finish implementation of CommittablePanel interface
+        return true; // TODO:Finish implementation of CommittablePanel interface
     }
 
     /**
@@ -269,7 +275,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * Directly access the neuron panel to utilize its methods without using
      * this class as an intermediary. An example of this can be seen in
-     *
+     * 
      * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
      * @return the currently displayed neuron update rule panel
      */
@@ -278,7 +284,8 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     }
 
     /**
-     * @param neuronPanel the desired neuron update rule panel to be displayed
+     * @param neuronPanel
+     *            the desired neuron update rule panel to be displayed
      */
     public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
         this.neuronPanel = neuronPanel;
@@ -302,10 +309,9 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * An empty panel displayed in cases where the selected neurons have more
      * than one type of update rule.
-     *
+     * 
      * @author ztosi
      */
-    @SuppressWarnings("serial")
     private class EmptyRulePanel extends AbstractNeuronPanel {
 
         @Override
@@ -334,10 +340,5 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
         }
 
     }
-
-    @Override
-    public void fillFieldValues() {
-    }
-
 
 }

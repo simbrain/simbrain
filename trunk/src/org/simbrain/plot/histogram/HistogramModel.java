@@ -14,19 +14,21 @@ package org.simbrain.plot.histogram;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jfree.data.xy.IntervalXYDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.plot.histogram.OverwritableHistogramDataset.SeriesStruct;
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
  * arrays, one array per histogram. The histograms are represented by different
  * colors in HistogramPanel. The JFreeChart dataset is also stored here.
- *
+ * 
  * @author Zach Tosi
  * @author Jeff Yoshimi
- *
+ * 
  */
 public class HistogramModel extends ChartModel {
 
@@ -61,8 +63,9 @@ public class HistogramModel extends ChartModel {
 
     /**
      * Creates a histogram with no data and a specified number of datsets.
-     *
-     * @param numdsources number of datasets to add
+     * 
+     * @param numdsources
+     *            number of datasets to add
      */
     public HistogramModel(int numdsources) {
         this.addDataSources(numdsources);
@@ -73,10 +76,13 @@ public class HistogramModel extends ChartModel {
      * Creates a histogram with the provided number of bins, data set(s), and
      * data name(s), but does not include titles for the histogram, the x axis
      * or the y axis.
-     *
-     * @param data the data set(s) to be plotted
-     * @param dataNames the name(s) of the data set(s)
-     * @param bins the number of bins used in the histogram
+     * 
+     * @param data
+     *            the data set(s) to be plotted
+     * @param dataNames
+     *            the name(s) of the data set(s)
+     * @param bins
+     *            the number of bins used in the histogram
      */
     public HistogramModel(List<Number[]> data, List<String> dataNames, int bins) {
         this(data, dataNames, bins, "", "", "");
@@ -85,13 +91,19 @@ public class HistogramModel extends ChartModel {
     /**
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
-     *
-     * @param data the data set(s) to be plotted
-     * @param dataNames the name(s) of the data set(s)
-     * @param bins the number of bins used in the histogram
-     * @param title the title of the histogram
-     * @param xAxisName the title of the x axis
-     * @param yAxisName the title of the y axis
+     * 
+     * @param data
+     *            the data set(s) to be plotted
+     * @param dataNames
+     *            the name(s) of the data set(s)
+     * @param bins
+     *            the number of bins used in the histogram
+     * @param title
+     *            the title of the histogram
+     * @param xAxisName
+     *            the title of the x axis
+     * @param yAxisName
+     *            the title of the y axis
      */
     public HistogramModel(List<Number[]> data, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName) {
@@ -101,14 +113,21 @@ public class HistogramModel extends ChartModel {
     /**
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
-     *
-     * @param newData the data set(s) to be plotted
-     * @param dataNames the name(s) of the data set(s)
-     * @param bins the number of bins used in the histogram
-     * @param title the title of the histogram
-     * @param xAxisName the title of the x axis
-     * @param yAxisName the title of the y axis
-     * @param colorPallet a custom color pallete
+     * 
+     * @param newData
+     *            the data set(s) to be plotted
+     * @param dataNames
+     *            the name(s) of the data set(s)
+     * @param bins
+     *            the number of bins used in the histogram
+     * @param title
+     *            the title of the histogram
+     * @param xAxisName
+     *            the title of the x axis
+     * @param yAxisName
+     *            the title of the y axis
+     * @param colorPallet
+     *            a custom color pallete
      */
     public HistogramModel(List<Number[]> newData, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName,
@@ -125,7 +144,7 @@ public class HistogramModel extends ChartModel {
 
         for (int i = 0, n = data.size(); i < n; i++) {
             if (data.get(i).length != 0) {
-                ((OverwritableHistogramDataset) dataSet).overwriteSeries(i,
+                ((OverwritableHistogramDataset) dataSet).overwriteSeries(
                         dataNames.get(i), data.get(i), getBins());
             }
 
@@ -137,9 +156,11 @@ public class HistogramModel extends ChartModel {
      * Add data to a specified data series. This is the main method used to
      * dynamically add data when the histogram is used as a plot component.
      * Called via reflection from HistogramComponent.
-     *
-     * @param index data index
-     * @param histData the data to add at that index
+     * 
+     * @param index
+     *            data index
+     * @param histData
+     *            the data to add at that index
      */
     public void addData(Number[] histData, Integer index) {
         data.remove(index.intValue());
@@ -151,52 +172,34 @@ public class HistogramModel extends ChartModel {
      * Re-add the data.
      */
     public void redraw() {
-        for (int i = 0; i < data.size(); i++) {
-            // System.out.println(i + ":" + Utils.getVectorString(data.get(i),
-            // ","));
-            // System.out.println(i + ":" + dataNames.get(i));
-            ((OverwritableHistogramDataset) dataSet).overwriteSeries(i,
-                    dataNames.get(i), data.get(i), getBins());
-        }
+        dataSet.conformToNewParams(dataNames, data, bins);
     }
 
     /**
-     * @param data the data to set
+     * @param data
+     *            the data to set
      */
     public void resetData(List<Number[]> data, List<String> names) {
         this.data = data;
         this.dataNames = names;
         redraw();
     }
-    
-//  TODO: Review for removal, Unused.
-//    /**
-//     * Replaces data names with blank strings. A bit of a hack needed because
-//     * there is no way currently to dynamically change the labels of the
-//     * datasets.
-//     */
-//    private void resetDataNames() {
-//        // Replace names with blank strings
-//        for (int i = 0; i < dataNames.size(); i++) {
-//            dataNames.remove(i);
-//            dataNames.add(i, "---");
-//        }
-//    }
 
     /**
      * Clears the data. Currently just adds a single vector to each data source.
      */
     public void resetData() {
-        for (int i = 0; i < data.size(); i++) {
-            addData(new Number[] { 0 }, i);
-        }
+        data.clear();
+        dataNames.clear();
+        dataSet.conformToNewParams(dataNames, data, bins);
     }
 
     /**
      * Create specified number of set of data sources. Adds these two existing
      * data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
+     * 
+     * @param numDataSources
+     *            number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
         for (int i = 0; i < numDataSources; i++) {
@@ -218,8 +221,9 @@ public class HistogramModel extends ChartModel {
     /**
      * Sets the number of bins. Also automatically updates the number of bins
      * text field, but does NOT redraw the histogram.
-     *
-     * @param bins the new number of bins
+     * 
+     * @param bins
+     *            the new number of bins
      */
     public void setBins(int bins) {
         this.bins = bins;
@@ -230,6 +234,18 @@ public class HistogramModel extends ChartModel {
      */
     public List<Number[]> getData() {
         return data;
+    }
+
+    public void setSeriesColor(String name, Color c) {
+        dataSet.setSeriesColor(name, c);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Collection<SeriesStruct> getSeriesData() {
+        return dataSet.getSeriesStructs();
     }
 
     /**

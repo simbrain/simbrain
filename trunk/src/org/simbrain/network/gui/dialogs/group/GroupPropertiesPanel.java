@@ -22,9 +22,9 @@ import org.simbrain.util.widgets.EditablePanel;
  * group, hence the interface. Also there is a generic neuron group dialog, with
  * a tab for properties specific to a given type of group: that tab refers only
  * to this interface.
- *
+ * 
  * @author Jeff Yoshimi
- *
+ * 
  */
 public interface GroupPropertiesPanel extends EditablePanel {
 
@@ -36,7 +36,7 @@ public interface GroupPropertiesPanel extends EditablePanel {
     /**
      * Returns a string path to the documentation page for this group, relative
      * to the top level Simbrain/doc directory.
-     *
+     * 
      * @return the path to the docs
      */
     String getHelpPath();

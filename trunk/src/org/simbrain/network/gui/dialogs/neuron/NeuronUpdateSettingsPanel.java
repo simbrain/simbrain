@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 /**
  * A panel for setting the neuron type and changing the parameters of the
  * selected update rule.
- * 
+ *
  * @author ztosi
  * @author jyoshimi
  */
@@ -96,7 +96,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * Create a the panel with the default starting visibility (visible) for the
      * neuron panel.
-     * 
+     *
      * @param neuronList
      *            the list of neurons being edited
      * @param parent
@@ -108,7 +108,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
 
     /**
      * Create the panel with specified starting visibility.
-     * 
+     *
      * @param neuronList
      *            the list of neurons being edited
      * @param parent
@@ -275,7 +275,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * Directly access the neuron panel to utilize its methods without using
      * this class as an intermediary. An example of this can be seen in
-     * 
+     *
      * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
      * @return the currently displayed neuron update rule panel
      */
@@ -309,7 +309,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
     /**
      * An empty panel displayed in cases where the selected neurons have more
      * than one type of update rule.
-     * 
+     *
      * @author ztosi
      */
     private class EmptyRulePanel extends AbstractNeuronPanel {
@@ -339,6 +339,10 @@ public class NeuronUpdateSettingsPanel extends JPanel implements
         protected void writeValuesToRules(List<Neuron> neurons) {
         }
 
+    }
+
+    @Override
+    public void fillFieldValues() {
     }
 
 }

@@ -52,7 +52,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for editing synapse groups.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
@@ -113,7 +113,7 @@ public class SynapseGroupDialog extends StandardDialog {
      * Creates a synapse group dialog based on a source and target neuron group.
      * This should be used when the synapse group being "edited" doesn't exist
      * yet, i.e. it's being created from the parameters in this panel.
-     * 
+     *
      * @param np
      *            the network panel
      * @param src
@@ -135,7 +135,7 @@ public class SynapseGroupDialog extends StandardDialog {
      * Creates a synapse group dialog based on a given synapse group it goes
      * without saying that this means this dialog will be editing the given
      * synapse group.
-     * 
+     *
      * @param np
      *            the network panel
      * @param sg
@@ -152,7 +152,7 @@ public class SynapseGroupDialog extends StandardDialog {
 
     /**
      * Create a new synapse group connecting the indicated neuron groups.
-     * 
+     *
      * @param src
      *            source neuron group
      * @param tar
@@ -171,7 +171,7 @@ public class SynapseGroupDialog extends StandardDialog {
 
     /**
      * Construct the Synapse group dialog.
-     * 
+     *
      * @param np
      *            Parent network panel
      * @param sg
@@ -197,6 +197,7 @@ public class SynapseGroupDialog extends StandardDialog {
 
         // Generic group properties
         JScrollPane mainScrollWrap = new JScrollPane(tabMain);
+        mainScrollWrap.setBorder(null);
         storedComponents.add(mainScrollWrap);
         // This is the only tab that isn't passed an empty panel because it
         // is the first tab displayed.
@@ -240,22 +241,26 @@ public class SynapseGroupDialog extends StandardDialog {
                 editSynapses.add(editSpikeResponders);
             }
         }
-        editSynapses.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        storedComponents.add(new JScrollPane(editSynapses));
+        JScrollPane editSynapseScrollPane = new JScrollPane(editSynapses);
+        editSynapseScrollPane.setBorder(null);
+        storedComponents.add(editSynapseScrollPane);
         tabbedPane.addTab("Edit Synapses", new JPanel());
 
         if (!isCreationPanel) {
             // Synapse Adjustment Panel
-            storedComponents.add(new JScrollPane(tabAdjust));
+            JScrollPane adjustSynScrollPane = new JScrollPane(tabAdjust);
+            adjustSynScrollPane.setBorder(null);
+            storedComponents.add(adjustSynScrollPane);
             tabAdjust.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             tabbedPane.addTab("Adjust weights", new JPanel());
             tabAdjust.add(SynapseAdjustmentPanel.createSynapseAdjustmentPanel(
                     networkPanel, synapseGroup.getSynapseList()));
 
             // Weight Matrix
-            tabMatrix.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            storedComponents.add(new JScrollPane(tabMatrix));
+            JScrollPane matrixScrollPane = new JScrollPane(tabMatrix);
+            matrixScrollPane.setBorder(null);
+            storedComponents.add(matrixScrollPane);
             tabbedPane.addTab("Matrix", new JPanel());
             tabMatrix.add(WeightMatrixViewer
                     .getWeightMatrixPanel(new WeightMatrixViewer(synapseGroup
@@ -267,8 +272,16 @@ public class SynapseGroupDialog extends StandardDialog {
         Action helpAction;
         helpAction = new ShowHelpAction("Pages/Network/groups.html");
         addButton(new JButton(helpAction));
+
+        // Make this dialog based on a done button, rather than ok and cancel.
+        // All edits are done with apply
+        setAsDoneDialog();
+
     }
 
+    /**
+     * Add listeners.
+     */
     private void addListeners() {
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override

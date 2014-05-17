@@ -36,7 +36,7 @@ public class NeuronGroupCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param panel
      *            the parent network panel
      */

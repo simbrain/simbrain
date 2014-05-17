@@ -55,7 +55,7 @@ import org.simbrain.util.math.SimbrainMath;
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
  * outlined objects (neuron nodes) as children. Compare {@link SubnetworkNode}.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class NeuronGroupNode extends PNode implements PropertyChangeListener {
@@ -123,7 +123,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Create a Neuron Group PNode.
-     * 
+     *
      * @param networkPanel
      *            parent panel
      * @param group
@@ -145,7 +145,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param port
      * @param synGN
      * @return
@@ -185,7 +185,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param port
      * @param groups
      */
@@ -301,7 +301,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param dockPoints
      * @param groups
      * @param port
@@ -392,7 +392,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param origins
      * @param synGroups
      */
@@ -470,7 +470,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param synGN
      * @return
      */
@@ -491,7 +491,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     }
 
     /**
-     * 
+     *
      * @param synGroups
      * @return
      */
@@ -549,7 +549,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Get a reference to the underlying neuron group.
-     * 
+     *
      * @return reference to the neuron group.
      */
     public NeuronGroup getNeuronGroup() {
@@ -558,7 +558,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Add a custom menu item to the list.
-     * 
+     *
      * @param item
      *            the custom item to add
      */
@@ -605,7 +605,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Helper class to create the neuron group property dialog (since it is
      * needed in two places.)
-     * 
+     *
      * @return the neuron group property dialog.
      */
     private StandardDialog getPropertyDialog() {
@@ -629,7 +629,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Returns default actions for a context menu.
-     * 
+     *
      * @return the default context menu
      */
     public JPopupMenu getDefaultContextMenu() {
@@ -779,7 +779,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
     /**
      * Set a custom interaction box.
-     * 
+     *
      * @param interactionBox
      *            the interactionBox to set.
      */
@@ -808,7 +808,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Set at the workspace level by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     * 
+     *
      * @param consumerMenu
      *            the consumerMenu to set
      */
@@ -826,7 +826,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Set at the workspace level by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     * 
+     *
      * @param producerMenu
      *            the producerMenu to set
      */
@@ -864,9 +864,9 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     /**
      * Sets whether the clamping actions are enabled based on whether the
      * neurons are all clamped or not.
-     * 
+     *
      * If all neurons are clamped already, then "clamp neurons" is disabled.
-     * 
+     *
      * If all neurons are unclamped already, then "unclamp neurons" is disabled.
      */
     private void setClampActionsEnabled() {

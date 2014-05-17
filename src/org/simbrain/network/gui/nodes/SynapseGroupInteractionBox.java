@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.nodes;
 
 import java.awt.event.ActionEvent;
@@ -24,14 +42,19 @@ import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 
+/**
+ * Interaction box for synapse groups.
+ */
 public class SynapseGroupInteractionBox extends InteractionBox {
 
+    /** Reference to underlying synapse group. */
     private final SynapseGroup synapseGroup;
 
     /**
-     * Construct the custom interaction box
-     * 
+     * Construct the custom interaction box.
+     *
      * @param net
      *            parent network panel
      */
@@ -65,7 +88,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     /**
      * Returns default actions for a context menu.
-     * 
+     *
      * @return the default context menu
      */
     protected JPopupMenu getDefaultContextMenu() {
@@ -74,8 +97,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         // Edit
         Action editGroup = new AbstractAction("Edit Synapse Group...") {
             public void actionPerformed(final ActionEvent event) {
-                JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(
-                        getNetworkPanel(), synapseGroup);
+                StandardDialog dialog = SynapseGroupDialog
+                        .createSynapseGroupDialog(getNetworkPanel(),
+                                synapseGroup);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -256,9 +280,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     /**
      * Sets whether the freezing actions are enabled based on whether the
      * synapses are all frozen or not.
-     * 
+     *
      * If all synapses are frozen already, then "freeze synapses" is disabled.
-     * 
+     *
      * If all synapses are unfrozen already, then "unfreeze synapses" is
      * disabled.
      */
@@ -309,10 +333,10 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * two things here, (1) a property of synapses whereby the let current pass
      * or not and (2) a property of swing actions where being disabled means
      * being grayed out and unusable.
-     * 
+     *
      * If all synapses are enabled already, then the "enable synapses" action is
      * disabled.
-     * 
+     *
      * If all synapses are disabled already, then the "disable synapses" actions
      * is disabled.
      */

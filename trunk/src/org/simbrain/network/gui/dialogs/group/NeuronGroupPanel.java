@@ -407,15 +407,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 if (numNeurons < 1) {
                     throw new NumberFormatException();
                 }
-                if (numNeurons >= NeuronGroup.DEFAULT_GROUP_SIZE) {
-                    for (int i = NeuronGroup.DEFAULT_GROUP_SIZE; i < numNeurons; i++) {
-                        neuronGroup.addNeuron(template.deepCopy());
-                    }
-                } else {
-                    while (neuronGroup.getNeuronList().size() > numNeurons) {
-                        neuronGroup.getNeuronList().remove(
-                                neuronGroup.getNeuronList().size() - 1);
-                    }
+                for (int i = 0; i < numNeurons; i++) {
+                    neuronGroup.addNeuron(template.deepCopy());
                 }
                 neuronGroup.setLayout(layoutPanel.getCurrentLayout());
                 neuronGroup.applyLayout();

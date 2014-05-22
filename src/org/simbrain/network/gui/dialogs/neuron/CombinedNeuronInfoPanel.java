@@ -205,7 +205,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
                                 AbstractNeuronPanel np = updateInfoPanel
                                         .getNeuronPanel();
                                 neuronInfoPanel.getExtraDataPanel()
-                                        .updateFields(
+                                        .updateFieldVisibility(
                                                 np.getPrototypeRule());
                                 repaint();
                             }

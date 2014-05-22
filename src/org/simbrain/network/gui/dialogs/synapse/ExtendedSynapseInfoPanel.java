@@ -28,18 +28,19 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
+ * Panel which displays the specific parameters of a particular synapse
+ * learning rule.
  *
- * @author ztosi
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
  *
  */
 public class ExtendedSynapseInfoPanel extends JPanel {
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
 
     /** Freeze synapse field. */
     private TristateDropDown frozenDD = new TristateDropDown();
@@ -101,7 +102,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         // Handle Upper Bound
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
                 "getUpperBound")) {
-            tfUpBound.setText(NULL_STRING);
+            tfUpBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         }
@@ -109,7 +110,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         // Handle Lower Bound
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
                 "getLowerBound")) {
-            tfLowBound.setText(NULL_STRING);
+            tfLowBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         }
@@ -117,14 +118,14 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         // Handle Increment
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
                 "getIncrement")) {
-            tfIncrement.setText(NULL_STRING);
+            tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         }
 
         // Handle Delay
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
-            tfDelay.setText(NULL_STRING);
+            tfDelay.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfDelay.setText(Integer.toString(synapseRef.getDelay()));
         }

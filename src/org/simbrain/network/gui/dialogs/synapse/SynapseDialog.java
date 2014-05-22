@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.Box;
@@ -69,10 +68,10 @@ public class SynapseDialog extends StandardDialog {
     private final SpikeResponderSettingsPanel responderPanel;
 
     /**
-     * A boolean value to store the results of {@link #containsASpikeResponder(List)}
-     * which determines whether or not a spike responder panel should be
-     * displayed based on the update rules used by the presynaptic neurons to
-     * the synapses being edited.
+     * A boolean value to store the results of
+     * {@link #containsASpikeResponder(List)} which determines whether or not a
+     * spike responder panel should be displayed based on the update rules used
+     * by the presynaptic neurons to the synapses being edited.
      */
     private final boolean usesSpikeResponders;
 
@@ -185,7 +184,8 @@ public class SynapseDialog extends StandardDialog {
      */
     public void commitChanges() {
 
-        infoPanel.commitChanges(synapseList);
+        infoPanel.commitChanges(); // TODO: Will this work without a
+                                   // synapseList?
 
         // Now commit changes specific to the synapse type
         updatePanel.getSynapsePanel().commitChanges(synapseList);
@@ -217,29 +217,36 @@ public class SynapseDialog extends StandardDialog {
      */
     public static boolean containsASpikeResponder(List<Synapse> synapses) {
         for (Synapse s : synapses) {
-            NeuronUpdateRule nur = s.getSource().getUpdateRule();
-            if (nur instanceof SpikingNeuronUpdateRule) {
-                return true;
+            if (s.getSource() == null) {
+                // If "free-floating" synapses are found then treat the list as not
+                // having spike responders (possibly change later);
+                return false;
+            } else {
+                NeuronUpdateRule nur = s.getSource().getUpdateRule();
+                if (nur instanceof SpikingNeuronUpdateRule) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
     // Old version of test that required all synapses were spike responders
-    //    public static boolean spikeResponderTest(List<Synapse> synapses) {
-    //        HashSet<SpikingNeuronUpdateRule> snurs = new HashSet<SpikingNeuronUpdateRule>();
-    //        for (Synapse s : synapses) {
-    //            NeuronUpdateRule nur = s.getSource().getUpdateRule();
-    //            if (!snurs.contains(nur)) {
-    //                if (!(nur instanceof SpikingNeuronUpdateRule)) {
-    //                    return false;
-    //                } else {
-    //                    snurs.add((SpikingNeuronUpdateRule) nur);
-    //                }
-    //            }
-    //        }
-    //        return true;
-    //    }
+    // public static boolean spikeResponderTest(List<Synapse> synapses) {
+    // HashSet<SpikingNeuronUpdateRule> snurs = new
+    // HashSet<SpikingNeuronUpdateRule>();
+    // for (Synapse s : synapses) {
+    // NeuronUpdateRule nur = s.getSource().getUpdateRule();
+    // if (!snurs.contains(nur)) {
+    // if (!(nur instanceof SpikingNeuronUpdateRule)) {
+    // return false;
+    // } else {
+    // snurs.add((SpikingNeuronUpdateRule) nur);
+    // }
+    // }
+    // }
+    // return true;
+    // }
 
     // /**
     // * Test Main: For fast prototyping.

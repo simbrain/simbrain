@@ -21,13 +21,10 @@ package org.simbrain.network.gui.dialogs.group;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -35,19 +32,16 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
-import org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel;
-import org.simbrain.network.gui.dialogs.synapse.SpikeResponderSettingsPanel;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.gui.dialogs.synapse.SynapseUpdateSettingsPanel;
+import org.simbrain.network.gui.dialogs.synapse.CombinedSynapseInfoPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.ApplyPanel;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
@@ -56,7 +50,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
-public class SynapseGroupDialog extends StandardDialog {
+public final class SynapseGroupDialog extends StandardDialog {
 
     /** Parent network panel. */
     private NetworkPanel networkPanel;
@@ -66,9 +60,6 @@ public class SynapseGroupDialog extends StandardDialog {
 
     /** Main tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /** General properties. */
-    private JPanel tabMain = new JPanel();
 
     /** Histogram tab. */
     private JPanel tabAdjust = new JPanel();
@@ -82,17 +73,11 @@ public class SynapseGroupDialog extends StandardDialog {
     /** Rate Field. */
     private final JTextField tfRateLabel = new JTextField();
 
-    /** Main properties panel. */
-    private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** Panel with basic neuron group info. */
+    private JPanel summaryInfoPanel;
 
-    /** Panel to edit synapse basic info. */
-    private BasicSynapseInfoPanel editBasicSynapseInfo;
-
-    /** Panel to edit synapse update rule. */
-    private SynapseUpdateSettingsPanel editSynapseType;
-
-    /** Panel to edit spike responders. */
-    private SpikeResponderSettingsPanel editSpikeResponders;
+    /** Panel for editing synapses in the group. */
+    private JPanel editSynapsesPanel;
 
     /** If true this is a creation panel. Otherwise it is an edit panel. */
     private boolean isCreationPanel = false;
@@ -114,12 +99,9 @@ public class SynapseGroupDialog extends StandardDialog {
      * This should be used when the synapse group being "edited" doesn't exist
      * yet, i.e. it's being created from the parameters in this panel.
      *
-     * @param np
-     *            the network panel
-     * @param src
-     *            the source neuron group
-     * @param tar
-     *            the target neuron group
+     * @param np the network panel
+     * @param src the source neuron group
+     * @param tar the target neuron group
      * @return a synapse group dialog for creating a synapse group between the
      *         source and target neuron groups.
      */
@@ -136,10 +118,8 @@ public class SynapseGroupDialog extends StandardDialog {
      * without saying that this means this dialog will be editing the given
      * synapse group.
      *
-     * @param np
-     *            the network panel
-     * @param sg
-     *            the synapse group being edited
+     * @param np the network panel
+     * @param sg the synapse group being edited
      * @return a synapse group dialog which can edit the specified synapse group
      */
     public static SynapseGroupDialog createSynapseGroupDialog(
@@ -153,12 +133,9 @@ public class SynapseGroupDialog extends StandardDialog {
     /**
      * Create a new synapse group connecting the indicated neuron groups.
      *
-     * @param src
-     *            source neuron group
-     * @param tar
-     *            target neuron group
-     * @param np
-     *            parent panel
+     * @param src source neuron group
+     * @param tar target neuron group
+     * @param np parent panel
      */
     private SynapseGroupDialog(final NetworkPanel np, NeuronGroup src,
             NeuronGroup tar) {
@@ -172,10 +149,8 @@ public class SynapseGroupDialog extends StandardDialog {
     /**
      * Construct the Synapse group dialog.
      *
-     * @param np
-     *            Parent network panel
-     * @param sg
-     *            Synapse group being edited
+     * @param np Parent network panel
+     * @param sg Synapse group being edited
      */
     private SynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
         networkPanel = np;
@@ -195,58 +170,38 @@ public class SynapseGroupDialog extends StandardDialog {
         fillFieldValues();
         setContentPane(tabbedPane);
 
-        // Generic group properties
-        JScrollPane mainScrollWrap = new JScrollPane(tabMain);
-        mainScrollWrap.setBorder(null);
-        storedComponents.add(mainScrollWrap);
-        // This is the only tab that isn't passed an empty panel because it
-        // is the first tab displayed.
-        tabbedPane.addTab("Properties", mainScrollWrap);
-        tabMain.add(mainPanel);
-        if (!isCreationPanel) {
-            mainPanel.addItem("Id:", new JLabel(synapseGroup.getId()));
-        }
-        tabMain.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        mainPanel.addItem("Label:", tfSynapseGroupLabel);
-        tfSynapseGroupLabel.setColumns(12);
-        // TODO: As more synapse group types are added generalize
-        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
-            mainPanel.addItem("Learning Rate:", tfRateLabel);
-        }
-
-        // Synapse edit tab
-        Box editSynapses = Box.createVerticalBox();
+        // Summary panel tab
         if (isCreationPanel) {
-            Synapse baseSynapse = Synapse.getTemplateSynapse();
-            editBasicSynapseInfo = new BasicSynapseInfoPanel(
-                    Collections.singletonList(baseSynapse), this);
-            editSynapseType = new SynapseUpdateSettingsPanel(
-                    Collections.singletonList(baseSynapse), this);
-            // Todo: make it possible to edit spike responders at creation time?
+            synapseGroup = new SynapseGroup(networkPanel.getNetwork(),
+                    sourceNeuronGroup, targetNeuronGroup);
+            summaryInfoPanel = new SummaryPanel(synapseGroup);
         } else {
-            editBasicSynapseInfo = new BasicSynapseInfoPanel(
-                    synapseGroup.getSynapseList(), this);
-            editSynapseType = new SynapseUpdateSettingsPanel(
-                    synapseGroup.getSynapseList(), this);
+            summaryInfoPanel = ApplyPanel.createApplyPanel(new SummaryPanel(
+                    synapseGroup));
         }
-        editSynapses.add(editBasicSynapseInfo);
-        editSynapses.add(editSynapseType);
-        // Set up spike responder panel if any of the synapses are spike
-        // responders
-        if (!isCreationPanel) {
-            if (SynapseDialog.containsASpikeResponder(synapseGroup
-                    .getSynapseList())) {
-                editSpikeResponders = new SpikeResponderSettingsPanel(
-                        synapseGroup.getSynapseList(), this);
-                editSynapses.add(editSpikeResponders);
-            }
-        }
+        JScrollPane summaryScrollWrapper = new JScrollPane(summaryInfoPanel);
+        summaryScrollWrapper.setBorder(null);
+        storedComponents.add(summaryScrollWrapper);
+        tabbedPane.addTab("Properties", summaryScrollWrapper);
 
-        JScrollPane editSynapseScrollPane = new JScrollPane(editSynapses);
+        // Tab for editing synapses
+        if (isCreationPanel) {
+            editSynapsesPanel = CombinedSynapseInfoPanel
+                    .createCombinedSynapseInfoPanel(
+                            synapseGroup.getSynapseList(), this);
+            // TODO: Make it possible to edit spike responders at creation time?
+        } else {
+            editSynapsesPanel = ApplyPanel
+                    .createApplyPanel(CombinedSynapseInfoPanel
+                            .createCombinedSynapseInfoPanel(
+                                    synapseGroup.getSynapseList(), this));
+        }
+        JScrollPane editSynapseScrollPane = new JScrollPane(editSynapsesPanel);
         editSynapseScrollPane.setBorder(null);
         storedComponents.add(editSynapseScrollPane);
         tabbedPane.addTab("Edit Synapses", new JPanel());
 
+        // Synapse Adjustment Panel and Weight Matrix Editor Tabs
         if (!isCreationPanel) {
             // Synapse Adjustment Panel
             JScrollPane adjustSynScrollPane = new JScrollPane(tabAdjust);
@@ -273,9 +228,11 @@ public class SynapseGroupDialog extends StandardDialog {
         helpAction = new ShowHelpAction("Pages/Network/groups.html");
         addButton(new JButton(helpAction));
 
-        // Make this dialog based on a done button, rather than ok and cancel.
-        // All edits are done with apply
-        setAsDoneDialog();
+        if (!isCreationPanel) {
+            // If editing, make this dialog based on a done button, rather than
+            // ok and cancel. All edits are done with apply
+            setAsDoneDialog();
+        }
 
     }
 
@@ -342,35 +299,21 @@ public class SynapseGroupDialog extends StandardDialog {
      */
     public void commitChanges() {
         if (isCreationPanel) {
-            synapseGroup = new SynapseGroup(networkPanel.getNetwork(),
-                    sourceNeuronGroup, targetNeuronGroup);
-            synapseGroup.setLabel(tfSynapseGroupLabel.getText());
-            editBasicSynapseInfo.commitChanges(synapseGroup.getSynapseList());
-            editSynapseType.getSynapsePanel().commitChanges(
-                    synapseGroup.getSynapseList());
+            // TODO: Use the return value on commit changes?
+            ((EditablePanel) summaryInfoPanel).commitChanges();
+            ((EditablePanel) editSynapsesPanel).commitChanges();
+            // TODO: Spike responders at creation time?
             networkPanel.getNetwork().addGroup(synapseGroup);
-        } else {
-            // editBasicSynapseInfo.commitChanges(synapseGroup.getSynapseList());
-            editSynapseType.getSynapsePanel().commitChanges(
-                    synapseGroup.getSynapseList());
-            if (editSpikeResponders != null) {
-                editSpikeResponders.getSpikeResponsePanel().commitChanges(
-                        synapseGroup.getSynapseList());
-            }
+            networkPanel.repaint();
         }
-
-        // Special case for synapse groups that have a learning rate
-        if (synapseGroup instanceof SynapseGroupWithLearningRate) {
-            ((SynapseGroupWithLearningRate) synapseGroup)
-                    .setLearningRate(Double.parseDouble(tfRateLabel.getText()));
-        }
-        networkPanel.repaint();
     }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        commitChanges();
+        if (isCreationPanel) {
+            commitChanges();
+        }
     }
 
 }

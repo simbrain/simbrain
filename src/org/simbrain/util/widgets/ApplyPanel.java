@@ -25,9 +25,9 @@ import javax.swing.JPanel;
 /**
  * A widget that contains an apply button, for cases when it should be possible
  * to immediately apply changes in an editing panel (as opposed to waiting to
- * press ok in the parent dialog). Implements {@link EditablePanel}, since
- * the apply can fail.
- * 
+ * press ok in the parent dialog). Implements {@link EditablePanel}, since the
+ * apply can fail.
+ *
  * @author ztosi
  */
 @SuppressWarnings("serial")
@@ -53,10 +53,10 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * A factory method to create an apply panel
-     * 
-     * @param mainPanel
-     * @return
+     * A factory method to create an apply panel.
+     *
+     * @param mainPanel the panel to wrap
+     * @return the wrapped apply panel
      */
     public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
         ApplyPanel ap = new ApplyPanel(mainPanel);
@@ -65,10 +65,9 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Constructs the apply panel. Requires a committable panel to wrap around.
-     * 
-     * @param mainPanel
-     *            the committable panel to which changes may be applied
+     * Constructs the apply panel. Requires an editable panel to wrap around.
+     *
+     * @param mainPanel the editable panel to which changes may be applied
      */
     public ApplyPanel(EditablePanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -76,7 +75,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Lay out the panel. It is assumed that the committable main panel has
+     * Lay out the panel. It is assumed that the editable main panel has
      * already been laid out.
      */
     protected void masterLayout() {
@@ -122,7 +121,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     *
+     * Add the apply button listener.
      */
     private void addListener() {
         applyButton.addActionListener(new ActionListener() {
@@ -133,29 +132,6 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         });
     }
 
-    /**
-     * Adds a listener to the apply button so that actions other than committing
-     * changes can be carried out when the apply button is pressed.
-     * 
-     * @param al
-     */
-    public void addListenerToApplyButton(ActionListener al) {
-        applyButton.addActionListener(al);
-    }
-
-    /*
-     * /CHECKSTYLE:OFF************************************** GETTERS *
-     * ****************************************************
-     */
-
-    public JButton getApplyButton() {
-        return applyButton;
-    }
-
-    /**
-     * {@inheritDoc} <b>Specifically:</b> returns the committable panel this
-     * panel wraps around.
-     */
     @Override
     public JPanel getPanel() {
         return (JPanel) mainPanel;
@@ -163,7 +139,6 @@ public class ApplyPanel extends JPanel implements EditablePanel {
 
     @Override
     public void fillFieldValues() {
-        // Not currently used        
     }
 
 }

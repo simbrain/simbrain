@@ -28,16 +28,15 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * A panel which provides a high level summary of certain groups in Simbrain.
  * As of right now, Subnetworks are accepted, but only NeuronGroups and
  * SynapseGroups actually have implementations in this class.
- * TODO: Either implement or abandon subnetworks: Discussion Required
  *
  * @author ztosi
  */
@@ -73,7 +72,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     private final JLabel nameLabel = new JLabel("Label: ");
 
     /** Population label */
-    private final JLabel popLabel = new JLabel("Population: ");
+    private final JLabel populationLabel = new JLabel("Population: ");
 
     /** Type label */
     private final JLabel typeLabel = new JLabel("Type: ");
@@ -87,6 +86,8 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     /** A label for any outgoing groups. */
     private final JLabel outgoingGroupLabel = new JLabel();
 
+    /** A label for synapse group learning rate. */
+    private final JLabel learningRateLabel = new JLabel("Learning rate:");
 
     /*/****************************************************
      *                      Fields                        *
@@ -99,13 +100,13 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     private JTextField nameField = new JTextField();
 
     /** The population of the group field. */
-    private JLabel popField = new JLabel();
+    private JLabel populationField = new JLabel();
 
     /**
      * An editable population field for situations (creation) where population
      * can be edited.
      */
-    private JTextField editablePopField = new JTextField();
+    private JTextField editablePopulationField = new JTextField();
 
     /** The type of objects contained in the group field. */
     private JLabel typeField = new JLabel();
@@ -125,6 +126,9 @@ public class SummaryPanel extends JPanel implements EditablePanel {
      */
     private JLabel outgoingField = new JLabel();
 
+    /** The field for learning rate. */
+    private JTextField learningRateField = new JTextField();
+
     /**
      * Constructs the summary panel based on a neuron group. Names the
      * incoming and outgoing labels appropriately (Incoming/Outgoing).
@@ -138,7 +142,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         this.editable = editable;
         incomingGroupLabel.setText("Incoming: ");
         outgoingGroupLabel.setText("Outgoing: ");
-        fillFieldValues(ng);
+        fillFieldValues();
         initializeLayout();
     }
 
@@ -151,20 +155,12 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         setGroup(sg);
         incomingGroupLabel.setText("Source Group: ");
         outgoingGroupLabel.setText("Target Group: ");
-        fillFieldValues(sg);
+        fillFieldValues();
         initializeLayout();
     }
 
     /**
-     * TODO: Include? Discuss...
-     * @param subNet the subnetwork for which a summary will be built
-     */
-    public SummaryPanel(Subnetwork subNet) {
-        fillFieldValues(subNet);
-    }
-
-    /**
-     *
+     * Initialize the layout.
      */
     private void initializeLayout() {
         GridLayout layout = new GridLayout(0, 2);
@@ -175,11 +171,11 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         this.add(idField);
         this.add(nameLabel);
         this.add(nameField);
-        this.add(popLabel);
+        this.add(populationLabel);
         if (isEditable()) {
-            this.add(editablePopField);
+            this.add(editablePopulationField);
         } else {
-            this.add(popField);
+            this.add(populationField);
         }
         this.add(typeLabel);
         this.add(typeField);
@@ -190,6 +186,12 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             this.add(incomingField);
             this.add(outgoingGroupLabel);
             this.add(outgoingField);
+        }
+        // TODO: Below will have to be refactored if more customized synpase
+        // groups are added
+        if (group instanceof SynapseGroupWithLearningRate) {
+            this.add(learningRateLabel);
+            this.add(learningRateField);
         }
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
@@ -214,10 +216,10 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         }
         if (ng.getNeuronList().size() > 0) {
             if (isEditable()) {
-                editablePopField.setText(Integer
+                editablePopulationField.setText(Integer
                         .toString(ng.getNeuronList().size()));
             } else {
-                popField.setText(Integer.toString(ng.getNeuronList().size()));
+                populationField.setText(Integer.toString(ng.getNeuronList().size()));
             }
             if (NetworkUtils.isConsistent(ng.getNeuronList(), Neuron.class,
                     "getUpdateRuleDescription"))
@@ -230,13 +232,13 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         } else {
             if (isEditable()) {
                 // Is a creation dialog
-                editablePopField.setText(Integer
+                editablePopulationField.setText(Integer
                         .toString(NeuronGroup.DEFAULT_GROUP_SIZE));
                 typeField.setText(Neuron.DEFAULT_UPDATE_RULE.getDescription());
             } else {
                 // Handles if an empty neuron group is selected
                 // (for some reason)...
-                popField.setText(Integer.toString(0));
+                populationField.setText(Integer.toString(0));
                 typeField.setText("None");
             }
         }
@@ -283,7 +285,13 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         } else {
             nameField.setText(sg.getLabel());
         }
-        popField.setText(Integer.toString(sg.getSynapseList().size()));
+        populationField.setText(Integer.toString(sg.getSynapseList().size()));
+
+        if (sg instanceof SynapseGroupWithLearningRate) {
+            learningRateField.setText(""
+                    + ((SynapseGroupWithLearningRate) sg).getLearningRate());
+        }
+
         if (sg.getSynapseList().size() > 0) {
             if (NetworkUtils.isConsistent(sg.getSynapseList(), Synapse.class,
                     "getLearningRule"))
@@ -306,18 +314,17 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * TODO: include?
-     * @param subNet the subnetwork being used to fill field values
-     */
-    private void fillFieldValues(Subnetwork subNet) {
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public boolean commitChanges() {
         group.setLabel(nameField.getText());
+
+        if (group instanceof SynapseGroupWithLearningRate) {
+            ((SynapseGroupWithLearningRate) group).setLearningRate(Double
+                    .parseDouble(learningRateField.getText()));
+        }
+
         return true; // Always Successful: the only field it makes sense to
                      // commit from here cannot fail as a result of user action.
     }
@@ -344,11 +351,11 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     }
 
     public JLabel getPopField() {
-        return popField;
+        return populationField;
     }
 
     public void setPopField(JLabel popField) {
-        this.popField = popField;
+        this.populationField = popField;
     }
 
     public JLabel getTypeField() {
@@ -420,49 +427,22 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     }
 
     public JTextField getEditablePopField() {
-        return editablePopField;
-    }
-
-    public void setEditablePopField(JTextField editablePopField) {
-        this.editablePopField = editablePopField;
-    }
-
-    public JLabel getIdLabel() {
-        return idLabel;
-    }
-
-    public JLabel getNameLabel() {
-        return nameLabel;
+        return editablePopulationField;
     }
 
     public JLabel getPopLabel() {
-        return popLabel;
-    }
-
-    public JLabel getTypeLabel() {
-        return typeLabel;
-    }
-
-    public JLabel getParentGroupLabel() {
-        return parentGroupLabel;
-    }
-
-    public JLabel getIncomingGroupLabel() {
-        return incomingGroupLabel;
-    }
-
-    public JLabel getOutgoingGroupLabel() {
-        return outgoingGroupLabel;
+        return populationLabel;
     }
 
     @Override
     public void fillFieldValues() {
-        // TODO: Merge this with argument based fill field values?        
+        if (group instanceof SynapseGroup){
+            fillFieldValues((SynapseGroup)group);
+        } else if (group instanceof NeuronGroup){            
+            fillFieldValues((NeuronGroup)group);
+        }
     }
 
-    /*/****************************************************
-     *              END Getters and Setters               *
-     ****************************************CHECKSTYLE:ON*/
 
 //    public static void main(String[] args) {
 //        Network net = new Network();

@@ -1530,8 +1530,8 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the synapse properties dialog.
      */
     public void showSelectedSynapseProperties() {
-        SynapseDialog dialog = new SynapseDialog(
-                this.getSelectedModelSynapses());
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(this
+                .getSelectedModelSynapses());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

@@ -167,4 +167,18 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
 
+    /**
+     * @return the updateInfoPanel
+     */
+    public SynapseUpdateSettingsPanel getUpdateInfoPanel() {
+        return updateInfoPanel;
+    }
+
+    /**
+     * @param updateInfoPanel the updateInfoPanel to set
+     */
+    public void setUpdateInfoPanel(SynapseUpdateSettingsPanel updateInfoPanel) {
+        this.updateInfoPanel = updateInfoPanel;
+    }
+
 }

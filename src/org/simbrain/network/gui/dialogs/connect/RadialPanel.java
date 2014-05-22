@@ -72,7 +72,8 @@ public class RadialPanel extends AbstractConnectionPanel {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
                 excitatoryList.add(connection.getBaseExcitatorySynapse());
-                SynapseDialog dialog = new SynapseDialog(excitatoryList);
+                SynapseDialog dialog = SynapseDialog
+                        .createSynapseDialog(excitatoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -94,7 +95,8 @@ public class RadialPanel extends AbstractConnectionPanel {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
                 inhibitoryList.add(connection.getBaseInhibitorySynapse());
-                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
+                SynapseDialog dialog = SynapseDialog
+                        .createSynapseDialog(inhibitoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);

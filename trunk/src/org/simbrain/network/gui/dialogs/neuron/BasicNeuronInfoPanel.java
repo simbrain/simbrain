@@ -40,7 +40,7 @@ import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
- * Panel showing the basic properties common to a set of neurons.
+ * Panel showing activation and label properties of a neuron.
  *
  * @author ztosi
  * @author jyoshimi
@@ -89,50 +89,50 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
     private boolean displayIDInfo;
 
     /**
-     * Creates a basic neuron info panel. Here whether or not to display
-     * ID info is automatically set based on the state of the neuron 
-     * list.
+     * Creates a basic neuron info panel. Here whether or not to display ID info
+     * is automatically set based on the state of the neuron list.
+     *
      * @param neuronList the neurons whose information is being displayed/made
-     *  available to edit on this panel
+     *            available to edit on this panel
      * @param parent the parent window for dynamic resizing.
      * @return A basic neuron info panel with the specified parameters
      */
     public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
-    		final List<Neuron> neuronList, final Window parent) {
-    	return createBasicNeuronInfoPanel(neuronList, parent,
-    			!(neuronList == null || neuronList.size() != 1));
+            final List<Neuron> neuronList, final Window parent) {
+        return createBasicNeuronInfoPanel(neuronList, parent,
+                !(neuronList == null || neuronList.size() != 1));
     }
-    
+
     /**
-     * Creates a basic neuron info panel. Here the whether or not
-     * ID info is displayed is manually set. This is the case when
-     * the number of neurons (such as when adding multiple neurons)
-     * is unknown at the time of display. In fact this is probably 
-     * the only reason to use this factory method over 
+     * Creates a basic neuron info panel. Here the whether or not ID info is
+     * displayed is manually set. This is the case when the number of neurons
+     * (such as when adding multiple neurons) is unknown at the time of display.
+     * In fact this is probably the only reason to use this factory method over
      * {@link #createBasicNeuronInfoPanel(List, Window)}.
+     *
      * @param neuronList the neurons whose information is being displayed/made
-     *  available to edit on this panel
+     *            available to edit on this panel
      * @param parent the parent window for dynamic resizing
      * @param displayIDInfo whether or not to display ID info
      * @return A basic neuron info panel with the specified parameters
      */
     public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
-    		final List<Neuron> neuronList, final Window parent,
-    		final boolean displayIDInfo) {
-    	BasicNeuronInfoPanel bnip = new BasicNeuronInfoPanel(neuronList,
-    			parent, displayIDInfo);
-    	bnip.addListeners();
-    	return bnip;
+            final List<Neuron> neuronList, final Window parent,
+            final boolean displayIDInfo) {
+        BasicNeuronInfoPanel bnip = new BasicNeuronInfoPanel(neuronList,
+                parent, displayIDInfo);
+        bnip.addListeners();
+        return bnip;
     }
-    
+
     /**
-     * 
+     *
      * @param neuronList
      * @param parent
      * @param displayIDInfo
      */
     private BasicNeuronInfoPanel(final List<Neuron> neuronList,
-    		final Window parent, final boolean displayIDInfo) {
+            final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
@@ -161,11 +161,11 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
         }
         basicStatsPanel.add(new JLabel("Activation:"));
         basicStatsPanel.add(tfActivation);
-//        if (!multiFlag) {
-        //TODO: Visible or not if multiple or no neurons are being edited?
+        // if (!multiFlag) {
+        // TODO: Visible or not if multiple or no neurons are being edited?
         basicStatsPanel.add(new JLabel("Label:"));
         basicStatsPanel.add(tfNeuronLabel);
-//        }
+        // }
 
         JPanel ddTrianglePanel = new JPanel();
         ddTrianglePanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
@@ -229,9 +229,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
         });
     }
 
-    /**
-     * Set the initial values of dialog components.
-     */
+    @Override
     public void fillFieldValues() {
 
         Neuron neuronRef = neuronList.get(0);
@@ -245,8 +243,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
 
         // Handle Activation
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getActivation"))
-        {
+                "getActivation")) {
             tfActivation.setText(NULL_STRING);
         } else {
             tfActivation.setText(Double.toString(neuronRef.getActivation()));
@@ -261,9 +258,6 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
 
     }
 
-    /**
-     * Commit changes made in GUI to neurons.
-     */
     @Override
     public boolean commitChanges() {
 
@@ -289,9 +283,9 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
             }
         }
         if (!neuronList.isEmpty()) {
-        	neuronList.get(0).getNetwork().fireNetworkChanged();
+            neuronList.get(0).getNetwork().fireNetworkChanged();
         }
-        
+
         success &= extraDataPanel.commitChanges();
 
         return success;
@@ -318,7 +312,6 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
     public boolean isMultiFlag() {
         return displayIDInfo;
     }
-
 
     @Override
     public JPanel getPanel() {

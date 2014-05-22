@@ -35,7 +35,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * The basic neuron info panel and neuron update settings panel are frequently
  * used together and depend on each other. This panel combines the two and
  * handles changes to one being applied to the other.
- * 
+ *
  * @author ztosi
  */
 @SuppressWarnings("serial")
@@ -54,7 +54,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
     private static final boolean DEFAULT_NUSP_DISPLAY_STATE = false;
 
     /** The basic neuron info panel. */
-    private BasicNeuronInfoPanel neuroninfoPanel;
+    private BasicNeuronInfoPanel neuronInfoPanel;
 
     /** The neuron update settings panel. */
     private NeuronUpdateSettingsPanel updateInfoPanel;
@@ -63,7 +63,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      * Creates a combined neuron info panel, which includes the basic neuron
      * info panel and a neuron update settings panel. The panel is automatically
      * built and laid out, such that it is immediately ready for display.
-     * 
+     *
      * @param neuronList
      *            the list of neurons either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -82,7 +82,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      * built and laid out, such that it is immediately ready for display. The
      * nusp (neuron update settings panel)'s display state is that extra data is
      * by default hidden.
-     * 
+     *
      * @param neuronList
      *            the list of neurons either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -111,7 +111,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      * multiple neurons are going to be displayed. This is here for cases where
      * the number of neurons is itself a variable and normally ID information
      * would be displayed because there is only one neuron in the list.
-     * 
+     *
      * @param neuronList
      *            the list of neurons either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -135,7 +135,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * {@link #createCombinedNeuronInfoPanel(List, Window, boolean)}
-     * 
+     *
      * @param neuronList
      *            the list of neurons either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -147,7 +147,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      */
     private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
             final Window parent, final boolean nuspExtendedDisplay) {
-        neuroninfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+        neuronInfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
                 neuronList, parent);
         updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
                 nuspExtendedDisplay);
@@ -155,7 +155,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * {@link #createCombinedNeuronInfoPanel(List, Window, boolean, boolean)}
-     * 
+     *
      * @param neuronList
      *            the list of neurons either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -170,7 +170,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
     private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
             final Window parent, final boolean nuspExtendedDisplay,
             final boolean displayIDInfo) {
-        neuroninfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+        neuronInfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
                 neuronList, parent, displayIDInfo);
         updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
                 nuspExtendedDisplay);
@@ -182,7 +182,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
     private void initializeLayout() {
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);
-        this.add(neuroninfoPanel);
+        this.add(neuronInfoPanel);
         this.add(Box.createVerticalStrut(DEFAULT_VGAP));
         this.add(updateInfoPanel);
     }
@@ -204,8 +204,8 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
                             public void run() {
                                 AbstractNeuronPanel np = updateInfoPanel
                                         .getNeuronPanel();
-                                neuroninfoPanel.getExtraDataPanel()
-                                        .fillDefaultValues(
+                                neuronInfoPanel.getExtraDataPanel()
+                                        .updateFields(
                                                 np.getPrototypeRule());
                                 repaint();
                             }
@@ -229,7 +229,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
         // edited that can result in ClassCastExceptions otherwise.
         success &= updateInfoPanel.commitChanges();
 
-        success &= neuroninfoPanel.commitChanges();
+        success &= neuronInfoPanel.commitChanges();
 
         return success;
 
@@ -249,11 +249,11 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     public BasicNeuronInfoPanel getNeuroninfoPanel() {
-        return neuroninfoPanel;
+        return neuronInfoPanel;
     }
 
     public void setNeuroninfoPanel(BasicNeuronInfoPanel neuroninfoPanel) {
-        this.neuroninfoPanel = neuroninfoPanel;
+        this.neuronInfoPanel = neuroninfoPanel;
     }
 
     public NeuronUpdateSettingsPanel getUpdateInfoPanel() {
@@ -266,7 +266,6 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     @Override
     public void fillFieldValues() {
-        // Not Currently Used        
     }
 
 }

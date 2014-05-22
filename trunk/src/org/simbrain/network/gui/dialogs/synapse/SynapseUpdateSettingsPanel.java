@@ -41,14 +41,17 @@ import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapseP
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
+ * A panel for setting the synapse type and changing the parameters of the
+ * selected update rule.
  *
- * @author ztosi
+ * * @author ztosi
  *
  */
 @SuppressWarnings("serial")
-public class SynapseUpdateSettingsPanel extends JPanel {
+public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel {
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -97,7 +100,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
      */
     public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
             final Window parent) {
-        this(synapseList, DEFAULT_SP_DISPLAY_STATE, parent);
+        this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
 
     /**
@@ -114,7 +117,7 @@ public class SynapseUpdateSettingsPanel extends JPanel {
      *            itself.
      */
     public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
-            boolean startingState, final Window parent) {
+            final Window parent, boolean startingState) {
         this.synapseList = synapseList;
         this.parent = parent;
         displaySPTriangle = new DropDownTriangle(UpDirection.LEFT,
@@ -164,7 +167,6 @@ public class SynapseUpdateSettingsPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent arg0) {
-
                 synapsePanel.setVisible(displaySPTriangle.isDown());
                 repaint();
                 parent.pack();
@@ -268,6 +270,21 @@ public class SynapseUpdateSettingsPanel extends JPanel {
      */
     public void setSynapsePanel(AbstractSynapsePanel synapsePanel) {
         this.synapsePanel = synapsePanel;
+    }
+
+    @Override
+    public void fillFieldValues() {
+    }
+
+    @Override
+    public boolean commitChanges() {
+        synapsePanel.commitChanges(synapseList);
+        return true; // TODO:Finish implementation of CommittablePanel interface
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

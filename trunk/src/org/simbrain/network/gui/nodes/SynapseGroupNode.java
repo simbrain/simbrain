@@ -112,4 +112,11 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener {
         return outlinedObjects;
     }
 
+    /**
+     * Update the text in the interaction box.
+     */
+    public void updateText() {
+        interactionBox.setText(synapseGroup.getLabel());
+        interactionBox.updateText();
+    };
 }

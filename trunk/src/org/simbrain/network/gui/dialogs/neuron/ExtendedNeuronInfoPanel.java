@@ -42,23 +42,19 @@ import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * 
  * A panel containing more detailed generic information about neurons. Generally
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- * 
- * Values included are: Activation ceiling and floor, label, priority and
+ *
+ * Values included are: Activation, upper / lower bounds, label, priority and
  * increment.
- * 
+ *
  * @author ztosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
 
     /** Upper bound field. */
     private final JTextField tfCeiling = new JTextField();
@@ -112,11 +108,13 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /** Are upper and lower bounds enabled? */
     private boolean boundsEnabled;
 
+    /** Is clipping visible in this panel. */
     private boolean clippingVisible;
 
     /** Bounds panel. */
     private final JPanel boundsPanel = new JPanel();
 
+    /** Clipping panel. */
     private final JPanel clippingPanel = new JPanel();
 
     /**
@@ -133,7 +131,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Construct the panel representing the provided neurons.
-     * 
+     *
      * @param neuronList
      *            list of neurons to represent.
      * @param parent
@@ -276,7 +274,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         // Handle Increment
         if (!NetworkUtils.isConsistent(Neuron.getRuleList(neuronList),
                 NeuronUpdateRule.class, "getIncrement")) {
-            tfIncrement.setText(NULL_STRING);
+            tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(neuronRef.getUpdateRule()
                     .getIncrement()));
@@ -285,7 +283,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         // Handle Priority
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
                 "getUpdatePriority")) {
-            tfPriority.setText(NULL_STRING);
+            tfPriority.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfPriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
         }
@@ -298,30 +296,24 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @param rule
-     *            the neuron update rule from which default values will be used
-     *            to fill field data.
+     * Update field visibility based on whether rule is bounded and/or clipped.
+     *
+     * @param rule the current rule
      */
-    public void fillDefaultValues(NeuronUpdateRule rule) {
+    public void updateFields(NeuronUpdateRule rule) {
         boolean bounded = rule instanceof BoundedUpdateRule;
         boolean clip = false;
         setBoundsVisible(bounded);
         if (bounded) {
-            tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
-                    .getUpperBound()));
-            tfFloor.setText(Double.toString(((BoundedUpdateRule) rule)
-                    .getLowerBound()));
             clip = rule instanceof ClippableUpdateRule;
             clipping.setSelected(clip);
         }
         setClippingVisible(clip);
         setBoundsEnabled(bounded);
-        tfIncrement.setText(Double.toString(rule.getIncrement()));
-        tfPriority.setText(Integer.toString(0));
     }
 
     /**
-     * {@inheritDoc} <b>Specifically:</b> Uses the values from text fields to
+     * <b>Specifically:</b> Uses the values from text fields to
      * alter corresponding values in the neuron(s) being edited. Called
      * externally to apply changes.
      */
@@ -350,7 +342,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfCeiling.getText().matches(NULL_STRING);
+                    success &= tfCeiling.getText().matches(SimbrainConstants.NULL_STRING);
                 }
                 // Lower Bound
                 double floor = Utils.doubleParsable(tfFloor);
@@ -362,7 +354,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfFloor.getText().matches(NULL_STRING);
+                    success &= tfFloor.getText().matches(SimbrainConstants.NULL_STRING);
                 }
             }
 
@@ -377,7 +369,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfIncrement.getText().matches(NULL_STRING);
+            success &= tfIncrement.getText().matches(SimbrainConstants.NULL_STRING);
         }
 
         // Priority
@@ -391,7 +383,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfPriority.getText().matches(NULL_STRING);
+            success &= tfPriority.getText().matches(SimbrainConstants.NULL_STRING);
         }
 
         // Clamped
@@ -422,7 +414,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         boundsEnabled = enabled;
         int t = TristateDropDown.getTRUE();
         int f = TristateDropDown.getFALSE();
-        clipping.setSelectedIndex(isBoundsEnabled() ? t : f);
+        clipping.setSelectedIndex(boundsEnabled ? t : f);
         tfCeiling.setEnabled(enabled);
         tfFloor.setEnabled(enabled);
         repaint();
@@ -442,8 +434,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Properly repaints the panel when clipping and its label are made visible
      * or invisible.
-     * 
-     * @param visible
+     *
+     * @param visible should the clipping stuff be visible or not
      */
     public void setClippingVisible(boolean visible) {
         clippingVisible = visible;
@@ -452,27 +444,6 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         parent.pack();
     }
 
-    /**
-     * Are the upper and lower bound fields visible.
-     * 
-     * @return whether or not boundaries are visible. Only occurs for
-     *         BoundedUpdateRules
-     * 
-     * @see org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule.java
-     */
-    public boolean isBoundsVisible() {
-        return boundsVisible;
-    }
-
-    /**
-     * Are the upper /lower bound fields enabled.
-     * 
-     * @return whether or not boundary fields are enabled given the current
-     *         neuron update rule
-     */
-    public boolean isBoundsEnabled() {
-        return boundsEnabled;
-    }
 
     @Override
     public JPanel getPanel() {

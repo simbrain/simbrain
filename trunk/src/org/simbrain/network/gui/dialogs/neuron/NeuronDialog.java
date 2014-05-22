@@ -33,9 +33,8 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>NeuronDialog</b> is a dialog box for setting the properties of a Neuron.
- * 
  */
-public class NeuronDialog extends StandardDialog {
+public final class NeuronDialog extends StandardDialog {
 
     /** The default serial version id. */
     private static final long serialVersionUID = 1L;
@@ -62,16 +61,16 @@ public class NeuronDialog extends StandardDialog {
     private final ArrayList<Neuron> neuronList;
 
     /**
-     * Creates a neuron dialog from a collection of NeuronNodes
-     * 
+     * Creates a neuron dialog from a collection of NeuronNodes.
+     *
      * @param selectedNeurons
-     * @return
+     * @return the dialog.
      */
     public static NeuronDialog createNeuronDialog(
             final Collection<NeuronNode> selectedNeurons) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons);
         nd.neuronDataPanel = CombinedNeuronInfoPanel
-                .createCombinedNeuronInfoPanel(nd.neuronList, nd, true);
+                .createCombinedNeuronInfoPanel(nd.neuronList, nd);
         nd.init();
         nd.addListeners();
         nd.updateHelp();
@@ -88,7 +87,7 @@ public class NeuronDialog extends StandardDialog {
 
     /**
      * Get the logical neurons from the NeuronNodes.
-     * 
+     *
      * @param selectedNeurons
      *            the selected gui neurons (pnodes) from which the neuron model
      *            objects will be extracted and then edited by this panel

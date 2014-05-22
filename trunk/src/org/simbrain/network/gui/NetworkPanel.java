@@ -547,6 +547,12 @@ public class NetworkPanel extends JPanel {
                     if (node != null) {
                         node.updateText();
                     }
+                } else if (event.getObject() instanceof SynapseGroup) {
+                    SynapseGroupNode node = (SynapseGroupNode) objectNodeMap
+                            .get(event.getObject());
+                    if (node != null) {
+                        node.updateText();
+                    }
                 } else if (event.getObject() instanceof Subnetwork) {
                     SubnetworkNode node = (SubnetworkNode) objectNodeMap
                             .get(event.getObject());

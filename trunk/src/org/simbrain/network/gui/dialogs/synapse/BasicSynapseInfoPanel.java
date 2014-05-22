@@ -35,15 +35,18 @@ import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.TristateDropDown;
 
-public class BasicSynapseInfoPanel extends JPanel {
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
+/**
+ * Panel showing basic properties of a set of synapses, e.g. id, strength, and
+ * whether it is enabled or not.
+ */
+public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
     /** Id Label. */
     private final JLabel idLabel = new JLabel();
@@ -76,6 +79,72 @@ public class BasicSynapseInfoPanel extends JPanel {
      */
     private final Window parent;
 
+    /** The synapses being modified. */
+    private final List<Synapse> synapseList;
+
+    /**
+     * If true, displays ID info and other fields that would only make sense if
+     * multiple synapses are being edited. This value is set automatically
+     * unless otherwise specified at construction.
+     */
+    private boolean displayIDInfo;
+
+    /**
+     * Creates a basic synapse info panel. Here whether or not to display ID
+     * info is automatically set based on the state of the synapse list.
+     *
+     * @param synapseList the synapses whose information is being displayed/made
+     *            available to edit on this panel
+     * @param parent the parent window for dynamic resizing.
+     * @return A basic synapse info panel with the specified parameters
+     */
+    public static BasicSynapseInfoPanel createBasicNeuronInfoPanel(
+            final List<Synapse> synapseList, final Window parent) {
+        return createBasicSynapseInfoPanel(synapseList, parent,
+                !(synapseList == null || synapseList.size() != 1));
+    }
+
+    /**
+     * Creates a basic synapse info panel. Here the whether or not ID info is
+     * displayed is manually set. This is the case when the number of synapses
+     * (such as when adding multiple synapses) is unknown at the time of
+     * display. In fact this is probably the only reason to use this factory
+     * method over {@link #createBasicSynapseInfoPanel(List, Window)}.
+     *
+     * @param synapseList the synapses whose information is being displayed/made
+     *            available to edit on this panel
+     * @param parent the parent window for dynamic resizing
+     * @param displayIDInfo whether or not to display ID info
+     * @return A basic synapse info panel with the specified parameters
+     */
+    public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
+            final List<Synapse> synapseList, final Window parent,
+            final boolean displayIDInfo) {
+        BasicSynapseInfoPanel panel = new BasicSynapseInfoPanel(synapseList,
+                parent, displayIDInfo);
+        panel.addListeners();
+        return panel;
+    }
+
+    /**
+     * Construct the panel.
+     *
+     * @param synapseList the synapse list
+     * @param parent the parent window
+     * @param displayIDInfo whether to display ids
+     */
+    private BasicSynapseInfoPanel(final List<Synapse> synapseList,
+            final Window parent, final boolean displayIDInfo) {
+        this.synapseList = synapseList;
+        this.parent = parent;
+        this.displayIDInfo = displayIDInfo;
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
+                "Less", parent);
+        extraDataPanel = new ExtendedSynapseInfoPanel(this.synapseList);
+        initializeLayout();
+        fillFieldValues();
+    }
+
     /**
      *
      * @param synapseList The list of synapses to be edited.
@@ -86,11 +155,12 @@ public class BasicSynapseInfoPanel extends JPanel {
     public BasicSynapseInfoPanel(final List<Synapse> synapseList,
             final Window parent) {
         this.parent = parent;
+        this.synapseList = synapseList;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
                 "Less", parent);
         extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
         initializeLayout();
-        fillFieldValues(synapseList);
+        fillFieldValues();
         addListeners();
     }
 
@@ -201,16 +271,14 @@ public class BasicSynapseInfoPanel extends JPanel {
         });
     }
 
-    /**
-     * Set the initial values of dialog components.
-     */
-    public void fillFieldValues(List<Synapse> synapseList) {
+    @Override
+    public void fillFieldValues() {
 
         Synapse synapseRef = synapseList.get(0);
         if (synapseList.size() == 1) {
             idLabel.setText(synapseRef.getId());
         } else {
-            idLabel.setText(NULL_STRING);
+            idLabel.setText(SimbrainConstants.NULL_STRING);
         }
 
         // (Below) Handle consistency of multiple selections
@@ -218,7 +286,7 @@ public class BasicSynapseInfoPanel extends JPanel {
         // Handle Strength
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
                 "getStrength")) {
-            tfStrength.setText(NULL_STRING);
+            tfStrength.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfStrength.setText(Double.toString(synapseRef.getStrength()));
         }
@@ -235,11 +303,8 @@ public class BasicSynapseInfoPanel extends JPanel {
 
     }
 
-    /**
-     * Commit changes to the panel to the synapse update rules of the synapses
-     * being edited.
-     */
-    public void commitChanges(List<Synapse> synapseList) {
+    @Override
+    public boolean commitChanges() {
 
         // Strength
         double strength = Utils.doubleParsable(tfStrength);
@@ -260,6 +325,7 @@ public class BasicSynapseInfoPanel extends JPanel {
 
         extraDataPanel.commitChanges(synapseList);
 
+        return true; // TODO
     }
 
     /**
@@ -268,6 +334,18 @@ public class BasicSynapseInfoPanel extends JPanel {
      */
     public DropDownTriangle getDetailTriangle() {
         return detailTriangle;
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
+    }
+
+    /**
+     * @return the extraDataPanel
+     */
+    public ExtendedSynapseInfoPanel getExtraDataPanel() {
+        return extraDataPanel;
     }
 
 }

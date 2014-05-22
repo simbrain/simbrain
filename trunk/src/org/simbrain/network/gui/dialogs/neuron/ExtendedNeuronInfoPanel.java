@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.SimbrainConstants;
@@ -143,6 +144,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         this.parent = parent;
         fillFieldValues();
         initializeLayout();
+        // Initialize fields using linear rule, for now.
+        initializeDefaultValues(new LinearRule());
     }
 
     /**
@@ -194,10 +197,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     }
 
-    /**
-     * Fills the values of the text fields based on the corresponding values of
-     * the neurons to be edited. Called before {@link #initializeLayout()}.
-     */
+    @Override
     public void fillFieldValues() {
 
         Neuron neuronRef = neuronList.get(0);
@@ -296,11 +296,25 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
+     * Initialize the panel with default field values.
+     *
+     * @param rule rule to use for setting the default values.
+     */
+    private void initializeDefaultValues(NeuronUpdateRule rule) {
+        tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
+                .getUpperBound()));
+        tfFloor.setText(Double.toString(((BoundedUpdateRule) rule)
+                .getLowerBound()));
+        tfIncrement.setText(Double.toString(rule.getIncrement()));
+        tfPriority.setText(Integer.toString(0));
+    }
+
+    /**
      * Update field visibility based on whether rule is bounded and/or clipped.
      *
      * @param rule the current rule
      */
-    public void updateFields(NeuronUpdateRule rule) {
+    public void updateFieldVisibility(NeuronUpdateRule rule) {
         boolean bounded = rule instanceof BoundedUpdateRule;
         boolean clip = false;
         setBoundsVisible(bounded);

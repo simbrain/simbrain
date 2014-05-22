@@ -18,20 +18,20 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
@@ -39,41 +39,14 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * The <b>SynapseDialog</b> is initialized with a list of synapses. When the
  * dialog is closed the synapses are changed based on the state of the dialog.
  */
-public class SynapseDialog extends StandardDialog {
-
-    /** The default serial version id. */
-    private static final long serialVersionUID = 1L;
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
-
-    /** Main panel. */
-    private final Box mainPanel = Box.createVerticalBox();
+public final class SynapseDialog extends StandardDialog {
 
     /**
-     * Top panel. Contains fields for displaying/editing basic synapse
-     * information.
+     * Main panel for editing synapses.
      *
      * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
      */
-    private final BasicSynapseInfoPanel infoPanel;
-
-    /**
-     * Bottom panel. Contains fields for displaying/editing synapse update rule
-     * parameters.
-     */
-    private final SynapseUpdateSettingsPanel updatePanel;
-
-    /** The currently displayed spike responder panel. */
-    private final SpikeResponderSettingsPanel responderPanel;
-
-    /**
-     * A boolean value to store the results of
-     * {@link #containsASpikeResponder(List)} which determines whether or not a
-     * spike responder panel should be displayed based on the update rules used
-     * by the presynaptic neurons to the synapses being edited.
-     */
-    private final boolean usesSpikeResponders;
+    private CombinedSynapseInfoPanel synapseEditingPanel;
 
     /**
      * Help Button. Links to information about the currently selected synapse
@@ -85,26 +58,41 @@ public class SynapseDialog extends StandardDialog {
     private ShowHelpAction helpAction;
 
     /** The synapses being modified. */
-    private final ArrayList<Synapse> synapseList;
+    private ArrayList<Synapse> synapseList;
 
     /**
-     * @param selectedSynapses the pnode_synapses being adjusted
+     * Creates a synapse dialog from a collection of SynapseNodes.
+     *
+     * @param selectedSynapses the nodes
+     * @return the dialog.
      */
-    public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
-        this(getSynapses(selectedSynapses));
+    public static SynapseDialog createSynapseDialog(
+            final Collection<SynapseNode> selectedSynapses) {
+        SynapseDialog sd = createSynapseDialog(getSynapses(selectedSynapses));
+        return sd;
+    }
+
+    /**
+     * Creates synapse dialog from a collection of synapses.
+     *
+     * @param selectedSynapses the synapses
+     * @return the dialog.
+     */
+    public static SynapseDialog createSynapseDialog(
+            final List<Synapse> selectedSynapses) {
+        SynapseDialog sd = new SynapseDialog(selectedSynapses);
+        sd.addListeners();
+        return sd;
     }
 
     /**
      * @param synapseList the logical synapses being adjusted
      */
-    public SynapseDialog(final List<Synapse> synapseList) {
+    private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        infoPanel = new BasicSynapseInfoPanel(synapseList, this);
-        updatePanel = new SynapseUpdateSettingsPanel(synapseList, this);
-        responderPanel = new SpikeResponderSettingsPanel(synapseList, this);
-        usesSpikeResponders = containsASpikeResponder(synapseList);
+        synapseEditingPanel = CombinedSynapseInfoPanel
+                .createCombinedSynapseInfoPanel(synapseList, this);
         initializeLayout();
-        addListeners();
         updateHelp();
     }
 
@@ -128,31 +116,8 @@ public class SynapseDialog extends StandardDialog {
      */
     private void initializeLayout() {
         setTitle("Synapse Dialog");
-        mainPanel.add(infoPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainPanel.add(updatePanel);
-        if (usesSpikeResponders) {
-            mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-            mainPanel.add(responderPanel);
-        }
-        setContentPane(mainPanel);
+        setContentPane(synapseEditingPanel);
         this.addButton(helpButton);
-    }
-
-    /**
-     * Add listeners to the components of the dialog
-     */
-    private void addListeners() {
-        updatePanel.getCbSynapseType().addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-
-                updateHelp();
-
-            }
-
-        });
     }
 
     /**
@@ -165,14 +130,33 @@ public class SynapseDialog extends StandardDialog {
     }
 
     /**
+     * Add listeners to the components of the dialog
+     */
+    private void addListeners() {
+        synapseEditingPanel.getUpdateInfoPanel().getCbSynapseType()
+                .addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateHelp();
+                            }
+                        });
+                    }
+                });
+    }
+
+    /**
      * Set the help page based on the currently selected synapse type.
      */
     public void updateHelp() {
-        if (updatePanel.getCbSynapseType().getSelectedItem() == NULL_STRING) {
+        if (synapseEditingPanel.getUpdateInfoPanel().getCbSynapseType()
+                .getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else {
-            String name = (String) updatePanel.getCbSynapseType()
-                    .getSelectedItem();
+            String name = (String) synapseEditingPanel.getUpdateInfoPanel()
+                    .getCbSynapseType().getSelectedItem();
             helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
                     + ".html");
         }
@@ -184,16 +168,7 @@ public class SynapseDialog extends StandardDialog {
      */
     public void commitChanges() {
 
-        infoPanel.commitChanges(); // TODO: Will this work without a
-                                   // synapseList?
-
-        // Now commit changes specific to the synapse type
-        updatePanel.getSynapsePanel().commitChanges(synapseList);
-
-        // If applicable commit changes for spike responders
-        if (usesSpikeResponders) {
-            responderPanel.getSpikeResponsePanel().commitChanges(synapseList);
-        }
+        synapseEditingPanel.commitChanges();
 
         // Notify the network that changes have been made
         synapseList.get(0).getNetwork().fireNetworkChanged();
@@ -218,7 +193,8 @@ public class SynapseDialog extends StandardDialog {
     public static boolean containsASpikeResponder(List<Synapse> synapses) {
         for (Synapse s : synapses) {
             if (s.getSource() == null) {
-                // If "free-floating" synapses are found then treat the list as not
+                // If "free-floating" synapses are found then treat the list as
+                // not
                 // having spike responders (possibly change later);
                 return false;
             } else {

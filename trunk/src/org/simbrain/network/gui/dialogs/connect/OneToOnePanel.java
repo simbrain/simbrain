@@ -54,7 +54,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
                 Synapse temp = connection.getBaseSynapse();
                 list.add(temp);
-                SynapseDialog dialog = new SynapseDialog(list);
+                SynapseDialog dialog = SynapseDialog.createSynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);

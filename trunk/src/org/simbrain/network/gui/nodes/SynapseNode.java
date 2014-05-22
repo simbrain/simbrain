@@ -374,8 +374,8 @@ public final class SynapseNode extends ScreenElement {
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel()
-                .getSelectedSynapses());
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(this
+                .getNetworkPanel().getSelectedSynapses());
         return dialog;
     }
 

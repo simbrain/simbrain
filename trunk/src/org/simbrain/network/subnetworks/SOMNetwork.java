@@ -62,6 +62,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
         inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
+        inputLayer.setLayoutBasedOnSize();
         this.addNeuronGroup(som);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {

@@ -144,8 +144,6 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         this.parent = parent;
         fillFieldValues();
         initializeLayout();
-        // Initialize fields using linear rule, for now.
-        initializeDefaultValues(new LinearRule());
     }
 
     /**

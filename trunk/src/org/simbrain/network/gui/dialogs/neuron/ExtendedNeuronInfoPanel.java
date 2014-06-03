@@ -47,12 +47,12 @@ import org.simbrain.util.widgets.TristateDropDown;
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- *
+ * 
  * Values included are: Activation, upper / lower bounds, label, priority and
  * increment.
- *
+ * 
  * @author ztosi
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
@@ -132,7 +132,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Construct the panel representing the provided neurons.
-     *
+     * 
      * @param neuronList
      *            list of neurons to represent.
      * @param parent
@@ -195,76 +195,137 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     }
 
+    /**
+     * Checks that the upper bounds of all the neurons this panel is editing are
+     * the same. If they are not, sets the text in {@link #tfCeiling} to "...".
+     * If not all the neurons share the bounded interface, throws a
+     * ClassCastException.
+     * 
+     * @param ruleList
+     * @throws ClassCastException
+     */
+    private void upBoundConsistencyCheckAndAssign(
+            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        Neuron neuronRef = neuronList.get(0);
+        double upBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
+                .getUpperBound();
+        boolean upDiscrepancy = false;
+        for (NeuronUpdateRule nur : ruleList) {
+            // Does the upper bound of the first neuron equal the upper bound
+            // of this one? upDiscrepancy is true if it does not.
+            upDiscrepancy = upBound != ((BoundedUpdateRule) nur)
+                    .getUpperBound();
+            if (upDiscrepancy) { // There is at least one discrepancy
+                                 // so we can't assign tfCeiling a value
+                break;
+            }
+        }
+        if (upDiscrepancy) { // Discrepancy... assign null string
+            tfCeiling.setText(SimbrainConstants.NULL_STRING);
+        } else { // No discrepancies... assign value
+            tfCeiling.setText(Double.toString(upBound));
+        }
+    }
+
+    /**
+     * Checks that the lower bounds of all the neurons this panel is editing are
+     * the same. If they are not, sets the text in {@link #tfFloor} to "...". If
+     * not all the neurons share the bounded interface, throws a
+     * ClassCastException.
+     * 
+     * @param ruleList
+     * @throws ClassCastException
+     */
+    private void lowBoundConsistencyCheckAndAssign(
+            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        Neuron neuronRef = neuronList.get(0);
+        double lowBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
+                .getLowerBound();
+        boolean lowDiscrepancy = false;
+        for (NeuronUpdateRule nur : ruleList) {
+            // Does the lower bound of the first neuron equal the lower bound
+            // of this one? lowDiscrepancy is true if it does not.
+            lowDiscrepancy = lowBound != ((BoundedUpdateRule) nur)
+                    .getLowerBound();
+            if (lowDiscrepancy) { // There is at least one discrepancy
+                                  // so we can't assign tfFloor a value
+                break;
+            }
+        }
+        if (lowDiscrepancy) { // Discrepancy... assign null string
+            tfFloor.setText(SimbrainConstants.NULL_STRING);
+        } else { // No discrepancies... assign value
+            tfFloor.setText(Double.toString(lowBound));
+        }
+    }
+
+    /**
+     * Checks that the clipping states of all the neurons this panel is editing
+     * are the same. If they are not, sets the the values of the
+     * {@link #clipping} TristateDropDown to a null value. If not all the
+     * neurons share the clippable interface, throws a ClassCastException.
+     * 
+     * @param ruleList
+     * @throws ClassCastException
+     */
+    private void clippingConsistencyCheckAndAssign(
+            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        Neuron neuronRef = neuronList.get(0);
+        boolean clipped = ((ClippableUpdateRule) neuronRef.getUpdateRule())
+                .isClipped();
+        boolean discrepancy = false;
+        for (NeuronUpdateRule nur : ruleList) {
+            // Is the first neuron clipped, but not this one? If so
+            // there is a discrepancy and below code assigns true
+            // to discrepancy.
+            discrepancy = clipped != ((ClippableUpdateRule) nur).isClipped();
+            if (discrepancy) { // There is at least one discrepancy
+                               // so we can't assign clipping a binary value
+                break;
+            }
+        }
+        if (discrepancy) { // Discrepancy detected, set clipping to null state
+            clipping.setSelectedIndex(TristateDropDown.getNULL());
+            setBoundsEnabled(false);
+        } else { // No discrepancies... assign neuronRef's clipping value to
+                 // clipping
+            clipping.setSelected(clipped);
+            setBoundsEnabled(clipped);
+        }
+        setClippingVisible(true);
+        setBoundsEnabled(clipped);
+    }
+
     @Override
     public void fillFieldValues() {
-
         Neuron neuronRef = neuronList.get(0);
         List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
-
         boolean skipClipCheck = false;
         try {
-            double upBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                    .getUpperBound();
-            double lowBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                    .getLowerBound();
-            boolean upDiscrepancy = false;
-            boolean lowDiscrepancy = false;
-            for (NeuronUpdateRule nur : ruleList) {
-                upDiscrepancy = upBound != ((BoundedUpdateRule) nur)
-                        .getUpperBound();
-                if (upDiscrepancy) {
-                    break;
-                }
-            }
-            if (upDiscrepancy) {
-                tfCeiling.setText(SimbrainConstants.NULL_STRING);
-            } else {
-                tfCeiling.setText(Double.toString(upBound));
-            }
-
-            for (NeuronUpdateRule nur : ruleList) {
-                lowDiscrepancy = lowBound != ((BoundedUpdateRule) nur)
-                        .getLowerBound();
-                if (lowDiscrepancy) {
-                    break;
-                }
-            }
-            if (lowDiscrepancy) {
-                tfCeiling.setText(SimbrainConstants.NULL_STRING);
-            } else {
-                tfFloor.setText(Double.toString(lowBound));
-            }
+            // Check for consistency of bounded interface and consistency
+            // of bounded values provided the former is consistent
+            upBoundConsistencyCheckAndAssign(ruleList);
+            lowBoundConsistencyCheckAndAssign(ruleList);
             setBoundsVisible(true);
             setBoundsEnabled(true);
+            // Catch class cast exceptions thrown if not all the neurons (or
+            // none)
+            // implement the bounded interface... in which case tfCeiling and
+            // tfFloor are not applicable
         } catch (ClassCastException cce) {
+            // Disable fields related to bounded & clipped rules.
             setBoundsVisible(false);
             setBoundsEnabled(false);
             setClippingVisible(false);
+            // If not all neurons are bounded, then by necesity not all are
+            // clipped, thus checks related to clipping can be skipped.
             skipClipCheck = true;
         }
-
         if (!skipClipCheck) {
             try {
-                boolean clipped = ((ClippableUpdateRule) neuronRef
-                        .getUpdateRule()).isClipped();
-                boolean discrepancy = false;
-                for (NeuronUpdateRule nur : ruleList) {
-                    discrepancy = clipped != ((ClippableUpdateRule) nur)
-                            .isClipped();
-                    if (discrepancy) {
-                        break;
-                    }
-                }
-                if (discrepancy) {
-                    clipping.setSelectedIndex(TristateDropDown.getNULL());
-                    setBoundsEnabled(false);
-                } else {
-                    clipping.setSelected(clipped);
-                    setBoundsEnabled(clipped);
-                }
-                setClippingVisible(true);
-                setBoundsEnabled(clipped);
+                clippingConsistencyCheckAndAssign(ruleList);
             } catch (ClassCastException cce) {
+                // Not all neurons shared the clippable interface
                 setClippingVisible(false);
             }
         }
@@ -295,8 +356,9 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Initialize the panel with default field values.
-     *
-     * @param rule rule to use for setting the default values.
+     * 
+     * @param rule
+     *            rule to use for setting the default values.
      */
     private void initializeDefaultValues(NeuronUpdateRule rule) {
         tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
@@ -309,8 +371,9 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Update field visibility based on whether rule is bounded and/or clipped.
-     *
-     * @param rule the current rule
+     * 
+     * @param rule
+     *            the current rule
      */
     public void updateFieldVisibility(NeuronUpdateRule rule) {
         boolean bounded = rule instanceof BoundedUpdateRule;
@@ -325,9 +388,9 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * <b>Specifically:</b> Uses the values from text fields to
-     * alter corresponding values in the neuron(s) being edited. Called
-     * externally to apply changes.
+     * <b>Specifically:</b> Uses the values from text fields to alter
+     * corresponding values in the neuron(s) being edited. Called externally to
+     * apply changes.
      */
     @Override
     public boolean commitChanges() {
@@ -354,7 +417,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfCeiling.getText().matches(SimbrainConstants.NULL_STRING);
+                    success &= tfCeiling.getText().matches(
+                            SimbrainConstants.NULL_STRING);
                 }
                 // Lower Bound
                 double floor = Utils.doubleParsable(tfFloor);
@@ -366,7 +430,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
-                    success &= tfFloor.getText().matches(SimbrainConstants.NULL_STRING);
+                    success &= tfFloor.getText().matches(
+                            SimbrainConstants.NULL_STRING);
                 }
             }
 
@@ -381,7 +446,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfIncrement.getText().matches(SimbrainConstants.NULL_STRING);
+            success &= tfIncrement.getText().matches(
+                    SimbrainConstants.NULL_STRING);
         }
 
         // Priority
@@ -395,7 +461,8 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
-            success &= tfPriority.getText().matches(SimbrainConstants.NULL_STRING);
+            success &= tfPriority.getText().matches(
+                    SimbrainConstants.NULL_STRING);
         }
 
         // Clamped
@@ -446,8 +513,9 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Properly repaints the panel when clipping and its label are made visible
      * or invisible.
-     *
-     * @param visible should the clipping stuff be visible or not
+     * 
+     * @param visible
+     *            should the clipping stuff be visible or not
      */
     public void setClippingVisible(boolean visible) {
         clippingVisible = visible;
@@ -455,7 +523,6 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         repaint();
         parent.pack();
     }
-
 
     @Override
     public JPanel getPanel() {

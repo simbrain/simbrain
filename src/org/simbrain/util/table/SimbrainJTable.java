@@ -339,6 +339,13 @@ public class SimbrainJTable extends JXTable {
             toolbar.add(TableActionManager
                     .getSaveCSVAction((NumericTable) getData()));
             return toolbar;
+        } else if (getData() instanceof TextTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager.getOpenCSVAction(
+                    (TextTable) getData(), allowRowChanges, allowColumnChanges));
+            toolbar.add(TableActionManager
+                    .getSaveCSVAction((TextTable) getData()));
+            return toolbar;
         }
         return null;
     }
@@ -504,6 +511,13 @@ public class SimbrainJTable extends JXTable {
                     allowColumnChanges)));
             menu.add(new JMenuItem(TableActionManager
                     .getSaveCSVAction((NumericTable) getData())));
+            return menu;
+        } else if (getData() instanceof TextTable) {
+            JMenu menu = new JMenu("Import / Export .csv");
+            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(
+                    (TextTable) getData(), allowRowChanges, allowColumnChanges)));
+            menu.add(new JMenuItem(TableActionManager
+                    .getSaveCSVAction((TextTable) getData())));
             return menu;
         }
         return null;

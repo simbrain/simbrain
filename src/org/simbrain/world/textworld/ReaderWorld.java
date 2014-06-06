@@ -18,9 +18,7 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +34,20 @@ import com.thoughtworks.xstream.XStream;
  * in, for example, a neural networks.
  */
 public class ReaderWorld extends TextWorld {
+
+    /**
+     * The reader world "dictionary", which associates string tokens with arrays
+     * of doubles.
+     */
+    private final LinkedHashMap<String, double[]> tokenVectorMap = new LinkedHashMap<String, double[]>();
+
+    // Initialize map to sample values
+    {
+        tokenVectorMap.put("hello", new double[] { .2, 0, 0 });
+        tokenVectorMap.put("how", new double[] { .1 });
+        tokenVectorMap.put("are", new double[] { 1 });
+        tokenVectorMap.put("you", new double[] { 0, .5, 0 });
+    }
 
     /** List of parsing style. */
     public enum ParseStyle {
@@ -137,15 +149,15 @@ public class ReaderWorld extends TextWorld {
         } else if (parseStyle == ParseStyle.WORD) {
             if (matcher != null) {
                 if (matcherInValidState) {
-                    System.out.println("matcherInValidState");
+                    // System.out.println("matcherInValidState");
                     positionAfterLastDelimeter = matcher.end();
                 }
                 if (getPosition() < getText().length()) {
                     if (matcher.find()) {
                         matcherInValidState = true;
-                        System.out.println("Delimeter found: ["
-                                + matcher.group() + "](" + matcher.start()
-                                + "," + matcher.end() + ")");
+                        // System.out.println("Delimeter found: ["
+                        // + matcher.group() + "](" + matcher.start()
+                        // + "," + matcher.end() + ")");
                         int begin = positionAfterLastDelimeter;
                         int end = matcher.start();
                         if (begin <= end) {
@@ -160,13 +172,14 @@ public class ReaderWorld extends TextWorld {
                         // System.out.println(getCurrentItem());
                     } else {
                         matcherInValidState = false;
-                        System.out.println("nothing found");
+                        // System.out.println("nothing found");
                         setCurrentItem(new TextItem(getPosition(),
                                 getPosition(), ""));
-                        setPosition(0); // TODO:Option to reset to beginning of text
+                        setPosition(0); // TODO:Option to reset to beginning of
+                                        // text
                     }
                 } else {
-                    System.out.println("position >= text.length");
+                    // System.out.println("position >= text.length");
                     setCurrentItem(new TextItem(getPosition(), getPosition(),
                             ""));
                     setPosition(0);
@@ -262,57 +275,32 @@ public class ReaderWorld extends TextWorld {
     }
 
     /**
-     * Returns 1 if the current item matches the provided text, 0 otherwise.
-     * Used for localist representation of words.
+     * Return the vector associated with the currently parsed token, or a
+     * default zero vector.
      *
-     * @param text the text to search for
-     * @return 1 if the word is contained, 0 otherwise.
+     * @param token the token to associate with a vector
+     * @return the associated vector
      */
-    public int matchCurrentItem(String text) {
-        if (getCurrentItem().getText().equalsIgnoreCase(text)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    public Map<String, double[]> tokenVectorMap = new HashMap<String, double[]>();
-
-    {
-        putToken("Jeff", new double[] { 1, 2, 3, 4 });
-        putToken("Randy", new double[] { 1, 2, 1, 1 });
-        putToken("Greg", new double[] { -1, 1, 1, -1 });
-        putToken("Sally", new double[] { 1, 0, 0, -1 });
-    }
-
-    public void putToken(String token, double[] vector) {
-        tokenVectorMap.put(token, vector);
-    }
-
-    public double[] getVector(String token) {
+    private double[] getVector(String token) {
         if (tokenVectorMap.containsKey(token)) {
             return tokenVectorMap.get(token);
         } else {
+            // Default vector if no matching string is found in the token map.
             return SimbrainMath.zeroVector(5); // todo; size
         }
     }
 
+    /**
+     * Returns the double array associated with the currently selected token
+     * (character or word). The reader world can produce a vector at any moment
+     * by calling this function. Called by reflection by ReaderComponent.
+     *
+     * @return the vector corresponding to the currently parsed token.
+     */
     public double[] getCurrentVector() {
         // System.out.println(Arrays.toString(this.getVector(this.getCurrentItem()
         // .getText())));
         return this.getVector(this.getCurrentItem().getText());
-    }
-
-    public static void main(String[] argv) {
-        ReaderWorld world = new ReaderWorld();
-
-        for (String name : world.tokenVectorMap.keySet()) {
-
-            String key = name.toString();
-            double[] value = world.tokenVectorMap.get(name);
-            System.out.println(key + " " + Arrays.toString(value));
-
-        }
     }
 
     /**
@@ -323,5 +311,33 @@ public class ReaderWorld extends TextWorld {
     static XStream getXStream() {
         XStream xstream = TextWorld.getXStream();
         return xstream;
+    }
+
+    /**
+     * Reset the reader world dictionary.
+     *
+     * @param tableData array of strings to repopulate dictionary
+     */
+    public void resetRWDictionary(String[][] tableData) {
+        // TODO: Make it so the dialog dynamically updates only based on current
+        // cell
+        // TODO: Complain if bad text...
+        tokenVectorMap.clear();
+        for (int i = 0; i < tableData.length; i++) {
+            String[] parsedString = tableData[i][1].split(",");
+            double[] vector = new double[parsedString.length];
+            for (int j = 0; j < parsedString.length; j++) {
+                vector[j] = Double.parseDouble(parsedString[j]);
+            }
+            tokenVectorMap.put(tableData[i][0], vector);
+        }
+        fireDictionaryChangedEvent();
+    }
+
+    /**
+     * @return the tokenVectorMap
+     */
+    public LinkedHashMap<String, double[]> getTokenVectorMap() {
+        return tokenVectorMap;
     }
 }

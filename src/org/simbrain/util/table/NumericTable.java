@@ -368,22 +368,4 @@ public class NumericTable extends MutableTable<Double> implements
         return returnList;
     }
 
-    /**
-     * The wrong type of data is being read in to this table.
-     *
-     * @author jeffyoshimi
-     */
-    public class TableDataException extends RuntimeException {
-
-        /**
-         * Construct the exception.
-         *
-         * @param string message string
-         */
-        public TableDataException(String string) {
-            super(string);
-        }
-
-    }
-
 }

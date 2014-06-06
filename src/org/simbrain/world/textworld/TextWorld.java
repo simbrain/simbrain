@@ -50,9 +50,12 @@ public abstract class TextWorld {
     /** Last position in the text. */
     private int lastPosition;
 
+    //TODO: Remove and create separate dictionaries for the two types of world?
     /** Word list for word parsing in both directions (reading and display). */
     private Set<String> dictionary = new TreeSet<String>();
 
+    // TODO: Listeners may no longer be needed since there will no longer be
+    // separate attributes for each word
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
 

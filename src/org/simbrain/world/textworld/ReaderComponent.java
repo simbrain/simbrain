@@ -65,28 +65,22 @@ public class ReaderComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
+        addProducerType(new AttributeType(this, "TokenVectors", double[].class,
+                true));
         addProducerType(new AttributeType(this, "Letters", double.class, true));
-        addProducerType(new AttributeType(this, "Words", double.class, false));
-        world.addListener(new TextListener() {
-            public void textChanged() {
-            }
-
-            public void dictionaryChanged() {
-                ReaderComponent.this.firePotentialAttributesChanged();
-            }
-
-            public void positionChanged() {
-            }
-
-            public void currentItemChanged(TextItem newItem) {
-            }
-        });
     }
 
     @Override
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
+            if (type.getTypeName().equalsIgnoreCase("TokenVectors")) {
+                PotentialProducer producer = getAttributeManager()
+                        .createPotentialProducer(world, "getCurrentVector",
+                                double[].class);
+                returnList.add(producer);
+
+            }
             if (type.getTypeName().equalsIgnoreCase("Letters")) {
                 char letter;
                 for (letter = 'a'; letter <= 'z'; letter++) {
@@ -99,31 +93,7 @@ public class ReaderComponent extends WorkspaceComponent {
                     returnList.add(producer);
                 }
             }
-            if (type.getTypeName().equalsIgnoreCase("Words")) {
-//                for (String word : world.getDictionary()) {
-//                    PotentialProducer producer = getAttributeManager()
-//                            .createPotentialProducer(world, "matchCurrentItem",
-//                                    double.class, new Class[] { String.class },
-//                                    new Object[] { word });
-//                    producer.setCustomDescription(word);
-//                    returnList.add(producer);
-//                }
-
-            }
         }
-//        for (String word : world.dictionary2.keySet()) {
-//            PotentialProducer producer = getAttributeManager()
-//                    .createPotentialProducer(world, "getVector",
-//                            double[].class, new Class[] { String.class },
-//                            new Object[] { word });
-//            producer.setCustomDescription(word);
-//            returnList.add(producer);
-//        }
-        PotentialProducer producer = getAttributeManager()
-                .createPotentialProducer(world, "getCurrentVector",
-                        double[].class);
-        returnList.add(producer);
-
         return returnList;
     }
 

@@ -60,28 +60,65 @@ public class ReaderPanel extends JPanel {
     private JTextArea textArea = new JTextArea();
 
     /**
+     * Toolbar for opening and closing the world. Must be defined at component
+     * level.
+     */
+    private JToolBar openCloseToolBar = null;
+
+    /**
+     * Initialize the panel with an open / close toolbar.
+     *
+     * @param theWorld the reader world to display
+     * @param toolbar the openClose toolbar.
+     */
+    public ReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
+        this(theWorld);
+        openCloseToolBar = toolbar;
+        init();
+    }
+
+    /**
      * Construct a reader panel to represent data in a text world.
      *
-     * @param world the world to represent
+     * @param theWorld the world to represent
      */
     public ReaderPanel(ReaderWorld theWorld) {
-        super(new BorderLayout());
-        this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         this.world = theWorld;
-        // textArea.addKeyListener(this);
-        // textArea.addMouseListener(this);
-
-        textArea.setLineWrap(true);
-        textArea.setText(world.getText());
-
         init();
 
     }
 
     /**
-     * Initialize all the listeners of this class.
+     * Initialize the panel and its listeners
      */
     private void init() {
+
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        textArea.setLineWrap(true);
+        textArea.setText(world.getText());
+        final JScrollPane inputScrollPane = new JScrollPane(textArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(inputScrollPane);
+
+        // Add toolbars
+        JPanel topToolbarPanel = new JPanel();
+        topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        if (openCloseToolBar != null) {
+            topToolbarPanel.add(openCloseToolBar);
+        }
+        JToolBar dictionaryToolBar = new JToolBar();
+        dictionaryToolBar
+                .add(TextWorldActions.getShowDictionaryRWAction(world));
+        topToolbarPanel.add(dictionaryToolBar);
+
+        add(topToolbarPanel, BorderLayout.NORTH);
+        JPanel bottomToolbarPanel = new JPanel();
+        bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        bottomToolbarPanel.add(getToolbarModeSelect());
+        add(bottomToolbarPanel, BorderLayout.SOUTH);
+
 
         textArea.addCaretListener(new CaretListener() {
 
@@ -120,21 +157,6 @@ public class ReaderPanel extends JPanel {
 
         });
 
-        final JScrollPane inputScrollPane = new JScrollPane(textArea,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(inputScrollPane);
-
-        // Add toolbars
-        JPanel topToolbarPanel = new JPanel();
-        topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        topToolbarPanel.add(getToolbarDictionary());
-        add(topToolbarPanel, BorderLayout.NORTH);
-
-        JPanel bottomToolbarPanel = new JPanel();
-        bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        bottomToolbarPanel.add(getToolbarModeSelect());
-        add(bottomToolbarPanel, BorderLayout.SOUTH);
 
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {
@@ -229,19 +251,6 @@ public class ReaderPanel extends JPanel {
      */
     public ReaderWorld getWorld() {
         return world;
-    }
-
-    /**
-     * Return a toolbar with buttons for importing and exporting dictionaries.
-     *
-     * @return the dictionary toolbar
-     */
-    public JToolBar getToolbarDictionary() {
-        JToolBar toolbar = new JToolBar();
-        toolbar.add(TextWorldActions.getLoadDictionaryAction(world));
-        toolbar.add(TextWorldActions.getShowDictionaryAction(world));
-        // add action for opening dictionary files: toolbar.add(ACTION);
-        return toolbar;
     }
 
     /**

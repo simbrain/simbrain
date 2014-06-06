@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
-import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,8 +37,8 @@ import javax.swing.KeyStroke;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -176,6 +175,62 @@ public class TextWorldActions {
     }
 
     /**
+     * Action for displaying the contents of the text world dictionary.
+     *
+     * @param world the world whose dictionary should be displayed
+     * @return the action
+     */
+    public static Action getShowDictionaryRWAction(final ReaderWorld world) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(NAME, "Token > vector map");
+                putValue(SHORT_DESCRIPTION, "Display token > vector map");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+
+                // Should really enable / disable the action depending
+                // on if the dictionary is empty or not, but time is limited...
+                StandardDialog dialog = new StandardDialog();
+                dialog.setTitle("View / Edit Token > Vector Mappings");
+                JPanel mainPanel = new JPanel(new BorderLayout());
+                SimbrainJTable table = new SimbrainJTable(new TextTable(
+                        world.getTokenVectorMap()));
+                table.setShowCSVInPopupMenu(true);
+                table.setShowDeleteColumnPopupMenu(false);
+                table.setShowInsertColumnPopupMenu(false);
+                table.setShowEditInPopupMenu(false);
+                SimbrainJTableScrollPanel scroller = new SimbrainJTableScrollPanel(
+                        table);
+                JPanel toolbarPanel = new JPanel();
+                toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                toolbarPanel.add(table.getToolbarCSV(true, false));
+                toolbarPanel.add(table.getToolbarEditRows());
+                mainPanel.add(toolbarPanel, BorderLayout.NORTH);
+                scroller.setMaxVisibleRows(10);
+                table.setDisplayColumnHeadings(false);
+                mainPanel.add(scroller, BorderLayout.CENTER);
+
+                // Display dialog
+                dialog.setContentPane(mainPanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                if (!dialog.hasUserCancelled()) {
+                    world.resetRWDictionary(table.getData().asStringArray());
+                }
+            }
+        };
+
+    }
+
+    /**
      * Action for displaying a preference dialog.
      *
      * @param world the world for which a dialog should be shown
@@ -233,5 +288,6 @@ public class TextWorldActions {
             return null;
         }
     }
+
 
 }

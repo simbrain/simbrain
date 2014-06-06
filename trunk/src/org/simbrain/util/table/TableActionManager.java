@@ -38,7 +38,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.table.NumericTable.TableDataException;
 
 /**
  * Contains actions for use in SimbrainJTables.
@@ -94,12 +93,53 @@ public class TableActionManager {
     }
 
     /**
+     * Action for opening text table from comma separated value file.
+     *
+     * @param table table to load data in to
+     * @param allowRowChanges whether to allow number of rows to change
+     * @param allowColumnChanges whether to allow number of columns to change
+     * @return the action
+     */
+    public static Action getOpenCSVAction(final TextTable table,
+            final boolean allowRowChanges, final boolean allowColumnChanges) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(NAME, "Import (.csv)");
+                putValue(SHORT_DESCRIPTION, "Import table from .csv");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
+                        "comma-separated-values (csv)", "csv");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    try {
+                        table.readData(theFile, allowRowChanges,
+                                allowColumnChanges);
+                    } catch (TableDataException e) {
+                        JOptionPane.showOptionDialog(null, e.getMessage(),
+                                "Warning", JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.WARNING_MESSAGE, null, null, null);
+                    }
+                }
+            }
+
+        };
+    }
+
+    /**
      * Action for saving to comma separated value file.
      *
      * @param table table to load data in to
      * @return the action
      */
-    public static Action getSaveCSVAction(final NumericTable table) {
+    public static Action getSaveCSVAction(final SimbrainDataTable table) {
         return new AbstractAction() {
 
             // Initialize

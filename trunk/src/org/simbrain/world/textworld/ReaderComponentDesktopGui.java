@@ -26,6 +26,7 @@ import java.awt.event.ComponentEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JToolBar;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -84,7 +85,10 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         super(frame, component);
 
         world = component.getWorld();
-        panel = new ReaderPanel(world);
+        JToolBar openSaveToolBar = new JToolBar();
+        openSaveToolBar.add(new OpenAction(this));
+        openSaveToolBar.add(new SaveAction(this));
+        panel = new ReaderPanel(world, openSaveToolBar);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         addMenuBar();
         add(panel);

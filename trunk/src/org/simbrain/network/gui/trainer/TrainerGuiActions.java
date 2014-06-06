@@ -36,8 +36,8 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
-import org.simbrain.util.table.NumericTable.TableDataException;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.TableDataException;
 
 /**
  * Contains actions for use in Trainer GUI.

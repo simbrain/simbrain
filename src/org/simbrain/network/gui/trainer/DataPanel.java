@@ -111,6 +111,9 @@ public class DataPanel extends JPanel {
         // Initialize listener
         table.getData().addListener(new SimbrainTableListener() {
 
+            // TODO: These should make targeted changes rather than blanket changes
+            //      to the whole table.  Inefficient for large tables.
+
             public void columnAdded(int column) {
                 // Should not happen.
             }

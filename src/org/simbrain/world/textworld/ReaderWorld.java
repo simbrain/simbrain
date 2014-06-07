@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -33,21 +34,20 @@ import com.thoughtworks.xstream.XStream;
  * by a regular expression), and can then convert these items to numbers for use
  * in, for example, a neural networks.
  */
-public class ReaderWorld extends TextWorld {
+public final class ReaderWorld extends TextWorld {
 
     /**
      * The reader world "dictionary", which associates string tokens with arrays
      * of doubles.
      */
-    private final LinkedHashMap<String, double[]> tokenVectorMap = new LinkedHashMap<String, double[]>();
+    private final LinkedHashMap<String, double[]> vectorDictionary =
+            new LinkedHashMap<String, double[]>();
 
-    // Initialize map to sample values
-    {
-        tokenVectorMap.put("hello", new double[] { .2, 0, 0 });
-        tokenVectorMap.put("how", new double[] { .1 });
-        tokenVectorMap.put("are", new double[] { 1 });
-        tokenVectorMap.put("you", new double[] { 0, .5, 0 });
-    }
+    /**
+     * Default zero vector to return if no matching entry is found in the vector
+     * dictionary.
+     */
+    private final static double[] ZERO_VEC = SimbrainMath.zeroVector(5);
 
     /** List of parsing style. */
     public enum ParseStyle {
@@ -78,14 +78,37 @@ public class ReaderWorld extends TextWorld {
      */
     private boolean matcherInValidState = false;
 
+    //Initialize vector dictionary to sample values
+    {
+        vectorDictionary.put("hello", new double[] { .2, 0, 0 });
+        vectorDictionary.put("how", new double[] { .1 });
+        vectorDictionary.put("are", new double[] { 1 });
+        vectorDictionary.put("you", new double[] { 0, .5, 0 });
+    }
+
+    /**
+     * Factory method for Reader world.
+     *
+     * @return the constructed world.
+     */
+    public static ReaderWorld createReaderWorld() {
+        final ReaderWorld r = new ReaderWorld();
+        r.initListeners();
+        return r;
+    }
     /**
      * Constructs an instance of TextWorld.
      */
-    public ReaderWorld() {
-
+    private ReaderWorld() {
         // Set whitespace as default delimeter
         setDelimeter("\\s");
         resetMatcher();
+    }
+
+    /**
+     * Init the listeners, called by factor method, outside the constructor.
+     */
+    private void initListeners() {
 
         // Text Listener
         this.addListener(new TextListener() {
@@ -282,11 +305,12 @@ public class ReaderWorld extends TextWorld {
      * @return the associated vector
      */
     private double[] getVector(String token) {
-        if (tokenVectorMap.containsKey(token)) {
-            return tokenVectorMap.get(token);
-        } else {
+        double[] vector = vectorDictionary.get(token);
+        if (vector == null) {
             // Default vector if no matching string is found in the token map.
-            return SimbrainMath.zeroVector(5); // todo; size
+            return ZERO_VEC;
+        } else {
+            return vector;
         }
     }
 
@@ -316,20 +340,13 @@ public class ReaderWorld extends TextWorld {
     /**
      * Reset the reader world dictionary.
      *
-     * @param tableData array of strings to repopulate dictionary
+     * @param tableData array of strings to re-populate dictionary
      */
-    public void resetRWDictionary(String[][] tableData) {
-        // TODO: Make it so the dialog dynamically updates only based on current
-        // cell
-        // TODO: Complain if bad text...
-        tokenVectorMap.clear();
+    public void resetVectorDictionary(String[][] tableData) {
+        vectorDictionary.clear();
         for (int i = 0; i < tableData.length; i++) {
-            String[] parsedString = tableData[i][1].split(",");
-            double[] vector = new double[parsedString.length];
-            for (int j = 0; j < parsedString.length; j++) {
-                vector[j] = Double.parseDouble(parsedString[j]);
-            }
-            tokenVectorMap.put(tableData[i][0], vector);
+            double[] vector = Utils.parseVectorString(tableData[i][1]);
+            vectorDictionary.put(tableData[i][0], vector);
         }
         fireDictionaryChangedEvent();
     }
@@ -337,7 +354,7 @@ public class ReaderWorld extends TextWorld {
     /**
      * @return the tokenVectorMap
      */
-    public LinkedHashMap<String, double[]> getTokenVectorMap() {
-        return tokenVectorMap;
+    public LinkedHashMap<String, double[]> getVectorDictionary() {
+        return vectorDictionary;
     }
 }

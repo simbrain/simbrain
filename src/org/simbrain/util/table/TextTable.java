@@ -19,8 +19,6 @@
 package org.simbrain.util.table;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.simbrain.util.Utils;
@@ -56,20 +54,9 @@ public class TextTable extends MutableTable<String> {
     }
 
     /**
-     * Construct table that associates tokens with vector strings.
+     * No arg constructor.
      */
-    public TextTable(final HashMap<String, double[]> dictionary) {
-        //TODO: This should happen outside of this class.
-        init(dictionary.size(), 2);
-        int i = 0;
-        for (Map.Entry<String, double[]> entry : dictionary.entrySet()) {
-            String token = entry.getKey();
-            double[] vals = entry.getValue();
-            setValue(i, 0, token, false);
-            setValue(i, 1, Utils.doubleArrayToString(vals), false);
-            i++;
-        }
-        fireTableDataChanged();
+    public TextTable() {
     }
 
     /**
@@ -109,16 +96,8 @@ public class TextTable extends MutableTable<String> {
     public void readData(final File file, final boolean allowRowChanges,
             final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
-        // TODO: Code below duplicates part of NumericTable.readData
-        if (!allowRowChanges && values.length != getRowCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values.length + " rows into a table with "
-                    + getRowCount() + " rows.");
-        } else if (!allowColumnChanges && values[0].length != getColumnCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values[0].length + " columns into a table with "
-                    + getColumnCount() + " columns.");
-        } else {
+        try {
+            checkData(allowRowChanges, allowColumnChanges, values);
             reset(values.length, values[0].length);
             for (int i = 0; i < values.length; i++) {
                 for (int j = 0; j < values[0].length; j++) {
@@ -128,6 +107,8 @@ public class TextTable extends MutableTable<String> {
                 }
             }
             fireTableStructureChanged();
+        } catch (TableDataException tde) {
+            throw tde;
         }
     }
 

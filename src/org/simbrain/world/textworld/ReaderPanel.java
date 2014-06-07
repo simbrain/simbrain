@@ -59,6 +59,9 @@ public class ReaderPanel extends JPanel {
     /** Text area for inputting text into networks. */
     private JTextArea textArea = new JTextArea();
 
+    /** The main scroll panel. */
+    final JScrollPane inputScrollPane;
+
     /**
      * Toolbar for opening and closing the world. Must be defined at component
      * level.
@@ -66,38 +69,47 @@ public class ReaderPanel extends JPanel {
     private JToolBar openCloseToolBar = null;
 
     /**
+     * Factory method for panel (so that listeners are not created in
+     * constructor).
+     *
+     * @param theWorld the world
+     * @param toolbar pass in open / close toolbar
+     * @return the constructed panel
+     */
+    public static ReaderPanel createReaderPanel(ReaderWorld theWorld,
+            JToolBar toolbar) {
+        ReaderPanel panel = new ReaderPanel(theWorld, toolbar);
+        panel.initListeners();
+        return panel;
+    }
+
+    /**
+     * Factory method for panel (so that listeners are not created in
+     * constructor).
+     *
+     * @param theWorld the world
+     * @return the constructed panel
+     */
+    public static ReaderPanel createReaderPanel(ReaderWorld theWorld) {
+        ReaderPanel panel = new ReaderPanel(theWorld, null);
+        panel.initListeners();
+        return panel;
+    }
+
+    /**
      * Initialize the panel with an open / close toolbar.
      *
      * @param theWorld the reader world to display
      * @param toolbar the openClose toolbar.
      */
-    public ReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
-        this(theWorld);
-        openCloseToolBar = toolbar;
-        init();
-    }
-
-    /**
-     * Construct a reader panel to represent data in a text world.
-     *
-     * @param theWorld the world to represent
-     */
-    public ReaderPanel(ReaderWorld theWorld) {
+    private ReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
-        init();
-
-    }
-
-    /**
-     * Initialize the panel and its listeners
-     */
-    private void init() {
-
+        openCloseToolBar = toolbar;
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-        final JScrollPane inputScrollPane = new JScrollPane(textArea,
+        inputScrollPane = new JScrollPane(textArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(inputScrollPane);
@@ -110,7 +122,7 @@ public class ReaderPanel extends JPanel {
         }
         JToolBar dictionaryToolBar = new JToolBar();
         dictionaryToolBar
-                .add(TextWorldActions.getShowDictionaryRWAction(world));
+                .add(TextWorldActions.showVectorDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
 
         add(topToolbarPanel, BorderLayout.NORTH);
@@ -118,7 +130,12 @@ public class ReaderPanel extends JPanel {
         bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         bottomToolbarPanel.add(getToolbarModeSelect());
         add(bottomToolbarPanel, BorderLayout.SOUTH);
+    }
 
+    /**
+     * Init the listeners, called by factor method, outside the constructor.
+     */
+    private void initListeners() {
 
         textArea.addCaretListener(new CaretListener() {
 
@@ -156,7 +173,6 @@ public class ReaderPanel extends JPanel {
             }
 
         });
-
 
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {

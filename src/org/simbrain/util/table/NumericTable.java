@@ -57,7 +57,7 @@ public class NumericTable extends MutableTable<Double> implements
      * Construct a table with a specified number of rows and columns.
      *
      * @param numRows number of rows.
-     * @param getColumnCount() number of columns.
+     * @param numColumns number of columns.
      */
     public NumericTable(final int numRows, final int numColumns) {
         init(numRows, numColumns);
@@ -324,16 +324,8 @@ public class NumericTable extends MutableTable<Double> implements
     public void readData(final File file, final boolean allowRowChanges,
             final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
-
-        if (!allowRowChanges && values.length != getRowCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values.length + " rows into a table with "
-                    + getRowCount() + " rows.");
-        } else if (!allowColumnChanges && values[0].length != getColumnCount()) {
-            throw new TableDataException("Trying to import data with "
-                    + values[0].length + " columns into a table with "
-                    + getColumnCount() + " columns.");
-        } else {
+        try {
+            checkData(allowRowChanges, allowColumnChanges, values);
             reset(values.length, values[0].length);
             for (int i = 0; i < values.length; i++) {
                 for (int j = 0; j < values[0].length; j++) {
@@ -349,6 +341,8 @@ public class NumericTable extends MutableTable<Double> implements
                 }
             }
             fireTableStructureChanged();
+        } catch (TableDataException tde) {
+            throw tde;
         }
     }
 

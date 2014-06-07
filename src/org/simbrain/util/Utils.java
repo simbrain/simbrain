@@ -213,6 +213,21 @@ public class Utils {
     }
 
     /**
+     * Like {@link #doubleParsable(tField)} but checks for the formatting of a
+     * string rather than a text field.
+     *
+     * @param text the text to check
+     * @return NaN if invalid, the parsed double otherwise
+     */
+    public static double doubleParsable(String text) {
+        try {
+            return Double.parseDouble(text);
+        } catch (NullPointerException | NumberFormatException ex) {
+            return Double.NaN;
+        }
+    }
+
+    /**
      * Convert an array of doubles into a String.
      *
      * @param theVec the array of doubles to convert
@@ -322,6 +337,23 @@ public class Utils {
         }
 
         return ret;
+    }
+
+    /**
+     * Converts a String representation of a vector (e.g. "1,0,0,1,0") into a
+     * double array. Invalid characters are converted to 0.
+     *
+     * @param vectorString the string to parse.
+     * @return the parsed double array.
+     */
+    public static double[] parseVectorString(String vectorString) {
+        String[] parsedString = vectorString.split(",");
+        double[] vector = new double[parsedString.length];
+        for (int j = 0; j < parsedString.length; j++) {
+            double val = Utils.doubleParsable(parsedString[j]);
+            vector[j] = Double.isNaN(val) ? 0 : val;
+        }
+        return vector;
     }
 
     /**

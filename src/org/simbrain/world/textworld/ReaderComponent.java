@@ -45,7 +45,7 @@ public class ReaderComponent extends WorkspaceComponent {
      */
     public ReaderComponent(String name) {
         super(name);
-        world = new ReaderWorld();
+        world = ReaderWorld.createReaderWorld();
         init();
     }
 

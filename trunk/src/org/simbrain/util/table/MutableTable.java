@@ -267,6 +267,29 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     public void reset(final int rows, final int cols, final T val) {
         reset(rows, cols);
         fill(val);
+
+    }
+
+    /**
+     * Check the integrity of the data.
+     *
+     * @param allowRowChanges whether rows should be editable
+     * @param allowColumnChanges whether columns should be editable
+     * @param values the value to check
+     * @throws TableDataException exception if data are invalid
+     */
+    protected void checkData(boolean allowRowChanges,
+            boolean allowColumnChanges, Object[][] values)
+            throws TableDataException {
+        if (!allowRowChanges && values.length != getRowCount()) {
+            throw new TableDataException("Trying to import data with "
+                    + values.length + " rows into a table with "
+                    + getRowCount() + " rows.");
+        } else if (!allowColumnChanges && values[0].length != getColumnCount()) {
+            throw new TableDataException("Trying to import data with "
+                    + values[0].length + " columns into a table with "
+                    + getColumnCount() + " columns.");
+        }
     }
 
 }

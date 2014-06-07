@@ -175,12 +175,12 @@ public class TextWorldActions {
     }
 
     /**
-     * Action for displaying the contents of the text world dictionary.
+     * Action for showing the vector dictionary editor.
      *
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
-    public static Action getShowDictionaryRWAction(final ReaderWorld world) {
+    public static Action showVectorDictionaryEditor(final ReaderWorld world) {
         return new AbstractAction() {
 
             // Initialize
@@ -194,37 +194,12 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-
-                // Should really enable / disable the action depending
-                // on if the dictionary is empty or not, but time is limited...
-                StandardDialog dialog = new StandardDialog();
-                dialog.setTitle("View / Edit Token > Vector Mappings");
-                JPanel mainPanel = new JPanel(new BorderLayout());
-                SimbrainJTable table = new SimbrainJTable(new TextTable(
-                        world.getTokenVectorMap()));
-                table.setShowCSVInPopupMenu(true);
-                table.setShowDeleteColumnPopupMenu(false);
-                table.setShowInsertColumnPopupMenu(false);
-                table.setShowEditInPopupMenu(false);
-                SimbrainJTableScrollPanel scroller = new SimbrainJTableScrollPanel(
-                        table);
-                JPanel toolbarPanel = new JPanel();
-                toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-                toolbarPanel.add(table.getToolbarCSV(true, false));
-                toolbarPanel.add(table.getToolbarEditRows());
-                mainPanel.add(toolbarPanel, BorderLayout.NORTH);
-                scroller.setMaxVisibleRows(10);
-                table.setDisplayColumnHeadings(false);
-                mainPanel.add(scroller, BorderLayout.CENTER);
-
-                // Display dialog
-                dialog.setContentPane(mainPanel);
+                VectorDictionaryEditor dialog = VectorDictionaryEditor
+                        .createVectorDictionaryEditor(world);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                if (!dialog.hasUserCancelled()) {
-                    world.resetRWDictionary(table.getData().asStringArray());
-                }
+
             }
         };
 

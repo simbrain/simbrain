@@ -88,7 +88,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         JToolBar openSaveToolBar = new JToolBar();
         openSaveToolBar.add(new OpenAction(this));
         openSaveToolBar.add(new SaveAction(this));
-        panel = new ReaderPanel(world, openSaveToolBar);
+        panel = ReaderPanel.createReaderPanel(world, openSaveToolBar);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         addMenuBar();
         add(panel);

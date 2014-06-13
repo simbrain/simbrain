@@ -51,7 +51,8 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
     /**
      * Construct an SOM Network.
      *
-     * @param net parent network
+     * @param net parent network. Set to null when this is used simply as a
+     *            holder for param values.
      * @param numSOMNeurons number of neurons in the SOM layer
      * @param numInputNeurons number of neurons in the input layer
      * @param initialPosition bottom corner where network will be placed.
@@ -63,6 +64,9 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         som = new SOMGroup(net, numSOMNeurons);
         inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
         inputLayer.setLayoutBasedOnSize();
+        if (net == null) {
+            return;
+        }
         this.addNeuronGroup(som);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {

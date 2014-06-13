@@ -42,32 +42,30 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryRatioPanel;
 
 /**
  * Panel for adjusting the connectivity between a source and target set of
  * neurons.
- *
+ * 
  * TODO: Not yet completed. This is temporary.
- *
+ * 
  */
 public class ConnectivityAdjustmentPanel extends JPanel {
 
-    private final ExcitatoryInhibitoryRatioPanel eipPanel;
-
     /** A slider for setting the sparsity of the connections. */
-    private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
+    private JSlider sparsitySlider =
+        new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
 
     /** A text field for setting the sparsity of the connections. */
     private JFormattedTextField sparsity = new JFormattedTextField(
-            NumberFormat.getNumberInstance());
+        NumberFormat.getNumberInstance());
 
     /**
      * A text field allowing the user to specify the number of outgoing synapses
      * per source neuron.
      */
     private JFormattedTextField synsPerSource = new JFormattedTextField(
-            NumberFormat.getNumberInstance());
+        NumberFormat.getNumberInstance());
 
     /**
      * A check box for determining if the number of outgoing synapses per source
@@ -90,9 +88,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
     private boolean userFlag = true;
 
     public ConnectivityAdjustmentPanel(final Sparse connection,
-            final NetworkPanel networkPanel) {
-        eipPanel = new ExcitatoryInhibitoryRatioPanel(connection);
-        // eipPanel.turnStuffOff = true;
+        final NetworkPanel networkPanel) {
         numTargs = networkPanel.getSelectedModelNeurons().size();
         // fillFieldValues();
         initializeSparseSlider();
@@ -121,27 +117,12 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
 
-        // gbc.insets = new Insets(10, 10, 0, 10);
-        // gbc.gridy = 4;
-        // gbc.gridheight = 1;
-        // sparseContainer.add(new JSeparator(), gbc);
-        //
-        // gbc.insets = new Insets(0, 0, 0, 0);
-        // gbc.gridy = 5;
-        // gbc.gridheight = 9;
-        // sparseContainer.add(eipPanel, gbc);
-        //
-        // gbc.insets = new Insets(10, 10, 0, 10);
-        // gbc.gridy = 14;
-        // gbc.gridheight = 1;
-        // sparseContainer.add(new JSeparator(), gbc);
-        //
-        // gbc.gridy = 15;
-        // gbc.gridwidth = 1;
-        // sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
-        //
-        // gbc.gridx = 2;
-        // sparseContainer.add(allowSelfConnect, gbc);
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
+
+        gbc.gridx = 2;
+        sparseContainer.add(allowSelfConnect, gbc);
 
     }
 
@@ -203,7 +184,8 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         sparsitySlider.setMinorTickSpacing(2);
         sparsitySlider.setPaintTicks(true);
 
-        Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable2 =
+            new Hashtable<Integer, JLabel>();
         labelTable2.put(new Integer(0), new JLabel("0%"));
         labelTable2.put(new Integer(100), new JLabel("100%"));
         sparsitySlider.setLabelTable(labelTable2);
@@ -238,50 +220,50 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         });
 
         synsPerSource.addPropertyChangeListener("value",
-                new PropertyChangeListener() {
+            new PropertyChangeListener() {
 
-                    public void propertyChange(PropertyChangeEvent arg0) {
-                        if (arg0.getSource() == synsPerSource
-                                && sparseSpecific.isSelected()) {
-                            double sparse;
-                            if (userFlag) {
-                                userFlag = false;
-                                if (synsPerSource != null) {
-                                    sparse = ((Number) synsPerSource.getValue())
-                                            .doubleValue() / numTargs;
-                                    sparsity.setValue(new Double(sparse));
-                                    int sVal = (int) (sparse * 100);
-                                    sparsitySlider.setValue(new Integer(sVal));
-                                }
-                            } else {
-                                userFlag = true;
+                public void propertyChange(PropertyChangeEvent arg0) {
+                    if (arg0.getSource() == synsPerSource
+                        && sparseSpecific.isSelected()) {
+                        double sparse;
+                        if (userFlag) {
+                            userFlag = false;
+                            if (synsPerSource != null) {
+                                sparse = ((Number) synsPerSource.getValue())
+                                    .doubleValue() / numTargs;
+                                sparsity.setValue(new Double(sparse));
+                                int sVal = (int) (sparse * 100);
+                                sparsitySlider.setValue(new Integer(sVal));
                             }
+                        } else {
+                            userFlag = true;
                         }
                     }
-                });
+                }
+            });
 
         sparsity.addPropertyChangeListener("value",
-                new PropertyChangeListener() {
+            new PropertyChangeListener() {
 
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getSource() == sparsity) {
-                            int sps;
-                            if (userFlag) {
-                                userFlag = false;
-                                if (sparsity.getValue() != null) {
-                                    sps = (int) (((Number) sparsity.getValue())
-                                            .doubleValue() * numTargs);
-                                    synsPerSource.setValue(new Integer(sps));
-                                    int sVal = (int) (((Number) sparsity
-                                            .getValue()).doubleValue() * 100);
-                                    sparsitySlider.setValue(new Integer(sVal));
-                                }
-                            } else {
-                                userFlag = true;
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (evt.getSource() == sparsity) {
+                        int sps;
+                        if (userFlag) {
+                            userFlag = false;
+                            if (sparsity.getValue() != null) {
+                                sps = (int) (((Number) sparsity.getValue())
+                                    .doubleValue() * numTargs);
+                                synsPerSource.setValue(new Integer(sps));
+                                int sVal = (int) (((Number) sparsity
+                                    .getValue()).doubleValue() * 100);
+                                sparsitySlider.setValue(new Integer(sVal));
                             }
+                        } else {
+                            userFlag = true;
                         }
                     }
-                });
+                }
+            });
 
     }
 

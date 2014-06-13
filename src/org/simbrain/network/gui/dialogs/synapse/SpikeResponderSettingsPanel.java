@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -44,7 +45,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  * Panel to display spike responder settings.
- *
+ * 
  * @author ztosi
  */
 public class SpikeResponderSettingsPanel extends JPanel {
@@ -61,7 +62,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
             AbstractSpikeResponsePanel.getResponderList());
 
     /** The synapses being modified. */
-    private final List<Synapse> synapseList;
+    private final Collection<Synapse> synapseList;
 
     /** The currently displayed spike responder panel. */
     private AbstractSpikeResponsePanel spikeResponderPanel;
@@ -85,12 +86,14 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      * A constructor that sets up the panel in its default display state.
-     *
-     * @param synapseList the list of synapses, the spike responders of which
-     *            will be displayed for edit
-     * @param parent the parent window
+     * 
+     * @param synapseList
+     *            the list of synapses, the spike responders of which will be
+     *            displayed for edit
+     * @param parent
+     *            the parent window
      */
-    public SpikeResponderSettingsPanel(final List<Synapse> synapseList,
+    public SpikeResponderSettingsPanel(final Collection<Synapse> synapseList,
             final Window parent) {
         this(synapseList, DEFAULT_SP_DISPLAY_STATE, parent);
     }
@@ -98,14 +101,17 @@ public class SpikeResponderSettingsPanel extends JPanel {
     /**
      * A constructor that sets up the panel with the spike response panel either
      * hidden or displayed.
-     *
-     * @param synapseList the list of synapses, the spike responders of which
-     *            will be displayed for edit
-     * @param startingState whether or not the spike response panel will start
-     *            out hidden or visible
-     * @param parent the parent window
+     * 
+     * @param synapseList
+     *            the list of synapses, the spike responders of which will be
+     *            displayed for edit
+     * @param startingState
+     *            whether or not the spike response panel will start out hidden
+     *            or visible
+     * @param parent
+     *            the parent window
      */
-    public SpikeResponderSettingsPanel(final List<Synapse> synapseList,
+    public SpikeResponderSettingsPanel(final Collection<Synapse> synapseList,
             final boolean startingState, final Window parent) {
         this.synapseList = synapseList;
         this.parent = parent;
@@ -238,8 +244,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
                     .setSelectedIndex(cbResponderType.getItemCount() - 1);
             spikeResponderPanel = new EmptySpikeResponsePanel();
         } else {
-            String spikeResponderName = synapseList.get(0).getSpikeResponder()
-                    .getDescription();
+            String spikeResponderName = srList.get(0).getDescription();
             spikeResponderPanel = AbstractSpikeResponsePanel.RESPONDER_MAP
                     .get(spikeResponderName);
             spikeResponderPanel.fillFieldValues(srList);
@@ -263,17 +268,18 @@ public class SpikeResponderSettingsPanel extends JPanel {
     }
 
     /**
-     * @param spikeResponderPanel set the currently displayed spike responder
-     *            panel to the specified panel
+     * @param spikeResponderPanel
+     *            set the currently displayed spike responder panel to the
+     *            specified panel
      */
     public void setSynapsePanel(AbstractSpikeResponsePanel spikeResponderPanel) {
         this.spikeResponderPanel = spikeResponderPanel;
     }
 
     /**
-     *
+     * 
      * @author zach
-     *
+     * 
      */
     private class EmptySpikeResponsePanel extends AbstractSpikeResponsePanel {
 
@@ -290,11 +296,11 @@ public class SpikeResponderSettingsPanel extends JPanel {
         }
 
         @Override
-        public void commitChanges(List<Synapse> synapses) {
+        public void commitChanges(Collection<Synapse> synapses) {
         }
 
         @Override
-        public void writeValuesToRules(List<Synapse> synapses) {
+        public void writeValuesToRules(Collection<Synapse> synapses) {
         }
 
         @Override
@@ -306,12 +312,12 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      * Commit changes to the panel.
-     *
+     * 
      * @return success or not, but does nothing now.
      */
     public boolean commitChanges() {
         spikeResponderPanel.commitChanges(synapseList);
-        return true; //TODO;
+        return true; // TODO;
     }
 
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 
     /**
      * This method is the default constructor.
-     *
+     * 
      */
     public StepSpikerPanel() {
         tfResponseHeight.setColumns(6);
@@ -118,7 +119,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(List<Synapse> synapses) {
+    public void commitChanges(Collection<Synapse> synapses) {
 
         if (isReplace()) {
             for (Synapse s : synapses) {
@@ -131,7 +132,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     }
 
     @Override
-    protected void writeValuesToRules(List<Synapse> synapses) {
+    protected void writeValuesToRules(Collection<Synapse> synapses) {
 
         // Response Height
         double responseHeight = Utils.doubleParsable(tfResponseHeight);

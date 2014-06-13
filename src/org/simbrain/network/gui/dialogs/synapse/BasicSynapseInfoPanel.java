@@ -25,6 +25,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -59,7 +60,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * input.
      */
     private final TristateDropDown synapseEnabled = new TristateDropDown(
-            "Enabled", "Disabled");
+        "Enabled", "Disabled");
 
     /**
      * A triangle that switches between an up (left) and a down state Used for
@@ -80,7 +81,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
     private final Window parent;
 
     /** The synapses being modified. */
-    private final List<Synapse> synapseList;
+    private final Collection<Synapse> synapseList;
 
     /**
      * If true, displays ID info and other fields that would only make sense if
@@ -89,19 +90,23 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      */
     private boolean displayIDInfo;
 
+    private boolean ignoreSetStrength;
+
     /**
      * Creates a basic synapse info panel. Here whether or not to display ID
      * info is automatically set based on the state of the synapse list.
-     *
-     * @param synapseList the synapses whose information is being displayed/made
+     * 
+     * @param synapseList
+     *            the synapses whose information is being displayed/made
      *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing.
+     * @param parent
+     *            the parent window for dynamic resizing.
      * @return A basic synapse info panel with the specified parameters
      */
     public static BasicSynapseInfoPanel createBasicNeuronInfoPanel(
-            final List<Synapse> synapseList, final Window parent) {
+        final Collection<Synapse> synapseList, final Window parent) {
         return createBasicSynapseInfoPanel(synapseList, parent,
-                !(synapseList == null || synapseList.size() != 1));
+            !(synapseList == null || synapseList.size() != 1));
     }
 
     /**
@@ -110,63 +115,50 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * (such as when adding multiple synapses) is unknown at the time of
      * display. In fact this is probably the only reason to use this factory
      * method over {@link #createBasicSynapseInfoPanel(List, Window)}.
-     *
-     * @param synapseList the synapses whose information is being displayed/made
+     * 
+     * @param synapseList
+     *            the synapses whose information is being displayed/made
      *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing
-     * @param displayIDInfo whether or not to display ID info
+     * @param parent
+     *            the parent window for dynamic resizing
+     * @param displayIDInfo
+     *            whether or not to display ID info
      * @return A basic synapse info panel with the specified parameters
      */
     public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
-            final List<Synapse> synapseList, final Window parent,
-            final boolean displayIDInfo) {
+        final Collection<Synapse> synapseList, final Window parent,
+        final boolean displayIDInfo) {
         BasicSynapseInfoPanel panel = new BasicSynapseInfoPanel(synapseList,
-                parent, displayIDInfo);
+            parent, displayIDInfo);
         panel.addListeners();
         return panel;
     }
 
     /**
      * Construct the panel.
-     *
-     * @param synapseList the synapse list
-     * @param parent the parent window
-     * @param displayIDInfo whether to display ids
+     * 
+     * @param synapseList
+     *            the synapse list
+     * @param parent
+     *            the parent window
+     * @param displayIDInfo
+     *            whether to display ids
      */
-    private BasicSynapseInfoPanel(final List<Synapse> synapseList,
-            final Window parent, final boolean displayIDInfo) {
+    private BasicSynapseInfoPanel(final Collection<Synapse> synapseList,
+        final Window parent, final boolean displayIDInfo) {
         this.synapseList = synapseList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
-                "Less", parent);
-        extraDataPanel = new ExtendedSynapseInfoPanel(this.synapseList);
-        initializeLayout();
-        fillFieldValues();
-    }
-
-    /**
-     *
-     * @param synapseList The list of synapses to be edited.
-     * @param parent The "parent" window (frame, dialog, etc.) containing this
-     *            panel. Here so that it can be resized when this panel changes
-     *            its size.
-     */
-    public BasicSynapseInfoPanel(final List<Synapse> synapseList,
-            final Window parent) {
-        this.parent = parent;
-        this.synapseList = synapseList;
-        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
-                "Less", parent);
+            "Less", parent);
         extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
         initializeLayout();
         fillFieldValues();
-        addListeners();
     }
 
     /**
      * Initialize the basic info panel (generic synapse parameters)
-     *
+     * 
      */
     private void initializeLayout() {
 
@@ -177,16 +169,19 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.8;
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 0, 0, 0);
-        basicsPanel.add(new JLabel("Synapse Id:"), gbc);
 
-        gbc.gridwidth = 2;
-        gbc.gridx = 1;
-        basicsPanel.add(idLabel, gbc);
+        if (displayIDInfo) {
+            gbc.weightx = 0.8;
+            gbc.gridwidth = 1;
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.insets = new Insets(5, 0, 0, 0);
+            basicsPanel.add(new JLabel("Synapse Id:"), gbc);
+
+            gbc.gridwidth = 2;
+            gbc.gridx = 1;
+            basicsPanel.add(idLabel, gbc);
+        }
 
         gbc.weightx = 0.8;
         gbc.gridwidth = 1;
@@ -273,8 +268,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
     @Override
     public void fillFieldValues() {
-
-        Synapse synapseRef = synapseList.get(0);
+        Synapse synapseRef = synapseList.iterator().next();
         if (synapseList.size() == 1) {
             idLabel.setText(synapseRef.getId());
         } else {
@@ -285,7 +279,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
         // Handle Strength
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "getStrength")) {
+            "getStrength")) {
             tfStrength.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfStrength.setText(Double.toString(synapseRef.getStrength()));
@@ -293,12 +287,13 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
         // Handle Enabled
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-                "isSendWeightedInput")) {
+            "isSendWeightedInput")) {
             synapseEnabled.setNull();
         } else {
             synapseEnabled
-                    .setSelectedIndex(synapseRef.isSendWeightedInput() ? TristateDropDown
-                            .getTRUE() : TristateDropDown.getFALSE());
+                .setSelectedIndex(synapseRef.isSendWeightedInput()
+                    ? TristateDropDown
+                        .getTRUE() : TristateDropDown.getFALSE());
         }
 
     }
@@ -308,7 +303,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
         // Strength
         double strength = Utils.doubleParsable(tfStrength);
-        if (!Double.isNaN(strength)) {
+        if (!Double.isNaN(strength) && !ignoreSetStrength) {
             for (Synapse s : synapseList) {
                 s.setStrength(strength);
             }
@@ -316,7 +311,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
         // Enabled?
         boolean enabled = synapseEnabled.getSelectedIndex() == TristateDropDown
-                .getTRUE();
+            .getTRUE();
         if (synapseEnabled.getSelectedIndex() != TristateDropDown.getNULL()) {
             for (Synapse s : synapseList) {
                 s.setSendWeightedInput(enabled);
@@ -346,6 +341,25 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      */
     public ExtendedSynapseInfoPanel getExtraDataPanel() {
         return extraDataPanel;
+    }
+
+    /**
+     * @return the ignoreSetStrength
+     */
+    public boolean isIgnoreSetStrength() {
+        return ignoreSetStrength;
+    }
+
+    /**
+     * @param ignoreSetStrength
+     *            the ignoreSetStrength to set
+     */
+    public void setIgnoreSetStrength(boolean ignoreSetStrength) {
+        this.ignoreSetStrength = ignoreSetStrength;
+    }
+
+    public double getStrength() {
+        return Utils.doubleParsable(tfStrength);
     }
 
 }

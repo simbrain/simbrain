@@ -39,8 +39,9 @@ public final class SelectOutgoingWeightsAction extends AbstractAction {
 
     /**
      * Create a new clamp weights action with the specified network panel.
-     *
-     * @param networkPanel networkPanel, must not be null
+     * 
+     * @param networkPanel
+     *            networkPanel, must not be null
      */
     public SelectOutgoingWeightsAction(final NetworkPanel networkPanel) {
 
@@ -60,7 +61,7 @@ public final class SelectOutgoingWeightsAction extends AbstractAction {
         List<Neuron> list = networkPanel.getSelectedModelNeurons();
         List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();
         for (Neuron neuron : list) {
-            for (Synapse synapse : neuron.getFanOut()) {
+            for (Synapse synapse : neuron.getFanOut().values()) {
                 sourceWeights.add((SynapseNode) networkPanel.getObjectNodeMap()
                         .get(synapse));
             }

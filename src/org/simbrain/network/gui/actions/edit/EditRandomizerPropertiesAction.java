@@ -29,7 +29,7 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * Edit properties of randomizer object for network.
- *
+ * 
  * TODO: Not currently used but being left in case it is reinstated.
  */
 public final class EditRandomizerPropertiesAction extends AbstractAction {
@@ -39,8 +39,9 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
 
     /**
      * Construct the action.
-     *
-     * @param networkPanel networkPanel, must not be null
+     * 
+     * @param networkPanel
+     *            networkPanel, must not be null
      */
     public EditRandomizerPropertiesAction(final NetworkPanel networkPanel) {
 
@@ -55,18 +56,17 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        final RandomizerPanel randomPanel = new RandomizerPanel();
-        //randomPanel.fillFieldValues(networkPanel.getNetwork()
-        //        .getWeightRandomizer());
+        // randomPanel.fillFieldValues(networkPanel.getNetwork()
+        // .getWeightRandomizer());
         StandardDialog dialog = new StandardDialog() {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();
-                //randomPanel.commitRandom(networkPanel.getNetwork()
-                //        .getWeightRandomizer());
+                // randomPanel.commitRandom(networkPanel.getNetwork()
+                // .getWeightRandomizer());
             }
         };
+        final RandomizerPanel randomPanel = new RandomizerPanel(dialog);
         dialog.setContentPane(randomPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

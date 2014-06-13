@@ -28,13 +28,12 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * A panel specifically for the randomizers used by neurons... a higher level
- * version of this should be created if its ideas are to be extended to
- * other objects which require higher level noise generators. Used to give
- * each neuron being edited the <b>same</b> Randomizer object as an
- * optimization. 
+ * version of this should be created if its ideas are to be extended to other
+ * objects which require higher level noise generators. Used to give each neuron
+ * being edited the <b>same</b> Randomizer object as an optimization.
  * 
  * @author Zach Tosi
- *
+ * 
  */
 public class NeuronNoiseGenPanel extends RandomizerPanel {
 
@@ -43,15 +42,17 @@ public class NeuronNoiseGenPanel extends RandomizerPanel {
      * is assigned the same randomizer, that way any time some number of neurons
      * is simultaneously edited, they receive the same randomizer. This prevents
      * each neuron from having to have its own randomizer with exactly the same
-     * parameters. However, it also allows different neurons to have different 
+     * parameters. However, it also allows different neurons to have different
      * randomizers, since any time any neurons are singled out, they will
      * receive a brand new randomizer.
-     * @param noiseyNeurons the neurons
+     * 
+     * @param noiseyNeurons
+     *            the neurons
      */
     public void commitRandom(List<Neuron> noiseyNeurons)
-            throws ClassCastException {
+        throws ClassCastException {
         if (!getCbDistribution().getSelectedItem()
-                .equals(SimbrainConstants.NULL_STRING)) {
+            .equals(SimbrainConstants.NULL_STRING)) {
             Randomizer rand = new Randomizer();
             super.commitRandom(rand);
             for (Neuron n : noiseyNeurons) {

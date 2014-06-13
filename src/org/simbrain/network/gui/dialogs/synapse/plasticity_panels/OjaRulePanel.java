@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(final List<Synapse> synapses) {
+    public void commitChanges(final Collection<Synapse> synapses) {
 
         if (isReplace()) {
             for (Synapse s : synapses) {
@@ -126,7 +127,7 @@ public class OjaRulePanel extends AbstractSynapsePanel {
      * {@inheritDoc}
      */
     @Override
-    protected void writeValuesToRules(final List<Synapse> synapses) {
+    protected void writeValuesToRules(final Collection<Synapse> synapses) {
 
         // Normalize
         double normalize = Utils.doubleParsable(tfNormalize);

@@ -67,7 +67,7 @@ public class HistogramPanel extends JPanel {
 
     /** The preferred dimensions of the histogram. */
     private Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH,
-            DEFAULT_PREF_HEIGHT);
+        DEFAULT_PREF_HEIGHT);
 
     /** The grid width of this panel, for use by possible parent panels. */
     public static final int GRID_WIDTH = 3;
@@ -86,7 +86,8 @@ public class HistogramPanel extends JPanel {
     private static final int DEFAULT_NUM_DATASETS = 4;
 
     /** The color pallete, initialized to the default number of data sets. */
-    private static final Color[] DEFAULT_PALLET = new Color[DEFAULT_NUM_DATASETS];
+    private static final Color[] DEFAULT_PALLET =
+        new Color[DEFAULT_NUM_DATASETS];
 
     public static Color[] getDefault_Pallet() {
         Color[] pallet = new Color[DEFAULT_PALLET.length];
@@ -106,13 +107,13 @@ public class HistogramPanel extends JPanel {
      */
     static {
         DEFAULT_PALLET[0] = new Color((Color.RED.getRGB() << 8) >>> 8
-                | DEFAULT_ALPHA << 24, true);
+            | DEFAULT_ALPHA << 24, true);
         DEFAULT_PALLET[1] = new Color((Color.BLUE.getRGB() << 8) >>> 8
-                | DEFAULT_ALPHA << 24, true);
+            | DEFAULT_ALPHA << 24, true);
         DEFAULT_PALLET[2] = new Color((Color.GREEN.getRGB() << 8) >>> 8
-                | DEFAULT_ALPHA << 24, true);
+            | DEFAULT_ALPHA << 24, true);
         DEFAULT_PALLET[3] = new Color((Color.YELLOW.getRGB() << 8) >>> 8
-                | DEFAULT_ALPHA << 24, true);
+            | DEFAULT_ALPHA << 24, true);
 
     }
 
@@ -132,7 +133,7 @@ public class HistogramPanel extends JPanel {
 
     /** The color pallet, initialized to the default number of data sets. */
     private Color[] colorPallet = Arrays.copyOf(DEFAULT_PALLET,
-            DEFAULT_NUM_DATASETS);
+        DEFAULT_NUM_DATASETS);
 
     /** The main panel supporting the histogram chart. */
     private JPanel mainPanel;
@@ -199,8 +200,8 @@ public class HistogramPanel extends JPanel {
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
                     JOptionPane.showMessageDialog(getParent(),
-                            "Non-Integer number of bins.", "Error",
-                            JOptionPane.ERROR);
+                        "Non-Integer number of bins.", "Error",
+                        JOptionPane.ERROR);
                 }
             }
 
@@ -218,23 +219,23 @@ public class HistogramPanel extends JPanel {
         try {
             if (this.getModel().getData() != null) {
                 mainChart = ChartFactory.createHistogram(title, xAxisName,
-                        yAxisName, model.getDataSet(),
-                        PlotOrientation.VERTICAL, true, true, false);
+                    yAxisName, model.getDataSet(),
+                    PlotOrientation.VERTICAL, true, true, false);
                 mainChart.setBackgroundPaint(UIManager
-                        .getColor("this.Background"));
+                    .getColor("this.Background"));
 
                 XYPlot plot = (XYPlot) mainChart.getPlot();
                 plot.setForegroundAlpha(0.75F);
                 // Sets y-axis ticks to integers.
                 NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
                 rangeAxis.setStandardTickUnits(NumberAxis
-                        .createIntegerTickUnits());
+                    .createIntegerTickUnits());
                 XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
                 renderer.setDrawBarOutline(false);
                 renderer.setShadowVisible(false);
 
                 Iterator<ColoredDataSeries> series = model.getSeriesData()
-                        .iterator();
+                    .iterator();
                 for (int i = 0; i < model.getData().size(); i++) {
                     if (i < colorPallet.length) {
                         ColoredDataSeries s = series.next();
@@ -250,21 +251,21 @@ public class HistogramPanel extends JPanel {
             } else {
 
                 mainChart = ChartFactory.createHistogram(title, xAxisName,
-                        yAxisName, model.getDataSet(),
-                        PlotOrientation.VERTICAL, true, true, false);
+                    yAxisName, model.getDataSet(),
+                    PlotOrientation.VERTICAL, true, true, false);
                 mainChart.setBackgroundPaint(UIManager
-                        .getColor("this.Background"));
+                    .getColor("this.Background"));
 
             }
 
         } catch (IllegalArgumentException iaEx) {
             iaEx.printStackTrace();
             JOptionPane.showMessageDialog(null, iaEx.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE);
         } catch (IllegalStateException isEx) {
             isEx.printStackTrace();
             JOptionPane.showMessageDialog(null, isEx.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE);
         }
         mainPanel = new ChartPanel(mainChart);
 

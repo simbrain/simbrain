@@ -39,23 +39,26 @@ public enum ProbDistribution {
     UNIFORM {
 
         /**
-         * @param floor the lowest value of the interval
-         * @param ceil the highest value of the interval
+         * @param floor
+         *            the lowest value of the interval
+         * @param ceil
+         *            the highest value of the interval
          */
         @Override
         public double nextRand(double floor, double ceil) {
-            return UniformGen.nextDouble(stream, floor, ceil);
+            return UniformGen.nextDouble(DEFAULT_RANDOM_STREAM, floor, ceil);
         }
 
         /**
-         * @param floor the lowest value of the interval
-         * @param ceil the highest value of the interval
+         * @param floor
+         *            the lowest value of the interval
+         * @param ceil
+         *            the highest value of the interval
          */
         @Override
         public int nextRandInt(int floor, int ceil) {
             return (int) nextRand(floor, ceil);
         }
-
 
         @Override
         public UniformDist getBestFit(double[] observations, int numObs) {
@@ -63,8 +66,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return UniformDist.getMLE(observations, numObs);
         }
 
@@ -103,26 +105,30 @@ public enum ProbDistribution {
             return 0;
         }
 
-    }, NORMAL{
+    },
+    NORMAL {
 
         /**
-         * @param mean the mean for this normal distribution
-         * @param std the standard deviation for this normal distribution
+         * @param mean
+         *            the mean for this normal distribution
+         * @param std
+         *            the standard deviation for this normal distribution
          */
         @Override
         public double nextRand(double mean, double std) {
-            return NormalGen.nextDouble(stream, mean, std);
+            return NormalGen.nextDouble(DEFAULT_RANDOM_STREAM, mean, std);
         }
 
         /**
-         * @param mean the mean for this normal distribution
-         * @param std the standard deviation for this normal distribution
+         * @param mean
+         *            the mean for this normal distribution
+         * @param std
+         *            the standard deviation for this normal distribution
          */
         @Override
         public int nextRandInt(int mean, int std) {
             return (int) nextRand(mean, std);
         }
-
 
         @Override
         public Distribution getBestFit(double[] observations, int numObs) {
@@ -130,8 +136,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return NormalDist.getMLE(observations, numObs);
         }
 
@@ -170,11 +175,12 @@ public enum ProbDistribution {
             return Double.NEGATIVE_INFINITY;
         }
 
-    }, GAMMA {
+    },
+    GAMMA {
 
         @Override
         public double nextRand(double shape, double scale) {
-            return GammaGen.nextDouble(stream, shape, scale);
+            return GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale);
         }
 
         @Override
@@ -188,8 +194,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return GammaDist.getMLE(observations, numObs);
         }
 
@@ -228,7 +233,8 @@ public enum ProbDistribution {
             return 0;
         }
 
-    }, LOGNORMAL {
+    },
+    LOGNORMAL {
 
         @Override
         public double nextRand(double mean, double std) {
@@ -236,10 +242,11 @@ public enum ProbDistribution {
             // standard deviation of the resulting lognormal distribution
             // rather than the mean and standard deviation of the normal
             // distribution beneath it.
-            double mos = std/mean;
-            double correctedStd = Math.sqrt(Math.log((mos*mos) + 1));
-            double correctedMean = Math.log(mean/correctedStd);
-            return LognormalGen.nextDouble(stream, correctedMean, correctedStd);
+            double mos = std / mean;
+            double correctedStd = Math.sqrt(Math.log((mos * mos) + 1));
+            double correctedMean = Math.log(mean / correctedStd);
+            return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM,
+                    correctedMean, correctedStd);
         }
 
         @Override
@@ -253,8 +260,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return LognormalDist.getMLE(observations, numObs);
         }
 
@@ -293,11 +299,12 @@ public enum ProbDistribution {
             return 0;
         }
 
-    }, EXPONENTIAL {
+    },
+    EXPONENTIAL {
 
         @Override
         public double nextRand(double lambda, double nullVar) {
-            return ExponentialGen.nextDouble(stream, lambda);
+            return ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda);
         }
 
         @Override
@@ -311,8 +318,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return ExponentialDist.getMLE(observations, numObs);
         }
 
@@ -351,11 +357,12 @@ public enum ProbDistribution {
             return 0;
         }
 
-    }, PARETO {
+    },
+    PARETO {
 
         @Override
         public double nextRand(double slope, double min) {
-            return ParetoGen.nextDouble(stream, slope, min);
+            return ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min);
         }
 
         @Override
@@ -369,8 +376,7 @@ public enum ProbDistribution {
         }
 
         @Override
-        public double[]
-                getBestFitParams(double[] observations, int numObs) {
+        public double[] getBestFitParams(double[] observations, int numObs) {
             return ParetoDist.getMLE(observations, numObs);
         }
 
@@ -412,54 +418,52 @@ public enum ProbDistribution {
     };
 
     // POISSON { //TODO: Move somewhere else, because of single parameter and
-    //                 // integer values being required... doesn't fit with others.
+    // // integer values being required... doesn't fit with others.
     //
-    //        @Override
-    //        public double nextRand(double lambda, double nullVar) {
-    //            return nextRandInt((int) lambda, (int)nullVar);
-    //        }
+    // @Override
+    // public double nextRand(double lambda, double nullVar) {
+    // return nextRandInt((int) lambda, (int)nullVar);
+    // }
     //
-    //        @Override
-    //        public int nextRandInt(int lambda, int nullVar) {
-    //            return PoissonGen.nextInt(stream, lambda);
-    //        }
+    // @Override
+    // public int nextRandInt(int lambda, int nullVar) {
+    // return PoissonGen.nextInt(stream, lambda);
+    // }
     //
-    //        @Override
-    //        public Distribution getBestFit(double[] observations, int numObs) {
-    //            int [] obs = new int[observations.length]; //Problematic, move?
-    //            for (int i = 0, n = observations.length; i < n; i++) {
-    //                obs[i] = (int) observations[i];
-    //            }
-    //            return PoissonDist.getInstanceFromMLE(obs, numObs);
-    //        }
+    // @Override
+    // public Distribution getBestFit(double[] observations, int numObs) {
+    // int [] obs = new int[observations.length]; //Problematic, move?
+    // for (int i = 0, n = observations.length; i < n; i++) {
+    // obs[i] = (int) observations[i];
+    // }
+    // return PoissonDist.getInstanceFromMLE(obs, numObs);
+    // }
     //
-    //        @Override
-    //        public double[]
-    //                getBestFitParams(double[] observations, int numObs) {
-    //            int [] obs = new int[observations.length]; //Problematic, move?
-    //            for (int i = 0, n = observations.length; i < n; i++) {
-    //                obs[i] = (int) observations[i];
-    //            }
-    //            return PoissonDist.getMLE(obs, numObs);
-    //        }
+    // @Override
+    // public double[]
+    // getBestFitParams(double[] observations, int numObs) {
+    // int [] obs = new int[observations.length]; //Problematic, move?
+    // for (int i = 0, n = observations.length; i < n; i++) {
+    // obs[i] = (int) observations[i];
+    // }
+    // return PoissonDist.getMLE(obs, numObs);
+    // }
     //
-    //        @Override
-    //        public String getName() {
-    //            return "Poisson";
-    //        }
-    //    };
+    // @Override
+    // public String getName() {
+    // return "Poisson";
+    // }
+    // };
 
-    private static final RandomStream stream = new WELL1024();
+    public static final RandomStream DEFAULT_RANDOM_STREAM = new WELL1024();
 
     public abstract double nextRand(double var1, double var2);
 
     public abstract int nextRandInt(int var1, int var2);
 
-    public abstract Distribution getBestFit(double [] observations,
-            int numObs);
+    public abstract Distribution getBestFit(double[] observations, int numObs);
 
-    public abstract double [] getBestFitParams(double [] observations,
-            int numObs);
+    public abstract double[] getBestFitParams(double[] observations, int numObs);
 
     @Override
     public abstract String toString();
@@ -476,8 +480,8 @@ public enum ProbDistribution {
 
     public abstract double getDefaultLowBound();
 
-    public static String [] getNames() {
-        String [] names = new String[ProbDistribution.values().length];
+    public static String[] getNames() {
+        String[] names = new String[ProbDistribution.values().length];
         for (int i = 0; i < ProbDistribution.values().length; i++) {
             names[i] = ProbDistribution.values()[i].toString();
         }
@@ -487,27 +491,31 @@ public enum ProbDistribution {
     /**
      * The Kullback-Leibler divergence between some distribution and a set of
      * observations. In this case, the returned value represents the amount of
-     * information lost when the given distribution is used to approximate the 
+     * information lost when the given distribution is used to approximate the
      * given observations.
-     * @param d a probability distribution
-     * @param observations a 2D array such that the first row represents x 
-     * values and the second represents y values (must sum to 1, so all
-     * observations must be scaled to fit this constraint prior to being
-     * passed to this function)
-     * @return the amount of information lost in bits when the distribution d
-     * is used to approximate the distribution implicit in the observations.
+     * 
+     * @param d
+     *            a probability distribution
+     * @param observations
+     *            a 2D array such that the first row represents x values and the
+     *            second represents y values (must sum to 1, so all observations
+     *            must be scaled to fit this constraint prior to being passed to
+     *            this function)
+     * @return the amount of information lost in bits when the distribution d is
+     *         used to approximate the distribution implicit in the
+     *         observations.
      */
-    public static double KL_Divergence(Distribution d,
-            double [][] observations) {
+    public static double KL_Divergence(Distribution d, double[][] observations) {
         double tot = 0;
         double interval;
         double distProb;
         for (int i = 0, n = observations[0].length - 1; i < n; i++) {
             interval = observations[0][i + 1] - observations[0][i];
-            distProb = d.cdf(observations[0][i+1]) - d.cdf(observations[0][i]);
-            tot += ((Math.log(interval * observations[1][i])/Math.log(2)) 
-                    / (Math.log(distProb)/Math.log(2))) * (interval
-                            * observations[1][i]) ;
+            distProb = d.cdf(observations[0][i + 1])
+                    - d.cdf(observations[0][i]);
+            tot += ((Math.log(interval * observations[1][i]) / Math.log(2)) / (Math
+                    .log(distProb) / Math.log(2)))
+                    * (interval * observations[1][i]);
         }
         return tot;
     }
@@ -515,12 +523,12 @@ public enum ProbDistribution {
     /**
      * Normalizes a set of observations so they may be used as a discrete
      * probability density function.
+     * 
      * @param observations
      * @return
      */
-    public static double [][] observationsToProbDist(double [][] observations) {
-        double [][] retObs = new double[observations.length]
-                [observations[0].length];
+    public static double[][] observationsToProbDist(double[][] observations) {
+        double[][] retObs = new double[observations.length][observations[0].length];
         retObs[0] = SimbrainMath.normalizeVec(observations[0]);
         retObs[1] = observations[1];
         return retObs;

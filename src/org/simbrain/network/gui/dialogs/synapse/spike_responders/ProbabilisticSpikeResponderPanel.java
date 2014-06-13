@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class ProbabilisticSpikeResponderPanel extends
 
     /**
      * This method is the default constructor.
-     *
+     * 
      */
     public ProbabilisticSpikeResponderPanel() {
         tfActivationProbability.setColumns(6);
@@ -115,7 +116,7 @@ public class ProbabilisticSpikeResponderPanel extends
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(List<Synapse> synapses) {
+    public void commitChanges(Collection<Synapse> synapses) {
 
         if (isReplace()) {
             for (Synapse s : synapses) {
@@ -131,7 +132,7 @@ public class ProbabilisticSpikeResponderPanel extends
      * {@inheritDoc}
      */
     @Override
-    protected void writeValuesToRules(List<Synapse> synapses) {
+    protected void writeValuesToRules(Collection<Synapse> synapses) {
 
         // Activation Probability
         double actProb = Utils.doubleParsable(tfActivationProbability);

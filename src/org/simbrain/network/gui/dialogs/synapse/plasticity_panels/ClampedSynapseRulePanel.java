@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.simbrain.network.core.Synapse;
@@ -55,7 +56,7 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(final List<Synapse> commitSynapses) {
+    public void commitChanges(final Collection<Synapse> commitSynapses) {
         for (Synapse s : commitSynapses) {
             commitChanges(s);
         }
@@ -73,7 +74,7 @@ public class ClampedSynapseRulePanel extends AbstractSynapsePanel {
     /**
      * {@inheritDoc}
      */
-    protected void writeValuesToRules(List<Synapse> synapses) {
+    protected void writeValuesToRules(Collection<Synapse> synapses) {
         // No variables: Does nothing...
     }
 

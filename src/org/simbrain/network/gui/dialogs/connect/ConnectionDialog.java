@@ -21,25 +21,22 @@ package org.simbrain.network.gui.dialogs.connect;
 import javax.swing.JButton;
 
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
- *
+ * 
  * Dialog wrapper for all connection panels.
- *
+ * 
  * @author jyoshimi
  * @author ztosi
- *
+ * 
  */
+@SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
 
-    /** The parent network panel. */
-    private final NetworkPanel networkPanel;
-
     /** The connection panel wrapped in this dialog. */
-    private AbstractConnectionPanel optionsPanel;
+    private AbstractConnectionPanel connectionPanel;
 
     /** The connection object associated with the connection panel. */
     private ConnectNeurons connection;
@@ -53,36 +50,32 @@ public class ConnectionDialog extends StandardDialog {
     // private JComboBox synapseGroups;
 
     /**
-     *
+     * 
      * @param networkPanel
      */
-    public ConnectionDialog(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
+    public ConnectionDialog() {
     }
 
     /**
-     *
+     * 
      * @param networkPanel
      * @param optionsPanel
      */
-    public ConnectionDialog(final NetworkPanel networkPanel,
-            AbstractConnectionPanel optionsPanel) {
-        this.networkPanel = networkPanel;
-        this.optionsPanel = optionsPanel;
+    public ConnectionDialog(AbstractConnectionPanel optionsPanel) {
+        this.connectionPanel = optionsPanel;
         this.connection = optionsPanel.getConnection();
         fillFrame();
     }
 
     /**
-     *
+     * 
      * @param networkPanel
      * @param optionsPanel
      * @param connection
      */
-    public ConnectionDialog(final NetworkPanel networkPanel,
-            AbstractConnectionPanel optionsPanel, ConnectNeurons connection) {
-        this.networkPanel = networkPanel;
-        this.optionsPanel = optionsPanel;
+    public ConnectionDialog(AbstractConnectionPanel optionsPanel,
+            ConnectNeurons connection) {
+        this.connectionPanel = optionsPanel;
         this.connection = connection;
         fillFrame();
     }
@@ -94,25 +87,21 @@ public class ConnectionDialog extends StandardDialog {
         ShowHelpAction helpAction = new ShowHelpAction(
                 "Pages/Network/connections.html");
         addButton(new JButton(helpAction));
-        setContentPane(optionsPanel);
+        setContentPane(connectionPanel);
     }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        optionsPanel.commitChanges();
-        connection.connectNeurons(networkPanel.getNetwork(),
-                networkPanel.getSourceModelNeurons(),
-                networkPanel.getSelectedModelNeurons(), true);
-
+        connectionPanel.commitChanges();
     }
 
     public AbstractConnectionPanel getOptionsPanel() {
-        return optionsPanel;
+        return connectionPanel;
     }
 
     public void setOptionsPanel(AbstractConnectionPanel optionsPanel) {
-        this.optionsPanel = optionsPanel;
+        this.connectionPanel = optionsPanel;
     }
 
     public ConnectNeurons getConnection() {

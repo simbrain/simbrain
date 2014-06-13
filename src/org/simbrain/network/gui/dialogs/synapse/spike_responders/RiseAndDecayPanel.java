@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.spike_responders;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -118,7 +119,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(List<Synapse> synapses) {
+    public void commitChanges(Collection<Synapse> synapses) {
 
         if (isReplace()) {
             for (Synapse s : synapses) {
@@ -134,7 +135,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      * {@inheritDoc}
      */
     @Override
-    protected void writeValuesToRules(List<Synapse> synapses) {
+    protected void writeValuesToRules(Collection<Synapse> synapses) {
 
         // Max Response
         double maxResponse = Utils.doubleParsable(tfMaximumResponse);

@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -28,22 +29,15 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    ClampedSynapseRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    HebbianCPCARulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    HebbianRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    HebbianThresholdRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ClampedSynapseRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianCPCARulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.HebbianThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.OjaRulePanel;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.STDPRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    ShortTermPlasticityRulePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    StaticSynapsePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.
-    SubtractiveNormalizationRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.ShortTermPlasticityRulePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.SubtractiveNormalizationRulePanel;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
@@ -69,7 +63,8 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     // Populate synapse rule map
     static {
-     // TODO: Backwards compatibility.  Remove for 3.0 after converting all sims
+        // TODO: Backwards compatibility. Remove for 3.0 after converting all
+        // sims
         RULE_MAP.put(new ClampedSynapseRule().getDescription(),
                 new ClampedSynapseRulePanel());
         RULE_MAP.put(new StaticSynapseRule().getDescription(),
@@ -104,9 +99,11 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Adds an item.
-     *
-     * @param text label of item to add
-     * @param comp component to add
+     * 
+     * @param text
+     *            label of item to add
+     * @param comp
+     *            component to add
      */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
@@ -114,9 +111,11 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Add item label.
-     *
-     * @param text label to add
-     * @param comp component to apply label
+     * 
+     * @param text
+     *            label to add
+     * @param comp
+     *            component to apply label
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
@@ -132,8 +131,9 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Populate fields with current data.
-     *
-     * @param ruleList the list of rules from which variables will be displayed
+     * 
+     * @param ruleList
+     *            the list of rules from which variables will be displayed
      */
     public abstract void fillFieldValues(final List<SynapseUpdateRule> ruleList);
 
@@ -151,8 +151,9 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * this to be the case. Do NOT use this method repeatedly to commit changes
      * to multiple synapses, {@link #commitChanges(List)} does this much more
      * efficiently.
-     *
-     * @param synapse the synapse being edited.
+     * 
+     * @param synapse
+     *            the synapse being edited.
      */
     public abstract void commitChanges(final Synapse synapse);
 
@@ -161,10 +162,11 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * being edited. Generally this method is used in the synapse editing
      * process rather than the synapse creation process, but there is no reason
      * outside convention for this to be the case.
-     *
-     * @param synapses the synapses being edited
+     * 
+     * @param synapses
+     *            the synapses being edited
      */
-    public abstract void commitChanges(final List<Synapse> synapses);
+    public abstract void commitChanges(final Collection<Synapse> synapses);
 
     /**
      * Edits synapse update rules that already exist. This is the alternative to
@@ -172,17 +174,18 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * are the same type as the panel. {@link #replacing} is the flag for
      * whether the synapse rules are replaced by a new rule before this rule is
      * called.
-     *
-     * @param synapses the neurons whose rules are being <b>edited</b>, not
-     *            replaced.
+     * 
+     * @param synapses
+     *            the neurons whose rules are being <b>edited</b>, not replaced.
      */
-    protected abstract void writeValuesToRules(final List<Synapse> synapses);
+    protected abstract void writeValuesToRules(
+            final Collection<Synapse> synapses);
 
     /**
      * Are we replacing rules or editing them? Replacing happens when
      * {@link #commitChanges(List)} is called on a synapse panel whose rule is
      * different from the rules of the synapses being edited.
-     *
+     * 
      * @return replacing or editing
      */
     protected boolean isReplace() {
@@ -193,8 +196,9 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * Tells this panel whether it is going to be editing synapse update rules,
      * or creating new ones and replacing the update rule of each of the
      * synapses being edited.
-     *
-     * @param replace tell the panel if it's replacing rules or editing them
+     * 
+     * @param replace
+     *            tell the panel if it's replacing rules or editing them
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -213,15 +217,16 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * SynapseUpdateRule corresponds to the rule specified by the panel name.
      * Used so that other classes can query specific properties of the rule the
      * panel edits. Also used internally to make deep copies.
-     *
+     * 
      * @return an instance of the synapse rule which corresponds to the panel.
      */
     public abstract SynapseUpdateRule getPrototypeRule();
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.
-     *
-     * @param text Text to add to bottom of panel
+     * 
+     * @param text
+     *            Text to add to bottom of panel
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();

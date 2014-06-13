@@ -26,7 +26,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
@@ -83,7 +82,6 @@ import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
-import org.simbrain.network.gui.dialogs.network.BPTTCreationDialog;
 import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveNetworkCreationDialog;
@@ -265,8 +263,9 @@ public final class NetworkActionManager {
 
     /**
      * Create a new network action manager for the specified network panel.
-     *
-     * @param networkPanel networkPanel, must not be null
+     * 
+     * @param networkPanel
+     *            networkPanel, must not be null
      */
     NetworkActionManager(final NetworkPanel networkPanel) {
 
@@ -332,25 +331,11 @@ public final class NetworkActionManager {
         setTextPropertiesAction = new SetTextPropertiesAction(networkPanel);
 
         allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(),
-                "All to all", false);
-        allToAllSelf = new ApplyConnectionAction(networkPanel, new AllToAll(),
-                "All to all (self)", true);
-        fixedFanout = new ApplyConnectionAction(networkPanel,
-                new FixedFanout(), "Fixed fanout", false);
-        fixedFanoutSelf = new ApplyConnectionAction(networkPanel,
-                new FixedFanout(), "Fixed fanout (self)", true);
+                "All to all");
         oneToOne = new ApplyConnectionAction(networkPanel, new OneToOne(),
-                "One-to-one", false);
-        oneToOneSelf = new ApplyConnectionAction(networkPanel, new AllToAll(),
-                "One-to-one (self)", true);
-        radial = new ApplyConnectionAction(networkPanel, new Radial(),
-                "Radial", false);
-        radialSelf = new ApplyConnectionAction(networkPanel, new Radial(),
-                "Radial (self)", true);
-        sparse = new ApplyConnectionAction(networkPanel, new Sparse(),
-                "Sparse", false);
-        sparseSelf = new ApplyConnectionAction(networkPanel, new Sparse(),
-                "Sparse (self)", true);
+                "One-to-one");
+        radial = new ApplyConnectionAction(networkPanel, new Radial(), "Radial");
+        sparse = new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse");
 
         gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
         hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(),
@@ -381,7 +366,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the text edit mode action.
-     *
+     * 
      * @return the text edit mode action
      */
     public Action getTextEditModeAction() {
@@ -390,7 +375,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the pan edit mode action.
-     *
+     * 
      * @return the pan edit mode action
      */
     public Action getPanEditModeAction() {
@@ -399,7 +384,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the zoom in edit mode action.
-     *
+     * 
      * @return the zoom in edit mode action
      */
     public Action getZoomInEditModeAction() {
@@ -408,7 +393,7 @@ public final class NetworkActionManager {
 
     /**
      * Return a list of network mode actions.
-     *
+     * 
      * @return a list of network mode actions
      */
     public List<Action> getNetworkModeActions() {
@@ -419,7 +404,7 @@ public final class NetworkActionManager {
 
     /**
      * Return a list of network control actions.
-     *
+     * 
      * @return a list of network control actions
      */
     public List<Action> getNetworkControlActions() {
@@ -429,7 +414,7 @@ public final class NetworkActionManager {
 
     /**
      * Return clipboard actions.
-     *
+     * 
      * @return a list of clipboard actions
      */
     public List<Action> getClipboardActions() {
@@ -439,7 +424,7 @@ public final class NetworkActionManager {
 
     /**
      * Return a list of network editing actions.
-     *
+     * 
      * @return a list of network editing actions
      */
     public List<Action> getNetworkEditingActions() {
@@ -456,7 +441,7 @@ public final class NetworkActionManager {
 
     /**
      * Returns a menu of model group actions.
-     *
+     * 
      * @return the group menu
      */
     public JMenu getGroupMenu() {
@@ -468,7 +453,7 @@ public final class NetworkActionManager {
 
     /**
      * Returns a menu for setting neuron connections.
-     *
+     * 
      * @return the connection menu
      */
     public JMenu getLayoutMenu() {
@@ -489,7 +474,7 @@ public final class NetworkActionManager {
 
     /**
      * (Not current used).
-     *
+     * 
      * @return self connect actions
      */
     public List<Action> getSelfConnectionActions() {
@@ -499,7 +484,7 @@ public final class NetworkActionManager {
 
     /**
      * Returns a menu for setting neuron connections.
-     *
+     * 
      * @return the connection menu
      */
     public JMenu getConnectionMenu() {
@@ -519,9 +504,9 @@ public final class NetworkActionManager {
                 .asList(new Action[] {
                         new AddGroupAction(networkPanel,
                                 BackpropCreationDialog.class, "Backprop"),
-                        //new AddGroupAction(networkPanel,
-                        //        BPTTCreationDialog.class,
-                        //        "Backprop Through Time"),
+                        // new AddGroupAction(networkPanel,
+                        // BPTTCreationDialog.class,
+                        // "Backprop Through Time"),
                         new AddGroupAction(networkPanel,
                                 CompetitiveNetworkCreationDialog.class,
                                 "Competitive Network"),
@@ -564,7 +549,7 @@ public final class NetworkActionManager {
 
     /**
      * Return a JMenu for creating new networks.
-     *
+     * 
      * @return the new JMenu.
      */
     public JMenu getNewNetworkMenu() {
@@ -577,7 +562,7 @@ public final class NetworkActionManager {
 
     /**
      * Return a JMenu for creating new neuron groups.
-     *
+     * 
      * @return the new JMenu.
      */
     public JMenu getNewGroupMenu() {
@@ -590,7 +575,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the new neuron action.
-     *
+     * 
      * @return the new neuron action
      */
     public Action getNewNeuronAction() {
@@ -599,7 +584,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the clear neurons action.
-     *
+     * 
      * @return the clear neurons action
      */
     public Action getZeroSelectedObjectsAction() {
@@ -608,7 +593,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the randomize objects action.
-     *
+     * 
      * @return the randomize objects action
      */
     public Action getRandomizeObjectsAction() {
@@ -617,7 +602,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the select all action.
-     *
+     * 
      * @return the select all action
      */
     public Action getSelectAllAction() {
@@ -626,7 +611,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the iterate network action.
-     *
+     * 
      * @return the iterate network action
      */
     public Action getIterateNetworkAction() {
@@ -642,7 +627,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the run network action.
-     *
+     * 
      * @return the run network action
      */
     public Action getRunNetworkAction() {
@@ -651,7 +636,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the stop network action.
-     *
+     * 
      * @return the stop network action
      */
     public Action getStopNetworkAction() {
@@ -660,7 +645,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the show network preferences action.
-     *
+     * 
      * @return the network preferences action
      */
     public Action getShowNetworkPreferencesAction() {
@@ -669,7 +654,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the clear action.
-     *
+     * 
      * @return the clear action
      */
     public Action getDeleteAction() {
@@ -678,7 +663,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the copy action.
-     *
+     * 
      * @return the copy action
      */
     public Action getCopyAction() {
@@ -687,7 +672,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the cut action.
-     *
+     * 
      * @return the cut action
      */
     public Action getCutAction() {
@@ -696,7 +681,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the paste action.
-     *
+     * 
      * @return the paste action
      */
     public Action getPasteAction() {
@@ -705,7 +690,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the align horizontal action.
-     *
+     * 
      * @return the align horizontal action
      */
     public Action getAlignHorizontalAction() {
@@ -714,7 +699,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the align vertical action.
-     *
+     * 
      * @return the align vertical action
      */
     public Action getAlignVerticalAction() {
@@ -723,7 +708,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the space horizontal action.
-     *
+     * 
      * @return the space horizontal action
      */
     public Action getSpaceHorizontalAction() {
@@ -732,7 +717,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the space vertical action.
-     *
+     * 
      * @return the space vertical action
      */
     public Action getSpaceVerticalAction() {
@@ -741,7 +726,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the set auto zoom check box menu item.
-     *
+     * 
      * @return the set auto zoom check box menu item
      */
     public JCheckBoxMenuItem getSetAutoZoomMenuItem() {
@@ -753,7 +738,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the neuron properties action.
-     *
+     * 
      * @return the neuron properties action
      */
     public Action getSetNeuronPropertiesAction() {
@@ -762,7 +747,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the synapse properties action.
-     *
+     * 
      * @return the synapse properties action
      */
     public Action getSetSynapsePropertiesAction() {
@@ -771,7 +756,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the select all neurons action.
-     *
+     * 
      * @return the select all neurons action
      */
     public Action getSelectAllNeuronsAction() {
@@ -780,7 +765,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the select all weights action.
-     *
+     * 
      * @return the select all weights action.
      */
     public Action getSelectAllWeightsAction() {
@@ -789,7 +774,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the show edit tool bar menu item.
-     *
+     * 
      * @return the show edit tool bar menu item
      */
     public JCheckBoxMenuItem getShowEditToolBarMenuItem() {
@@ -801,7 +786,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the show main tool bar menu item.
-     *
+     * 
      * @return the show main tool bar menu item
      */
     public JCheckBoxMenuItem getShowMainToolBarMenuItem() {
@@ -813,7 +798,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the run clamp tool bar menu item.
-     *
+     * 
      * @return the run clamp tool bar menu item
      */
     public JCheckBoxMenuItem getShowRunToolBarMenuItem() {
@@ -825,7 +810,7 @@ public final class NetworkActionManager {
 
     /**
      * Return the set source neurons action.
-     *
+     * 
      * @return set source neurons action
      */
     public Action getSetSourceNeuronsAction() {

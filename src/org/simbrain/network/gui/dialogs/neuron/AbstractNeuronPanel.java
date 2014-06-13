@@ -70,7 +70,8 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
 public abstract class AbstractNeuronPanel extends JPanel {
 
     /** Associations between names of rules and panels for editing them. */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
+        new LinkedHashMap<String, AbstractNeuronPanel>();
 
     // Populate the Rule Map
     static {
@@ -78,38 +79,39 @@ public abstract class AbstractNeuronPanel extends JPanel {
         RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
         RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
         RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
-                new IntegrateAndFireRulePanel());
+            new IntegrateAndFireRulePanel());
         RULE_MAP.put(new IzhikevichRule().getDescription(),
-                new IzhikevichRulePanel());
+            new IzhikevichRulePanel());
         RULE_MAP.put(new LinearRule().getDescription(), new LinearRulePanel());
         RULE_MAP.put(new NakaRushtonRule().getDescription(),
-                new NakaRushtonRulePanel());
+            new NakaRushtonRulePanel());
         RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
-                new ContinuousSigmoidalRulePanel());
+            new ContinuousSigmoidalRulePanel());
         RULE_MAP.put(new SigmoidalRule().getDescription(),
-                new SigmoidalRulePanel());
+            new SigmoidalRulePanel());
         RULE_MAP.put(new SpikingThresholdRule().getDescription(),
-                new SpikingThresholdRulePanel());
+            new SpikingThresholdRulePanel());
         RULE_MAP.put(new ThreeValueRule().getDescription(),
-                new ThreeValueRulePanel());
+            new ThreeValueRulePanel());
     }
 
     /**
      * Associations between names of activity generators and panels for editing
      * them.
      */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> GENERATOR_MAP = new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronPanel> GENERATOR_MAP =
+        new LinkedHashMap<String, AbstractNeuronPanel>();
 
     // Populate the Generator Map
     static {
         GENERATOR_MAP.put(new LogisticRule().getDescription(),
-                new LogisticGeneratorPanel());
+            new LogisticGeneratorPanel());
         GENERATOR_MAP.put(new RandomNeuronRule().getDescription(),
-                new RandomGeneratorPanel());
+            new RandomGeneratorPanel());
         GENERATOR_MAP.put(new SinusoidalRule().getDescription(),
-                new SinusoidalGeneratorPanel());
+            new SinusoidalGeneratorPanel());
         GENERATOR_MAP.put(new StochasticRule().getDescription(),
-                new StochasticGeneratorPanel());
+            new StochasticGeneratorPanel());
     }
 
     /**

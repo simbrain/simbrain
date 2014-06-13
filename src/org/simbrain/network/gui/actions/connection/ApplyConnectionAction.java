@@ -17,29 +17,17 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.connections.Radial;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
-import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
-import org.simbrain.network.gui.dialogs.connect.OneToOnePanel;
-import org.simbrain.network.gui.dialogs.connect.RadialPanel;
-import org.simbrain.network.gui.dialogs.connect.SparsePanel;
 
 /**
  * Apply specified connection either from selected neurons to themselves
- * ("self connect") or form source to target.
+ * ("self connect") or from source to target.
  */
 public final class ApplyConnectionAction extends ConditionallyEnabledAction {
-
-    /** If true, connect selected neurons to themselves. */
-    private boolean isSelfConnect;
 
     /** The connection to apply. */
     private ConnectNeurons connection;
@@ -49,63 +37,57 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     /**
      * Construct the action.
-     *
-     * @param networkPanel networkPanel, must not be null
-     * @param connection the connection to apply
-     * @param name the name of this action
-     * @param isSelfConnect whether to connect selected neurons to themselves or
-     *            not.
+     * 
+     * @param networkPanel
+     *            networkPanel, must not be null
+     * @param connection
+     *            the connection to apply
+     * @param name
+     *            the name of this action
+     * @param isSelfConnect
+     *            whether to connect selected neurons to themselves or not.
      */
     public ApplyConnectionAction(final NetworkPanel networkPanel,
-            ConnectNeurons connection, String name, boolean isSelfConnect) {
+        ConnectNeurons connection, String name) {
 
         super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGET_NEURONS);
 
         putValue(SHORT_DESCRIPTION, "Use " + name
-                + " method to connect source to target neurons");
+            + " method to connect source to target neurons");
 
-        this.isSelfConnect = isSelfConnect;
         this.connection = connection;
 
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        if (isSelfConnect) {
-            // Not used..
-            connection.connectNeurons(networkPanel.getNetwork(),
-                    networkPanel.getSelectedModelNeurons(),
-                    networkPanel.getSelectedModelNeurons(), true);
-        } else {
 
-            String title = "Connect ";
+        String title = "Connect ";
 
-            if (connection instanceof AllToAll) {
-                optionsPanel = new AllToAllPanel((AllToAll) connection);
-                optionsPanel.fillFieldValues();
-                title += "All to All";
-            } else if (connection instanceof OneToOne) {
-                optionsPanel = new OneToOnePanel((OneToOne) connection);
-                optionsPanel.fillFieldValues();
-                title += "One to One";
-            } else if (connection instanceof Radial) {
-                optionsPanel = new RadialPanel((Radial) connection);
-                optionsPanel.fillFieldValues();
-                title += "Radial";
-            } else if (connection instanceof Sparse) {
-                optionsPanel = new SparsePanel((Sparse) connection,
-                        networkPanel);
-                optionsPanel.fillFieldValues();
-                title += "Sparse";
-            }
-            ConnectionDialog dialog = new ConnectionDialog(networkPanel,
-                    optionsPanel, connection);
-            dialog.setTitle(title);
-            dialog.setLocationRelativeTo(null);
-            dialog.pack();
-            dialog.setVisible(true);
+        // if (connection instanceof AllToAll) {
+        // optionsPanel = new AllToAllPanel((AllToAll) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // title += "All to All";
+        // } else if (connection instanceof OneToOne) {
+        // optionsPanel = new OneToOnePanel((OneToOne) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // title += "One to One";
+        // } else if (connection instanceof Radial) {
+        // optionsPanel = new RadialPanel((Radial) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // title += "Radial";
+        // } else if (connection instanceof Sparse) {
+        // optionsPanel = new SparsePanel((Sparse) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // title += "Sparse";
+        // }
+        ConnectionDialog dialog =
+            new ConnectionDialog(optionsPanel, connection);
+        dialog.setTitle(title);
+        dialog.setLocationRelativeTo(null);
+        dialog.pack();
+        dialog.setVisible(true);
 
-        }
     }
 
 }

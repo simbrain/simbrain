@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.Window;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
@@ -26,12 +27,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * This panel combines synapse editing sub-panels and handles changes to one
  * being applied to the others.
- *
+ * 
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
@@ -62,16 +64,17 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * info panel and a synapse update settings panel. The panel is
      * automatically built and laid out, such that it is immediately ready for
      * display.
-     *
-     * @param synapseList the list of synapse synapses either being edited
-     *            (editing) or being used to fill the panel with default values
-     *            (creation).
-     * @param parent the parent window, made available for easy resizing.
+     * 
+     * @param synapseList
+     *            the list of synapse synapses either being edited (editing) or
+     *            being used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
      */
     public static CombinedSynapseInfoPanel createCombinedSynapseInfoPanel(
-            final List<Synapse> synapseList, final Window parent) {
+        final Collection<Synapse> synapseList, final Window parent) {
         return createCombinedSynapseInfoPanel(synapseList, parent,
-                DEFAULT_DISPLAY_PARAMS);
+            DEFAULT_DISPLAY_PARAMS);
     }
 
     /**
@@ -80,42 +83,47 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * automatically built and laid out, such that it is immediately ready for
      * display. The setting panel's display state is that extra data is by
      * default hidden.
-     *
-     * @param synapseList the list of synapses either being edited (editing) or
-     *            being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams whether or not to display the synapse
-     *            update rule's details initially
+     * 
+     * @param synapseList
+     *            the list of synapses either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param showSpecificRuleParams
+     *            whether or not to display the synapse update rule's details
+     *            initially
      */
     public static CombinedSynapseInfoPanel createCombinedSynapseInfoPanel(
-            final List<Synapse> synapseList, final Window parent,
-            final boolean showSpecificRuleParams) {
+        final Collection<Synapse> synapseList, final Window parent,
+        final boolean showSpecificRuleParams) {
         CombinedSynapseInfoPanel cnip = new CombinedSynapseInfoPanel(
-                synapseList, parent, showSpecificRuleParams);
+            synapseList, parent, showSpecificRuleParams);
         cnip.initializeLayout();
         return cnip;
     }
 
     /**
      * {@link #createCombinedSynapseInfoPanel(List, Window, boolean)}
-     *
-     * @param synapseList the list of synapses either being edited (editing) or
-     *            being used to fill the panel with default values (creation).
-     * @param parent the parent window, made available for easy resizing.
-     * @param showSpecificRuleParams whether or not to display the synapse
-     *            update rule's details initially.
+     * 
+     * @param synapseList
+     *            the list of synapses either being edited (editing) or being
+     *            used to fill the panel with default values (creation).
+     * @param parent
+     *            the parent window, made available for easy resizing.
+     * @param showSpecificRuleParams
+     *            whether or not to display the synapse update rule's details
+     *            initially.
      */
-    private CombinedSynapseInfoPanel(final List<Synapse> synapseList,
-            final Window parent, final boolean showSpecificRuleParams) {
+    private CombinedSynapseInfoPanel(final Collection<Synapse> synapseList,
+        final Window parent, final boolean showSpecificRuleParams) {
         synapseInfoPanel = BasicSynapseInfoPanel.createBasicSynapseInfoPanel(
-                synapseList, parent, showSpecificRuleParams);
+            synapseList, parent, synapseList.size() < 2);
         updateInfoPanel = new SynapseUpdateSettingsPanel(synapseList, parent,
-                showSpecificRuleParams);
+            showSpecificRuleParams);
         if (SynapseDialog.containsASpikeResponder(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
-                    parent);
+                parent);
         }
-
     }
 
     /**
@@ -158,6 +166,13 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
 
     }
 
+    /**
+     * @return a template rule assoc
+     */
+    public SynapseUpdateRule getTemplateSelectedRule() {
+        return updateInfoPanel.getTemplateRule();
+    }
+
     @Override
     public JPanel getPanel() {
         return this;
@@ -175,10 +190,24 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @param updateInfoPanel the updateInfoPanel to set
+     * @param updateInfoPanel
+     *            the updateInfoPanel to set
      */
     public void setUpdateInfoPanel(SynapseUpdateSettingsPanel updateInfoPanel) {
         this.updateInfoPanel = updateInfoPanel;
+    }
+
+    /**
+     * Sets whether or not the basic synapse
+     * 
+     * @param ignoreSetStrength
+     */
+    public void setIgnoreSetStrength(boolean ignoreSetStrength) {
+        synapseInfoPanel.setIgnoreSetStrength(ignoreSetStrength);
+    }
+
+    public double getStrength() {
+        return synapseInfoPanel.getStrength();
     }
 
 }

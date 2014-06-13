@@ -53,7 +53,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Random panel. */
-    private RandomizerPanel randPanel = new RandomizerPanel();
+    private RandomizerPanel randPanel;// = new RandomizerPanel();
 
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();
@@ -63,7 +63,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
-     *
+     * 
      */
     public SinusoidalGeneratorPanel() {
         super();
@@ -86,21 +86,21 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
 
         // Handle Frequency
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getFrequency"))
+            "getFrequency"))
             tfFrequency.setText(SimbrainConstants.NULL_STRING);
         else
             tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
 
         // Handle Phase
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getPhase"))
+            "getPhase"))
             tfPhase.setText(SimbrainConstants.NULL_STRING);
         else
             tfPhase.setText(Double.toString(neuronRef.getPhase()));
 
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-                "getAddNoise"))
+            "getAddNoise"))
             isAddNoise.setNull();
         else
             isAddNoise.setSelected(neuronRef.getAddNoise());
@@ -112,7 +112,8 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
+    private ArrayList<Randomizer>
+        getRandomizers(List<NeuronUpdateRule> ruleList) {
         ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {

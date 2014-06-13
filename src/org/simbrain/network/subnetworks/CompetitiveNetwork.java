@@ -35,7 +35,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
  * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
  * group. An input layer and input data have been added so that the SOM can be
  * easily trained using existing Simbrain GUI tools
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class CompetitiveNetwork extends Subnetwork implements Trainable {
@@ -51,19 +51,22 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
 
     /**
      * Construct an SOM Network.
-     *
-     * @param net parent network
-     * @param numCompetitiveNeurons number of neurons in the Competitive layer
-     * @param numInputNeurons number of neurons in the input layer
-     * @param initialPosition bottom corner where network will be placed.
+     * 
+     * @param net
+     *            parent network
+     * @param numCompetitiveNeurons
+     *            number of neurons in the Competitive layer
+     * @param numInputNeurons
+     *            number of neurons in the input layer
+     * @param initialPosition
+     *            bottom corner where network will be placed.
      */
     public CompetitiveNetwork(Network net, int numCompetitiveNeurons,
             int numInputNeurons, Point2D initialPosition) {
         super(net);
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
-        inputLayer = new NeuronGroup(net, initialPosition,
-                numInputNeurons);
+        inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
         inputLayer.setLayoutBasedOnSize();
         this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);
@@ -72,7 +75,8 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         }
         inputLayer.setClamped(true);
         this.connectNeuronGroups(inputLayer, competitive);
-        for (Synapse synapse : getSynapseGroup().getSynapseList()) {
+        // TODO: Check if all positive synapses was the intention
+        for (Synapse synapse : getSynapseGroup().getAllSynapses()) {
             synapse.setLowerBound(0);
         }
         layoutNetwork();

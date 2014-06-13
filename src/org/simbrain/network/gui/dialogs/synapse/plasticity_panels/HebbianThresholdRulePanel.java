@@ -19,6 +19,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse.plasticity_panels;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,8 +66,9 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
-     *
-     * @param ruleList the list of rules to edit/use to display variables from
+     * 
+     * @param ruleList
+     *            the list of rules to edit/use to display variables from
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
@@ -146,7 +148,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
      * {@inheritDoc}
      */
     @Override
-    public void commitChanges(final List<Synapse> synapses) {
+    public void commitChanges(final Collection<Synapse> synapses) {
         if (isReplace()) {
             for (Synapse s : synapses) {
                 s.setLearningRule(prototypeRule.deepCopy());
@@ -161,7 +163,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
      * {@inheritDoc}
      */
     @Override
-    protected void writeValuesToRules(final List<Synapse> synapses) {
+    protected void writeValuesToRules(final Collection<Synapse> synapses) {
 
         // LearningRate
         double learningRate = Utils.doubleParsable(tfLearningRate);

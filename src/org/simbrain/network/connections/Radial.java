@@ -17,22 +17,18 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them.
- *
+ * 
  * TODO: More complex connection making functions Custom randomization? Ability
  * to connect in a range (e.g, between 109 and 209 units away)
- *
+ * 
  * @author jyoshimi
- *
+ * 
  */
 public class Radial extends ConnectNeurons {
 
@@ -63,18 +59,6 @@ public class Radial extends ConnectNeurons {
      */
     private double inhibitoryProbability = .8;
 
-    /**
-     * See super class description.
-     *
-     * @param network network with neurons to be connected.
-     * @param neurons source neurons.
-     * @param neurons2 target neurons.
-     */
-    public Radial(final Network network, final List<? extends Neuron> neurons,
-            final List<? extends Neuron> neurons2) {
-        super(network, neurons, neurons2);
-    }
-
     /** {@inheritDoc} */
     public Radial() {
     }
@@ -84,83 +68,83 @@ public class Radial extends ConnectNeurons {
         return "Radial";
     }
 
-    @Override
-    public List<Synapse> connectNeurons(final boolean looseSynapses) {
-        ArrayList<Synapse> syns = new ArrayList<Synapse>();
-        for (Neuron source : sourceNeurons) {
-            makeExcitatory(source, syns, looseSynapses);
-            makeInhibitory(source, syns, looseSynapses);
-        }
-        return syns;
-    }
-
-    /**
-     * Make an inhibitory neuron, in the sense of connecting this neuron with
-     * surrounding neurons via excitatory connections.
-     *
-     * @param source source neuron
-     */
-    private void makeInhibitory(final Neuron source, List<Synapse> syns,
-            boolean looseSynapses) {
-        for (Neuron target : network.getNeuronsInRadius(source,
-                inhibitoryRadius)) {
-            if (!sourceNeurons.contains(target)) {
-                continue;
-            }
-            // Don't add a connection if there is already one present
-            if (Network.getSynapse(source, target) != null) {
-                continue;
-            }
-            if (!allowSelfConnections) {
-                if (source == target) {
-                    continue;
-                }
-            }
-            if (Math.random() < inhibitoryProbability) {
-                Synapse synapse = baseInhibitorySynapse
-                        .instantiateTemplateSynapse(source, target, network);
-                synapse.setStrength(-1);
-                if (looseSynapses) {
-                    network.addSynapse(synapse);
-                }
-                syns.add(synapse);
-            }
-        }
-    }
-
-    /**
-     * Make an excitatory neuron, in the sense of connecting this neuron with
-     * surrounding neurons via excitatory connections.
-     *
-     * @param source source neuron
-     */
-    private void makeExcitatory(final Neuron source, List<Synapse> syns,
-            boolean looseSynapses) {
-        for (Neuron target : network.getNeuronsInRadius(source,
-                excitatoryRadius)) {
-            if (!sourceNeurons.contains(target)) {
-                continue;
-            }
-            // Don't add a connection if there is already one present
-            if (Network.getSynapse(source, target) != null) {
-                continue;
-            }
-            if (!allowSelfConnections) {
-                if (source == target) {
-                    continue;
-                }
-            }
-            if (Math.random() < excitatoryProbability) {
-                Synapse synapse = baseExcitatorySynapse
-                        .instantiateTemplateSynapse(source, target, network);
-                synapse.setStrength(1);
-                if (looseSynapses) {
-                    network.addSynapse(synapse);
-                }
-                syns.add(synapse);
-            }
-        }
-    }
+    // @Override
+    // public List<Synapse> connectNeurons(final boolean looseSynapses) {
+    // ArrayList<Synapse> syns = new ArrayList<Synapse>();
+    // for (Neuron source : sourceNeurons) {
+    // makeExcitatory(source, syns, looseSynapses);
+    // makeInhibitory(source, syns, looseSynapses);
+    // }
+    // return syns;
+    // }
+    //
+    // /**
+    // * Make an inhibitory neuron, in the sense of connecting this neuron with
+    // * surrounding neurons via excitatory connections.
+    // *
+    // * @param source source neuron
+    // */
+    // private void makeInhibitory(final Neuron source, List<Synapse> syns,
+    // boolean looseSynapses) {
+    // for (Neuron target : network.getNeuronsInRadius(source,
+    // inhibitoryRadius)) {
+    // if (!sourceNeurons.contains(target)) {
+    // continue;
+    // }
+    // // Don't add a connection if there is already one present
+    // if (Network.getSynapse(source, target) != null) {
+    // continue;
+    // }
+    // if (!allowSelfConnections) {
+    // if (source == target) {
+    // continue;
+    // }
+    // }
+    // if (Math.random() < inhibitoryProbability) {
+    // Synapse synapse = baseInhibitorySynapse
+    // .instantiateTemplateSynapse(source, target, network);
+    // synapse.setStrength(-1);
+    // if (looseSynapses) {
+    // network.addSynapse(synapse);
+    // }
+    // syns.add(synapse);
+    // }
+    // }
+    // }
+    //
+    // /**
+    // * Make an excitatory neuron, in the sense of connecting this neuron with
+    // * surrounding neurons via excitatory connections.
+    // *
+    // * @param source source neuron
+    // */
+    // private void makeExcitatory(final Neuron source, List<Synapse> syns,
+    // boolean looseSynapses) {
+    // for (Neuron target : network.getNeuronsInRadius(source,
+    // excitatoryRadius)) {
+    // if (!sourceNeurons.contains(target)) {
+    // continue;
+    // }
+    // // Don't add a connection if there is already one present
+    // if (Network.getSynapse(source, target) != null) {
+    // continue;
+    // }
+    // if (!allowSelfConnections) {
+    // if (source == target) {
+    // continue;
+    // }
+    // }
+    // if (Math.random() < excitatoryProbability) {
+    // Synapse synapse = baseExcitatorySynapse
+    // .instantiateTemplateSynapse(source, target, network);
+    // synapse.setStrength(1);
+    // if (looseSynapses) {
+    // network.addSynapse(synapse);
+    // }
+    // syns.add(synapse);
+    // }
+    // }
+    // }
 
     /**
      * @return the allowSelfConnections
@@ -170,7 +154,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param allowSelfConnections the allowSelfConnections to set
+     * @param allowSelfConnections
+     *            the allowSelfConnections to set
      */
     public void setAllowSelfConnections(final boolean allowSelfConnections) {
         this.allowSelfConnections = allowSelfConnections;
@@ -184,7 +169,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param excitatoryProbability the excitatoryProbability to set
+     * @param excitatoryProbability
+     *            the excitatoryProbability to set
      */
     public void setExcitatoryProbability(final double excitatoryProbability) {
         this.excitatoryProbability = excitatoryProbability;
@@ -198,7 +184,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param excitatoryRadius the excitatoryRadius to set
+     * @param excitatoryRadius
+     *            the excitatoryRadius to set
      */
     public void setExcitatoryRadius(final double excitatoryRadius) {
         this.excitatoryRadius = excitatoryRadius;
@@ -212,7 +199,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param inhibitoryRadius the inhibitoryRadius to set
+     * @param inhibitoryRadius
+     *            the inhibitoryRadius to set
      */
     public void setInhibitoryRadius(final double inhibitoryRadius) {
         this.inhibitoryRadius = inhibitoryRadius;
@@ -226,7 +214,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param inhibitoryProbability the inhibitoryProbability to set
+     * @param inhibitoryProbability
+     *            the inhibitoryProbability to set
      */
     public void setInhibitoryProbability(final double inhibitoryProbability) {
         this.inhibitoryProbability = inhibitoryProbability;
@@ -240,7 +229,8 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
+     * @param baseExcitatorySynapse
+     *            the baseExcitatorySynapse to set
      */
     public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
         this.baseExcitatorySynapse = baseExcitatorySynapse;
@@ -254,10 +244,17 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
+     * @param baseInhibitorySynapse
+     *            the baseInhibitorySynapse to set
      */
     public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
         this.baseInhibitorySynapse = baseInhibitorySynapse;
+    }
+
+    @Override
+    public void connectNeurons(SynapseGroup synGroup) {
+        // TODO Auto-generated method stub
+
     }
 
 }

@@ -23,26 +23,39 @@ package org.simbrain.util;
  * A class solely for storing constants used throughout simbrain.
  * 
  * @author Zach Tosi
- *
+ * 
  */
 public class SimbrainConstants {
-    
+
     public static final String NULL_STRING = "...";
-    
+
     public static enum Polarity {
         EXCITATORY {
             @Override
             public double value(double val) {
                 return Math.abs(val);
             }
-        }, INHIBITORY {
+
+            @Override
+            public String title() {
+                return "Excitatory";
+            }
+        },
+        INHIBITORY {
             @Override
             public double value(double val) {
                 return -Math.abs(val);
             }
-            
+
+            @Override
+            public String title() {
+                return "Inhibitory";
+            }
         };
         public abstract double value(double val);
+
+        /** A capitalized version to toString(). */
+        public abstract String title();
     }
-    
+
 }

@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -61,17 +63,20 @@ public class HopfieldTrainer extends Trainer {
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
             int k = 0;
+            Neuron [] neurons = hopfield.getSynapseGroup().getSourceNeurons()
+                    .toArray(new Neuron[pattern.length]);
             for (int i = 0; i < pattern.length; i++) {
                 for (int j = 0; j < pattern.length; j++) {
                     if (i != j) {
-                        vals[k++] += pattern[i] * pattern[j];
+                        Synapse s = neurons[i].getFanOut().get(neurons[j]);
+                        s.setStrength(s.getStrength() + pattern[i] * pattern[j]);
                     }
                 }
             }
         }
         vals = SimbrainMath.multVector(vals, normConstant);
-        hopfield.getSynapseGroup().setWeightVector(vals);
-
+        // Make sure excitatory/inhibitory are in proper lists
+        hopfield.getSynapseGroup().checkAndFixInconsistencies();
         hopfield.getParentNetwork().fireNetworkChanged();
     }
 

@@ -11,21 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.connect;
+package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
@@ -39,33 +35,14 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /** Sets whether connections are bidirectional. */
     private JCheckBox bidirectionalConnection = new JCheckBox();
 
-    /** Set base synapse type. */
-    private JButton setSynapseType = new JButton();
+    private OneToOne connection;
 
     /**
      * Default constructor.
      */
     public OneToOnePanel(final OneToOne connection) {
-        super(connection);
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
-        setSynapseType.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Synapse> list = new ArrayList<Synapse>();
-                Synapse temp = connection.getBaseSynapse();
-                list.add(temp);
-                SynapseDialog dialog = SynapseDialog.createSynapseDialog(list);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                Synapse synapse = dialog.getSynapseList().get(0);
-                connection.setBaseSynapse(synapse);
-                setSynapseType.setText(synapse.getType());
-            }
-
-        });
-        setSynapseType.setText(connection.getBaseSynapse().getType());
-        addItem("Synapse Type:", setSynapseType);
+        // setSynapseType.setText(connection.getBaseSynapse().getType());
         addItem("Orientation: ", orientationBox);
         addItem("Bidirectional Connections: ", bidirectionalConnection);
     }
@@ -75,11 +52,11 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      */
     public void commitChanges() {
         ((OneToOne) connection)
-                .setUseBidirectionalConnections(bidirectionalConnection
-                        .isSelected());
-        ((OneToOne) connection)
-                .setConnectOrientation((Comparator) orientationBox
-                        .getSelectedItem());
+            .setUseBidirectionalConnections(bidirectionalConnection
+                .isSelected());
+        // ((OneToOne) connection)
+        // .setConnectOrientation((Comparator) orientationBox
+        // .getSelectedItem());
     }
 
     /**
@@ -87,16 +64,28 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      */
     public void fillFieldValues() {
         bidirectionalConnection.setSelected(((OneToOne) connection)
-                .isUseBidirectionalConnections());
+            .isUseBidirectionalConnections());
         orientationBox.setSelectedItem(((OneToOne) connection)
-                .getConnectOrientation());
+            .getConnectOrientation());
     }
 
     /**
      *
      */
     public void fillFieldValues(ConnectNeurons connection) {
-        // TODO Auto-Generated Method Stub
+        bidirectionalConnection.setSelected(((OneToOne) connection)
+            .isUseBidirectionalConnections());
+    }
+
+    @Override
+    public OneToOne getConnection() {
+        return connection;
+    }
+
+    @Override
+    public void commitChanges(List<Neuron> source, List<Neuron> target) {
+        OneToOne.connectOneToOne(source, target,
+            bidirectionalConnection.isSelected(), true);
     }
 
 }

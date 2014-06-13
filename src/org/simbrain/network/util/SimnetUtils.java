@@ -300,7 +300,7 @@ public class SimnetUtils {
             // Add this hidden layer then recursively add another layer, if
             // there is one.
             List<Neuron> newLayer = new ArrayList<Neuron>(newLayerTemp);
-            Collections.sort(newLayer, Comparators.X_ORDER);
+            Collections.sort(newLayer, OrientationComparator.X_ORDER);
             layers.add(newLayer);
             addPreviousLayer(layers, sourceLayer, newLayer);
         }

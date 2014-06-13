@@ -32,10 +32,7 @@ import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.SynapseGroupNodeFull;
-import org.simbrain.network.gui.nodes.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
@@ -56,7 +53,7 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
  * level references are built.
  * <p>
  * Applet menus are handled in {@link org.simbrain.network.gui.NetworkMenuBar}
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class NetworkPanelDesktop extends NetworkPanel {
@@ -66,12 +63,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Construct the desktop extension of network panel. The main thing
-     *
-     * @param component the component level representation of the desktop
-     * @param Network the neural network model
+     * 
+     * @param component
+     *            the component level representation of the desktop
+     * @param Network
+     *            the neural network model
      */
     public NetworkPanelDesktop(final NetworkDesktopComponent component,
-            final Network Network) {
+        final Network Network) {
         super(Network);
         this.component = component;
 
@@ -93,29 +92,29 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public void applyUserPrefsToNetwork() {
         try {
             NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences
-                    .getInt("networkBackgroundColor")));
+                .getInt("networkBackgroundColor")));
             EditMode.setWandRadius(SimbrainPreferences
-                    .getInt("networkWandRadius"));
+                .getInt("networkWandRadius"));
             NetworkPanel.setNudgeAmount(SimbrainPreferences
-                    .getDouble("networkNudgeAmount"));
+                .getDouble("networkNudgeAmount"));
             Network.setSynapseVisibilityThreshold(SimbrainPreferences
-                    .getInt("networkSynapseVisibilityThreshold"));
+                .getInt("networkSynapseVisibilityThreshold"));
             NeuronNode.setHotColor(SimbrainPreferences
-                    .getFloat("networkHotNodeColor"));
+                .getFloat("networkHotNodeColor"));
             NeuronNode.setCoolColor(SimbrainPreferences
-                    .getFloat("networkCoolNodeColor"));
+                .getFloat("networkCoolNodeColor"));
             NeuronNode.setSpikingColor(new Color(SimbrainPreferences
-                    .getInt("networkSpikingColor")));
+                .getInt("networkSpikingColor")));
             SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences
-                    .getInt("networkExcitatorySynapseColor")));
+                .getInt("networkExcitatorySynapseColor")));
             SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences
-                    .getInt("networkInhibitorySynapseColor")));
+                .getInt("networkInhibitorySynapseColor")));
             SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences
-                    .getInt("networkZeroWeightColor")));
+                .getInt("networkZeroWeightColor")));
             SynapseNode.setMaxDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMaxSize"));
+                .getInt("networkSynapseMaxSize"));
             SynapseNode.setMinDiameter(SimbrainPreferences
-                    .getInt("networkSynapseMinSize"));
+                .getInt("networkSynapseMinSize"));
             resetColors();
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
@@ -124,7 +123,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Edit menu for this Network panel.
-     *
+     * 
      * @return a new Edit menu for this Network panel
      */
     JMenu createEditMenu() {
@@ -160,7 +159,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Insert menu for this Network panel.
-     *
+     * 
      * @return a new Insert menu for this Network panel
      */
     JMenu createInsertMenu() {
@@ -180,7 +179,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new View menu for this Network panel.
-     *
+     * 
      * @return a new View menu for this Network panel
      */
     JMenu createViewMenu() {
@@ -203,7 +202,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create a selection JMenu.
-     *
+     * 
      * @return the selection menu.
      */
     public JMenu createSelectionMenu() {
@@ -218,7 +217,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Help menu for this Network panel.
-     *
+     * 
      * @return a new Help menu for this Network panel
      */
     public JMenu createHelpMenu() {
@@ -230,9 +229,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * This version of network dialog allows user to set User Preferences.
-     *
+     * 
      * @param networkPanel
-     *
+     * 
      * @return superclass version of network dialog, with User Preferences
      */
     public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
@@ -241,7 +240,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * This version adds the script menu.
-     *
+     * 
      * @return the context menu with script menu added
      */
     public JPopupMenu createNetworkContextMenu() {
@@ -278,20 +277,20 @@ public class NetworkPanelDesktop extends NetworkPanel {
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
             PotentialProducer producer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialProducer(neuron, "getActivation",
-                            double.class);
+                .getWorkspaceComponent()
+                .getAttributeManager()
+                .createPotentialProducer(neuron, "getActivation",
+                    double.class);
             PotentialConsumer consumer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialConsumer(neuron, "setInputValue",
-                            double.class);
+                .getWorkspaceComponent()
+                .getAttributeManager()
+                .createPotentialConsumer(neuron, "setInputValue",
+                    double.class);
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Scalar Coupling to", workspace, producer);
+                "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
             JMenu consumerMenu = new CouplingMenuConsumer(
-                    "Receive Scalar Coupling from", workspace, consumer);
+                "Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;
@@ -302,15 +301,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         if (component.getWorkspaceComponent() != null) {
             PotentialProducer producer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialProducer(neuronGroup, "getActivations",
-                            double[].class);
+                .getWorkspaceComponent()
+                .getAttributeManager()
+                .createPotentialProducer(neuronGroup, "getActivations",
+                    double[].class);
             producer.setCustomDescription("Neuron Group: "
-                    + neuronGroup.getLabel());
+                + neuronGroup.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component
-                            .getWorkspaceComponent().getWorkspace(), producer);
+                "Send Vector Coupling to", component
+                    .getWorkspaceComponent().getWorkspace(), producer);
             return producerMenu;
         }
         return null;
@@ -320,15 +319,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
             PotentialConsumer consumer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialConsumer(neuronGroup, "setInputValues",
-                            double[].class);
+                .getWorkspaceComponent()
+                .getAttributeManager()
+                .createPotentialConsumer(neuronGroup, "setInputValues",
+                    double[].class);
             consumer.setCustomDescription("Neuron Group: "
-                    + neuronGroup.getLabel());
+                + neuronGroup.getLabel());
             JMenu menu = new CouplingMenuConsumer(
-                    "Receive Vector Coupling from", component
-                            .getWorkspaceComponent().getWorkspace(), consumer);
+                "Receive Vector Coupling from", component
+                    .getWorkspaceComponent().getWorkspace(), consumer);
             return menu;
         }
         return null;
@@ -338,14 +337,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public JMenu getSynapseGroupProducerMenu(SynapseGroup sg) {
         if (component.getWorkspaceComponent() != null) {
             PotentialProducer producer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialProducer(sg, "getWeightVector",
-                            double[].class);
+                .getWorkspaceComponent()
+                .getAttributeManager()
+                .createPotentialProducer(sg, "getWeightVector",
+                    double[].class);
             producer.setCustomDescription("Synapse Group: " + sg.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component
-                            .getWorkspaceComponent().getWorkspace(), producer);
+                "Send Vector Coupling to", component
+                    .getWorkspaceComponent().getWorkspace(), producer);
             return producerMenu;
         }
         return null;
@@ -353,19 +352,20 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     @Override
     public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
-        if (component.getWorkspaceComponent() != null) {
-            PotentialConsumer consumer = component
-                    .getWorkspaceComponent()
-                    .getAttributeManager()
-                    .createPotentialConsumer(synapseGroup, "setWeightVector",
-                            double[].class);
-            consumer.setCustomDescription("Synapse Group: " + synapseGroup.getLabel());
-
-            JMenu menu = new CouplingMenuConsumer(
-                    "Receive Vector Coupling from", component
-                            .getWorkspaceComponent().getWorkspace(), consumer);
-            return menu;
-        }
+        // if (component.getWorkspaceComponent() != null) {
+        // PotentialConsumer consumer = component
+        // .getWorkspaceComponent()
+        // .getAttributeManager()
+        // .createPotentialConsumer(synapseGroup, "setWeightVector",
+        // double[].class);
+        // consumer.setCustomDescription("Synapse Group: " +
+        // synapseGroup.getLabel());
+        //
+        // JMenu menu = new CouplingMenuConsumer(
+        // "Receive Vector Coupling from", component
+        // .getWorkspaceComponent().getWorkspace(), consumer);
+        // return menu;
+        // }
         return null;
     }
 

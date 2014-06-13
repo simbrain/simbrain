@@ -19,10 +19,11 @@
 package org.simbrain.network.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -66,7 +67,7 @@ public class Synapse {
     // public static final int NUM_PARAMETERS = 8;
 
     /** Strength of synapse. */
-    private double strength = 1;
+    private double strength = 0;
 
     /** Post-Synaptic Response */
     private double psr;
@@ -84,7 +85,7 @@ public class Synapse {
     private int delay;
 
     /** Parent group, if any (null if none). */
-    private Group parentGroup;
+    private SynapseGroup parentGroup;
 
     /**
      * Boolean flag, indicating whether this type of synapse participates in the
@@ -128,8 +129,7 @@ public class Synapse {
      *            update rule for this synapse
      */
     public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule) {
-        setSource(source);
-        setTarget(target);
+        setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         if (source != null) {
             parentNetwork = source.getNetwork();
@@ -151,10 +151,9 @@ public class Synapse {
      *            synapse with parameters to copy
      */
     public Synapse(Neuron source, Neuron target,
-            SynapseUpdateRule learningRule, Synapse templateSynapse) {
+        SynapseUpdateRule learningRule, Synapse templateSynapse) {
         this(templateSynapse); // invoke the copy constructor
-        setSource(source);
-        setTarget(target);
+        setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         if (source != null) {
             parentNetwork = source.getNetwork();
@@ -175,9 +174,8 @@ public class Synapse {
      *            parent network for this synapse.
      */
     public Synapse(Neuron source, Neuron target,
-            SynapseUpdateRule learningRule, Network parent) {
-        setSource(source);
-        setTarget(target);
+        SynapseUpdateRule learningRule, Network parent) {
+        setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         parentNetwork = parent;
     }
@@ -273,20 +271,18 @@ public class Synapse {
         return source;
     }
 
-    /**
-     * New source neuron to attach the synapse.
-     * 
-     * @param n
-     *            Neuron to attach synapse
-     */
-    public void setSource(final Neuron n) {
+    private void setSourceAndTarget(final Neuron source, final Neuron target) {
         if (this.source != null) {
-            this.source.removeTarget(this);
+            this.source.removeEfferent(this);
         }
-
-        if (n != null) {
-            this.source = n;
-            n.addTarget(this);
+        if (this.target != null) {
+            this.target.removeAfferent(this);
+        }
+        if (source != null && target != null) {
+            this.source = source;
+            this.target = target;
+            source.addEfferent(this);
+            target.addAfferent(this);
         }
     }
 
@@ -295,22 +291,6 @@ public class Synapse {
      */
     public Neuron getTarget() {
         return target;
-    }
-
-    /**
-     * New target neuron to attach the synapse.
-     * 
-     * @param n
-     *            Neuron to attach synapse
-     */
-    public void setTarget(final Neuron n) {
-        if (this.target != null) {
-            this.target.removeSource(this);
-        }
-        if (n != null) {
-            this.target = n;
-            n.addSource(this);
-        }
     }
 
     /**
@@ -455,7 +435,7 @@ public class Synapse {
      */
     public String getToolTipText() {
         return "(" + id + ") Strength: "
-                + Utils.round(this.getStrength(), MAX_DIGITS);
+            + Utils.round(this.getStrength(), MAX_DIGITS);
     }
 
     /**
@@ -464,10 +444,7 @@ public class Synapse {
      * @return the symmetric synapse, if any.
      */
     public Synapse getSymmetricSynapse() {
-        List<Synapse> targetsOut = this.getTarget().getFanOut();
-        int index = targetsOut.indexOf(this.getSource());
-
-        return (index < 0) ? null : targetsOut.get(index);
+        return getTarget().getFanOut().get(getSource());
     }
 
     /**
@@ -475,7 +452,7 @@ public class Synapse {
      */
     public void randomize() {
         strength = (getUpperBound() - getLowerBound()) * Math.random()
-                + getLowerBound();
+            + getLowerBound();
         getNetwork().fireSynapseChanged(this);
     }
 
@@ -598,7 +575,7 @@ public class Synapse {
         String ret = new String();
         ret += ("Synapse [" + getId() + "]: " + getStrength());
         ret += ("  Connects neuron " + getSource().getId() + " to neuron "
-                + getTarget().getId() + "\n");
+            + getTarget().getId() + "\n");
         return ret;
     }
 
@@ -672,15 +649,15 @@ public class Synapse {
     public void setLearningRule(String name) {
         try {
             SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
-                    "org.simbrain.network.synapse_update_rules." + name)
-                    .newInstance();
+                "org.simbrain.network.synapse_update_rules." + name)
+                .newInstance();
             setLearningRule(newRule);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
-                    "The provided learning rule name, \""
-                            + name
-                            + "\", does not correspond to a known synapse type."
-                            + "\n Could not find " + e.getMessage());
+                "The provided learning rule name, \""
+                    + name
+                    + "\", does not correspond to a known synapse type."
+                    + "\n Could not find " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -742,23 +719,26 @@ public class Synapse {
     }
 
     /**
-     * A method which takes in a list of synapses and returns a list of their
-     * update rules in order.
+     * A method which takes in a collection of synapses and returns a list of
+     * their update rules in the order in which they appear in the original
+     * collection, if that collection supports a consistent order.
      * 
-     * @param synapseList
-     *            The list of synapses whose update rules we want to query.
+     * @param synapseCollection
+     *            The collection of synapses whose update rules we want to
+     *            query.
      * @return Returns a list of synapse update rules associated with the group
      *         of synapses
      */
-    public static List<SynapseUpdateRule> getRuleList(List<Synapse> synapseList) {
-        ArrayList<SynapseUpdateRule> ruleList = new ArrayList<SynapseUpdateRule>();
-        for (Synapse s : synapseList) {
+    public static List<SynapseUpdateRule> getRuleList(
+        Collection<Synapse> synapseCollection) {
+        ArrayList<SynapseUpdateRule> ruleList =
+            new ArrayList<SynapseUpdateRule>(
+                synapseCollection.size());
+        for (Synapse s : synapseCollection) {
             ruleList.add(s.getLearningRule());
 
         }
-
         return ruleList;
-
     }
 
     /**
@@ -776,7 +756,7 @@ public class Synapse {
      *         properties
      */
     public Synapse instantiateTemplateSynapse(Neuron source, Neuron target,
-            Network parent) {
+        Network parent) {
         this.source = source;
         this.target = target;
         this.parentNetwork = parent;
@@ -786,7 +766,7 @@ public class Synapse {
     /**
      * @return the parentGroup
      */
-    public Group getParentGroup() {
+    public SynapseGroup getParentGroup() {
         return parentGroup;
     }
 
@@ -794,7 +774,7 @@ public class Synapse {
      * @param parentGroup
      *            the parentGroup to set
      */
-    public void setParentGroup(Group parentGroup) {
+    public void setParentGroup(SynapseGroup parentGroup) {
         this.parentGroup = parentGroup;
     }
 

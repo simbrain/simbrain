@@ -23,7 +23,6 @@ import java.util.List;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * <b>RandomNeuronPanel</b> Currently unimplemented pending decisions about
@@ -31,16 +30,16 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  */
 public class RandomGeneratorPanel extends AbstractNeuronPanel {
 
-    /** Random pane. */
-    private RandomizerPanel rp = new RandomizerPanel();
+    // /** Random pane. */
+    // private RandomizerPanel rp = new RandomizerPanel();
 
     /**
      * Creates an instance of this panel.
-     *
+     * 
      */
     public RandomGeneratorPanel() {
         super();
-        this.add(rp);
+        // this.add(rp);
     }
 
     // /**
@@ -61,7 +60,7 @@ public class RandomGeneratorPanel extends AbstractNeuronPanel {
      * Fill field values to default values for random neuron.
      */
     public void fillDefaultValues() {
-        rp.fillDefaultValues();
+        // rp.fillDefaultValues();
     }
 
     // /**

@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -61,7 +60,7 @@ public class ProbDistPanel {
 
     /** Clipping combo box. */
     private TristateDropDown tsClipping =
-            new TristateDropDown();
+        new TristateDropDown();
 
     /** The panel where all items are placed. */
     private JPanel mainPanel = new JPanel();
@@ -73,12 +72,14 @@ public class ProbDistPanel {
      * Creates a panel within this class that is globally accessible
      * representing an editor for a randomizer with a specific probability
      * distribution.
-     * @param pdf the probability distribution the main panel will represent
+     * 
+     * @param pdf
+     *            the probability distribution the main panel will represent
      */
     public ProbDistPanel(ProbDistribution pdf) {
         this.pdf = pdf;
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.add(new LabelledItem (pdf.getParam1Name(), tfParam1));
+        mainPanel.add(new LabelledItem(pdf.getParam1Name(), tfParam1));
         if (pdf.getParam2Name() != null) {
             mainPanel.add(new LabelledItem(pdf.getParam2Name(), tfParam2));
         }
@@ -95,9 +96,6 @@ public class ProbDistPanel {
 
             });
             mainPanel.add(new LabelledItem("Clipping", tsClipping));
-        } else {
-            mainPanel.add(Box.createVerticalStrut(5
-                    * (tfUpBound.getPreferredSize().height + 6)));
         }
         fillDefaultValues();
     }
@@ -108,8 +106,9 @@ public class ProbDistPanel {
 
     /**
      * Populates the fields with current values.
-     *
-     * @param randomizers List of randomizers
+     * 
+     * @param randomizers
+     *            List of randomizers
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
         Randomizer rand = (Randomizer) randomizers.get(0);
@@ -119,14 +118,14 @@ public class ProbDistPanel {
         }
 
         if (NetworkUtils.isConsistent(randomizers,
-                Randomizer.class, "getParam1")) {
+            Randomizer.class, "getParam1")) {
             tfParam1.setText(Double.toString(rand.getParam1()));
         } else {
             tfParam1.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (NetworkUtils.isConsistent(randomizers,
-                Randomizer.class, "getParam2")) {
+            Randomizer.class, "getParam2")) {
             tfParam2.setText(Double.toString(rand.getParam2()));
         } else {
             tfParam2.setText(SimbrainConstants.NULL_STRING);
@@ -134,19 +133,19 @@ public class ProbDistPanel {
 
         if (!pdf.equals(ProbDistribution.UNIFORM)) {
             if (NetworkUtils.isConsistent(randomizers,
-                    Randomizer.class, "getLowerBound")) {
+                Randomizer.class, "getLowerBound")) {
                 tfLowBound.setText(Double.toString(rand.getLowerBound()));
             } else {
                 tfLowBound.setText(SimbrainConstants.NULL_STRING);
             }
             if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
-                    "getUpperBound")) {
+                "getUpperBound")) {
                 tfUpBound.setText(Double.toString(rand.getUpperBound()));
             } else {
                 tfUpBound.setText(SimbrainConstants.NULL_STRING);
             }
             if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
-                    "getClipping")) {
+                "getClipping")) {
                 tsClipping.setSelected(rand.getClipping());
             } else {
                 tsClipping.setNull();
@@ -156,7 +155,7 @@ public class ProbDistPanel {
 
     /**
      * Fills fields with values from a Random Source.
-     *
+     * 
      * @param rand
      */
     public void fillFieldValues(Randomizer rand) {
@@ -187,8 +186,9 @@ public class ProbDistPanel {
 
     /**
      * Called externally when dialog is being closed.
-     *
-     * @param rand Random source
+     * 
+     * @param rand
+     *            Random source
      */
     public void commitRandom(final Randomizer rand) {
         rand.setPdf(pdf);
@@ -230,8 +230,8 @@ public class ProbDistPanel {
     public void setEnabled(boolean enabled) {
 
         boolean boundConditions = enabled
-                && pdf.equals(ProbDistribution.UNIFORM)
-                && tsClipping.isSelected();
+            && pdf.equals(ProbDistribution.UNIFORM)
+            && tsClipping.isSelected();
 
         tfParam1.setEnabled(enabled);
         tfParam2.setEnabled(enabled);
@@ -240,7 +240,6 @@ public class ProbDistPanel {
         tfLowBound.setEnabled(boundConditions);
         tsClipping.setEnabled(boundConditions);
     }
-
 
     /**
      * @return the probability distribution represented by this panel
@@ -290,19 +289,19 @@ public class ProbDistPanel {
     }
 
     /**
-     * Contains the specific error message that occurs if one tries to 
-     * use this panel to modify a Randomizer with a different Probability
-     * distribution. 
-     * @throws an IllegalArgumentException if this class is passed a randomizer
-     * which cannot be altered sensibly by this class because it has a different
-     * probability distribution function
+     * Contains the specific error message that occurs if one tries to use this
+     * panel to modify a Randomizer with a different Probability distribution.
+     * 
+     * @throws an
+     *             IllegalArgumentException if this class is passed a randomizer
+     *             which cannot be altered sensibly by this class because it has
+     *             a different probability distribution function
      */
     private static void throwBadPdfException() {
         throw new IllegalArgumentException("Random panel was initialized" +
-                " for one type of probability distribution, while a" +
-                " randomizer with a different probability distribution" +
-                " is being used to fill its feilds");
+            " for one type of probability distribution, while a" +
+            " randomizer with a different probability distribution" +
+            " is being used to fill its feilds");
     }
-
 
 }

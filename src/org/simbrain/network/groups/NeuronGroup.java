@@ -75,7 +75,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Construct a new neuron group from a list of neurons.
-     * 
+     *
      * @param net
      *            the network
      * @param neurons
@@ -91,7 +91,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Construct a new neuron group with a specified number of neurons.
-     * 
+     *
      * @param net
      *            parent network
      * @param numNeurons
@@ -103,7 +103,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Construct a new neuron group with a specified number of neurons.
-     * 
+     *
      * @param net
      *            parent network
      * @param initialPosition
@@ -127,7 +127,7 @@ public class NeuronGroup extends Group {
     /**
      * Create a neuron group without any initial neurons and an initial
      * position.
-     * 
+     *
      * @param network
      *            parent network
      * @param initialPosition
@@ -141,7 +141,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Create a neuron group without any initial neurons.
-     * 
+     *
      * @param network
      *            parent network
      */
@@ -152,7 +152,7 @@ public class NeuronGroup extends Group {
     /**
      * Copy constructor. pass in network for cases where a group is pasted from
      * one network to another
-     * 
+     *
      * @param network
      *            parent network
      * @param toCopy
@@ -199,7 +199,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the update rule for the neurons in this group.
-     * 
+     *
      * @param base
      *            the neuron update rule to set.
      */
@@ -211,7 +211,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the string update rule for the neurons in this group.
-     * 
+     *
      * @param rule
      *            the neuron update rule to set.
      */
@@ -224,7 +224,7 @@ public class NeuronGroup extends Group {
     /**
      * Return a human-readable name for this type of neuron group. Subclasses
      * should override this. Used in the Gui for various purposes.
-     * 
+     *
      * @return the name of this type of neuron group.
      */
     public String getTypeDescription() {
@@ -234,7 +234,7 @@ public class NeuronGroup extends Group {
     /**
      * Returns true if the provided synapse is in the fan-in weight vector of
      * some node in this neuron group.
-     * 
+     *
      * @param synapse
      *            the synapse to check
      * @return true if it's attached to a neuron in this group
@@ -271,7 +271,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Return flat list of fanins for all neurons in group.
-     * 
+     *
      * @return incoming weights
      */
     public List<Synapse> getIncomingWeights() {
@@ -284,7 +284,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Return flat list of fanouts for all neurons in group.
-     * 
+     *
      * @return outgoing weights
      */
     public List<Synapse> getOutgoingWeights() {
@@ -306,7 +306,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Randomize bias for all neurons in group.
-     * 
+     *
      * @param lower
      *            lower bound for randomization.
      * @param upper
@@ -320,7 +320,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Add a neuron to group.
-     * 
+     *
      * @param neuron
      *            neuron to add
      * @param fireEvent
@@ -339,7 +339,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Add neuron to group.
-     * 
+     *
      * @param neuron
      *            neuron to add
      */
@@ -349,7 +349,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Delete the provided neuron.
-     * 
+     *
      * @param toDelete
      *            the neuron to delete
      */
@@ -379,10 +379,10 @@ public class NeuronGroup extends Group {
     /**
      * Set activations of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
-     * 
+     *
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
-     * 
+     *
      * @param inputs
      *            the input vector as a double array.
      */
@@ -399,10 +399,10 @@ public class NeuronGroup extends Group {
     /**
      * Set input values of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
-     * 
+     *
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
-     * 
+     *
      * @param inputs
      *            the input vector as a double array.
      */
@@ -420,10 +420,10 @@ public class NeuronGroup extends Group {
      * Force set activations of neurons using an array of doubles. Assumes the
      * order of the items in the array should match the order of items in the
      * neuronlist.
-     * 
+     *
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
-     * 
+     *
      * @param inputs
      *            the input vector as a double array.
      */
@@ -439,7 +439,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Return activations as a double array.
-     * 
+     *
      * @return the activation array
      */
     public double[] getActivations() {
@@ -453,11 +453,11 @@ public class NeuronGroup extends Group {
 
     /**
      * Return biases as a double array.
-     * 
+     *
      * @return the bias array
      */
     public double[] getBiases() {
-        double[] retArray = SimbrainMath.zeroVector(neuronList.size());
+        double[] retArray = new double[neuronList.size()];
         int i = 0;
         for (Neuron neuron : neuronList) {
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
@@ -470,7 +470,7 @@ public class NeuronGroup extends Group {
 
     /**
      * True if the group contains the specified neuron.
-     * 
+     *
      * @param n
      *            neuron to check for.
      * @return true if the group contains this neuron, false otherwise
@@ -493,7 +493,7 @@ public class NeuronGroup extends Group {
     /**
      * Get the central x coordinate of this group, based on the positions of the
      * neurons that comprise it.
-     * 
+     *
      * @return the center x coordinate.
      */
     public double getCenterX() {
@@ -513,7 +513,7 @@ public class NeuronGroup extends Group {
     /**
      * Get the central y coordinate of this group, based on the positions of the
      * neurons that comprise it.
-     * 
+     *
      * @return the center y coordinate.
      */
     public double getCenterY() {
@@ -533,7 +533,7 @@ public class NeuronGroup extends Group {
     /**
      * Returns the maximum X position of this group based on the neurons that
      * comprise it.
-     * 
+     *
      * @return the x position of the farthest right neuron in the group.
      */
     public double getMaxX() {
@@ -549,7 +549,7 @@ public class NeuronGroup extends Group {
     /**
      * Returns the minimum X position of this group based on the neurons that
      * comprise it.
-     * 
+     *
      * @return the x position of the farthest left neuron in the group.
      */
     public double getMinX() {
@@ -565,7 +565,7 @@ public class NeuronGroup extends Group {
     /**
      * Returns the maximum Y position of this group based on the neurons that
      * comprise it.
-     * 
+     *
      * @return the y position of the farthest north neuron in the group.
      */
     public double getMaxY() {
@@ -581,7 +581,7 @@ public class NeuronGroup extends Group {
     /**
      * Returns the minimum Y position of this group based on the neurons that
      * comprise it.
-     * 
+     *
      * @return the y position of the farthest south neuron in the group.
      */
     public double getMinY() {
@@ -597,7 +597,7 @@ public class NeuronGroup extends Group {
     /**
      * Return the width of this group, based on the positions of the neurons
      * that comprise it.
-     * 
+     *
      * @return the width of the group
      */
     public double getWidth() {
@@ -617,7 +617,7 @@ public class NeuronGroup extends Group {
     /**
      * Return the height of this group, based on the positions of the neurons
      * that comprise it.
-     * 
+     *
      * @return the height of the group
      */
     public double getHeight() {
@@ -643,7 +643,7 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Point2D[] getFourCorners() {
@@ -665,9 +665,9 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * 
+     *
      * Translate all neurons (the only objects with position information).
-     * 
+     *
      * @param offsetX
      *            x offset for translation.
      * @param offsetY
@@ -691,7 +691,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set clamping on all neurons in this group.
-     * 
+     *
      * @param clamp
      *            true to clamp them, false otherwise
      */
@@ -703,7 +703,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set all activations to a specified value.
-     * 
+     *
      * @param value
      *            the value to set the neurons to
      */
@@ -715,7 +715,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Force set all activations to a specified value.
-     * 
+     *
      * @param value
      *            the value to set the neurons to
      */
@@ -727,7 +727,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Copy activations from one neuron group to this one.
-     * 
+     *
      * @param toCopy
      *            the group to copy activations from.
      */
@@ -773,7 +773,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the layout. Does not apply it. Call apply layout for that.
-     * 
+     *
      * @param layout
      *            the layout to set
      */
@@ -784,7 +784,7 @@ public class NeuronGroup extends Group {
     /**
      * Return current position (upper left corner of neuron in the farthest
      * north-west position.
-     * 
+     *
      * @return position upper left position of group
      */
     public Point2D.Double getPosition() {
@@ -802,7 +802,7 @@ public class NeuronGroup extends Group {
     /**
      * Apply this group's layout to its neurons based on a specified initial
      * position.
-     * 
+     *
      * @param initialPosition
      *            the position from which to begin the layout.
      */
@@ -845,7 +845,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Returns true if all the neurons in this group are clamped.
-     * 
+     *
      * @return true if all neurons are clamped, false otherwise
      */
     public boolean isAllClamped() {
@@ -860,7 +860,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Returns true if all the neurons in this group are unclamped.
-     * 
+     *
      * @return true if all neurons are unclamped, false otherwise
      */
     public boolean isAllUnclamped() {
@@ -875,7 +875,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the lower bound on all neurons in this group.
-     * 
+     *
      * @param lb
      *            the lower bound to set.
      */
@@ -887,7 +887,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the upper bound on all neurons in this group.
-     * 
+     *
      * @param ub
      *            the upper bound to set.
      */
@@ -899,7 +899,7 @@ public class NeuronGroup extends Group {
 
     /**
      * Set the increment on all neurons in this group.
-     * 
+     *
      * @param increment
      *            the increment to set.
      */
@@ -935,7 +935,7 @@ public class NeuronGroup extends Group {
     /**
      * If more than gridThreshold neurons use a grid layout, else a horizontal
      * line layout.
-     * 
+     *
      * @param initialPosition
      *            the initial Position for the layout
      */

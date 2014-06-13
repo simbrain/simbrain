@@ -47,7 +47,7 @@ public final class ReaderWorld extends TextWorld {
      * Default zero vector to return if no matching entry is found in the vector
      * dictionary.
      */
-    private final static double[] ZERO_VEC = SimbrainMath.zeroVector(5);
+    private final static double[] ZERO_VEC = new double[5];
 
     /** List of parsing style. */
     public enum ParseStyle {

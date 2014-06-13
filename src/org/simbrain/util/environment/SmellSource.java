@@ -283,7 +283,7 @@ public class SmellSource {
      * @return proximal stimulus to creature caused by this object
      */
     public double[] getStimulus(final double distance) {
-        double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
+        double[] ret = new double[getStimulusDimension()];
         if (returnVector == null) {
             returnVector = stimulusVector;
         }

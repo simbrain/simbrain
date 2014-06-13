@@ -83,7 +83,7 @@ public class SmellSensor extends Sensor {
      * {@inheritDoc}
      */
     public void update() {
-        double[] temp = SimbrainMath.zeroVector(currentValue.length);
+        double[] temp = new double[currentValue.length];
         for (OdorWorldEntity entity : parent.getParentWorld().getObjectList()) {
 
             // Don't smell yourself

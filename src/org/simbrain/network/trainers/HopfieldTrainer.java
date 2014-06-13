@@ -58,8 +58,7 @@ public class HopfieldTrainer extends Trainer {
         int numInputs =  hopfield.getInputNeurons().size();
         float normConstant = 1 / (float) numRows;
 
-        double[] vals = SimbrainMath.zeroVector((numInputs * numInputs)
-                - numInputs);
+        double[] vals = new double[numInputs * numInputs - numInputs];
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
             int k = 0;

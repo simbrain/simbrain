@@ -174,13 +174,12 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
                 Direction.NORTH, betweenLayerInterval);
 
         // Connect the layers
-        AllToAll connect = new AllToAll(false);
         SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer,
-                hiddenLayer, connect, 0.5);
-        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(inputLayer,
-                hiddenLayer, connect, 0.5);
-        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(inputLayer,
-                hiddenLayer, connect, 0.5);
+                hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer,
+                hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer,
+                outputLayer, new AllToAll(false), 0.5);
 
         addAndLabelSynapseGroup(inToHid);
         addAndLabelSynapseGroup(contToHid);

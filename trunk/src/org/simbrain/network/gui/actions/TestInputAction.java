@@ -28,6 +28,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -40,16 +41,10 @@ import org.simbrain.resource.ResourceManager;
  * @author Jeff Yoshimi
  * @author Lam Nguyen
  */
-public class TestInputAction extends AbstractAction {
+public class TestInputAction extends ConditionallyEnabledAction{
 
     /** Network panel. */
     private NetworkPanel networkPanel;
-
-    /** The panel used to test inputs to a network. */
-    private JPanel testInputPanel;
-
-    /** The nodes to test. */
-    private List<Neuron> inputNeurons;
 
     /**
      * Construct action.
@@ -58,45 +53,21 @@ public class TestInputAction extends AbstractAction {
      */
     public TestInputAction(NetworkPanel networkPanel) {
 
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-        putValue(NAME, "Create Input Table...");
+        super(networkPanel, "Create Input Table...",
+                EnablingCondition.NEURONS);
         putValue(SHORT_DESCRIPTION,
                 "Create a table whose rows provide input to selected neurons");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
 
         this.networkPanel = networkPanel;
-
-        // Enable / disable and set inputs based on selected neurons
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-            /** @see NetworkSelectionListener */
-            public void selectionChanged(NetworkSelectionEvent event) {
-                updateAction();
-            }
-        });
     }
 
-    /**
-     * Set properties of test input panel based on number of selected neurons.
-     */
-    private void updateAction() {
-        int numNeurons = networkPanel.getSelectedNeurons().size();
-
-        if (numNeurons > 0) {
-            inputNeurons = networkPanel.getSelectedModelNeurons();
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
-    }
 
     /**
      * Initialize and display the test input panel.
      */
     public void actionPerformed(ActionEvent event) {
-        updateAction();
-        testInputPanel = new TestInputPanel(networkPanel, inputNeurons);
-        networkPanel.displayPanel(testInputPanel, "Test inputs");
+        networkPanel.displayPanel(new TestInputPanel(networkPanel,
+                networkPanel.getSelectedModelNeurons()), "Test inputs");
     }
 }

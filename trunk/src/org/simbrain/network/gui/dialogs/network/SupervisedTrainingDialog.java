@@ -84,7 +84,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
         // Testing tab
         final TestInputPanel testInputPanel = new TestInputPanel(networkPanel,
                 trainable.getInputNeurons(), trainable.getTrainingSet()
-                        .getInputData());
+                        .getInputDataMatrix());
         tabbedPane.addTab("Test data", testInputPanel);
 
         // Finalize

@@ -304,7 +304,7 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
                         getNetworkPanel(),
                         ((Trainable) subnetwork).getInputNeurons(),
                         ((Trainable) subnetwork).getTrainingSet()
-                                .getInputData());
+                                .getInputDataMatrix());
                 getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
 
             }

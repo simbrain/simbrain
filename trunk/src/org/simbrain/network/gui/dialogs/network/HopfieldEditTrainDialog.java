@@ -88,7 +88,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
         // Testing tab
         final TestInputPanel testInputPanel = new TestInputPanel(np,
                 hop.getInputNeurons(), hop.getTrainingSet()
-                        .getInputData());
+                        .getInputDataMatrix());
         tabbedPane.addTab("Test data", testInputPanel);
 
 

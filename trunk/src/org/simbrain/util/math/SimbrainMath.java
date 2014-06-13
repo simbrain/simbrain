@@ -38,12 +38,12 @@ public class SimbrainMath {
 
     /**
      * Calculates the Euclidean distance between two points. Used in World.
-     * 
+     *
      * @param src
      *            source point
      * @param tar
      *            target point
-     * 
+     *
      * @return distance between source and target
      */
     public static int distance(final Point src, final Point tar) {
@@ -57,12 +57,12 @@ public class SimbrainMath {
 
     /**
      * Calculates the Euclidean distance between two points. Used in World.
-     * 
+     *
      * @param src
      *            source point
      * @param tar
      *            target point
-     * 
+     *
      * @return distance between source and target
      */
     public static double distance(final double[] src, final double[] tar) {
@@ -75,13 +75,11 @@ public class SimbrainMath {
     }
 
     /**
-     * Set an array of doubles to zero. TODO: Replace usage in World with
-     * library call
-     * 
-     * @param size
-     *            size of array
-     * 
-     * @return new array of zero'd values
+     * Creates an array of doubles set to zero.
+     *
+     * @param size size of vector to create
+     *
+     * @return the array of zeros.
      */
     public static double[] zeroVector(final int size) {
         double[] ret = new double[size];
@@ -94,9 +92,27 @@ public class SimbrainMath {
     }
 
     /**
+     * Creates a matrix of doubles (a 2-d array ) set to 0.
+     *
+     * @param rows number of rows.
+     * @param cols number of columns
+     * @return the zero matrix.
+     */
+    public static double[][] zeroMatrix(int rows, int cols) {
+        double[][] ret = new double[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                ret[i][j] = 0;
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Returns a random permutation of all the integers between floor
-     * (inclusive) and ceil (exclusive)
-     * 
+     * (inclusive) and ceil (exclusive).
+     *
      * @param floor
      * @param ceil
      * @return
@@ -118,9 +134,9 @@ public class SimbrainMath {
      * Returns a random permutation of all the integers between floor
      * (inclusive) and ceil (exclusive) with the exception of one number
      * (excluded) which is intentionally excluded.
-     * 
+     *
      * This method will fail if excluded
-     * 
+     *
      * @param floor
      * @param ceil
      * @param excluded
@@ -149,7 +165,7 @@ public class SimbrainMath {
 
     /**
      * Finds the vector multiple.
-     * 
+     *
      * @param theVec
      *            Vecotr
      * @param mult
@@ -169,12 +185,12 @@ public class SimbrainMath {
 
     /**
      * Return the greater of two integers.
-     * 
+     *
      * @param one
      *            first int
      * @param two
      *            second int
-     * 
+     *
      * @return greater of one and two
      */
     public static int max(final int one, final int two) {
@@ -187,7 +203,7 @@ public class SimbrainMath {
 
     /**
      * Finds the longer of two arrays.
-     * 
+     *
      * @param one
      *            First array
      * @param two
@@ -204,7 +220,7 @@ public class SimbrainMath {
 
     /**
      * Sums all the values in an array
-     * 
+     *
      * @param arr
      *            the array to sum
      * @return the sum of the values in the array
@@ -219,7 +235,7 @@ public class SimbrainMath {
 
     /**
      * An exponential sum of an array
-     * 
+     *
      * @param arr
      *            the array to exponential sum
      * @return the exponential sum of the array
@@ -236,7 +252,7 @@ public class SimbrainMath {
      * A normalized version of the vector, i.e. a scalar multiple of the vector
      * which sums to one. In this case each element is divided by the sum of the
      * array.
-     * 
+     *
      * @param vec
      *            the vector to normalize
      * @return a scalar multiple of the vector which sums to one
@@ -252,7 +268,7 @@ public class SimbrainMath {
 
     /**
      * The soft-max of the vector
-     * 
+     *
      * @param vec
      *            the vector to soft-max
      * @return
@@ -269,7 +285,7 @@ public class SimbrainMath {
     /**
      * Add these vectors. If one is larger than the other return a vector with
      * zeros in the difference.
-     * 
+     *
      * @param base
      *            Base number
      * @param add
@@ -304,10 +320,10 @@ public class SimbrainMath {
 
     /**
      * Helper function for computing mean values of an array of doubles.
-     * 
+     *
      * @param vals
      *            an array of values
-     * 
+     *
      * @return the mean values of the array
      */
     public static double getAverage(final double[] vals) {
@@ -322,7 +338,7 @@ public class SimbrainMath {
 
     /**
      * Prints out the vector list.
-     * 
+     *
      * @param da
      *            Vector list
      */
@@ -348,7 +364,7 @@ public class SimbrainMath {
 
     /**
      * Returns the midpoint for a cubic Bezier curve.
-     * 
+     *
      * @param src
      *            the start point of the curve
      * @param ctrl1
@@ -369,12 +385,12 @@ public class SimbrainMath {
     /**
      * A fast determinant utility to find the determinant of the 2 by 2 matrix
      * made up of the vectors (stored as 2D points) v0 and v1, i.e. :
-     * 
+     *
      * |v0x v1x| |v0y v1y|
-     * 
+     *
      * Used so that more complex determinant algorithms in matrix packages are
      * avoided for such a simple operation...
-     * 
+     *
      * @param v0
      *            the first vector, stored as a Point2D, making up the first
      *            column of the matrix we are taking the determinant of.
@@ -402,7 +418,7 @@ public class SimbrainMath {
      * It is up to whoever calls this function to determine if an intersection
      * actually occurs by checking the returned vector (as a Point2D) of
      * parameters.
-     * 
+     *
      * @param u0
      *            the start point of the first line segment
      * @param v0
@@ -447,7 +463,7 @@ public class SimbrainMath {
     /**
      * Calculates the inverse of the error function. Originally written by S.C.
      * Pohlig, adapted by J.N. Sanders
-     * 
+     *
      * @param p
      *            Parameter to find inverse of the error
      * @return inverse of the error
@@ -455,20 +471,20 @@ public class SimbrainMath {
     public static double inverf(final double p) { // 0 <= p <= 1
         /*
          * Originally written by S.C. Pohlig, adapted by J.N. Sanders
-         * 
+         *
          * This function returns an approximation to the inverse of the standard
          * normal probability distribution. The approximation error is less than
          * 4.5e-4. The approximation formula is from M. Abramowitz and I. A.
          * Stegun, Handbook of Mathematical Functions, eqn. 26.2.23, Dover
          * Publications, Inc.
-         * 
+         *
          * The C language error function returns erf(x) = (2/sqrt(pi)) *
          * Integral(0,x) of exp(-t*t)dt, which gives erf(infinity) = 1. In
          * essence, this gives the area under the curve between -x and +x,
          * normalized to 1. However, this function (inverf), solves for the
          * inverse of (1/sqrt(pi)) * Integral(-infinity, x) of exp(-t*t)dt. As a
          * result, the symmetric inverse is: x = inverf(erf(x) / 2. + .5)
-         * 
+         *
          * Given the integral of a unit variance gaussian, from -infinity to x,
          * normalized such that the integral to +infinity is 1, multiply this
          * result by sqrt(2) to obtain x.
@@ -521,7 +537,7 @@ public class SimbrainMath {
 
     /**
      * Finds the largest value in a vector array.
-     * 
+     *
      * @param theVec
      *            Vector array
      * @return largest value in array
@@ -542,7 +558,7 @@ public class SimbrainMath {
      * Returns the maximum value of an array of numbers. Warning: comparisons
      * are done using the numbers' double values and they are
      * compared/stored/returned as doubles.
-     * 
+     *
      * @param arr
      * @return
      */
@@ -560,7 +576,7 @@ public class SimbrainMath {
      * Returns the minimum value of an array of numbers. Warning: comparisons
      * are done using the numbers' double values and they are
      * compared/stored/returned as doubles.
-     * 
+     *
      * @param arr
      * @return
      */
@@ -576,7 +592,7 @@ public class SimbrainMath {
 
     /**
      * Add noise to a vector.
-     * 
+     *
      * @param vector
      *            vector to which noise should be added
      * @param noiselevel
@@ -595,7 +611,7 @@ public class SimbrainMath {
 
     /**
      * Add noise to a vector and return the result.
-     * 
+     *
      * @param vector
      *            vector to which noise should be added
      * @param noiselevel
@@ -619,7 +635,7 @@ public class SimbrainMath {
 
     /**
      * Create a random vector with i components.
-     * 
+     *
      * @param i
      *            number of components in this vector.
      * @return the random vector.
@@ -634,7 +650,7 @@ public class SimbrainMath {
 
     /**
      * Returns a vector of random values between min and max.
-     * 
+     *
      * @param length
      *            number of components in the vector
      * @param min
@@ -654,9 +670,9 @@ public class SimbrainMath {
 
     /**
      * Round a double value to a specified number of places.
-     * 
+     *
      * (From user dforbu on the Sun Java Programming forum).
-     * 
+     *
      * @param d
      *            double value to round
      * @param places
@@ -669,7 +685,7 @@ public class SimbrainMath {
 
     /**
      * Returns the Euclidean norm of the supplied vector.
-     * 
+     *
      * @param vector
      *            vector to check
      * @return the norm

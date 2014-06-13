@@ -50,6 +50,7 @@ import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SimbrainMath;
 
 /**
@@ -728,8 +729,8 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         }
 
         // Test Inputs action
-        menu.addSeparator();
-        menu.add(testInputsAction);
+        //menu.addSeparator();
+        //menu.add(testInputsAction);
 
         // Coupling menu
         if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
@@ -921,9 +922,21 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            NumericMatrix matrix = new NumericMatrix() {
+
+                @Override
+                public void setData(double[][] data) {
+                    neuronGroup.setTestData(data);
+                }
+
+                @Override
+                public double[][] getData() {
+                    return neuronGroup.getTestData();
+                }
+            };
             final TestInputPanel testInputPanel = new TestInputPanel(
                     networkPanel, neuronGroup.getNeuronList(),
-                    neuronGroup.getTestData());
+                    matrix);
             networkPanel.displayPanel(testInputPanel,
                     "Inputs for neuron group: " + neuronGroup.getLabel());
         }

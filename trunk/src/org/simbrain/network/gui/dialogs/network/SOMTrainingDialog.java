@@ -99,7 +99,7 @@ public class SOMTrainingDialog extends StandardDialog {
         // Testing tab
         final TestInputPanel testInputPanel = new TestInputPanel(np,
                 network.getInputNeurons(), network.getTrainingSet()
-                        .getInputData());
+                        .getInputDataMatrix());
         tabbedPane.addTab("Test data", testInputPanel);
 
         // Listen for tab changed events. Load inputs to test tab

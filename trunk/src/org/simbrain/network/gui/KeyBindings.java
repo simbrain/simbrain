@@ -26,7 +26,6 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
@@ -36,7 +35,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
- *
+ * 
  * TODO: - Migrate some of the local actions here to "official" actions in the
  * action package
  */
@@ -44,8 +43,9 @@ public class KeyBindings {
 
     /**
      * Add key bindings.
-     *
-     * @param panel panel in which to add bindings.
+     * 
+     * @param panel
+     *            panel in which to add bindings.
      */
     public static void addBindings(final NetworkPanel panel) {
 
@@ -219,11 +219,9 @@ public class KeyBindings {
                         .sourceAndTargetNeuronGroupsSelected(panel)) {
                     AddSynapseGroupAction.displaySynapseGroupDialog(panel);
                 } else {
-                    ConnectNeurons connection = QuickConnectPreferences
-                            .getCurrentConnection();
-                    connection.connectNeurons(panel.getNetwork(),
-                            panel.getSourceModelNeurons(),
-                            panel.getSelectedModelNeurons(), true);
+                    QuickConnectPreferences.getCurrentConnection()
+                            .applyConnection(panel.getSourceModelNeurons(),
+                                    panel.getSelectedModelNeurons());
                 }
 
             }

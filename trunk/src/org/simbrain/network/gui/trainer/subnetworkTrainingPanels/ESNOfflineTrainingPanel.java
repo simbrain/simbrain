@@ -21,6 +21,7 @@ package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -32,18 +33,17 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Panel for training ESN's.
- *
+ * 
  * ESN classes like this have to do some tricky things because of how ESN's
  * work. The "visible training set" for the ESN is inputs and targets. But the
  * "real training set" that the learning rule is applied to is actually
  * harvested data from the reservoir network as inputs and the visible target
  * data as targets.
- *
+ * 
  * This is similar to LMSOfflineTrainingPanel, but customized in light of the
  * above.
  */
@@ -59,17 +59,20 @@ public class ESNOfflineTrainingPanel extends JPanel {
     private final ReservoirUtilsPanel rUtilsPanel;
 
     /** The parent frame. */
-    private GenericFrame frame;
+    private final Window frame;
 
     /**
      * Construct an ESN Training Panel.
-     *
-     * @param panel the parent network panel
-     * @param esn the underlying network
+     * 
+     * @param panel
+     *            the parent network panel
+     * @param esn
+     *            the underlying network
      */
     public ESNOfflineTrainingPanel(final NetworkPanel panel,
-            final EchoStateNetwork esn) {
+        final EchoStateNetwork esn, final Window frame) {
 
+        this.frame = frame;
         // Initialize control panel with no trainer. It has to be set
         // After the apply button is pressed
         controlPanel = new LMSOfflineControlPanel(panel);
@@ -107,11 +110,11 @@ public class ESNOfflineTrainingPanel extends JPanel {
 
         // Training Set Panel
         trainingSetPanel = new TrainingSetPanel(esn.getInputLayer()
-                .getNeuronList(), inputData, esn.getOutputLayer()
-                .getNeuronList(), targetData, 3);
+            .getNeuronList(), inputData, esn.getOutputLayer()
+            .getNeuronList(), targetData, 3);
 
         // Res Utils
-        rUtilsPanel = new ReservoirUtilsPanel(esn);
+        rUtilsPanel = new ReservoirUtilsPanel(esn, frame);
         controlPanelConstraints.weightx = 1;
         controlPanelConstraints.weighty = 1;
         controlPanelConstraints.gridx = 0;
@@ -145,12 +148,12 @@ public class ESNOfflineTrainingPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 if (inputData.getData() == null) {
                     JOptionPane.showOptionDialog(null, "Input data not set",
-                            "Warning", JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, null, null);
+                        "Warning", JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
                 } else if (targetData.getData() == null) {
                     JOptionPane.showOptionDialog(null, "Target data not set",
-                            "Warning", JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, null, null);
+                        "Warning", JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
                 } else {
                     if (controlPanel.getTrainer() == null) {
                         controlPanel.setTrainer((LMSOffline) esn.getTrainer());
@@ -161,17 +164,6 @@ public class ESNOfflineTrainingPanel extends JPanel {
             }
         });
 
-    }
-
-    /**
-     * Set parent frame.
-     *
-     * @param frame the frame containing this panel.
-     */
-    public void setFrame(final GenericFrame frame) {
-        this.frame = frame;
-        trainingSetPanel.setFrame(frame);
-        rUtilsPanel.setFrame(frame);
     }
 
 }

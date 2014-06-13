@@ -30,7 +30,7 @@ import org.simbrain.network.subnetworks.BPTTNetwork;
 /**
  * Trainer for backprop through time Networks. As a test use the "Walker"
  * tables.
- *
+ * 
  * @author jyoshimi
  */
 public class BPTTTrainer extends IterableTrainer {
@@ -64,8 +64,9 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Construct the SRN trainer.
-     *
-     * @param bptt the simple recurrent network
+     * 
+     * @param bptt
+     *            the simple recurrent network
      */
     public BPTTTrainer(BPTTNetwork bptt) {
         super(bptt);
@@ -143,7 +144,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * True if this is the iteration that begans a training series.
-     *
+     * 
      * @return true if first patter in a set.
      */
     private boolean firstPatternInSet() {
@@ -152,7 +153,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * True if this is the iteration that ends a training series.
-     *
+     * 
      * @return true if last pattern in a set.
      */
     private boolean lastPatternInSet() {
@@ -162,8 +163,9 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Compute error contribution for all nodes using backprop algorithm.
-     *
-     * @param row current row of training data
+     * 
+     * @param row
+     *            current row of training data
      */
     private void backpropagateStoreError(Trainable network, int row) {
 
@@ -178,7 +180,7 @@ public class BPTTTrainer extends IterableTrainer {
         for (Neuron neuron : bptt.getHiddenLayer().getNeuronList()) {
             // Compute sum of fan-out errors on this neuron
             double sumFanOutErrors = 0;
-            for (Synapse synapse : neuron.getFanOut()) {
+            for (Synapse synapse : neuron.getFanOut().values()) {
                 Neuron nextLayerNeuron = synapse.getTarget();
                 sumFanOutErrors += (errorMap.get(nextLayerNeuron) * synapse
                         .getStrength());
@@ -191,9 +193,11 @@ public class BPTTTrainer extends IterableTrainer {
     /**
      * Store the error value, bias delta, and fan-in weight deltas for this
      * neuron.
-     *
-     * @param neuron neuron whose activation function's derivative is used
-     * @param error simple error for outputs, sum of errors in fan-out, times
+     * 
+     * @param neuron
+     *            neuron whose activation function's derivative is used
+     * @param error
+     *            simple error for outputs, sum of errors in fan-out, times
      *            weights for hidden units
      */
     private void storeErrorAndDeltas(Neuron neuron, double error) {
@@ -251,8 +255,9 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Randomize the specified layer.
-     *
-     * @param layer the layer to randomize
+     * 
+     * @param layer
+     *            the layer to randomize
      */
     private void randomize(List<Neuron> layer) {
         for (Neuron neuron : layer) {
@@ -270,7 +275,8 @@ public class BPTTTrainer extends IterableTrainer {
     }
 
     /**
-     * @param learningRate the learningRate to set
+     * @param learningRate
+     *            the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
@@ -284,7 +290,8 @@ public class BPTTTrainer extends IterableTrainer {
     }
 
     /**
-     * @param momentum the momentum to set
+     * @param momentum
+     *            the momentum to set
      */
     public void setMomentum(double momentum) {
         this.momentum = momentum;

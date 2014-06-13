@@ -14,12 +14,14 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -31,14 +33,13 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** Reference to underlying connection object. */
-    protected ConnectNeurons connection;
-
     /**
      * Adds a new item.
-     *
-     * @param text Text to add
-     * @param comp SimbrainComponent to add
+     * 
+     * @param text
+     *            Text to add
+     * @param comp
+     *            SimbrainComponent to add
      */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
@@ -46,9 +47,11 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Adds a new item label.
-     *
-     * @param text Text to add
-     * @param comp Component to add.
+     * 
+     * @param text
+     *            Text to add
+     * @param comp
+     *            Component to add.
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
@@ -57,37 +60,36 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /**
      * This method is the default constructor.
      */
-    public AbstractConnectionPanel(final ConnectNeurons connection) {
-        this.connection = connection;
+    public AbstractConnectionPanel() {
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
-     * Populate fields with current data.
-     */
-    public abstract void fillFieldValues();
-
-    /**
      * Populates fields with data from a connect neurons object.
-     *
+     * 
      * @param connection
-     * @throws ClassCastException may occur if a sub-class of connect neurons
-     *             not consistent with one of the sub-classes of
-     *             AbstractConnectionPanel is passed into this method.
+     * @throws ClassCastException
+     *             may occur if a sub-class of connect neurons not consistent
+     *             with one of the sub-classes of AbstractConnectionPanel is
+     *             passed into this method.
      */
     public abstract void fillFieldValues(ConnectNeurons connection)
-            throws ClassCastException;
+        throws ClassCastException;
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public abstract void commitChanges();
 
+    public abstract void commitChanges(List<Neuron> source,
+        List<Neuron> target);
+
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.
-     *
-     * @param text Text to be added
+     * 
+     * @param text
+     *            Text to be added
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
@@ -99,14 +101,6 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /**
      * @return the ConnectNeurons object
      */
-    public ConnectNeurons getConnection() {
-        return connection;
-    }
+    public abstract ConnectNeurons getConnection();
 
-    /**
-     * @param connection the desired ConnectNeurons object
-     */
-    public void setConnection(ConnectNeurons connection) {
-        this.connection = connection;
-    }
 }

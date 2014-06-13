@@ -20,8 +20,8 @@ package org.simbrain.network.gui;
 
 import java.awt.Dimension;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -39,14 +39,16 @@ public class NetworkUtils {
      * Checks to see if all the objects in a list return the same value for a
      * method which the user provides by name. The method can have no arguments
      * (typically a getter method).
-     *
-     * @param toCheck the list of objects to check for consistency
-     * @param methodName the method to be invoked (uses reflection)
+     * 
+     * @param toCheck
+     *            the list of objects to check for consistency
+     * @param methodName
+     *            the method to be invoked (uses reflection)
      * @return true if the list of objects returns the same value for
      *         methodName, false otherwise
      */
     @SuppressWarnings("rawtypes")
-    public static boolean isConsistent(final List toCheck,
+    public static boolean isConsistent(final Collection toCheck,
             final Class<?> theClass, final String methodName) {
         Method theMethod = null;
 
@@ -62,7 +64,7 @@ public class NetworkUtils {
             throw new IllegalArgumentException("List to check is empty.");
         }
 
-        Object o1 = toCheck.get(0);
+        Object o1 = toCheck.iterator().next();
         Object result1 = null;
 
         try {
@@ -92,13 +94,15 @@ public class NetworkUtils {
     /**
      * Helper method for creating formatted rows in dialog boxes, which consist
      * of a label, a component, and some tool-tip for the label.
-     *
-     * @param text the text to be displayed to the left of the commponent as a
+     * 
+     * @param text
+     *            the text to be displayed to the left of the commponent as a
      *            JLabel
-     * @param toolTip a tooltip / help to be displayed for the label
-     * @param theComponent the component to be displayed to the right of the
-     *            label
-     *
+     * @param toolTip
+     *            a tooltip / help to be displayed for the label
+     * @param theComponent
+     *            the component to be displayed to the right of the label
+     * 
      * @return a JPanel containing the formatted label and component
      */
     public static JPanel createRow(final String text, final String toolTip,

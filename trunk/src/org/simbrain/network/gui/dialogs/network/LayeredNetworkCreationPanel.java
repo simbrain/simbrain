@@ -37,11 +37,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.FeedForward;
 import org.simbrain.util.math.SquashingFunction;
 
 /**

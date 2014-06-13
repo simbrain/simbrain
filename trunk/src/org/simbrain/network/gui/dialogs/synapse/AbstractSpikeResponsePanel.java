@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -76,9 +77,11 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Adds an item.
-     *
-     * @param text label of item to add
-     * @param comp component to add
+     * 
+     * @param text
+     *            label of item to add
+     * @param comp
+     *            component to add
      */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
@@ -86,9 +89,11 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Adds an item label.
-     *
-     * @param text label to add
-     * @param comp component to label
+     * 
+     * @param text
+     *            label to add
+     * @param comp
+     *            component to label
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
@@ -104,9 +109,10 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Populate fields with current data.
-     *
-     * @param spikeResponderList the list of spike responders being used to
-     *            ascertain which values should fill their respective fields.
+     * 
+     * @param spikeResponderList
+     *            the list of spike responders being used to ascertain which
+     *            values should fill their respective fields.
      */
     public abstract void fillFieldValues(
             final List<SpikeResponder> spikeResponderList);
@@ -122,9 +128,9 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * synapse which will be used as a template and copied, since it only takes
      * in one synapse. This typically occurs during the creation of multiple
      * synapses.
-     *
-     * @param synapse the synapse to which spike responder changes will be
-     *            committed
+     * 
+     * @param synapse
+     *            the synapse to which spike responder changes will be committed
      */
     public abstract void commitChanges(final Synapse synapse);
 
@@ -136,30 +142,33 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * into the panel's fields. This method is meant to ensure that each synapse
      * has the correct kind of spike responder, then pass the list to
      * {@link #writeValuesToRules(List)} to make the actual changes.
-     *
-     * @param synapses the synapses to which spike responder changes will be
+     * 
+     * @param synapses
+     *            the synapses to which spike responder changes will be
      *            committed
      */
-    public abstract void commitChanges(final List<Synapse> synapses);
+    public abstract void commitChanges(final Collection<Synapse> synapses);
 
     /**
      * Used internally to actually write all changes to the spike responders of
      * a given list of synapses. Prior to using this method it must be the case
      * that all synapses in the lists' spike responders are of the appropriate
      * type, otherwise a ClassCastException will be thrown.
-     *
-     * @param synapses the synapses whose spike responders will be written to
-     *            based on the values in their respective fields.
+     * 
+     * @param synapses
+     *            the synapses whose spike responders will be written to based
+     *            on the values in their respective fields.
      */
-    protected abstract void writeValuesToRules(final List<Synapse> synapses);
+    protected abstract void writeValuesToRules(
+            final Collection<Synapse> synapses);
 
     /**
      * Tells this panel whether it is going to be editing spike responders, or
      * creating new ones and replacing the spike responders of each of the
      * synapses being edited.
-     *
-     * @param replace tell the panel if it's replacing responders or editing
-     *            them
+     * 
+     * @param replace
+     *            tell the panel if it's replacing responders or editing them
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -169,7 +178,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * Are we replacing rules or editing them? Replacing happens when
      * {@link #commitChanges(List)} is called on a synapse panel whose rule is
      * different from the rules of the synapses being edited.
-     *
+     * 
      * @return replacing or editing
      */
     protected boolean isReplace() {
@@ -190,8 +199,9 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted..
-     *
-     * @param text Text to be used for bottom of panel
+     * 
+     * @param text
+     *            Text to be used for bottom of panel
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
@@ -208,7 +218,8 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     }
 
     /**
-     * @param mainPanel the mainPanel to set
+     * @param mainPanel
+     *            the mainPanel to set
      */
     public void setMainPanel(LabelledItemPanel mainPanel) {
         this.mainPanel = mainPanel;

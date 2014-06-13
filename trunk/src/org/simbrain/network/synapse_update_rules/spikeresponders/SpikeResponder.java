@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.simbrain.network.core.Synapse;
@@ -38,8 +39,9 @@ public abstract class SpikeResponder {
 
     /**
      * Update the synapse.
-     *
-     * @param s the synapse being updated
+     * 
+     * @param s
+     *            the synapse being updated
      */
     public abstract void update(final Synapse s);
 
@@ -59,14 +61,16 @@ public abstract class SpikeResponder {
     /**
      * A method which takes in a list of synapses and returns a list of their
      * spike responder, if they have any.
-     *
-     * @param synapses The list of synapses whose spike responders we want to
-     *            query.
+     * 
+     * @param synapses
+     *            The list of synapses whose spike responders we want to query.
      * @return Returns a list of spike responders associated with the group of
      *         synapses
      */
-    public static List<SpikeResponder> getResponderList(List<Synapse> synapses) {
-        List<SpikeResponder> srList = new ArrayList<SpikeResponder>();
+    public static List<SpikeResponder> getResponderList(
+            Collection<Synapse> synapses) {
+        List<SpikeResponder> srList = new ArrayList<SpikeResponder>(
+                synapses.size());
         for (Synapse s : synapses) {
             if (s.getSpikeResponder() != null) {
                 srList.add(s.getSpikeResponder());
@@ -83,7 +87,8 @@ public abstract class SpikeResponder {
     }
 
     /**
-     * @param value The value to set.
+     * @param value
+     *            The value to set.
      */
     public void setValue(final double value) {
         this.value = value;

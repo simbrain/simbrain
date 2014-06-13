@@ -21,24 +21,22 @@ import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.QuickConnectPreferences;
-import org.simbrain.network.connections.Radial;
-import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.connections.QuickConnectPreferences.ConnectType;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>QuickConnectPreferencesPanel</b> is a dialog box for setting connection types and
- * properties.
+ * <b>QuickConnectPreferencesPanel</b> is a dialog box for setting connection
+ * types and properties.
  */
 public class QuickConnectPreferencesPanel extends JPanel {
 
     /** Select connection type. */
-    private JComboBox cbConnectionType = new JComboBox(
+    private JComboBox<ConnectType> cbConnectionType =
+        new JComboBox<ConnectType>(
             QuickConnectPreferences.getConnectiontypes());
 
     /** Main dialog box. */
@@ -59,14 +57,13 @@ public class QuickConnectPreferencesPanel extends JPanel {
     /**
      * Connection dialog default constructor.
      */
-    public QuickConnectPreferencesPanel(NetworkPanel panel,
-            Window parentWindow) {
+    public QuickConnectPreferencesPanel(NetworkPanel panel, Window parentWindow) {
         this.panel = panel;
         this.parentWindow = parentWindow;
 
         // Set up combo box
         cbConnectionType.setSelectedItem(QuickConnectPreferences
-                .getCurrentConnection());
+            .getCurrentConnection());
         cbConnectionType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 initPanel();
@@ -77,42 +74,42 @@ public class QuickConnectPreferencesPanel extends JPanel {
         // Set up main panel
         initPanel();
         mainPanel.add(typePanel);
-        mainPanel.add(optionsPanel);
+        // mainPanel.add(optionsPanel);
         this.add(mainPanel);
 
         // Set up help button. TODO
-        //ShowHelpAction helpAction = new ShowHelpAction(
-        //        "Pages/Network/connections.html");
-        //parentDialog.addButton(new JButton(helpAction));
+        // ShowHelpAction helpAction = new ShowHelpAction(
+        // "Pages/Network/connections.html");
+        // parentDialog.addButton(new JButton(helpAction));
     }
 
-     /**
+    /**
      * Initialize the connection panel based upon the current connection type.
      */
     private void initPanel() {
-        ConnectNeurons connection = (ConnectNeurons) cbConnectionType
-                .getSelectedItem();
-        if (connection instanceof AllToAll) {
-            clearOptionPanel();
-            optionsPanel = new AllToAllPanel((AllToAll) connection);
-            optionsPanel.fillFieldValues();
-            mainPanel.add(optionsPanel);
-        } else if (connection instanceof OneToOne) {
-            clearOptionPanel();
-            optionsPanel = new OneToOnePanel((OneToOne) connection);
-            optionsPanel.fillFieldValues();
-            mainPanel.add(optionsPanel);
-        } else if (connection instanceof Radial) {
-            clearOptionPanel();
-            optionsPanel = new RadialPanel((Radial) connection);
-            optionsPanel.fillFieldValues();
-            mainPanel.add(optionsPanel);
-        } else if (connection instanceof Sparse) {
-            clearOptionPanel();
-            optionsPanel = new SparsePanel((Sparse) connection, panel);
-            optionsPanel.fillFieldValues();
-            mainPanel.add(optionsPanel);
-        }
+        ConnectNeurons connection = ((ConnectType) cbConnectionType
+            .getSelectedItem()).getDefaultInstance();
+        // if (connection instanceof AllToAll) {
+        // clearOptionPanel();
+        // optionsPanel = new AllToAllPanel((AllToAll) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // mainPanel.add(optionsPanel);
+        // } else if (connection instanceof OneToOne) {
+        // clearOptionPanel();
+        // optionsPanel = new OneToOnePanel((OneToOne) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // mainPanel.add(optionsPanel);
+        // } else if (connection instanceof Radial) {
+        // clearOptionPanel();
+        // optionsPanel = new RadialPanel((Radial) connection);
+        // optionsPanel.fillDefaultFieldValues();
+        // mainPanel.add(optionsPanel);
+        // } else if (connection instanceof Sparse) {
+        // clearOptionPanel();
+        // optionsPanel = new SparsePanel((Sparse) connection, panel);
+        // optionsPanel.fillDefaultFieldValues();
+        // mainPanel.add(optionsPanel);
+        // }
         parentWindow.pack();
         parentWindow.setLocationRelativeTo(null);
     }
@@ -131,9 +128,9 @@ public class QuickConnectPreferencesPanel extends JPanel {
      */
     public void commitChanges() {
         QuickConnectPreferences
-                .setCurrentConnection((ConnectNeurons) cbConnectionType
-                        .getSelectedItem());
-        optionsPanel.commitChanges();
+            .setCurrentConnection((ConnectType) cbConnectionType
+                .getSelectedItem());
+        // optionsPanel.commitChanges();
     }
 
     /**
@@ -146,8 +143,9 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
         /**
          * Construct the dialog.
-         *
-         * @param panel the embedded panel
+         * 
+         * @param panel
+         *            the embedded panel
          */
         public QuickConnectDialog(QuickConnectPreferencesPanel panel) {
             this.panel = panel;

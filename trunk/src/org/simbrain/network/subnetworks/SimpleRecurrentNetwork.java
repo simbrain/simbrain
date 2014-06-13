@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +26,11 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
@@ -43,7 +38,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991).
- *
+ * 
  * @author ztosi
  * @author Jeff Yoshimi
  */
@@ -87,11 +82,15 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
     /**
      * Build an SRN with default activation rules and initial position.
-     *
-     * @param network underlying network
-     * @param numInputNodes number of nodes in the input layer
-     * @param numHiddenNodes number of nodes in the hidden and context layers
-     * @param numOutputNodes number of output nodes
+     * 
+     * @param network
+     *            underlying network
+     * @param numInputNodes
+     *            number of nodes in the input layer
+     * @param numHiddenNodes
+     *            number of nodes in the hidden and context layers
+     * @param numOutputNodes
+     *            number of output nodes
      */
     public SimpleRecurrentNetwork(final Network network, int numInputNodes,
             int numHiddenNodes, int numOutputNodes) {
@@ -102,14 +101,21 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
-     *
-     * @param network underlying network
-     * @param numInputNodes number of nodes in the input layer
-     * @param numHiddenNodes number of nodes in the hidden and context layers
-     * @param numOutputNodes number of output nodes
-     * @param hiddenNeuronType update rule for hidden nodes
-     * @param outputNeuronType update rule for hidden nodes
-     * @param initialPosition where to position the network (upper left)
+     * 
+     * @param network
+     *            underlying network
+     * @param numInputNodes
+     *            number of nodes in the input layer
+     * @param numHiddenNodes
+     *            number of nodes in the hidden and context layers
+     * @param numOutputNodes
+     *            number of output nodes
+     * @param hiddenNeuronType
+     *            update rule for hidden nodes
+     * @param outputNeuronType
+     *            update rule for hidden nodes
+     * @param initialPosition
+     *            where to position the network (upper left)
      */
     public SimpleRecurrentNetwork(final Network network, int numInputNodes,
             int numHiddenNodes, int numOutputNodes,
@@ -168,17 +174,17 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
                 Direction.NORTH, betweenLayerInterval);
 
         // Connect the layers
-        AllToAll connect = new AllToAll(this.getParentNetwork());
-        connect.setAllowSelfConnection(false);
-        connect.setExcitatoryRatio(.5);
-        Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
-        synapse.setLowerBound(-1);
-        synapse.setUpperBound(1);
-        connect.setBaseExcitatorySynapse(synapse);
-        connect.setBaseInhibitorySynapse(synapse);
-        connectNeuronGroups(inputLayer, hiddenLayer, connect);
-        connectNeuronGroups(contextLayer, hiddenLayer, connect);
-        connectNeuronGroups(hiddenLayer, outputLayer, connect);
+        AllToAll connect = new AllToAll(false);
+        SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer,
+                hiddenLayer, connect, 0.5);
+        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(inputLayer,
+                hiddenLayer, connect, 0.5);
+        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(inputLayer,
+                hiddenLayer, connect, 0.5);
+
+        addAndLabelSynapseGroup(inToHid);
+        addAndLabelSynapseGroup(contToHid);
+        addAndLabelSynapseGroup(hidToOut);
 
         // Initialize activations
         initNetwork();
@@ -188,10 +194,13 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     /**
      * Helper method to initialize a layer by adding the desired number of
      * neurons with the desired neuron update rule.
-     *
-     * @param layer the list of neurons
-     * @param nodeType the desired neuron update rule
-     * @param nodes the desired number of nodes
+     * 
+     * @param layer
+     *            the list of neurons
+     * @param nodeType
+     *            the desired neuron update rule
+     * @param nodes
+     *            the desired number of nodes
      */
     private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
             int nodes) {

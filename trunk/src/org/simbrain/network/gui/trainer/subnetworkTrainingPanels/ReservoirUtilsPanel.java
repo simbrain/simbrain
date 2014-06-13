@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -30,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
@@ -47,7 +47,7 @@ public class ReservoirUtilsPanel extends JPanel {
     private Randomizer randomSource;
 
     /** A panel for setting random values. */
-    private RandomizerPanel randomPanel = new RandomizerPanel();
+    private RandomizerPanel randomPanel;
 
     /** Enables noise. */
     private JButton enableNoise = new JButton();
@@ -62,16 +62,19 @@ public class ReservoirUtilsPanel extends JPanel {
     private GridBagConstraints gbc = new GridBagConstraints();
 
     /** The parent frame. */
-    private GenericFrame frame;
+    private final Window frame;
 
     /**
      * The constructor, requiring both a reference to an esn and the parent
      * trainer panel.
-     *
-     * @param esn the esn where state noise is being injected.
+     * 
+     * @param esn
+     *            the esn where state noise is being injected.
      */
-    public ReservoirUtilsPanel(EchoStateNetwork esn) {
+    public ReservoirUtilsPanel(EchoStateNetwork esn, Window frame) {
         this.esn = esn;
+        this.frame = frame;
+        randomPanel = new RandomizerPanel(frame);
         this.setLayout(new GridBagLayout());
         // this.setBorder(title);
         randomSource = esn.getNoiseGenerator();
@@ -197,13 +200,6 @@ public class ReservoirUtilsPanel extends JPanel {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-    }
-
-    /**
-     * @param frame the parentFrame to set
-     */
-    public void setFrame(GenericFrame frame) {
-        this.frame = frame;
     }
 
 }

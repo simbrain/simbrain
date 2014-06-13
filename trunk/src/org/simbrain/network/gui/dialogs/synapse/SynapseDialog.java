@@ -43,7 +43,7 @@ public final class SynapseDialog extends StandardDialog {
 
     /**
      * Main panel for editing synapses.
-     *
+     * 
      * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
      */
     private CombinedSynapseInfoPanel synapseEditingPanel;
@@ -62,8 +62,9 @@ public final class SynapseDialog extends StandardDialog {
 
     /**
      * Creates a synapse dialog from a collection of SynapseNodes.
-     *
-     * @param selectedSynapses the nodes
+     * 
+     * @param selectedSynapses
+     *            the nodes
      * @return the dialog.
      */
     public static SynapseDialog createSynapseDialog(
@@ -74,8 +75,9 @@ public final class SynapseDialog extends StandardDialog {
 
     /**
      * Creates synapse dialog from a collection of synapses.
-     *
-     * @param selectedSynapses the synapses
+     * 
+     * @param selectedSynapses
+     *            the synapses
      * @return the dialog.
      */
     public static SynapseDialog createSynapseDialog(
@@ -86,9 +88,10 @@ public final class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * @param synapseList the logical synapses being adjusted
+     * @param synapseList
+     *            the logical synapses being adjusted
      */
-    private SynapseDialog(final List<Synapse> synapseList) {
+    private SynapseDialog(final Collection<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = CombinedSynapseInfoPanel
                 .createCombinedSynapseInfoPanel(synapseList, this);
@@ -98,8 +101,9 @@ public final class SynapseDialog extends StandardDialog {
 
     /**
      * Gets the logical synapses from a list of gui Synapse Nodes
-     *
-     * @param selectedSynapses the selected Synapse Node gui objects
+     * 
+     * @param selectedSynapses
+     *            the selected Synapse Node gui objects
      * @return the synapses contained within the slected synapse nodes
      */
     private static ArrayList<Synapse> getSynapses(
@@ -186,11 +190,12 @@ public final class SynapseDialog extends StandardDialog {
      * Tests to make sure that at least one source neuron in the provided list
      * of synapses is a spiking neuron. . This is used to determine if a spike
      * responder panel should or shouldn't be displayed.
-     *
-     * @param synapses the synapses whose source neurons will be tested.
+     * 
+     * @param synapses
+     *            the synapses whose source neurons will be tested.
      * @return whether or not at least one of the synapses has a spike responder
      */
-    public static boolean containsASpikeResponder(List<Synapse> synapses) {
+    public static boolean containsASpikeResponder(Collection<Synapse> synapses) {
         for (Synapse s : synapses) {
             if (s.getSource() == null) {
                 // If "free-floating" synapses are found then treat the list as

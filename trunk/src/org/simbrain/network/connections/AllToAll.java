@@ -13,121 +13,174 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * Connect every source neuron to every target neuron.
- *
- * @author jyoshimi
- * @author ztosi
+ * 
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  */
-public class AllToAll extends ConnectNeurons {
+public class AllToAll extends DensityBasedConnector {
 
-    /** Allows neurons to have a self connection. */
-    private boolean allowSelfConnection = true;
-
-    /**
-     * Construct all to all connection object.
-     *
-     * @param network parent network
-     * @param neurons base neurons
-     * @param neurons2 target neurons
-     */
-    public AllToAll(final Network network,
-            final List<? extends Neuron> neurons,
-            final List<? extends Neuron> neurons2) {
-        super(network, neurons, neurons2);
-    }
-
-    /**
-     * Construct all to all connection object specifying only the parent
-     * network.
-     *
-     * @param network parent network
-     */
-    public AllToAll(final Network network) {
-        this.network = network;
-    }
+    /** {@inheritDoc}. By definition is always 1.0 for All To All. */
+    private final double connectionDensity = 1.0;
 
     /** {@inheritDoc} */
     public AllToAll() {
+        super();
     }
 
+    /**
+     * Construct all to all connection object.
+     * 
+     * @param network
+     *            parent network
+     * @param neurons
+     *            base neurons
+     * @param neurons2
+     *            target neurons
+     */
+    public AllToAll(boolean allowSelfConnect) {
+        this.selfConnectionAllowed = allowSelfConnect;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "All to all";
     }
 
-    /** {@inheritDoc} */
-    public List<Synapse> connectNeurons(final boolean looseSynapses) {
-        ArrayList<Synapse> syns = new ArrayList<Synapse>();
-        Random rGen = new Random();
-        int numConnects = 0;
-
-        numConnects = sourceNeurons.size() * targetNeurons.size();
-        int numEx = (int) (excitatoryRatio * numConnects);
-        int numIn = numConnects - numEx;
-
-        // TODO: percent excitatory currently not guaranteed for recurrent
-        // connections (source list == target list) when self connection is
-        // not allowed
-
-        for (Neuron source : sourceNeurons) {
-            for (Neuron target : targetNeurons) {
-                if (!(!(Network.getSynapse(source, target) == null) || (!allowSelfConnection && (source == target)))) {
-                    Synapse synapse = null;
-                    int ex = rGen.nextInt(numEx + numIn);
-                    if (ex < numEx) {
-                        numEx--;
-                        synapse = baseExcitatorySynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        if (enableExcitatoryRandomization) {
-                            synapse.setStrength(excitatoryRandomizer
-                                    .getRandom());
-                        } else {
-                            synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
-                        }
-                    } else {
-                        numIn--;
-                        synapse = baseInhibitorySynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        if (enableInhibitoryRandomization) {
-                            synapse.setStrength(inhibitoryRandomizer
-                                    .getRandom());
-                        } else {
-                            synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
-                        }
+    /**
+     * Connects every source neuron to every target neuron. The only exception
+     * being that if the source and target neuron lists are the same, then no
+     * connection will be made between a neuron and itself if self connections
+     * aren't allowed. Will produce n^2 synapses if self connections are allowed
+     * and n(n-1) if they are not.
+     * 
+     * @param sourceNeurons
+     * @param targetNeurons
+     * @param allowSelfConnection
+     * @param looseSynapses
+     * @return
+     */
+    public static List<Synapse> connectAllToAll(
+        final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons,
+        final boolean recurrent, final boolean allowSelfConnection,
+        final boolean looseSynapses) {
+        ArrayList<Synapse> syns = new ArrayList<Synapse>(
+            (int) (targetNeurons.size() * sourceNeurons.size() / 0.75));
+        if (recurrent && !allowSelfConnection) {
+            int i = 0;
+            int j;
+            for (Neuron source : sourceNeurons) {
+                j = 0;
+                for (Neuron target : targetNeurons) {
+                    if (i != j) {
+                        Synapse s = new Synapse(source, target);
+                        syns.add(s);
                     }
-                    if (looseSynapses) {
-                        network.addSynapse(synapse);
-                    }
-                    syns.add(synapse);
+                    j++;
+                }
+                i++;
+            }
+        } else {
+            for (Neuron source : sourceNeurons) {
+                for (Neuron target : targetNeurons) {
+                    Synapse s = new Synapse(source, target);
+                    syns.add(s);
                 }
             }
         }
-
+        // If loose add directly to the network.
+        if (looseSynapses) {
+            for (Synapse s : syns) {
+                s.getSource().getNetwork().addSynapse(s);
+            }
+        }
         return syns;
-
     }
 
     /**
-     * @return the allowSelfConnection
+     * AllToAll is in some respects a special case of VariableDensityConnector,
+     * with connection density always set to 1.
      */
-    public boolean isAllowSelfConnection() {
-        return allowSelfConnection;
+    @Override
+    public double getConnectionDensity() {
+        return connectionDensity;
     }
 
     /**
-     * @param allowSelfConnection the allowSelfConnection to set
+     * Throws and catches an UnsupportedOperationException if the
+     * specifiedConnectionDensity does not equal 1.0. This is because by
+     * definition the connection density of the connections resulting from an
+     * AllToAll connector must have a density of 1.0. If the
+     * connectionDensityParameter is 1.0, nothing happens. This functionality is
+     * provided so that "instanceof" checks can be avoided.
      */
-    public void setAllowSelfConnection(boolean allowSelfConnection) {
-        this.allowSelfConnection = allowSelfConnection;
+    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
+        try {
+            if (connectionDensity != 1.0) {
+                throw new UnsupportedOperationException(
+                    "The connection density of"
+                        + " an AllToAll connector cannot be"
+                        + " changed, by definition it is always 1.0");
+            }
+        } catch (UnsupportedOperationException uoe) {
+            uoe.printStackTrace();
+
+        }
+        return null;
     }
+
+    /**
+     * Connects neurons such that every source neuron is connected to every
+     * target neuron. The only exception to this case is if the source neuron
+     * group is the target neuron group and self-connections are not allowed.
+     * 
+     * @param synGroup
+     *            the synapse group to which the synapses created by this
+     *            connection class will be added.
+     */
+    @Override
+    public void connectNeurons(SynapseGroup synGroup) {
+        List<Synapse> syns = connectAllToAll(synGroup.getSourceNeurons(),
+            synGroup.getTargetNeurons(), synGroup.isRecurrent(),
+            selfConnectionAllowed, false);
+        // Set the capacity of the synapse group's list to accomodate the
+        // synapses this group will add.
+        synGroup.preAllocateSynapses(synGroup.getSourceNeuronGroup().size()
+            * synGroup.getTargetNeuronGroup().size());
+        for (Synapse s : syns) {
+            synGroup.addNewSynapse(s);
+        }
+    }
+
+    /**
+     * @return if neurons are allowed to connect to themselves i.e. a synapse
+     *         where the source and target neuron are the same neuron is
+     *         allowed.
+     */
+    @Override
+    public boolean isSelfConnectionAllowed() {
+        return selfConnectionAllowed;
+    }
+
+    /**
+     * Set whether or not self connections are allowed.
+     * 
+     * @param allowSelfConnect
+     */
+    @Override
+    public void setSelfConnectionAllowed(boolean allowSelfConnect) {
+        this.selfConnectionAllowed = allowSelfConnect;
+    }
+
 }

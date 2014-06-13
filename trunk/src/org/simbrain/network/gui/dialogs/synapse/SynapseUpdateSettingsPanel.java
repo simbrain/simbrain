@@ -25,6 +25,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -36,7 +39,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
@@ -46,9 +49,9 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * A panel for setting the synapse type and changing the parameters of the
  * selected update rule.
- *
+ * 
  * * @author ztosi
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel {
@@ -62,10 +65,10 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
 
     /** Synapse type combo box. */
     private final JComboBox<String> cbSynapseType = new JComboBox<String>(
-            AbstractSynapsePanel.getRuleList());
+        AbstractSynapsePanel.getRuleList());
 
     /** The synapses being modified. */
-    private final List<Synapse> synapseList;
+    private final Collection<Synapse> synapseCollection;
 
     /** Synapse panel. */
     private AbstractSynapsePanel synapsePanel;
@@ -91,15 +94,16 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      * Constructs a synapse update settings panel for a given synapse list and
      * within a specified parent window. Starts in the default display state for
      * the actual neuron update panel.
-     *
-     * @param synapseList the list of synapses which will be edited by the
-     *            displayed neuron update rule panel
-     * @param parent the swing window within which this panel will be placed.
-     *            Here so that "pack()" can be called when this panel resizes
-     *            itself.
+     * 
+     * @param synapseList
+     *            the list of synapses which will be edited by the displayed
+     *            neuron update rule panel
+     * @param parent
+     *            the swing window within which this panel will be placed. Here
+     *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
-            final Window parent) {
+    public SynapseUpdateSettingsPanel(Collection<Synapse> synapseList,
+        final Window parent) {
         this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
 
@@ -107,21 +111,23 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      * Constructs a synapse update settings panel for a given synapse list and
      * within a specified parent window, and with the starting display state of
      * the neuron update panel specified.
-     *
-     * @param synapseList the list of synapses which will be edited by the
-     *            displayed neuron update rule panel
-     * @param startingState whether or not the neuron update rule panel starts
-     *            off displayed or hidden
-     * @param parent the swing window within which this panel will be placed.
-     *            Here so that "pack()" can be called when this panel resizes
-     *            itself.
+     * 
+     * @param synapseList
+     *            the list of synapses which will be edited by the displayed
+     *            neuron update rule panel
+     * @param startingState
+     *            whether or not the neuron update rule panel starts off
+     *            displayed or hidden
+     * @param parent
+     *            the swing window within which this panel will be placed. Here
+     *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SynapseUpdateSettingsPanel(List<Synapse> synapseList,
-            final Window parent, boolean startingState) {
-        this.synapseList = synapseList;
+    public SynapseUpdateSettingsPanel(Collection<Synapse> synapseList,
+        final Window parent, boolean startingState) {
+        this.synapseCollection = synapseList;
         this.parent = parent;
         displaySPTriangle = new DropDownTriangle(UpDirection.LEFT,
-                startingState, "Settings", "Settings", parent);
+            startingState, "Settings", "Settings", parent);
         initSynapseType();
         startingPanel = synapsePanel;
         initializeLayout();
@@ -196,7 +202,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 synapsePanel = AbstractSynapsePanel.RULE_MAP.get(cbSynapseType
-                        .getSelectedItem());
+                    .getSelectedItem());
 
                 // Is the current panel different from the starting panel?
                 boolean replace = synapsePanel != startingPanel;
@@ -231,23 +237,32 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
 
     /**
      * Initialize the main synapse panel based on the type of the selected
-     * synapses.
+     * synapses. Assumes > 0 synapses are selected.
      */
     private void initSynapseType() {
-
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
+        Iterator<Synapse> synIter = synapseCollection.iterator();
+        Synapse protoSyn = synIter.next();
+        boolean discrepancy = false;
+        while (synIter.hasNext()) {
+            if (!protoSyn.getLearningRule().getClass()
+                .equals(synIter.next().getLearningRule().getClass())) {
+                discrepancy = true;
+                break;
+            }
+        }
+        if (discrepancy) {
             cbSynapseType.addItem(SimbrainConstants.NULL_STRING);
             cbSynapseType.setSelectedIndex(cbSynapseType.getItemCount() - 1);
             // Simply to serve as an empty panel
             synapsePanel = new StaticSynapsePanel();
         } else {
-            String synapseName = synapseList.get(0).getLearningRule()
-                    .getDescription();
+            List<SynapseUpdateRule> synapseList = Synapse
+                .getRuleList(synapseCollection);
+            String synapseName = synapseList.get(0).getDescription();
             synapsePanel = AbstractSynapsePanel.RULE_MAP.get(synapseName);
-            synapsePanel.fillFieldValues(Synapse.getRuleList(synapseList));
+            synapsePanel.fillFieldValues(synapseList);
             cbSynapseType.setSelectedItem(synapseName);
         }
-
     }
 
     /**
@@ -258,6 +273,18 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
     }
 
     /**
+     * @return a template synapse update rule object associated with the
+     *         selected synapse update rule panel.
+     */
+    public SynapseUpdateRule getTemplateRule() {
+        SynapseUpdateRule rule = synapsePanel.getPrototypeRule().deepCopy();
+        Synapse s = Synapse.getTemplateSynapse();
+        s.setLearningRule(rule);
+        synapsePanel.writeValuesToRules(Collections.singleton(s));
+        return rule;
+    }
+
+    /**
      * @return the currently displayed synapse panel
      */
     public AbstractSynapsePanel getSynapsePanel() {
@@ -265,8 +292,9 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
     }
 
     /**
-     * @param synapsePanel set the currently displayed synapse panel to the
-     *            specified panel
+     * @param synapsePanel
+     *            set the currently displayed synapse panel to the specified
+     *            panel
      */
     public void setSynapsePanel(AbstractSynapsePanel synapsePanel) {
         this.synapsePanel = synapsePanel;
@@ -278,7 +306,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
 
     @Override
     public boolean commitChanges() {
-        synapsePanel.commitChanges(synapseList);
+        synapsePanel.commitChanges(synapseCollection);
         return true; // TODO:Finish implementation of CommittablePanel interface
     }
 

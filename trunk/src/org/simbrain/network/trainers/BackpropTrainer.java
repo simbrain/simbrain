@@ -18,26 +18,19 @@
  */
 package org.simbrain.network.trainers;
 
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 
 /**
  * Backprop trainer. An implementation of the backpropagation learning
  * algorithm.
- *
+ * 
  * @author jyoshimi
  */
 public class BackpropTrainer extends IterableTrainer {
@@ -71,9 +64,11 @@ public class BackpropTrainer extends IterableTrainer {
 
     /**
      * Construct the backprop trainer.
-     *
-     * @param network the network
-     * @param layers the layers to train
+     * 
+     * @param network
+     *            the network
+     * @param layers
+     *            the layers to train
      */
     public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
         super(network);
@@ -144,8 +139,9 @@ public class BackpropTrainer extends IterableTrainer {
 
     /**
      * Compute error contribution for all nodes using backprop algorithm.
-     *
-     * @param row current row of training data
+     * 
+     * @param row
+     *            current row of training data
      */
     private void backpropagateError(Trainable network, int row) {
         int numOutputs = network.getOutputNeurons().size();
@@ -172,7 +168,8 @@ public class BackpropTrainer extends IterableTrainer {
 
                     // Compute sum of fan-out errors on this neuron
                     double sumFanOutErrors = 0;
-                    for (Synapse synapse : hiddenLayerNeuron.getFanOut()) {
+                    for (Synapse synapse : hiddenLayerNeuron.getFanOut()
+                            .values()) {
                         Neuron nextLayerNeuron = synapse.getTarget();
                         // TODO: Why do I need this check?
                         // Happens on 2 layer case?
@@ -191,9 +188,11 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Store the error value, bias delta, and fan-in weight deltas for this
      * neuron.
-     *
-     * @param neuron neuron whose activation function's derivative is used
-     * @param error simple error for outputs, sum of errors in fan-out, times
+     * 
+     * @param neuron
+     *            neuron whose activation function's derivative is used
+     * @param error
+     *            simple error for outputs, sum of errors in fan-out, times
      *            weights for hidden units
      */
     private void storeErrorAndDeltas(Neuron neuron, double error) {
@@ -239,8 +238,9 @@ public class BackpropTrainer extends IterableTrainer {
 
     /**
      * Randomize the specified layer.
-     *
-     * @param layer the layer to randomize
+     * 
+     * @param layer
+     *            the layer to randomize
      */
     protected void randomize(List<Neuron> layer) {
         for (Neuron neuron : layer) {
@@ -276,121 +276,122 @@ public class BackpropTrainer extends IterableTrainer {
     }
 
     /**
-     * @param learningRate the learningRate to set
+     * @param learningRate
+     *            the learningRate to set
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }
 
-    /**
-     * Test method.
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        test();
-    }
-
-    /**
-     * Test the neural network.
-     */
-    public static void test() {
-
-        double inputData[][] = { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } };
-        double trainingData[][] = { { 0 }, { 1 }, { 1 }, { 0 } };
-
-        // Build network
-        Network network = new Network();
-
-        // Layout object
-        LineLayout layout = new LineLayout(50, LineOrientation.HORIZONTAL);
-        int initialYPosition = 400;
-        int layerInterval = 100;
-
-        // Set up input layer
-        List<Neuron> inputLayer = new ArrayList<Neuron>();
-        for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new LinearRule());
-            neuron.getUpdateRule().setIncrement(1); // For easier testing
-            network.addNeuron(neuron);
-            inputLayer.add(neuron);
-        }
-        layout.setInitialLocation(new Point(10, initialYPosition));
-        layout.layoutNeurons(inputLayer);
-
-        // Set up hidden layer 1
-        List<Neuron> hiddenLayer = new ArrayList<Neuron>();
-        for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalRule());
-            network.addNeuron(neuron);
-            hiddenLayer.add(neuron);
-        }
-        layout.setInitialLocation(new Point(10, initialYPosition
-                - layerInterval));
-        layout.layoutNeurons(hiddenLayer);
-
-        // Set up hidden layer 2
-        List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
-        for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalRule());
-            network.addNeuron(neuron);
-            hiddenLayer2.add(neuron);
-            // System.out.println("Hidden2-" + i + " = " + neuron.getId());
-        }
-        layout.setInitialLocation(new Point(10, initialYPosition
-                - layerInterval * 2));
-        layout.layoutNeurons(hiddenLayer2);
-
-        // Set up output layer
-        List<Neuron> outputLayer = new ArrayList<Neuron>();
-        for (int i = 0; i < 1; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalRule());
-            network.addNeuron(neuron);
-            outputLayer.add(neuron);
-        }
-        layout.setInitialLocation(new Point(10, initialYPosition
-                - layerInterval * 3));
-        layout.layoutNeurons(outputLayer);
-
-        // Connect input layer to hidden layer
-        AllToAll connection = new AllToAll(network, inputLayer, hiddenLayer);
-        connection.connectNeurons(true);
-
-        // Connect hidden layer to hidden layer2
-        AllToAll connection2 = new AllToAll(network, hiddenLayer, hiddenLayer2);
-        connection2.connectNeurons(true);
-
-        // Connect hidden layer2 to output layer
-        AllToAll connection3 = new AllToAll(network, hiddenLayer2, outputLayer);
-        connection3.connectNeurons(true);
-
-        // Randomize weights and biases
-        network.randomizeWeights();
-        network.randomizeBiases(-.5, .5);
-
-        // Initialize the trainer
-        // REDO
-        // Backprop trainer = new Backprop(network, inputLayer, outputLayer);
-        // network.setLearningRate(.9);
-        // trainer.setInputData(inputData);
-        // trainer.setTrainingData(trainingData);
-        // trainer.init();
-        // int epochs = 10000; // Takes 10K iteration to get < 0.1
-        // for (int i = 0; i < epochs; i++) {
-        // trainer.apply();
-        // System.out.println("Epoch " + i + ", error = " + trainer.getError());
-        // }
-        //
-        // String FILE_OUTPUT_LOCATION = "./";
-        // File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
-        // try {
-        // Network.getXStream().toXML(network,
-        // new FileOutputStream(theFile));
-        // } catch (FileNotFoundException e) {
-        // e.printStackTrace();
-        // }
-
-    }
+    // /**
+    // * Test method.
+    // *
+    // * @param args
+    // */
+    // public static void main(String[] args) {
+    // test();
+    // }
+    //
+    // /**
+    // * Test the neural network.
+    // */
+    // public static void test() {
+    //
+    // double inputData[][] = { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } };
+    // double trainingData[][] = { { 0 }, { 1 }, { 1 }, { 0 } };
+    //
+    // // Build network
+    // Network network = new Network();
+    //
+    // // Layout object
+    // LineLayout layout = new LineLayout(50, LineOrientation.HORIZONTAL);
+    // int initialYPosition = 400;
+    // int layerInterval = 100;
+    //
+    // // Set up input layer
+    // List<Neuron> inputLayer = new ArrayList<Neuron>();
+    // for (int i = 0; i < 2; i++) {
+    // Neuron neuron = new Neuron(network, new LinearRule());
+    // neuron.getUpdateRule().setIncrement(1); // For easier testing
+    // network.addNeuron(neuron);
+    // inputLayer.add(neuron);
+    // }
+    // layout.setInitialLocation(new Point(10, initialYPosition));
+    // layout.layoutNeurons(inputLayer);
+    //
+    // // Set up hidden layer 1
+    // List<Neuron> hiddenLayer = new ArrayList<Neuron>();
+    // for (int i = 0; i < 5; i++) {
+    // Neuron neuron = new Neuron(network, new SigmoidalRule());
+    // network.addNeuron(neuron);
+    // hiddenLayer.add(neuron);
+    // }
+    // layout.setInitialLocation(new Point(10, initialYPosition
+    // - layerInterval));
+    // layout.layoutNeurons(hiddenLayer);
+    //
+    // // Set up hidden layer 2
+    // List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
+    // for (int i = 0; i < 5; i++) {
+    // Neuron neuron = new Neuron(network, new SigmoidalRule());
+    // network.addNeuron(neuron);
+    // hiddenLayer2.add(neuron);
+    // // System.out.println("Hidden2-" + i + " = " + neuron.getId());
+    // }
+    // layout.setInitialLocation(new Point(10, initialYPosition
+    // - layerInterval * 2));
+    // layout.layoutNeurons(hiddenLayer2);
+    //
+    // // Set up output layer
+    // List<Neuron> outputLayer = new ArrayList<Neuron>();
+    // for (int i = 0; i < 1; i++) {
+    // Neuron neuron = new Neuron(network, new SigmoidalRule());
+    // network.addNeuron(neuron);
+    // outputLayer.add(neuron);
+    // }
+    // layout.setInitialLocation(new Point(10, initialYPosition
+    // - layerInterval * 3));
+    // layout.layoutNeurons(outputLayer);
+    //
+    // // Connect input layer to hidden layer
+    // AllToAll connection = new AllToAll(network, inputLayer, hiddenLayer);
+    // connection.connectNeurons(true);
+    //
+    // // Connect hidden layer to hidden layer2
+    // AllToAll connection2 = new AllToAll(network, hiddenLayer, hiddenLayer2);
+    // connection2.connectNeurons(true);
+    //
+    // // Connect hidden layer2 to output layer
+    // AllToAll connection3 = new AllToAll(network, hiddenLayer2, outputLayer);
+    // connection3.connectNeurons(true);
+    //
+    // // Randomize weights and biases
+    // network.randomizeWeights();
+    // network.randomizeBiases(-.5, .5);
+    //
+    // // Initialize the trainer
+    // // REDO
+    // // Backprop trainer = new Backprop(network, inputLayer, outputLayer);
+    // // network.setLearningRate(.9);
+    // // trainer.setInputData(inputData);
+    // // trainer.setTrainingData(trainingData);
+    // // trainer.init();
+    // // int epochs = 10000; // Takes 10K iteration to get < 0.1
+    // // for (int i = 0; i < epochs; i++) {
+    // // trainer.apply();
+    // // System.out.println("Epoch " + i + ", error = " + trainer.getError());
+    // // }
+    // //
+    // // String FILE_OUTPUT_LOCATION = "./";
+    // // File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
+    // // try {
+    // // Network.getXStream().toXML(network,
+    // // new FileOutputStream(theFile));
+    // // } catch (FileNotFoundException e) {
+    // // e.printStackTrace();
+    // // }
+    //
+    // }
 
     /**
      * @return the momentum
@@ -400,7 +401,8 @@ public class BackpropTrainer extends IterableTrainer {
     }
 
     /**
-     * @param momentum the momentum to set
+     * @param momentum
+     *            the momentum to set
      */
     public void setMomentum(double momentum) {
         this.momentum = momentum;

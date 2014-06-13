@@ -11,11 +11,12 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.connect;
+package org.simbrain.network.gui.dialogs.connect.connector_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,12 +24,17 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Radial;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
  * connections.
+ * 
+ * TODO: Currently not implemented pending refactor of Radial.java
+ * 
  */
 public class RadialPanel extends AbstractConnectionPanel {
 
@@ -55,14 +61,15 @@ public class RadialPanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
-     *
-     * @param connection type
+     * 
+     * @param connection
+     *            type
      */
     public RadialPanel(final Radial connection) {
-        super(connection);
+        // super(connection);
 
         setExcitatorySynapseType.setText(connection.getBaseExcitatorySynapse()
-                .getType());
+            .getType());
         this.addItem("Excitatory Radius:", tfExciteRadius);
         this.addItem("Excitatory Probability:", tfExciteProbability);
         this.addItem("Excitatory Synapse Type:", setExcitatorySynapseType);
@@ -73,7 +80,7 @@ public class RadialPanel extends AbstractConnectionPanel {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
                 excitatoryList.add(connection.getBaseExcitatorySynapse());
                 SynapseDialog dialog = SynapseDialog
-                        .createSynapseDialog(excitatoryList);
+                    .createSynapseDialog(excitatoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -85,7 +92,7 @@ public class RadialPanel extends AbstractConnectionPanel {
         });
 
         setInhibitorySynapseType.setText(connection.getBaseInhibitorySynapse()
-                .getType());
+            .getType());
         this.addItem("Inhibitory Radius:", tfInhibitRadius);
         this.addItem("Inhibitory Probability:", tfInhibitProbability);
         this.addItem("Inhibitory Synapse Type:", setInhibitorySynapseType);
@@ -96,7 +103,7 @@ public class RadialPanel extends AbstractConnectionPanel {
                 ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
                 inhibitoryList.add(connection.getBaseInhibitorySynapse());
                 SynapseDialog dialog = SynapseDialog
-                        .createSynapseDialog(inhibitoryList);
+                    .createSynapseDialog(inhibitoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -114,39 +121,51 @@ public class RadialPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        ((Radial) connection).setExcitatoryProbability(Double
-                .parseDouble(tfExciteProbability.getText()));
-        ((Radial) connection).setExcitatoryRadius(Double
-                .parseDouble(tfExciteRadius.getText()));
-        ((Radial) connection).setInhibitoryProbability(Double
-                .parseDouble(tfInhibitProbability.getText()));
-        ((Radial) connection).setInhibitoryRadius(Double
-                .parseDouble(tfInhibitRadius.getText()));
-        ((Radial) connection).setAllowSelfConnections(allowSelfConnect
-                .isSelected());
+        // ((Radial) connection).setExcitatoryProbability(Double
+        // .parseDouble(tfExciteProbability.getText()));
+        // ((Radial) connection).setExcitatoryRadius(Double
+        // .parseDouble(tfExciteRadius.getText()));
+        // ((Radial) connection).setInhibitoryProbability(Double
+        // .parseDouble(tfInhibitProbability.getText()));
+        // ((Radial) connection).setInhibitoryRadius(Double
+        // .parseDouble(tfInhibitRadius.getText()));
+        // ((Radial) connection).setAllowSelfConnections(allowSelfConnect
+        // .isSelected());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        tfExciteProbability.setText(Double.toString(((Radial) connection)
-                .getExcitatoryProbability()));
-        tfInhibitProbability.setText(Double.toString(((Radial) connection)
-                .getInhibitoryProbability()));
-        tfExciteRadius.setText(Double.toString(((Radial) connection)
-                .getExcitatoryRadius()));
-        tfInhibitProbability.setText(Double.toString(((Radial) connection)
-                .getInhibitoryProbability()));
-        tfInhibitRadius.setText(Double.toString(((Radial) connection)
-                .getInhibitoryRadius()));
-        allowSelfConnect.setSelected(((Radial) connection)
-                .isAllowSelfConnections());
+        // tfExciteProbability.setText(Double.toString(((Radial) connection)
+        // .getExcitatoryProbability()));
+        // tfInhibitProbability.setText(Double.toString(((Radial) connection)
+        // .getInhibitoryProbability()));
+        // tfExciteRadius.setText(Double.toString(((Radial) connection)
+        // .getExcitatoryRadius()));
+        // tfInhibitProbability.setText(Double.toString(((Radial) connection)
+        // .getInhibitoryProbability()));
+        // tfInhibitRadius.setText(Double.toString(((Radial) connection)
+        // .getInhibitoryRadius()));
+        // allowSelfConnect.setSelected(((Radial) connection)
+        // .isAllowSelfConnections());
+    }
+
+    @Override
+    public ConnectNeurons getConnection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void commitChanges(List<Neuron> source, List<Neuron> target) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
     public void fillFieldValues(ConnectNeurons connection)
-            throws ClassCastException {
+        throws ClassCastException {
         // TODO Auto-generated method stub
 
     }

@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.GridLayout;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -33,12 +33,12 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * Panel which displays the specific parameters of a particular synapse
- * learning rule.
- *
+ * Panel which displays the specific parameters of a particular synapse learning
+ * rule.
+ * 
  * @author Jeff Yoshimi
  * @author Zach Tosi
- *
+ * 
  */
 public class ExtendedSynapseInfoPanel extends JPanel {
 
@@ -61,10 +61,11 @@ public class ExtendedSynapseInfoPanel extends JPanel {
     private JTextField tfDelay = new JTextField();
 
     /**
-     *
-     * @param synapseList The list of synapses being edited.
+     * 
+     * @param synapseList
+     *            The list of synapses being edited.
      */
-    public ExtendedSynapseInfoPanel(final List<Synapse> synapseList) {
+    public ExtendedSynapseInfoPanel(final Collection<Synapse> synapseList) {
         fillFieldValues(synapseList);
         initializeLayout();
     }
@@ -95,43 +96,39 @@ public class ExtendedSynapseInfoPanel extends JPanel {
      * Fills the values of the text fields based on the corresponding values of
      * the synapses to be edited.
      */
-    public void fillFieldValues(List<Synapse> synapseList) {
-
-        Synapse synapseRef = synapseList.get(0);
-
+    public void fillFieldValues(Collection<Synapse> synapseCollection) {
+        Synapse synapseRef = synapseCollection.iterator().next();
         // Handle Upper Bound
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getUpperBound")) {
             tfUpBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         }
-
         // Handle Lower Bound
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getLowerBound")) {
             tfLowBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         }
-
         // Handle Increment
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
+        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getIncrement")) {
             tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         }
-
         // Handle Delay
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
+        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
+                "getDelay")) {
             tfDelay.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfDelay.setText(Integer.toString(synapseRef.getDelay()));
         }
-
         // Handle Frozen
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "isFrozen")) {
+        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
+                "isFrozen")) {
             frozenDD.setNull();
         } else {
             frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
@@ -143,8 +140,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
      * Uses the values from text fields to alter corresponding values in the
      * synapse(s) being edited. Called externally to apply changes.
      */
-    public void commitChanges(List<Synapse> synapses) {
-
+    public void commitChanges(Collection<Synapse> synapses) {
         // Upper Bound
         double uB = Utils.doubleParsable(tfUpBound);
         if (!Double.isNaN(uB)) {
@@ -152,7 +148,6 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 s.setUpperBound(uB);
             }
         }
-
         // Lower Bound
         double lB = Utils.doubleParsable(tfLowBound);
         if (!Double.isInfinite(lB)) {
@@ -160,7 +155,6 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 s.setLowerBound(lB);
             }
         }
-
         // Increment
         double increment = Utils.doubleParsable(tfIncrement);
         if (!Double.isNaN(increment)) {
@@ -168,7 +162,6 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 s.setIncrement(increment);
             }
         }
-
         // Delay
         double delay = Utils.doubleParsable(tfDelay);
         if (!Double.isNaN(delay)) {
@@ -177,7 +170,6 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 s.setDelay(dly);
             }
         }
-
         // Frozen ?
         boolean frozen = frozenDD.getSelectedIndex() == TristateDropDown
                 .getTRUE();
@@ -186,7 +178,6 @@ public class ExtendedSynapseInfoPanel extends JPanel {
                 s.setFrozen(frozen);
             }
         }
-
     }
 
 }

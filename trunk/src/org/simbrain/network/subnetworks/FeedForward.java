@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.groups;
+package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -21,6 +21,9 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -30,7 +33,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 /**
  * A standard feed-forward network, where a succession of neuron groups and
  * synapse groups are organized into layers.
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class FeedForward extends Subnetwork {
@@ -40,14 +43,17 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Construct a feed-forward network.
-     *
-     * @param network the parent network to which the layered network is being
-     *            added
-     * @param nodesPerLayer an array of integers which determines the number of
-     *            layers and neurons in each layer. Integers 1...n in the array
-     *            correspond to the number of nodes in layers 1...n.
-     * @param initialPosition bottom corner where network will be placed.
-     * @param inputNeuronTemplate the type of Neuron to use for the input layer
+     * 
+     * @param network
+     *            the parent network to which the layered network is being added
+     * @param nodesPerLayer
+     *            an array of integers which determines the number of layers and
+     *            neurons in each layer. Integers 1...n in the array correspond
+     *            to the number of nodes in layers 1...n.
+     * @param initialPosition
+     *            bottom corner where network will be placed.
+     * @param inputNeuronTemplate
+     *            the type of Neuron to use for the input layer
      */
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition, final Neuron inputNeuronTemplate) {
@@ -59,13 +65,15 @@ public class FeedForward extends Subnetwork {
     /**
      * Add the layered network to the specified network, with a specified number
      * of layers and nodes in each layer.
-     *
-     * @param network the parent network to which the layered network is being
-     *            added
-     * @param nodesPerLayer an array of integers which determines the number of
-     *            layers and neurons in each layer. Integers 1...n in the array
-     *            correspond to the number of nodes in layers 1...n.
-     * @param initialPosition upper left corner where network will be placed.
+     * 
+     * @param network
+     *            the parent network to which the layered network is being added
+     * @param nodesPerLayer
+     *            an array of integers which determines the number of layers and
+     *            neurons in each layer. Integers 1...n in the array correspond
+     *            to the number of nodes in layers 1...n.
+     * @param initialPosition
+     *            upper left corner where network will be placed.
      */
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
@@ -79,14 +87,17 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Create the network using the parameters.
-     *
-     * @param network the parent network to which the layered network is being
-     *            added
-     * @param nodesPerLayer an array of integers which determines the number of
-     *            layers and neurons in each layer. Integers 1...n in the array
-     *            correspond to the number of nodes in layers 1...n.
-     * @param initialPosition bottom corner where network will be placed.
-     * @param inputNeuronTemplate the type of Neuron to use for the input layer
+     * 
+     * @param network
+     *            the parent network to which the layered network is being added
+     * @param nodesPerLayer
+     *            an array of integers which determines the number of layers and
+     *            neurons in each layer. Integers 1...n in the array correspond
+     *            to the number of nodes in layers 1...n.
+     * @param initialPosition
+     *            bottom corner where network will be placed.
+     * @param inputNeuronTemplate
+     *            the type of Neuron to use for the input layer
      */
     private void buildNetwork(final Network network, int[] nodesPerLayer,
             Point2D initialPosition, final Neuron inputNeuronTemplate) {
@@ -130,13 +141,10 @@ public class FeedForward extends Subnetwork {
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,
                     Direction.NORTH, betweenLayerInterval);
 
-            AllToAll connection = new AllToAll(getParentNetwork());
-            connection.setBaseExcitatorySynapse(synapse);
-            connection.setBaseInhibitorySynapse(synapse);
-            connection.setEnableExcitatoryRandomization(true);
-            connection.setEnableInhibitoryRandomization(true);
-
-            connectNeuronGroups(lastLayer, hiddenLayer, connection);
+            AllToAll connection = new AllToAll();
+            SynapseGroup lh = connectNeuronGroups(lastLayer, hiddenLayer,
+                    connection);
+            lh.randomizeConnections();
 
             // Reset last layer
             lastLayer = hiddenLayer;
@@ -151,7 +159,8 @@ public class FeedForward extends Subnetwork {
     }
 
     /**
-     * @param betweenLayerInterval the betweenLayerInterval to set
+     * @param betweenLayerInterval
+     *            the betweenLayerInterval to set
      */
     public void setBetweenLayerInterval(int betweenLayerInterval) {
         this.betweenLayerInterval = betweenLayerInterval;
@@ -165,7 +174,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Returns the input layer.
-     *
+     * 
      * @return the input layer
      */
     public NeuronGroup getInputLayer() {
@@ -174,7 +183,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Returns the output layer.
-     *
+     * 
      * @return the output layer
      */
     public NeuronGroup getOutputLayer() {
@@ -184,7 +193,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Convenience method for getting the neurons associated with the input
      * group. Also allows all feed-forward networks to implement Trainable.
-     *
+     * 
      * @return the input layer neurons as a list.
      */
     public List<Neuron> getInputNeurons() {
@@ -194,7 +203,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Convenience method for getting the neurons associated with the output
      * group. Also allows all feed-forward networks to implement Trainable.
-     *
+     * 
      * @return the output layer neurons as a list.
      */
     public List<Neuron> getOutputNeurons() {

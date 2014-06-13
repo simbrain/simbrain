@@ -23,13 +23,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
-import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -55,7 +53,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
-                toolkit.getMenuShortcutKeyMask());
+            toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
 
         this.networkPanel = networkPanel;
@@ -76,7 +74,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
      */
     private void updateAction() {
         boolean atLeastOneSynapseSelected = (networkPanel
-                .getSelectedModelSynapses().size() > 0);
+            .getSelectedModelSynapses().size() > 0);
         if (atLeastOneSynapseSelected) {
             setEnabled(true);
         } else {
@@ -87,15 +85,16 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
-                .createSynapseAdjustmentPanel(networkPanel,
-                        networkPanel.getSelectedModelSynapses());
-        JDialog dialog = new JDialog();
-        dialog.setTitle("Adjust selected synapses");
-        dialog.setContentPane(synapsePanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        // TODO: Reimplement
+        // final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
+        // .createSynapseAdjustmentPanel(networkPanel,
+        // networkPanel.getSelectedModelSynapses());
+        // JDialog dialog = new JDialog();
+        // dialog.setTitle("Adjust selected synapses");
+        // dialog.setContentPane(synapsePanel);
+        // dialog.pack();
+        // dialog.setLocationRelativeTo(null);
+        // dialog.setVisible(true);
         // dialog.addWindowListener(new WindowAdapter() {
         // public void windowClosing(WindowEvent e) {
         // synapsePanel.removeListeners();

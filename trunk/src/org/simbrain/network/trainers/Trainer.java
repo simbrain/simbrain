@@ -25,9 +25,9 @@ import java.util.List;
 /**
  * Superclass for all trainer classes, which trains a trainable object,
  * typically a network.
- *
+ * 
  * @author jeffyoshimi
- *
+ * 
  */
 public abstract class Trainer {
 
@@ -39,8 +39,9 @@ public abstract class Trainer {
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.
-     *
-     * @param network the network to be trained
+     * 
+     * @param network
+     *            the network to be trained
      */
     public Trainer(Trainable network) {
         this.network = network;
@@ -48,16 +49,17 @@ public abstract class Trainer {
 
     /**
      * Apply the algorithm.
-     *
-     * @throws DataNotInitializedException when input or target data have not
-     *             been set.
+     * 
+     * @throws DataNotInitializedException
+     *             when input or target data have not been set.
      */
     public abstract void apply() throws DataNotInitializedException;
 
     /**
      * Add a trainer listener.
-     *
-     * @param trainerListener the listener to add
+     * 
+     * @param trainerListener
+     *            the listener to add
      */
     public void addListener(final TrainerListener trainerListener) {
         if (listeners == null) {
@@ -68,8 +70,9 @@ public abstract class Trainer {
 
     /**
      * Remove a trainer listener.
-     *
-     * @param trainerListener the listener to add
+     * 
+     * @param trainerListener
+     *            the listener to add
      */
     public void removeListener(final TrainerListener trainerListener) {
         if (listeners != null) {
@@ -105,9 +108,11 @@ public abstract class Trainer {
     /**
      * Notify listeners of an update in training progress. Used by GUI progress
      * bars.
-     *
-     * @param progressUpdate string description of current state
-     * @param percentComplete how far along the training is.
+     * 
+     * @param progressUpdate
+     *            string description of current state
+     * @param percentComplete
+     *            how far along the training is.
      */
     public void fireProgressUpdate(String progressUpdate, int percentComplete) {
         for (TrainerListener listener : getListeners()) {
@@ -125,14 +130,15 @@ public abstract class Trainer {
     /**
      * Exception thrown when a training algorithm is applied but no data have
      * been initialized.
-     *
+     * 
      * @author jyoshimi
-     *
+     * 
      */
     public class DataNotInitializedException extends Exception {
 
         /**
-         * @param message error message
+         * @param message
+         *            error message
          */
         public DataNotInitializedException(final String message) {
             super(message);

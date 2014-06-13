@@ -42,8 +42,9 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Create new Histogram Component.
-     *
-     * @param name chart name
+     * 
+     * @param name
+     *            chart name
      */
     public HistogramComponent(final String name) {
         super(name);
@@ -55,9 +56,11 @@ public class HistogramComponent extends WorkspaceComponent {
     /**
      * Create new Histogram Component from a specified model. Used in
      * deserializing.
-     *
-     * @param name chart name
-     * @param model chart model
+     * 
+     * @param name
+     *            chart name
+     * @param model
+     *            chart model
      */
     public HistogramComponent(final String name, final HistogramModel model) {
         super(name);
@@ -114,7 +117,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Returns model.
-     *
+     * 
      * @return the model.
      */
     public HistogramModel getModel() {
@@ -123,10 +126,13 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Opens a saved bar chart.
-     *
-     * @param input stream
-     * @param name name of file
-     * @param format format
+     * 
+     * @param input
+     *            stream
+     * @param name
+     *            name of file
+     * @param format
+     *            format
      * @return bar chart component to be opened
      */
     public static HistogramComponent open(final InputStream input,

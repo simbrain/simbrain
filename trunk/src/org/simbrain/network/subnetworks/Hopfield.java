@@ -54,8 +54,8 @@ public class Hopfield extends Subnetwork implements Trainable {
 
             @Override
             public String getDescription() {
-                return "Randomly ordered sequential update (different every" +
-                		" time)";
+                return "Randomly ordered sequential update (different every"
+                        + " time)";
             }
 
             @Override
@@ -73,7 +73,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                     neurons = hop.getParentNetwork()
                             .getPrioritySortedNeuronList();
                     for (Neuron n : neurons) {
-                        //TODO: Hack to allow hopfield networks to be updated
+                        // TODO: Hack to allow hopfield networks to be updated
                         // within based on priority, without having to sort
                         // the list every iteration.
                         if (hop.getNeuronSet().contains(n)) {
@@ -110,7 +110,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 for (Neuron n : neurons) {
                     n.update();
                 }
-                for(Neuron n : neurons) {
+                for (Neuron n : neurons) {
                     n.setActivation(n.getBuffer());
                 }
             }
@@ -133,12 +133,12 @@ public class Hopfield extends Subnetwork implements Trainable {
                     return hu;
                 }
             }
-            throw new IllegalArgumentException("No such Hopfield update" +
-            		"function");
+            throw new IllegalArgumentException("No such Hopfield update"
+                    + "function");
         }
 
-        public static String [] getUpdateFuncNames() {
-            String [] names = new String [HopfieldUpdate.values().length];
+        public static String[] getUpdateFuncNames() {
+            String[] names = new String[HopfieldUpdate.values().length];
             for (int i = 0; i < HopfieldUpdate.values().length; i++) {
                 names[i] = HopfieldUpdate.values()[i].getName();
             }
@@ -165,8 +165,8 @@ public class Hopfield extends Subnetwork implements Trainable {
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
 
     /**
-     * If true, if the network's update order is sequential, it will update
-     * in order of priority.
+     * If true, if the network's update order is sequential, it will update in
+     * order of priority.
      */
     private boolean byPriority = false;
 
@@ -181,23 +181,25 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     private final TrainingSet trainingSet = new TrainingSet();
 
-//    /**
-//     * Copy constructor.
-//     *
-//     * @param newRoot new root network
-//     * @param oldNet old network.
-//     */
-//    public Hopfield(Network newRoot, Hopfield oldNet) {
-//        super(newRoot);
-//        setUpdateFunc(oldNet.getUpdateFunc());
-//        setLabel("Hopfield network");
-//    }
+    // /**
+    // * Copy constructor.
+    // *
+    // * @param newRoot new root network
+    // * @param oldNet old network.
+    // */
+    // public Hopfield(Network newRoot, Hopfield oldNet) {
+    // super(newRoot);
+    // setUpdateFunc(oldNet.getUpdateFunc());
+    // setLabel("Hopfield network");
+    // }
 
     /**
      * Creates a new Hopfield network.
-     *
-     * @param numNeurons Number of neurons in new network
-     * @param root reference to Network.
+     * 
+     * @param numNeurons
+     *            Number of neurons in new network
+     * @param root
+     *            reference to Network.
      */
     public Hopfield(final Network root, final int numNeurons) {
         super(root);
@@ -237,8 +239,8 @@ public class Hopfield extends Subnetwork implements Trainable {
 
     /**
      * Randomizes the update sequence by shuffling the neuron list associated
-     * with this Hopfield network. Only has an effect if the update function
-     * is sequential.
+     * with this Hopfield network. Only has an effect if the update function is
+     * sequential.
      */
     public void randomizeSequence() {
         Collections.shuffle(this.getModifiableNeuronList());
@@ -309,10 +311,11 @@ public class Hopfield extends Subnetwork implements Trainable {
      * main training algorithm, which directly makes use of the input data.
      */
     public void trainOnCurrentPattern() {
-        for (Synapse w : this.getSynapseGroup().getSynapseList()) {
+        for (Synapse w : this.getSynapseGroup().getAllSynapses()) {
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
-            w.setStrength(w.getStrength() + src.getActivation()
+            getSynapseGroup().setSynapseStrength(w,
+                    w.getStrength() + src.getActivation()
                     * tar.getActivation());
         }
         getParentNetwork().fireNetworkChanged();
@@ -326,7 +329,8 @@ public class Hopfield extends Subnetwork implements Trainable {
     }
 
     /**
-     * @param updateFunc the updateFunc to set
+     * @param updateFunc
+     *            the updateFunc to set
      */
     public void setUpdateFunc(HopfieldUpdate updateFunc) {
         this.updateFunc = updateFunc;
@@ -340,7 +344,8 @@ public class Hopfield extends Subnetwork implements Trainable {
     }
 
     /**
-     * @param neuronSet the neuronSet to set
+     * @param neuronSet
+     *            the neuronSet to set
      */
     public void setNeuronSet(HashSet<Neuron> neuronSet) {
         this.neuronSet = neuronSet;

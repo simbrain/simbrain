@@ -1,576 +1,255 @@
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
-import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
-import org.simbrain.network.gui.dialogs.synapse.plasticity_panels.StaticSynapsePanel;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.SwitchableActionListener;
-import org.simbrain.util.SwitchablePropertyChangeListener;
-import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
-import org.simbrain.util.widgets.LinkIcon;
+import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.dialogs.synapse.CombinedSynapseInfoPanel;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * A panel allowing synapse learning rules to be set and random weights to be
  * activated/adjusted, designed with segregation of inhibitory and excitatory
  * weights in mind.
- *
+ * 
  * @author ztosi
- *
+ * 
  */
-public class SynapsePropertiesPanel extends JPanel {
-
-    /** Null string. */
-    public static final String NULL_STRING = "...";
+public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
-     * A combo-box containing select-able synapse learning rules for excitatory
-     * synapses.
+     * A synapse info panel containing basic synapse properties and synapse
+     * update rule properties for excitatory synapses.
      */
-    private JComboBox<String> exSynTypes = new JComboBox<String>(
-            AbstractSynapsePanel.getRuleList());
+    private CombinedSynapseInfoPanel excitatoryInfoPanel;
 
     /**
-     * A combo-box containing select-able synapse learning rules for inhibitory
-     * synapses.
+     * A synapse info panel containing basic synapse properties and synapse
+     * update rule properties for inhibitory synapses.
      */
-    private JComboBox<String> inSynTypes = new JComboBox<String>(
-            AbstractSynapsePanel.getRuleList());
+    private CombinedSynapseInfoPanel inhibitoryInfoPanel;
+
+    private JButton exApplyButton = new JButton("Apply");
+
+    private JButton inApplyButton = new JButton("Apply");
 
     /**
-     * Listens to changes to the type of excitatory synapse selected in the
-     * combo-box, brining up the corresponding synapse panel and adjusting the
-     * template excitatory synapse accordingly. This Listener is switchable
-     *
-     * @see org.simbrain.util.SwitchableActionListener.java
+     * A template excitatory synapse used to store committed information if a
+     * synapse group doesn't have any connections yet.
      */
-    private SwitchableActionListener exSynListener;
+    private final Synapse templateExcitatorySynapse;
 
     /**
-     * Listens to changes to the type of inhibitory synapse selected in the
-     * combo-box, brining up the corresponding synapse panel and adjusting the
-     * template inhibitory synapse accordingly. This Listener is switchable
-     *
-     * @see org.simbrain.util.SwitchableActionListener.java
+     * A template inhibitory synapse used to store committed information if a
+     * synapse group doesn't have any connections yet.
      */
-    private SwitchableActionListener inSynListener;
+    private final Synapse templateInhibitorySynapse;
+
+    /** The synapse group being edited. Null, if editing loose synapses. */
+    private final SynapseGroup synapseGroup;
+
+    /** The main panel which contains the other panels. */
+    private final JPanel mainPanel = new JPanel();
+
+    /** Whether or not this is a creation panel. */
+    private final boolean creationPanel;
 
     /**
-     * Listens to changes as to whether or not excitatory weights will be
-     * randomized. Responsible for synchronizing changes to excitatory random
-     * fields to inhibitory random fields when the attributes are linked. This
-     * Listener is switchable
-     *
-     * @see org.simbrain.util.SwitchablePropertyChangeListener.java
+     * 
+     * @param parent
+     * @param synapseGroup
+     * @return
      */
-    private SwitchablePropertyChangeListener randExListener;
-
-    /**
-     * Listens to changes as to whether or not inhibitory weights will be
-     * randomized. Responsible for synchronizing changes to inhibitory random
-     * fields to excitatory random fields when the attributes are linked. This
-     * Listener is switchable
-     *
-     * @see org.simbrain.util.SwitchablePropertyChangeListener.java
-     */
-    private SwitchablePropertyChangeListener randInListener;
-
-    /**
-     * A random panel to set the range and distribution of excitatory strengths.
-     */
-    private RandomizerPanel exRandPanel = new RandomizerPanel();
-
-    /**
-     * A random panel to set the range and distribution of inhibitory strengths.
-     */
-    private RandomizerPanel inRandPanel = new RandomizerPanel();
-
-    /**
-     * A synapse panel, set to the selected synapse learning rule and displayed
-     * upon selection.
-     */
-    private AbstractSynapsePanel synapsePanel = new StaticSynapsePanel();
-
-    /**
-     * A checkbox for whether or not inhibitory weights will be randomized.
-     */
-    private JCheckBox inRandCheck = new JCheckBox();
-
-    /**
-     * A checkbox for whether or not excitatory weights will be randomized.
-     */
-    private JCheckBox exRandCheck = new JCheckBox();
-
-    /**
-     * A link icon for displaying and editing whether or not random-fields are
-     * linked/synchronized. If changing from an un-linked to a linked state,
-     * values from the most recently edited side is copied to the other side.
-     */
-    private LinkIcon randLink;
-
-    /**
-     * A link icon for displaying and editing whether or not the synapse types
-     * are linked/syncronized.If changing from an un-linked to a linked state,
-     * values from the most recently edited side is copied to the other side.
-     */
-    private LinkIcon typeLink;
-
-    /**
-     * The connect neurons object which will be edited when changes are
-     * committed to this panel.
-     */
-    private ConnectNeurons connection;
-
-    /**
-     * A template excitatory synapse, allowing synapse learning rule values to
-     * be edited in this panel without having to commit them until such a time
-     * as committing changes would be desirable.
-     */
-    private Synapse exTemplateSynapse = Synapse.getTemplateSynapse();
-
-    /**
-     * A template inhibitory synapse, allowing synapse learning rule values to
-     * be edited in this panel without having to commit them until such a time
-     * as committing changes would be desirable.
-     */
-    private Synapse inTemplateSynapse = Synapse.getTemplateSynapse();
-
-    /**
-     * The last time the excitatory synapse type was interacted with, used for
-     * determining the direction of synchronization when changing from an
-     * un-linked to a linked state.
-     */
-    private long lastExSynTypeEdit = 0L;
-
-    /**
-     * The last time the inhibitory synapse type was interacted with, used for
-     * determining the direction of synchronization when changing from an
-     * un-linked to a linked state.
-     */
-    private long lastInSynTypeEdit = 0L;
-
-    /**
-     * The last time any fields in the excitatory random weights area was
-     * interacted with, used for determining the direction of synchronization
-     * when changing from an un-linked to a linked state.
-     */
-    private long lastExRandEdit = 0L;
-
-    /**
-     * The last time any fields in the inhibitory random weights area was
-     * interacted with, used for determining the direction of synchronization
-     * when changing from an un-linked to a linked state.
-     */
-    private long lastInRandEdit = 0L;
-
-    /**
-     * Creates the synapse properties sub-panel for editing how and if weights
-     * are randomized, as well as the synapse type.
-     *
-     * @param connection the connection object which will be altered when values
-     *            from this panel are committed.
-     */
-    public SynapsePropertiesPanel(ConnectNeurons connection) {
-        this.connection = connection;
-        fillFieldValues();
-        initializeListeners();
-        addListeners();
-        initializeLayout();
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+        final Window parent, final SynapseGroup synapseGroup) {
+        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent,
+            synapseGroup);
+        spp.initApplyListeners();
+        return spp;
     }
 
     /**
-     * Initializes the panel's layout
+     * 
+     * @param parent
+     * @param synapses
+     * @return
      */
-    private void initializeLayout() {
-
-        GridBagLayout layout = new GridBagLayout();
-        GridBagConstraints gbc = new GridBagConstraints();
-        this.setLayout(layout);
-
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        gbc.weightx = 1.0;
-        gbc.gridwidth = 2;
-
-        JPanel exRChSub = new JPanel(new FlowLayout());
-        exRChSub.add(new JLabel("Random Weights:"));
-        exRChSub.add(exRandCheck);
-
-        JPanel exR = new JPanel(new BorderLayout());
-        exR.add(exRChSub, BorderLayout.NORTH);
-        exRandPanel.setPreferredSize(new Dimension((int) exSynTypes
-                .getPreferredSize().getWidth(), (int) exRandPanel
-                .getPreferredSize().getHeight()));
-        exRandCheck.setSelected(false);
-        exRandPanel.setEnabled(false);
-        exRandPanel.getTfLowBound().setText("0.1");
-        exR.add(exRandPanel, BorderLayout.SOUTH);
-        exR.setBorder(BorderFactory.createLineBorder(new Color(255, 50, 50)));
-        this.add(exR, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridwidth = 1;
-        this.add(randLink, gbc);
-
-        JPanel inRChSub = new JPanel(new FlowLayout());
-        inRChSub.add(new JLabel("Random Weights:"));
-        inRChSub.add(inRandCheck);
-
-        JPanel inR = new JPanel(new BorderLayout());
-        inR.add(inRChSub, BorderLayout.NORTH);
-        inRandPanel.setPreferredSize(new Dimension((int) inSynTypes
-                .getPreferredSize().getWidth(), (int) inRandPanel
-                .getPreferredSize().getHeight()));
-        inRandCheck.setSelected(false);
-        inRandPanel.setEnabled(false);
-        inRandPanel.getTfUpBound().setText("-0.1");
-        inR.add(inRandPanel, BorderLayout.SOUTH);
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        inR.setBorder(BorderFactory.createLineBorder(new Color(50, 50, 255)));
-        this.add(inR, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        this.add(exSynTypes, gbc);
-        gbc.insets = new Insets(10, 3, 10, 3);
-        exSynTypes.setBackground(new Color(255, 200, 200));
-
-        gbc.gridx = 2;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(3, 3, 3, 3);
-        this.add(typeLink, gbc);
-
-        gbc.gridx = 3;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 3, 10, 3);
-        this.add(inSynTypes, gbc);
-        inSynTypes.setBackground(new Color(200, 200, 255));
-
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+        final Window parent, final Collection<Synapse> synapses) {
+        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent,
+            synapses);
+        spp.initApplyListeners();
+        return spp;
     }
 
     /**
-     * Initializes the the class-variable listeners
+     * 
+     * @param parentWindow
+     * @param synapseGroup
      */
-    private void initializeListeners() {
+    private SynapsePropertiesPanel(final Window parentWindow,
+        final SynapseGroup synapseGroup) {
+        this.synapseGroup = synapseGroup;
+        creationPanel = synapseGroup.isEmpty();
+        templateExcitatorySynapse = synapseGroup.getExcitatoryPrototype();
+        templateInhibitorySynapse = synapseGroup.getInhibitoryPrototype();
+        Set<Synapse> excitatorySynapses;
+        Set<Synapse> inhibitorySynapses;
+        excitatorySynapses = synapseGroup.hasExcitatory()
+            ? synapseGroup.getExcitatorySynapses()
+            : Collections.singleton(synapseGroup.getExcitatoryPrototype());
+        inhibitorySynapses = synapseGroup.hasInhibitory()
+            ? synapseGroup.getInhibitorySynapses()
+            : Collections.singleton(synapseGroup.getInhibitoryPrototype());
+        excitatoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
+        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
+        init();
+    }
 
-        // TODO: Repetitive code within move to an external method, class, etc?
-        exSynListener = new SwitchableActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object selected = exSynTypes.getSelectedItem();
-                if (selected != NULL_STRING && isEnabled()) {
-                    synapsePanel = AbstractSynapsePanel.RULE_MAP.get(exSynTypes
-                            .getSelectedItem());
-                    synapsePanel.fillDefaultValues();
-                    if (!(synapsePanel instanceof StaticSynapsePanel)) {
-                        StandardDialog sdsp = new StandardDialog() {
-                            @Override
-                            protected void closeDialogOk() {
-                                super.closeDialogOk();
-                                synapsePanel.commitChanges(exTemplateSynapse);
-                            }
-                        };
-                        sdsp.setContentPane(synapsePanel);
-                        sdsp.pack();
-                        sdsp.setLocationRelativeTo(inSynTypes);
-                        sdsp.setVisible(true);
-                    } else {
-                        synapsePanel.commitChanges(exTemplateSynapse);
-                    }
-                }
-                if (!typeLink.isLinked()) {
-                    lastExSynTypeEdit = System.nanoTime();
-                } else {
-                    inSynListener.disable();
-                    inSynTypes.setSelectedItem(selected);
-                    synapsePanel.commitChanges(inTemplateSynapse);
-                    inSynListener.enable();
-                }
-            }
-        };
+    /**
+     * 
+     * @param parentWindow
+     * @param synapses
+     */
+    private SynapsePropertiesPanel(final Window parentWindow,
+        final Collection<Synapse> synapses) {
+        synapseGroup = null;
+        templateExcitatorySynapse = Synapse.getTemplateSynapse();
+        templateInhibitorySynapse = Synapse.getTemplateSynapse();
+        creationPanel = synapses.isEmpty();
+        Collection<Synapse> excitatorySynapses = ConnectionUtilities
+            .getExcitatorySynapses(synapses);
+        Collection<Synapse> inhibitorySynapses = ConnectionUtilities
+            .getInhibitorySynapses(synapses);
+        excitatoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
+        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
+        init();
+    }
 
-        inSynListener = new SwitchableActionListener() {
+    private void init() {
+        // Excitatory Border
+        int redShadow = 0;
+        byte bitmask = 0x7F;
+        // RGB: 0x7F, 0, 0
+        redShadow = redShadow | (bitmask << 16);
+        // Color.RED as highlight, redShadow as shadow
+        Border redBorder =
+            BorderFactory.createEtchedBorder(EtchedBorder.LOWERED,
+                Color.RED, new Color(redShadow));
+        Border exBorder = BorderFactory.createTitledBorder(redBorder,
+            "Excitatory");
 
-            public void actionPerformed(ActionEvent e) {
-                Object selected = inSynTypes.getSelectedItem();
-                if (selected != NULL_STRING && isEnabled()) {
-                    synapsePanel = AbstractSynapsePanel.RULE_MAP.get(inSynTypes
-                            .getSelectedItem());
-                    synapsePanel.fillDefaultValues();
-                    if (!(synapsePanel instanceof StaticSynapsePanel)) {
-                        StandardDialog sdsp = new StandardDialog() {
-                            @Override
-                            protected void closeDialogOk() {
-                                super.closeDialogOk();
-                                synapsePanel.commitChanges(inTemplateSynapse);
-                            }
-                        };
-                        sdsp.setContentPane(synapsePanel);
-                        sdsp.pack();
-                        sdsp.setLocationRelativeTo(inSynTypes);
-                        sdsp.setVisible(true);
-                    } else {
-                        synapsePanel.commitChanges(inTemplateSynapse);
-                    }
-                }
+        // Inhibitory Border
+        int blueShadow = 0;
+        // RGB: 0, 0, 0x7F
+        blueShadow = blueShadow | bitmask;
+        Border blueBorder =
+            BorderFactory.createEtchedBorder(EtchedBorder.LOWERED,
+                Color.BLUE, new Color(blueShadow));
+        Border inBorder = BorderFactory.createTitledBorder(blueBorder,
+            "Inhibitory");
 
-                if (!typeLink.isLinked()) {
-                    lastInSynTypeEdit = System.nanoTime();
-                } else {
-                    exSynListener.disable();
-                    exSynTypes.setSelectedItem(selected);
-                    synapsePanel.commitChanges(exTemplateSynapse);
-                    exSynListener.enable();
-                }
-            }
+        // Layout panels
+        BoxLayout bxLayout = new BoxLayout(mainPanel, BoxLayout.X_AXIS);
+        mainPanel.setLayout(bxLayout);
 
-        };
+        Box inBox = Box.createVerticalBox();
+        inBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        inBox.add(inhibitoryInfoPanel);
+        JPanel inApButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        inApButtonPanel.add(inApplyButton);
+        inBox.add(Box.createVerticalGlue());
+        inBox.add(inApButtonPanel);
+        inApButtonPanel.setVisible(!creationPanel);
 
-        randExListener = new SwitchablePropertyChangeListener() {
+        inBox.add(new JPanel());
+        inBox.setBorder(inBorder);
 
+        Box exBox = Box.createVerticalBox();
+        exBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        exBox.add(excitatoryInfoPanel);
+        JPanel exApButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        exApButtonPanel.add(exApplyButton);
+        exBox.add(Box.createVerticalGlue());
+        exBox.add(exApButtonPanel);
+        exApButtonPanel.setVisible(!creationPanel);
+        exBox.add(new JPanel());
+        exBox.setBorder(exBorder);
+
+        mainPanel.add(inBox);
+        mainPanel.add(Box.createHorizontalGlue(), bxLayout);
+        mainPanel.add(Box.createHorizontalStrut(10), bxLayout);
+        mainPanel.add(exBox);
+        this.add(mainPanel);
+
+    }
+
+    private void initApplyListeners() {
+        exApplyButton.addActionListener(new ActionListener() {
             @Override
-            public void propertyChange(PropertyChangeEvent arg0) {
-                if (Double.parseDouble(exRandPanel.getTfLowBound().getText()) < 0.0) {
-                    exRandPanel.getTfLowBound().setText("0.0");
-                }
-                if (Double.parseDouble(exRandPanel.getTfUpBound().getText()) < 0.0) {
-                    exRandPanel.getTfUpBound().setText("0.0");
-                }
-                if (randLink.isLinked() && isEnabled()) {
-                    syncRandExToIn();
-
-                }
-
-                if (!randLink.isLinked()) {
-                    lastExRandEdit = System.nanoTime();
-                }
-            }
-
-        };
-
-        randInListener = new SwitchablePropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent arg0) {
-                if (Double.parseDouble(inRandPanel.getTfUpBound().getText()) > 0.0) {
-                    inRandPanel.getTfUpBound().setText("0.0");
-                }
-                if (Double.parseDouble(inRandPanel.getTfLowBound().getText()) > 0.0) {
-                    inRandPanel.getTfLowBound().setText("0.0");
-                }
-                if (randLink.isLinked() && isEnabled()) {
-                    syncRandInToEx();
-                }
-
-                if (!randLink.isLinked()) {
-                    lastInRandEdit = System.nanoTime();
-                }
-            }
-        };
-
-    }
-
-    /**
-     * Adds listeners to their respective components. NOTE:
-     * initializeListeners() must be called prior to this method.
-     */
-    private void addListeners() {
-        exSynTypes.addActionListener(exSynListener);
-
-        inSynTypes.addActionListener(inSynListener);
-
-        exRandPanel.addPropertyChangeListenerToFields(randExListener);
-
-        inRandPanel.addPropertyChangeListenerToFields(randInListener);
-
-        inRandCheck.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent arg0) {
-                inRandPanel.setEnabled(inRandCheck.isSelected());
-                connection.setEnableInhibitoryRandomization(inRandCheck
-                        .isSelected());
-                if (!randLink.isLinked()) {
-                    lastInRandEdit = System.nanoTime();
+                excitatoryInfoPanel.commitChanges();
+                double exStrength = excitatoryInfoPanel.getStrength();
+                if (!Double.isNaN(exStrength) && synapseGroup != null) {
+                    synapseGroup.setAllExcitatoryStrengths(exStrength);
                 }
             }
         });
-
-        exRandCheck.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent arg0) {
-                exRandPanel.setEnabled(exRandCheck.isSelected());
-                connection.setEnableExcitatoryRandomization(exRandCheck
-                        .isSelected());
-                if (!randLink.isLinked()) {
-                    lastExRandEdit = System.nanoTime();
+        inApplyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                inhibitoryInfoPanel.commitChanges();
+                double inStrength = inhibitoryInfoPanel.getStrength();
+                if (!Double.isNaN(inStrength) && synapseGroup != null) {
+                    synapseGroup.setAllInhibitoryStrengths(inStrength);
                 }
             }
         });
-
-        typeLink = new LinkIcon(false) {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                changeState();
-                if (isLinked()) {
-                    if (lastExSynTypeEdit < lastInSynTypeEdit) {
-                        inSynListener.actionPerformed(null);
-                    } else {
-                        exSynListener.actionPerformed(null);
-                    }
-
-                }
-            }
-        };
-
-        randLink = new LinkIcon(false) {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                changeState();
-                if (isLinked()) {
-                    if (lastExRandEdit < lastInRandEdit) {
-                        syncRandInToEx();
-                    } else {
-                        syncRandExToIn();
-                    }
-                }
-            }
-        };
     }
 
     /**
-     * Copies field values from the excitatory random panel to the inhibitory
-     * random panel.
+     * {@inheritDoc}
      */
-    private void syncRandExToIn() {
-        Randomizer dummy = new Randomizer();
-        exRandPanel.commitRandom(dummy);
-        randInListener.disable();
-//        inRandPanel.fillFieldValues(dummy.mirrorCopy());
-        inRandCheck.setSelected(exRandCheck.isSelected());
-        inRandPanel.setEnabled(exRandCheck.isSelected());
-        randInListener.enable();
+    public boolean commitChanges() {
+        boolean success = true;
+        success &= excitatoryInfoPanel.commitChanges();
+        success &= inhibitoryInfoPanel.commitChanges();
+        return success;
     }
 
     /**
-     * Copies field values from the inhibitory random panel to the excitatory
-     * random panel.
+     * Does nothing. This panel contains two CombinedSynapseInfo panels, both of
+     * which call their own fillFieldValues() method in their constructors.
+     * Since there are no fields outside these panels in this panel
      */
-    private void syncRandInToEx() {
-        Randomizer dummy = new Randomizer();
-        inRandPanel.commitRandom(dummy);
-        randExListener.disable();
-//        exRandPanel.fillFieldValues(dummy.mirrorCopy());
-        exRandCheck.setSelected(inRandCheck.isSelected());
-        exRandPanel.setEnabled(inRandCheck.isSelected());
-        randExListener.enable();
-    }
-
-    /**
-     * Set default values.
-     */
+    @Override
     public void fillFieldValues() {
-        inRandPanel.fillFieldValues(connection.getInhibitoryRandomizer());
-        exRandPanel.fillFieldValues(connection.getExcitatoryRandomizer());
     }
 
-    /**
-     * Fills fields with values from a pre-existing connect neurons object. This
-     * panel's connection variable is set to the new connect neurons object by
-     * this method.
-     *
-     * @param connection the connection from which field values are derived.
-     */
-    public void fillFieldValues(ConnectNeurons connection) {
-
-        randExListener.disable();
-        randInListener.disable();
-        exSynListener.disable();
-        inSynListener.disable();
-
-        resetLinks();
-        this.connection = connection;
-        exRandPanel.fillFieldValues(connection.getExcitatoryRandomizer());
-        inRandPanel.fillFieldValues(connection.getInhibitoryRandomizer());
-
-        exSynTypes.setSelectedItem(connection.getBaseExcitatorySynapse()
-                .getLearningRule().getDescription());
-        inSynTypes.setSelectedItem(connection.getBaseInhibitorySynapse()
-                .getLearningRule().getDescription());
-
-        randExListener.enable();
-        randInListener.enable();
-        exSynListener.enable();
-        inSynListener.enable();
-
-    }
-
-    /**
-     * Resets the links and all associated timers to an un-linked and zeroed
-     * state.
-     */
-    public void resetLinks() {
-        lastInSynTypeEdit = 0L;
-        lastExSynTypeEdit = 0L;
-        lastExRandEdit = 0L;
-        lastInRandEdit = 0L;
-        randLink.setState(false);
-        typeLink.setState(false);
-    }
-
-    /**
-     * Committs the changes made to this panel to the connection object.
-     */
-    public void commitChanges() {
-        connection.setBaseExcitatorySynapse(exTemplateSynapse);
-        connection.setBaseInhibitorySynapse(inTemplateSynapse);
-        connection.setEnableInhibitoryRandomization(inRandCheck.isSelected());
-        connection.setEnableExcitatoryRandomization(exRandCheck.isSelected());
-        if (exRandCheck.isSelected())
-            exRandPanel.commitRandom(connection.getExcitatoryRandomizer());
-        if (inRandCheck.isSelected())
-            inRandPanel.commitRandom(connection.getInhibitoryRandomizer());
-    }
-
-    /**
-     * Test main: for rapid prototyping
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        Sparse s = new Sparse();
-        SynapsePropertiesPanel span = new SynapsePropertiesPanel(s);
-        JFrame frame = new JFrame();
-        frame.setContentPane(span);
-
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
+    @Override
+    public JPanel getPanel() {
+        return mainPanel;
     }
 
 }

@@ -35,6 +35,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -65,7 +67,7 @@ public class TestInputPanel extends JPanel {
     private JButton advance;
 
     /** The training input data. */
-    private double[][] data;
+    private NumericMatrix dataHolder;
 
     /**
      * This is the network that should be updated whenever the input neurons are
@@ -76,11 +78,15 @@ public class TestInputPanel extends JPanel {
     /** The nodes to test. */
     private List<Neuron> inputNeurons;
 
-    /** Reference to table holding numeric data. */
-    private NumericTable numericTable;
+    /**
+     * Temporary data for case where input panel does not read stored data but
+     * simply creates temporary data.
+     */
+    private double[][] tempDataMatrix;
 
     /**
-     * Construct panel using a network panel and a list of selected neurons.
+     * Construct panel using a network panel and a list of selected neurons. No
+     * data holder is provided.
      *
      * @param networkPanel networkPanel, must not be null
      * @param inputNeurons input neurons of the network to be tested
@@ -92,26 +98,41 @@ public class TestInputPanel extends JPanel {
 
         this.networkPanel = networkPanel;
         this.inputNeurons = inputNeurons;
+        tempDataMatrix = SimbrainMath.zeroMatrix(5,
+                inputNeurons.size());
+        this.dataHolder = new NumericMatrix() {
+
+            @Override
+            public void setData(double[][] data) {
+                tempDataMatrix = data;
+            }
+
+            @Override
+            public double[][] getData() {
+                return tempDataMatrix;
+            }
+
+        };
         initTestInputPanel();
     }
 
     /**
-     * Construct panel using data as default input data.
+     * Construct the panel using a reference to a class that has a double array.
+     * Changes to the table will change the data in that class.
      *
      * @param networkPanel networkPanel, must not be null
      * @param inputNeurons input neurons of the network to be tested
-     * @param data input data to test
+     * @param dataHolder the class whose data should be edited.
      */
-
     public TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
-            double[][] data) {
+            NumericMatrix dataHolder) {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
         this.inputNeurons = inputNeurons;
-        this.data = data;
+        this.dataHolder = dataHolder;
         initTestInputPanel();
     }
 
@@ -120,11 +141,7 @@ public class TestInputPanel extends JPanel {
      */
     private void initTestInputPanel() {
         network = networkPanel.getNetwork();
-        numericTable = new NumericTable(5, inputNeurons.size());
-        if (data != null) {
-            numericTable.setData(data);
-        }
-        table = new SimbrainJTable(numericTable);
+        table = new SimbrainJTable(new DataTable());
         ((NumericTable) table.getData()).setIterationMode(iterationMode);
         // Set up column headings
         List<String> colHeaders = new ArrayList<String>();
@@ -293,9 +310,72 @@ public class TestInputPanel extends JPanel {
      * @param data the data to set
      */
     public void setData(double[][] data) {
-        this.data = data;
         if (data != null) {
-            numericTable.setData(data);
+            ((NumericTable) table.getData()).setData(data);
+        }
+    }
+
+    /**
+     * Matrix of synapses to be viewed in a SimbrainJTable.
+     */
+    private class DataTable extends NumericTable {
+
+        /**
+         * Construct the data table.
+         */
+        private DataTable() {
+            //TODO: Move below to check method and use throughout
+            if (dataHolder.getData() == null) {
+                reset(5, inputNeurons.size());
+            }
+        }
+
+        @Override
+        public void setValue(final int row, final int col, final Double value,
+                final boolean fireEvent) {
+            dataHolder.getData()[row][col] = value;
+            if (fireEvent) {
+                fireTableDataChanged();
+            }
+        }
+
+        @Override
+        public void setValue(int row, int col, Double value) {
+            setValue(row, col, value, true);
+        }
+
+        @Override
+        public Double getValue(int row, int col) {
+            return dataHolder.getData()[row][col];
+
+        }
+
+        @Override
+        public void reset(int rows, int cols) {
+            dataHolder.setData(SimbrainMath.zeroMatrix(rows, cols));
+            fireTableStructureChanged();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return inputNeurons.size();
+        }
+
+        @Override
+        public int getRowCount() {
+            return dataHolder.getData().length;
+        }
+
+        @Override
+        public void insertRow(int at) {
+            System.out.println("insert row at " + at );
+            //TODO.
+        }
+
+        @Override
+        public void removeRow(int at) {
+            System.out.println("remove row at " + at );
+            //TODO.
         }
 
     }

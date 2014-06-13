@@ -36,6 +36,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
@@ -46,6 +47,7 @@ import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -79,6 +81,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     /** Panel for specific group types. Null for bare neuron group. */
     private EditablePanel specificNeuronGroupPanel;
+
+    /** Panel for editing test input data for this group. */
+    private TestInputPanel inputDataPanel;
 
     /**
      * The neuron group panel containing both a basic neuron info panel and a
@@ -220,6 +225,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             public void fillFieldValues() {
             }
         });
+
     }
 
     /**
@@ -276,6 +282,28 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         }
         tabbedPane.addTab("Neurons", new JPanel()); // Holder
         tabbedPane.addTab("Layout", new JPanel()); // Holder
+
+        if (!isCreationPanel) {
+            NumericMatrix matrix = new NumericMatrix() {
+
+                @Override
+                public void setData(double[][] data) {
+                    neuronGroup.setTestData(data);
+                }
+
+                @Override
+                public double[][] getData() {
+                    return neuronGroup.getTestData();
+                }
+            };
+            inputDataPanel = new TestInputPanel(
+                    networkPanel, neuronGroup.getNeuronList(), matrix);
+            storedComponents.add(inputDataPanel);
+            tabbedPane.addTab("Input Data", new JPanel()); // Holder            
+        }
+
+
+
         add(BorderLayout.CENTER, tabbedPane);
 
         if (parent instanceof StandardDialog) {

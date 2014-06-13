@@ -93,25 +93,8 @@ public final class ReaderWorld extends TextWorld {
      */
     public static ReaderWorld createReaderWorld() {
         final ReaderWorld r = new ReaderWorld();
-        r.initListeners();
-        return r;
-    }
-    /**
-     * Constructs an instance of TextWorld.
-     */
-    private ReaderWorld() {
-        // Set whitespace as default delimeter
-        setDelimeter("\\s");
-        resetMatcher();
-    }
-
-    /**
-     * Init the listeners, called by factor method, outside the constructor.
-     */
-    private void initListeners() {
-
         // Text Listener
-        this.addListener(new TextListener() {
+        r.addListener(new TextListener() {
 
             public void textChanged() {
                 // System.out.println("In textchanged");
@@ -132,15 +115,15 @@ public final class ReaderWorld extends TextWorld {
         });
         return r;
     }
-
     /**
      * Constructs an instance of TextWorld.
      */
-    public ReaderWorld() {
+    private ReaderWorld() {
         // Set whitespace as default delimeter
         setDelimeter("\\s");
         resetMatcher();
     }
+
 
     /**
      * Reset the parser and specify the region focused on by it, to go from the

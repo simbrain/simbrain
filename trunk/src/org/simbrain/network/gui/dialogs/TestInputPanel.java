@@ -98,8 +98,7 @@ public class TestInputPanel extends JPanel {
 
         this.networkPanel = networkPanel;
         this.inputNeurons = inputNeurons;
-        tempDataMatrix = SimbrainMath.zeroMatrix(5,
-                inputNeurons.size());
+        tempDataMatrix = new double[5][inputNeurons.size()];
         this.dataHolder = new NumericMatrix() {
 
             @Override
@@ -352,7 +351,7 @@ public class TestInputPanel extends JPanel {
 
         @Override
         public void reset(int rows, int cols) {
-            dataHolder.setData(SimbrainMath.zeroMatrix(rows, cols));
+            dataHolder.setData(new double[rows][cols]);
             fireTableStructureChanged();
         }
 

@@ -66,7 +66,7 @@ public final class AddSmellSourceAction extends AbstractAction {
                 .showInputDialog("How many dimensions will the smell vector have?");
         if (dimension != null) {
             int dims = Integer.parseInt(dimension);
-            entity.setSmellSource(new SmellSource(SimbrainMath.zeroVector(dims)));
+            entity.setSmellSource(new SmellSource(new double[dims]));
         }
     }
 

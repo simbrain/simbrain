@@ -75,41 +75,6 @@ public class SimbrainMath {
     }
 
     /**
-     * Creates an array of doubles set to zero.
-     *
-     * @param size size of vector to create
-     *
-     * @return the array of zeros.
-     */
-    public static double[] zeroVector(final int size) {
-        double[] ret = new double[size];
-
-        for (int i = 0; i < size; i++) {
-            ret[i] = 0;
-        }
-
-        return ret;
-    }
-
-    /**
-     * Creates a matrix of doubles (a 2-d array ) set to 0.
-     *
-     * @param rows number of rows.
-     * @param cols number of columns
-     * @return the zero matrix.
-     */
-    public static double[][] zeroMatrix(int rows, int cols) {
-        double[][] ret = new double[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                ret[i][j] = 0;
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Returns a random permutation of all the integers between floor
      * (inclusive) and ceil (exclusive).
      *

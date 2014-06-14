@@ -103,9 +103,9 @@ public class RandomizerPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
         cardPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+        add(cardPanel, BorderLayout.CENTER);
         add(new LabelledItem("Distribution: ", cbDistribution),
             BorderLayout.NORTH);
-        add(cardPanel, BorderLayout.CENTER);
         repaint();
         revalidate();
     }

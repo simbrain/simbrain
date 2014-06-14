@@ -529,23 +529,24 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
          */
         private void init() {
             randomizerPanel.fillFieldValues(randomizer);
+            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            Border colorBorder = BorderFactory.createLineBorder(Polarity
+                .EXCITATORY.equals(polarity) ? Color.red : Color.blue);
+            this.setBorder(BorderFactory.createTitledBorder(colorBorder,
+                polarity.title()));
 
             Box topPanel = Box.createHorizontalBox();
             topPanel.add(new JLabel("Weight Randomizer"));
             topPanel.add(Box.createHorizontalGlue());
+            topPanel.add(Box.createHorizontalStrut(15));
             topPanel.add(enableStatusTriangle);
-            topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             enableStatusTriangle.setVisible(creationPanel);
+            this.add(topPanel);
 
-            Border colorBorder = BorderFactory.createLineBorder(Polarity
-                .EXCITATORY.equals(polarity) ? Color.red : Color.blue);
-            this.setLayout(new BorderLayout());
-            Dimension rd = new Dimension(randomizerPanel.getPreferredSize()
-                .width - 40, topPanel.getPreferredSize().height);
-            topPanel.setPreferredSize(rd);
-            this.add(topPanel, BorderLayout.NORTH);
             randomizerPanel.setVisible(enableStatusTriangle.isDown());
-            this.add(randomizerPanel, BorderLayout.CENTER);
+            this.add(randomizerPanel);
+
             if (!creationPanel) {
                 JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout
                     .RIGHT));
@@ -553,10 +554,9 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
                 bottomPanel.setPreferredSize(new Dimension(randomizerPanel
                     .getPreferredSize().width,
                     bottomPanel.getPreferredSize().height));
-                this.add(bottomPanel, BorderLayout.SOUTH);
+                this.add(bottomPanel);
             }
-            this.setBorder(BorderFactory.createTitledBorder(colorBorder,
-                polarity.title()));
+
         }
 
         /**

@@ -60,10 +60,10 @@ import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSerie
 public class HistogramPanel extends JPanel {
 
     /** The default preferred height. */
-    private static final int DEFAULT_PREF_HEIGHT = 400;
+    private static final int DEFAULT_PREF_HEIGHT = 300;
 
     /** The default preferred width. */
-    private static final int DEFAULT_PREF_WIDTH = 600;
+    private static final int DEFAULT_PREF_WIDTH = 400;
 
     /** The preferred dimensions of the histogram. */
     private Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH,

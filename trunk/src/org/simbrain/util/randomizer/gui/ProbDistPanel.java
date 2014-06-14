@@ -44,7 +44,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 public class ProbDistPanel {
 
     /** The default number of spaces given to each text field. */
-    private static final int DEFAULT_TF_SIZE = 20;
+    private static final int DEFAULT_TF_SIZE = 10;
 
     /** Upper bound field. */
     private JTextField tfUpBound = new JTextField(DEFAULT_TF_SIZE);

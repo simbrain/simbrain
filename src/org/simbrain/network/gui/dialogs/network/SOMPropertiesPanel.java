@@ -35,13 +35,13 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
  * Self organizing map.
- *
+ * 
  */
 public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
     EditablePanel {
 
     // TODO: This class takes care of SOM network and group. Not sure that's
-    // good.  Some things are conflated, e.g. help page.
+    // good. Some things are conflated, e.g. help page.
 
     /** Default number of neurons. */
     private static final int DEFAULT_NUM_SOM_NEURONS = 16;
@@ -92,13 +92,15 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for the case where an som group is being created.
-     *
-     * @param np parent network panel
-     * @param panelType whether this is a network or group creation panel. Edit
-     *            is not an acceptable argument.
+     * 
+     * @param np
+     *            parent network panel
+     * @param panelType
+     *            whether this is a network or group creation panel. Edit is not
+     *            an acceptable argument.
      */
     public SOMPropertiesPanel(final NetworkPanel np,
-            final SOMPropsPanelType panelType) {
+        final SOMPropsPanelType panelType) {
         // TODO Error if paneltype is edit
         this.networkPanel = np;
         this.panelType = panelType;
@@ -117,9 +119,11 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for case where an existing som group is being edited.
-     *
-     * @param np parent network panel
-     * @param som network being modified.
+     * 
+     * @param np
+     *            parent network panel
+     * @param som
+     *            network being modified.
      */
     public SOMPropertiesPanel(final NetworkPanel np, final SOMGroup som) {
         this.networkPanel = np;
@@ -137,7 +141,7 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
         mainPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
         mainPanel
-        .addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+            .addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
         add(mainPanel);
     }
 
@@ -146,11 +150,12 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
         // For creation panels use an "empty" som network to harvest
         // default values
         if (panelType == SOMPropsPanelType.CREATE_GROUP) {
-            som = new SOMGroup(null, 1);
+            som = new SOMGroup(networkPanel.getNetwork(), 1);
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             fillSOMGroupFieldValues();
         } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-            som = new SOMNetwork(null, 1, 1, networkPanel.getWhereToAdd());
+            som = new SOMNetwork(networkPanel.getNetwork(), 1, 1,
+                networkPanel.getWhereToAdd());
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);
             fillSOMNetworkFieldValues();
@@ -165,11 +170,11 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
     private void fillSOMGroupFieldValues() {
         tfAlpha.setText(Double.toString(((SOMGroup) som).getInitAlpha()));
         tfInitNeighborhoodSize.setText(Double.toString(((SOMGroup) som)
-                .getInitNeighborhoodSize()));
+            .getInitNeighborhoodSize()));
         tfAlphaDecayRate.setText(Double.toString(((SOMGroup) som)
-                .getAlphaDecayRate()));
+            .getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Double.toString(((SOMGroup) som)
-                .getNeighborhoodDecayAmount()));
+            .getNeighborhoodDecayAmount()));
 
     }
 
@@ -178,13 +183,13 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
      */
     private void fillSOMNetworkFieldValues() {
         tfAlpha.setText(Double.toString(((SOMNetwork) som).getSom()
-                .getInitAlpha()));
+            .getInitAlpha()));
         tfInitNeighborhoodSize.setText(Double.toString(((SOMNetwork) som)
-                .getSom().getInitNeighborhoodSize()));
+            .getSom().getInitNeighborhoodSize()));
         tfAlphaDecayRate.setText(Double.toString(((SOMNetwork) som).getSom()
-                .getAlphaDecayRate()));
+            .getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Double.toString(((SOMNetwork) som)
-                .getSom().getNeighborhoodDecayAmount()));
+            .getSom().getNeighborhoodDecayAmount()));
 
     }
 
@@ -196,13 +201,13 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
         try {
             if (panelType == SOMPropsPanelType.CREATE_GROUP) {
                 som = new SOMGroup(networkPanel.getNetwork(),
-                        Integer.parseInt(tfNumSOMNeurons.getText()));
+                    Integer.parseInt(tfNumSOMNeurons.getText()));
                 commitSOMGroupFieldValues();
             } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
                 som = new SOMNetwork(networkPanel.getNetwork(),
-                        Integer.parseInt(tfNumSOMNeurons.getText()),
-                        Integer.parseInt(tfNumInputNeurons.getText()),
-                        networkPanel.getWhereToAdd());
+                    Integer.parseInt(tfNumSOMNeurons.getText()),
+                    Integer.parseInt(tfNumInputNeurons.getText()),
+                    networkPanel.getWhereToAdd());
                 commitSOMNetworkFieldValues();
             } else if (panelType == SOMPropsPanelType.EDIT_GROUP) {
                 commitSOMGroupFieldValues();
@@ -219,11 +224,11 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
     private void commitSOMGroupFieldValues() {
         ((SOMGroup) som).setInitAlpha(Double.parseDouble(tfAlpha.getText()));
         ((SOMGroup) som).setInitNeighborhoodSize(Double
-                .parseDouble(tfInitNeighborhoodSize.getText()));
+            .parseDouble(tfInitNeighborhoodSize.getText()));
         ((SOMGroup) som).setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate
-                .getText()));
+            .getText()));
         ((SOMGroup) som).setNeighborhoodDecayAmount(Double
-                .parseDouble(tfNeigborhoodDecayAmount.getText()));
+            .parseDouble(tfNeigborhoodDecayAmount.getText()));
 
     }
 
@@ -232,13 +237,13 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
      */
     private void commitSOMNetworkFieldValues() {
         ((SOMNetwork) som).getSom().setInitAlpha(
-                Double.parseDouble(tfAlpha.getText()));
+            Double.parseDouble(tfAlpha.getText()));
         ((SOMNetwork) som).getSom().setInitNeighborhoodSize(
-                Double.parseDouble(tfInitNeighborhoodSize.getText()));
+            Double.parseDouble(tfInitNeighborhoodSize.getText()));
         ((SOMNetwork) som).getSom().setAlphaDecayRate(
-                Double.parseDouble(tfAlphaDecayRate.getText()));
+            Double.parseDouble(tfAlphaDecayRate.getText()));
         ((SOMNetwork) som).getSom().setNeighborhoodDecayAmount(
-                Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
+            Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
     }
 
     /**

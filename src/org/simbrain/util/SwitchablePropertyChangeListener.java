@@ -3,9 +3,9 @@ package org.simbrain.util;
 import java.beans.PropertyChangeListener;
 
 public abstract class SwitchablePropertyChangeListener implements
-        PropertyChangeListener {
+    PropertyChangeListener {
 
-    private boolean enabled = true;
+    private volatile boolean enabled = true;
 
     public void enable() {
         enabled = true;

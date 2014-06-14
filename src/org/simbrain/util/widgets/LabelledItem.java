@@ -32,9 +32,11 @@ public class LabelledItem extends JPanel {
 
     /**
      * Construct the labelled item.
-     *
-     * @param labelText the text for the label
-     * @param component the labelled component
+     * 
+     * @param labelText
+     *            the text for the label
+     * @param component
+     *            the labelled component
      */
     public LabelledItem(String labelText, JComponent component) {
         Box itemBox = Box.createHorizontalBox();
@@ -44,7 +46,6 @@ public class LabelledItem extends JPanel {
         itemBox.add(label);
         itemBox.add(Box.createHorizontalStrut(10));
         itemBox.add(Box.createHorizontalGlue());
-        component.setPreferredSize(new Dimension(110, 25));
         itemBox.add(component);
         add(itemBox);
     }

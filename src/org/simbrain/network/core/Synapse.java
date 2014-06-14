@@ -128,7 +128,8 @@ public class Synapse {
      * @param learningRule
      *            update rule for this synapse
      */
-    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule) {
+    public Synapse(Neuron source, Neuron target,
+        SynapseUpdateRule learningRule) {
         setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         if (source != null) {
@@ -271,6 +272,12 @@ public class Synapse {
         return source;
     }
 
+    /**
+     * Sets the source and target neurons simultaneously.
+     * 
+     * @param source
+     * @param target
+     */
     private void setSourceAndTarget(final Neuron source, final Neuron target) {
         if (this.source != null) {
             this.source.removeEfferent(this);

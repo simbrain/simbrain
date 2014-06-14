@@ -25,8 +25,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -40,7 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -51,6 +51,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
+import org.simbrain.util.SwitchableChangeListener;
+import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
 
 /**
@@ -96,6 +98,12 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * committed.
      */
     private DensityBasedConnector connection;
+
+    private SwitchablePropertyChangeListener densityTfListener;
+
+    private SwitchablePropertyChangeListener synsPerSourceListener;
+
+    private SwitchableChangeListener sliderListener;
 
     /**
      * The number of target neurons being connected to. Used for determining the
@@ -181,6 +189,9 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * Initializes the panel's layout
      */
     private void initializeLayout() {
+        densityTfListener.disable();
+        synsPerSourceListener.disable();
+        sliderListener.disable();
         // Create label/text field combo panels for:
         // Connection Density
         // Equalize Efferents
@@ -242,6 +253,9 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         gbc.anchor = GridBagConstraints.NORTHEAST;
         this.add(allowSelfConnectPanel, gbc);
 
+        densityTfListener.enable();
+        synsPerSourceListener.enable();
+        sliderListener.enable();
     }
 
     /**
@@ -268,58 +282,111 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private void addChangeListeners() {
 
-        connectionDensitySlider.addChangeListener(new ChangeListener() {
-
+        // Slider
+        sliderListener = new SwitchableChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                if (source == connectionDensitySlider) {
-                    if (!consistentValues()) {
-                        int nt = allowSelfConnect ? numTargs : numTargs - 1;
-                        double val =
-                            (double) (connectionDensitySlider.getValue()) / 100;
-                        densityTf.setValue(new Double(val));
-                        int sps = (int) (val * nt);
-                        synsPerSource.setValue(new Integer(sps));
+                if (source == connectionDensitySlider && isEnabled()) {
+                    densityTfListener.disable();
+                    synsPerSourceListener.disable();
+                    int nt = allowSelfConnect || !recurrentConnection
+                        ? numTargs : numTargs - 1;
+                    double val =
+                        (double) (connectionDensitySlider.getValue()) / 100;
+                    densityTf.setValue(new Double(val));
+                    int sps = (int) (val * nt);
+                    synsPerSource.setValue(new Integer(sps));
+                }
+            }
+        };
+        connectionDensitySlider.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                sliderListener.enable();
+            }
 
+            @Override
+            public void focusLost(FocusEvent e) {
+                sliderListener.disable();
+            }
+        });
+        connectionDensitySlider.addChangeListener(sliderListener);
+
+        // Equalized efferent number (Synapses per source)
+        synsPerSourceListener = new SwitchablePropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (isEnabled() && evt.getSource() == synsPerSource) {
+                    densityTfListener.disable();
+                    sliderListener.disable();
+                    int nt =
+                        allowSelfConnect
+                            || !recurrentConnection ? numTargs
+                            : numTargs - 1;
+                    int sps = (int) Integer.parseInt(synsPerSource.getText());
+                    densityTf.setValue(new Double((double) sps / nt));
+                    int sVal =
+                        (int) (((Number) densityTf
+                            .getValue()).doubleValue() * 100);
+                    connectionDensitySlider
+                        .setValue(new Integer(sVal));
+                }
+            }
+        };
+        synsPerSource.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent arg0) {
+                synsPerSourceListener.enable();
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                synsPerSourceListener.disable();
+            }
+        });
+
+        synsPerSource.addPropertyChangeListener(synsPerSourceListener);
+
+        // Overall density
+        densityTfListener = new SwitchablePropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getSource() == densityTf && isEnabled()) {
+                    sliderListener.disable();
+                    synsPerSourceListener.disable();
+                    int sps;
+                    int nt =
+                        allowSelfConnect ? numTargs
+                            : numTargs - 1;
+                    if (densityTf.getValue() != null) {
+                        sps =
+                            (int) (((Number) densityTf
+                                .getValue()).doubleValue() * nt);
+                        synsPerSource.setValue(new Integer(sps));
+                        int sVal =
+                            (int) (((Number) densityTf
+                                .getValue()).doubleValue() * 100);
+                        connectionDensitySlider
+                            .setValue(new Integer(sVal));
                     }
                 }
             }
+        };
+        densityTf.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                densityTfListener.enable();
+            }
 
+            @Override
+            public void focusLost(FocusEvent e) {
+                densityTfListener.disable();
+            }
         });
+        densityTf.addPropertyChangeListener(densityTfListener);
 
-        synsPerSource.addPropertyChangeListener("value",
-            new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent arg0) {
-                    resetSynsPerSource();
-                }
-            });
-
-        densityTf.addPropertyChangeListener("value",
-            new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getSource() == densityTf) {
-                        int sps;
-                        if (!consistentValues()) {
-                            int nt =
-                                allowSelfConnect ? numTargs
-                                    : numTargs - 1;
-                            if (densityTf.getValue() != null) {
-                                sps =
-                                    (int) (((Number) densityTf
-                                        .getValue()).doubleValue() * nt);
-                                synsPerSource.setValue(new Integer(sps));
-                                int sVal =
-                                    (int) (((Number) densityTf
-                                        .getValue()).doubleValue() * 100);
-                                connectionDensitySlider
-                                    .setValue(new Integer(sVal));
-                            }
-                        }
-                    }
-                }
-            });
     }
 
     /**
@@ -347,63 +414,21 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 allowSelfConnect = allowSelfConnectChkBx.isSelected();
-                resetSynsPerSource();
+
+                densityTfListener.disable();
+                sliderListener.disable();
+                synsPerSourceListener.disable();
+
+                int nt =
+                    allowSelfConnect
+                        || !recurrentConnection ? numTargs
+                        : numTargs - 1;
+                double sparsity = Double.parseDouble(densityTf.getText());
+                synsPerSource.setValue(new Integer((int) (sparsity * nt)));
+
             }
         });
 
-    }
-
-    /**
-     * Resets the synapses per source text field. Particularly useful when the
-     * self-connect preferences are changed, or in any case where other
-     * components change in ways that should effect the synsPerSource field.
-     */
-    private void resetSynsPerSource() {
-        double sparse;
-        if (!consistentValues()) {
-            int nt =
-                allowSelfConnect
-                    || !recurrentConnection ? numTargs
-                    : numTargs - 1;
-            if (synsPerSource != null) {
-                sparse =
-                    ((Number) synsPerSource.getValue())
-                        .doubleValue()
-                        / nt;
-                densityTf.setValue(new Double(sparse));
-                int sVal = (int) (sparse * 100);
-                connectionDensitySlider
-                    .setValue(new Integer(sVal));
-            }
-        }
-    }
-
-    /**
-     * Checks if all values in the text fields and sliders are consistent. Used
-     * to prevent infinite listener loops. TODO: Replace with switchable
-     * (Simbrain Utils) listeners/ investigate event source issue
-     * 
-     * @return true or false: are the values in the fields consistent?
-     */
-    private boolean consistentValues() {
-        int spVal = (int) (Double.parseDouble(densityTf.getText()) * 100);
-        if (spVal > 100) {
-            densityTf.setText("1.0");
-            spVal = 100;
-        }
-        if (spVal < 0) {
-            densityTf.setText("0");
-            spVal = 0;
-        }
-        int trueNumTargs = allowSelfConnect || !recurrentConnection ? numTargs
-            : numTargs - 1;
-        int spsVal =
-            (int) (100 * Double.parseDouble(densityTf.getText())
-            / trueNumTargs);
-
-        int slideVal = connectionDensitySlider.getValue();
-
-        return slideVal == spsVal && spsVal == spVal;
     }
 
     /**
@@ -419,11 +444,11 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     public void fillFieldValues(ConnectNeurons connection_) {
         this.connection = (DensityBasedConnector) connection_;
         double connectivity = connection.getConnectionDensity();
-        densityTf.setValue(connectivity);
         equalizeEfferentsChkBx
             .setSelected(connection.isSelfConnectionAllowed());
         synsPerSource.setValue((int) (connectivity * numTargs));
         connectionDensitySlider.setValue((int) (connectivity * 100));
+        densityTf.setValue(connectivity);
     }
 
     /**
@@ -468,11 +493,13 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     public void allToAllView() {
         connectionDensitySlider.setValue(100);
+        allowSelfConnectChkBx.setSelected(true);
+        allowSelfConnect = true;
         connectionDensitySlider.setEnabled(false);
         equalizeEfferentsChkBx.setSelected(true);
         equalizeEfferentsChkBx.setEnabled(false);
         synsPerSource.setEditable(false);
-        allowSelfConnectChkBx.setSelected(true);
+        densityTf.setEnabled(false);
     }
 
     public boolean isRecurrentConnection() {

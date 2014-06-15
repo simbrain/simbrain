@@ -150,11 +150,11 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
         // For creation panels use an "empty" som network to harvest
         // default values
         if (panelType == SOMPropsPanelType.CREATE_GROUP) {
-            som = new SOMGroup(networkPanel.getNetwork(), 1);
+            som = new SOMGroup(null, 1);
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             fillSOMGroupFieldValues();
         } else if (panelType == SOMPropsPanelType.CREATE_NETWORK) {
-            som = new SOMNetwork(networkPanel.getNetwork(), 1, 1,
+            som = new SOMNetwork(null, 1, 1,
                 networkPanel.getWhereToAdd());
             tfNumSOMNeurons.setText("" + DEFAULT_NUM_SOM_NEURONS);
             tfNumInputNeurons.setText("" + DEFAULT_NUM_INPUT_NEURONS);

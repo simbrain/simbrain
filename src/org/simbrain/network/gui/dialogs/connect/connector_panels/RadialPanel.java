@@ -36,6 +36,7 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
  * TODO: Currently not implemented pending refactor of Radial.java
  * 
  */
+@SuppressWarnings("serial")
 public class RadialPanel extends AbstractConnectionPanel {
 
     /** Excitatory Probability. */
@@ -158,9 +159,10 @@ public class RadialPanel extends AbstractConnectionPanel {
     }
 
     @Override
-    public void commitChanges(List<Neuron> source, List<Neuron> target) {
+    public List<Synapse>
+        commitChanges(List<Neuron> source, List<Neuron> target) {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
     @Override

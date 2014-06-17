@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.dialogs.connect.ExcitatoryInhibitoryRatioPanel;
+import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel.SynapseView;
 import org.simbrain.plot.histogram.HistogramModel;
 import org.simbrain.plot.histogram.HistogramPanel;
@@ -80,7 +80,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      * The panel governing the percent excitatory connections and the randomizer
      * associated with each polarity.
      */
-    private final ExcitatoryInhibitoryRatioPanel excitatoryPercentPanel;
+    private final SynapsePolarityAndRandomizerPanel excitatoryPercentPanel;
 
     /** The synapse group being displayed/edited. */
     private final SynapseGroup synapseGroup;
@@ -114,8 +114,8 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         histogramPanel.setEnabled(!creationPanel);
         statPanel.update();
         statPanel.setEnabled(!creationPanel);
-        excitatoryPercentPanel = new ExcitatoryInhibitoryRatioPanel(parent,
-            synapseGroup);
+        excitatoryPercentPanel = SynapsePolarityAndRandomizerPanel
+            .createPolarityRatioPanel(parent, synapseGroup);
         init();
     }
 

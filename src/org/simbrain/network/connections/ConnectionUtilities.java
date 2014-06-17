@@ -123,7 +123,7 @@ public class ConnectionUtilities {
         Collection<Synapse> synapses, PolarizedRandomizer exciteRand) {
         checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
         for (Synapse s : synapses) {
-            if (s.getSource().getPolarity().equals(Polarity.EXCITATORY)
+            if (Polarity.EXCITATORY.equals(s.getSource().getPolarity())
                 || s.getStrength() > 0) {
                 s.setStrength(exciteRand != null ? exciteRand.getRandom()
                     : DEFAULT_EXCITATORY_STRENGTH);
@@ -160,7 +160,7 @@ public class ConnectionUtilities {
         Collection<Synapse> synapses, PolarizedRandomizer inhibRand) {
         checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
         for (Synapse s : synapses) {
-            if (s.getSource().getPolarity().equals(Polarity.INHIBITORY)
+            if (Polarity.INHIBITORY.equals(s.getSource().getPolarity())
                 || s.getStrength() < 0) {
                 s.setStrength(inhibRand != null ? inhibRand.getRandom()
                     : DEFAULT_INHIBITORY_STRENGTH);
@@ -264,6 +264,60 @@ public class ConnectionUtilities {
                         / (double) remaining;
                 }
                 remaining--;
+            }
+        }
+    }
+
+    /**
+     * Makes the synapses in the given collection conform to the parameters of
+     * the given template synapses, which are essentially information ferries.
+     * Throws an exception if the template synapses do not match the appropriate
+     * polarities implied by their names.
+     * 
+     * @param synapses
+     * @param exTemplateSynapse
+     * @param inTemplateSynapse
+     */
+    public static void conformToTemplates(Collection<Synapse> synapses,
+        Synapse exTemplateSynapse, Synapse inTemplateSynapse) {
+        if (exTemplateSynapse.getStrength() <= 0) {
+            throw new IllegalArgumentException("Excitatory template synapse" +
+                " must be excitatory (having strength > 0).");
+        }
+        if (inTemplateSynapse.getStrength() >= 0) {
+            throw new IllegalArgumentException("Inhibitory template synapse" +
+                " must be inhibitory (having strength < 0).");
+        }
+        for (Synapse s : synapses) {
+            if (s.getStrength() < 0) {
+                s.setStrength(inTemplateSynapse.getStrength());
+                s.setLearningRule(inTemplateSynapse.getLearningRule()
+                    .deepCopy());
+                s.setUpperBound(inTemplateSynapse.getUpperBound());
+                s.setLowerBound(inTemplateSynapse.getLowerBound());
+                s.setDelay(inTemplateSynapse.getDelay());
+                s.setEnabled(inTemplateSynapse.isEnabled());
+                s.setFrozen(inTemplateSynapse.isFrozen());
+                s.setIncrement(inTemplateSynapse.getIncrement());
+                if (inTemplateSynapse.getSpikeResponder() != null) {
+                    s.setSpikeResponder(inTemplateSynapse.getSpikeResponder()
+                        .deepCopy());
+                }
+            }
+            if (s.getStrength() > 0) {
+                s.setStrength(exTemplateSynapse.getStrength());
+                s.setLearningRule(exTemplateSynapse.getLearningRule()
+                    .deepCopy());
+                s.setUpperBound(exTemplateSynapse.getUpperBound());
+                s.setLowerBound(exTemplateSynapse.getLowerBound());
+                s.setDelay(exTemplateSynapse.getDelay());
+                s.setEnabled(exTemplateSynapse.isEnabled());
+                s.setFrozen(exTemplateSynapse.isFrozen());
+                s.setIncrement(exTemplateSynapse.getIncrement());
+                if (exTemplateSynapse.getSpikeResponder() != null) {
+                    s.setSpikeResponder(exTemplateSynapse.getSpikeResponder()
+                        .deepCopy());
+                }
             }
         }
     }

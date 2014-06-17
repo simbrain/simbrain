@@ -64,7 +64,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * 
  */
 @SuppressWarnings("serial")
-public class ExcitatoryInhibitoryRatioPanel extends JPanel {
+public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     /** Max ratio of excitatory/inhibitory connections. */
     private static final int RATIO_MAX = 100;
@@ -139,20 +139,86 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
     private final Window parent;
 
     /**
+     * 
+     * @param parent
+     * @return
+     */
+    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(
+        final Window parent) {
+        SynapsePolarityAndRandomizerPanel prPanel =
+            new SynapsePolarityAndRandomizerPanel(parent);
+        prPanel.excitatoryRandomizerPanel =
+            prPanel.new EditableRandomizerPanel(parent,
+                Polarity.EXCITATORY);
+        prPanel.inhibitoryRandomizerPanel =
+            prPanel.new EditableRandomizerPanel(parent,
+                Polarity.INHIBITORY);
+        prPanel.excitatoryRandomizerPanel.initListeners();
+        prPanel.inhibitoryRandomizerPanel.initListeners();
+        prPanel.initializeContent();
+        prPanel.initializeLayout();
+        prPanel.fillDefaultValues();
+        return prPanel;
+    }
+
+    /**
+     * 
+     * @param parent
+     * @param synGrp
+     * @return
+     */
+    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(
+        final Window parent, final SynapseGroup synGrp) {
+        SynapsePolarityAndRandomizerPanel prPanel =
+            new SynapsePolarityAndRandomizerPanel(parent, synGrp);
+        if (synGrp.isEmpty()) {
+            prPanel.fillDefaultValues();
+            prPanel.creationPanel = true;
+            prPanel.excitatoryRandomizerPanel =
+                prPanel.new EditableRandomizerPanel(parent,
+                    Polarity.EXCITATORY);
+            prPanel.inhibitoryRandomizerPanel =
+                prPanel.new EditableRandomizerPanel(parent,
+                    Polarity.INHIBITORY);
+        } else {
+            prPanel.fillFieldValues(synGrp);
+            prPanel.creationPanel = false;
+            if (synGrp.getExcitatoryRandomizer() == null) {
+                prPanel.excitatoryRandomizerPanel =
+                    prPanel.new EditableRandomizerPanel(parent,
+                        Polarity.EXCITATORY);
+            } else {
+                prPanel.excitatoryRandomizerPanel =
+                    prPanel.new EditableRandomizerPanel(parent,
+                        synGrp.getExcitatoryRandomizer());
+            }
+            if (synGrp.getInhibitoryRandomizer() == null) {
+                prPanel.inhibitoryRandomizerPanel =
+                    prPanel.new EditableRandomizerPanel(parent,
+                        Polarity.INHIBITORY);
+            } else {
+                prPanel.inhibitoryRandomizerPanel =
+                    prPanel.new EditableRandomizerPanel(parent,
+                        synGrp.getInhibitoryRandomizer());
+            }
+
+        }
+        prPanel.excitatoryRandomizerPanel.initListeners();
+        prPanel.inhibitoryRandomizerPanel.initListeners();
+        prPanel.initializeContent();
+        prPanel.initializeLayout();
+        return prPanel;
+    }
+
+    /**
      * Constructs the excitatory/inhibitory ratio sub-panel with default values
      * for the creation of some set of synapses grouped or otherwise.
      */
-    public ExcitatoryInhibitoryRatioPanel(Window parent) {
+    private SynapsePolarityAndRandomizerPanel(final Window parent) {
         this.parent = parent;
-        creationPanel = false;
+        creationPanel = true;
         synapseGroup = null;
-        excitatoryRandomizerPanel = new EditableRandomizerPanel(parent,
-            Polarity.EXCITATORY);
-        inhibitoryRandomizerPanel = new EditableRandomizerPanel(parent,
-            Polarity.INHIBITORY);
-        initializeContent();
-        initializeLayout();
-        fillDefaultValues();
+
     }
 
     /**
@@ -161,39 +227,10 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
      * 
      * @param synGrp
      */
-    public ExcitatoryInhibitoryRatioPanel(Window parent, SynapseGroup synGrp) {
+    private SynapsePolarityAndRandomizerPanel(final Window parent,
+        final SynapseGroup synGrp) {
         this.parent = parent;
         this.synapseGroup = synGrp;
-        if (synGrp.isEmpty()) {
-            fillDefaultValues();
-            creationPanel = true;
-            excitatoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                Polarity.EXCITATORY);
-            inhibitoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                Polarity.INHIBITORY);
-        } else {
-            fillFieldValues(synGrp);
-            creationPanel = false;
-            if (synGrp.getExcitatoryRandomizer() == null) {
-                excitatoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                    Polarity.EXCITATORY);
-            } else {
-                excitatoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                    synGrp.getExcitatoryRandomizer());
-            }
-            if (synGrp.getInhibitoryRandomizer() == null) {
-                inhibitoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                    Polarity.INHIBITORY);
-            } else {
-                inhibitoryRandomizerPanel = new EditableRandomizerPanel(parent,
-                    synGrp.getInhibitoryRandomizer());
-            }
-
-        }
-        excitatoryRandomizerPanel.initListeners();
-        inhibitoryRandomizerPanel.initListeners();
-        initializeContent();
-        initializeLayout();
     }
 
     /**
@@ -462,6 +499,20 @@ public class ExcitatoryInhibitoryRatioPanel extends JPanel {
      */
     public EditableRandomizerPanel getInhibitoryRandomizerPanel() {
         return inhibitoryRandomizerPanel;
+    }
+
+    /**
+     * @return whether or not excitatory randomization is enabled.
+     */
+    public boolean exRandomizerEnabled() {
+        return excitatoryRandomizerPanel.enableStatusTriangle.isDown();
+    }
+
+    /**
+     * @return whether or not inhibitory randomization is enabled.
+     */
+    public boolean inRandomizerEnabled() {
+        return inhibitoryRandomizerPanel.enableStatusTriangle.isDown();
     }
 
     /**

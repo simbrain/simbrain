@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.Color;
@@ -16,7 +34,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
@@ -29,9 +46,10 @@ import org.simbrain.util.widgets.EditablePanel;
  * activated/adjusted, designed with segregation of inhibitory and excitatory
  * weights in mind.
  * 
- * @author ztosi
+ * @author Zach Tosi
  * 
  */
+@SuppressWarnings("serial")
 public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
@@ -46,8 +64,10 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     private CombinedSynapseInfoPanel inhibitoryInfoPanel;
 
+    /** The apply button for editing associated with excitatory synapses. */
     private JButton exApplyButton = new JButton("Apply");
 
+    /** The apply button for editing associated with inhibitory synapses. */
     private JButton inApplyButton = new JButton("Apply");
 
     /**
@@ -101,6 +121,19 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * 
+     * @param parent
+     * @param synapses
+     * @return
+     */
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+        final Window parent) {
+        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent);
+        spp.initApplyListeners();
+        return spp;
+    }
+
+    /**
+     * 
      * @param parentWindow
      * @param synapseGroup
      */
@@ -136,10 +169,19 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         templateExcitatorySynapse = Synapse.getTemplateSynapse();
         templateInhibitorySynapse = Synapse.getTemplateSynapse();
         creationPanel = synapses.isEmpty();
-        Collection<Synapse> excitatorySynapses = ConnectionUtilities
-            .getExcitatorySynapses(synapses);
-        Collection<Synapse> inhibitorySynapses = ConnectionUtilities
-            .getInhibitorySynapses(synapses);
+        Collection<Synapse> excitatorySynapses;
+        Collection<Synapse> inhibitorySynapses;
+        if (!creationPanel) {
+            excitatorySynapses = ConnectionUtilities
+                .getExcitatorySynapses(synapses);
+            inhibitorySynapses = ConnectionUtilities
+                .getInhibitorySynapses(synapses);
+        } else {
+            excitatorySynapses = Collections.singleton(
+                getTemplateExcitatorySynapse());
+            inhibitorySynapses = Collections.singleton(
+                getTemplateInhibitorySynapse());
+        }
         excitatoryInfoPanel = CombinedSynapseInfoPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = CombinedSynapseInfoPanel
@@ -147,26 +189,47 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         init();
     }
 
+    /**
+     * A constructor specifically for creating loose connections.
+     * 
+     * @param parentWindow
+     * @param synapses
+     */
+    private SynapsePropertiesPanel(final Window parentWindow) {
+        synapseGroup = null;
+        creationPanel = true;
+        templateExcitatorySynapse = Synapse.getTemplateSynapse();
+        templateInhibitorySynapse = Synapse.getTemplateSynapse();
+        templateExcitatorySynapse.setStrength(
+            ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
+        templateInhibitorySynapse.setStrength(
+            ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
+        Collection<Synapse> excitatorySynapses;
+        Collection<Synapse> inhibitorySynapses;
+        excitatorySynapses = Collections.singleton(
+            getTemplateExcitatorySynapse());
+        inhibitorySynapses = Collections.singleton(
+            getTemplateInhibitorySynapse());
+        excitatoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
+        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
+        init();
+    }
+
+    /**
+     * Initializes/Lays out the panel.
+     */
     private void init() {
         // Excitatory Border
-        int redShadow = 0;
-        byte bitmask = 0x7F;
-        // RGB: 0x7F, 0, 0
-        redShadow = redShadow | (bitmask << 16);
-        // Color.RED as highlight, redShadow as shadow
         Border redBorder =
-            BorderFactory.createEtchedBorder(EtchedBorder.LOWERED,
-                Color.RED, new Color(redShadow));
+            BorderFactory.createLineBorder(Color.RED);
         Border exBorder = BorderFactory.createTitledBorder(redBorder,
             "Excitatory");
 
         // Inhibitory Border
-        int blueShadow = 0;
-        // RGB: 0, 0, 0x7F
-        blueShadow = blueShadow | bitmask;
         Border blueBorder =
-            BorderFactory.createEtchedBorder(EtchedBorder.LOWERED,
-                Color.BLUE, new Color(blueShadow));
+            BorderFactory.createLineBorder(Color.BLUE);
         Border inBorder = BorderFactory.createTitledBorder(blueBorder,
             "Inhibitory");
 
@@ -205,6 +268,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     }
 
+    /**
+     * Initializes the listeners associated with the apply buttons for editing.
+     */
     private void initApplyListeners() {
         exApplyButton.addActionListener(new ActionListener() {
             @Override
@@ -235,6 +301,11 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         boolean success = true;
         success &= excitatoryInfoPanel.commitChanges();
         success &= inhibitoryInfoPanel.commitChanges();
+        // Ensure that strengths have been set within appropriate boundaries...
+        templateExcitatorySynapse.setStrength( // Always positive
+            Math.abs(templateExcitatorySynapse.getStrength()));
+        templateInhibitorySynapse.setStrength( // Always negative
+            -Math.abs(templateInhibitorySynapse.getStrength()));
         return success;
     }
 
@@ -247,9 +318,28 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JPanel getPanel() {
         return mainPanel;
+    }
+
+    /**
+     * @return the template excitatory synapse, used to store parameters from
+     *         this panel for creation, when no synapses exist yet to edit.
+     */
+    public Synapse getTemplateExcitatorySynapse() {
+        return templateExcitatorySynapse;
+    }
+
+    /**
+     * @return the template inhibitory synapse, used to store parameters from
+     *         this panel for creation, when no synapses exist yet to edit.
+     */
+    public Synapse getTemplateInhibitorySynapse() {
+        return templateInhibitorySynapse;
     }
 
 }

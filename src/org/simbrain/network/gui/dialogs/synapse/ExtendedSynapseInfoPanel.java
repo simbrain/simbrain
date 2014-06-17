@@ -49,16 +49,16 @@ public class ExtendedSynapseInfoPanel extends JPanel {
     // private TristateDropDown clippingDD = new TristateDropDown();
 
     /** Increment field. */
-    private JTextField tfIncrement = new JTextField();
+    private JTextField tfIncrement = new JTextField(10);
 
     /** Upper bound field. */
-    private JTextField tfUpBound = new JTextField();
+    private JTextField tfUpBound = new JTextField(10);
 
     /** Lower bound field. */
-    private JTextField tfLowBound = new JTextField();
+    private JTextField tfLowBound = new JTextField(10);
 
     /** Delay field. */
-    private JTextField tfDelay = new JTextField();
+    private JTextField tfDelay = new JTextField(10);
 
     /**
      * 
@@ -100,35 +100,35 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         Synapse synapseRef = synapseCollection.iterator().next();
         // Handle Upper Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                "getUpperBound")) {
+            "getUpperBound")) {
             tfUpBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         }
         // Handle Lower Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                "getLowerBound")) {
+            "getLowerBound")) {
             tfLowBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         }
         // Handle Increment
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                "getIncrement")) {
+            "getIncrement")) {
             tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         }
         // Handle Delay
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                "getDelay")) {
+            "getDelay")) {
             tfDelay.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfDelay.setText(Integer.toString(synapseRef.getDelay()));
         }
         // Handle Frozen
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-                "isFrozen")) {
+            "isFrozen")) {
             frozenDD.setNull();
         } else {
             frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
@@ -172,7 +172,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
         }
         // Frozen ?
         boolean frozen = frozenDD.getSelectedIndex() == TristateDropDown
-                .getTRUE();
+            .getTRUE();
         if (frozenDD.getSelectedIndex() != TristateDropDown.getNULL()) {
             for (Synapse s : synapses) {
                 s.setFrozen(frozen);

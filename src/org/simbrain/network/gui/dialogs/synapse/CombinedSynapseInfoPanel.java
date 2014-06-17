@@ -117,7 +117,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
     private CombinedSynapseInfoPanel(final Collection<Synapse> synapseList,
         final Window parent, final boolean showSpecificRuleParams) {
         synapseInfoPanel = BasicSynapseInfoPanel.createBasicSynapseInfoPanel(
-            synapseList, parent, synapseList.size() < 2);
+            synapseList, parent);
         updateInfoPanel = new SynapseUpdateSettingsPanel(synapseList, parent,
             showSpecificRuleParams);
         if (SynapseDialog.containsASpikeResponder(synapseList)) {

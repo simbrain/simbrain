@@ -17,16 +17,24 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.connections.Radial;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.RadialPanel;
 
 /**
  * Apply specified connection either from selected neurons to themselves
  * ("self connect") or from source to target.
  */
+@SuppressWarnings("serial")
 public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     /** The connection to apply. */
@@ -64,30 +72,30 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
         String title = "Connect ";
 
-        // if (connection instanceof AllToAll) {
-        // optionsPanel = new AllToAllPanel((AllToAll) connection);
-        // optionsPanel.fillDefaultFieldValues();
-        // title += "All to All";
-        // } else if (connection instanceof OneToOne) {
-        // optionsPanel = new OneToOnePanel((OneToOne) connection);
-        // optionsPanel.fillDefaultFieldValues();
-        // title += "One to One";
-        // } else if (connection instanceof Radial) {
-        // optionsPanel = new RadialPanel((Radial) connection);
-        // optionsPanel.fillDefaultFieldValues();
-        // title += "Radial";
-        // } else if (connection instanceof Sparse) {
-        // optionsPanel = new SparsePanel((Sparse) connection);
-        // optionsPanel.fillDefaultFieldValues();
-        // title += "Sparse";
-        // }
+        if (connection instanceof AllToAll) {
+            optionsPanel =
+                DensityBasedConnectionPanel.createAllToAllAdjustmentPanel(
+                    (AllToAll) connection, networkPanel);
+            title += "All to All";
+        } else if (connection instanceof OneToOne) {
+            optionsPanel = new OneToOnePanel((OneToOne) connection);
+            title += "One to One";
+        } else if (connection instanceof Radial) {
+            optionsPanel = new RadialPanel((Radial) connection);
+            title += "Radial";
+        } else if (connection instanceof Sparse) {
+            optionsPanel = DensityBasedConnectionPanel
+                .createSparsityAdjustmentPanel((Sparse) connection,
+                    networkPanel);
+            title += "Sparse";
+        }
         ConnectionDialog dialog =
-            new ConnectionDialog(optionsPanel, connection);
+            ConnectionDialog.createConnectionDialog(optionsPanel, connection,
+                networkPanel);
         dialog.setTitle(title);
         dialog.setLocationRelativeTo(null);
         dialog.pack();
         dialog.setVisible(true);
-
     }
 
 }

@@ -26,6 +26,7 @@ import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -53,7 +54,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
     private final JLabel idLabel = new JLabel();
 
     /** Strength field. */
-    private final JTextField tfStrength = new JTextField();
+    private final JTextField tfStrength = new JTextField(10);
 
     /**
      * A switch for determining whether or not the synapse will send a weighted
@@ -96,17 +97,21 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * Creates a basic synapse info panel. Here whether or not to display ID
      * info is automatically set based on the state of the synapse list.
      * 
-     * @param synapseList
+     * @param synapses
      *            the synapses whose information is being displayed/made
      *            available to edit on this panel
      * @param parent
      *            the parent window for dynamic resizing.
      * @return A basic synapse info panel with the specified parameters
      */
-    public static BasicSynapseInfoPanel createBasicNeuronInfoPanel(
-        final Collection<Synapse> synapseList, final Window parent) {
-        return createBasicSynapseInfoPanel(synapseList, parent,
-            !(synapseList == null || synapseList.size() != 1));
+    public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
+        final Collection<Synapse> synapses, final Window parent) {
+        boolean displayIDInfo = synapses != null && synapses.size() == 1;
+        if (displayIDInfo) {
+            Iterator<Synapse> synIter = synapses.iterator();
+            displayIDInfo = synIter.next().getSource() != null;
+        }
+        return createBasicSynapseInfoPanel(synapses, parent, displayIDInfo);
     }
 
     /**
@@ -116,7 +121,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * display. In fact this is probably the only reason to use this factory
      * method over {@link #createBasicSynapseInfoPanel(List, Window)}.
      * 
-     * @param synapseList
+     * @param synapses
      *            the synapses whose information is being displayed/made
      *            available to edit on this panel
      * @param parent
@@ -126,9 +131,9 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * @return A basic synapse info panel with the specified parameters
      */
     public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
-        final Collection<Synapse> synapseList, final Window parent,
+        final Collection<Synapse> synapses, final Window parent,
         final boolean displayIDInfo) {
-        BasicSynapseInfoPanel panel = new BasicSynapseInfoPanel(synapseList,
+        BasicSynapseInfoPanel panel = new BasicSynapseInfoPanel(synapses,
             parent, displayIDInfo);
         panel.addListeners();
         return panel;

@@ -61,7 +61,7 @@ public class ConnectionPanel {
     private void init() {
         connectPanel.setLayout(new CardLayout());
         connectorPanels[0] = DensityBasedConnectionPanel
-            .createSparsityAdjustmentPanel(new AllToAll(), networkPanel);
+            .createAllToAllAdjustmentPanel(new AllToAll(), networkPanel);
         connectorPanels[1] = DensityBasedConnectionPanel
             .createSparsityAdjustmentPanel(new Sparse(), networkPanel);
         connectorPanels[2] = new OneToOnePanel(new OneToOne());

@@ -18,9 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.util.List;
+
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
@@ -35,36 +43,34 @@ import org.simbrain.util.widgets.ShowHelpAction;
 @SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
 
+    private final NetworkPanel networkPanel;
+
     /** The connection panel wrapped in this dialog. */
     private AbstractConnectionPanel connectionPanel;
 
     /** The connection object associated with the connection panel. */
     private ConnectNeurons connection;
 
-    // TODO: Unused, find use or schedule for removal
-    // /** The mapping of group names to available synapse groups. */
-    // private LinkedHashMap<String, SynapseGroup> groupingOptions =
-    // new LinkedHashMap<String, SynapseGroup>();
-    //
-    // /** A combo-box showing the available group options. */
-    // private JComboBox synapseGroups;
+    private JPanel mainPanel;
+
+    private SynapsePropertiesPanel propertiesPanel;
+
+    private SynapsePolarityAndRandomizerPanel eirPanel;
 
     /**
      * 
-     * @param networkPanel
-     */
-    public ConnectionDialog() {
-    }
-
-    /**
-     * 
-     * @param networkPanel
      * @param optionsPanel
+     * @param connection
+     * @param networkPanel
+     * @return
      */
-    public ConnectionDialog(AbstractConnectionPanel optionsPanel) {
-        this.connectionPanel = optionsPanel;
-        this.connection = optionsPanel.getConnection();
-        fillFrame();
+    public static ConnectionDialog createConnectionDialog(
+        final AbstractConnectionPanel optionsPanel,
+        final ConnectNeurons connection, final NetworkPanel networkPanel) {
+        ConnectionDialog cd = new ConnectionDialog(optionsPanel, connection,
+            networkPanel);
+        cd.init();
+        return cd;
     }
 
     /**
@@ -73,10 +79,26 @@ public class ConnectionDialog extends StandardDialog {
      * @param optionsPanel
      * @param connection
      */
-    public ConnectionDialog(AbstractConnectionPanel optionsPanel,
-            ConnectNeurons connection) {
+    private ConnectionDialog(final AbstractConnectionPanel optionsPanel,
+        final ConnectNeurons connection, final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
         this.connectionPanel = optionsPanel;
         this.connection = connection;
+    }
+
+    /**
+     * 
+     */
+    private void init() {
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.add(connectionPanel);
+        propertiesPanel = SynapsePropertiesPanel
+            .createSynapsePropertiesPanel(this);
+        mainPanel.add(propertiesPanel);
+        eirPanel = SynapsePolarityAndRandomizerPanel
+            .createPolarityRatioPanel(this);
+        mainPanel.add(eirPanel);
         fillFrame();
     }
 
@@ -85,15 +107,34 @@ public class ConnectionDialog extends StandardDialog {
      */
     public void fillFrame() {
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/Network/connections.html");
+            "Pages/Network/connections.html");
         addButton(new JButton(helpAction));
-        setContentPane(connectionPanel);
+        setContentPane(mainPanel);
     }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        connectionPanel.commitChanges();
+        List<Neuron> source = networkPanel.getSourceModelNeurons();
+        List<Neuron> target = networkPanel.getSelectedModelNeurons();
+        List<Synapse> synapses = connectionPanel.commitChanges(source, target);
+        ConnectionUtilities.polarizeSynapses(synapses,
+            eirPanel.getPercentExcitatory());
+        propertiesPanel.commitChanges();
+        ConnectionUtilities.conformToTemplates(synapses,
+            propertiesPanel.getTemplateExcitatorySynapse(),
+            propertiesPanel.getTemplateInhibitorySynapse());
+        eirPanel.commitChanges();
+        if (eirPanel.exRandomizerEnabled()) {
+            ConnectionUtilities.randomizeExcitatorySynapses(synapses,
+                eirPanel.getExRandomizer());
+        }
+        if (eirPanel.inRandomizerEnabled()) {
+            ConnectionUtilities.randomizeInhibitorySynapses(synapses,
+                eirPanel.getInRandomizer());
+        }
+        networkPanel.revalidate();
+        networkPanel.repaint();
     }
 
     public AbstractConnectionPanel getOptionsPanel() {

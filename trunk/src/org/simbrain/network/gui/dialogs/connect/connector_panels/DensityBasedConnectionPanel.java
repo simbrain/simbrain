@@ -36,7 +36,6 @@ import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -46,8 +45,8 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.DensityBasedConnector;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
@@ -62,9 +61,10 @@ import org.simbrain.util.Utils;
  * displaying how many efferents per source neuron there would be if efferents
  * are equalized. All of these are kept in sync.
  * 
- * @author ztosi
+ * @author Zach Tosi
  * 
  */
+@SuppressWarnings("serial")
 public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
 
     /** A slider for setting the sparsity of the connections. */
@@ -99,10 +99,22 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private DensityBasedConnector connection;
 
+    /**
+     * A property change listener for the density text field which can be
+     * switched off to prevent infinite loops.
+     */
     private SwitchablePropertyChangeListener densityTfListener;
 
+    /**
+     * A property change listener for the synapses per source neuron text field
+     * which can be switched off to prevent infinite loops.
+     */
     private SwitchablePropertyChangeListener synsPerSourceListener;
 
+    /**
+     * A change listener for the slider which can be switched off to prevent
+     * infinite loops.
+     */
     private SwitchableChangeListener sliderListener;
 
     /**
@@ -139,7 +151,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * @param networkPanel
      * @return
      */
-    public static DensityBasedConnectionPanel createSparsityAdjustmentPanel(
+    public static DensityBasedConnectionPanel createAllToAllAdjustmentPanel(
         AllToAll connection, NetworkPanel networkPanel) {
         DensityBasedConnectionPanel sap =
             new DensityBasedConnectionPanel(connection, networkPanel);
@@ -148,6 +160,8 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         sap.addChangeListeners();
         sap.addActionListeners();
         sap.initializeLayout();
+        // Set the enabled fields appropriately given that all to all is
+        // selected.
         sap.allToAllView();
         return sap;
     }
@@ -279,9 +293,19 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     /**
      * Adds change listeners specific to sparse panel: Sparsity slider, sparsity
      * text field, and syns/source field.
+     * 
+     * Since every field listens to every field, loops are prevented through the
+     * use of so-called "switchable listeners", which have fields allowing them
+     * to be turned off, and focus listeners. Any field not being interacted
+     * with by the user has its listener disabled, and any field being
+     * interacted with (which is "in focus") is enabled. This allows all fields
+     * to be changed accordingly in response to user input without changes to
+     * the out of focus fields themselves firing off events.
+     * 
      */
     private void addChangeListeners() {
 
+        // *********************************************************************
         // Slider
         sliderListener = new SwitchableChangeListener() {
             @Override
@@ -303,16 +327,21 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         connectionDensitySlider.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                // Enables the listener associated with the density slider
+                // field while it is in focus.
                 sliderListener.enable();
             }
 
             @Override
             public void focusLost(FocusEvent e) {
+                // Disables the listener associated with the density slider
+                // field when it is not in focus.
                 sliderListener.disable();
             }
         });
         connectionDensitySlider.addChangeListener(sliderListener);
 
+        // *********************************************************************
         // Equalized efferent number (Synapses per source)
         synsPerSourceListener = new SwitchablePropertyChangeListener() {
             @Override
@@ -337,18 +366,23 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         synsPerSource.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent arg0) {
+                // Enables the listener associated with the synapse per source
+                // field while it is in focus.
                 synsPerSourceListener.enable();
 
             }
 
             @Override
             public void focusLost(FocusEvent arg0) {
+                // Disables the listener associated with the synapse per source
+                // field while it is not in focus.
                 synsPerSourceListener.disable();
             }
         });
 
         synsPerSource.addPropertyChangeListener(synsPerSourceListener);
 
+        // *********************************************************************
         // Overall density
         densityTfListener = new SwitchablePropertyChangeListener() {
             @Override
@@ -377,11 +411,15 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         densityTf.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                // Enables the listener associated with the density
+                // field while it is in focus.
                 densityTfListener.enable();
             }
 
             @Override
             public void focusLost(FocusEvent e) {
+                // Disables the listener associated with the density
+                // field while it is not in focus.
                 densityTfListener.disable();
             }
         });
@@ -469,6 +507,27 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Synapse>
+        commitChanges(List<Neuron> source, List<Neuron> target) {
+        double density = Utils.doubleParsable(densityTf);
+        if (!Double.isNaN(density)) {
+            if (density == 1.0) {
+                return AllToAll.connectAllToAll(source, target, source
+                    .equals(target),
+                    allowSelfConnect, true);
+            } else {
+                return Sparse.connectSparse(source, target, density,
+                    allowSelfConnect,
+                    equalizeEfferentsChkBx.isSelected(), true);
+            }
+        }
+        return null;
+    }
+
+    /**
      * 
      * @return
      */
@@ -506,37 +565,25 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         return recurrentConnection;
     }
 
-    public void setRecurrentConnection(boolean recurrentConnection) {
-        this.recurrentConnection = recurrentConnection;
+    /**
+     * @return the number of target neurons.
+     */
+    public int getNumTargs() {
+        return numTargs;
     }
 
-    @Override
-    public void commitChanges(List<Neuron> source, List<Neuron> target) {
+    /**
+     * Refreshes the panel's view.
+     */
+    public void refresh() {
         double density = Utils.doubleParsable(densityTf);
-        if (!Double.isNaN(density)) {
-            if (density == 1.0) {
-                AllToAll.connectAllToAll(source, target, source.equals(target),
-                    allowSelfConnect, true);
-            } else {
-                Sparse.connectSparse(source, target, density, allowSelfConnect,
-                    equalizeEfferentsChkBx.isSelected(), true);
-            }
-        }
+        densityTf.setText(Double.toString(density));
+        densityTfListener.disable();
     }
 
     @Override
     public ConnectNeurons getConnection() {
         return connection;
-    }
-
-    public static void main(String[] args) {
-        DensityBasedConnectionPanel dbcp = DensityBasedConnectionPanel
-            .createSparsityAdjustmentPanel(new Sparse(),
-                new NetworkPanel(new Network()));
-        JFrame frame = new JFrame();
-        frame.setContentPane(dbcp);
-        frame.setVisible(true);
-        frame.pack();
     }
 
 }

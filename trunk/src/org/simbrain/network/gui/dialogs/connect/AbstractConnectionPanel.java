@@ -22,12 +22,14 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
  * <b>AbstractConnectionPanel</b> is the abstract panel for all specific panels
  * for setting connection properties.
  */
+@SuppressWarnings("serial")
 public abstract class AbstractConnectionPanel extends JPanel {
 
     /** Main panel. */
@@ -82,7 +84,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
      */
     public abstract void commitChanges();
 
-    public abstract void commitChanges(List<Neuron> source,
+    public abstract List<Synapse> commitChanges(List<Neuron> source,
         List<Neuron> target);
 
     /**

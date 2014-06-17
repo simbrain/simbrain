@@ -21,12 +21,14 @@ import javax.swing.JComboBox;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
  * neuron connections.
  */
+@SuppressWarnings("serial")
 public class OneToOnePanel extends AbstractConnectionPanel {
 
     /** Sets the connection orientation. */
@@ -83,8 +85,9 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     }
 
     @Override
-    public void commitChanges(List<Neuron> source, List<Neuron> target) {
-        OneToOne.connectOneToOne(source, target,
+    public List<Synapse>
+        commitChanges(List<Neuron> source, List<Neuron> target) {
+        return OneToOne.connectOneToOne(source, target,
             bidirectionalConnection.isSelected(), true);
     }
 

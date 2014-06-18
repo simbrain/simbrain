@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -46,7 +47,7 @@ import org.simbrain.util.table.TextTable;
 
 /**
  * Contains actions relating to Text World.
- *
+ * 
  * @author jyoshimi
  */
 public class TextWorldActions {
@@ -55,7 +56,7 @@ public class TextWorldActions {
      * Action for loading a dictionary, by finding every distinct word and
      * punctuation mark in a text file. TODO: Add more flexibility in terms of
      * parsing the loaded file.
-     *
+     * 
      * @param world the world whose dictionary should be loaded
      * @return the action
      */
@@ -118,7 +119,7 @@ public class TextWorldActions {
 
     /**
      * Action for displaying the contents of the text world dictionary.
-     *
+     * 
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
@@ -145,8 +146,8 @@ public class TextWorldActions {
                 StandardDialog dialog = new StandardDialog();
                 dialog.setTitle("View / Edit Dictionary");
                 JPanel mainPanel = new JPanel(new BorderLayout());
-                SimbrainJTable table = new SimbrainJTable(new TextTable(
-                        world.getDictionary()));
+                SimbrainJTable table = SimbrainJTable
+                        .createTable(new TextTable(world.getDictionary()));
                 table.setShowCSVInPopupMenu(false);
                 table.setShowDeleteColumnPopupMenu(false);
                 table.setShowInsertColumnPopupMenu(false);
@@ -167,7 +168,7 @@ public class TextWorldActions {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    world.resetDictionary(table.getData().asFlatList());
+                    world.resetDictionary((List<String>) table.getData().asFlatList());
                 }
             }
         };
@@ -176,7 +177,7 @@ public class TextWorldActions {
 
     /**
      * Action for showing the vector dictionary editor.
-     *
+     * 
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
@@ -207,7 +208,7 @@ public class TextWorldActions {
 
     /**
      * Action for displaying a preference dialog.
-     *
+     * 
      * @param world the world for which a dialog should be shown
      * @return the action
      */
@@ -241,17 +242,16 @@ public class TextWorldActions {
     /**
      * Sets the current directory for the dictionary file (memory for file
      * chooser).
-     *
+     * 
      * @param dir directory to set
      */
     public static void setDictionaryDirectory(final String dir) {
-        SimbrainPreferences.putString("textWorldDictionaryDirectory",
-                dir);
+        SimbrainPreferences.putString("textWorldDictionaryDirectory", dir);
     }
 
     /**
      * Return the current directory for the dictionary file.
-     *
+     * 
      * @return return the dictionary directory
      */
     public static String getDictionaryDirectory() {
@@ -263,6 +263,5 @@ public class TextWorldActions {
             return null;
         }
     }
-
 
 }

@@ -67,7 +67,7 @@ public class TestInputAction extends ConditionallyEnabledAction{
      * Initialize and display the test input panel.
      */
     public void actionPerformed(ActionEvent event) {
-        networkPanel.displayPanel(new TestInputPanel(networkPanel,
-                networkPanel.getSelectedModelNeurons()), "Test inputs");
+        TestInputPanel panel = TestInputPanel.createTestInputPanel(networkPanel, networkPanel.getSelectedModelNeurons());
+        networkPanel.displayPanel(panel, "Test Input Panel");
     }
 }

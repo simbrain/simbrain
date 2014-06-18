@@ -36,9 +36,9 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for training a Competitive network.
- * 
+ *
  * @author Jeff Yoshimi
- * 
+ *
  */
 public class CompetitiveTrainingDialog extends StandardDialog {
 
@@ -54,9 +54,15 @@ public class CompetitiveTrainingDialog extends StandardDialog {
     /** Reference to the Competitive Network. */
     private CompetitiveNetwork network;
 
+    /** Reference to input data panel. */
+    private DataPanel inputPanel;
+
+    /** Reference to validate inputs panel */
+    private TestInputPanel validateInputsPanel;
+
     /**
      * Construct the dialog.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param network
@@ -83,16 +89,16 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Train Network", controlPanel);
 
         // Input data tab
-        final DataPanel inputPanel = new DataPanel(network.getInputNeurons(),
+        inputPanel = new DataPanel(network.getInputNeurons(),
                 network.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        final TestInputPanel testInputPanel = new TestInputPanel(np,
+        validateInputsPanel = new TestInputPanel(np,
                 network.getInputNeurons(), network.getTrainingSet()
                         .getInputDataMatrix());
-        tabbedPane.addTab("Test data", testInputPanel);
+        tabbedPane.addTab("Validate", validateInputsPanel);
 
         // Listen for tab changed events. Load inputs to test tab
         // If inputs have been loaded
@@ -108,7 +114,7 @@ public class CompetitiveTrainingDialog extends StandardDialog {
                 // Just clicked out of input tab
                 if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
-                        testInputPanel.setData(((NumericTable) inputPanel
+                        validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
                     }
                 }
@@ -130,6 +136,8 @@ public class CompetitiveTrainingDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         competitivePropsPanel.commitChanges();
+        inputPanel.commitChanges();
+        validateInputsPanel.commitChanges();
     }
 
 }

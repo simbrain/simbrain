@@ -116,25 +116,21 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Populate data in simbrain table
         Synapse[][] weights = SimnetUtils.getWeightMatrix(sourceList,
                 targetList);
-        displayWarningIfEmptyCells(weights);
+        //displayWarningIfEmptyCells(weights);
         WeightMatrix weightMatrix = new WeightMatrix(weights);
-        table = new SimbrainJTable(weightMatrix);
+        table = SimbrainJTable.createTable(weightMatrix);
         table.disableTableModificationMenus();
 
         // Create names for row headings
         List<String> rowHeaders = new ArrayList<String>();
-        int i = 0;
         for (Neuron neuron : sourceList) {
-            rowHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
-                    + ")");
+            rowHeaders.add(new String(neuron.getId()));
         }
 
         // Create names for column headings
         List<String> colHeaders = new ArrayList<String>();
-        i = 0;
         for (Neuron neuron : targetList) {
-            colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
-                    + ")");
+            colHeaders.add(new String(neuron.getId()));
         }
         table.setColumnHeadings(colHeaders);
         table.setRowHeadings(rowHeaders);
@@ -148,12 +144,6 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
 
             public void networkChanged() {
                 repaint();
-            }
-
-            public void neuronClampToggled() {
-            }
-
-            public void synapseClampToggled() {
             }
 
         });
@@ -186,14 +176,13 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
      * A matrix representation of synapses is passed in, and as the table data
      * are changed the synapses are directly updated.
      *
+     * Note that the "mutable" features of numerictable are all passed over.
+     *
      */
     private class WeightMatrix extends NumericTable {
 
         /** Underlying data. */
         private Synapse[][] weights;
-
-        /** Reference to root network. */
-        private Network parentNetwork;
 
         /**
          * @param weights the weights to set
@@ -203,16 +192,15 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             this.weights = weights;
         }
 
+        // TOOD: Explain below. Possibly move to  a special immutable numeric class
         @Override
         public void setValue(final int row, final int col, final Double value,
                 final boolean fireEvent) {
-            if (weights[row][col] != null) {
-                weights[row][col].forceSetStrength(value);
-                /**
-                 * Save reference when a non-null is found (important for
-                 * networks with null vals)
-                 */
-                parentNetwork = weights[row][col].getNetwork();
+            if (col == 0) {
+                return;
+            }
+            if (weights[row][col-1] != null) {
+                weights[row][col-1].forceSetStrength(value);
             }
             if (fireEvent) {
                 fireTableDataChanged();
@@ -224,16 +212,33 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             setValue(row, col, value, true);
         }
 
+
         @Override
-        public Double getValue(int row, int col) {
-            // TODO: For null case render cell in some special way.
-            // Other null handling also needed.
-            if (weights[row][col] != null) {
-                return weights[row][col].getStrength();
+        public Double getValueAt(int row, int col) {
+            if (col == 0) {
+                return null;
+            }
+            if (weights[row][col - 1] != null) {
+                return weights[row][col - 1].getStrength();
             } else {
-                return new Double(0);
+                return null;
             }
         }
+
+
+        @Override
+        public void setLogicalValue(int row, int column, Double value,
+                boolean fireEvent) {
+            setValue(row, column+1, value, fireEvent);
+        }
+
+
+        @Override
+        public Double getLogicalValueAt(int row, int col) {
+            return getValueAt(row, col+1);
+        }
+
+
 
     }
 

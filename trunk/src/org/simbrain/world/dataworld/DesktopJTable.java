@@ -47,6 +47,7 @@ public class DesktopJTable extends SimbrainJTable {
     public DesktopJTable(NumericTable dataModel, DataWorldComponent component) {
         super(dataModel);
         this.component = component;
+        this.initJTable();
     }
 
     /**

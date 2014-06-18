@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,9 +36,9 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * @param fireEvent whether to fire an update event or not
      */
     private void addRow(T value, boolean fireEvent) {
-        rowData.add(getNewRow(value));
+        rowData.add(createNewRow(value));
         if (fireEvent) {
-            this.fireRowAdded(getRowCount() - 1);
+            this.fireTableRowsInserted(getRowCount(), getRowCount());
         }
     }
 
@@ -76,8 +77,8 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * @param value value for new row cells
      */
     public void insertRow(int at, T value) {
-        rowData.add(at, getNewRow(value));
-        this.fireRowAdded(at);
+        rowData.add(at, createNewRow(value));
+        this.fireTableRowsInserted(at, at);
     }
 
     /**
@@ -87,6 +88,38 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      */
     public void insertRow(int at) {
         insertRow(at, getDefaultValue());
+    }
+
+    /**
+     * Create a new row for the table, with a specified value.
+     *
+     * @param value value for columns of new row
+     * @return the new row
+     */
+    protected List<T> createNewRow(final T value) {
+        ArrayList<T> row = new ArrayList<T>();
+        for (int i = 0; i < getLogicalColumnCount(); i++) {
+            row.add(value);
+        }
+        return row;
+    }
+
+    /**
+     * Create a new row for the table, with a specified value.
+     *
+     * @param value value for columns of new row
+     * @param cols number of "logical" columns in a row for this table (i.e.
+     *            actual number of columns in the data itself, without
+     *            accounting for fist header row).
+     * @return the new row
+     */
+    protected List<T> createNewRow(final T value, final int cols) {
+        ArrayList<T> row = new ArrayList<T>();
+
+        for (int i = 0; i < cols; i++) {
+            row.add(value);
+        }
+        return row;
     }
 
     /**
@@ -102,7 +135,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
         }
         rowData.remove(rowToRemoveIndex);
         if (fireEvent) {
-            this.fireRowRemoved(rowToRemoveIndex);
+            this.fireTableRowsDeleted(rowToRemoveIndex, rowToRemoveIndex);
         }
     }
 
@@ -126,7 +159,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
             row.add(value);
         }
         if (fireEvent) {
-            this.fireColumnAdded(getColumnCount() - 1);
+            this.fireTableStructureChanged();
         }
     }
 
@@ -168,7 +201,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
         for (List<T> row : rowData) {
             row.add(at, value);
         }
-        this.fireColumnAdded(at);
+        this.fireTableStructureChanged();
     }
 
     /**
@@ -195,7 +228,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
             row.remove(columnToRemoveIndex);
         }
         if (fireEvent) {
-            this.fireColumnRemoved(columnToRemoveIndex);
+            this.fireTableStructureChanged();
         }
     }
 
@@ -251,7 +284,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
         rowData.clear();
 
         for (int i = 0; i < rows; i++) {
-            rowData.add(getNewRow(getDefaultValue(), cols));
+            rowData.add(createNewRow(getDefaultValue(), cols));
         }
 
         fireTableStructureChanged();
@@ -285,10 +318,11 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
             throw new TableDataException("Trying to import data with "
                     + values.length + " rows into a table with "
                     + getRowCount() + " rows.");
-        } else if (!allowColumnChanges && values[0].length != getColumnCount()) {
+        } else if (!allowColumnChanges
+                && values[0].length != getLogicalColumnCount()) {
             throw new TableDataException("Trying to import data with "
                     + values[0].length + " columns into a table with "
-                    + getColumnCount() + " columns.");
+                    + getLogicalColumnCount() + " columns.");
         }
     }
 

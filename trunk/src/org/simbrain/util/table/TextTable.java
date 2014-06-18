@@ -36,7 +36,7 @@ public class TextTable extends MutableTable<String> {
     public TextTable(final int rows, final int cols) {
         init(rows, cols);
         for (int i = 0; i < rows; i++) {
-            rowData.add(getNewRow(""));
+            rowData.add(createNewRow(""));
         }
     }
 
@@ -47,7 +47,7 @@ public class TextTable extends MutableTable<String> {
         init(dictionary.size(), 1);
         int i = 0;
         for (String string : dictionary) {
-            setValue(i, 0, string, false);
+            setLogicalValue(i, 0, string, false);
             i++;
         }
         fireTableDataChanged();
@@ -68,7 +68,7 @@ public class TextTable extends MutableTable<String> {
     protected void init(int rows, int cols) {
         rowData.clear();
         for (int i = 0; i < rows; i++) {
-            rowData.add(getNewRow(" ", cols));
+            rowData.add(createNewRow(" ", cols));
         }
         fireTableStructureChanged();
     }
@@ -81,6 +81,15 @@ public class TextTable extends MutableTable<String> {
     @Override
     public Class getDataType() {
         return String.class;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == 0) {
+            return Double.class;
+        } else {
+            return String.class;
+        }
     }
 
     /**
@@ -97,12 +106,12 @@ public class TextTable extends MutableTable<String> {
             final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
         try {
-            checkData(allowRowChanges, allowColumnChanges, values);
+            //checkData(allowRowChanges, allowColumnChanges, values);
             reset(values.length, values[0].length);
             for (int i = 0; i < values.length; i++) {
-                for (int j = 0; j < values[0].length; j++) {
+                for (int j = 1; j < values[0].length; j++) {
                     if ((values[i][j]).length() > 0) {
-                        setValue(i, j, values[i][j], false);
+                        setLogicalValue(i, j, values[i][j], false);
                     }
                 }
             }

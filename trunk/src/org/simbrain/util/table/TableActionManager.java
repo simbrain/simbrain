@@ -205,8 +205,8 @@ public class TableActionManager {
             // Initialize
             {
                 // putValue(SMALL_ICON, ResourceManager.getImageIcon(""));
-                putValue(NAME, "Normalize");
-                putValue(SHORT_DESCRIPTION, "Normalize");
+                putValue(NAME, "Normalize Column(s)");
+                putValue(SHORT_DESCRIPTION, "Normalize Selected Columns");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);

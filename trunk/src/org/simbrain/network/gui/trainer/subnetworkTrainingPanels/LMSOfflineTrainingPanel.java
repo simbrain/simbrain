@@ -29,6 +29,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * Combines an LMS Offline control panel and training set panel to provide the
@@ -38,7 +39,7 @@ import org.simbrain.util.genericframe.GenericFrame;
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public class LMSOfflineTrainingPanel extends JPanel {
+public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
 
     /** Reference to trainer object. */
     private LMSOffline trainer;
@@ -100,6 +101,20 @@ public class LMSOfflineTrainingPanel extends JPanel {
         this.parentFrame = parentFrame;
         controlPanel.setFrame(parentFrame);
         trainingSetPanel.setFrame(parentFrame);
+    }
+
+    @Override
+    public void fillFieldValues() {
+    }
+
+    @Override
+    public boolean commitChanges() {
+        return trainingSetPanel.commitChanges();
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

@@ -51,6 +51,12 @@ public class HopfieldEditTrainDialog extends StandardDialog {
     /** Main tabbed pane. */
     protected JTabbedPane tabbedPane = new JTabbedPane();
 
+    /** Reference to input data panel. */
+    private DataPanel inputPanel;
+
+    /** Reference to validate inputs panel */
+    private TestInputPanel validateInputsPanel;
+
     /**
      * Construct the dialog.
      *
@@ -80,16 +86,16 @@ public class HopfieldEditTrainDialog extends StandardDialog {
 
 
         // Input data tab
-        final DataPanel inputPanel = new DataPanel(hop.getInputNeurons(),
+        inputPanel = new DataPanel(hop.getInputNeurons(),
                 hop.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        final TestInputPanel testInputPanel = new TestInputPanel(np,
+        validateInputsPanel = new TestInputPanel(np,
                 hop.getInputNeurons(), hop.getTrainingSet()
                         .getInputDataMatrix());
-        tabbedPane.addTab("Test data", testInputPanel);
+        tabbedPane.addTab("Validate", validateInputsPanel);
 
 
         // Listen for tab changed events. Load inputs to test tab
@@ -101,7 +107,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
                 int index = sourceTabbedPane.getSelectedIndex();
                 if (index == 2) {
                     if (inputPanel.getTable().getData() != null) {
-                        testInputPanel.setData(((NumericTable) inputPanel
+                        validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
                     }
                 }
@@ -118,9 +124,18 @@ public class HopfieldEditTrainDialog extends StandardDialog {
 
     }
 
+    /**
+     * Commit all changes made in the dialog to the model.
+     */
+    private void commitChanges() {
+        hopfieldPropsPanel.commitChanges();
+        inputPanel.commitChanges();
+        validateInputsPanel.commitChanges();
+    }
+
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        hopfieldPropsPanel.commitChanges();
+        commitChanges();
     }
 }

@@ -20,6 +20,7 @@ package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
-import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.util.table.TextTable;
 
 /**
@@ -54,7 +54,6 @@ public class VectorDictionaryEditor extends StandardDialog {
     public static VectorDictionaryEditor createVectorDictionaryEditor(
             final ReaderWorld world) {
         VectorDictionaryEditor editor = new VectorDictionaryEditor(world);
-        //editor.addListener();
         return editor;
     }
 
@@ -66,14 +65,16 @@ public class VectorDictionaryEditor extends StandardDialog {
     private VectorDictionaryEditor(final ReaderWorld world) {
         super();
         this.world = world;
-        setTitle("View / Edit Vector Dictionary");
+        setTitle("Vector Dictionary");
         JPanel mainPanel = new JPanel(new BorderLayout());
-        table = new SimbrainJTable(new VectorDictionaryTable(
+        table = SimbrainJTable.createTable(new VectorDictionaryTable(
                 world.getVectorDictionary()));
         table.setShowCSVInPopupMenu(true);
         table.setShowDeleteColumnPopupMenu(false);
         table.setShowInsertColumnPopupMenu(false);
         table.setShowEditInPopupMenu(false);
+        table.setDisplayColumnHeadings(true);
+        table.setColumnHeadings(Arrays.asList("Token", "Vector"));
         SimbrainJTableScrollPanel scroller = new SimbrainJTableScrollPanel(
                 table);
         JPanel toolbarPanel = new JPanel();
@@ -81,60 +82,10 @@ public class VectorDictionaryEditor extends StandardDialog {
         toolbarPanel.add(table.getToolbarCSV(true, false));
         toolbarPanel.add(table.getToolbarEditRows());
         mainPanel.add(toolbarPanel, BorderLayout.NORTH);
-        scroller.setMaxVisibleRows(10);
         table.setDisplayColumnHeadings(false);
         mainPanel.add(scroller, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
-    }
-
-    /**
-     * Add the table data listener. 
-     * 
-     * TODO: (Not currently implemented)
-     */
-    private void addListener() {
-
-        table.getData().addListener(new SimbrainTableListener() {
-
-            @Override
-            public void columnAdded(int column) {
-            }
-
-            @Override
-            public void columnRemoved(int column) {
-            }
-
-            @Override
-            public void rowAdded(int row) {
-            }
-
-            @Override
-            public void rowRemoved(int row) {
-            }
-
-            @Override
-            public void cellDataChanged(int row, int column) {
-                // Only the vector can currently be edited
-                if (column == 1) {
-                    // Edit vector
-                    String key = (String) table.getData().getValue(row, 0);
-                    // TODO: Need better representation of invalid data
-                    double[] vector = Utils.parseVectorString((String) table
-                            .getData().getValue(row, 1));
-                    world.getVectorDictionary().put(key, vector);
-                }
-            }
-
-            @Override
-            public void tableDataChanged() {
-            }
-
-            @Override
-            public void tableStructureChanged() {
-            }
-
-        });
     }
 
     @Override
@@ -159,8 +110,8 @@ public class VectorDictionaryEditor extends StandardDialog {
             for (Map.Entry<String, double[]> entry : dictionary.entrySet()) {
                 String token = entry.getKey();
                 double[] vals = entry.getValue();
-                setValue(i, 0, token, false);
-                setValue(i, 1, Utils.doubleArrayToString(vals), false);
+                setLogicalValue(i, 0, token, false);
+                setLogicalValue(i, 1, Utils.doubleArrayToString(vals), false);
                 i++;
             }
             fireTableDataChanged();

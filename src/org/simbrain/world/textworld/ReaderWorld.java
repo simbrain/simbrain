@@ -207,7 +207,7 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Returns the current parse style inside a comboboxwrapper. Used by
      * preference dialog.
-     * 
+     *
      * @return the the comboBox
      */
     public ComboBoxWrapper getParseStyle() {
@@ -224,7 +224,7 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * Set the current parse style. Used by preference dialog.
-     * 
+     *
      * @param parseStyle
      *            the current style.
      */
@@ -234,7 +234,7 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * Set the parse style object.
-     * 
+     *
      * @param parseStyle
      *            the current parse style
      */
@@ -244,7 +244,7 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * Get the current parse style.
-     * 
+     *
      * @return the current parse style
      */
     public ParseStyle getTheParseStyle() {
@@ -279,7 +279,7 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Returns 1 if the current item is this character, or 0 otherwise. Used for
      * localist representations of letters.
-     * 
+     *
      * @param letter
      *            the letter to search for
      * @return 1 if the letter is contained, 0 otherwise.
@@ -298,7 +298,7 @@ public final class ReaderWorld extends TextWorld {
     /**
      * Return the vector associated with the currently parsed token, or a
      * default zero vector.
-     * 
+     *
      * @param token
      *            the token to associate with a vector
      * @return the associated vector
@@ -317,7 +317,7 @@ public final class ReaderWorld extends TextWorld {
      * Returns the double array associated with the currently selected token
      * (character or word). The reader world can produce a vector at any moment
      * by calling this function. Called by reflection by ReaderComponent.
-     * 
+     *
      * @return the vector corresponding to the currently parsed token.
      */
     public double[] getCurrentVector() {
@@ -328,7 +328,7 @@ public final class ReaderWorld extends TextWorld {
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     static XStream getXStream() {

@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
@@ -43,7 +44,8 @@ public final class NewDataWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        DataWorldComponent world = new DataWorldComponent("");
+        DataWorldComponent world = DataWorldComponent.createDataWorld(
+                new NumericTable(), "");
         workspace.addWorkspaceComponent(world);
     }
 }

@@ -19,9 +19,13 @@
 package org.simbrain.util.table;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.simbrain.util.Utils;
+import org.simbrain.util.table.SimbrainJTable.CellIndex;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -88,7 +92,7 @@ public class NumericTable extends MutableTable<Double> implements
     protected void init(int rows, int cols) {
         rowData.clear();
         for (int i = 0; i < rows; i++) {
-            rowData.add(getNewRow(new Double(0), cols));
+            rowData.add(createNewRow(new Double(0), cols));
         }
         fireTableStructureChanged();
     }
@@ -112,7 +116,7 @@ public class NumericTable extends MutableTable<Double> implements
         reset(data.length, data[0].length);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[0].length; j++) {
-                this.setValue(i, j, data[i][j], false);
+                this.setLogicalValue(i, j, data[i][j], false);
             }
         }
         fireTableDataChanged();
@@ -127,7 +131,7 @@ public class NumericTable extends MutableTable<Double> implements
         int i = getCurrentRow();
         for (int j = 0; j < data.length; j++) {
             if (j < this.getColumnCount()) {
-                this.setValue(i, j, data[j], false);
+                this.setLogicalValue(i, j, data[j], false);
             }
         }
         fireTableDataChanged();
@@ -142,7 +146,7 @@ public class NumericTable extends MutableTable<Double> implements
         double[] retVec = new double[this.getColumnCount()];
         int currRow = getCurrentRow();
         for (int i = 0; i < this.getColumnCount(); i++) {
-            retVec[i] = this.getValue(currRow, i);
+            retVec[i] = this.getLogicalValueAt(currRow, i);
         }
         return retVec;
     }
@@ -164,7 +168,7 @@ public class NumericTable extends MutableTable<Double> implements
      * @return value of this column in current row
      */
     public double getValueCurrentRow(final int column) {
-        return getValue(currentRow, column);
+        return getLogicalValueAt(currentRow, column);
     }
 
     @Override
@@ -186,18 +190,6 @@ public class NumericTable extends MutableTable<Double> implements
                 setCurrentRow(getCurrentRow() + 1);
             }
         }
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(SimbrainDataTable.class, "listeners");
-        xstream.omitField(SimbrainDataTable.class, "initialized");
-        return xstream;
     }
 
     /**
@@ -223,56 +215,6 @@ public class NumericTable extends MutableTable<Double> implements
      */
     public void setIterationMode(boolean iterationMode) {
         this.iterationMode = iterationMode;
-    }
-
-    /**
-     * Normalize data in selected column. TODO: Use bounds.
-     *
-     * @param columnIndex column to normalize.
-     */
-    public void normalizeColumn(final int columnIndex) { // TODO: combine with
-                                                         // normalizeTable?
-        // TODO: Check for valid column
-        double max = Double.NEGATIVE_INFINITY;
-        double min = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < this.getRowCount(); i++) {
-            double val = getValue(i, columnIndex);
-            if (val > max) {
-                max = val;
-            }
-            if (val < min) {
-                min = val;
-            }
-        }
-        for (int i = 0; i < this.getRowCount(); i++) {
-            setValue(i, columnIndex, (getValue(i, columnIndex) - min)
-                    / (max - min), false);
-        }
-        this.fireTableDataChanged();
-    }
-
-    /**
-     * Randomize neurons within specified bounds.
-     */
-    public void randomizeTable() {
-        Random rand = new Random();
-        int range = getUpperBound() - getLowerBound();
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                double value = (rand.nextDouble() * range) + getLowerBound();
-                setValue(i, j, value, false);
-            }
-        }
-        fireTableDataChanged();
-    }
-
-    /**
-     * Normalize the whole table.
-     */
-    public void normalizeTable() {
-        for (int i = 0; i < this.getColumnCount(); i++) {
-            normalizeColumn(i);
-        }
     }
 
     /**
@@ -335,7 +277,7 @@ public class NumericTable extends MutableTable<Double> implements
                             num = Double.valueOf(values[i][j]);
                         } catch (NumberFormatException exception) {
                         } finally {
-                            setValue(i, j, num, false);
+                            setLogicalValue(i, j, num, false);
                         }
                     }
                 }
@@ -353,13 +295,81 @@ public class NumericTable extends MutableTable<Double> implements
      */
     public double[][] asDoubleArray() {
 
-        double returnList[][] = new double[getRowCount()][getColumnCount()];
+        double returnList[][] = new double[getRowCount()][getLogicalColumnCount()];
         for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                returnList[i][j] = this.getValue(i, j);
+            for (int j = 0; j < getLogicalColumnCount(); j++) {
+                returnList[i][j] = this.getLogicalValueAt(i, j);
             }
         }
         return returnList;
     }
+
+    /**
+     * Fill the table at selected with the indicated value at the indicated
+     * locations.
+     *
+     * @param cellIndices list of cell indices.
+     * @param val the value to fill
+     */
+    public void fill(List<CellIndex> cellIndices, double val) {
+        for (CellIndex cellIndex : cellIndices) {
+            int row = cellIndex.row;
+            int col = cellIndex.col;
+            this.setLogicalValue(row, col, val, false);
+        }
+        this.fireTableDataChanged();
+    }
+
+    /**
+     * Randomize neurons within specified bounds.
+     *
+     * @param cellIndices list of cell indices.
+     */
+    public void randomize(List<CellIndex> cellIndices) {
+        Random rand = new Random();
+        int range = getUpperBound() - getLowerBound();
+        for (CellIndex cellIndex : cellIndices) {
+            int row = cellIndex.row;
+            int col = cellIndex.col;
+            double value = (rand.nextDouble() * range) + getLowerBound();
+            setLogicalValue(row, col, value, false);
+        }
+        fireTableDataChanged();
+    }
+
+    /**
+     * Normalize the whole table.
+     */
+    public void normalizeTable() {
+        for (int i = 0; i < this.getLogicalColumnCount(); i++) {
+            normalizeColumn(i);
+        }
+    }
+
+    /**
+     * Normalize data in selected column. TODO: Use bounds.
+     *
+     * @param columnIndex column to normalize.
+     */
+    public void normalizeColumn(final int columnIndex) {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < this.getRowCount(); i++) {
+            double val = getLogicalValueAt(i, columnIndex);
+            if (val > max) {
+                max = val;
+            }
+            if (val < min) {
+                min = val;
+            }
+        }
+        for (int i = 0; i < this.getRowCount(); i++) {
+            setLogicalValue(i, columnIndex, (getLogicalValueAt(i, columnIndex) - min)
+                    / (max - min), false);
+        }
+        this.fireTableDataChanged();
+    }
+
+
 
 }

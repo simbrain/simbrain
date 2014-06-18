@@ -18,28 +18,23 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
 /**
  * Panel for sending inputs from a table to a network. The action that calls
@@ -49,16 +44,10 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  * @author Jeff Yoshimi
  * @author Lam Nguyen
  */
-public class TestInputPanel extends JPanel {
+public class TestInputPanel extends DataPanel {
 
     /** Network panel. */
     private NetworkPanel networkPanel;
-
-    /** JTable contained in scroller. */
-    private SimbrainJTable table;
-
-    /** Scroll panel for table. */
-    private SimbrainJTableScrollPanel scroller;
 
     /** True when iteration mode is on. */
     private boolean iterationMode = true;
@@ -66,53 +55,47 @@ public class TestInputPanel extends JPanel {
     /** Button used to advance row. Disabled when iteration mode is on. */
     private JButton advance;
 
-    /** The training input data. */
-    private NumericMatrix dataHolder;
-
     /**
      * This is the network that should be updated whenever the input neurons are
      * updated. If null, update the whole network
      */
     private Network network;
 
-    /** The nodes to test. */
-    private List<Neuron> inputNeurons;
-
     /**
      * Temporary data for case where input panel does not read stored data but
      * simply creates temporary data.
      */
-    private double[][] tempDataMatrix;
+    private double[][] tempDataMatrix = new double[5][inputNeurons.size()];
 
     /**
-     * Construct panel using a network panel and a list of selected neurons. No
-     * data holder is provided.
+     * Create panel using a network panel and a list of selected neurons for
+     * case where no data holder is provided (currently, applying test inputs to
+     * an arbitrary set of loose neurons).
      *
      * @param networkPanel networkPanel, must not be null
      * @param inputNeurons input neurons of the network to be tested
+     * @return the constructed panel
      */
-    public TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons) {
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
+    public static TestInputPanel createTestInputPanel(
+            NetworkPanel networkPanel, final List<Neuron> inputNeurons) {
 
-        this.networkPanel = networkPanel;
-        this.inputNeurons = inputNeurons;
-        tempDataMatrix = new double[5][inputNeurons.size()];
-        this.dataHolder = new NumericMatrix() {
+        NumericMatrix dataHolder = new NumericMatrix() {
+            double[][] dataMatrix = new double[5][inputNeurons.size()];
 
             @Override
             public void setData(double[][] data) {
-                tempDataMatrix = data;
+                dataMatrix = data;
             }
 
             @Override
             public double[][] getData() {
-                return tempDataMatrix;
+                return dataMatrix;
             }
 
         };
-        initTestInputPanel();
+        TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons,
+                dataHolder);
+        return panel;
     }
 
     /**
@@ -125,13 +108,12 @@ public class TestInputPanel extends JPanel {
      */
     public TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
             NumericMatrix dataHolder) {
+        super(inputNeurons, dataHolder, 5, "Test Inputs");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-
-        this.networkPanel = networkPanel;
-        this.inputNeurons = inputNeurons;
         this.dataHolder = dataHolder;
+        this.networkPanel = networkPanel;
         initTestInputPanel();
     }
 
@@ -140,26 +122,7 @@ public class TestInputPanel extends JPanel {
      */
     private void initTestInputPanel() {
         network = networkPanel.getNetwork();
-        table = new SimbrainJTable(new DataTable());
         ((NumericTable) table.getData()).setIterationMode(iterationMode);
-        // Set up column headings
-        List<String> colHeaders = new ArrayList<String>();
-        for (int i = 0; i < inputNeurons.size(); i++) {
-            colHeaders.add(new String("" + (i + 1) + " ("
-                    + inputNeurons.get(i).getId())
-                    + ")");
-        }
-        table.setColumnHeadings(colHeaders);
-        table.getData().fireTableStructureChanged();
-        scroller = new SimbrainJTableScrollPanel(table);
-        this.setLayout(new BorderLayout());
-        this.add("Center", scroller);
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JToolBar editRowToolBar = new JToolBar();
-        toolbar.add(table.getToolbarCSV(true, false));
-        toolbar.add(editRowToolBar);
-        editRowToolBar.add(table.getToolbarEditRows());
-        toolbar.add(table.getToolbarRandomize());
         JButton test = new JButton(testRowAction);
         advance = new JButton(advanceRowAction);
         JButton testTable = new JButton(testTableAction);
@@ -170,8 +133,7 @@ public class TestInputPanel extends JPanel {
         testToolBar.add(advance);
         testToolBar.add(testTable);
         testToolBar.add(iterationCheckBox);
-        toolbar.add(testToolBar);
-        this.add("North", toolbar);
+        toolbars.add(testToolBar);
     }
 
     /**
@@ -269,7 +231,8 @@ public class TestInputPanel extends JPanel {
         table.updateRowSelection();
         for (int j = 0; j < inputNeurons.size(); j++) {
             inputNeurons.get(j).forceSetActivation(
-                    ((NumericTable) table.getData()).getValue(testRow, j));
+                    ((NumericTable) table.getData()).getLogicalValueAt(testRow,
+                            j));
         }
         if (network != null) {
             network.update();
@@ -314,68 +277,4 @@ public class TestInputPanel extends JPanel {
         }
     }
 
-    /**
-     * Matrix of synapses to be viewed in a SimbrainJTable.
-     */
-    private class DataTable extends NumericTable {
-
-        /**
-         * Construct the data table.
-         */
-        private DataTable() {
-            //TODO: Move below to check method and use throughout
-            if (dataHolder.getData() == null) {
-                reset(5, inputNeurons.size());
-            }
-        }
-
-        @Override
-        public void setValue(final int row, final int col, final Double value,
-                final boolean fireEvent) {
-            dataHolder.getData()[row][col] = value;
-            if (fireEvent) {
-                fireTableDataChanged();
-            }
-        }
-
-        @Override
-        public void setValue(int row, int col, Double value) {
-            setValue(row, col, value, true);
-        }
-
-        @Override
-        public Double getValue(int row, int col) {
-            return dataHolder.getData()[row][col];
-
-        }
-
-        @Override
-        public void reset(int rows, int cols) {
-            dataHolder.setData(new double[rows][cols]);
-            fireTableStructureChanged();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return inputNeurons.size();
-        }
-
-        @Override
-        public int getRowCount() {
-            return dataHolder.getData().length;
-        }
-
-        @Override
-        public void insertRow(int at) {
-            System.out.println("insert row at " + at );
-            //TODO.
-        }
-
-        @Override
-        public void removeRow(int at) {
-            System.out.println("remove row at " + at );
-            //TODO.
-        }
-
-    }
 }

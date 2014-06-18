@@ -19,28 +19,50 @@
 package org.simbrain.util.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 /**
  * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
- * reasonable, readable way with XStream. Currently numerical table and a
- * default implementation are subclasses.
+ * reasonable, readable way with XStream.
+ *
+ * All data are backed to a list of lists. This data structure can then be
+ * converted to other data structures (e.g. a 2d array of doubles) as needed.
+ * This is not as fast as alternatives but it's pretty fast and so suitable for
+ * most purposes.
+ *
+ * This class can also be subclassed and relevant methods overridden for an
+ * immutable, view type setup. For an example see WeightMatrixViewer.
+ *
+ * Note that the first column of all tables is a special header column that
+ * displays row number or other information. For convenience and ease of use,
+ * special "logical" methods are provided that use the indices of the data
+ * itself(i.e. column 0 is the first column of the data, not the special
+ * row-header column).
  *
  * @param <T> the type of the data to be displayed.
- * @author jyoshimi
+ * @author Jeff Yoshimi
+ * @see org.simbrain.util.table.SimbrainJTable
+ * @see org.simbrain.network.gui.WeightMatrixViewer
  */
-public abstract class SimbrainDataTable<T> {
+public abstract class SimbrainDataTable<T> extends AbstractTableModel {
 
-    /** The data. */
+    /**
+     * The data. For use with mutable tables. Subclasses can choose not to make
+     * use of this (e.g. WeightMatrixViewer)
+     */
     protected final List<List<T>> rowData;
 
-    /** Listeners. */
-    private List<SimbrainTableListener> listeners;
-
-    // Initialize fields
+    // Initialize data
     {
-        listeners = new ArrayList<SimbrainTableListener>();
         rowData = new ArrayList<List<T>>();
     }
 
@@ -57,6 +79,20 @@ public abstract class SimbrainDataTable<T> {
      * @return the data type.
      */
     abstract Class<?> getDataType();
+
+    /**
+     * Custom column headings. Only used if set, otherwise default column
+     * headings (1...n) used.
+     */
+    private List<String> columnHeadings;
+
+    /** Whether to display column headings. */
+    private boolean displayColumnHeadings = true;
+
+    @Override
+    public void setValueAt(Object val, int rowIndex, int columnIndex) {
+        setValue(rowIndex, columnIndex, (T) val);
+    }
 
     /**
      * Set the value at specific position in the table.
@@ -83,30 +119,93 @@ public abstract class SimbrainDataTable<T> {
     public void setValue(final int row, final int column, final T value,
             final boolean fireEvent) {
 
-        rowData.get(row).set(column, value);
-        if (fireEvent) {
-            fireCellDataChanged(row, column);
+        if (column == 0) {
+            return; // Can't adjust first "header" column.
+        }
+        setLogicalValue(row, column - 1, value, fireEvent);
+    }
+
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (column == 0) {
+            // This is taken care of by the CustomCellRenderer.
+            return null;
+        } else {
+            // -1 To account for header column
+            return getLogicalValueAt(row, column - 1);
         }
     }
 
     /**
-     * Get the value of a specific cell in the table.
+     * Set the value at specific position in the data underlying the table, and
+     * specify whether to fire a changed event (false useful when a lot of
+     * values need to be changed at once and it would waste time to update the
+     * GUI for every such change).
+     *
+     * @param row row index in the "logical" data
+     * @param column column index in the "logical" data
+     * @param value value to add
+     * @param fireEvent true if an event should be fired, false otherwise.
+     */
+    public void setLogicalValue(final int row, final int column, final T value,
+            final boolean fireEvent) {
+        rowData.get(row).set(column, value);
+        if (fireEvent) {
+            this.fireTableCellUpdated(row, column);
+        }
+
+    }
+
+    /**
+     * Get the value of a specific cell in the data structure backing this table
+     * data structure.
      *
      * @param row the row index
      * @param col the column index
      * @return the value at that cell
      */
-    public T getValue(int row, int col) {
+    public T getLogicalValueAt(int row, int col) {
         return rowData.get(row).get(col);
     }
 
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return Double.class;
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        if (column == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        if (!displayColumnHeadings) {
+            return null;
+        }
+        if (columnIndex == 0) {
+            return "#";
+        } else {
+            // System.out.println(Arrays.asList(columnHeadings));
+            if (columnHeadings != null) {
+                return columnHeadings.get(columnIndex - 1);
+            } else {
+                return "" + columnIndex;
+            }
+        }
+    }
+
     /**
-     * Returns the number of columns in the dataset. Note the same as columns in
-     * the simbrainjtable, which has an extra row and column for headers.
+     * Returns the number of columns in the underlying data, which is one less
+     * than the number of columns in the table data.
      *
-     * @return the columns in the dataset.
+     * @return the number of columns in the data
      */
-    public int getColumnCount() {
+    public int getLogicalColumnCount() {
         if (rowData.size() > 0) {
             return rowData.get(0).size();
         } else {
@@ -114,43 +213,18 @@ public abstract class SimbrainDataTable<T> {
         }
     }
 
-    /**
-     * Returns the number of rows in the dataset.
-     *
-     * @return the rows in the dataset.
-     */
+    @Override
+    public int getColumnCount() {
+        if (rowData.size() > 0) {
+            return rowData.get(0).size() + 1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public int getRowCount() {
         return rowData.size();
-    }
-
-    /**
-     * Create a new row for the table, with a specified value.
-     *
-     * @param value value for columns of new row
-     * @return the new row
-     */
-    protected List<T> getNewRow(final T value) {
-        ArrayList<T> row = new ArrayList<T>();
-        for (int i = 0; i < getColumnCount(); i++) {
-            row.add(value);
-        }
-        return row;
-    }
-
-    /**
-     * Create a new row for the table, with a specified value.
-     *
-     * @param value value for columns of new row
-     * @param cols number of columns in a row for this table
-     * @return the new row
-     */
-    protected List<T> getNewRow(final T value, final int cols) {
-        ArrayList<T> row = new ArrayList<T>();
-
-        for (int i = 0; i < cols; i++) {
-            row.add(value);
-        }
-        return row;
     }
 
     /**
@@ -161,24 +235,32 @@ public abstract class SimbrainDataTable<T> {
     public void fill(final T value) {
         for (int i = 0; i < this.getRowCount(); i++) {
             for (int j = 0; j < this.getColumnCount(); j++) {
-                setValue(i, j, value, false);
+                setLogicalValue(i, j, value, false);
             }
         }
         this.fireTableDataChanged();
     }
 
     /**
-     * Returns a string array representation of the table, useful in csv
-     * parsing.
+     * Shuffle the rows of the dataset.
+     */
+    public void shuffle() {
+        Collections.shuffle(rowData);
+        fireTableDataChanged();
+    }
+
+    /**
+     * Returns a string array representation of the table.
      *
      * @return string array version of table
      */
     public String[][] asStringArray() {
-        String stringArray[][] = new String[getRowCount()][getColumnCount()];
+        String stringArray[][] = new String[getRowCount()][getLogicalColumnCount()];
         for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                stringArray[i][j] = "" + getValue(i, j);
+            for (int j = 0; j < getLogicalColumnCount(); j++) {
+                stringArray[i][j] = "" + getLogicalValueAt(i, j);
             }
+            // System.out.println(Arrays.toString(stringArray[i]));
         }
         return stringArray;
     }
@@ -192,114 +274,49 @@ public abstract class SimbrainDataTable<T> {
         List<T> list = new ArrayList<T>();
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                list.add(getValue(i, j));
+                list.add(getLogicalValueAt(i, j));
             }
         }
         return list;
     }
 
     /**
-     * Add a table listener.
+     * @param columnHeadings the columnHeadings to set
+     */
+    public void setColumnHeadings(List<String> columnHeadings) {
+        // System.out.println("setColumnHeadings " +
+        // Arrays.asList(columnHeadings));
+        this.columnHeadings = columnHeadings;
+        this.fireTableStructureChanged();
+    }
+
+    /**
+     * TODO: This only works for setting from true to false. Setting from false
+     * back to true does not work.
      *
-     * @param listener listener to add
+     * @param displayColumnHeadings the displayColumnHeadings to set
      */
-    public void addListener(SimbrainTableListener listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<SimbrainTableListener>();
-        }
-        listeners.add(listener);
+    public void setDisplayColumnHeadings(boolean displayColumnHeadings) {
+        this.displayColumnHeadings = displayColumnHeadings;
     }
 
     /**
-     * Remove a table listener.
+     * Returns a properly initialized xstream object.
      *
-     * @param listener listener to remove
+     * @return the XStream object
      */
-    public void removeListener(SimbrainTableListener listener) {
-        listeners.remove(listener);
+    public static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(AbstractTableModel.class, "listenerList");
+        return xstream;
     }
 
-    /**
-     * Fire column added event.
-     *
-     * @param index index of column to add
-     */
-    public void fireColumnAdded(final int index) {
-        for (SimbrainTableListener listener : listeners) {
-            listener.columnAdded(index);
+    @Override
+    public void addTableModelListener(TableModelListener l) {
+        if (listenerList == null) {
+            listenerList = new EventListenerList();
         }
-    }
-
-    /**
-     * Fire row added event.
-     *
-     * @param index index of column to add
-     */
-    public void fireRowAdded(final int index) {
-        for (SimbrainTableListener listener : listeners) {
-            listener.rowAdded(index);
-        }
-    }
-
-    /**
-     * Fire column removed event.
-     *
-     * @param index index of column to remove
-     */
-    public void fireColumnRemoved(final int index) {
-        for (SimbrainTableListener listener : listeners) {
-            listener.columnRemoved(index);
-        }
-    }
-
-    /**
-     * Fire row removed event.
-     *
-     * @param index index of row to remove
-     */
-    public void fireRowRemoved(final int index) {
-        for (SimbrainTableListener listener : listeners) {
-            listener.rowRemoved(index);
-        }
-    }
-
-    /**
-     * Fire table data changed event. Only call when all data has changed. When
-     * a specific bit of data has changed call celldata changed.
-     */
-    public void fireTableDataChanged() {
-        for (SimbrainTableListener listener : listeners) {
-            listener.tableDataChanged();
-        }
-    }
-
-    /**
-     * Fire cell data changed event.
-     *
-     * @param row row index
-     * @param column column index
-     */
-    public void fireCellDataChanged(int row, int column) {
-        for (SimbrainTableListener listener : listeners) {
-            listener.cellDataChanged(row, column);
-        }
-    }
-
-    /**
-     * Fire table structure changed event.
-     */
-    public void fireTableStructureChanged() {
-        for (SimbrainTableListener listener : listeners) {
-            listener.tableStructureChanged();
-        }
-    }
-
-    /**
-     * Shuffle the rows of the dataset.
-     */
-    public void shuffle() {
-        Collections.shuffle(rowData);
-        fireTableDataChanged();
+        super.addTableModelListener(l);
     }
 
 }

@@ -26,13 +26,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * Display input data and target data.
  *
  * @author jyoshimi
  */
-public class TrainingSetPanel extends JPanel {
+public class TrainingSetPanel extends JPanel implements EditablePanel {
 
     /** Representation of input data. */
     private DataPanel inputPanel;
@@ -161,6 +162,20 @@ public class TrainingSetPanel extends JPanel {
         parentFrame.setMaximizable(false);
         inputPanel.setFrame(frame);
         targetPanel.setFrame(frame);
+    }
+
+    @Override
+    public boolean commitChanges() {
+        return inputPanel.commitChanges() && targetPanel.commitChanges();
+    }
+
+    @Override
+    public void fillFieldValues() {
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

@@ -38,6 +38,7 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -47,6 +48,8 @@ import javax.swing.JToolBar;
 import javax.swing.JToolTip;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
@@ -127,6 +130,7 @@ import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
+import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
 
 /**
@@ -2789,8 +2793,19 @@ public class NetworkPanel extends JPanel {
      *            title for the frame
      * @return reference to frame the panel will be displayed in.
      */
-    public GenericFrame displayPanel(JPanel panel, String title) {
+    public GenericFrame displayPanel(final JPanel panel, String title) {
         GenericFrame frame = new GenericJDialog();
+        if (frame instanceof JInternalFrame) {
+            ((JInternalFrame)frame).addInternalFrameListener(new InternalFrameAdapter(
+                    ) {
+                @Override
+                public void internalFrameClosed(InternalFrameEvent e) {
+                    if (panel instanceof EditablePanel) {
+                        ((EditablePanel)panel).commitChanges();
+                    }
+                }
+            });
+        }
         frame.setContentPane(panel);
         frame.pack();
         frame.setTitle(title);

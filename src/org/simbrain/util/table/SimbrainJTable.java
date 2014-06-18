@@ -26,9 +26,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -36,26 +35,32 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 
 /**
  * <b>SimbrainJTable</b> is a version of a JXTable (itself an improved JTable
- * from SwingLabs) which provides GUI access to a Simbrain data table. Provides
+ * from SwingLabs) which provides GUI access to a SimbrainDataTable. Provides
  * various features that are useful in simbrain, e.g. ability to set row and
- * column headings. (Note that JTables have their own tablemodels, which are
- * used here under the hood, but can be ignored when using this class. Just
- * instantiate some subclass of SimbrainJTable and pass it to an instance of
- * this class, and the data will display).
+ * column headings.
+ *
+ * The first column of all tables is a special header column that displays row
+ * number or other information. Calls to the underlying SimbrainDataTable model
+ * thus must either be offset by 1 as necessary, or can call special methods
+ * that refer to "logical" row / column indices that refer to location in the
+ * data itself (i.e. column 0 is the first column of the data, not the special
+ * row-header column).
  *
  * @author jyoshimi
+ * @see org.simbrain.util.table.SimbrainDataTable
  */
 public class SimbrainJTable extends JXTable {
 
     /** The data to be displayed in the jtable. */
-    private SimbrainDataTable data;
+    private SimbrainDataTable<?> data;
 
     /**
      * Row headings. Only used if set, otherwise default row headings (1...n)
@@ -63,23 +68,11 @@ public class SimbrainJTable extends JXTable {
      */
     private List<String> rowHeadings;
 
-    /**
-     * Custom column headings. Only used if set, otherwise default column
-     * headings (1...n) used.
-     */
-    private List<String> columnHeadings;
-
     /** Point selected. */
     private Point selectedPoint;
 
     /** Grid Color. */
     private Color gridColor = Color.LIGHT_GRAY;
-
-    /** Underlying Java table model. */
-    private TableModel tableModel;
-
-    /** Whether to display column headings. */
-    private boolean displayColumnHeadings = true;
 
     /** Whether to display the default popup menu. */
     private boolean displayPopUpMenu = true;
@@ -102,34 +95,33 @@ public class SimbrainJTable extends JXTable {
     private boolean showCSVInPopupMenu = true;
 
     /**
-     * Construct the table with specified number of rows and columns.
+     * Creates a new simbrain gui jtable.
      *
-     * @param rows number of rows of data
-     * @param cols number of columns of data
+     * @param dataModel the initial data
+     * @return the jtable the constructed table
      */
-    public SimbrainJTable(int rows, int cols) {
-        data = new NumericTable(rows, cols);
-        initJTable();
+    public static SimbrainJTable createTable(SimbrainDataTable dataModel) {
+        SimbrainJTable table = new SimbrainJTable(dataModel);
+        table.initJTable();
+        table.setHasChangedSinceLastSave(false);
+        return table;
     }
 
     /**
-     * Creates a new instance of the data world.
+     * Construct the jtable.
      *
-     * @param dataModel
+     * @param dataModel the data
      */
-    public SimbrainJTable(SimbrainDataTable dataModel) {
+    protected SimbrainJTable(SimbrainDataTable dataModel) {
         data = dataModel;
-        // get data values and use to set?
-        initJTable();
+        this.setModel(data);
     }
 
     /**
      * Initialize the table.
      */
-    private void initJTable() {
-        this.setModel(new TableModel());
-        addKeyListener(keyListener);
-        addMouseListener(mouseListener);
+    protected void initJTable() {
+        // addKeyListener(keyListener);
         setColumnSelectionAllowed(true);
         setRolloverEnabled(true);
         setRowSelectionAllowed(true);
@@ -152,8 +144,8 @@ public class SimbrainJTable extends JXTable {
             showFillInPopupMenu = false;
             showCSVInPopupMenu = false;
         }
-        hasChangedSinceLastSave = false;
 
+        // Header listener. Manage column selection.
         getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -174,7 +166,24 @@ public class SimbrainJTable extends JXTable {
                 }
             }
         });
+        // Main mouse listener. Handle row selection and popup menu
         this.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                selectedPoint = e.getPoint();
+
+                if (data instanceof IterableRowsTable) {
+                    ((IterableRowsTable) data).setCurrentRow(getSelectedRow());
+                }
+                if (e.isPopupTrigger() && displayPopUpMenu) {
+                    JPopupMenu menu = buildPopupMenu();
+                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
+                            (int) selectedPoint.getY());
+                }
+            }
+
+            @Override
             public void mouseReleased(final MouseEvent e) {
                 final int row = rowAtPoint(e.getPoint());
                 final int column = columnAtPoint(e.getPoint());
@@ -187,17 +196,25 @@ public class SimbrainJTable extends JXTable {
                 }
             }
         });
+
+        hasChangedSinceLastSave = false;
+        data.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                hasChangedSinceLastSave = true;
+            }
+        });
     }
 
     /**
      * Special width for first column.
      */
     public void setFirstColumnWidth() {
-        // Initially forces first column to specific width; but has other
-        // side effects
-        // setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        getColumnModel().getColumn(0).setPreferredWidth(30);
-        // TODO: Make preferred width for first column settable
+        // If no row headings set assume just integers
+        if (rowHeadings == null) {
+            // TODO: 20 gets overridden by something
+            getColumnModel().getColumn(0).setPreferredWidth(20);
+        }
     }
 
     /**
@@ -240,33 +257,9 @@ public class SimbrainJTable extends JXTable {
     /**
      * @return the data
      */
-    public SimbrainDataTable getData() {
+    public SimbrainDataTable<?> getData() {
         return data;
     }
-
-    /**
-     * Listener for mouse events.
-     */
-    private MouseListener mouseListener = new MouseAdapter() {
-
-        /**
-         * {@inheritDoc}
-         */
-        public void mousePressed(final MouseEvent e) {
-            selectedPoint = e.getPoint();
-
-            if (data instanceof IterableRowsTable) {
-                ((IterableRowsTable) data).setCurrentRow(getSelectedRow());
-            }
-            // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
-            boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
-            if (isRightClick && displayPopUpMenu) {
-                JPopupMenu menu = buildPopupMenu();
-                menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
-                        (int) selectedPoint.getY());
-            }
-        }
-    };
 
     /**
      * Build the context menu for the table.
@@ -413,89 +406,6 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     * Randomize neurons within specified bounds.
-     */
-    public void randomize() {
-        Random rand = new Random();
-        int range = ((NumericTable) getData()).getUpperBound()
-                - ((NumericTable) getData()).getLowerBound();
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i, j)) {
-                    if (j > 0) {
-                        double value = (rand.nextDouble() * range)
-                                + ((NumericTable) getData()).getLowerBound();
-                        ((NumericTable) getData()).setValue(i, j - 1, value,
-                                false);
-                    }
-                }
-            }
-        }
-        ((NumericTable) getData()).fireTableDataChanged();
-    }
-
-    /**
-     * Normalize selected data. TODO: Use bounds?
-     *
-     */
-    public void normalize() {
-        double max = Double.NEGATIVE_INFINITY;
-        double min = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i, j)) {
-                    if (j > 0) {
-                        double val = ((NumericTable) getData()).getValue(i,
-                                j - 1);
-
-                        if (val > max) {
-                            max = val;
-                        }
-                        if (val < min) {
-                            min = val;
-                        }
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i, j)) {
-                    if (j > 0) {
-                        ((NumericTable) getData())
-                                .setValue(
-                                        i,
-                                        j - 1,
-                                        (((NumericTable) getData()).getValue(i,
-                                                j - 1) - min) / (max - min),
-                                        false);
-                    }
-                }
-            }
-        }
-        ((NumericTable) getData()).fireTableDataChanged();
-    }
-
-    /**
-     * Fills the table with the given value.
-     *
-     * @param value value to fill the table with.
-     */
-    public void fill(final double value) {
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                if (isCellSelected(i, j)) {
-                    if (j > 0) {
-                        ((NumericTable) getData()).setValue(i, j - 1, value,
-                                false);
-                    }
-                }
-            }
-        }
-        ((NumericTable) getData()).fireTableDataChanged();
-    }
-
-    /**
      * Return a menu with items for opening from and saving to .csv files.
      *
      * @param allowRowChanges whether to allow number of rows to change
@@ -627,15 +537,6 @@ public class SimbrainJTable extends JXTable {
     };
 
     /**
-     * Returns a copy of the underlying table model.
-     *
-     * @return the tableModel
-     */
-    TableModel getTableModel() {
-        return tableModel;
-    }
-
-    /**
      * Renderer for table. If custom row headings are used, treats first column
      * as a set of headings.
      */
@@ -661,163 +562,15 @@ public class SimbrainJTable extends JXTable {
                 }
                 return label;
             } else {
+                if (value == null) {
+                    JLabel label = new JLabel();
+                    label.setOpaque(true);
+                    label.setBackground(Color.GRAY.brighter());
+                    return label;
+                }
+
                 return super.getTableCellRendererComponent(table, value,
                         selected, focused, row, column);
-            }
-        }
-    }
-
-    /**
-     * <b>TableModel</b> extends DefaultTableModel (the standard model for
-     * JTables), and passes data from the SimbrainDataTable in to it, so that it
-     * can be presented in the JTable. This hides the tablemodel from the
-     * client, who only has to use this class and some subclass of
-     * SimbrainDataTable.
-     */
-    private class TableModel extends AbstractTableModel {
-
-        /** Listener. */
-        private final SimbrainTableListener listener = new SimbrainTableListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void columnAdded(int column) {
-                fireTableStructureChanged();
-                fireTableDataChanged();
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void columnRemoved(int column) {
-                fireTableStructureChanged();
-                fireTableDataChanged();
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void cellDataChanged(int row, int column) {
-                fireTableCellUpdated(row, column);
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void rowAdded(int row) {
-                fireTableRowsInserted(row, row);
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void rowRemoved(int row) {
-                fireTableRowsDeleted(row, row);
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void tableStructureChanged() {
-                fireTableStructureChanged();
-                hasChangedSinceLastSave = true;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void tableDataChanged() {
-                fireTableDataChanged();
-                hasChangedSinceLastSave = true;
-            }
-
-        };
-
-        /**
-         * Construct the table model.
-         *
-         * @param model reference to underlying data.
-         */
-        public TableModel() {
-            super();
-            data.addListener(listener);
-        }
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            if (data instanceof NumericTable) {
-                return Double.class;
-            } else if (data instanceof TextTable) {
-                if (columnIndex > 0) {
-                    return String.class;
-                } else {
-                    return Double.class;
-                }
-            }
-            return Double.class;
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            if (column == 0) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        @Override
-        public void setValueAt(Object value, int row, int column) {
-            if (column > 0) {
-                data.setValue(row, column - 1, value);
-            }
-        }
-
-        @Override
-        public String getColumnName(int columnIndex) {
-            if (!displayColumnHeadings) {
-                return null;
-            }
-            if (columnIndex > 0) {
-                if (columnHeadings != null) {
-                    return columnHeadings.get(columnIndex - 1);
-                } else {
-                    return "" + (columnIndex);
-                }
-            } else {
-                return "#"; // TODO: Make this settable
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int getColumnCount() {
-            return data.getColumnCount() + 1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int getRowCount() {
-            return data.getRowCount();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Object getValueAt(int row, int column) {
-            if (column == 0) {
-                // This is taken care of by the CustomCellRenderer.
-                return null;
-            } else {
-                return data.getValue(row, column - 1);
             }
         }
     }
@@ -837,37 +590,28 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     * @return the columnHeadings
-     */
-    public List<String> getColumnHeadings() {
-        return columnHeadings;
-    }
-
-    /**
      * @param columnHeadings the columnHeadings to set
      */
     public void setColumnHeadings(List<String> columnHeadings) {
-        this.columnHeadings = columnHeadings;
+        data.setColumnHeadings(columnHeadings);
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        Object o = getValueAt(row, column);
+        if (o == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
-     * @return the displayColumnHeadings
-     */
-    public boolean isDisplayColumnHeadings() {
-        return displayColumnHeadings;
-    }
-
-    /**
-     * TODO: This only works for setting from true to false. Setting from false
-     * back to true does not work.
+     * Forward setting to table model.
      *
      * @param displayColumnHeadings the displayColumnHeadings to set
      */
     public void setDisplayColumnHeadings(boolean displayColumnHeadings) {
-        this.displayColumnHeadings = displayColumnHeadings;
-        if (displayColumnHeadings == false) {
-            this.setTableHeader(null); // dubious method but worked
-        }
+        data.setDisplayColumnHeadings(displayColumnHeadings);
     }
 
     /**
@@ -959,6 +703,83 @@ public class SimbrainJTable extends JXTable {
      */
     public void setShowCSVInPopupMenu(boolean showCSVInPopupMenu) {
         this.showCSVInPopupMenu = showCSVInPopupMenu;
+    }
+
+    /**
+     * Normalize selected columns of selected cells.
+     */
+    public void normalize() {
+        if (data instanceof NumericTable) {
+            for (int i = 0; i < this.getSelectedColumns().length; i++) {
+                ((NumericTable) data)
+                        .normalizeColumn(getSelectedColumns()[i] - 1);
+            }
+        }
+    }
+
+    /**
+     * Randomize selected cells.
+     */
+    public void randomize() {
+
+        if (data instanceof NumericTable) {
+            ((NumericTable) data).randomize(getSelectedLogicalCellIndices());
+        }
+    }
+
+    /**
+     * Fills the table with the given value.
+     *
+     * @param value value to fill the table with.
+     */
+    public void fill(final double value) {
+        if (data instanceof NumericTable) {
+            ((NumericTable) data).fill(getSelectedLogicalCellIndices(), value);
+        }
+    }
+
+    /**
+     * Holds reference to row / column index.
+     */
+    class CellIndex {
+
+        /** Row index. */
+        public int row;
+
+        /** Column Index. */
+        public int col;
+
+        /**
+         * Construct the cell index.
+         *
+         * @param row row index
+         * @param col collumn index
+         */
+        public CellIndex(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+    /**
+     * Returns a list of selected cell-indices. These are "logical" indices of
+     * the data, with all column indices reduced by 1 (since the first column of
+     * a SimbrainDataTable is a header column).
+     *
+     * @return the list of cells
+     */
+    private List<CellIndex> getSelectedLogicalCellIndices() {
+        List<CellIndex> selectedCellIndices = new ArrayList<CellIndex>();
+        for (int i = 0; i < this.getSelectedRows().length; i++) {
+            for (int j = 0; j < this.getSelectedColumns().length; j++) {
+                int row = this.getSelectedRows()[i];
+                int col = this.getSelectedColumns()[j];
+                if (col > 0) {
+                    selectedCellIndices.add(new CellIndex(row, col - 1));
+                }
+            }
+        }
+        return selectedCellIndices;
     }
 
 }

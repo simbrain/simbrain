@@ -128,7 +128,7 @@ public class Neuron {
      * Construct a neuron with all default values in the specified network.
      * Usually this is used as the basis for a template neuron which will be
      * edited and then copied.
-     * 
+     *
      * @param parent
      *            The parent network of this neuron.
      */
@@ -139,7 +139,7 @@ public class Neuron {
 
     /**
      * Construct a specific type of neuron from a string description.
-     * 
+     *
      * @param parent
      *            The parent network. Be careful not to set this to root network
      *            if the root network is not the parent.
@@ -153,7 +153,7 @@ public class Neuron {
 
     /**
      * Construct a specific type of neuron.
-     * 
+     *
      * @param parent
      *            The parent network. Be careful not to set this to root network
      *            if the root network is not the parent.
@@ -167,7 +167,7 @@ public class Neuron {
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param parent
      *            The parent network. Be careful not to set this to root network
      *            if the root network is not the parent.
@@ -188,7 +188,7 @@ public class Neuron {
 
     /**
      * Provides a deep copy of this neuron.
-     * 
+     *
      * @return a deep copy of this neuron.
      */
     public Neuron deepCopy() {
@@ -209,7 +209,7 @@ public class Neuron {
 
     /**
      * Returns the time type of this neuron's update rule.
-     * 
+     *
      * @return the time type.
      */
     public TimeType getTimeType() {
@@ -218,7 +218,7 @@ public class Neuron {
 
     /**
      * Returns the current update rule.
-     * 
+     *
      * @return the neuronUpdateRule
      */
     public NeuronUpdateRule getUpdateRule() {
@@ -227,7 +227,7 @@ public class Neuron {
 
     /**
      * Returns the current update rule's description (name).
-     * 
+     *
      * @return the neuronUpdateRule's description
      */
     public String getUpdateRuleDescription() {
@@ -237,7 +237,7 @@ public class Neuron {
     /**
      * Sets the update rule using a String description. The provided description
      * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-     * 
+     *
      * @param name
      *            the "simple name" of the class associated with the neuron rule
      *            to set.
@@ -260,7 +260,7 @@ public class Neuron {
 
     /**
      * Set a new update rule. Essentially like changing the type of the network.
-     * 
+     *
      * @param updateRule
      *            the neuronUpdateRule to set
      */
@@ -292,7 +292,7 @@ public class Neuron {
      * set the activation use {@link #forceSetActivation(double)
      * forceSetActivation(double)}. Under normal circumstances model classes
      * will use this method.
-     * 
+     *
      * @param act
      *            Activation
      */
@@ -312,7 +312,7 @@ public class Neuron {
      * Overrides clamping and any intrinsic dynamics of the neuron, and forces
      * the neuron's activation to take a specific value. Used primarily by the
      * GUI (e.g. when externally setting the values of clamped input neurons).
-     * 
+     *
      * @param act
      *            the new activation value
      */
@@ -337,7 +337,7 @@ public class Neuron {
 
     /**
      * Sets the id of the neuron.
-     * 
+     *
      * @param theName
      *            Neuron id
      */
@@ -365,7 +365,7 @@ public class Neuron {
      * intermediate bodies. If the connection is a duplicate connection the
      * original synapse connecting this neuron to a target neuron will be
      * removed and replaced by <i>Synapse s</i>.
-     * 
+     *
      * @param s
      */
     public void addEfferent(final Synapse synapse) {
@@ -379,7 +379,7 @@ public class Neuron {
 
     /**
      * Remove this neuron from target neuron via a weight.
-     * 
+     *
      * @param synapse
      *            the connection between this neuron and a target neuron
      */
@@ -393,7 +393,7 @@ public class Neuron {
      * Adds an afferent synapse to this neuron, i.e. adds a synapse to
      * {@link #fanIn}. Does <b>NOT</b> add this synapse to the network or any
      * intermediate bodies.
-     * 
+     *
      * @param s
      */
     public void addAfferent(final Synapse source) {
@@ -404,7 +404,7 @@ public class Neuron {
 
     /**
      * Remove this neuron from source neuron via a weight.
-     * 
+     *
      * @param synapse
      *            the connection between this neuron and a source neuron
      */
@@ -416,7 +416,7 @@ public class Neuron {
 
     /**
      * Sums the weighted signals that are sent to this node.
-     * 
+     *
      * @return weighted input to this node
      */
     public double getWeightedInputs() {
@@ -469,7 +469,7 @@ public class Neuron {
 
     /**
      * Returns the root network this neuron is embedded in.
-     * 
+     *
      * @return root network.
      */
     public Network getNetwork() {
@@ -479,7 +479,7 @@ public class Neuron {
     /**
      * Temporary buffer which can be used for algorithms which should not depend
      * on the order in which neurons are updated.
-     * 
+     *
      * @param d
      *            temporary value
      */
@@ -506,7 +506,7 @@ public class Neuron {
      * {@link #getWeightedInputs()} as an "external input" to the neuron. When
      * external components (like input tables) send activation to the network
      * they should use this.
-     * 
+     *
      * @param inputValue
      *            The inputValue to set.
      */
@@ -518,7 +518,7 @@ public class Neuron {
      * The name of the update rule of this neuron; it's "type". Used via
      * reflection for consistency checking in the gui. (Open multiple neurons
      * and if they are of the different types the dialog is different).
-     * 
+     *
      * @return the name of the class of this network.
      */
     public String getType() {
@@ -527,7 +527,7 @@ public class Neuron {
 
     /**
      * Returns the sum of the strengths of the weights attaching to this neuron.
-     * 
+     *
      * @return the sum of the incoming weights to this neuron.
      */
     public double getSummedIncomingWeights() {
@@ -544,7 +544,7 @@ public class Neuron {
     /**
      * Returns the number of neurons attaching to this one which have activity
      * above a specified threshold.
-     * 
+     *
      * @param threshold
      *            value above which neurons are considered "active."
      * @return number of "active" neurons
@@ -582,7 +582,7 @@ public class Neuron {
 
     /**
      * True if the synapse is connected to this neuron, false otherwise.
-     * 
+     *
      * @param s
      *            the synapse to check.
      * @return true if synapse is connected, false otherwise.
@@ -630,16 +630,25 @@ public class Neuron {
     }
 
     /**
-     * Set position.
-     * 
-     * @param x
-     *            x coordinate
-     * @param y
-     *            y coordinate
+     * Set x, y position of a neuron.
+     *
+     * @param x x coordinate for neuron
+     * @param y y coordinate for neuron
      */
     public void setLocation(final double x, final double y) {
         setX(x);
         setY(y);
+    }
+
+    /**
+     * Translate the neuron by a specified amount.
+     *
+     * @param delta_x x amount to translate neuron
+     * @param delta_y y amount to translate neuron
+     */
+    public void offset(final double delta_x, final double delta_y) {
+        setX(getX() + delta_x);
+        setY(getY() + delta_y);
     }
 
     /**
@@ -655,7 +664,7 @@ public class Neuron {
      * Used for deletion to avoid a ConcurrentModificationException as well as
      * conform to the other processes inovlved in removing synapses from a
      * network.
-     * 
+     *
      * @return an element by element shallow copy of the synapses in this
      *         neuron's fanIn map.
      */
@@ -672,7 +681,7 @@ public class Neuron {
      * Used for deletion to avoid a ConcurrentModificationException as well as
      * conform to the other processes inovlved in removing synapses from a
      * network.
-     * 
+     *
      * @return an element by element shallow copy of the synapses in this
      *         neuron's fanOut map.
      */
@@ -727,7 +736,7 @@ public class Neuron {
     /**
      * Forward to update rule's tool tip method, which returns string for tool
      * tip or short description.
-     * 
+     *
      * @return tool tip text
      */
     public String getToolTipText() {
@@ -743,7 +752,7 @@ public class Neuron {
 
     /**
      * Set target value.
-     * 
+     *
      * @param targetValue
      *            value to set.
      */
@@ -780,7 +789,7 @@ public class Neuron {
 
     /**
      * Toggles whether this neuron is clamped.
-     * 
+     *
      * @param clamped
      *            Whether this neuron is to be clamped.
      */
@@ -806,7 +815,7 @@ public class Neuron {
 
     /**
      * Returns position as a 2-d point.
-     * 
+     *
      * @return point representation of neuron position.
      */
     public Point2D getPosition() {
@@ -815,7 +824,7 @@ public class Neuron {
 
     /**
      * Set position of neuron using a point object.
-     * 
+     *
      * @param position
      *            point location of neuron
      */
@@ -827,7 +836,7 @@ public class Neuron {
     /**
      * If this neuron has a bias field, randomize it within the specified
      * bounds.
-     * 
+     *
      * @param lower
      *            lower bound for randomization.
      * @param upper
@@ -861,7 +870,7 @@ public class Neuron {
     /**
      * A method that returns a list of all the neuron update rules associated
      * with a list of neurons.
-     * 
+     *
      * @param neuronList
      *            The list of neurons whose update rules we want to query.
      * @return Returns a list of neuron update rules associated with a group of
@@ -878,7 +887,7 @@ public class Neuron {
 
     /**
      * TODO: Possibly make this be a NeuronGroup. See design notes.
-     * 
+     *
      * @return the parentGroup
      */
     public Group getParentGroup() {
@@ -903,7 +912,7 @@ public class Neuron {
     /**
      * Mark this neuron as an input generator. Automatically sets the
      * {@link #fanIn fan-in list} to null if true.
-     * 
+     *
      * @param generator
      *            Whether or not this is being set as an input generator.
      */
@@ -917,7 +926,7 @@ public class Neuron {
     /**
      * Convenience method to set upper bound on the neuron's update rule, if it
      * is a bounded update rule.
-     * 
+     *
      * @param upperBound
      *            upper bound to set.
      */
@@ -930,7 +939,7 @@ public class Neuron {
     /**
      * Convenience method to set lower bound on the neuron's update rule, if it
      * is a bounded update rule.
-     * 
+     *
      * @param lowerBound
      *            lower bound to set.
      */
@@ -943,7 +952,7 @@ public class Neuron {
     /**
      * Return the upper bound for the the underlying rule, if it is bounded.
      * Else it simply returns 1. Used to color neuron activations.
-     * 
+     *
      * @return the upper bound, if applicable, and 1 otherwise.
      */
     public double getUpperBound() {
@@ -957,7 +966,7 @@ public class Neuron {
     /**
      * Return the lower bound for the the underlying rule, if it is bounded.
      * Else it simply returns -1. Used to color neuron activations.
-     * 
+     *
      * @return the upper bound, if applicable, and -1 otherwise.
      */
     public double getLowerBound() {
@@ -970,7 +979,7 @@ public class Neuron {
 
     /**
      * Convenience method to set increment on the neuron's update rule.
-     * 
+     *
      * @param increment
      *            increment to set
      */
@@ -996,7 +1005,7 @@ public class Neuron {
     /**
      * Is the neuron update rule's update going to be ignored during the
      * neuron's update rule cycle?
-     * 
+     *
      * @return status of flag
      */
     private boolean isTempIgnoreUpdateFlag() {
@@ -1006,7 +1015,7 @@ public class Neuron {
     /**
      * Set whether or not the neuron update rule's update part of this neuron's
      * update cycle should be ignored.
-     * 
+     *
      * @param tempIgnoreUpdateFlag
      *            the flag
      */
@@ -1017,7 +1026,7 @@ public class Neuron {
     /**
      * A placeholder allowing the polarized framework to be built around neuron
      * before being formally implemented.
-     * 
+     *
      * @return
      */
     public boolean isPolarized() {
@@ -1027,7 +1036,7 @@ public class Neuron {
     /**
      * A placeholder allowing the polarized framework to be built around neuron
      * before being formally implemented.
-     * 
+     *
      * @return
      */
     public Polarity getPolarity() {

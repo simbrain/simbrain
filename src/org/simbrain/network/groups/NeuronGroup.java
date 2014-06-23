@@ -665,13 +665,21 @@ public class NeuronGroup extends Group {
     }
 
     /**
+     * Set x, y position of the upper-left corner of a neuron group.
      *
+     * @param x x coordinate for neuron group
+     * @param y y coordinate for neuron group
+     */
+    public void setLocation(final double x, final double y) {
+        offset(-this.getMinX(), -this.getMinY());
+        offset(x, y);
+    }
+
+    /**
      * Translate all neurons (the only objects with position information).
      *
-     * @param offsetX
-     *            x offset for translation.
-     * @param offsetY
-     *            y offset for translation.
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : neuronList) {

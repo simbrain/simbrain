@@ -63,6 +63,20 @@ public class NetworkTextObject {
     }
 
     /**
+     * Construct the text object with initial text.
+     *
+     * @param parent root network
+     * @param x x position
+     * @param y y position
+     * @param initialText text for the text object
+     */
+    public NetworkTextObject(Network parent, double x, double y,
+            String initialText) {
+        this(parent, x, y);
+        this.setText(initialText);
+    }
+
+    /**
      * Copy constructor.
      *
      * @param newParent parent network for this text object

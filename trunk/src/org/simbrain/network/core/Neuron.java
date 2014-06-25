@@ -112,11 +112,6 @@ public class Neuron {
      */
     private double auxValue;
 
-    // Temporary properties and init for backwards compatibility and
-    // workspace conversion. Also see postunmarshallinit
-    // TODO: Remove these before 3.0 release
-    private double increment = .1;
-
     /**
      * A flag for whether or not a neuron should be updated. Set to true by
      * {@link #forceSetActivation} so that the neuron's update rule does not
@@ -203,8 +198,6 @@ public class Neuron {
         // TODO: Add checks?
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
-
-        updateRule.setIncrement(increment);
     }
 
     /**

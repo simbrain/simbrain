@@ -13,6 +13,8 @@
 
 
 
+
+
     <meta name="generator" content="HTML Tidy for Mac OS X (vers 31 October 2006 - Apple Inc. build 15.6), see www.w3.org"><title>Simbrain Documentation</title>
     
 
@@ -61,7 +63,7 @@ running them. &nbsp; Try modifying them in simple ways (e.g. modifying
 the paramters at the top) and re-running them.&nbsp; <br>
         </p>
         <p>Scripting is closely
-relating to custom updating in Simbrain. Custom update methods for the
+related to custom updating in Simbrain. Custom update methods for the
 workspace or for components introduce custom update actions that are
 written using this same Beanshell scripting framework.&nbsp; See <a href="./Workspace/Update.html">workspace update</a> and <a href="./Network/update.html">network update</a>.
             <br>
@@ -238,9 +240,9 @@ copy and paste the text below, and save it as a .bsh file (for example,
         </p>
         <p>To
 do this, you must create a custom update action.&nbsp;&nbsp; First
-create a network and add a Backprop network to it.&nbsp; Then go to
-edit custom update actions.&nbsp;&nbsp; Then press the "add custom
-action" button.&nbsp; Then enter the following in the editor:</p>
+create a network and add a Backprop subnetwork to it.&nbsp; Then go to&nbsp;<span class="command">File &gt; Edit&nbsp; Update Sequence...</span>.&nbsp; Then click the "add custom
+action" button.&nbsp; Then&nbsp; copy and paste the code below in to the editor:<br>
+</p>
         <p class="command" style="margin-left: 40px;">
             <br>import org.simbrain.network.core.*;
             <br>import org.simbrain.network.subnetworks.*;

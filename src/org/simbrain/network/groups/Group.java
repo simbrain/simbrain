@@ -56,9 +56,8 @@ public abstract class Group {
 
     /**
      * Construct a model group with a reference to its root network.
-     * 
-     * @param net
-     *            reference to root network.
+     *
+     * @param net reference to root network.
      */
     public Group(final Network net) {
         parentNetwork = net;
@@ -66,7 +65,7 @@ public abstract class Group {
 
     /**
      * Whether this group is empty or not.
-     * 
+     *
      * @return true if the group is empty, false otherwise.
      */
     public abstract boolean isEmpty();
@@ -90,7 +89,7 @@ public abstract class Group {
     /**
      * Returns a description of this group's update method, which is displayed
      * in the update manager panel.
-     * 
+     *
      * @return a description of the update method.
      */
     public abstract String getUpdateMethodDesecription();
@@ -121,8 +120,7 @@ public abstract class Group {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(String id) {
         this.id = id;
@@ -136,8 +134,7 @@ public abstract class Group {
     }
 
     /**
-     * @param label
-     *            the label to set
+     * @param label the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -154,8 +151,7 @@ public abstract class Group {
     }
 
     /**
-     * @param stateInfo
-     *            the stateInfo to set
+     * @param stateInfo the stateInfo to set
      */
     public void setStateInfo(String stateInfo) {
         this.stateInfo = stateInfo;
@@ -172,24 +168,16 @@ public abstract class Group {
     }
 
     /**
-     * @param parentGroup
-     *            the parentGroup to set
+     * @param parentGroup the parentGroup to set
      */
     protected void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
     }
 
-    // /**
-    // * @return the deleteWhenEmpty
-    // */
-    // public boolean isDeleteWhenEmpty() {
-    // return deleteWhenEmpty;
-    // }
-
     /**
      * Returns true if this group has a parent group (i.e. it is a sub-group
      * within a larger group).
-     * 
+     *
      * @return true if this group has a parent, false otherwise.
      */
     public boolean hasParentGroup() {
@@ -203,7 +191,7 @@ public abstract class Group {
     /**
      * Returns true if this group is "top level" (has no parent group).
      * Basically a convenience wrapper around hasParentGroup().
-     * 
+     *
      * @return true if this has a parent group, false otherwise.
      */
     public boolean isTopLevelGroup() {
@@ -222,8 +210,7 @@ public abstract class Group {
     }
 
     /**
-     * @param markedForDeletion
-     *            the markedForDeletion to set
+     * @param markedForDeletion the markedForDeletion to set
      */
     protected void setMarkedForDeletion(boolean markedForDeletion) {
         this.markedForDeletion = markedForDeletion;

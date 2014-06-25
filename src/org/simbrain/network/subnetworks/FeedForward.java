@@ -33,7 +33,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 /**
  * A standard feed-forward network, where a succession of neuron groups and
  * synapse groups are organized into layers.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class FeedForward extends Subnetwork {
@@ -43,7 +43,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Construct a feed-forward network.
-     * 
+     *
      * @param network
      *            the parent network to which the layered network is being added
      * @param nodesPerLayer
@@ -65,7 +65,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Add the layered network to the specified network, with a specified number
      * of layers and nodes in each layer.
-     * 
+     *
      * @param network
      *            the parent network to which the layered network is being added
      * @param nodesPerLayer
@@ -87,7 +87,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Create the network using the parameters.
-     * 
+     *
      * @param network
      *            the parent network to which the layered network is being added
      * @param nodesPerLayer
@@ -174,7 +174,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Returns the input layer.
-     * 
+     *
      * @return the input layer
      */
     public NeuronGroup getInputLayer() {
@@ -183,7 +183,7 @@ public class FeedForward extends Subnetwork {
 
     /**
      * Returns the output layer.
-     * 
+     *
      * @return the output layer
      */
     public NeuronGroup getOutputLayer() {
@@ -193,7 +193,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Convenience method for getting the neurons associated with the input
      * group. Also allows all feed-forward networks to implement Trainable.
-     * 
+     *
      * @return the input layer neurons as a list.
      */
     public List<Neuron> getInputNeurons() {
@@ -203,7 +203,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Convenience method for getting the neurons associated with the output
      * group. Also allows all feed-forward networks to implement Trainable.
-     * 
+     *
      * @return the output layer neurons as a list.
      */
     public List<Neuron> getOutputNeurons() {

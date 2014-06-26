@@ -106,6 +106,24 @@ public class ConnectionUtilities {
     }
 
     /**
+     * Randomize and polarize synapses using default excitatory and inhibitory
+     * polarizers (uniform 0 to 1).  See {@link #randomizeAndPolarizeSynapses(Collection, PolarizedRandomizer, 
+     * PolarizedRandomizer, double)}
+     *
+     * @param synapses the synapses to modify
+     * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
+     */
+    public static void randomizeAndPolarizeSynapses(
+            Collection<Synapse> synapses, double excitatoryRatio) {
+        PolarizedRandomizer exciteRand = new PolarizedRandomizer(
+                Polarity.EXCITATORY);
+        PolarizedRandomizer inhibRand = new PolarizedRandomizer(
+                Polarity.INHIBITORY);
+        randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand,
+                excitatoryRatio);
+    }
+
+    /**
      *
      * @param synapses
      * @param exciteRand

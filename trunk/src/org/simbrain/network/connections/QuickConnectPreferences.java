@@ -34,7 +34,7 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  * created. Not thread-safe. This class is used by gui methods, and is not
  * intended to be used in settings where concurrent threads are simultaneously
  * building network objects.
- * 
+ *
  * @author jyoshimi
  */
 public class QuickConnectPreferences {
@@ -51,9 +51,11 @@ public class QuickConnectPreferences {
             @Override
             public List<Synapse> applyConnection(List<Neuron> source,
                 List<Neuron> target) {
-                return AllToAll.connectAllToAll(source, target,
+                List<Synapse> retList = AllToAll.connectAllToAll(source, target,
                     source.equals(target), AllToAll.DEFAULT_SELF_CONNECT_PREF,
                     true);
+                ConnectionUtilities.polarizeSynapses(retList, 1.0);
+                return retList;
             }
 
             @Override
@@ -72,10 +74,12 @@ public class QuickConnectPreferences {
             @Override
             public List<Synapse> applyConnection(List<Neuron> source,
                 List<Neuron> target) {
-                return Sparse.connectSparse(source, target,
+                List<Synapse> retList = Sparse.connectSparse(source, target,
                     Sparse.DEFAULT_CONNECTION_DENSITY,
                     Sparse.DEFAULT_SELF_CONNECT_PREF,
                     Sparse.DEFAULT_FF_PREF, true);
+                ConnectionUtilities.randomizeAndPolarizeSynapses(retList, .5);
+                return retList;
             }
 
             @Override
@@ -94,8 +98,10 @@ public class QuickConnectPreferences {
             @Override
             public List<Synapse> applyConnection(List<Neuron> source,
                 List<Neuron> target) {
-                return OneToOne.connectOneToOne(source, target,
+                List<Synapse> retList =  OneToOne.connectOneToOne(source, target,
                     OneToOne.DEFAULT_BIDIRECT_PREF, true);
+                ConnectionUtilities.polarizeSynapses(retList, 1.0);
+                return retList;
             }
 
             @Override
@@ -202,7 +208,7 @@ public class QuickConnectPreferences {
     }
 
     /**
-     * 
+     *
      * @param source
      * @param target
      * @return
@@ -226,7 +232,7 @@ public class QuickConnectPreferences {
     }
 
     /**
-     * 
+     *
      */
     public static void restoreDefaults() {
         percentExcitatory = DEFAULT_PERCENT_EXCITATORY;

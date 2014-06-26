@@ -222,6 +222,7 @@ public class KeyBindings {
                     QuickConnectPreferences.getCurrentConnection()
                             .applyConnection(panel.getSourceModelNeurons(),
                                     panel.getSelectedModelNeurons());
+                    panel.getNetwork().fireNetworkChanged();
                 }
 
             }

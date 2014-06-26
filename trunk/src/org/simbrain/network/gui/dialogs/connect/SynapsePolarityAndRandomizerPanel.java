@@ -412,7 +412,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 double percentExcitatory = Utils.doubleParsable(eRatio) / 100;
                 if (!Double.isNaN(percentExcitatory)) {
-                    synapseGroup.setPercentExcitatory(percentExcitatory);
+                    synapseGroup.setExcitatoryRatio(percentExcitatory);
                 }
             }
         });
@@ -433,7 +433,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      *            the connection being used to determine the field values
      */
     public void fillFieldValues(SynapseGroup synGrp) {
-        double exRatio = synGrp.getPercentExcitatory();
+        double exRatio = synGrp.getExcitatoryRatio();
         eRatio.setValue((int) (exRatio * 100));
         iRatio.setValue((int) ((1 - exRatio) * 100));
         ratioSlider.setValue((int) (exRatio * 100));
@@ -443,7 +443,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      * Fills the fields based on certain default values
      */
     public void fillDefaultValues() {
-        double exRatio = SynapseGroup.DEFAULT_PERCENT_EXCITATORY;
+        double exRatio = SynapseGroup.DEFAULT_EXCITATORY_RATIO;
         eRatio.setValue((int) (exRatio * 100));
         iRatio.setValue((int) ((1 - exRatio) * 100));
         ratioSlider.setValue((int) (exRatio * 100));
@@ -457,7 +457,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     public void commitChanges(SynapseGroup synapseGroup) {
         double percentExcitatory = Utils.doubleParsable(eRatio) / 100;
         if (!Double.isNaN(percentExcitatory))
-            synapseGroup.setPercentExcitatory(percentExcitatory);
+            synapseGroup.setExcitatoryRatio(percentExcitatory);
         excitatoryRandomizerPanel.commitChanges();
         inhibitoryRandomizerPanel.commitChanges();
         synapseGroup.setExcitatoryRandomizer(exRandomizer);

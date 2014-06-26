@@ -33,7 +33,7 @@ import umontreal.iro.lecuyer.randvar.BinomialGen;
 
 /**
  * Connect neurons sparsely.
- * 
+ *
  * @author Zach Tosi
  */
 public class Sparse extends DensityBasedConnector {
@@ -54,7 +54,16 @@ public class Sparse extends DensityBasedConnector {
 
     /**
      * Whether or not each source neuron is given an equal number of efferent
-     * synapses.
+     * synapses. If true, every source neuron will have exactly the same number
+     * of synapses emanating from them, that is, each source will connect to the
+     * same number of targets. If you have 10 source neurons and 10 target
+     * neurons, and 50% sparsity, then each source neuron will connect to
+     * exactly 5 targets. If equalizeEfferents is false, then the number of
+     * target neurons each source neuron connects to will be drawn from a
+     * binomial distribution with a %success chance of 50%, so on average each
+     * source neuron will connect to 5 targets, and the sparsity will be roughly
+     * 50% (more exact the more neurons/synapses there are). However the number
+     * of targets any given source neuron connects to is by no means guaranteed.
      */
     private boolean equalizeEfferents = DEFAULT_FF_PREF;
 
@@ -91,7 +100,7 @@ public class Sparse extends DensityBasedConnector {
 
     /**
      * See super class description.
-     * 
+     *
      * @param network
      *            network with neurons to be connected.
      * @param neurons
@@ -116,18 +125,18 @@ public class Sparse extends DensityBasedConnector {
      * Connects two lists of neurons with synapses assigning connections between
      * source and target neurons randomly in such a way that results in
      * "sparsity" percentage of possible connections being created.
-     * 
+     *
      * @param sourceNeurons
      * @param targetNeurons
      * @param sparsity
-     * @param selfConnectionAllowedion
+     * @param selfConnectionAllowed
      * @param equalizeEfferents
      * @param looseSynapses
      * @return
      */
     public static List<Synapse> connectSparse(List<Neuron> sourceNeurons,
         List<Neuron> targetNeurons, double sparsity,
-        boolean selfConnectionAllowedion, boolean equalizeEfferents,
+        boolean selfConnectionAllowed, boolean equalizeEfferents,
         boolean looseSynapses) {
         boolean recurrent = ConnectionUtilities.testRecurrence(sourceNeurons,
             targetNeurons);
@@ -143,7 +152,7 @@ public class Sparse extends DensityBasedConnector {
                 targetList.add(i);
             }
             int numSyns;
-            if (!selfConnectionAllowedion && sourceNeurons == targetNeurons) {
+            if (!selfConnectionAllowed && sourceNeurons == targetNeurons) {
                 numSyns =
                     (int) (sparsity * sourceNeurons.size() * (targetNeurons
                         .size() - 1));
@@ -163,7 +172,7 @@ public class Sparse extends DensityBasedConnector {
 
             for (int i = 0; i < sourceNeurons.size(); i++) {
                 source = sourceNeurons.get(i);
-                if (!selfConnectionAllowedion && recurrent) {
+                if (!selfConnectionAllowed && recurrent) {
                     tListCopy = new ArrayList<Integer>();
                     for (int k = 0; k < targetList.size(); k++) {
                         if (k == i) // Exclude oneself as a possible target
@@ -188,7 +197,7 @@ public class Sparse extends DensityBasedConnector {
         } else {
             for (int i = 0; i < sourceNeurons.size(); i++) {
                 for (int j = 0; j < targetNeurons.size(); j++) {
-                    if (!selfConnectionAllowedion && recurrent && i == j) {
+                    if (!selfConnectionAllowed && recurrent && i == j) {
                         continue;
                     } else {
                         if (Math.random() < sparsity) {
@@ -210,7 +219,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      */
     public void connectNeurons(SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
@@ -238,7 +247,7 @@ public class Sparse extends DensityBasedConnector {
      * efferent synapses. This number being whichever satisfies the constraints
      * given by the sparsity and whether or not the synapse group is recurrent
      * and self connections are allowed.
-     * 
+     *
      * @param synapseGroup
      */
     private void connectEqualized(SynapseGroup synapseGroup) {
@@ -273,7 +282,7 @@ public class Sparse extends DensityBasedConnector {
      * strength. The number of efferent synapses assigned to each source neuron
      * is drawn from a binomial distribution with a mean of
      * NumberOfTargetNeurons * sparsity
-     * 
+     *
      * @param synapseGroup
      */
     private void connectRandom(SynapseGroup synapseGroup) {
@@ -300,7 +309,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param recurrent
      */
     private void generateSparseOrdering(boolean recurrent) {
@@ -326,7 +335,7 @@ public class Sparse extends DensityBasedConnector {
      * swapped with other elements in the list. This method will alter the list
      * passed to it, so situations where this would be undesirable should pass
      * this method a copy.
-     * 
+     *
      * @param inds
      *            a list of integers. This methods WILL shuffle inds, so pass a
      *            copy unless inds being shuffled is not a problem.
@@ -343,7 +352,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param newSparsity
      * @param returnRemoved
      * @return
@@ -399,7 +408,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param newSparsity
      * @return
      */

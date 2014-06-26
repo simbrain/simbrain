@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
@@ -10,6 +28,11 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
+/**
+ * TODO.
+ *
+ * @author Zach Tosi
+ */
 public class ConnectionUtilities {
 
     /** The default excitatory strength. */
@@ -21,60 +44,60 @@ public class ConnectionUtilities {
     /**
      * Randomizes a collection of synapses based on excitatory and inhibitory
      * (polarized appropriately) randomizers, which cannot be the same
-     * randomizer. This method will always attempt to maintain the percent of
+     * randomizer. This method will always attempt to maintain the ratio of
      * excitatory synapses specified. However if some of the source neurons are
      * themselves polarized, this may not always be possible. In such a case,
-     * this method will get as close as possible to the desired percent. This,
-     * however is not reccommended.
-     * 
+     * this method will get as close as possible to the desired ratio. This,
+     * however is not recommended.
+     *
      * If the source neurons to these synapses are themselves, by and large,
      * polarized, this method can be, but should <b>NOT</b> be used.
-     * 
+     *
      * Null values for either PolarizedRandomizer is permitted. Synapses are
      * assigned default strengths based on their polarity depending on which
      * randomizers are null.
-     * 
+     *
      * @param exciteRand
      * @param inhibRand
-     * @param percentExcitatory
+     * @param excitatoryRatio
      * @param synapses
      * @throws IllegalArgumentException
      */
     public static void randomizeAndPolarizeSynapses(
         Collection<Synapse> synapses, PolarizedRandomizer exciteRand,
-        PolarizedRandomizer inhibRand, double percentExcitatory)
+        PolarizedRandomizer inhibRand, double excitatoryRatio)
         throws IllegalArgumentException {
         if (exciteRand.equals(inhibRand)) {
             throw new IllegalArgumentException("Randomization has failed."
                 + " The excitatory and inhibitory randomizers cannot be"
                 + " the same object.");
-        } else if (percentExcitatory > 1 || percentExcitatory < 0) {
+        } else if (excitatoryRatio > 1 || excitatoryRatio < 0) {
             throw new IllegalArgumentException("Randomization had failed."
-                + " The percent of excitatory synapses "
+                + " The ratio of excitatory synapses "
                 + " cannot be greater than 1 or less than 0.");
         } else {
             checkPolarityMatches(exciteRand, Polarity.EXCITATORY);
             checkPolarityMatches(inhibRand, Polarity.INHIBITORY);
-            int exciteCount = (int) (percentExcitatory * synapses.size());
+            int exciteCount = (int) (excitatoryRatio * synapses.size());
             int inhibCount = synapses.size() - exciteCount;
             int remaining = synapses.size();
             boolean excitatory = false;
             for (Synapse s : synapses) {
-                excitatory = shouldBeExcitatory(percentExcitatory, exciteCount,
+                excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount,
                     inhibCount, s);
                 // Set the strength based on the polarity.
                 if (excitatory) {
                     s.setStrength(exciteRand != null ? exciteRand.getRandom()
                         : DEFAULT_EXCITATORY_STRENGTH);
                     exciteCount--;
-                    // Change the percentExcitatory to maintain balance
-                    percentExcitatory = exciteCount / (double) remaining;
+                    // Change the excitatoryRatio to maintain balance
+                    excitatoryRatio = exciteCount / (double) remaining;
                 } else {
                     s.setStrength(inhibRand != null ? inhibRand.getRandom()
                         : DEFAULT_INHIBITORY_STRENGTH);
                     inhibCount--;
-                    // Change the percentExcitatory to maintain balance.
-                    percentExcitatory = (remaining - inhibCount)
+                    // Change the excitatoryRatio to maintain balance.
+                    excitatoryRatio = (remaining - inhibCount)
                         / (double) remaining;
                 }
                 remaining--;
@@ -83,7 +106,7 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
+     *
      * @param synapses
      * @param exciteRand
      * @param inhibRand
@@ -115,7 +138,7 @@ public class ConnectionUtilities {
     /**
      * Randomizes the excitatory synapses in the given list of synapses using
      * the given excitatory randomizer.
-     * 
+     *
      * @param synapses
      * @param exciteRand
      */
@@ -136,7 +159,7 @@ public class ConnectionUtilities {
      * without checking first to make sure that the given synapses or their
      * source neurons are not inhibitory. Used for speed when the polarity of
      * the synapses in the list is known ahead of time.
-     * 
+     *
      * @param synapses
      * @param exciteRand
      */
@@ -152,7 +175,7 @@ public class ConnectionUtilities {
     /**
      * Randomizes the inhibitory synapses in the given list of synapses using
      * the given inhibitory randomizer.
-     * 
+     *
      * @param synapses
      * @param inhibRand
      */
@@ -173,7 +196,7 @@ public class ConnectionUtilities {
      * without checking first to make sure that the given synapses or their
      * source neurons are not excitatory. Used for speed when the polarity of
      * the synapses in the list is known ahead of time.
-     * 
+     *
      * @param synapses
      * @param inhibRand
      */
@@ -187,7 +210,7 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
+     *
      * @param synapses
      * @return
      */
@@ -204,7 +227,7 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
+     *
      * @param synapses
      * @return
      */
@@ -222,45 +245,46 @@ public class ConnectionUtilities {
 
     /**
      * Changes all the synapses in a given collection such that
-     * <b>percentExcitatory</b> of them are excitatory and <b>1 -
-     * percentExcitatory</b> of them are inhibitory, assigning default strengths
+     * <b>excitatoryRatio</b> of them are excitatory and <b>1 -
+     * excitatoryRatio</b> of them are inhibitory, assigning default strengths
      * respectively to each.
-     * 
-     * This method will attempt to maintain the requested percentExcitatory even
+     *
+     * This method will attempt to maintain the requested excitatoryRatio even
      * if some or all of the source neurons are themselves polarized. In such
      * cases the polarity of the Neurons efferent synapses will not be
      * overridden. Though it may not be possible to obtain the desired
-     * percentExcitatory in this case, this method will get as close as
+     * excitatoryRatio in this case, this method will get as close as
      * possible.
-     * 
-     * @param synapses
-     * @param percentExcitatory
+     *
+     * @param synapses the synapses to polarize
+     * @param excitatoryRatio the ration of excitatory synapses (1 for all
+     *            exctitatory)
      */
     public static void polarizeSynapses(Collection<Synapse> synapses,
-        double percentExcitatory) {
-        if (percentExcitatory > 1 || percentExcitatory < 0) {
+        double excitatoryRatio) {
+        if (excitatoryRatio > 1 || excitatoryRatio < 0) {
             throw new IllegalArgumentException("Randomization had failed."
-                + " The percent of excitatory synapses "
+                + " The ratio of excitatory synapses "
                 + " cannot be greater than 1 or less than 0.");
         } else {
-            int exciteCount = (int) (percentExcitatory * synapses.size());
+            int exciteCount = (int) (excitatoryRatio * synapses.size());
             int inhibCount = synapses.size() - exciteCount;
             int remaining = synapses.size();
             boolean excitatory = false;
             for (Synapse s : synapses) {
-                excitatory = shouldBeExcitatory(percentExcitatory, exciteCount,
+                excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount,
                     inhibCount, s);
                 // Set the strength based on the polarity.
                 if (excitatory) {
                     s.setStrength(DEFAULT_EXCITATORY_STRENGTH);
                     exciteCount--;
-                    // Change the percentExcitatory to maintain balance
-                    percentExcitatory = exciteCount / (double) remaining;
+                    // Change the excitatoryRatio to maintain balance
+                    excitatoryRatio = exciteCount / (double) remaining;
                 } else {
                     s.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                     inhibCount--;
-                    // Change the percentExcitatory to maintain balance.
-                    percentExcitatory = (remaining - inhibCount)
+                    // Change the excitatoryRatio to maintain balance.
+                    excitatoryRatio = (remaining - inhibCount)
                         / (double) remaining;
                 }
                 remaining--;
@@ -273,7 +297,7 @@ public class ConnectionUtilities {
      * the given template synapses, which are essentially information ferries.
      * Throws an exception if the template synapses do not match the appropriate
      * polarities implied by their names.
-     * 
+     *
      * @param synapses
      * @param exTemplateSynapse
      * @param inTemplateSynapse
@@ -323,7 +347,7 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
+     *
      * @param inQuestion
      * @param expectedPolarity
      * @throws IllegalArgumentException
@@ -340,14 +364,14 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
-     * @param percentExcitatory
+     *
+     * @param excitatoryRatio
      * @param exciteCount
      * @param inhibCount
      * @param s
      * @return
      */
-    private static boolean shouldBeExcitatory(double percentExcitatory,
+    private static boolean shouldBeExcitatory(double excitatoryRatio,
         int exciteCount, int inhibCount, Synapse s) {
         boolean excitatory = false;
         if (s.getSource().isPolarized()) {
@@ -366,7 +390,7 @@ public class ConnectionUtilities {
                 }
             } else {
                 double exciteOrInhib = Math.random();
-                if (exciteOrInhib < percentExcitatory) {
+                if (exciteOrInhib < excitatoryRatio) {
                     excitatory = true;
                 } else {
                     excitatory = false;
@@ -380,7 +404,7 @@ public class ConnectionUtilities {
      * Tests whether or not these connections are recurrent, that is, whether or
      * not the neurons in the source list are the same as those in the target
      * list.
-     * 
+     *
      * @return true or false: whether or not these connections are recurrent.
      */
     public static boolean testRecurrence(List<Neuron> sourceNeurons,
@@ -398,7 +422,7 @@ public class ConnectionUtilities {
     }
 
     /**
-     * 
+     *
      * @param exciteRule
      * @param inhibRule
      * @param synapses

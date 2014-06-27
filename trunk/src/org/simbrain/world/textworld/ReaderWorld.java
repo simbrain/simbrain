@@ -257,6 +257,7 @@ public final class ReaderWorld extends TextWorld {
      */
     public void setParseStyle(ParseStyle parseStyle) {
         this.parseStyle = parseStyle;
+        //TODO: Fire an event that the radio button listens to
     }
 
     /**
@@ -323,7 +324,11 @@ public final class ReaderWorld extends TextWorld {
     public double[] getCurrentVector() {
         // System.out.println(Arrays.toString(this.getVector(this.getCurrentItem()
         // .getText())));
-        return this.getVector(this.getCurrentItem().getText());
+        if (getCurrentItem() == null) {
+            return this.ZERO_VEC;
+        } else {
+            return this.getVector(this.getCurrentItem().getText());
+        }
     }
 
     /**

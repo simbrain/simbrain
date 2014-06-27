@@ -48,7 +48,7 @@ public abstract class TextWorld {
     private int position = 0;
 
     /** Last position in the text. */
-    private int lastPosition;
+    private int lastPosition = 0;
 
     //TODO: Remove and create separate dictionaries for the two types of world?
     /** Word list for word parsing in both directions (reading and display). */

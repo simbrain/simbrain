@@ -353,13 +353,15 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
                         allowSelfConnect
                             || !recurrentConnection ? numTargs
                             : numTargs - 1;
-                    int sps = (int) Integer.parseInt(synsPerSource.getText());
-                    densityTf.setValue(new Double((double) sps / nt));
-                    int sVal =
-                        (int) (((Number) densityTf
-                            .getValue()).doubleValue() * 100);
-                    connectionDensitySlider
-                        .setValue(new Integer(sVal));
+                    Integer sps = Utils.parseInteger(synsPerSource);
+                    if (sps != null) {
+                        densityTf.setValue(new Double((double) sps / nt));
+                        int sVal =
+                            (int) (((Number) densityTf
+                                .getValue()).doubleValue() * 100);
+                        connectionDensitySlider
+                            .setValue(new Integer(sVal));
+                    }
                 }
             }
         };

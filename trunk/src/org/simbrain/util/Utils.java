@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -219,8 +220,10 @@ public class Utils {
      */
     public static double doubleParsable(JTextField tField) {
         try {
-            return Double.parseDouble(tField.getText());
-        } catch (NullPointerException | NumberFormatException ex) {
+            return SimbrainConstants.LOCAL_FORMATTER.parse(tField.getText())
+                .doubleValue();
+        } catch (NullPointerException | NumberFormatException
+            | ParseException ex) {
             return Double.NaN;
         }
     }
@@ -228,15 +231,57 @@ public class Utils {
     /**
      * Like {@link #doubleParsable(tField)} but checks for the formatting of a
      * string rather than a text field.
-     *
-     * @param text the text to check
+     * 
+     * @param text
+     *            the text to check
      * @return NaN if invalid, the parsed double otherwise
      */
     public static double doubleParsable(String text) {
         try {
-            return Double.parseDouble(text);
-        } catch (NullPointerException | NumberFormatException ex) {
+            return SimbrainConstants.LOCAL_FORMATTER.parse(text)
+                .doubleValue();
+        } catch (NullPointerException | NumberFormatException
+            | ParseException ex) {
             return Double.NaN;
+        }
+    }
+
+    /**
+     * Parses the given String in the text field into an integer. If given a
+     * double value, <b>double_val</b> parsing will not fail, but rather, the
+     * result of <b><i>(int) double_val</i></b> will be returned. Returns a null
+     * Integer in cases where the string cannot be parsed into an instance of
+     * <b>Number</b> or if something else went wrong. Parsing is done using the
+     * default locale of the JVM being used to run Simbrain.
+     * 
+     * @param tField
+     *            the text field containing the String to be parsed.
+     * @return the integer value of the string or null if the String cannot be
+     *         parsed into a <b>Number</b>
+     */
+    public static Integer parseInteger(JTextField tField) {
+        try {
+            return SimbrainConstants.LOCAL_FORMATTER.parse(tField.getText())
+                .intValue();
+        } catch (NullPointerException | NumberFormatException
+            | ParseException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * The same as {@link #parseInteger(JTextField)} except using a String
+     * directly as an input.
+     * 
+     * @param text
+     * @return
+     */
+    public static Integer parseInteger(String text) {
+        try {
+            return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
+        } catch (NullPointerException | NumberFormatException
+            | ParseException ex) {
+            return null;
         }
     }
 
@@ -362,8 +407,9 @@ public class Utils {
     /**
      * Converts a String representation of a vector (e.g. "1,0,0,1,0") into a
      * double array. Invalid characters are converted to 0.
-     *
-     * @param vectorString the string to parse.
+     * 
+     * @param vectorString
+     *            the string to parse.
      * @return the parsed double array.
      */
     public static double[] parseVectorString(String vectorString) {

@@ -18,6 +18,9 @@
  */
 package org.simbrain.util;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 /**
  * 
  * A class solely for storing constants used throughout simbrain.
@@ -28,6 +31,9 @@ package org.simbrain.util;
 public class SimbrainConstants {
 
     public static final String NULL_STRING = "...";
+
+    public static final NumberFormat LOCAL_FORMATTER = NumberFormat
+        .getNumberInstance(Locale.getDefault());
 
     public static enum Polarity {
         EXCITATORY {

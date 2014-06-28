@@ -19,6 +19,9 @@
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.simbrain.network.core.Neuron;
@@ -72,6 +75,7 @@ public class GridLayout implements Layout {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;
+        //this.manualColumns = true; // else why set numColumns?
     }
 
     /**
@@ -98,6 +102,47 @@ public class GridLayout implements Layout {
             neuron.setX(initialX + (i % numCols) * hSpacing);
             neuron.setY(initialY + rowNum * vSpacing);
         }
+    }
+
+    /**
+     * Returns a list of columns corresponding to a set of neurons assumed to be
+     * in the form of a grid. Utility method currently used in scripts.
+     *
+     * TODO: Possibly move this method to a utility class for determining the
+     * locations of neurons and other network elements.
+     *
+     *
+     * @param neurons the list of neurons
+     * @param numRows the number of rows in the grid
+     * @return the list of columns, ordered by x-direction
+     */
+    public static List<List<Neuron>> getColumnList(final List<Neuron> neurons,
+            int numRows) {
+        // Sort by x value
+        ArrayList<Neuron> neuronList = new ArrayList<Neuron>(neurons);
+        Collections.sort(neuronList, new Comparator<Neuron>() {
+            public int compare(Neuron n1, Neuron n2) {
+                return Double.compare(n1.getX(), n2.getX());
+            }
+        });
+
+        List<List<Neuron>> grid = new ArrayList<List<Neuron>>();
+        List<Neuron> currentColumn = new ArrayList<Neuron>();
+        for (int i = 1; i < neuronList.size() + 1; i++) {
+            Neuron neuron = neuronList.get(i - 1);
+            currentColumn.add(neuron);
+            if ((i > 0) && (i % numRows) == 0) {
+                // Sort by y value
+                Collections.sort(currentColumn, new Comparator<Neuron>() {
+                    public int compare(Neuron n1, Neuron n2) {
+                        return Double.compare(n1.getY(), n2.getY());
+                    }
+                });
+                grid.add(currentColumn);
+                currentColumn = new ArrayList<Neuron>();
+            }
+        }
+        return grid;
     }
 
     @Override

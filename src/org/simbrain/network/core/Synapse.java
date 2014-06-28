@@ -36,6 +36,12 @@ import org.simbrain.util.Utils;
  */
 public class Synapse {
 
+    private static final SynapseUpdateRule DEFAULT_LEARNING_RULE =
+        new StaticSynapseRule();
+
+    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER =
+        new JumpAndDecay();
+
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
      * and their parents can occur at different levels of the network hierarchy.
@@ -52,10 +58,10 @@ public class Synapse {
      * The update method of this synapse, which corresponds to what kind of
      * synapse it is.
      */
-    private SynapseUpdateRule learningRule;
+    private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /** Only used of source neuron is a spiking neuron. */
-    private SpikeResponder spikeResponder;
+    private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /** Synapse id. */
     private String id;
@@ -106,20 +112,28 @@ public class Synapse {
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent
      * of this synapse.
-     *
-     * @param source source neuron
-     * @param target target neuron
+     * 
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
      */
     public Synapse(Neuron source, Neuron target) {
-        this(source, target, new StaticSynapseRule());
+        setSourceAndTarget(source, target);
+        if (source != null) {
+            parentNetwork = source.getNetwork();
+        }
     }
 
     /**
      * Construct a synapse with a specified initial strength.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     * @param initialStrength initial strength for synapse
+     * 
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param initialStrength
+     *            initial strength for synapse
      */
     public Synapse(Neuron source, Neuron target, double initialStrength) {
         this(source, target);
@@ -130,7 +144,7 @@ public class Synapse {
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
-     *
+     * 
      * @param source
      *            source neuron
      * @param target
@@ -151,7 +165,7 @@ public class Synapse {
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
-     *
+     * 
      * @param source
      *            source neuron
      * @param target
@@ -174,7 +188,7 @@ public class Synapse {
     /**
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule.
-     *
+     * 
      * @param source
      *            source neuron
      * @param target
@@ -193,12 +207,12 @@ public class Synapse {
 
     /**
      * Copy constructor.
-     *
+     * 
      * @param s
      *            Synapse to used as a template for constructing a new synapse.
      */
-    public Synapse(final Synapse s) {
-        this(s.source, s.target, s.getLearningRule().deepCopy());
+    private Synapse(final Synapse s) {
+        setLearningRule(s.getLearningRule().deepCopy());
         forceSetStrength(s.getStrength());
         setUpperBound(s.getUpperBound());
         setLowerBound(s.getLowerBound());
@@ -236,7 +250,7 @@ public class Synapse {
      * For spiking source neurons, returns the spike-responder's value times the
      * synapse strength. For non-spiking neurons, returns the pre-synaptic
      * activation times the synapse strength.
-     *
+     * 
      * @return Value
      */
     public double getValue() {
@@ -261,7 +275,7 @@ public class Synapse {
      * The name of the learning rule of the synapse; it's "type". Used via
      * reflection for consistency checking in the gui. (Open multiple synapses
      * and if they are of the different types the dialog is different).
-     *
+     * 
      * @return the name of the class of this network.
      */
     public String getType() {
@@ -284,7 +298,7 @@ public class Synapse {
 
     /**
      * Sets the source and target neurons simultaneously.
-     *
+     * 
      * @param source
      * @param target
      */
@@ -312,7 +326,7 @@ public class Synapse {
 
     /**
      * Sets the strength of the synapse.
-     *
+     * 
      * @param wt
      *            Strength value
      */
@@ -323,7 +337,7 @@ public class Synapse {
     }
 
     /**
-     *
+     * 
      * @param wt
      *            the value to set the strength of the synapse to
      */
@@ -340,7 +354,7 @@ public class Synapse {
 
     /**
      * Sets the upper synapse bound.
-     *
+     * 
      * @param d
      *            bound
      */
@@ -357,7 +371,7 @@ public class Synapse {
 
     /**
      * Sets the lower synapse bound.
-     *
+     * 
      * @param d
      *            bound
      */
@@ -374,7 +388,7 @@ public class Synapse {
 
     /**
      * Sets the amount to increment neuron.
-     *
+     * 
      * @param d
      *            Increment amount
      */
@@ -447,7 +461,7 @@ public class Synapse {
 
     /**
      * Returns string for tool tip or short description.
-     *
+     * 
      * @return tool tip text
      */
     public String getToolTipText() {
@@ -457,7 +471,7 @@ public class Synapse {
 
     /**
      * Returns symmetric synapse if there is one, null otherwise.
-     *
+     * 
      * @return the symmetric synapse, if any.
      */
     public Synapse getSymmetricSynapse() {
@@ -489,7 +503,7 @@ public class Synapse {
     /**
      * Utility function for use in learning rules. If value is above or below
      * the bounds of this synapse set it to those bounds.
-     *
+     * 
      * @param value
      *            Value to be checked
      * @return Evaluated value
@@ -542,7 +556,7 @@ public class Synapse {
 
     /**
      * Delay manager.
-     *
+     * 
      * @param dly
      *            Amount of delay
      */
@@ -579,7 +593,7 @@ public class Synapse {
 
     /**
      * Enqueeu.
-     *
+     * 
      * @param val
      *            Value to enqueu
      */
@@ -614,7 +628,7 @@ public class Synapse {
      * A better name than setSendWeightedInput. Forwarding to
      * setSendWeightedInput for now. Possibly change name for 3.0. have not done
      * so yet so as note to break a bunch of simulations.
-     *
+     * 
      * @param enabled
      *            true if enabled, false otherwise.
      */
@@ -624,7 +638,7 @@ public class Synapse {
 
     /**
      * Whether this synapse is enabled or not.
-     *
+     * 
      * @return true if enabled, false otherwise.
      */
     public boolean isEnabled() {
@@ -641,7 +655,7 @@ public class Synapse {
 
     /**
      * Convenience method for getting a reference to the parent root network.
-     *
+     * 
      * @return reference to root network.
      */
     public Network getNetwork() {
@@ -658,7 +672,7 @@ public class Synapse {
     /**
      * Sets the update rule using a String description. The provided description
      * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-     *
+     * 
      * @param name
      *            the "simple name" of the class associated with the neuron rule
      *            to set.
@@ -682,7 +696,7 @@ public class Synapse {
 
     /**
      * Change this synapse's learning rule.
-     *
+     * 
      * @param newLearningRule
      *            the learningRule to set
      */
@@ -699,7 +713,7 @@ public class Synapse {
 
     /**
      * Returns a "template" synapse.
-     *
+     * 
      * @return the template synapse.
      * @see instantiateTemplateSynapse
      */
@@ -709,7 +723,7 @@ public class Synapse {
 
     /**
      * Returns a template synapse with a specified learning rule.
-     *
+     * 
      * @param rule
      *            the learning rule.
      * @return the template synapse
@@ -723,7 +737,7 @@ public class Synapse {
 
     /**
      * Returns a template synapse with a (string) specified learning rule.
-     *
+     * 
      * @param rule
      *            the learning rule.
      * @return the template synapse
@@ -739,7 +753,7 @@ public class Synapse {
      * A method which takes in a collection of synapses and returns a list of
      * their update rules in the order in which they appear in the original
      * collection, if that collection supports a consistent order.
-     *
+     * 
      * @param synapseCollection
      *            The collection of synapses whose update rules we want to
      *            query.
@@ -762,7 +776,7 @@ public class Synapse {
      * A template synapse is a synapse that has no proper references, but is
      * used for setting properties. When the user is ready to instantiate it,
      * they call this method to give the proper references.
-     *
+     * 
      * @param source
      *            source neuron
      * @param target
@@ -798,7 +812,7 @@ public class Synapse {
     /**
      * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength
      * in half.
-     *
+     * 
      * @param decayPercent
      *            decay percent
      */

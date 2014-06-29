@@ -393,7 +393,7 @@ public class ConnectionUtilities {
         int exciteCount, int inhibCount, Synapse s) {
         boolean excitatory = false;
         if (s.getSource().isPolarized()) {
-            if (s.getSource().getPolarity().equals(Polarity.EXCITATORY)) {
+            if (Polarity.EXCITATORY == s.getSource().getPolarity()) {
                 excitatory = true;
             } else {
                 excitatory = false;

@@ -324,11 +324,11 @@ public final class SynapseGroupDialog extends StandardDialog {
     public void commitChanges() {
         if (isCreationPanel) {
             connectionPanel.commitChanges(synapseGroup);
-            adjustmentPanel.commitChanges();
+
             // TODO: Use the return value on commit changes?
             ((EditablePanel) summaryInfoPanel).commitChanges();
             ((EditablePanel) editSynapsesPanel).commitChanges();
-
+            adjustmentPanel.commitChanges();
             // Create the synapse group.
             synapseGroup.makeConnections();
 

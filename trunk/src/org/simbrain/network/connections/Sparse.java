@@ -33,7 +33,7 @@ import umontreal.iro.lecuyer.randvar.BinomialGen;
 
 /**
  * Connect neurons sparsely.
- *
+ * 
  * @author Zach Tosi
  */
 public class Sparse extends DensityBasedConnector {
@@ -100,7 +100,7 @@ public class Sparse extends DensityBasedConnector {
 
     /**
      * See super class description.
-     *
+     * 
      * @param network
      *            network with neurons to be connected.
      * @param neurons
@@ -125,7 +125,7 @@ public class Sparse extends DensityBasedConnector {
      * Connects two lists of neurons with synapses assigning connections between
      * source and target neurons randomly in such a way that results in
      * "sparsity" percentage of possible connections being created.
-     *
+     * 
      * @param sourceNeurons
      * @param targetNeurons
      * @param sparsity
@@ -247,7 +247,7 @@ public class Sparse extends DensityBasedConnector {
      * efferent synapses. This number being whichever satisfies the constraints
      * given by the sparsity and whether or not the synapse group is recurrent
      * and self connections are allowed.
-     *
+     * 
      * @param synapseGroup
      */
     private void connectEqualized(SynapseGroup synapseGroup) {
@@ -282,7 +282,7 @@ public class Sparse extends DensityBasedConnector {
      * strength. The number of efferent synapses assigned to each source neuron
      * is drawn from a binomial distribution with a mean of
      * NumberOfTargetNeurons * sparsity
-     *
+     * 
      * @param synapseGroup
      */
     private void connectRandom(SynapseGroup synapseGroup) {
@@ -309,7 +309,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     *
+     * 
      * @param recurrent
      */
     private void generateSparseOrdering(boolean recurrent) {
@@ -335,7 +335,7 @@ public class Sparse extends DensityBasedConnector {
      * swapped with other elements in the list. This method will alter the list
      * passed to it, so situations where this would be undesirable should pass
      * this method a copy.
-     *
+     * 
      * @param inds
      *            a list of integers. This methods WILL shuffle inds, so pass a
      *            copy unless inds being shuffled is not a problem.
@@ -352,7 +352,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     *
+     * 
      * @param newSparsity
      * @param returnRemoved
      * @return
@@ -368,7 +368,7 @@ public class Sparse extends DensityBasedConnector {
             * getMaxPossibleConnections()));
         List<Synapse> removeList = null;
         if (returnRemoved) {
-            removeList = new ArrayList<Synapse>((int) (removeTotal / 0.75));
+            removeList = new ArrayList<Synapse>(removeTotal);
         }
         if (equalizeEfferents) {
             int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
@@ -408,7 +408,7 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
-     *
+     * 
      * @param newSparsity
      * @return
      */
@@ -419,7 +419,7 @@ public class Sparse extends DensityBasedConnector {
         }
         int addTotal = ((int) (newSparsity * getMaxPossibleConnections())
             - synapseGroup.size());
-        List<Synapse> addList = new ArrayList<Synapse>((int) (addTotal / 0.75));
+        List<Synapse> addList = new ArrayList<Synapse>(addTotal);
         if (equalizeEfferents) {
             int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
             int addPerSource = addTotal / sourceNeurons.length;

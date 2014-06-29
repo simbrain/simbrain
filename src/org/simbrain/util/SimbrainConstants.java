@@ -22,19 +22,26 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * 
+ *
  * A class solely for storing constants used throughout simbrain.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 public class SimbrainConstants {
 
+    /** Null string used in various parts of the GUI. */
     public static final String NULL_STRING = "...";
 
+    /** Convenience constant referring to current Locale.  */
     public static final NumberFormat LOCAL_FORMATTER = NumberFormat
         .getNumberInstance(Locale.getDefault());
 
+    /**
+     * Used to indicate if an object (in particular neurons) have a polarity,
+     * i.e. are specifically excitatory or inhibitory.  Convenience methods
+     * included so that values passed in respect the object's polarity.
+     */
     public static enum Polarity {
         EXCITATORY {
             @Override
@@ -58,9 +65,21 @@ public class SimbrainConstants {
                 return "Inhibitory";
             }
         };
+
+        /**
+         * Get the appropriate value, e.g. excitatory for -5 is 5.
+         *
+         * @param val the value to check
+         * @return the appropriate value
+         */
         public abstract double value(double val);
 
-        /** A capitalized version to toString(). */
+        /**
+         * The appropriate name for the enum member, for use in the GUI.
+         * Mainly just capitalizes.
+         *
+         * @return the  name of enum member.
+         */
         public abstract String title();
     }
 

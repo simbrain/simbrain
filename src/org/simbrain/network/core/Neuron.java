@@ -93,6 +93,12 @@ public class Neuron {
     /** If true then do not update this neuron. */
     private boolean clamped;
 
+    /**
+     * The polarity of this neuron (excitatory, inhibitory, or none, which is
+     * null).
+     */
+    private Polarity polarity = null;
+
     /** Target value. */
     private double targetValue;
 
@@ -111,13 +117,6 @@ public class Neuron {
      * values can be useful in scripts.
      */
     private double auxValue;
-
-    /**
-     * A flag for whether or not a neuron should be updated. Set to true by
-     * {@link #forceSetActivation} so that the neuron's update rule does not
-     * override the forced activation.
-     */
-    private boolean tempIgnoreUpdateFlag = false;
 
     /**
      * Construct a neuron with all default values in the specified network.
@@ -290,14 +289,11 @@ public class Neuron {
      *            Activation
      */
     public void setActivation(final double act) {
-        if (isClamped() || isTempIgnoreUpdateFlag()) {
-            if (isTempIgnoreUpdateFlag()) {
-                // Reset the flag
-                setTempIgnoreUpdateFlag(false);
-            }
+        if (isClamped()) {
             return;
+        } else {
+            activation = act;
         }
-        activation = act;
     }
 
     /**
@@ -310,7 +306,6 @@ public class Neuron {
      *            the new activation value
      */
     public void forceSetActivation(final double act) {
-        setTempIgnoreUpdateFlag(true);
         activation = act;
     }
 
@@ -996,44 +991,21 @@ public class Neuron {
     }
 
     /**
-     * Is the neuron update rule's update going to be ignored during the
-     * neuron's update rule cycle?
+     * If the neuron is polarized, it will be excitatory or inhibitory.
      *
-     * @return status of flag
-     */
-    private boolean isTempIgnoreUpdateFlag() {
-        return tempIgnoreUpdateFlag;
-    }
-
-    /**
-     * Set whether or not the neuron update rule's update part of this neuron's
-     * update cycle should be ignored.
-     *
-     * @param tempIgnoreUpdateFlag
-     *            the flag
-     */
-    private void setTempIgnoreUpdateFlag(boolean tempIgnoreUpdateFlag) {
-        this.tempIgnoreUpdateFlag = tempIgnoreUpdateFlag;
-    }
-
-    /**
-     * A placeholder allowing the polarized framework to be built around neuron
-     * before being formally implemented.
-     *
-     * @return
+     * @return whether this neuron is polarized.
      */
     public boolean isPolarized() {
-        return false;
+        return polarity != null;
     }
 
     /**
-     * A placeholder allowing the polarized framework to be built around neuron
-     * before being formally implemented.
+     * Polarity of this neuron (excitatory, inhibitory, or none = null).
      *
-     * @return
+     * @return the current polarity
      */
     public Polarity getPolarity() {
-        return null;
+        return polarity;
     }
 
 }

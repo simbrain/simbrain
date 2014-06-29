@@ -220,7 +220,8 @@ public class Utils {
      */
     public static double doubleParsable(JTextField tField) {
         try {
-            return SimbrainConstants.LOCAL_FORMATTER.parse(tField.getText())
+            String text = tField.getText().replaceFirst("\\s+", "");
+            return SimbrainConstants.LOCAL_FORMATTER.parse(text)
                 .doubleValue();
         } catch (NullPointerException | NumberFormatException
             | ParseException ex) {
@@ -238,6 +239,7 @@ public class Utils {
      */
     public static double doubleParsable(String text) {
         try {
+            text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text)
                 .doubleValue();
         } catch (NullPointerException | NumberFormatException
@@ -261,7 +263,8 @@ public class Utils {
      */
     public static Integer parseInteger(JTextField tField) {
         try {
-            return SimbrainConstants.LOCAL_FORMATTER.parse(tField.getText())
+            String text = tField.getText().replaceFirst("\\s+", "");
+            return SimbrainConstants.LOCAL_FORMATTER.parse(text)
                 .intValue();
         } catch (NullPointerException | NumberFormatException
             | ParseException ex) {
@@ -278,6 +281,7 @@ public class Utils {
      */
     public static Integer parseInteger(String text) {
         try {
+            text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
         } catch (NullPointerException | NumberFormatException
             | ParseException ex) {

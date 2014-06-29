@@ -23,7 +23,7 @@ import org.simbrain.util.math.ProbDistribution;
 /**
  * @author Zach Tosi
  * @author Jeff Yoshimi
- * 
+ *
  * <b>Randomizer</b> produces numbers drawn from a probability distribution
  * according to a set of user-specified parameters.
  */
@@ -31,11 +31,21 @@ public class Randomizer {
 
     public static final ProbDistribution DEFAULT_DISTRIBUTION =
             ProbDistribution.UNIFORM;
-    
+
     protected ProbDistribution pdf = DEFAULT_DISTRIBUTION;
 
+    /**
+     * First parameter of the selected probability distribution. To see what
+     * this signifies see
+     * {@link org.simbrain.util.math.ProbDistribution#getParam1Name()}.
+     */
     protected double param1 = 0;
 
+    /**
+     * First parameter of the selected probability distribution. To see what
+     * this signifies see
+     * {@link org.simbrain.util.math.ProbDistribution#getParam2Name()}.
+     */
     protected double param2 = 1;
 
     /** Upper bound of the random distribution. */
@@ -49,12 +59,12 @@ public class Randomizer {
      * bound values.
      */
     protected boolean clipping = false;
-    
+
     /**
      * Default constructor.
      */
     public Randomizer() {
-        
+
     }
 
     /**
@@ -161,6 +171,8 @@ public class Randomizer {
     }
 
     /**
+     * See the javadoc at {@link #param1}.
+     *
      * @return the param1
      */
     public double getParam1() {
@@ -168,6 +180,8 @@ public class Randomizer {
     }
 
     /**
+     * See the javadoc at {@link #param2}.
+     *
      * @return the param2
      */
     public double getParam2() {
@@ -175,7 +189,7 @@ public class Randomizer {
     }
 
     /**
-     * 
+     *
      * @param param1
      * @param param2
      */
@@ -193,8 +207,8 @@ public class Randomizer {
         }
         setParams(param1, param2);
     }
-    
-    
+
+
 
     public void setParam1Consistent(String p1Name, double param1) {
         if (!p1Name.equals(pdf.getParam1Name())) {
@@ -203,7 +217,7 @@ public class Randomizer {
         }
         this.param1 = param1;
     }
-    
+
     public void setParam2Consistent(String p2Name, double param2) {
         if (p2Name == null) return; //TODO think about this, it's a hack
         if (!p2Name.equals(pdf.getParam2Name())) {
@@ -212,7 +226,7 @@ public class Randomizer {
         }
         this.param2 = param2;
     }
-    
+
     /**
      * @return the upperBound
      */

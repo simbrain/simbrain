@@ -349,6 +349,8 @@ public class SynapseGroup extends Group {
             setMarkedForDeletion(true);
         }
         clear();
+        inSynapseSet = null;
+        exSynapseSet = null;
         getParentNetwork().removeGroup(this);
         if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
@@ -364,6 +366,7 @@ public class SynapseGroup extends Group {
         if (!sourceNeuronGroup.isMarkedForDeletion()) {
             sourceNeuronGroup.removeOutgoingSg(this);
         }
+        Runtime.getRuntime().gc();
     }
 
     /**
@@ -482,22 +485,25 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Remove the provided synapse.
+     * Remove the provided synapse from the group, but not the network.
      *
      * @param toDelete
      *            the synapse to delete
      */
-    public void removeSynapse(Synapse toDelete) {
+    public Synapse removeSynapse(Synapse toDelete) {
         if (toDelete.getStrength() > 0) {
             exSynapseSet.remove(toDelete);
         } else {
             inSynapseSet.remove(toDelete);
         }
-        getParentNetwork().fireSynapseRemoved(toDelete);
+        if (isDisplaySynapses()) {
+            toDelete.getNetwork().fireSynapseRemoved(toDelete);
+        }
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
         if (isEmpty()) {
             delete();
         }
+        return toDelete;
     }
 
     /**

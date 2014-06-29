@@ -17,50 +17,279 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.SimbrainConstants.Polarity;
 
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them.
  * 
- * TODO: More complex connection making functions Custom randomization? Ability
- * to connect in a range (e.g, between 109 and 209 units away)
- * 
- * @author jyoshimi
+ * @author Zach Tosi
  * 
  */
-public class Radial extends ConnectNeurons {
+public class Radial extends DensityBasedConnector {
 
-    /** Whether to allow self-connections. */
-    private boolean allowSelfConnections = false;
+    public static final double DEFAULT_DIST_CONST = 0.25;
 
-    /** Template synapse for excitatory synapses. */
-    private Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
+    public static final double DEFAULT_EE_CONST = 0.3;
 
-    /**
-     * Probability of designating a given synapse excitatory. If not, it's
-     * inhibitory.
-     */
-    private double excitatoryProbability = .8;
+    public static final double DEFAULT_EI_CONST = 0.2;
 
-    /** Radius within which to connect excitatory neurons. */
-    private double excitatoryRadius = 100;
+    public static final double DEFAULT_IE_CONST = 0.4;
 
-    /** Template synapse for inhibitory synapses. */
-    private Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
+    public static final double DEFAULT_II_CONST = 0.1;
 
-    /** Radius within which to connect inhibitory neurons. */
-    private double inhibitoryRadius = 80;
+    public static final double DEFAULT_LAMBDA = 2.5;
+
+    /** The connection constant for connections between 2 excitatory neurons. */
+    private double eeDistConst = DEFAULT_EE_CONST;
 
     /**
-     * Probability of designating a given synapse excitatory. If not, it's
-     * inhibitory.
+     * The connection constant for connection from an excitatory to an
+     * inhibitory neuron.
      */
-    private double inhibitoryProbability = .8;
+    private double eiDistConst = DEFAULT_EI_CONST;
 
-    /** {@inheritDoc} */
+    /**
+     * The connection constant for connection from an inhibitory to an
+     * excitatory neuron.
+     */
+    private double ieDistConst = DEFAULT_IE_CONST;
+
+    /** The connection constant for connections between 2 inhibitory neurons. */
+    private double iiDistConst = DEFAULT_II_CONST;
+
+    /**
+     * The connection constant for general connections. Used in cases where
+     * neurons have no explicit polarity.
+     */
+    private double distConst = DEFAULT_DIST_CONST;
+
+    /**
+     * A regulating constant governing overall connection density. Higher values
+     * create denser connections. Lambda can be thought of as the average
+     * connection distance.
+     */
+    private double lambda = DEFAULT_LAMBDA;
+
+    private List<Synapse> removedList;
+
+    private SynapseGroup synapseGroup;
+
+    /**
+     * 
+     * @param source
+     * @param target
+     * @param eeDistConst
+     * @param eiDistConst
+     * @param ieDistConst
+     * @param iiDistConst
+     * @param lambda
+     * @param loose
+     * @return
+     */
+    public static List<Synapse> connectRadialPolarized(
+        final List<Neuron> source, final List<Neuron> target,
+        double eeDistConst, double eiDistConst, double ieDistConst,
+        double iiDistConst, double distConst, double lambda, boolean loose) {
+        // Pre-allocating assuming that if one is using this as a connector
+        // then they are probably not going to have greater than 25%
+        // connectivity
+        List<Synapse> synapses = new ArrayList<Synapse>(source.size()
+            * target.size() / 4);
+        for (Neuron src : source) {
+            for (Neuron tar : target) {
+                double randVal = Math.random();
+                double probability;
+                if (src.getPolarity() == Polarity.EXCITATORY) {
+                    if (tar.getPolarity() == Polarity.EXCITATORY) {
+                        probability = calcConnectProb(src, tar, eeDistConst,
+                            lambda);
+                    } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+                        probability = calcConnectProb(src, tar, eiDistConst,
+                            lambda);
+                    } else {
+                        probability = calcConnectProb(src, tar, distConst,
+                            lambda);
+                    }
+                } else if (src.getPolarity() == Polarity.INHIBITORY) {
+                    if (tar.getPolarity() == Polarity.EXCITATORY) {
+                        probability = calcConnectProb(src, tar, ieDistConst,
+                            lambda);
+                    } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+                        probability = calcConnectProb(src, tar, iiDistConst,
+                            lambda);
+                    } else {
+                        probability = calcConnectProb(src, tar, distConst,
+                            lambda);
+                    }
+                } else {
+                    probability = calcConnectProb(src, tar, distConst,
+                        lambda);
+                }
+                if (randVal < probability) {
+                    Synapse s = new Synapse(src, tar);
+                    synapses.add(s);
+                    if (loose) {
+                        src.getNetwork().addSynapse(s);
+                    }
+                }
+            }
+        }
+        return synapses;
+    }
+
+    /**
+     * 
+     * @param source
+     * @param target
+     * @param distConst
+     * @param lambda
+     * @param loose
+     * @return
+     */
+    public static List<Synapse> connectRadialNoPolarity(
+        final List<Neuron> source, final List<Neuron> target, double distConst,
+        double lambda, boolean loose) {
+        // Pre-allocating assuming that if one is using this as a connector
+        // then they are probably not going to have greater than 25%
+        // connectivity
+        List<Synapse> synapses = new ArrayList<Synapse>(source.size()
+            * target.size() / 4);
+        for (Neuron src : source) {
+            for (Neuron tar : target) {
+                double randVal = Math.random();
+                double probability = calcConnectProb(src, tar, distConst,
+                    lambda);
+                if (randVal < probability) {
+                    Synapse s = new Synapse(src, tar);
+                    synapses.add(s);
+                    if (loose) {
+                        src.getNetwork().addSynapse(s);
+                    }
+                }
+            }
+        }
+        return synapses;
+    }
+
+    /**
+     * Default constructor
+     */
     public Radial() {
+    }
+
+    /**
+     * @param distConst
+     * @param lambda
+     */
+    public Radial(double distConst, double lambda) {
+        this.distConst = distConst;
+        this.lambda = lambda;
+    }
+
+    /**
+     * 
+     * @param eeDistConst
+     * @param eiDistConst
+     * @param ieDistConst
+     * @param iiDistConst
+     * @param lambda
+     */
+    public Radial(double eeDistConst, double eiDistConst, double ieDistConst,
+        double iiDistConst, double lambda) {
+        this.eeDistConst = eeDistConst;
+        this.eiDistConst = eiDistConst;
+        this.ieDistConst = ieDistConst;
+        this.iiDistConst = iiDistConst;
+        this.lambda = lambda;
+    }
+
+    /**
+     * {@inheritDoc} Specifically: Connects neurons based on a probability
+     * function related to their distance from one another, which exponentially
+     * decays with distance.
+     */
+    @Override
+    public void connectNeurons(SynapseGroup synGroup) {
+        this.synapseGroup = synGroup;
+        List<Neuron> source = synGroup.getSourceNeurons();
+        List<Neuron> target = synGroup.getTargetNeurons();
+        List<Synapse> synapses = connectRadialPolarized(source, target,
+            eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst,
+            lambda, false);
+        for (Synapse s : synapses) {
+            synGroup.addNewSynapse(s);
+        }
+        if (synGroup.isRecurrent()) {
+            connectionDensity = (double) synapses.size() /
+                (synGroup.getSourceNeuronGroup().size()
+                * (synGroup.getSourceNeuronGroup().size() - 1));
+        } else {
+            connectionDensity = (double) synapses.size() /
+                (synGroup.getSourceNeuronGroup().size()
+                * synGroup.getTargetNeuronGroup().size());
+        }
+        source = null;
+        target = null;
+        synapses = null;
+        Runtime.getRuntime().gc();
+    }
+
+    public void adjustConnectivity(double density) {
+
+    }
+
+    private void removeToDensity(double density) {
+        if (connectionDensity == 0)
+            return;
+
+    }
+
+    private void addToDensity(double density) {
+        if (connectionDensity == 1)
+            return;
+    }
+
+    /**
+     * 
+     * @param src
+     * @param tar
+     * @param distConst
+     * @param lambda
+     * @return
+     */
+    private static double calcConnectProb(Neuron src, Neuron tar,
+        double distConst, double lambda) {
+        double dist = -getRawDist(src, tar);
+        double exp = Math.exp(dist / (lambda * lambda));
+        if (exp == 1.0) { // Same location--same neuron: cheapest way to
+            // prevent self connections
+            exp = 0.0;
+        }
+        return distConst * exp;
+    }
+
+    /**
+     * 
+     * @param n1
+     * @param n2
+     * @return
+     */
+    private static double getRawDist(Neuron n1, Neuron n2) {
+        double x2 = (n1.getX() - n2.getX());
+        x2 *= x2;
+        double y2 = (n1.getY() - n2.getY());
+        y2 *= y2;
+        double z2 = (n1.getZ() - n2.getZ());
+        z2 *= z2;
+        return x2 + y2 + z2;
     }
 
     @Override
@@ -68,193 +297,128 @@ public class Radial extends ConnectNeurons {
         return "Radial";
     }
 
-    // @Override
-    // public List<Synapse> connectNeurons(final boolean looseSynapses) {
-    // ArrayList<Synapse> syns = new ArrayList<Synapse>();
-    // for (Neuron source : sourceNeurons) {
-    // makeExcitatory(source, syns, looseSynapses);
-    // makeInhibitory(source, syns, looseSynapses);
-    // }
-    // return syns;
-    // }
-    //
-    // /**
-    // * Make an inhibitory neuron, in the sense of connecting this neuron with
-    // * surrounding neurons via excitatory connections.
-    // *
-    // * @param source source neuron
-    // */
-    // private void makeInhibitory(final Neuron source, List<Synapse> syns,
-    // boolean looseSynapses) {
-    // for (Neuron target : network.getNeuronsInRadius(source,
-    // inhibitoryRadius)) {
-    // if (!sourceNeurons.contains(target)) {
-    // continue;
-    // }
-    // // Don't add a connection if there is already one present
-    // if (Network.getSynapse(source, target) != null) {
-    // continue;
-    // }
-    // if (!allowSelfConnections) {
-    // if (source == target) {
-    // continue;
-    // }
-    // }
-    // if (Math.random() < inhibitoryProbability) {
-    // Synapse synapse = baseInhibitorySynapse
-    // .instantiateTemplateSynapse(source, target, network);
-    // synapse.setStrength(-1);
-    // if (looseSynapses) {
-    // network.addSynapse(synapse);
-    // }
-    // syns.add(synapse);
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * Make an excitatory neuron, in the sense of connecting this neuron with
-    // * surrounding neurons via excitatory connections.
-    // *
-    // * @param source source neuron
-    // */
-    // private void makeExcitatory(final Neuron source, List<Synapse> syns,
-    // boolean looseSynapses) {
-    // for (Neuron target : network.getNeuronsInRadius(source,
-    // excitatoryRadius)) {
-    // if (!sourceNeurons.contains(target)) {
-    // continue;
-    // }
-    // // Don't add a connection if there is already one present
-    // if (Network.getSynapse(source, target) != null) {
-    // continue;
-    // }
-    // if (!allowSelfConnections) {
-    // if (source == target) {
-    // continue;
-    // }
-    // }
-    // if (Math.random() < excitatoryProbability) {
-    // Synapse synapse = baseExcitatorySynapse
-    // .instantiateTemplateSynapse(source, target, network);
-    // synapse.setStrength(1);
-    // if (looseSynapses) {
-    // network.addSynapse(synapse);
-    // }
-    // syns.add(synapse);
-    // }
-    // }
-    // }
-
-    /**
-     * @return the allowSelfConnections
-     */
-    public boolean isAllowSelfConnections() {
-        return allowSelfConnections;
+    public double getEeDistConst() {
+        return eeDistConst;
     }
 
-    /**
-     * @param allowSelfConnections
-     *            the allowSelfConnections to set
-     */
-    public void setAllowSelfConnections(final boolean allowSelfConnections) {
-        this.allowSelfConnections = allowSelfConnections;
+    public void setEeDistConst(double eeDistConst) {
+        this.eeDistConst = eeDistConst;
     }
 
-    /**
-     * @return the excitatoryProbability
-     */
-    public double getExcitatoryProbability() {
-        return excitatoryProbability;
+    public double getEiDistConst() {
+        return eiDistConst;
     }
 
-    /**
-     * @param excitatoryProbability
-     *            the excitatoryProbability to set
-     */
-    public void setExcitatoryProbability(final double excitatoryProbability) {
-        this.excitatoryProbability = excitatoryProbability;
+    public void setEiDistConst(double eiDistConst) {
+        this.eiDistConst = eiDistConst;
     }
 
-    /**
-     * @return the excitatoryRadius
-     */
-    public double getExcitatoryRadius() {
-        return excitatoryRadius;
+    public double getIeDistConst() {
+        return ieDistConst;
     }
 
-    /**
-     * @param excitatoryRadius
-     *            the excitatoryRadius to set
-     */
-    public void setExcitatoryRadius(final double excitatoryRadius) {
-        this.excitatoryRadius = excitatoryRadius;
+    public void setIeDistConst(double ieDistConst) {
+        this.ieDistConst = ieDistConst;
     }
 
-    /**
-     * @return the inhibitoryRadius
-     */
-    public double getInhibitoryRadius() {
-        return inhibitoryRadius;
+    public double getIiDistConst() {
+        return iiDistConst;
     }
 
-    /**
-     * @param inhibitoryRadius
-     *            the inhibitoryRadius to set
-     */
-    public void setInhibitoryRadius(final double inhibitoryRadius) {
-        this.inhibitoryRadius = inhibitoryRadius;
+    public void setIiDistConst(double iiDistConst) {
+        this.iiDistConst = iiDistConst;
     }
 
-    /**
-     * @return the inhibitoryProbability
-     */
-    public double getInhibitoryProbability() {
-        return inhibitoryProbability;
+    public double getDistConst() {
+        return distConst;
     }
 
-    /**
-     * @param inhibitoryProbability
-     *            the inhibitoryProbability to set
-     */
-    public void setInhibitoryProbability(final double inhibitoryProbability) {
-        this.inhibitoryProbability = inhibitoryProbability;
+    public void setDistConst(double distConst) {
+        this.distConst = distConst;
     }
 
-    /**
-     * @return the baseExcitatorySynapse
-     */
-    public Synapse getBaseExcitatorySynapse() {
-        return baseExcitatorySynapse;
+    public double getLambda() {
+        return lambda;
     }
 
-    /**
-     * @param baseExcitatorySynapse
-     *            the baseExcitatorySynapse to set
-     */
-    public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
-        this.baseExcitatorySynapse = baseExcitatorySynapse;
-    }
-
-    /**
-     * @return the baseInhibitorySynapse
-     */
-    public Synapse getBaseInhibitorySynapse() {
-        return baseInhibitorySynapse;
-    }
-
-    /**
-     * @param baseInhibitorySynapse
-     *            the baseInhibitorySynapse to set
-     */
-    public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
-        this.baseInhibitorySynapse = baseInhibitorySynapse;
+    public void setLambda(double lambda) {
+        this.lambda = lambda;
     }
 
     @Override
-    public void connectNeurons(SynapseGroup synGroup) {
-        // TODO Auto-generated method stub
+    public double getConnectionDensity() {
+        return 0;
+    }
 
+    @Override
+    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public class DensityEstimator implements Runnable {
+
+        private double estimateDensity;
+
+        @Override
+        public void run() {
+            int count = 0;
+            for (Neuron src : synapseGroup.getSourceNeurons()) {
+                for (Neuron tar : synapseGroup.getTargetNeurons()) {
+                    double randVal = Math.random();
+                    double probability;
+                    if (src.getPolarity() == Polarity.EXCITATORY) {
+                        if (tar.getPolarity() == Polarity.EXCITATORY) {
+                            probability =
+                                calcConnectProb(src, tar, eeDistConst,
+                                    lambda);
+                        } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+                            probability =
+                                calcConnectProb(src, tar, eiDistConst,
+                                    lambda);
+                        } else {
+                            probability = calcConnectProb(src, tar, distConst,
+                                lambda);
+                        }
+                    } else if (src.getPolarity() == Polarity.INHIBITORY) {
+                        if (tar.getPolarity() == Polarity.EXCITATORY) {
+                            probability =
+                                calcConnectProb(src, tar, ieDistConst,
+                                    lambda);
+                        } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+                            probability =
+                                calcConnectProb(src, tar, iiDistConst,
+                                    lambda);
+                        } else {
+                            probability = calcConnectProb(src, tar, distConst,
+                                lambda);
+                        }
+                    } else {
+                        probability = calcConnectProb(src, tar, distConst,
+                            lambda);
+                    }
+                    if (randVal < probability) {
+                        count++;
+                    }
+                }
+            }
+            if (synapseGroup.isRecurrent()) {
+                estimateDensity = (double) count / (synapseGroup
+                    .getSourceNeuronGroup().size()
+                    * (synapseGroup.getSourceNeuronGroup().size() - 1));
+            } else {
+                estimateDensity = (double) count / (synapseGroup.
+                    getSourceNeuronGroup().size() * synapseGroup
+                    .getTargetNeuronGroup().size());
+            }
+            synchronized (this) {
+                notify();
+            }
+        }
+
+        public double getDensityEsitmate() {
+            return estimateDensity;
+        }
     }
 
 }

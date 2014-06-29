@@ -76,7 +76,7 @@ public class AllToAll extends DensityBasedConnector {
         final boolean recurrent, final boolean allowSelfConnection,
         final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>(
-            (int) (targetNeurons.size() * sourceNeurons.size() / 0.75));
+            (int) (targetNeurons.size() * sourceNeurons.size()));
         if (recurrent && !allowSelfConnection) {
             int i = 0;
             int j;

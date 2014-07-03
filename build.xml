@@ -101,6 +101,7 @@
 	<target name="clean" description="Remove build and bin directories">
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
+		<delete dir="${bin}" />
 		<delete dir="${temp}" />
 	</target>
 

@@ -184,9 +184,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         if (turningType.isVisible()) {
                             double direction = ((Turning) effector)
                                     .getDirection();
-                            // TODO: Rethink this approach; produces different
-                            // results in menu vs. dialog
-                            if (direction < 0) {
+                            if (direction == Turning.LEFT) {
                                 String description = entity.getName()
                                         + ":turnLeft";
                                 PotentialConsumer consumer = getAttributeManager()
@@ -194,7 +192,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                                                 "setAmount", double.class);
                                 consumer.setCustomDescription(description);
                                 returnList.add(consumer);
-                            } else {
+                            } else if (direction == Turning.RIGHT) {
                                 String description = entity.getName()
                                         + ":turnRight";
                                 PotentialConsumer consumer = getAttributeManager()

@@ -164,7 +164,10 @@ public class QuickConnectPreferences {
      * Static set of connection types. These are modified and the current one is
      * used for quick connect.
      */
-    private static final ConnectType[] connectionTypes = ConnectType.values();
+    private static final ConnectType[] connectionTypes = new ConnectType[] {
+            ConnectType.ALL_TO_ALL, ConnectType.ONE_TO_ONE, ConnectType.SPARSE };
+    // Radial is not currently entabled
+    //private static final ConnectType[] connectionTypes = ConnectType.values();
 
     /**
      * Holds "current" connection object.

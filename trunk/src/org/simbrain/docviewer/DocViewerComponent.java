@@ -43,6 +43,22 @@ public class DocViewerComponent extends WorkspaceComponent {
             + "using the File menu.\n</body>\n</html>\n";
 
     /**
+     * Construct a new document viewer component.
+     */
+    public DocViewerComponent() {
+        super("");
+    }
+
+    /**
+     * Construct a new document viewer component with a specified title.
+     *
+     * @param name title for frame this is displayed in
+     */
+    public DocViewerComponent(String name) {
+        super(name);
+    }
+
+    /**
      * Opens a saved component. There isn't much to do here since currently
      * there is nothing to persist with a console. This just ensures that a
      * component is created and (in the gui) presented.
@@ -69,13 +85,6 @@ public class DocViewerComponent extends WorkspaceComponent {
         }
         comp.setText(text);
         return comp;
-    }
-
-    /**
-     * Construct a new document viewer component.
-     */
-    public DocViewerComponent(String name) {
-        super(name);
     }
 
     @Override

@@ -170,17 +170,30 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     }
 
+    /**
+     * Helper method for making neuron consumers, since it happens in a few
+     * different places and is important to be consistent about.
+     *
+     * @param component network component
+     * @param neuron the neuron that will produce activations
+     * @return the neuron consumer
+     */
+    public static PotentialConsumer getNeuronConsumer(
+            NetworkComponent component, Neuron neuron) {
+        PotentialConsumer consumer = component.getAttributeManager()
+                .createPotentialConsumer(neuron, "setInputValue",
+                double.class);
+        consumer.setCustomDescription(neuron.getId() + ":" + "setInputValue");
+        return consumer;
+    }
+
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
-                    String description = type.getDescription(neuron.getId());
-                    PotentialConsumer consumer = getAttributeManager()
-                            .createPotentialConsumer(neuron, type);
-                    consumer.setCustomDescription(description);
-                    returnList.add(consumer);
+                    returnList.add(getNeuronConsumer(this, neuron));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
@@ -221,17 +234,30 @@ public final class NetworkComponent extends WorkspaceComponent {
         return returnList;
     }
 
+    /**
+     * Helper method for making neuron producers, since it happens in a few
+     * different places and is important to be consistent about.
+     *
+     * @param component network component
+     * @param neuron the neuron that will produce activations
+     * @return the neuron producer
+     */
+    public static PotentialProducer getNeuronProducer(
+            NetworkComponent component, Neuron neuron) {
+        PotentialProducer producer = component.getAttributeManager()
+                .createPotentialProducer(neuron, "getActivation",
+                double.class);
+        producer.setCustomDescription(neuron.getId() + ":" + "getActivation");
+        return producer;
+    }
+
     @Override
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
-                    String description = type.getDescription(neuron.getId());
-                    PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(neuron, type);
-                    producer.setCustomDescription(description);
-                    returnList.add(producer);
+                    returnList.add(getNeuronProducer(this, neuron));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {

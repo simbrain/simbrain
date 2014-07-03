@@ -42,7 +42,7 @@ public final class NewDocViewerAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        DocViewerComponent component = new DocViewerComponent("");
+        DocViewerComponent component = new DocViewerComponent();
         workspace.addWorkspaceComponent(component);
     }
 }

@@ -141,9 +141,9 @@ public class OdorWorld {
             entity.addEffector(new StraightMovement((RotatingEntity) entity,
                     "Go-straight"));
             entity.addEffector(new Turning((RotatingEntity) entity, "Go-left",
-                    1));
+                    Turning.LEFT));
             entity.addEffector(new Turning((RotatingEntity) entity, "Go-right",
-                    -1));
+                    Turning.RIGHT));
 
             // Add default sensors
             entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8,

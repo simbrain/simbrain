@@ -30,7 +30,16 @@ public class Turning extends Effector {
     /** Default direction. */
     public static final double DEFAULT_DIRECTION = 0;
 
-    /** Turn by amount times fixed amount. 1 for left, -1 for right. */
+    /** Direction value to turn left. */
+    public static final double LEFT = 1;
+
+    /** Direction value to turn right. */
+    public static final double RIGHT = -1;
+
+    /**
+     * Turn by amount times direction, which encodes direction: 1 for left, -1
+     * for right.
+     */
     private double direction;
 
     /** Default amount. */
@@ -47,11 +56,11 @@ public class Turning extends Effector {
      *
      * @param parent parent entity.
      * @param label descriptive label
-     * @param radians amount turn in radians.
+     * @param direction amount turn in radians.
      */
-    public Turning(RotatingEntity parent, String label, double radians) {
+    public Turning(RotatingEntity parent, String label, double direction) {
         super(parent, label);
-        this.direction = radians;
+        this.direction = direction;
     }
 
     @Override

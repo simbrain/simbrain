@@ -469,7 +469,7 @@ public final class NetworkActionManager {
      */
     public List<Action> getConnectionActions() {
         return Arrays
-                .asList(new Action[] { allToAll, oneToOne, radial, sparse });
+                .asList(new Action[] { allToAll, oneToOne, sparse });
     }
 
     /**
@@ -479,7 +479,7 @@ public final class NetworkActionManager {
      */
     public List<Action> getSelfConnectionActions() {
         return Arrays.asList(new Action[] { allToAllSelf, fixedFanoutSelf,
-                oneToOneSelf, radialSelf, sparseSelf });
+                oneToOneSelf, sparseSelf });
     }
 
     /**

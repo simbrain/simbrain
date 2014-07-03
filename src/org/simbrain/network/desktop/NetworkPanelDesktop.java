@@ -24,6 +24,7 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -276,16 +277,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            PotentialProducer producer = component
-                .getWorkspaceComponent()
-                .getAttributeManager()
-                .createPotentialProducer(neuron, "getActivation",
-                    double.class);
-            PotentialConsumer consumer = component
-                .getWorkspaceComponent()
-                .getAttributeManager()
-                .createPotentialConsumer(neuron, "setInputValue",
-                    double.class);
+            PotentialProducer producer = NetworkComponent.getNeuronProducer(
+                    component.getWorkspaceComponent(), neuron);
+            PotentialConsumer consumer = NetworkComponent.getNeuronConsumer(
+                    component.getWorkspaceComponent(), neuron);
             JMenu producerMenu = new CouplingMenuProducer(
                 "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);

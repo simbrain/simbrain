@@ -403,7 +403,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             success &= combinedNeuronInfoPanel.commitChanges();
             Neuron template = neuronGroup.getNeuronList().get(0);
             try {
-                neuronGroup.getNeuronList().clear();
+                neuronGroup.clearNeuronList();
                 int numNeurons = Integer.parseInt(((SummaryPanel) summaryPanel)
                         .getEditablePopField().getText());
                 if (numNeurons < 1) {

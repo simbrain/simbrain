@@ -30,11 +30,11 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 /**
- *
+ * 
  * A group of synapses. Must connect a source and target neuron group.
- *
+ * 
  * @author Zach Tosi
- *
+ * 
  */
 public class SynapseGroup extends Group {
 
@@ -82,7 +82,7 @@ public class SynapseGroup extends Group {
     boolean recurrent;
 
     /**
-     *
+     * 
      * @param source
      * @param target
      * @return
@@ -93,7 +93,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param source
      * @param target
      * @param connectionManager
@@ -106,7 +106,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param source
      * @param target
      * @param connectionManager
@@ -121,7 +121,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param source
      * @param target
      * @param connectionManager
@@ -143,7 +143,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param source
      * @param target
      */
@@ -159,7 +159,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Create a new synapse group.
-     *
+     * 
      * @param source
      *            source neuron group
      * @param target
@@ -221,7 +221,7 @@ public class SynapseGroup extends Group {
      * excitatoryRatio. <b>2)</b> Changes in weights performed to achieve the
      * desired excitatoryRatio will result from sign changes to synapses. The
      * absolute value of synapse strengths will not be changed.
-     *
+     * 
      * @param excitatoryRatio
      *            the ratio of synapses which will be made excitatory, value
      *            must be in the range [0, 1]
@@ -306,7 +306,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns the excitatory ratio.
-     *
+     * 
      * @return the ration of excitatory synapses in this group
      */
     public double getExcitatoryRatio() {
@@ -349,8 +349,6 @@ public class SynapseGroup extends Group {
             setMarkedForDeletion(true);
         }
         clear();
-        inSynapseSet = null;
-        exSynapseSet = null;
         getParentNetwork().removeGroup(this);
         if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
@@ -371,7 +369,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Add a synapse to this synapse group.
-     *
+     * 
      * @param synapse
      *            synapse to add
      */
@@ -385,7 +383,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      */
     public void addExcitatorySynapse(final Synapse synapse) {
@@ -398,7 +396,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      */
     public void addInhibitorySynapse(final Synapse synapse) {
@@ -411,7 +409,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      */
     public void addNewSynapse(final Synapse synapse) {
@@ -433,7 +431,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      */
     public void addNewExcitatorySynapse(final Synapse synapse) {
@@ -459,7 +457,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
@@ -486,7 +484,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Remove the provided synapse from the group, but not the network.
-     *
+     * 
      * @param toDelete
      *            the synapse to delete
      */
@@ -507,7 +505,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param synapse
      * @param newWeight
      * @return
@@ -551,7 +549,7 @@ public class SynapseGroup extends Group {
      * Subsequent attempts to modify the connection manager will fail, as
      * changing the connection manager amounts to (and should be implemented as)
      * creating an entirely new synapse group.
-     *
+     * 
      * @param connection
      */
     public void setConnectionManager(ConnectNeurons connection) {
@@ -598,7 +596,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param excitatoryRandomizer
      */
     public void
@@ -607,7 +605,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param inhibitoryRandomizer
      */
     public void
@@ -616,7 +614,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param excitatoryRandomizer
      * @param inhibitoryRandomizer
      */
@@ -627,7 +625,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public PolarizedRandomizer getExcitatoryRandomizer() {
@@ -635,7 +633,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public PolarizedRandomizer getInhibitoryRandomizer() {
@@ -647,7 +645,7 @@ public class SynapseGroup extends Group {
      * synapses, this method can be called to change the excitatoryRatio to
      * reflect this value. This happens rarely, and generally speaking is not
      * recommended outside prototyping.
-     *
+     * 
      * @return the ratio of synapses in this group that are excitatory.
      */
     public double calculateExcitatoryRatio() {
@@ -691,7 +689,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Check whether this synapse group connects a neuron group to itself.
-     *
+     * 
      * @return true if this connects a neuron group to itself, false otherwise.
      */
     public boolean isRecurrent() {
@@ -701,7 +699,7 @@ public class SynapseGroup extends Group {
     /**
      * Tests if this synapse group is in fact recurrent (it's target and source
      * neuron groups are the same).
-     *
+     * 
      * @return
      */
     private boolean testRecurrent() {
@@ -711,7 +709,7 @@ public class SynapseGroup extends Group {
     /**
      * Return a list of source neurons associated with the synapses in this
      * group.
-     *
+     * 
      * @return the source neuron list.
      */
     public List<Neuron> getSourceNeurons() {
@@ -721,7 +719,7 @@ public class SynapseGroup extends Group {
     /**
      * Return a list of target neurons associated with the synapses in this
      * group.
-     *
+     * 
      * @return the target neuron list.
      */
     public List<Neuron> getTargetNeurons() {
@@ -799,7 +797,7 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the excitatory prototype synapse, allowing more detailed synapse
      * values to be set for any synapses that might be added to the group.
-     *
+     * 
      * @return
      */
     public Synapse getExcitatoryPrototype() {
@@ -809,7 +807,7 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the inhibitory prototype synapse, allowing more detailed synapse
      * values to be set for any synapses that might be added to the group.
-     *
+     * 
      * @return
      */
     public Synapse getInhibitoryPrototype() {
@@ -818,7 +816,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Return weight strengths as a double vector.
-     *
+     * 
      * @return weights
      */
     public double[] getWeightVector() {
@@ -859,7 +857,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Set all weight strengths to a specified value.
-     *
+     * 
      * @param value
      *            the value to set the synapses to
      */
@@ -884,7 +882,7 @@ public class SynapseGroup extends Group {
     /**
      * Sets all excitatory synapses to a certain value. If value is negative,
      * uses abs(value) instead.
-     *
+     * 
      * @param value
      */
     public void setAllExcitatoryStrengths(double value) {
@@ -897,7 +895,7 @@ public class SynapseGroup extends Group {
     /**
      * Sets all inhibitory synapses to a certain value. If value is positive
      * uses -abs(value) instead.
-     *
+     * 
      * @param value
      */
     public void setAllInhibitoryStrengths(double value) {
@@ -909,7 +907,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Enable or disable all synapses in this group.
-     *
+     * 
      * @param enabled
      *            true to enable them all; false to disable them all
      */
@@ -919,7 +917,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param enabled
      */
     public void setExcitatoryEnabled(final boolean enabled) {
@@ -930,7 +928,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * 
      * @param enabled
      */
     public void setInhibitoryEnabled(final boolean enabled) {
@@ -942,7 +940,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Freeze or unfreeze all synapses in this group.
-     *
+     * 
      * @param freeze
      *            true to freeze the group; false to unfreeze it
      */
@@ -953,7 +951,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Freeze or unfreeze all the excitatory synapses in this group
-     *
+     * 
      * @param frozen
      */
     public void setExcitatoryFrozen(final boolean frozen) {
@@ -965,7 +963,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Freeze or unfreeze all the inhibitorySynapses in this group.
-     *
+     * 
      * @param frozen
      */
     public void setInhibitoryFrozen(final boolean frozen) {
@@ -977,7 +975,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are frozen.
-     *
+     * 
      * @return true if all synapses are frozen, false otherwise
      */
     public boolean isFrozen() {
@@ -1030,7 +1028,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Returns true if all the synapses in this group are enabled.
-     *
+     * 
      * @return true if all synapses are enabled, false otherwise
      */
     public boolean isEnabled() {
@@ -1087,7 +1085,7 @@ public class SynapseGroup extends Group {
      * group, then this method will reliably report if the inhibitory synapses
      * of this group are all frozen or not in O(1) vs. O(n) time for
      * {@link #isAllInhibitoryFrozen()}.
-     *
+     * 
      * @return
      */
     public boolean isInhibitoryFrozenQuick() {
@@ -1100,7 +1098,7 @@ public class SynapseGroup extends Group {
      * group, then this method will reliably report if the Excitatory synapses
      * of this group are all frozen or not in O(1) vs. O(n) time for
      * {@link #isAllExcitatoryFrozen()}.
-     *
+     * 
      * @return
      */
     public boolean isExcitatoryFrozenQuick() {
@@ -1113,7 +1111,7 @@ public class SynapseGroup extends Group {
      * group, then this method will reliably report if the inhibitory synapses
      * of this group are all enabled or not in O(1) vs. O(n) time for
      * {@link #isAllInhibitoryEnabled()}.
-     *
+     * 
      * @return
      */
     public boolean isInhibitoryEnabledQuick() {
@@ -1126,7 +1124,7 @@ public class SynapseGroup extends Group {
      * group, then this method will reliably report if the excitatory synapses
      * of this group are all enabled or not in O(1) vs. O(n) time for
      * {@link #isAllExcitatoryEnabled()}.
-     *
+     * 
      * @return
      */
     public boolean isExcitatoryEnabledQuick() {
@@ -1162,7 +1160,7 @@ public class SynapseGroup extends Group {
 
     /**
      * Sets the update rule of all excitatory synapses to the specified rule.
-     *
+     * 
      * @param excitatoryRule
      */
     public void setExcitatoryRule(SynapseUpdateRule excitatoryRule) {
@@ -1182,7 +1180,7 @@ public class SynapseGroup extends Group {
     /**
      * Sets the update rule of all the inhibitory synapses to the specified
      * rule.
-     *
+     * 
      * @param inhibitoryRule
      */
     public void setInhibitoryRule(SynapseUpdateRule inhibitoryRule) {
@@ -1197,7 +1195,7 @@ public class SynapseGroup extends Group {
      * containing this synapse group's synapses. This allows expectedNumber of
      * synapses to be added to this synapse group without the synapse list
      * having to perform any operations related to expanding the list size.
-     *
+     * 
      * @param expectedNumSynapses
      * @throws IllegalStateException
      */

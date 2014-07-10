@@ -105,7 +105,11 @@ public class HopfieldEditTrainDialog extends StandardDialog {
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
-                if (index == 2) {
+                if (index == 0) {
+                    // When entering training tab, commit table changes
+                    hopfieldPropsPanel.commitChanges();
+                    inputPanel.commitChanges();
+                } else if (index == 2) {
                     if (inputPanel.getTable().getData() != null) {
                         validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
@@ -130,7 +134,6 @@ public class HopfieldEditTrainDialog extends StandardDialog {
     private void commitChanges() {
         hopfieldPropsPanel.commitChanges();
         inputPanel.commitChanges();
-        validateInputsPanel.commitChanges();
     }
 
     @Override

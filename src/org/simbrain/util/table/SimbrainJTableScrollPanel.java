@@ -74,7 +74,8 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     /**
      * Sets the jtable.
      *
-     * @param jtable the jtable.
+     * @param jtable
+     *            the jtable.
      */
     public void setTable(SimbrainJTable jtable) {
         this.jtable = jtable;
@@ -94,11 +95,16 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
         int width, height;
 
         // Set width of scrollpane based on number of columns
-        int cols = jtable.getData().getColumnCount() + 1;
+        int cols = jtable.getData().getColumnCount();
         if (cols < maxVisibleColumns) {
             width = cols * columnWidth;
         } else {
             width = maxVisibleColumns * columnWidth;
+            // Hack below for cases where cols = maxCols, and sizing is not
+            // quite right.
+            if (cols > (maxVisibleColumns + 1)) {
+                jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            }
         }
 
         // Set height of scrollpane based on number of rows
@@ -122,7 +128,8 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     }
 
     /**
-     * @param maxVisibleColumns the maxVisibleColumns to set
+     * @param maxVisibleColumns
+     *            the maxVisibleColumns to set
      */
     public void setMaxVisibleColumns(int maxVisibleColumns) {
         this.maxVisibleColumns = maxVisibleColumns;
@@ -137,7 +144,8 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     }
 
     /**
-     * @param maxVisibleRows the maxVisibleRows to set
+     * @param maxVisibleRows
+     *            the maxVisibleRows to set
      */
     public void setMaxVisibleRows(int maxVisibleRows) {
         this.maxVisibleRows = maxVisibleRows;

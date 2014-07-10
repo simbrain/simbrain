@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -47,8 +46,10 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
     /**
      * Default constructor.
      *
-     * @param np parent panel
-     * @param lms edited network
+     * @param np
+     *            parent panel
+     * @param lms
+     *            edited network
      */
     public LMSEditorDialog(final NetworkPanel np, final LMSNetwork lms) {
         super(np, lms);
@@ -66,18 +67,18 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         // Set up combo box
         String[] lmsTypes = { "Iterative", "Offline" };
         final JComboBox<String> selectType = new JComboBox<String>(lmsTypes);
-        selectType.setPreferredSize(new Dimension(100, 100));
         Box cbHolder = Box.createHorizontalBox();
         cbHolder.add(Box.createHorizontalGlue());
         cbHolder.add(new JLabel("Select training type: "));
         cbHolder.add(selectType);
         cbHolder.add(Box.createHorizontalGlue());
 
-
         // Main vertical box
         Box trainerPanel = Box.createVerticalBox();
         trainerPanel.setOpaque(true);
+        trainerPanel.add(Box.createVerticalStrut(5));
         trainerPanel.add(cbHolder);
+        trainerPanel.add(Box.createVerticalStrut(5));
         final JPanel trainerContainer = new JPanel();
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         trainerPanel.add(separator);
@@ -101,20 +102,24 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
     /**
      * Update trainer panel based on the combo box.
      *
-     * @param selectType the combo box
-     * @param trainerContainer the container
+     * @param selectType
+     *            the combo box
+     * @param trainerContainer
+     *            the container
      */
     private void updateComboBox(JComboBox<String> selectType,
-            JPanel trainerContainer) {
+        JPanel trainerContainer) {
         trainerContainer.removeAll();
         if (selectType.getSelectedIndex() == 0) {
             LMSIterative trainer = new LMSIterative(lms);
-            IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
+            IterativeControlsPanel iterativeControls =
+                new IterativeControlsPanel(
                     networkPanel, trainer);
             trainerContainer.add(iterativeControls);
         } else {
             LMSOffline trainer = new LMSOffline(lms);
-            LMSOfflineControlPanel offlineControls = new LMSOfflineControlPanel(
+            LMSOfflineControlPanel offlineControls =
+                new LMSOfflineControlPanel(
                     networkPanel, trainer);
             trainerContainer.removeAll();
             trainerContainer.add(offlineControls);

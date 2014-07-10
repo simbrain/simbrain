@@ -194,6 +194,11 @@ public class SimbrainJTable extends JXTable {
                         }
                     }
                 }
+                if (e.isPopupTrigger() && displayPopUpMenu) {
+                    JPopupMenu menu = buildPopupMenu();
+                    menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
+                            (int) selectedPoint.getY());
+                }
             }
         });
 

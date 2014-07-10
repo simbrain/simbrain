@@ -99,11 +99,6 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
             width = cols * columnWidth;
         } else {
             width = maxVisibleColumns * columnWidth;
-            // Hack below for cases where cols = maxCols, and sizing is not
-            // quite right.
-            if (cols > (maxVisibleColumns + 1)) {
-                jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            }
         }
 
         // Set height of scrollpane based on number of rows

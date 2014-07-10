@@ -94,14 +94,18 @@ public class SupervisedTrainingDialog extends StandardDialog {
         // Finalize
         setContentPane(tabbedPane);
 
-        // Listen for tab changed events. Load inputs to test tab
-        // If inputs have been loaded
+        // Listen for tab changed events.
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
-                if (index == 3) {
+                if (index == 0) {
+                    // When entering training tab, commit table changes
+                    inputPanel.commitChanges();
+                    trainingPanel.commitChanges();
+                } else if (index == 3) {
+                    // Set validation data to whatever input data currently is
                     if (inputPanel.getTable().getData() != null) {
                         validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
@@ -120,6 +124,5 @@ public class SupervisedTrainingDialog extends StandardDialog {
         super.closeDialogOk();
         inputPanel.commitChanges();
         trainingPanel.commitChanges();
-        validateInputsPanel.commitChanges();
     }
 }

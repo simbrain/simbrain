@@ -117,11 +117,11 @@ public class SOMTrainingDialog extends StandardDialog {
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
                 // Just clicked out of Properties tab
-                if (index == 2) {
+                if (index == 1) {
+                    // When entering training tab, commit table changes
+                    inputPanel.commitChanges();
                     somPropsPanel.commitChanges();
-                }
-                // Just clicked out of input tab
-                if (index == 3) {
+                } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
                         validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
@@ -146,7 +146,6 @@ public class SOMTrainingDialog extends StandardDialog {
         super.closeDialogOk();
         somPropsPanel.commitChanges();
         inputPanel.commitChanges();
-        validateInputsPanel.commitChanges();
     }
 
 }

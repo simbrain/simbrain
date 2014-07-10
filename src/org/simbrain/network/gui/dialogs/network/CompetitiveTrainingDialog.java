@@ -107,12 +107,11 @@ public class CompetitiveTrainingDialog extends StandardDialog {
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
                         .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
-                // Just clicked out of Properties tab
-                if (index == 2) {
+                if (index == 1) {
+                    // When entering training tab, commit table changes
+                    inputPanel.commitChanges();
                     competitivePropsPanel.commitChanges();
-                }
-                // Just clicked out of input tab
-                if (index == 3) {
+                } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
                         validateInputsPanel.setData(((NumericTable) inputPanel
                                 .getTable().getData()).asDoubleArray());
@@ -137,7 +136,6 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         super.closeDialogOk();
         competitivePropsPanel.commitChanges();
         inputPanel.commitChanges();
-        validateInputsPanel.commitChanges();
     }
 
 }

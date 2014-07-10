@@ -202,13 +202,18 @@ public class SimbrainJTable extends JXTable {
             }
         });
 
-        hasChangedSinceLastSave = false;
         data.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                hasChangedSinceLastSave = true;
+                // Upon opening a table an event is fired with first row = -1
+                // The table data have not changed in this case, and so the
+                // "hasChanged" flag should not be set to true.
+                if (e.getFirstRow() >= 0) {
+                    hasChangedSinceLastSave = true;
+                }
             }
         });
+        hasChangedSinceLastSave = false;
     }
 
     /**

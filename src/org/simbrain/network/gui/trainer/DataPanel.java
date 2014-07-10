@@ -32,7 +32,6 @@ import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
 import org.simbrain.util.widgets.EditablePanel;
-import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * A data table used to represent input or target data for a group of neurons in
@@ -138,16 +137,20 @@ public class DataPanel extends JPanel implements EditablePanel {
 
     /**
      * Called externally when the data in the visible table can be converted to
-     * a double array and applied to the data holder.
+     * a double array and applied to the data holder. Only apply the data (which
+     * can be quite large) if the data have changed.
      *
      * @return
      */
     @Override
     public boolean commitChanges() {
-        // System.out.println("DataPanel commit changes " + table.hasChanged());
+        //System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
             dataHolder
                     .setData(((NumericTable) table.getData()).asDoubleArray());
+            // Set has changed to false, so that the data only re-committed if
+            // the data have changed.
+            table.setHasChangedSinceLastSave(false);
             return true;
         }
         return false;

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Neuron;
@@ -107,7 +108,9 @@ public final class NeuronDialog extends StandardDialog {
      */
     private void init() {
         setTitle("Neuron Dialog");
-        setContentPane(neuronDataPanel);
+        JScrollPane scroller = new JScrollPane(neuronDataPanel);
+        scroller.setBorder(null);
+        setContentPane(scroller);
         this.addButton(helpButton);
     }
 

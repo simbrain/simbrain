@@ -49,7 +49,7 @@ import org.simbrain.util.widgets.StopLight;
 
 /**
  * TODO: Unimplemented/Broken... awaiting refactor to conform to new GUI api
- * 
+ *
  * @author ztosi
  */
 public class ESNCreationDialog extends StandardDialog implements
@@ -172,7 +172,7 @@ public class ESNCreationDialog extends StandardDialog implements
 
     /**
      * Creation dialog constructor.
-     * 
+     *
      * @param panel
      *            Underlying network panel
      */
@@ -324,10 +324,10 @@ public class ESNCreationDialog extends StandardDialog implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * Checks if each of the used connections has been properly set and either
      * enables or disables the Ok button accordingly.
-     * 
+     *
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
      * PropertyChangeEvent)
      */
@@ -350,7 +350,7 @@ public class ESNCreationDialog extends StandardDialog implements
      * Creates a new dialog section given a title and using a JSeparator. TODO:
      * This should really be in utils somewhere. Perhaps added to
      * LabelledItemPanel or made into its own class?
-     * 
+     *
      * @param label
      *            name of the section
      * @param gbc
@@ -400,7 +400,7 @@ public class ESNCreationDialog extends StandardDialog implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.simbrain.util.StandardDialog#closeDialogOk()
      */
     @Override

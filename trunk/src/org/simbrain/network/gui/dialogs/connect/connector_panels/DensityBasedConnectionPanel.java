@@ -60,9 +60,9 @@ import org.simbrain.util.Utils;
  * field for setting the sparsity as well as a slider and a text field
  * displaying how many efferents per source neuron there would be if efferents
  * are equalized. All of these are kept in sync.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
@@ -128,7 +128,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     private boolean recurrentConnection = false;
 
     /**
-     * 
+     *
      * @param connection
      * @param networkPanel
      * @return
@@ -146,7 +146,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      * @param connection
      * @param networkPanel
      * @return
@@ -169,7 +169,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     /**
      * Constructs a gui panel for adjusting the sparsity of a sparse connect
      * neurons object, and initializes all appropriate listeners.
-     * 
+     *
      * @param connection
      *            the connection object this panel will act on
      * @param numTargs
@@ -293,7 +293,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     /**
      * Adds change listeners specific to sparse panel: Sparsity slider, sparsity
      * text field, and syns/source field.
-     * 
+     *
      * Since every field listens to every field, loops are prevented through the
      * use of so-called "switchable listeners", which have fields allowing them
      * to be turned off, and focus listeners. Any field not being interacted
@@ -301,7 +301,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * interacted with (which is "in focus") is enabled. This allows all fields
      * to be changed accordingly in response to user input without changes to
      * the out of focus fields themselves firing off events.
-     * 
+     *
      */
     private void addChangeListeners() {
 
@@ -475,7 +475,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * Fills the field values for this panel based on an already existing
      * connection tied to a synapse group. This method also sets the underlying
      * connect neurons object to the connection parameter.
-     * 
+     *
      * @param connection
      *            the connection object used to determine field values for this
      *            panel.
@@ -530,7 +530,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isAllowSelfConnect() {
@@ -538,7 +538,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      * @param allowSelfConnect
      */
     public void setAllowSelfConnect(boolean allowSelfConnect) {

@@ -67,7 +67,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
     /** Opens the help dialog for TextWorld. */
     private JMenu help = new JMenu("Help");
-    
+
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Reader Help");
 

@@ -9,11 +9,10 @@ import java.util.Iterator;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.UngroupAction;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.util.PBounds;
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.UngroupAction;
 
 /**
  * A group of screen elements.

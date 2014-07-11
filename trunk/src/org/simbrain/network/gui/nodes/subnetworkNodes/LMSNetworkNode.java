@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -35,11 +34,9 @@ import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.LMSOfflineTrain
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.math.NumericMatrix;
 
 /**
  * PNode representation of a group of a LMS network.

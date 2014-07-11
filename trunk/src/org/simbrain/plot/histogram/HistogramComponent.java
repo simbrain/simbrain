@@ -42,7 +42,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Create new Histogram Component.
-     * 
+     *
      * @param name
      *            chart name
      */
@@ -56,7 +56,7 @@ public class HistogramComponent extends WorkspaceComponent {
     /**
      * Create new Histogram Component from a specified model. Used in
      * deserializing.
-     * 
+     *
      * @param name
      *            chart name
      * @param model
@@ -117,7 +117,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Returns model.
-     * 
+     *
      * @return the model.
      */
     public HistogramModel getModel() {
@@ -126,7 +126,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
     /**
      * Opens a saved bar chart.
-     * 
+     *
      * @param input
      *            stream
      * @param name

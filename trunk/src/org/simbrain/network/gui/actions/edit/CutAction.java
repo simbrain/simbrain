@@ -26,10 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionEvent;
-import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.resource.ResourceManager;
 
 /**

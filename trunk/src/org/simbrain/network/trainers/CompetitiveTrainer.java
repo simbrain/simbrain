@@ -19,7 +19,6 @@
 package org.simbrain.network.trainers;
 
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
-import org.simbrain.network.subnetworks.SOMNetwork;
 
 /**
  * A trainer for SOM Networks. Just goes through input data sets input node and

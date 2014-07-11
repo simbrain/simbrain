@@ -47,7 +47,7 @@ import org.simbrain.util.table.TextTable;
 
 /**
  * Contains actions relating to Text World.
- * 
+ *
  * @author jyoshimi
  */
 public class TextWorldActions {
@@ -56,7 +56,7 @@ public class TextWorldActions {
      * Action for loading a dictionary, by finding every distinct word and
      * punctuation mark in a text file. TODO: Add more flexibility in terms of
      * parsing the loaded file.
-     * 
+     *
      * @param world the world whose dictionary should be loaded
      * @return the action
      */
@@ -119,7 +119,7 @@ public class TextWorldActions {
 
     /**
      * Action for displaying the contents of the text world dictionary.
-     * 
+     *
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
@@ -177,7 +177,7 @@ public class TextWorldActions {
 
     /**
      * Action for showing the vector dictionary editor.
-     * 
+     *
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
@@ -208,7 +208,7 @@ public class TextWorldActions {
 
     /**
      * Action for displaying a preference dialog.
-     * 
+     *
      * @param world the world for which a dialog should be shown
      * @return the action
      */
@@ -242,7 +242,7 @@ public class TextWorldActions {
     /**
      * Sets the current directory for the dictionary file (memory for file
      * chooser).
-     * 
+     *
      * @param dir directory to set
      */
     public static void setDictionaryDirectory(final String dir) {
@@ -251,7 +251,7 @@ public class TextWorldActions {
 
     /**
      * Return the current directory for the dictionary file.
-     * 
+     *
      * @return return the dictionary directory
      */
     public static String getDictionaryDirectory() {

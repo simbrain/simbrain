@@ -195,7 +195,7 @@ public class Hopfield extends Subnetwork implements Trainable {
 
     /**
      * Creates a new Hopfield network.
-     * 
+     *
      * @param numNeurons
      *            Number of neurons in new network
      * @param root

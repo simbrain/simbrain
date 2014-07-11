@@ -30,7 +30,7 @@ import org.simbrain.network.subnetworks.BPTTNetwork;
 /**
  * Trainer for backprop through time Networks. As a test use the "Walker"
  * tables.
- * 
+ *
  * @author jyoshimi
  */
 public class BPTTTrainer extends IterableTrainer {
@@ -64,7 +64,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Construct the SRN trainer.
-     * 
+     *
      * @param bptt
      *            the simple recurrent network
      */
@@ -144,7 +144,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * True if this is the iteration that begans a training series.
-     * 
+     *
      * @return true if first patter in a set.
      */
     private boolean firstPatternInSet() {
@@ -153,7 +153,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * True if this is the iteration that ends a training series.
-     * 
+     *
      * @return true if last pattern in a set.
      */
     private boolean lastPatternInSet() {
@@ -163,7 +163,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Compute error contribution for all nodes using backprop algorithm.
-     * 
+     *
      * @param row
      *            current row of training data
      */
@@ -193,7 +193,7 @@ public class BPTTTrainer extends IterableTrainer {
     /**
      * Store the error value, bias delta, and fan-in weight deltas for this
      * neuron.
-     * 
+     *
      * @param neuron
      *            neuron whose activation function's derivative is used
      * @param error
@@ -255,7 +255,7 @@ public class BPTTTrainer extends IterableTrainer {
 
     /**
      * Randomize the specified layer.
-     * 
+     *
      * @param layer
      *            the layer to randomize
      */

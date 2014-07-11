@@ -96,7 +96,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
     /**
      * Creates a basic synapse info panel. Here whether or not to display ID
      * info is automatically set based on the state of the synapse list.
-     * 
+     *
      * @param synapses
      *            the synapses whose information is being displayed/made
      *            available to edit on this panel
@@ -120,7 +120,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * (such as when adding multiple synapses) is unknown at the time of
      * display. In fact this is probably the only reason to use this factory
      * method over {@link #createBasicSynapseInfoPanel(List, Window)}.
-     * 
+     *
      * @param synapses
      *            the synapses whose information is being displayed/made
      *            available to edit on this panel
@@ -141,7 +141,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Construct the panel.
-     * 
+     *
      * @param synapseList
      *            the synapse list
      * @param parent
@@ -163,7 +163,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Initialize the basic info panel (generic synapse parameters)
-     * 
+     *
      */
     private void initializeLayout() {
 

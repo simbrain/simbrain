@@ -18,10 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.gui.NetworkPanel;
-
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
+import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * Input event handler for a network node that updates tool tip text for its

@@ -66,7 +66,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
-     * 
+     *
      * @param ruleList
      *            the list of rules to edit/use to display variables from
      */

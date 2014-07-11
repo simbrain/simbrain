@@ -39,7 +39,7 @@ public abstract class SpikeResponder {
 
     /**
      * Update the synapse.
-     * 
+     *
      * @param s
      *            the synapse being updated
      */
@@ -61,7 +61,7 @@ public abstract class SpikeResponder {
     /**
      * A method which takes in a list of synapses and returns a list of their
      * spike responder, if they have any.
-     * 
+     *
      * @param synapses
      *            The list of synapses whose spike responders we want to query.
      * @return Returns a list of spike responders associated with the group of

@@ -100,7 +100,7 @@ public class SpeechEffectorPanel extends AbstractEffectorPanel {
         }
     }
 
-    /** 
+    /**
      * Set the current values of all fields.
      */
     private void fillFieldValues() {

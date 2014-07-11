@@ -25,10 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionEvent;
-import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -52,7 +49,7 @@ public final class DeleteAction extends ConditionallyEnabledAction {
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke("DELETE"), this);
         networkPanel.getActionMap().put(this, this);
-        
+
     }
 
     /** @see AbstractAction */

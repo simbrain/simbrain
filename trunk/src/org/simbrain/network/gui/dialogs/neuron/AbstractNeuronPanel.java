@@ -61,7 +61,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
 /**
  * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
  * parameters of specific neuron rule types.
- * 
+ *
  * Optimization has been emphasized for methods intended for neuron creation
  * rather than editing on the assumption that the former will be far more common
  * for large numbers of neurons.
@@ -134,7 +134,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
 
     /**
      * Populate fields with current data.
-     * 
+     *
      * @param ruleList
      *            the list of rules being used to determine which values should
      *            be used to fill the fields with data.
@@ -152,7 +152,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * neurons. Using this method to commit changes to many neurons is not
      * recommended. Instead pass a list of the neurons to be changed into
      * {@link #commitChanges(List) commitChanges}.
-     * 
+     *
      * @param neuron
      *            the neuron to which changes are being committed to.
      */
@@ -164,7 +164,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * neurons' update rules. To change this behavior set {@link #replacing} to
      * <b> false </b>, indicating to the panel that it is editing rather than
      * changing/replacing existing neuron update rules.
-     * 
+     *
      * @param neurons
      *            the list of neurons which are being edited and to which
      *            changes based on the values in the fields of this panel will
@@ -178,7 +178,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * are the same type as the panel. {@link #replacing} is the flag for
      * whether this method is used for committing or the rules are deleted and
      * replaced entirely, in which case this method is not called.
-     * 
+     *
      * @param neurons
      *            the neurons whose rules are being <b>edited</b>, not replaced.
      */
@@ -187,7 +187,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * Override to add custom notes or other text to bottom of panel. Can be
      * html formatted.
-     * 
+     *
      * @param text
      *            Text to be added
      */
@@ -204,7 +204,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * NeuronUpdateRule corresponds to the rule specified by the panel name.
      * Used so that other classes can query specific properties of the rule the
      * panel edits. Also used internally to make deep copies.
-     * 
+     *
      * @return an instance of the neuron rule which corresponds to the panel.
      */
     protected abstract NeuronUpdateRule getPrototypeRule();
@@ -213,7 +213,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * Are we replacing rules or editing them? Replacing happens when
      * {@link #commitChanges(List)} is called on a neuron panel whose rule is
      * different from the rules of the neurons being edited.
-     * 
+     *
      * @return replacing or editing
      */
     protected boolean isReplace() {
@@ -224,7 +224,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * Tells this panel whether it is going to be editing neuron update rules,
      * or creating new ones and replacing the update rule of each of the neurons
      * being edited.
-     * 
+     *
      * @param replace
      *            used to tell the panel if it's being used to replace neuron
      *            update rules.

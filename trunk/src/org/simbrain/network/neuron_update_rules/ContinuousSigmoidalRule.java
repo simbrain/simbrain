@@ -33,22 +33,22 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>Continuous Sigmoidal Neuron</b> provides various squashing function
  * implementations of a sigmoidal neuron numerically integrated continuously
  * over time.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
- * 
+ *
  */
 public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
         BoundedUpdateRule, NoisyUpdateRule {
 
-	/** 
+	/**
 	 * The default squashing function, informs the default upper and
 	 * lower bounds.
 	 */
 	public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
 			SquashingFunction.LOGISTIC;
-	
+
     /** Default time constant (ms). */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;
 
@@ -107,7 +107,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
     /**
      * Construct a sigmoid update with a specified implementation.
-     * 
+     *
      * @param sFunction
      *            the implementation to use.
      */

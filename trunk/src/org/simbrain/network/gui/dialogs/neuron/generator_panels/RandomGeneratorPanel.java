@@ -35,7 +35,7 @@ public class RandomGeneratorPanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
-     * 
+     *
      */
     public RandomGeneratorPanel() {
         super();

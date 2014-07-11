@@ -305,12 +305,12 @@ public class DirectedCubicArrow extends PNode {
     }
 
     //    /**
-    //     * 
+    //     *
     //     * Uggg... Terrible... It's nearly perfect... but needs smoothing. High
     //     * aspirations, and should be picked back up later, but there just isn't
     //     * enough time...
-    //     * 
-    //     * 
+    //     *
+    //     *
     //     * @author zach
     //     *
     //     */
@@ -334,7 +334,7 @@ public class DirectedCubicArrow extends PNode {
     //        private float percentFull;
     //
     //        /**
-    //         * 
+    //         *
     //         * @param srcTheta
     //         * @param endTheta
     //         * @param src
@@ -360,36 +360,36 @@ public class DirectedCubicArrow extends PNode {
     //
     //
     //        //		/**
-    //        //		 * 
+    //        //		 *
     //        //		 * @param arg0
     //        //		 */
     //        //		public void paint(Graphics g) {
     //        //			Graphics2D g2d = (Graphics2D) g;
-    //        //			
+    //        //
     //        //			GeneralPath arrow = drawArrow();
-    //        //			
-    //        //			BasicStroke stroke = new BasicStroke((1 - percentFull) 
+    //        //
+    //        //			BasicStroke stroke = new BasicStroke((1 - percentFull)
     //        //					* strokeWidth / 2,
     //        //					BasicStroke.CAP_SQUARE,
     //        //					BasicStroke.JOIN_MITER);
-    //        //			
+    //        //
     //        //			g2d.setPaint(color);
-    //        //			
+    //        //
     //        //			g2d.setStroke(stroke);
-    //        //			
+    //        //
     //        //			g2d.draw(arrow);
-    //        //			
+    //        //
     //        ////			int bitmask = 127 << 24;
     //        ////			Color fillC  = new Color((color.getRGB() << 8 >> 8) | bitmask);
-    //        ////			
+    //        ////
     //        ////			g2d.setPaint(fillC);
-    //        //			
+    //        //
     //        //			g2d.fill(arrow);
-    //        //			
+    //        //
     //        //		}
     //
     //        /**
-    //         * 
+    //         *
     //         * @param start
     //         * @param end
     //         * @param mag
@@ -402,7 +402,7 @@ public class DirectedCubicArrow extends PNode {
     //        }
     //
     //        /**
-    //         * 
+    //         *
     //         * @return
     //         */
     //        public GeneralPath drawArrow () {
@@ -425,7 +425,7 @@ public class DirectedCubicArrow extends PNode {
     //            startP = new Point2D.Float((float) (src.getX() + offXst),
     //                    (float) (src.getY() + offYst));
     //            endP = new Point2D.Float((float) (src.getX() - offXst),
-    //                    (float)(src.getY() - offYst));	
+    //                    (float)(src.getY() - offYst));
     //
     //            int numSides = 3;
     //            int[] triPtx = new int[numSides];

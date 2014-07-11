@@ -24,8 +24,8 @@ import org.simbrain.network.util.OrientationComparator;
 
 /**
  * Connect each source neuron to a single target.
- * 
- * 
+ *
+ *
  * @author jyoshimi
  */
 public class OneToOne extends ConnectNeurons {
@@ -61,7 +61,7 @@ public class OneToOne extends ConnectNeurons {
 
     /**
      * Returns a sorted list of neurons, given a comparator.
-     * 
+     *
      * @param neuronList
      *            the base list of neurons.
      * @param comparator
@@ -78,7 +78,7 @@ public class OneToOne extends ConnectNeurons {
     }
 
     /**
-     * 
+     *
      * @param sourceNeurons
      * @param targetNeurons
      * @param useBidirectionalConnections
@@ -173,7 +173,7 @@ public class OneToOne extends ConnectNeurons {
     }
 
     /**
-     * 
+     *
      * @param sourceNeurons
      * @param targetNeurons
      * @param connectOrientation
@@ -263,7 +263,7 @@ public class OneToOne extends ConnectNeurons {
 
     /**
      * Used for populating combo box with orientation types.
-     * 
+     *
      * @return Array of connection types.
      */
     public static OrientationComparator[] getOrientationTypes() {

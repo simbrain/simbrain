@@ -493,7 +493,7 @@ public enum ProbDistribution {
      * observations. In this case, the returned value represents the amount of
      * information lost when the given distribution is used to approximate the
      * given observations.
-     * 
+     *
      * @param d
      *            a probability distribution
      * @param observations
@@ -523,7 +523,7 @@ public enum ProbDistribution {
     /**
      * Normalizes a set of observations so they may be used as a discrete
      * probability density function.
-     * 
+     *
      * @param observations
      * @return
      */

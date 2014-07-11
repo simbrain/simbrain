@@ -53,7 +53,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     /**
      * Construct the custom interaction box.
-     * 
+     *
      * @param net
      *            parent network panel
      */
@@ -87,7 +87,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     /**
      * Returns default actions for a context menu.
-     * 
+     *
      * @return the default context menu
      */
     protected JPopupMenu getDefaultContextMenu() {
@@ -287,9 +287,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     /**
      * Sets whether the freezing actions are enabled based on whether the
      * synapses are all frozen or not.
-     * 
+     *
      * If all synapses are frozen already, then "freeze synapses" is disabled.
-     * 
+     *
      * If all synapses are unfrozen already, then "unfreeze synapses" is
      * disabled.
      */
@@ -340,10 +340,10 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * two things here, (1) a property of synapses whereby the let current pass
      * or not and (2) a property of swing actions where being disabled means
      * being grayed out and unusable.
-     * 
+     *
      * If all synapses are enabled already, then the "enable synapses" action is
      * disabled.
-     * 
+     *
      * If all synapses are disabled already, then the "disable synapses" actions
      * is disabled.
      */

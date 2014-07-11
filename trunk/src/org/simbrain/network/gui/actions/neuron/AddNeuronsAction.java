@@ -36,12 +36,12 @@ public final class AddNeuronsAction extends AbstractAction {
 
     /*
      * class ShowNeuronDialog extends AbstractAction{
-     * 
+     *
      * private ArrayList<NeuronNode> nodes;
-     * 
+     *
      * public ShowNeuronDialog(ArrayList<NeuronNode> nodes){
      * super("Neuron Parameters"); this.nodes = nodes; }
-     * 
+     *
      * @Override public void actionPerformed(ActionEvent arg0) { NeuronDialog
      * nDialog = new NeuronDialog(nodes){ protected void closeDialogOk(){
      * super.closeDialogOk(); commitChanges(); LayoutDialog dialog = new
@@ -49,14 +49,14 @@ public final class AddNeuronsAction extends AbstractAction {
      * dialog.setLocationRelativeTo(null); dialog.setVisible(true); } };
      * nDialog.pack(); nDialog.setLocationRelativeTo(null);
      * nDialog.setVisible(true); }
-     * 
+     *
      * }
-     * 
+     *
      * private Action nDialog;
      */
     /**
      * Create a new neuron action with the specified network panel.
-     * 
+     *
      * @param networkPanel
      *            network panel, must not be null
      */

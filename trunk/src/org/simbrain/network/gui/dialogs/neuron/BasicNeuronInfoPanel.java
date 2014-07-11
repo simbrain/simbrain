@@ -35,9 +35,9 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * Panel showing activation and label properties of a neuron.

@@ -23,9 +23,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.nodes.NeuronNode;
-
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PLayer;
 import org.piccolo2d.PNode;
@@ -33,6 +30,8 @@ import org.piccolo2d.event.PDragSequenceEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.gui.nodes.NeuronNode;
 
 /**
  * Wand event handler. Change activation when dragging over neurons.

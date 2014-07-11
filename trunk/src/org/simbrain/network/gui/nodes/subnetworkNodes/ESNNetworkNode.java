@@ -41,7 +41,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
     /**
      * Create an ESN network.
-     * 
+     *
      * @param networkPanel
      *            parent panel
      * @param group

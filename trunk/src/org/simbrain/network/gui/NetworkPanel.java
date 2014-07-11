@@ -135,7 +135,7 @@ import org.simbrain.util.widgets.ToggleButton;
 
 /**
  * Network panel where the logical neural network is displayed.
- * 
+ *
  * Refactoring note: In a future refactor (perhaps for java 8 when this moves to
  * FX) enforce a rule whereby composite objects are completely built and only
  * then in a separate process are represented in the GUI. (This was improved
@@ -306,10 +306,10 @@ public class NetworkPanel extends JPanel {
      * placed diagonally below one another. The setup is not ideal, because
      * objects are not always built up from an initial location in the same way,
      * but works well enough for now.
-     * 
+     *
      * This is not the same as the paste apparatus, which handles multiple
      * pastes, as opposed to adding multiple instances of a new object.
-     * 
+     *
      */
     // Perhaps there is a better solution. Would be nice to translate stuff
     // after placing it. Annoying that every network has to have an argument for
@@ -630,7 +630,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Remove the indicated neuron from the GUI.
-     * 
+     *
      * @param neuron
      *            the model neuron to remove
      */
@@ -654,7 +654,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Using the GUI to add a set of neurons to the underlying network panel.
-     * 
+     *
      * @param neurons
      *            the set of neurons
      * @param layout
@@ -752,7 +752,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add GUI representation of specified model synapse to network panel.
-     * 
+     *
      * @param the
      *            synpase to add
      */
@@ -776,7 +776,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Remove any gui representation of the indicated synapse from the canvas.
-     * 
+     *
      * @param synapse
      *            the model synapse to remove.
      */
@@ -803,7 +803,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add a model group node to the piccolo canvas.
-     * 
+     *
      * Be aware that creation of groups is complex. parts of the groups can be
      * added in different orders (e.g. a neurongroup inside a subnetwork, or
      * neurons inside a neuron group, etc). These may or may not fire listeners
@@ -812,7 +812,7 @@ public class NetworkPanel extends JPanel {
      * created using all-to-all connection objects, which can call addSynpase as
      * they are invoked, so that synapse nodes may are already here when the
      * feed-forward node is created and added.
-     * 
+     *
      * @param group
      *            the group to add
      */
@@ -850,7 +850,7 @@ public class NetworkPanel extends JPanel {
     private static int counter = 0;
 
     /**
-     * 
+     *
      * @param sg1
      * @param sg2
      */
@@ -892,7 +892,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add a Piccolo representation of a neuron group to the canvas.
-     * 
+     *
      * @param neuronGroup
      *            the group to add.
      */
@@ -923,7 +923,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create the type of NeuronGroupNode associated with the type of the group.
-     * 
+     *
      * @param neuronGroup
      *            the neuron group to create a piccolo node for
      * @return the node
@@ -945,7 +945,7 @@ public class NetworkPanel extends JPanel {
      * Toggle the visibility of synapses in a synapsegroup. Based the status of
      * the displaySynpases flag in the model synapseGroup, either a visible or
      * invisible synapse group node is created and added to the canvas.
-     * 
+     *
      * @param synapseGroup
      *            the synapse group whose visibility should be toggled.
      */
@@ -966,7 +966,7 @@ public class NetworkPanel extends JPanel {
      * Adds a gui representation of a SynapseGroup object. The resulting node
      * will be a different type depending on whether a display flag is turned on
      * or not.
-     * 
+     *
      * @param synapseGroup
      *            the SynapseGroup to add
      */
@@ -1023,7 +1023,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Add a gui representation of a synapse group in which the constituent
      * synapses are visible.
-     * 
+     *
      * @param synapseGroup
      *            the model synapse group being represented
      */
@@ -1058,7 +1058,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Add a gui representation of a synapse group in which the constituent
      * synapses are not visible.
-     * 
+     *
      * @param synapseGroup
      *            the model synapse group being represented
      */
@@ -1073,7 +1073,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Remove all synapse group nodes associated with a synapse group. Used when
      * toggling the visibility of synapses in a synapse group node.
-     * 
+     *
      * @param group
      *            the synapse group whose synapses should be removed
      */
@@ -1100,7 +1100,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add a Piccolo representation of a subnetwork to the canvas.
-     * 
+     *
      * @param subnet
      *            the group to add.
      */
@@ -1141,7 +1141,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create an instance of a subnetwork node.
-     * 
+     *
      * @param subnet
      *            the model subnetwork
      * @return the pnode representing the subnetwork.
@@ -1185,7 +1185,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Removes a group from the network panel, but not necessarily the network
      * model.
-     * 
+     *
      * @param group
      *            the group to remove
      */
@@ -1257,7 +1257,7 @@ public class NetworkPanel extends JPanel {
      * specific to a node of interest should be built into a node-specific
      * context menu.
      * </p>
-     * 
+     *
      * @return the context menu for this Network panel
      */
     JPopupMenu getContextMenu() {
@@ -1266,7 +1266,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create the iteration tool bar.
-     * 
+     *
      * @return the toolbar.
      */
     protected CustomToolBar createRunToolBar() {
@@ -1282,7 +1282,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create the main tool bar.
-     * 
+     *
      * @return the toolbar.
      */
     protected CustomToolBar createMainToolBar() {
@@ -1298,7 +1298,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create the edit tool bar.
-     * 
+     *
      * @return the toolbar.
      */
     protected CustomToolBar createEditToolBar() {
@@ -1316,7 +1316,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return the align sub menu.
-     * 
+     *
      * @return the align sub menu
      */
     public JMenu createAlignMenu() {
@@ -1330,7 +1330,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return the space sub menu.
-     * 
+     *
      * @return the space sub menu
      */
     public JMenu createSpacingMenu() {
@@ -1357,7 +1357,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return the current edit mode for this Network panel.
-     * 
+     *
      * @return the current edit mode for this Network panel
      */
     public EditMode getEditMode() {
@@ -1370,7 +1370,7 @@ public class NetworkPanel extends JPanel {
      * <p>
      * This is a bound property.
      * </p>
-     * 
+     *
      * @param newEditMode
      *            edit mode for this Network panel, must not be null
      */
@@ -1623,7 +1623,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return true if the selection is empty.
-     * 
+     *
      * @return true if the selection is empty
      */
     public boolean isSelectionEmpty() {
@@ -1632,7 +1632,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return true if the specified element is selected.
-     * 
+     *
      * @param element
      *            element
      * @return true if the specified element is selected
@@ -1643,7 +1643,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return the selection as a collection of selected elements.
-     * 
+     *
      * @return the selection as a collection of selected elements
      */
     public Collection<PNode> getSelection() {
@@ -1652,7 +1652,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Set the selection to the specified collection of elements.
-     * 
+     *
      * @param elements
      *            elements
      */
@@ -1664,7 +1664,7 @@ public class NetworkPanel extends JPanel {
      * Toggle the selected state of the specified element; if it is selected,
      * remove it from the selection, if it is not selected, add it to the
      * selection.
-     * 
+     *
      * @param element
      *            element
      */
@@ -1678,7 +1678,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add objects to the current selection.
-     * 
+     *
      * @param element
      *            the element to "select."
      */
@@ -1688,7 +1688,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Add the specified Network selection listener.
-     * 
+     *
      * @param l
      *            Network selection listener to add
      */
@@ -1698,7 +1698,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Remove the specified Network selection listener.
-     * 
+     *
      * @param l
      *            Network selection listener to remove
      */
@@ -1708,7 +1708,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Update selection handles.
-     * 
+     *
      * @param event
      *            the NetworkSelectionEvent
      */
@@ -1735,7 +1735,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected Neurons.
-     * 
+     *
      * @return list of selectedNeurons
      */
     public Collection<NeuronNode> getSelectedNeurons() {
@@ -1744,7 +1744,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected Synapses.
-     * 
+     *
      * @return list of selected Synapses
      */
     public Collection<SynapseNode> getSelectedSynapses() {
@@ -1757,7 +1757,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns the selected Text objects.
-     * 
+     *
      * @return list of selected Text objects
      */
     public ArrayList<TextNode> getSelectedText() {
@@ -1767,7 +1767,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected Neurons.
-     * 
+     *
      * @return list of selectedNeurons
      */
     public ArrayList<Neuron> getSelectedModelNeurons() {
@@ -1782,7 +1782,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected synapses.
-     * 
+     *
      * @return list of selected synapses
      */
     public ArrayList<Synapse> getSelectedModelSynapses() {
@@ -1797,7 +1797,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected neuron groups.
-     * 
+     *
      * @return list of neuron groups.
      */
     public ArrayList<NeuronGroup> getSelectedModelNeuronGroups() {
@@ -1813,7 +1813,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Returns neuron groups which are "source elements" that can be connected
      * to other neuron groups.
-     * 
+     *
      * @return the source model group
      */
     public ArrayList<NeuronGroup> getSourceModelGroups() {
@@ -1828,7 +1828,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns selected synapse groups.
-     * 
+     *
      * @return list of synapse groups
      */
     public ArrayList<SynapseGroup> getSelectedModelSynapseGroups() {
@@ -1843,7 +1843,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns model Network elements corresponding to selected screen elements.
-     * 
+     *
      * @return list of selected model elements
      */
     public Collection getSelectedModelElements() {
@@ -1872,7 +1872,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return a collection of all neuron nodes.
-     * 
+     *
      * @return a collection of all neuron nodes
      */
     public Collection<NeuronNode> getNeuronNodes() {
@@ -1882,7 +1882,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return a collection of all synapse nodes.
-     * 
+     *
      * @return a collection of all synapse nodes
      */
     public Collection<SynapseNode> getSynapseNodes() {
@@ -1892,7 +1892,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return a collection of all text nodes.
-     * 
+     *
      * @return a collection of all text nodes
      */
     public Collection<TextNode> getTextNodes() {
@@ -1901,7 +1901,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return a collection of all parent nodes.
-     * 
+     *
      * @return a collection of all p nodes
      */
     public Collection getParentNodes() {
@@ -1912,7 +1912,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Return a collection of all persistent nodes, that is all neuron nodes and
      * all synapse nodes.
-     * 
+     *
      * @return a collection of all persistent nodes
      */
     public Collection<PNode> getPersistentNodes() {
@@ -1923,7 +1923,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Return a collection of all persistent nodes, that is all neuron nodes and
      * all synapse nodes.
-     * 
+     *
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectableNodes() {
@@ -1934,7 +1934,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Return a collection of all persistent nodes, that is all neuron nodes and
      * all synapse nodes.
-     * 
+     *
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectedScreenElements() {
@@ -1989,7 +1989,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Set Root network.
-     * 
+     *
      * @param Network
      *            The Network to set.
      */
@@ -2035,7 +2035,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Set the last position clicked on screen.
-     * 
+     *
      * @param lastLeftClicked
      *            The lastClickedPosition to set.
      */
@@ -2082,7 +2082,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Find the upper left corner of the subnet nodes.
-     * 
+     *
      * @param neuronList
      *            the set of neurons to check
      * @return the upper left corner
@@ -2104,7 +2104,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Ungroup specified object.
-     * 
+     *
      * @param vgn
      *            the group to remove.
      * @param selectConstituents
@@ -2172,7 +2172,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Return height bottom toolbar is taking up.
-     * 
+     *
      * @return height bottom toolbar is taking up
      */
     private double getToolbarOffset() {
@@ -2370,7 +2370,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Nudge selected objects.
-     * 
+     *
      * @param offsetX
      *            amount to nudge in the x direction (multipled by nudgeAmount)
      * @param offsetY
@@ -2460,7 +2460,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Turns the displaying of loose synapses on and off (for performance
      * increase or visual clarity).
-     * 
+     *
      * @param weightsVisible
      *            if true loose weights should be visible
      */
@@ -2484,7 +2484,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Turns the displaying of neuron priorities on or off.
-     * 
+     *
      * @param prioritiesOn
      *            whether to show priorities or not
      */
@@ -2500,7 +2500,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Set the visibility of the hiearchy panel.
-     * 
+     *
      * @param showIt
      *            whether it should be visible or not
      */
@@ -2558,7 +2558,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Beginning position used in calculating offsets for multiple pastes.
-     * 
+     *
      * @param beginPosition
      *            The beginPosition to set.
      */
@@ -2700,7 +2700,7 @@ public class NetworkPanel extends JPanel {
      * Returns a NetworkDialog. Overriden by NetworkPanelDesktop, which returns
      * a NetworkDialog with additional features used in Desktop version of
      * Simbrain.
-     * 
+     *
      * @param networkPanel
      *            network panel
      * @return subclass version of network dialog.
@@ -2711,7 +2711,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Overriden by NetworkPanelDesktop to adorn node with coupling menus.
-     * 
+     *
      * @param node
      *            the SynapseGroupNode.
      * @return the node. Does nothing here obviously.
@@ -2729,7 +2729,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Adds an internal menu bar; used in applets.
-     * 
+     *
      * @param applet
      */
     public void addInternalMenuBar() {
@@ -2789,7 +2789,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Display a panel in a dialog. This is overridden by the desktop version to
      * display the panel within the Simbrain desktop.
-     * 
+     *
      * @param panel
      *            panel to display
      * @param title
@@ -2864,7 +2864,7 @@ public class NetworkPanel extends JPanel {
      * Creates the context menu for neurons. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which adds a
      * coupling menu.
-     * 
+     *
      * @param neuron
      *            neuron which needs a menu
      * @return the context menu
@@ -2907,7 +2907,7 @@ public class NetworkPanel extends JPanel {
      * not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
-     * 
+     *
      * @param neuronGroup
      *            the neuron group that can produce vectors for couplings.
      * @return the producer menu
@@ -2921,7 +2921,7 @@ public class NetworkPanel extends JPanel {
      * not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
-     * 
+     *
      * @param neuronGroup
      *            the neuron group that can consume vectors for couplings.
      * @return the consumer menu
@@ -2935,7 +2935,7 @@ public class NetworkPanel extends JPanel {
      * is not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
-     * 
+     *
      * @param synapseGroup
      *            the neuron group that can produce vectors for couplings.
      * @return the producer menu
@@ -2949,7 +2949,7 @@ public class NetworkPanel extends JPanel {
      * is not in a desktop environment. Overridden by
      * {@link org.simbrain.network.desktop.NetworkPanelDesktop} which has access
      * to workspace level coupling menus.
-     * 
+     *
      * @param synapseGroup
      *            the neuron group that can consume vectors for couplings.
      * @return the consumer menu

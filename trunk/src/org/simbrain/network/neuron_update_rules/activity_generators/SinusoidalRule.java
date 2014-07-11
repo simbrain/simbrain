@@ -27,7 +27,7 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave; inputs are ignored.
- * 
+ *
  * TODO: Input generator
  */
 public class SinusoidalRule extends NeuronUpdateRule implements

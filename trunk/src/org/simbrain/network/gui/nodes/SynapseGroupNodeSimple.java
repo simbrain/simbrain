@@ -33,7 +33,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
 /**
  * PNode representation of a group of synapses, where the synapses themselves
  * are not visible.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
@@ -73,7 +73,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
 
     /**
      * Create a Synapse Group PNode.
-     * 
+     *
      * @param networkPanel
      *            parent panel
      * @param group
@@ -145,7 +145,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     * 
+     *
      * @param pt1
      * @param pt2
      */
@@ -171,7 +171,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     * 
+     *
      * @param src
      * @param tar
      */
@@ -194,7 +194,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     }
 
     /**
-     * 
+     *
      * @param src
      * @param tar
      * @return
@@ -226,7 +226,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     // }
     //
     /**
-     * 
+     *
      */
     public void determineProperEndPoints() {
 
@@ -385,7 +385,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
 
     /**
      * Returns a default position...
-     * 
+     *
      * @param ng
      * @return
      */

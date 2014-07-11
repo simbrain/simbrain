@@ -19,16 +19,8 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.JPanel;
-
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionEvent;
-import org.simbrain.network.gui.NetworkSelectionListener;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
 

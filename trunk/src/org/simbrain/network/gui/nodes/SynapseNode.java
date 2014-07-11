@@ -26,6 +26,8 @@ import java.awt.geom.Point2D;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.piccolo2d.PNode;
+import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
@@ -35,9 +37,6 @@ import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-
-import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PPath;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedee.Sensor;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorldComponent;

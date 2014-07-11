@@ -68,7 +68,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
 
     /** Random tab. */
     private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
-    
+
     {
         randTab.addPropertyChangeListener(this);
     }
@@ -97,7 +97,7 @@ public class DecayRulePanel extends AbstractNeuronPanel implements
         tabbedPane.add(randTab, "Noise");
         checkBounds();
     }
-    
+
     /**
      * Responds to actions performed.
      *

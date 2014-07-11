@@ -18,19 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
-
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -40,9 +30,6 @@ import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.SOMTrainerControlsPanel;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.trainers.SOMTrainer;
-import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.widgets.ShowHelpAction;

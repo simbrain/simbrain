@@ -40,7 +40,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
 
     /**
      * Construct the action.
-     * 
+     *
      * @param networkPanel
      *            networkPanel, must not be null
      */

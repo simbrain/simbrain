@@ -19,16 +19,11 @@
 package org.simbrain.util.table;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainJTable.CellIndex;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Default implementation of a table of numerical data. The table is mutable,

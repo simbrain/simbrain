@@ -45,7 +45,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  * Panel to display spike responder settings.
- * 
+ *
  * @author ztosi
  */
 public class SpikeResponderSettingsPanel extends JPanel {
@@ -86,7 +86,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      * A constructor that sets up the panel in its default display state.
-     * 
+     *
      * @param synapseList
      *            the list of synapses, the spike responders of which will be
      *            displayed for edit
@@ -101,7 +101,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
     /**
      * A constructor that sets up the panel with the spike response panel either
      * hidden or displayed.
-     * 
+     *
      * @param synapseList
      *            the list of synapses, the spike responders of which will be
      *            displayed for edit
@@ -277,9 +277,9 @@ public class SpikeResponderSettingsPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @author zach
-     * 
+     *
      */
     private class EmptySpikeResponsePanel extends AbstractSpikeResponsePanel {
 
@@ -312,7 +312,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     /**
      * Commit changes to the panel.
-     * 
+     *
      * @return success or not, but does nothing now.
      */
     public boolean commitChanges() {

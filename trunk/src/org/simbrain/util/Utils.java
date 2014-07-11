@@ -49,7 +49,7 @@ public class Utils {
 
     /**
      * Read a csv (comma-separated-values) files.
-     * 
+     *
      * @param theFile
      *            the file to read in
      * @return an two-dimensional array of comma-separated values
@@ -72,7 +72,7 @@ public class Utils {
 
     /**
      * Read a csv (comma-separated-values) files.
-     * 
+     *
      * @param theFile
      *            the file to read in
      * @return an two-dimensional array of comma-separated values
@@ -106,7 +106,7 @@ public class Utils {
 
     /**
      * Write a matrix of doubles to a file.
-     * 
+     *
      * @param data
      *            the matrix of doubles to write
      * @param theFile
@@ -118,7 +118,7 @@ public class Utils {
 
     /**
      * Save data as CSV (comma-separated-value) file.
-     * 
+     *
      * @param data
      *            Data to be written
      * @param theFile
@@ -154,7 +154,7 @@ public class Utils {
      * of the local user directory from the absolute path of the file to be
      * saved, and converts file-separators into forward slashes, which are used
      * for saving simulation files.
-     * 
+     *
      * @param baseDir
      *            absolute path of the local simbrain directory.
      * @param absolutePath
@@ -178,7 +178,7 @@ public class Utils {
 
     /**
      * Extract file name from a path description.
-     * 
+     *
      * @param thePath
      *            the path
      * @return the extracted file name
@@ -191,7 +191,7 @@ public class Utils {
 
     /**
      * Get the directory component of a file.
-     * 
+     *
      * @param theFile
      *            the file to get the directory of.
      * @return the extracted directory path
@@ -211,7 +211,7 @@ public class Utils {
      * exceptions thrown by Double.parseDouble(String), so that try/catch fields
      * do not have to be repeatedly written, and allows the program to continue
      * in the case that the string is not parsable.
-     * 
+     *
      * @param tField
      *            The text field to read from and test if its text can be parsed
      *            into a double value
@@ -232,7 +232,7 @@ public class Utils {
     /**
      * Like {@link #doubleParsable(tField)} but checks for the formatting of a
      * string rather than a text field.
-     * 
+     *
      * @param text
      *            the text to check
      * @return NaN if invalid, the parsed double otherwise
@@ -255,7 +255,7 @@ public class Utils {
      * Integer in cases where the string cannot be parsed into an instance of
      * <b>Number</b> or if something else went wrong. Parsing is done using the
      * default locale of the JVM being used to run Simbrain.
-     * 
+     *
      * @param tField
      *            the text field containing the String to be parsed.
      * @return the integer value of the string or null if the String cannot be
@@ -275,7 +275,7 @@ public class Utils {
     /**
      * The same as {@link #parseInteger(JTextField)} except using a String
      * directly as an input.
-     * 
+     *
      * @param text
      * @return
      */
@@ -291,7 +291,7 @@ public class Utils {
 
     /**
      * Convert an array of doubles into a String.
-     * 
+     *
      * @param theVec
      *            the array of doubles to convert
      * @param delimiter
@@ -314,7 +314,7 @@ public class Utils {
     /**
      * Convert a delimited string of doubles into an array of doubles. Undoes
      * String getVectorString.
-     * 
+     *
      * @param theVec
      *            string version of vector
      * @param delimiter
@@ -337,7 +337,7 @@ public class Utils {
 
     /**
      * Converts an array of strings containing doubles into an array of doubles.
-     * 
+     *
      * @param line
      *            the array of strings
      * @return the array of doubles
@@ -354,7 +354,7 @@ public class Utils {
 
     /**
      * Converts an array of doubles into an array of Strings of those doubles.
-     * 
+     *
      * @param line
      *            the array of doubles
      * @return the array of strings
@@ -371,7 +371,7 @@ public class Utils {
     /**
      * Converts a matrix of doubles into a matrix of Strings representing those
      * doubles. Used with writeMatrix.
-     * 
+     *
      * @param matrix
      *            the matrix of doubles
      * @return the matrix of Strings
@@ -387,7 +387,7 @@ public class Utils {
 
     /**
      * Utility to class to convert arrays of doubles to strings.
-     * 
+     *
      * @param data
      *            array of doubles
      * @return string representation of that array
@@ -411,7 +411,7 @@ public class Utils {
     /**
      * Converts a String representation of a vector (e.g. "1,0,0,1,0") into a
      * double array. Invalid characters are converted to 0.
-     * 
+     *
      * @param vectorString
      *            the string to parse.
      * @return the parsed double array.
@@ -428,7 +428,7 @@ public class Utils {
 
     /**
      * Returns a string rounded to the desired precision.
-     * 
+     *
      * @param num
      *            double to convert
      * @param precision
@@ -442,7 +442,7 @@ public class Utils {
 
     /**
      * Display a documentation page under {simbrainhome}/docs/...
-     * 
+     *
      * @param helpPage
      *            Help page
      */
@@ -455,7 +455,7 @@ public class Utils {
 
     /**
      * Launch an .html page using the system's default browser.
-     * 
+     *
      * @param url
      *            the url to display. Assumes it is in the local file system.
      */
@@ -471,7 +471,7 @@ public class Utils {
     /**
      * Converts a floating point value into a color in HSB, with Saturation and
      * Brightness 1.
-     * 
+     *
      * @param fclr
      *            Float color
      * @return Hue, saturation, and brightness
@@ -482,7 +482,7 @@ public class Utils {
 
     /**
      * Returns the Hue associated with a Color.
-     * 
+     *
      * @param clr
      *            Color
      * @return Hue, saturation and brightness
@@ -495,7 +495,7 @@ public class Utils {
     /**
      * Sets the alpha of the color represented by rgBInt to the value specified
      * in alpha and returns the resulting color.
-     * 
+     *
      * @param alpha
      *            an opacity value on [0, 255]
      * @param rgbIntColor
@@ -513,7 +513,7 @@ public class Utils {
     /**
      * Sets the red value of the color represented by rgbIntColor to the value
      * specified by red and returns the resulting color.
-     * 
+     *
      * @param red
      *            a red value on [0, 255]
      * @param rgbIntColor
@@ -532,7 +532,7 @@ public class Utils {
     /**
      * Sets the green value of the color represented by rgbIntColor to the value
      * specified by green and returns the resulting color.
-     * 
+     *
      * @param green
      *            a green value on [0, 255]
      * @param rgbIntColor
@@ -551,7 +551,7 @@ public class Utils {
     /**
      * Sets the blue value of the color represented by rgbIntColor to the value
      * specified by blue and returns the resulting color.
-     * 
+     *
      * @param blue
      *            a blue value on [0, 255]
      * @param rgbIntColor
@@ -569,7 +569,7 @@ public class Utils {
 
     /**
      * Convert a 2-d array of doubles to a string.
-     * 
+     *
      * @param matrix
      *            the matrix to print
      * @return the formatted string
@@ -590,7 +590,7 @@ public class Utils {
      * Decides if the operating system matches.
      * </p>
      * Source adapted from org.apache.commons.lang.SystemUtils
-     * 
+     *
      * @param osNamePrefix
      *            the prefix for the os name
      * @return true if matches, or false if not or can't determine
@@ -605,7 +605,7 @@ public class Utils {
 
     /**
      * Determines whether the system is a Mac os x.
-     * 
+     *
      * @return whether the system is a Mac os x.
      */
     public static boolean isMacOSX() {
@@ -615,7 +615,7 @@ public class Utils {
     /**
      * Reimplementation of same method from
      * org.apache.commons.collections.CollectionUtils.
-     * 
+     *
      * @param selection
      *            the collection to filter
      * @param filter
@@ -636,7 +636,7 @@ public class Utils {
     /**
      * Re-implementation of same method from
      * org.apache.commons.collections.CollectionUtils.
-     * 
+     *
      * @param a
      *            Collection
      * @param b
@@ -653,7 +653,7 @@ public class Utils {
     /**
      * Re-implementation of same method from
      * org.apache.commons.collections.CollectionUtils.
-     * 
+     *
      * @param a
      *            Collection
      * @param b
@@ -673,7 +673,7 @@ public class Utils {
 
     /**
      * Return the Simbrain properties file, or null if it is not found.
-     * 
+     *
      * @return the Simbrain properties file
      */
     public static Properties getSimbrainProperties() {
@@ -691,7 +691,7 @@ public class Utils {
 
     /**
      * Returns the contents of a file as a String.
-     * 
+     *
      * @param file
      *            the file to read
      * @return the string contents of the file
@@ -716,7 +716,7 @@ public class Utils {
     /**
      * Concatenate two arrays A, B to produce a third array A + B. From Jean
      * Nicolas https://chocolatapp.com/
-     * 
+     *
      * @param <T>
      *            type of the arrays to concatenate
      * @param A

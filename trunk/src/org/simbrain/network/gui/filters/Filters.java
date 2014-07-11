@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.filters;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
@@ -26,8 +27,6 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
-
-import org.piccolo2d.PNode;
 
 /**
  * Filters.

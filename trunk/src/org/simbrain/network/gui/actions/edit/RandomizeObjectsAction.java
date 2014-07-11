@@ -26,7 +26,6 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;

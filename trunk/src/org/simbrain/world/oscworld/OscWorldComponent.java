@@ -20,7 +20,6 @@ package org.simbrain.world.oscworld;
 
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import org.simbrain.workspace.WorkspaceComponent;

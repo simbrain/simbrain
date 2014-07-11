@@ -244,7 +244,7 @@ public class UpdateActionManager {
         clear();
         addAction(new UpdateAllBuffered(workspaceUpdater));
     }
-    
+
     /**
      * Returns a list of network update actions that can be added.
      *

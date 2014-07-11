@@ -106,7 +106,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Create a new neuron node.
-     * 
+     *
      * @param net
      *            Reference to NetworkPanel
      * @param neuron
@@ -160,7 +160,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Toggles the visibility of the priority view text label.
-     * 
+     *
      * @param visibility
      *            whether the priority text label should be visible
      */
@@ -221,7 +221,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Return the center of this node (the circle) in global coordinates.
-     * 
+     *
      * @return the center point of this node.
      */
     public Point2D getCenter() {
@@ -310,7 +310,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Check whether the specified saturation is valid or not.
-     * 
+     *
      * @param val
      *            the saturation value to check.
      * @return whether it is valid or not.
@@ -388,7 +388,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Returns String representation of this NeuronNode.
-     * 
+     *
      * @return String representation of this node.
      */
     public String toString() {
@@ -400,7 +400,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Return the neuron for this neuron node.
-     * 
+     *
      * @return the neuron for this neuron node
      */
     public Neuron getNeuron() {
@@ -412,7 +412,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * <p>
      * This is a bound property.
      * </p>
-     * 
+     *
      * @param neuron
      *            neuron for this neuron node
      */

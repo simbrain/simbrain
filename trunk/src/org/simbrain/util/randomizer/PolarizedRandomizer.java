@@ -22,22 +22,22 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 
 /**
- * 
+ *
  * A tentative solution to some of the issues involving randomizers....
  * Creaties a randomizer that returns either positive or negative values
  * exclusively depending on its polarity. It is meant to be the case that no
  * parameters should ever be negative since they represent absolute values and
  * the sign of the output is wholly determined by the polarity.
- * 
+ *
  * @author Zach Tosi
  *
  */
 public class PolarizedRandomizer extends Randomizer {
-    
+
     public static final Polarity DEFAULT_POLARITY = Polarity.EXCITATORY;
-    
+
     public Polarity polarity;
-    
+
     /**
      * Default constructor.
      */
@@ -47,14 +47,14 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
-     * 
+     *
      * @param polarity
      */
     public PolarizedRandomizer(Polarity polarity) {
         super();
         this.polarity = polarity;
     }
-    
+
     /**
      * Copy constructor.
      *
@@ -90,7 +90,7 @@ public class PolarizedRandomizer extends Randomizer {
         }
         return ret;
     }
-    
+
     /**
      * Returns a random number.
      *

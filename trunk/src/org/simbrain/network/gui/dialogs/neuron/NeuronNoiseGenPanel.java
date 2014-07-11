@@ -31,9 +31,9 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * version of this should be created if its ideas are to be extended to other
  * objects which require higher level noise generators. Used to give each neuron
  * being edited the <b>same</b> Randomizer object as an optimization.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 public class NeuronNoiseGenPanel extends RandomizerPanel {
 
@@ -45,7 +45,7 @@ public class NeuronNoiseGenPanel extends RandomizerPanel {
      * parameters. However, it also allows different neurons to have different
      * randomizers, since any time any neurons are singled out, they will
      * receive a brand new randomizer.
-     * 
+     *
      * @param noiseyNeurons
      *            the neurons
      */

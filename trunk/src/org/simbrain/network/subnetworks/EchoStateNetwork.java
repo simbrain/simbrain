@@ -43,7 +43,7 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * Builds an Echo-State Network with options for all valid weight
  * configurations.
- * 
+ *
  * @author ztosi
  */
 public class EchoStateNetwork extends Subnetwork {
@@ -132,7 +132,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Constructor with size of layers specified.
-     * 
+     *
      * @param network
      *            the root network wherein ESNBuilder will build components
      * @param inputNodes
@@ -202,7 +202,7 @@ public class EchoStateNetwork extends Subnetwork {
      * Connects all the layers of the network based on 3 connection objects each
      * with their own connection parameters. Also scales the spectral radius of
      * the recurrent connections in the reservoir.
-     * 
+     *
      * @param inToRes
      *            the connection object governing how the input connects to the
      *            reservoir.
@@ -252,7 +252,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * Fills and returns an ArrayList with neurons governed by the specified
      * node type.
-     * 
+     *
      * @param nodeType
      *            the desired update rule governing all the neurons in the
      *            layer.
@@ -275,7 +275,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * Return a trainer object that can be used to train this ESN. The trainer
      * has harvested state data as "inputs" and the desired outputs as outputs.
-     * 
+     *
      * @return the trainer.
      */
     public Trainer getTrainer() {
@@ -364,7 +364,7 @@ public class EchoStateNetwork extends Subnetwork {
      * and updates the reservoir. Depending on the ESN's un-frozen connectivity
      * the resulting return matrix will have rows consisting of concatenated
      * input, reservoir, and (teacher-forced) output states in that order.
-     * 
+     *
      * @return a matrix of data to be used for training
      */
     private double[][] harvestData() {
@@ -458,7 +458,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Compute the reservoir noise.
-     * 
+     *
      * @return noise reservoir noise.
      */
     private double reservoirNoise() {
@@ -467,7 +467,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set spectral radius.
-     * 
+     *
      * @param spectralRadius
      *            the spectral radius
      */
@@ -477,7 +477,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set type of reservoir neurons.
-     * 
+     *
      * @param reservoirNeuronType
      */
     public void setReservoirNeuronType(NeuronUpdateRule reservoirNeuronType) {
@@ -486,7 +486,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set type of output neurons.
-     * 
+     *
      * @param outputNeuronType
      */
     public void setOutputNeuronType(NeuronUpdateRule outputNeuronType) {
@@ -495,7 +495,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set to true for weights from output to reservoir.
-     * 
+     *
      * @param backWeights
      */
     public void setBackWeights(boolean backWeights) {
@@ -505,7 +505,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * Set to true for the output to receive input from itself from the previous
      * time-step.
-     * 
+     *
      * @param recurrentWeights
      */
     public void setRecurrentOutWeights(boolean recurrentWeights) {
@@ -514,7 +514,7 @@ public class EchoStateNetwork extends Subnetwork {
 
     /**
      * Set to true for weights directly from input to output.
-     * 
+     *
      * @param directInOutWeights
      *            weights directly from input to output.
      */

@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.trainers.SOMTrainer;
@@ -25,9 +24,9 @@ import org.simbrain.util.LabelledItemPanel;
  * Training panel for SOM Network
  */
 public class SOMTrainerControlsPanel extends JPanel {
-	
+
 	private NetworkPanel panel;
-	
+
 	private SOMNetwork network;
 
 	/** Reference to trainer. */

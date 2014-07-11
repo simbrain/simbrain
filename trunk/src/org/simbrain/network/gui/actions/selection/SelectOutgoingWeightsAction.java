@@ -39,7 +39,7 @@ public final class SelectOutgoingWeightsAction extends AbstractAction {
 
     /**
      * Create a new clamp weights action with the specified network panel.
-     * 
+     *
      * @param networkPanel
      *            networkPanel, must not be null
      */

@@ -55,7 +55,7 @@ public class CompetitiveGroupCreationDialog extends StandardDialog {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param networkPanel
      *            Network panel
      */

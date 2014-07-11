@@ -110,7 +110,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /**
      * A factory method for creating a competitive properties panel for cases
      * where the panel is being created.
-     * 
+     *
      * @param np
      *            the network panel
      * @param panelType
@@ -133,7 +133,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /**
      * Creates a competitive properties panel from a CompetitiveGroup allowing
      * that group to be edited.
-     * 
+     *
      * @param np
      *            the network panel
      * @param competitive
@@ -151,7 +151,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
 
     /**
      * Constructor for the case where a competitive network is being created.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param panelType
@@ -187,7 +187,7 @@ public class CompetitivePropertiesPanel extends JPanel implements
     /**
      * Constructor for the case where an existing competitive network is being
      * edited.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param competitive

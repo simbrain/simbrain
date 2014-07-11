@@ -35,7 +35,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
- * 
+ *
  * TODO: - Migrate some of the local actions here to "official" actions in the
  * action package
  */
@@ -43,7 +43,7 @@ public class KeyBindings {
 
     /**
      * Add key bindings.
-     * 
+     *
      * @param panel
      *            panel in which to add bindings.
      */

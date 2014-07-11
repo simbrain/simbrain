@@ -25,9 +25,9 @@ import java.util.List;
 /**
  * Superclass for all trainer classes, which trains a trainable object,
  * typically a network.
- * 
+ *
  * @author jeffyoshimi
- * 
+ *
  */
 public abstract class Trainer {
 
@@ -39,7 +39,7 @@ public abstract class Trainer {
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.
-     * 
+     *
      * @param network
      *            the network to be trained
      */
@@ -49,7 +49,7 @@ public abstract class Trainer {
 
     /**
      * Apply the algorithm.
-     * 
+     *
      * @throws DataNotInitializedException
      *             when input or target data have not been set.
      */
@@ -57,7 +57,7 @@ public abstract class Trainer {
 
     /**
      * Add a trainer listener.
-     * 
+     *
      * @param trainerListener
      *            the listener to add
      */
@@ -70,7 +70,7 @@ public abstract class Trainer {
 
     /**
      * Remove a trainer listener.
-     * 
+     *
      * @param trainerListener
      *            the listener to add
      */
@@ -108,7 +108,7 @@ public abstract class Trainer {
     /**
      * Notify listeners of an update in training progress. Used by GUI progress
      * bars.
-     * 
+     *
      * @param progressUpdate
      *            string description of current state
      * @param percentComplete
@@ -130,9 +130,9 @@ public abstract class Trainer {
     /**
      * Exception thrown when a training algorithm is applied but no data have
      * been initialized.
-     * 
+     *
      * @author jyoshimi
-     * 
+     *
      */
     public class DataNotInitializedException extends Exception {
 

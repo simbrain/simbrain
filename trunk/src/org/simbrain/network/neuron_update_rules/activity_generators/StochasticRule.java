@@ -22,7 +22,6 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 
 /**
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the

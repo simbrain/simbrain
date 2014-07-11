@@ -148,7 +148,7 @@ public class InteractionBox extends ScreenElement {
         super.setScale(scale);
 //        textLabel.setScale(scale);
     }
-    
+
     /**
      * @param contextMenu the contextMenu to set
      */

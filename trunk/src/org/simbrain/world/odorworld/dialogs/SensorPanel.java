@@ -27,7 +27,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -43,7 +42,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.odorworld.WorldListenerAdapter;
-import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.Sensor;

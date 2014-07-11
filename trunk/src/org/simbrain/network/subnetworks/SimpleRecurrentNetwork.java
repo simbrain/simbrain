@@ -38,7 +38,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991).
- * 
+ *
  * @author ztosi
  * @author Jeff Yoshimi
  */
@@ -82,7 +82,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
     /**
      * Build an SRN with default activation rules and initial position.
-     * 
+     *
      * @param network
      *            underlying network
      * @param numInputNodes
@@ -101,7 +101,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
-     * 
+     *
      * @param network
      *            underlying network
      * @param numInputNodes
@@ -193,7 +193,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     /**
      * Helper method to initialize a layer by adding the desired number of
      * neurons with the desired neuron update rule.
-     * 
+     *
      * @param layer
      *            the list of neurons
      * @param nodeType

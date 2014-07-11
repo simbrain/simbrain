@@ -37,7 +37,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  * A panel representing a given probability distribution.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
@@ -72,7 +72,7 @@ public class ProbDistPanel {
      * Creates a panel within this class that is globally accessible
      * representing an editor for a randomizer with a specific probability
      * distribution.
-     * 
+     *
      * @param pdf
      *            the probability distribution the main panel will represent
      */
@@ -106,7 +106,7 @@ public class ProbDistPanel {
 
     /**
      * Populates the fields with current values.
-     * 
+     *
      * @param randomizers
      *            List of randomizers
      */
@@ -155,7 +155,7 @@ public class ProbDistPanel {
 
     /**
      * Fills fields with values from a Random Source.
-     * 
+     *
      * @param rand
      */
     public void fillFieldValues(Randomizer rand) {
@@ -186,7 +186,7 @@ public class ProbDistPanel {
 
     /**
      * Called externally when dialog is being closed.
-     * 
+     *
      * @param rand
      *            Random source
      */
@@ -277,7 +277,7 @@ public class ProbDistPanel {
     }
 
     /**
-     * 
+     *
      * @param pc
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
@@ -291,7 +291,7 @@ public class ProbDistPanel {
     /**
      * Contains the specific error message that occurs if one tries to use this
      * panel to modify a Randomizer with a different Probability distribution.
-     * 
+     *
      * @throws an
      *             IllegalArgumentException if this class is passed a randomizer
      *             which cannot be altered sensibly by this class because it has

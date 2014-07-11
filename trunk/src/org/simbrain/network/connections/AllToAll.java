@@ -22,7 +22,7 @@ import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * Connect every source neuron to every target neuron.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
@@ -38,7 +38,7 @@ public class AllToAll extends DensityBasedConnector {
 
     /**
      * Construct all to all connection object.
-     * 
+     *
      * @param network
      *            parent network
      * @param neurons
@@ -64,7 +64,7 @@ public class AllToAll extends DensityBasedConnector {
      * connection will be made between a neuron and itself if self connections
      * aren't allowed. Will produce n^2 synapses if self connections are allowed
      * and n(n-1) if they are not.
-     * 
+     *
      * @param sourceNeurons
      * @param targetNeurons
      * @param allowSelfConnection
@@ -144,7 +144,7 @@ public class AllToAll extends DensityBasedConnector {
      * Connects neurons such that every source neuron is connected to every
      * target neuron. The only exception to this case is if the source neuron
      * group is the target neuron group and self-connections are not allowed.
-     * 
+     *
      * @param synGroup
      *            the synapse group to which the synapses created by this
      *            connection class will be added.
@@ -175,7 +175,7 @@ public class AllToAll extends DensityBasedConnector {
 
     /**
      * Set whether or not self connections are allowed.
-     * 
+     *
      * @param allowSelfConnect
      */
     @Override

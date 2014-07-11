@@ -2216,6 +2216,7 @@ public class NetworkPanel extends JPanel {
      */
     public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
+        actionManager.getSetAutoZoomMenuItem().setSelected(autoZoomMode);
         repaint();
     }
 

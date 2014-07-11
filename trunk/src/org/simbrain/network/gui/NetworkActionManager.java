@@ -171,7 +171,7 @@ public final class NetworkActionManager {
     private final Action spaceHorizontalAction;
 
     /** Set auto zoom action. */
-    private final Action setAutoZoomAction;
+    private final JCheckBoxMenuItem setAutoZoomAction;
 
     /** Set neuron properties action. */
     private final Action setNeuronPropertiesAction;
@@ -316,7 +316,7 @@ public final class NetworkActionManager {
         showNetworkHierarchyAction = new JCheckBoxMenuItem(
                 new ShowNetworkHierarchyPanel(networkPanel));
 
-        setAutoZoomAction = new SetAutoZoomAction(networkPanel);
+        setAutoZoomAction = new JCheckBoxMenuItem(new SetAutoZoomAction(networkPanel));
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
@@ -730,10 +730,7 @@ public final class NetworkActionManager {
      * @return the set auto zoom check box menu item
      */
     public JCheckBoxMenuItem getSetAutoZoomMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(
-                setAutoZoomAction);
-        actionWrapper.setSelected(networkPanel.getInOutMode());
-        return actionWrapper;
+        return setAutoZoomAction;
     }
 
     /**

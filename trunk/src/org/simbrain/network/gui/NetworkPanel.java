@@ -1384,6 +1384,8 @@ public class NetworkPanel extends JPanel {
         this.editMode = newEditMode;
         if (editMode == EditMode.WAND) {
             editMode.resetWandCursor();
+        } else if ((editMode == EditMode.ZOOM_IN) || (editMode == EditMode.ZOOM_OUT)) {
+            this.setAutoZoomMode(false);
         }
         firePropertyChange("editMode", oldEditMode, this.editMode);
         updateCursor();

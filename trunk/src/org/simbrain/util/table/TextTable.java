@@ -106,10 +106,10 @@ public class TextTable extends MutableTable<String> {
             final boolean allowColumnChanges) throws TableDataException {
         String[][] values = Utils.getStringMatrix(file);
         try {
-            //checkData(allowRowChanges, allowColumnChanges, values);
+            checkData(allowRowChanges, allowColumnChanges, values);
             reset(values.length, values[0].length);
             for (int i = 0; i < values.length; i++) {
-                for (int j = 1; j < values[0].length; j++) {
+                for (int j = 0; j < values[0].length; j++) {
                     if ((values[i][j]).length() > 0) {
                         setLogicalValue(i, j, values[i][j], false);
                     }

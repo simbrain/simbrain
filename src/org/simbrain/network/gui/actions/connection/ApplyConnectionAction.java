@@ -45,7 +45,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     /**
      * Construct the action.
-     * 
+     *
      * @param networkPanel
      *            networkPanel, must not be null
      * @param connection

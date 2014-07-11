@@ -52,7 +52,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      */
     public StepSpikerPanel() {
         tfResponseHeight.setColumns(6);

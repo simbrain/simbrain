@@ -41,7 +41,7 @@ public class Splasher {
     /**
      * Shows the splash screen, launches the application and then disposes the
      * splash screen.
-     * 
+     *
      * @param args
      *            the command line arguments
      */

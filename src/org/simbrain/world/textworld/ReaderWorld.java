@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import com.thoughtworks.xstream.XStream;

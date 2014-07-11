@@ -33,12 +33,12 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
- * 
+ *
  * Dialog wrapper for all connection panels.
- * 
+ *
  * @author jyoshimi
  * @author ztosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
@@ -58,7 +58,7 @@ public class ConnectionDialog extends StandardDialog {
     private SynapsePolarityAndRandomizerPanel eirPanel;
 
     /**
-     * 
+     *
      * @param optionsPanel
      * @param connection
      * @param networkPanel
@@ -74,7 +74,7 @@ public class ConnectionDialog extends StandardDialog {
     }
 
     /**
-     * 
+     *
      * @param networkPanel
      * @param optionsPanel
      * @param connection
@@ -87,7 +87,7 @@ public class ConnectionDialog extends StandardDialog {
     }
 
     /**
-     * 
+     *
      */
     private void init() {
         mainPanel = new JPanel();

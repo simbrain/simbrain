@@ -91,7 +91,7 @@ public class HearingSensorPanel extends AbstractSensorPanel {
         }
     }
 
-    /** 
+    /**
      * Set the current values of all fields.
      */
     private void fillFieldValues() {

@@ -67,7 +67,7 @@ public class ReservoirUtilsPanel extends JPanel {
     /**
      * The constructor, requiring both a reference to an esn and the parent
      * trainer panel.
-     * 
+     *
      * @param esn
      *            the esn where state noise is being injected.
      */

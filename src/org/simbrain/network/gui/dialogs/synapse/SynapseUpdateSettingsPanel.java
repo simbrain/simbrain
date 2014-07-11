@@ -49,9 +49,9 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * A panel for setting the synapse type and changing the parameters of the
  * selected update rule.
- * 
+ *
  * * @author ztosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel {
@@ -94,7 +94,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      * Constructs a synapse update settings panel for a given synapse list and
      * within a specified parent window. Starts in the default display state for
      * the actual neuron update panel.
-     * 
+     *
      * @param synapseList
      *            the list of synapses which will be edited by the displayed
      *            neuron update rule panel
@@ -111,7 +111,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      * Constructs a synapse update settings panel for a given synapse list and
      * within a specified parent window, and with the starting display state of
      * the neuron update panel specified.
-     * 
+     *
      * @param synapseList
      *            the list of synapses which will be edited by the displayed
      *            neuron update rule panel

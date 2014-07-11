@@ -48,10 +48,10 @@ import org.simbrain.util.math.SimbrainMath;
 /**
  * A panel for adjusting the polarity and weights of a synapse group as well as
  * its weight randomizers, and displaying the results in a histogram.
- * 
- * 
+ *
+ *
  * @author Zach Tosi
- * 
+ *
  */
 public class SynapseGroupAdjustmentPanel extends JPanel {
 
@@ -89,7 +89,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     private final boolean creationPanel;
 
     /**
-     * 
+     *
      * @param parent
      * @param synapseGroup
      * @return
@@ -103,7 +103,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @param parent
      * @param synapseGroup
      */
@@ -324,14 +324,14 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      */
     public void commitChanges() {
         excitatoryPercentPanel.commitChanges(synapseGroup);
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Collection<Synapse> getCurrentlyEditableSynapses() {
@@ -350,11 +350,11 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * A panel for displaying basic statistics about the synapse group
-     * 
+     *
      * @author Zach Tosi
-     * 
+     *
      */
     public class Stats extends JPanel {
 
@@ -377,7 +377,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         private JLabel stdDevLabel = new JLabel();
 
         /**
-         * 
+         *
          */
         public Stats() {
             super();
@@ -385,7 +385,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          */
         public void update() {
             calcStats();
@@ -405,7 +405,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          */
         public void layoutPanel() {
             this.setLayout(new GridLayout(3, 4));
@@ -425,7 +425,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          */
         public void calcStats() {
             Collection<Synapse> synapses = getCurrentlyEditableSynapses();
@@ -435,7 +435,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          * @param synapses
          * @return
          */
@@ -457,7 +457,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          * @param synapses
          * @return
          */
@@ -485,7 +485,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
         /**
-         * 
+         *
          * @param synapses
          * @return
          */

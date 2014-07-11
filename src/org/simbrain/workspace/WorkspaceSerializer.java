@@ -300,7 +300,7 @@ public class WorkspaceSerializer {
                                         componentDeserializer, actionRef));
             }
         }
-        
+
         // Deserialize workspace parameters (serialization occurs in
         // ArchiveContents.java).
         if (contents.getWorkspaceParameters() != null) {

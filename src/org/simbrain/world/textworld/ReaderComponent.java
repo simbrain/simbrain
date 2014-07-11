@@ -26,7 +26,6 @@ import java.util.List;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component. Handles

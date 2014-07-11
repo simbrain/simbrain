@@ -54,7 +54,7 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
  * level references are built.
  * <p>
  * Applet menus are handled in {@link org.simbrain.network.gui.NetworkMenuBar}
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class NetworkPanelDesktop extends NetworkPanel {
@@ -64,7 +64,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Construct the desktop extension of network panel. The main thing
-     * 
+     *
      * @param component
      *            the component level representation of the desktop
      * @param Network
@@ -124,7 +124,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Edit menu for this Network panel.
-     * 
+     *
      * @return a new Edit menu for this Network panel
      */
     JMenu createEditMenu() {
@@ -160,7 +160,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Insert menu for this Network panel.
-     * 
+     *
      * @return a new Insert menu for this Network panel
      */
     JMenu createInsertMenu() {
@@ -180,7 +180,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new View menu for this Network panel.
-     * 
+     *
      * @return a new View menu for this Network panel
      */
     JMenu createViewMenu() {
@@ -203,7 +203,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create a selection JMenu.
-     * 
+     *
      * @return the selection menu.
      */
     public JMenu createSelectionMenu() {
@@ -218,7 +218,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * Create and return a new Help menu for this Network panel.
-     * 
+     *
      * @return a new Help menu for this Network panel
      */
     public JMenu createHelpMenu() {
@@ -230,9 +230,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * This version of network dialog allows user to set User Preferences.
-     * 
+     *
      * @param networkPanel
-     * 
+     *
      * @return superclass version of network dialog, with User Preferences
      */
     public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
@@ -241,7 +241,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     /**
      * This version adds the script menu.
-     * 
+     *
      * @return the context menu with script menu added
      */
     public JPopupMenu createNetworkContextMenu() {

@@ -38,7 +38,7 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
 
     /**
      * Create a new neuron action with the specified network panel.
-     * 
+     *
      * @param networkPanel
      *            network panel, must not be null
      */
@@ -64,7 +64,7 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
     /**
      * Display the add synapse group dialog. Assumes the enabling condition (at
      * least one source and target neuron group designated) is in effect.
-     * 
+     *
      * @param networkPanel
      *            the network panel in which to add the group.
      */

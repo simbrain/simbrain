@@ -25,12 +25,11 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.gui.NetworkPanel;
-
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,

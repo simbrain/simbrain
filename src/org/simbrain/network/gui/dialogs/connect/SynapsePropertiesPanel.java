@@ -45,9 +45,9 @@ import org.simbrain.util.widgets.EditablePanel;
  * A panel allowing synapse learning rules to be set and random weights to be
  * activated/adjusted, designed with segregation of inhibitory and excitatory
  * weights in mind.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
@@ -92,7 +92,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     private final boolean creationPanel;
 
     /**
-     * 
+     *
      * @param parent
      * @param synapseGroup
      * @return
@@ -106,7 +106,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param parent
      * @param synapses
      * @return
@@ -120,7 +120,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param parent
      * @param synapses
      * @return
@@ -133,7 +133,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param parentWindow
      * @param synapseGroup
      */
@@ -159,7 +159,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param parentWindow
      * @param synapses
      */
@@ -191,7 +191,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * A constructor specifically for creating loose connections.
-     * 
+     *
      * @param parentWindow
      * @param synapses
      */

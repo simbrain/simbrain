@@ -37,11 +37,11 @@ import javax.swing.SwingUtilities;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Zach Tosi
- * 
+ *
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
@@ -73,7 +73,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
     /**
      * Creates an unlabeled drop down triangle pointing either left or right in
      * the "up" state and starting either "up" or down.
-     * 
+     *
      * @param upState
      *            The direction the triangle points when in the "up" state
      * @param down
@@ -93,7 +93,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      * "up" state and a label displayed when it is in the "down" state. The
      * triangle points either left or right in the "up" state and starts out
      * either "up" or down.
-     * 
+     *
      * @param upState
      *            The direction the triangle points when in the "up" state
      * @param down
@@ -190,7 +190,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Sets the color of the label when the triangle is in the up state.
-     * 
+     *
      * @param color
      */
     public void setUpLabelColor(Color color) {
@@ -199,7 +199,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     /**
      * Sets the color of the label when the triangle is in the down state.
-     * 
+     *
      * @param color
      */
     public void setDownLabelColor(Color color) {
@@ -207,9 +207,9 @@ public class DropDownTriangle extends JPanel implements MouseListener {
     }
 
     /**
-     * 
+     *
      * @author zach
-     * 
+     *
      */
     private class ClickableTriangle extends JPanel {
 
@@ -235,7 +235,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         private Image triangle;
 
         /**
-         * 
+         *
          * @param upState
          * @param down
          */
@@ -268,7 +268,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         /**
          * Sets the state of the triangle, to either the "up" position (Left or
          * Right) or the down position.
-         * 
+         *
          * @param down
          *            the desired state of the triangle. False, puts the
          *            triangle in the "up" position: pointing left or right,

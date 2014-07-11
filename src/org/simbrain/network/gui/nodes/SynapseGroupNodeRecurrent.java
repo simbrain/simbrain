@@ -32,9 +32,9 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Creates a simple synapse group node that represents a recurrent synapse
  * group.
- * 
+ *
  * @author zach
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
@@ -48,7 +48,7 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
     private AtomicBoolean halt = new AtomicBoolean(false);
 
     /**
-     * 
+     *
      * @param networkPanel
      * @param group
      * @return

@@ -46,14 +46,14 @@ import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSerie
 /**
  * Panel to display histogram. Used both for the plot component and as a
  * reusable component (e.g. in synapse adjustment panel).
- * 
+ *
  * Supports multiple simultaneous data sets represented by different colors,
  * partially transparent to make overlap visible. The histogram takes the form
  * of a chart supported by a panel which is then placed within the final panel.
  * This panel supports dynamically changing the number of histogram bins
  * graphically, but only logically supports the altering of data series, relying
  * on other classes for graphical representations of such.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
@@ -164,7 +164,7 @@ public class HistogramPanel extends JPanel {
 
     /**
      * Construct a new histogram panel.
-     * 
+     *
      * @param model
      *            reference to underlying data
      */
@@ -310,7 +310,7 @@ public class HistogramPanel extends JPanel {
 
     /**
      * Return reference to underlying data.
-     * 
+     *
      * @return the data
      */
     public HistogramModel getModel() {
@@ -319,7 +319,7 @@ public class HistogramPanel extends JPanel {
 
     /**
      * Returns default number of datasets.
-     * 
+     *
      * @return default num datasets.
      */
     public static int getDefaultNumDatasets() {

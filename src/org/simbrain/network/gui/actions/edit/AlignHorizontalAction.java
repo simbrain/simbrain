@@ -24,7 +24,6 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 import org.simbrain.resource.ResourceManager;
 
 /**

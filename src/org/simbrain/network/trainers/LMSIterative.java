@@ -25,7 +25,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 
 /**
  * Train using least mean squares.
- * 
+ *
  * @author jyoshimi
  */
 public class LMSIterative extends IterableTrainer {
@@ -38,7 +38,7 @@ public class LMSIterative extends IterableTrainer {
 
     /**
      * Construct a least mean squares iterative panel.
-     * 
+     *
      * @param network
      */
     public LMSIterative(Trainable network) {

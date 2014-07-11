@@ -63,7 +63,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
-     * 
+     *
      */
     public SinusoidalGeneratorPanel() {
         super();

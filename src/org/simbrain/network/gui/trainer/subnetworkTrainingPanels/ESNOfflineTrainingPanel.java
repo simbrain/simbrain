@@ -37,13 +37,13 @@ import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Panel for training ESN's.
- * 
+ *
  * ESN classes like this have to do some tricky things because of how ESN's
  * work. The "visible training set" for the ESN is inputs and targets. But the
  * "real training set" that the learning rule is applied to is actually
  * harvested data from the reservoir network as inputs and the visible target
  * data as targets.
- * 
+ *
  * This is similar to LMSOfflineTrainingPanel, but customized in light of the
  * above.
  */
@@ -63,7 +63,7 @@ public class ESNOfflineTrainingPanel extends JPanel {
 
     /**
      * Construct an ESN Training Panel.
-     * 
+     *
      * @param panel
      *            the parent network panel
      * @param esn

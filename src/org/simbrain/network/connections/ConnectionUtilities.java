@@ -107,7 +107,7 @@ public class ConnectionUtilities {
 
     /**
      * Randomize and polarize synapses using default excitatory and inhibitory
-     * polarizers (uniform 0 to 1).  See {@link #randomizeAndPolarizeSynapses(Collection, PolarizedRandomizer, 
+     * polarizers (uniform 0 to 1).  See {@link #randomizeAndPolarizeSynapses(Collection, PolarizedRandomizer,
      * PolarizedRandomizer, double)}
      *
      * @param synapses the synapses to modify

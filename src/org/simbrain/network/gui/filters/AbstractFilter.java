@@ -18,10 +18,9 @@
  */
 package org.simbrain.network.gui.filters;
 
-import org.simbrain.util.Predicate;
-
 import org.piccolo2d.PNode;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.util.Predicate;
 
 /**
  * Abstract filter, implements both <code>PNodeFilter</code> and

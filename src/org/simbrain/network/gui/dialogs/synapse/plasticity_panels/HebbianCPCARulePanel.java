@@ -67,7 +67,7 @@ public class HebbianCPCARulePanel extends AbstractSynapsePanel {
 
     /**
      * Populate fields with current data.
-     * 
+     *
      * @param ruleList
      *            the list of rules being edited
      */

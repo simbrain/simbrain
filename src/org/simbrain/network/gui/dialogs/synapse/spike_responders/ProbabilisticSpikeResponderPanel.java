@@ -49,7 +49,7 @@ public class ProbabilisticSpikeResponderPanel extends
 
     /**
      * This method is the default constructor.
-     * 
+     *
      */
     public ProbabilisticSpikeResponderPanel() {
         tfActivationProbability.setColumns(6);

@@ -38,7 +38,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * A panel which provides a high level summary of certain groups in Simbrain. As
  * of right now, Subnetworks are accepted, but only NeuronGroups and
  * SynapseGroups actually have implementations in this class.
- * 
+ *
  * @author ztosi
  */
 @SuppressWarnings("serial")
@@ -141,7 +141,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     /**
      * Constructs the summary panel based on a neuron group. Names the incoming
      * and outgoing labels appropriately (Incoming/Outgoing).
-     * 
+     *
      * @param ng
      *            the neuron group for which a summary will be built
      * @param editable
@@ -161,7 +161,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     /**
      * Constructs the summary panel based on a synapse group. Names the incoming
      * and outgoing labels appropriately (Source Group/Target Group).
-     * 
+     *
      * @param sg
      *            the synapse group for which a summary will be built
      */
@@ -213,7 +213,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param ng
      *            the neuron group being used to fill the values of this panel's
      *            fields.
@@ -288,7 +288,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * 
+     *
      * @param sg
      *            the synapse group being used to fill field values
      */

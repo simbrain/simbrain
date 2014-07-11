@@ -37,7 +37,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Adds a new item.
-     * 
+     *
      * @param text
      *            Text to add
      * @param comp
@@ -49,7 +49,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Adds a new item label.
-     * 
+     *
      * @param text
      *            Text to add
      * @param comp
@@ -69,7 +69,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Populates fields with data from a connect neurons object.
-     * 
+     *
      * @param connection
      * @throws ClassCastException
      *             may occur if a sub-class of connect neurons not consistent
@@ -89,7 +89,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.
-     * 
+     *
      * @param text
      *            Text to be added
      */

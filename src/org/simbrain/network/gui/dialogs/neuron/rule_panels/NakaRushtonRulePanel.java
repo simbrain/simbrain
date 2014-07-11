@@ -326,7 +326,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronPanel implements
 
     /**
      * Responds to actions performed.
-     * 
+     *
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {

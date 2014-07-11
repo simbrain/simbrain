@@ -35,7 +35,7 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
  * Self organizing map.
- * 
+ *
  */
 public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
     EditablePanel {
@@ -92,7 +92,7 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for the case where an som group is being created.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param panelType
@@ -119,7 +119,7 @@ public class SOMPropertiesPanel extends JPanel implements GroupPropertiesPanel,
 
     /**
      * Constructor for case where an existing som group is being edited.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param som

@@ -28,15 +28,15 @@ package org.simbrain.util.math;
  */
 public enum SquashingFunction {
 
-    
-    
-    
+
+
+
     /** Arctangent. */
     ARCTAN {
-        
+
         /** The max value as x -> inf of f(x) = arctan(x) .*/
         private static final double DEFAULT_ARCTAN_CEIL = Math.PI/2;
-        
+
         /** The min value as x -> -inf of f(x) = arctan(x) .*/
         private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI/2;
 
@@ -83,7 +83,7 @@ public enum SquashingFunction {
 
         /** The min value as x -> -inf of f(x) = 1 / (1 + e^x). */
         private static final double DEFAULT_LOGISTIC_FLOOR = 0.0;
-        
+
         @Override
         public String toString() {
             return "Logistic";
@@ -124,10 +124,10 @@ public enum SquashingFunction {
 
         /** The max value as x -> inf of f(x) = tanh(x). */
         private static final double DEFAULT_TANH_CEIL = 1.0;
-        
+
         /** The max value as x -> -inf of f(x) = tanh(x).*/
         private static final double DEFAULT_TANH_FLOOR = -1.0;
-        
+
         @Override
         public String toString() {
             return "Tanh";

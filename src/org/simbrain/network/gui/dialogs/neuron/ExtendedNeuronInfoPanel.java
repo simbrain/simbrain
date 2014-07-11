@@ -34,7 +34,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.SimbrainConstants;
@@ -47,12 +46,12 @@ import org.simbrain.util.widgets.TristateDropDown;
  * speaking, this panel is not meant to exist in a dialog by itself, it is a set
  * of commonly used (hence generic) neuron value fields which is shared by
  * multiple complete dialogs.
- * 
+ *
  * Values included are: Activation, upper / lower bounds, label, priority and
  * increment.
- * 
+ *
  * @author ztosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
@@ -132,7 +131,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Construct the panel representing the provided neurons.
-     * 
+     *
      * @param neuronList
      *            list of neurons to represent.
      * @param parent
@@ -200,7 +199,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
      * the same. If they are not, sets the text in {@link #tfCeiling} to "...".
      * If not all the neurons share the bounded interface, throws a
      * ClassCastException.
-     * 
+     *
      * @param ruleList
      * @throws ClassCastException
      */
@@ -232,7 +231,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
      * the same. If they are not, sets the text in {@link #tfFloor} to "...". If
      * not all the neurons share the bounded interface, throws a
      * ClassCastException.
-     * 
+     *
      * @param ruleList
      * @throws ClassCastException
      */
@@ -264,7 +263,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
      * are the same. If they are not, sets the the values of the
      * {@link #clipping} TristateDropDown to a null value. If not all the
      * neurons share the clippable interface, throws a ClassCastException.
-     * 
+     *
      * @param ruleList
      * @throws ClassCastException
      */
@@ -356,7 +355,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Initialize the panel with default field values.
-     * 
+     *
      * @param rule
      *            rule to use for setting the default values.
      */
@@ -371,7 +370,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Update field visibility based on whether rule is bounded and/or clipped.
-     * 
+     *
      * @param rule
      *            the current rule
      */
@@ -513,7 +512,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Properly repaints the panel when clipping and its label are made visible
      * or invisible.
-     * 
+     *
      * @param visible
      *            should the clipping stuff be visible or not
      */

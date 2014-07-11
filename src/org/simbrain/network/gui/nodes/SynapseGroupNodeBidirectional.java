@@ -40,9 +40,9 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  * indicate bidirectionality. Essentially this is a compound group node as it
  * represents and contains two separate synapse groups which make it
  * "bidirectional".
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SynapseGroupNodeBidirectional extends PNode implements
@@ -155,7 +155,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
 
     /**
      * Create a bidirectional simple synapse group PNode.
-     * 
+     *
      * @param networkPanel
      *            parent panel
      * @param group
@@ -179,7 +179,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
 
     /**
      * Create a bidirectional simple synapse group PNode.
-     * 
+     *
      * @param networkPanel
      *            parent panel
      * @param group
@@ -221,7 +221,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
      * Checks to make sure that this node is being appropriately applied.
      * Namely, that the target group of the first synapse group equals the
      * source group of the second synapse group and vice-versa.
-     * 
+     *
      * @param group1
      * @param group2
      * @throws IllegalStateException
@@ -358,7 +358,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     }
 
     /**
-     * 
+     *
      */
     @Override
     public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
@@ -396,7 +396,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * For the purposes of determining proper ports, the group being moved by
      * the user is considered to be the end/target group.
      */

@@ -24,7 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

@@ -95,7 +95,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Adds an item.
-     * 
+     *
      * @param text
      *            label of item to add
      * @param comp
@@ -107,7 +107,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Add item label.
-     * 
+     *
      * @param text
      *            label to add
      * @param comp
@@ -127,7 +127,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Populate fields with current data.
-     * 
+     *
      * @param ruleList
      *            the list of rules from which variables will be displayed
      */
@@ -147,7 +147,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * this to be the case. Do NOT use this method repeatedly to commit changes
      * to multiple synapses, {@link #commitChanges(List)} does this much more
      * efficiently.
-     * 
+     *
      * @param synapse
      *            the synapse being edited.
      */
@@ -158,7 +158,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * being edited. Generally this method is used in the synapse editing
      * process rather than the synapse creation process, but there is no reason
      * outside convention for this to be the case.
-     * 
+     *
      * @param synapses
      *            the synapses being edited
      */
@@ -170,7 +170,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * are the same type as the panel. {@link #replacing} is the flag for
      * whether the synapse rules are replaced by a new rule before this rule is
      * called.
-     * 
+     *
      * @param synapses
      *            the neurons whose rules are being <b>edited</b>, not replaced.
      */
@@ -181,7 +181,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * Are we replacing rules or editing them? Replacing happens when
      * {@link #commitChanges(List)} is called on a synapse panel whose rule is
      * different from the rules of the synapses being edited.
-     * 
+     *
      * @return replacing or editing
      */
     protected boolean isReplace() {
@@ -192,7 +192,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * Tells this panel whether it is going to be editing synapse update rules,
      * or creating new ones and replacing the update rule of each of the
      * synapses being edited.
-     * 
+     *
      * @param replace
      *            tell the panel if it's replacing rules or editing them
      */
@@ -213,14 +213,14 @@ public abstract class AbstractSynapsePanel extends JPanel {
      * SynapseUpdateRule corresponds to the rule specified by the panel name.
      * Used so that other classes can query specific properties of the rule the
      * panel edits. Also used internally to make deep copies.
-     * 
+     *
      * @return an instance of the synapse rule which corresponds to the panel.
      */
     public abstract SynapseUpdateRule getPrototypeRule();
 
     /**
      * Add notes or other text to bottom of panel. Can be html formatted.
-     * 
+     *
      * @param text
      *            Text to add to bottom of panel
      */

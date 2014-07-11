@@ -42,7 +42,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
  * object.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
@@ -85,7 +85,7 @@ public class RandomizerPanel extends JPanel {
 
     /**
      * A constructor specifying a parent window for auto-resizing.
-     * 
+     *
      * @param parent
      */
     public RandomizerPanel(Window parent) {
@@ -149,7 +149,7 @@ public class RandomizerPanel extends JPanel {
 
     /**
      * Populates the fields with current values.
-     * 
+     *
      * @param randomizers
      *            List of randomizers
      */
@@ -184,7 +184,7 @@ public class RandomizerPanel extends JPanel {
 
     /**
      * Fills fields with values from a Random Source.
-     * 
+     *
      * @param rand
      */
     public void fillFieldValues(Randomizer rand) {
@@ -214,7 +214,7 @@ public class RandomizerPanel extends JPanel {
 
     /**
      * Called externally when dialog is being closed.
-     * 
+     *
      * @param rand
      *            Random source
      */
@@ -280,7 +280,7 @@ public class RandomizerPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @param pc
      */
     public void addPropertyChangeListenerToFields(PropertyChangeListener pc) {
@@ -297,7 +297,7 @@ public class RandomizerPanel extends JPanel {
      * anything. It displays nothing and serves only as a place holder in
      * instances where multiple randomizers are selected with different
      * probability density functions.
-     * 
+     *
      * @author Zach Tosi
      */
     private class NullRandPanel extends ProbDistPanel {

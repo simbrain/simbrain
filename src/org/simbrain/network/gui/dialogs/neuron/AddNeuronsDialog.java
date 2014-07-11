@@ -50,11 +50,11 @@ import org.simbrain.util.widgets.ShowHelpAction;
 /**
  * A dialog for adding multiple neurons to the network. User can specify a
  * neuron type and a layout.
- * 
+ *
  * TODO: Merge this and NeuronDialog? They're almost the same class and we could
  * just add a Creation/Editing enum to tell it whether or not to display certain
  * fields.
- * 
+ *
  * @author ztosi
  * @author jyoshimi
  */
@@ -114,7 +114,7 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * A factory method that creates an AddNeuronsDialog to prevent references
      * to "this" from escaping during construction.
-     * 
+     *
      * @param networkPanel
      *            the network panel neurons will be added to.
      * @return an AddNeuronsDialog
@@ -145,7 +145,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
     /**
      * Constructs the dialog.
-     * 
+     *
      * @param networkPanel
      *            the panel the neurons are being added to.
      */
@@ -276,9 +276,9 @@ public class AddNeuronsDialog extends StandardDialog {
      * neuron group. Options include a new neuron group, already existing neuron
      * group, or no neuron group (loose). The user can also change a group's
      * name from here.
-     * 
+     *
      * @author ztosi
-     * 
+     *
      */
     @SuppressWarnings("serial")
     private class NeuronGroupPanelLite extends JPanel {
@@ -296,7 +296,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         /**
          * Creates the neuron group sub-panel
-         * 
+         *
          * @param np
          *            a reference to the network panel.
          */
@@ -341,7 +341,7 @@ public class AddNeuronsDialog extends StandardDialog {
          * Generates the neuron group with the attributes from the panel.
          * Returns null if the {@link #addToGroup addToGroup} check-box is not
          * selected.
-         * 
+         *
          * @return
          */
         public NeuronGroup generateNeuronGroup() {

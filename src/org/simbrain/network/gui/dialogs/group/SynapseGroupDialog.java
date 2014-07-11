@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Dialog for editing synapse groups.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
@@ -103,7 +103,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * Creates a synapse group dialog based on a source and target neuron group.
      * This should be used when the synapse group being "edited" doesn't exist
      * yet, i.e. it's being created from the parameters in this panel.
-     * 
+     *
      * @param np
      *            the network panel
      * @param src
@@ -125,7 +125,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * Creates a synapse group dialog based on a given synapse group it goes
      * without saying that this means this dialog will be editing the given
      * synapse group.
-     * 
+     *
      * @param np
      *            the network panel
      * @param sg
@@ -142,7 +142,7 @@ public final class SynapseGroupDialog extends StandardDialog {
 
     /**
      * Create a new synapse group connecting the indicated neuron groups.
-     * 
+     *
      * @param src
      *            source neuron group
      * @param tar
@@ -161,7 +161,7 @@ public final class SynapseGroupDialog extends StandardDialog {
 
     /**
      * Construct the Synapse group dialog.
-     * 
+     *
      * @param np
      *            Parent network panel
      * @param sg

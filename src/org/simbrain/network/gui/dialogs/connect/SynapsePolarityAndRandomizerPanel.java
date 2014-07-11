@@ -58,10 +58,10 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 /**
  * Display preferences for regarding the ratio of excitatory to inhibitory
  * connections.
- * 
+ *
  * @author ztosi
  * @author jyoshimi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SynapsePolarityAndRandomizerPanel extends JPanel {
@@ -98,7 +98,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     /**
      * A switchable listener
-     * 
+     *
      * @see org.simbrain.util.SwitchablePropertyChangeListener.java listenting
      *      to changes to the excitatory ratio text field.
      */
@@ -106,7 +106,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     /**
      * A switchable listener
-     * 
+     *
      * @see org.simbrain.util.SwitchablePropertyChangeListener.java listenting
      *      to changes to the inhibitory ratio text field.
      */
@@ -114,7 +114,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     /**
      * A switchable listener
-     * 
+     *
      * @see org.simbrain.util.SwitchableChangeListener.java listenting to
      *      changes to the excitatory/inhibitory ratio slider.
      */
@@ -139,7 +139,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     private final Window parent;
 
     /**
-     * 
+     *
      * @param parent
      * @return
      */
@@ -162,7 +162,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @param parent
      * @param synGrp
      * @return
@@ -224,7 +224,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * Constructs the excitatory/inhibitory ratio sub-panel, around an extant
      * synapse group.
-     * 
+     *
      * @param synGrp
      */
     private SynapsePolarityAndRandomizerPanel(final Window parent,
@@ -428,7 +428,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * Fills the field values for this sub-panel based on the values of an
      * already existing connection object.
-     * 
+     *
      * @param connection
      *            the connection being used to determine the field values
      */
@@ -451,7 +451,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     /**
      * Commits changes to a synapse group.
-     * 
+     *
      * @param synapseGroup
      */
     public void commitChanges(SynapseGroup synapseGroup) {
@@ -477,7 +477,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * Returns the desired percent excitatory. Used for loose connections
      * instead of committing changes.
-     * 
+     *
      * @return the user selected percent of excitatory synapses
      */
     public double getPercentExcitatory() {
@@ -486,7 +486,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public EditableRandomizerPanel getExcitatoryRandomizerPanel() {
@@ -494,7 +494,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public EditableRandomizerPanel getInhibitoryRandomizerPanel() {
@@ -518,7 +518,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * Adds an additional action listener to the apply button associated with
      * the slider, so that external panels can perform some action.
-     * 
+     *
      * @param al
      */
     public void addSliderApplyActionListener(ActionListener al) {
@@ -534,8 +534,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @author Zach Tosi
      */
     public class EditableRandomizerPanel extends JPanel {
@@ -677,7 +677,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         /**
          * Adds an additional listener to the apply button so that other panels
          * can perform other actions if the button is pressed.
-         * 
+         *
          * @param al
          */
         public void addApplyActionListener(ActionListener al) {

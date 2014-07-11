@@ -32,7 +32,7 @@ public class LabelledItem extends JPanel {
 
     /**
      * Construct the labelled item.
-     * 
+     *
      * @param labelText
      *            the text for the label
      * @param component

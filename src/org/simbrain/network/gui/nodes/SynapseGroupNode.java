@@ -52,7 +52,7 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener {
      * Constant for use in group changed events, indicating that the visibility
      * of synpases in a synapse group has changed.
      */
-    public static final String SYNAPSE_VISIBILITY_CHANGED = 
+    public static final String SYNAPSE_VISIBILITY_CHANGED =
             "synapseVisibilityChanged";
 
     /**

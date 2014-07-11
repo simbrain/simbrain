@@ -82,7 +82,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
 
     /**
      * Constructor for creating Hopfield networks.
-     * 
+     *
      * @param np
      *            parent network panel
      */
@@ -94,7 +94,7 @@ public class HopfieldPropertiesPanel extends JPanel implements
 
     /**
      * Constructor for editing.
-     * 
+     *
      * @param np
      *            parent network panel
      * @param hop

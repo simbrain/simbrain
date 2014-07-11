@@ -25,7 +25,7 @@ import org.simbrain.network.core.Synapse;
  * A superclass for all connectors whose primary parameter is related to base
  * connection density, taking no other major factors into account insofar as
  * slecting which neurons should be connected goes.
- * 
+ *
  * @author Zach Tosi
  */
 public abstract class DensityBasedConnector extends ConnectNeurons {
@@ -57,7 +57,7 @@ public abstract class DensityBasedConnector extends ConnectNeurons {
      * generally speaking the connectionDensity parameter represents a
      * probability reflecting how many possible connections between a given
      * source neuron and all available target neurons will actually be made.
-     * 
+     *
      * @param connectionDensity
      * @return the connections added or removed to achieve the desired density
      *         if density is being changed after connections have already been
@@ -77,7 +77,7 @@ public abstract class DensityBasedConnector extends ConnectNeurons {
     /**
      * Set whether or not self connections (connections where the source and
      * target neuron are the same neuron) are allowed.
-     * 
+     *
      * @param selfConnectionAllowed
      */
     public void setSelfConnectionAllowed(boolean selfConnectionAllowed) {

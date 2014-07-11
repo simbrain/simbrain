@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron;
 
 /**
  * Comparators for using in sorting various kinds of org.simbrain.network lists.
- * 
+ *
  * @author Zach Tosi
  * @author jyoshimi
  */
@@ -84,7 +84,7 @@ public enum OrientationComparator implements Comparator<Neuron> {
     };
 
     /**
-     * 
+     *
      * @param neuron1
      * @param neuron2
      * @return
@@ -92,7 +92,7 @@ public enum OrientationComparator implements Comparator<Neuron> {
     public abstract int compare(final Neuron neuron1, final Neuron neuron2);
 
     /**
-     * 
+     *
      * @param neurons
      * @return
      */

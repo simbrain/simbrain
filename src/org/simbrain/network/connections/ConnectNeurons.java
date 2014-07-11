@@ -23,9 +23,9 @@ import org.simbrain.network.groups.SynapseGroup;
 /**
  * Subclasses create connections (collections of synapses) between groups of
  * neurons.
- * 
+ *
  * TODO: Keep? If not, demote to interface?
- * 
+ *
  * @author Zach Tosi
  */
 public abstract class ConnectNeurons {
@@ -39,7 +39,7 @@ public abstract class ConnectNeurons {
 
     /**
      * Apply connection using specified parameters.
-     * 
+     *
      * @param network
      *            reference to parent network
      * @param neurons

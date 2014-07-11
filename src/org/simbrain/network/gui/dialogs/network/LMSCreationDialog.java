@@ -13,8 +13,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import java.awt.geom.Point2D;
-
 import javax.swing.Box;
 
 import org.simbrain.network.gui.NetworkPanel;

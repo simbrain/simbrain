@@ -143,7 +143,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
         /**
          * Construct the dialog.
-         * 
+         *
          * @param panel
          *            the embedded panel
          */

@@ -29,7 +29,7 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
 
 /**
  * Edit properties of randomizer object for network.
- * 
+ *
  * TODO: Not currently used but being left in case it is reinstated.
  */
 public final class EditRandomizerPropertiesAction extends AbstractAction {
@@ -39,7 +39,7 @@ public final class EditRandomizerPropertiesAction extends AbstractAction {
 
     /**
      * Construct the action.
-     * 
+     *
      * @param networkPanel
      *            networkPanel, must not be null
      */

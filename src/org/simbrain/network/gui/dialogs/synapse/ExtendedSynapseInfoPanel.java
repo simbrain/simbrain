@@ -35,10 +35,10 @@ import org.simbrain.util.widgets.TristateDropDown;
 /**
  * Panel which displays the specific parameters of a particular synapse learning
  * rule.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
- * 
+ *
  */
 public class ExtendedSynapseInfoPanel extends JPanel {
 
@@ -61,7 +61,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
     private JTextField tfDelay = new JTextField(10);
 
     /**
-     * 
+     *
      * @param synapseList
      *            The list of synapses being edited.
      */

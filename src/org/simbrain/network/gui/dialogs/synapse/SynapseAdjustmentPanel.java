@@ -53,10 +53,10 @@ import org.simbrain.util.randomizer.gui.RandomizerPanel;
  * allow polarity shifts and keep separate lists of excitatory/inhibitory
  * synapses, also allow to preview and keep values in numerical array and THEN
  * change synapse strengths.
- * 
+ *
  * @author Zach Tosi
  * @author Jeff Yoshimi
- * 
+ *
  */
 public class SynapseAdjustmentPanel extends JPanel {
 
@@ -233,7 +233,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
     /**
      * Create a synapse adjustment panel with a specified list of synapses.
-     * 
+     *
      * @param networkPanel
      *            parent network panel
      * @param synapses
@@ -640,9 +640,9 @@ public class SynapseAdjustmentPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      * @author zach
-     * 
+     *
      */
     public final class StatisticsBlock {
 
@@ -655,7 +655,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         /**
          * Gets the basic statistics: mean, median, and standard deviation of
          * the synapse weights based on which group of synapses is selected.
-         * 
+         *
          * @return an An array where the first element is the mean, the 2nd
          *         element is the median, and the 3rd element is the standard
          *         deviation.
@@ -764,7 +764,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         /**
          * Construct the scaler panel.
-         * 
+         *
          * @param networkPanel
          *            parent network panel
          */
@@ -825,7 +825,7 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         /**
          * Construct the panel.
-         * 
+         *
          * @param networkPanel
          *            reference to parent network panel.
          */

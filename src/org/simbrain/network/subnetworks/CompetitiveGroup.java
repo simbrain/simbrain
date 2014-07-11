@@ -30,10 +30,10 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>Competitive</b> implements a simple competitive network.
- * 
+ *
  * Current implementations include Rummelhart-Zipser (PDP, 151-193), and
  * Alvarez-Squire 1994, PNAS, 7041-7045.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class CompetitiveGroup extends NeuronGroup {
@@ -100,7 +100,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Constructs a competitive network with specified number of neurons.
-     * 
+     *
      * @param numNeurons
      *            size of this network in neurons
      * @param root
@@ -181,7 +181,7 @@ public class CompetitiveGroup extends NeuronGroup {
      * 1994, eq 2. TODO: rate is unused... in fact everything before
      * "double deltaw = learningRate" (line 200 at time of writing) cannot
      * possibly change any variables in the class.
-     * 
+     *
      * @param neuron
      *            winning neuron.
      */
@@ -202,7 +202,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Update winning neuron's weights in accordance with PDP 1, p. 179.
-     * 
+     *
      * @param neuron
      *            winning neuron.
      */
@@ -238,7 +238,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Apply leaky learning to provided learning.
-     * 
+     *
      * @param neuron
      *            neuron to apply leaky learning to
      */
@@ -285,7 +285,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Randomize all weights coming in to this network.
-     * 
+     *
      * TODO: Add gaussian option...
      */
     public void randomizeIncomingWeights() {
@@ -300,7 +300,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Returns the sum of all incoming weights to this network.
-     * 
+     *
      * @return the sum of all incoming weights to this network.
      */
     private double getSummedIncomingWeights() {
@@ -322,7 +322,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return the learning rate.
-     * 
+     *
      * @return the learning rate
      */
     public double getLearningRate() {
@@ -331,7 +331,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets learning rate.
-     * 
+     *
      * @param rate
      *            The new epsilon value.
      */
@@ -341,7 +341,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return the loser value.
-     * 
+     *
      * @return the loser Value
      */
     public final double getLoseValue() {
@@ -350,7 +350,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets the loser value.
-     * 
+     *
      * @param loseValue
      *            The new loser value
      */
@@ -360,7 +360,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return the winner value.
-     * 
+     *
      * @return the winner value
      */
     public final double getWinValue() {
@@ -369,7 +369,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets the winner value.
-     * 
+     *
      * @param winValue
      *            The new winner value
      */
@@ -379,7 +379,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return leaky learning rate.
-     * 
+     *
      * @return Leaky learning rate
      */
     public double getLeakyLearningRate() {
@@ -388,7 +388,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets the leaky learning rate.
-     * 
+     *
      * @param leakyRate
      *            Leaky rate value to set
      */
@@ -398,7 +398,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return the normalize inputs value.
-     * 
+     *
      * @return the normailize inputs value
      */
     public boolean getNormalizeInputs() {
@@ -407,7 +407,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets the normalize inputs value.
-     * 
+     *
      * @param normalizeInputs
      *            Normalize inputs value to set
      */
@@ -417,7 +417,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Return the leaky learning value.
-     * 
+     *
      * @return the leaky learning value
      */
     public boolean getUseLeakyLearning() {
@@ -426,7 +426,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
     /**
      * Sets the leaky learning value.
-     * 
+     *
      * @param useLeakyLearning
      *            The leaky learning value to set
      */
@@ -468,7 +468,7 @@ public class CompetitiveGroup extends NeuronGroup {
      * Subclass of neuron group that simply adds a settable learning rate. For
      * use with competitive networks where it is desirable to have different
      * learning rates for different synapse groups.
-     * 
+     *
      * TODO: Generalize this for other cases, e.g. SOM.
      */
     public static class SynapseGroupWithLearningRate extends SynapseGroup {
@@ -478,7 +478,7 @@ public class CompetitiveGroup extends NeuronGroup {
 
         /**
          * Construct the synapse group with learning rate.
-         * 
+         *
          * @param net
          *            parent net
          * @param source

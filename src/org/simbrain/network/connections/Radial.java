@@ -29,9 +29,9 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius
  * from it, and make excitatory and inhibitory synapses with them.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 public class Radial extends DensityBasedConnector {
 
@@ -83,7 +83,7 @@ public class Radial extends DensityBasedConnector {
     private SynapseGroup synapseGroup;
 
     /**
-     * 
+     *
      * @param source
      * @param target
      * @param eeDistConst
@@ -146,7 +146,7 @@ public class Radial extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param source
      * @param target
      * @param distConst
@@ -195,7 +195,7 @@ public class Radial extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param eeDistConst
      * @param eiDistConst
      * @param ieDistConst
@@ -258,7 +258,7 @@ public class Radial extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param src
      * @param tar
      * @param distConst
@@ -277,7 +277,7 @@ public class Radial extends DensityBasedConnector {
     }
 
     /**
-     * 
+     *
      * @param n1
      * @param n2
      * @return

@@ -33,7 +33,7 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * This panel combines synapse editing sub-panels and handles changes to one
  * being applied to the others.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
@@ -64,7 +64,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * info panel and a synapse update settings panel. The panel is
      * automatically built and laid out, such that it is immediately ready for
      * display.
-     * 
+     *
      * @param synapseList
      *            the list of synapse synapses either being edited (editing) or
      *            being used to fill the panel with default values (creation).
@@ -83,7 +83,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * automatically built and laid out, such that it is immediately ready for
      * display. The setting panel's display state is that extra data is by
      * default hidden.
-     * 
+     *
      * @param synapseList
      *            the list of synapses either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -104,7 +104,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * {@link #createCombinedSynapseInfoPanel(List, Window, boolean)}
-     * 
+     *
      * @param synapseList
      *            the list of synapses either being edited (editing) or being
      *            used to fill the panel with default values (creation).
@@ -199,7 +199,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
 
     /**
      * Sets whether or not the basic synapse
-     * 
+     *
      * @param ignoreSetStrength
      */
     public void setIgnoreSetStrength(boolean ignoreSetStrength) {

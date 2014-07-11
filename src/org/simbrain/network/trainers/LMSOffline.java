@@ -29,8 +29,8 @@ import javax.swing.JOptionPane;
 
 import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
@@ -325,28 +325,28 @@ public class LMSOffline extends Trainer {
 //            Collections.shuffle(frequencies);
 //            for (int i = 0; i < samples; i++) {
 //                for (int j = 0; j < tPerSample; j++) {
-//                    
+//
 //                    sineWave[(i * tPerSample) + j] = Math.sin((j/10.0)
 //                            * frequencies.get(i));
 //                    System.out.println((j/100.0) * frequencies.get(i));
-//                    
+//
 //                }
 //            }
-//            
+//
 //            for (int i = 0; i < tPerSample * samples; i++) {
 //                pw.println(frequencies.get((int) Math.floor(i/tPerSample))
 //                        + "");
 //            }
-//            
+//
 //            fw.close();
 //            pw.close();
 //            FileWriter fw2 = new FileWriter("SinContTeach.csv");
 //            PrintWriter pw2 = new PrintWriter(fw2);
-//            
+//
 //            for (int i = 0; i < tPerSample * samples; i++) {
 //                pw2.println(sineWave[i] + "");
 //            }
-//            
+//
 //            pw2.close();
 //            fw2.close();
 //

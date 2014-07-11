@@ -28,9 +28,9 @@ import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
  * connections.
- * 
+ *
  * TODO: Currently not implemented pending refactor of Radial.java
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class RadialPanel extends AbstractConnectionPanel {
@@ -58,7 +58,7 @@ public class RadialPanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param connection
      *            type
      */

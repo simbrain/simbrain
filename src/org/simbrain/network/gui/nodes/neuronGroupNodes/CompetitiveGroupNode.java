@@ -21,7 +21,6 @@ package org.simbrain.network.gui.nodes.neuronGroupNodes;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.simbrain.network.gui.NetworkPanel;

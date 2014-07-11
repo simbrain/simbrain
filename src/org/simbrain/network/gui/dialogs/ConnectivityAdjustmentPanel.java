@@ -46,9 +46,9 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Panel for adjusting the connectivity between a source and target set of
  * neurons.
- * 
+ *
  * TODO: Not yet completed. This is temporary.
- * 
+ *
  */
 public class ConnectivityAdjustmentPanel extends JPanel {
 

@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition;
 
 /**
  * Set source neurons.

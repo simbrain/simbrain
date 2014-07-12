@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -189,7 +190,8 @@ public class KeyBindings {
                 panel.getActionManager().getTextEditModeAction());
 
         // Zoom mode
-        inputMap.put(KeyStroke.getKeyStroke("Z"), "altPress");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT,
+                KeyEvent.ALT_DOWN_MASK), "altPress");
         panel.getActionMap().put("altPress", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (panel.getEditMode().isZoomIn()) {

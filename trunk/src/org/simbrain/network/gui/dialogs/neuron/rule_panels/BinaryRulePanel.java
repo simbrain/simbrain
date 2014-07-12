@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
@@ -37,7 +37,7 @@ import org.simbrain.util.Utils;
  * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
  * neurons.
  */
-public class BinaryRulePanel extends AbstractNeuronPanel {
+public class BinaryRulePanel extends AbstractNeuronRulePanel {
 
     /** Threshold for this neuron. */
     private JTextField tfThreshold = new JTextField();

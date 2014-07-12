@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
@@ -40,7 +40,7 @@ import org.simbrain.util.Utils;
  * normalization was removed because it was both unused and had no accessor
  * methods in PointNeuronRule.
  */
-public class PointNeuronRulePanel extends AbstractNeuronPanel {
+public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
 
     /** Excitatory Reversal field. */
     private JTextField tfER = new JTextField();

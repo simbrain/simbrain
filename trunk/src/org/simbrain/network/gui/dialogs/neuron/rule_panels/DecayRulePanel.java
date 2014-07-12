@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.util.LabelledItemPanel;
@@ -44,7 +44,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 /**
  * <b>DecayNeuronPanel</b>.
  */
-public class DecayRulePanel extends AbstractNeuronPanel implements
+public class DecayRulePanel extends AbstractNeuronRulePanel implements
         ActionListener, PropertyChangeListener {
 
     /** Relative absolute combo box. */

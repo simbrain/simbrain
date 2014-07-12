@@ -41,7 +41,7 @@ import org.simbrain.network.gui.dialogs.layout.MainLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
-import org.simbrain.network.gui.dialogs.neuron.CombinedNeuronInfoPanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronPropertiesPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
@@ -199,7 +199,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         }
 
         combinedNeuronInfoPanel = ApplyPanel
-                .createApplyPanel(CombinedNeuronInfoPanel
+                .createApplyPanel(NeuronPropertiesPanel
                         .createCombinedNeuronInfoPanel(
                                 neuronGroup.getNeuronList(), parent));
 
@@ -248,7 +248,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
 
-            combinedNeuronInfoPanel = CombinedNeuronInfoPanel
+            combinedNeuronInfoPanel = NeuronPropertiesPanel
                     .createCombinedNeuronInfoPanel(neuronGroup.getNeuronList(),
                             parent);
 

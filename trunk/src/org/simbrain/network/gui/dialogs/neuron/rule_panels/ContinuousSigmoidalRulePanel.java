@@ -31,7 +31,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
@@ -46,7 +46,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  * @author zach
  *
  */
-public class ContinuousSigmoidalRulePanel extends AbstractNeuronPanel {
+public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
     /** Implementation combo box. */
     private JComboBox<SquashingFunction> cbImplementation =

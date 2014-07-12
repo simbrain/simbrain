@@ -54,7 +54,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  *
  */
 @SuppressWarnings("serial")
-public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
+public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
 
     /** Upper bound field. */
     private final JTextField tfCeiling = new JTextField();
@@ -102,10 +102,10 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /** Priority Field. */
     private final JTextField tfPriority = new JTextField();
 
-    /** Are upper and lower bounds visible? */
+    /** True if this neuron update rule implements BoundedUpdateRule interface. */
     private boolean boundsVisible;
 
-    /** Are upper and lower bounds enabled? */
+    /** True if the bounds text fields be enabled and clipping turned on. */
     private boolean boundsEnabled;
 
     /** Is clipping visible in this panel. */
@@ -132,12 +132,10 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Construct the panel representing the provided neurons.
      *
-     * @param neuronList
-     *            list of neurons to represent.
-     * @param parent
-     *            parent window so pack can be called
+     * @param neuronList list of neurons to represent.
+     * @param parent parent window so pack can be called
      */
-    public ExtendedNeuronInfoPanel(final List<Neuron> neuronList,
+    public NeuronPropertiesExtended(final List<Neuron> neuronList,
             final Window parent) {
         this.neuronList = neuronList;
         this.parent = parent;
@@ -212,8 +210,11 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         for (NeuronUpdateRule nur : ruleList) {
             // Does the upper bound of the first neuron equal the upper bound
             // of this one? upDiscrepancy is true if it does not.
-            upDiscrepancy = upBound != ((BoundedUpdateRule) nur)
-                    .getUpperBound();
+            if (upBound != ((BoundedUpdateRule) nur).getUpperBound()) {
+                upDiscrepancy = false;
+            } else {
+                upDiscrepancy = true;
+            }
             if (upDiscrepancy) { // There is at least one discrepancy
                                  // so we can't assign tfCeiling a value
                 break;
@@ -243,9 +244,12 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         boolean lowDiscrepancy = false;
         for (NeuronUpdateRule nur : ruleList) {
             // Does the lower bound of the first neuron equal the lower bound
-            // of this one? lowDiscrepancy is true if it does not.
-            lowDiscrepancy = lowBound != ((BoundedUpdateRule) nur)
-                    .getLowerBound();
+            // of this one?
+            if (lowBound != ((BoundedUpdateRule) nur).getLowerBound()) {
+                lowDiscrepancy = true;
+            } else {
+                lowDiscrepancy = false;
+            }
             if (lowDiscrepancy) { // There is at least one discrepancy
                                   // so we can't assign tfFloor a value
                 break;
@@ -277,7 +281,11 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
             // Is the first neuron clipped, but not this one? If so
             // there is a discrepancy and below code assigns true
             // to discrepancy.
-            discrepancy = clipped != ((ClippableUpdateRule) nur).isClipped();
+            if (clipped != ((ClippableUpdateRule) nur).isClipped()) {
+                discrepancy = true;
+            } else {
+                discrepancy = false;
+            }
             if (discrepancy) { // There is at least one discrepancy
                                // so we can't assign clipping a binary value
                 break;
@@ -356,8 +364,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Initialize the panel with default field values.
      *
-     * @param rule
-     *            rule to use for setting the default values.
+     * @param rule rule to use for setting the default values.
      */
     private void initializeDefaultValues(NeuronUpdateRule rule) {
         tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
@@ -371,8 +378,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * Update field visibility based on whether rule is bounded and/or clipped.
      *
-     * @param rule
-     *            the current rule
+     * @param rule the current rule
      */
     public void updateFieldVisibility(NeuronUpdateRule rule) {
         boolean bounded = rule instanceof BoundedUpdateRule;
@@ -398,11 +404,10 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
         if (boundsVisible) {
             // Clipping?
             if (!clipping.isNull() && clippingVisible) {
-                boolean clip = clipping.getSelectedIndex() == TristateDropDown
-                        .getTRUE();
+                boolean clippingSelected = clipping.isSelected();
                 for (int i = 0; i < numNeurons; i++) {
                     ((ClippableUpdateRule) neuronList.get(i).getUpdateRule())
-                            .setClipped(clip);
+                            .setClipped(clippingSelected);
                 }
             }
             if (boundsVisible && boundsEnabled) {
@@ -466,8 +471,7 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
 
         // Clamped
         if (!clamped.isNull()) {
-            boolean clamp = clamped.getSelectedIndex() == TristateDropDown
-                    .getTRUE();
+            boolean clamp = clamped.isSelected();
             for (int i = 0; i < numNeurons; i++) {
                 neuronList.get(i).setClamped(clamp);
             }
@@ -485,22 +489,26 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @param enabled
-     *            are upper and lower bounds fields enabled?
+     * Set the state of the clipping drop-down and upper / lower bound text
+     * fields to reflect whether bound are enabled or not. If they are enabled
+     * then the text fields should enabled and clipping should be turned on, and
+     * if not then the text fields should be disabled and clipping should be
+     * turned off.
+     *
+     * @param enabled are upper and lower bounds fields enabled?
      */
     public void setBoundsEnabled(boolean enabled) {
         boundsEnabled = enabled;
-        int t = TristateDropDown.getTRUE();
-        int f = TristateDropDown.getFALSE();
-        clipping.setSelectedIndex(boundsEnabled ? t : f);
+        clipping.setSelected(boundsEnabled);
         tfCeiling.setEnabled(enabled);
         tfFloor.setEnabled(enabled);
         repaint();
     }
 
     /**
-     * @param visible
-     *            are upper and lower bound fields visible?
+     * Whether or not to display the bounds sub-panel.
+     *
+     * @param visible are upper and lower bound fields visible?
      */
     public void setBoundsVisible(boolean visible) {
         boundsVisible = visible;
@@ -510,11 +518,9 @@ public class ExtendedNeuronInfoPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Properly repaints the panel when clipping and its label are made visible
-     * or invisible.
+     * Whether or not to display the clipping drop down.
      *
-     * @param visible
-     *            should the clipping stuff be visible or not
+     * @param visible should the clipping stuff be visible or not
      */
     public void setClippingVisible(boolean visible) {
         clippingVisible = visible;

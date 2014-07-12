@@ -27,14 +27,14 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.util.SimbrainConstants;
 
 /**
  * <b>StochasticNeuronPanel</b>.
  */
-public class StochasticGeneratorPanel extends AbstractNeuronPanel {
+public class StochasticGeneratorPanel extends AbstractNeuronRulePanel {
 
     /** Firing probability field. */
     private JTextField tfFiringProbability = new JTextField();

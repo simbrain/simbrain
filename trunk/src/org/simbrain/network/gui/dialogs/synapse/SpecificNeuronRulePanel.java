@@ -54,7 +54,7 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel {
+public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -65,13 +65,13 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
 
     /** Synapse type combo box. */
     private final JComboBox<String> cbSynapseType = new JComboBox<String>(
-        AbstractSynapsePanel.getRuleList());
+        AbstractSynapseRulePanel.getRuleList());
 
     /** The synapses being modified. */
     private final Collection<Synapse> synapseCollection;
 
     /** Synapse panel. */
-    private AbstractSynapsePanel synapsePanel;
+    private AbstractSynapseRulePanel synapsePanel;
 
     /** For showing/hiding the synapse panel. */
     private final DropDownTriangle displaySPTriangle;
@@ -82,7 +82,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      * sure that we are not editing synapse update rules, but rather are
      * replacing them.
      */
-    private final AbstractSynapsePanel startingPanel;
+    private final AbstractSynapseRulePanel startingPanel;
 
     /**
      * A reference to the parent window, for resizing after panel content
@@ -102,7 +102,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      *            the swing window within which this panel will be placed. Here
      *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SynapseUpdateSettingsPanel(Collection<Synapse> synapseList,
+    public SpecificNeuronRulePanel(Collection<Synapse> synapseList,
         final Window parent) {
         this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
@@ -122,7 +122,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      *            the swing window within which this panel will be placed. Here
      *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SynapseUpdateSettingsPanel(Collection<Synapse> synapseList,
+    public SpecificNeuronRulePanel(Collection<Synapse> synapseList,
         final Window parent, boolean startingState) {
         this.synapseCollection = synapseList;
         this.parent = parent;
@@ -201,7 +201,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                synapsePanel = AbstractSynapsePanel.RULE_MAP.get(cbSynapseType
+                synapsePanel = AbstractSynapseRulePanel.RULE_MAP.get(cbSynapseType
                     .getSelectedItem());
 
                 // Is the current panel different from the starting panel?
@@ -259,7 +259,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
             List<SynapseUpdateRule> synapseList = Synapse
                 .getRuleList(synapseCollection);
             String synapseName = synapseList.get(0).getDescription();
-            synapsePanel = AbstractSynapsePanel.RULE_MAP.get(synapseName);
+            synapsePanel = AbstractSynapseRulePanel.RULE_MAP.get(synapseName);
             synapsePanel.fillFieldValues(synapseList);
             cbSynapseType.setSelectedItem(synapseName);
         }
@@ -287,7 +287,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
     /**
      * @return the currently displayed synapse panel
      */
-    public AbstractSynapsePanel getSynapsePanel() {
+    public AbstractSynapseRulePanel getSynapsePanel() {
         return synapsePanel;
     }
 
@@ -296,7 +296,7 @@ public class SynapseUpdateSettingsPanel extends JPanel implements EditablePanel 
      *            set the currently displayed synapse panel to the specified
      *            panel
      */
-    public void setSynapsePanel(AbstractSynapsePanel synapsePanel) {
+    public void setSynapsePanel(AbstractSynapseRulePanel synapsePanel) {
         this.synapsePanel = synapsePanel;
     }
 

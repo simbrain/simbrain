@@ -47,7 +47,7 @@ public final class NeuronDialog extends StandardDialog {
      * A data panel containing both the basic neuron info and neuron update
      * settings.
      */
-    private CombinedNeuronInfoPanel neuronDataPanel;
+    private NeuronPropertiesPanel neuronDataPanel;
 
     /**
      * Help Button. Links to information about the currently selected neuron
@@ -70,7 +70,7 @@ public final class NeuronDialog extends StandardDialog {
     public static NeuronDialog createNeuronDialog(
             final Collection<NeuronNode> selectedNeurons) {
         NeuronDialog nd = new NeuronDialog(selectedNeurons);
-        nd.neuronDataPanel = CombinedNeuronInfoPanel
+        nd.neuronDataPanel = NeuronPropertiesPanel
                 .createCombinedNeuronInfoPanel(nd.neuronList, nd);
         nd.init();
         nd.addListeners();

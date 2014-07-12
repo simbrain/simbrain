@@ -48,7 +48,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  * Panel showing basic properties of a set of synapses, e.g. id, strength, and
  * whether it is enabled or not.
  */
-public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
+public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
 
     /** Id Label. */
     private final JLabel idLabel = new JLabel();
@@ -73,7 +73,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * The extra data panel. Includes: increment, upper bound, lower bound, and
      * priority.
      */
-    private final ExtendedSynapseInfoPanel extraDataPanel;
+    private final SynapsePropertiesExtended extraDataPanel;
 
     /**
      * A reference to the parent window, for resizing after panel content
@@ -104,7 +104,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      *            the parent window for dynamic resizing.
      * @return A basic synapse info panel with the specified parameters
      */
-    public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
+    public static SynapsePropertiesSimple createBasicSynapseInfoPanel(
         final Collection<Synapse> synapses, final Window parent) {
         boolean displayIDInfo = synapses != null && synapses.size() == 1;
         if (displayIDInfo) {
@@ -130,10 +130,10 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      *            whether or not to display ID info
      * @return A basic synapse info panel with the specified parameters
      */
-    public static BasicSynapseInfoPanel createBasicSynapseInfoPanel(
+    public static SynapsePropertiesSimple createBasicSynapseInfoPanel(
         final Collection<Synapse> synapses, final Window parent,
         final boolean displayIDInfo) {
-        BasicSynapseInfoPanel panel = new BasicSynapseInfoPanel(synapses,
+        SynapsePropertiesSimple panel = new SynapsePropertiesSimple(synapses,
             parent, displayIDInfo);
         panel.addListeners();
         return panel;
@@ -149,14 +149,14 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
      * @param displayIDInfo
      *            whether to display ids
      */
-    private BasicSynapseInfoPanel(final Collection<Synapse> synapseList,
+    private SynapsePropertiesSimple(final Collection<Synapse> synapseList,
         final Window parent, final boolean displayIDInfo) {
         this.synapseList = synapseList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
             "Less", parent);
-        extraDataPanel = new ExtendedSynapseInfoPanel(synapseList);
+        extraDataPanel = new SynapsePropertiesExtended(synapseList);
         initializeLayout();
         fillFieldValues();
     }
@@ -344,7 +344,7 @@ public class BasicSynapseInfoPanel extends JPanel implements EditablePanel {
     /**
      * @return the extraDataPanel
      */
-    public ExtendedSynapseInfoPanel getExtraDataPanel() {
+    public SynapsePropertiesExtended getExtraDataPanel() {
         return extraDataPanel;
     }
 

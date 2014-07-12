@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
@@ -35,7 +35,7 @@ import org.simbrain.util.Utils;
 /**
  * <b>ShortTermPlasticitySynapsePanel</b> allows users to edit STDP synapses.
  */
-public class STDPRulePanel extends AbstractSynapsePanel {
+public class STDPRulePanel extends AbstractSynapseRulePanel {
 
     /** Tau minus. */
     private final JTextField tfTauMinus = new JTextField();

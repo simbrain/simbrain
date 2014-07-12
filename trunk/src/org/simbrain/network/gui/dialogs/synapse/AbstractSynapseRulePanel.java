@@ -51,13 +51,13 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>AbstractSynapsePanel</b> is the parent class for all panels used to set
  * parameters of specific synapse update rules.
  */
-public abstract class AbstractSynapsePanel extends JPanel {
+public abstract class AbstractSynapseRulePanel extends JPanel {
 
     /**
      * A mapping of available update rules to their respective panels. Used as a
      * reference (especially for combo-boxes) by GUI classes.
      */
-    public static final LinkedHashMap<String, AbstractSynapsePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapsePanel>();
+    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapseRulePanel>();
 
     // Populate synapse rule map
     static {
@@ -120,7 +120,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * This method is the default constructor.
      */
-    public AbstractSynapsePanel() {
+    public AbstractSynapseRulePanel() {
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
     }

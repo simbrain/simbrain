@@ -24,7 +24,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.RunningAverageRule;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -32,7 +32,7 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>RunningAverageNeuronPanel</b> Unimplemented: Scheduled for deletion
  * pending discussion because rule model does not work.
  */
-public class RunningAverageRulePanel extends AbstractNeuronPanel {
+public class RunningAverageRulePanel extends AbstractNeuronRulePanel {
 
     /** Rate constant field. */
     private JTextField tfRateConstant = new JTextField();

@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 
 /**
  * <b>ClampedSynapsePanel</b>.
  */
-public class StaticSynapsePanel extends AbstractSynapsePanel {
+public class StaticSynapsePanel extends AbstractSynapseRulePanel {
 
     /** Synapse reference. */
     private static final StaticSynapseRule prototypeRule = new StaticSynapseRule();

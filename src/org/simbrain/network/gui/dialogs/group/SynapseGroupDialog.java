@@ -37,7 +37,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
-import org.simbrain.network.gui.dialogs.connect.SynapsePropertiesPanel;
+import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.StandardDialog;
@@ -78,7 +78,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     private JPanel summaryInfoPanel;
 
     /** Panel for editing synapses in the group. */
-    private SynapsePropertiesPanel editSynapsesPanel;
+    private ConnectionSynapsePropertiesPanel editSynapsesPanel;
 
     private ConnectionPanel connectionPanel;
 
@@ -210,7 +210,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         }
 
         // Tab for editing synapses
-        editSynapsesPanel = SynapsePropertiesPanel
+        editSynapsesPanel = ConnectionSynapsePropertiesPanel
             .createSynapsePropertiesPanel(this, synapseGroup);
         JScrollPane editSynapseScrollPane = new JScrollPane(
             ((EditablePanel) editSynapsesPanel).getPanel());
@@ -325,7 +325,6 @@ public final class SynapseGroupDialog extends StandardDialog {
         if (isCreationPanel) {
             connectionPanel.commitChanges(synapseGroup);
 
-            // TODO: Use the return value on commit changes?
             ((EditablePanel) summaryInfoPanel).commitChanges();
             ((EditablePanel) editSynapsesPanel).commitChanges();
             adjustmentPanel.commitChanges();

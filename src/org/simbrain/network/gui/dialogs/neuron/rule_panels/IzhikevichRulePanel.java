@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.util.LabelledItemPanel;
@@ -40,7 +40,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 /**
  * <b>IzhikevichNeuronPanel</b>.
  */
-public class IzhikevichRulePanel extends AbstractNeuronPanel {
+public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
 
     /** A field. */
     private JTextField tfA = new JTextField();

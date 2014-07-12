@@ -45,9 +45,9 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * Main panel for editing synapses.
      *
-     * @see org.simbrain.network.gui.dialogs.synapse.BasicSynapseInfoPanel.java
+     * @see org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesSimple.java
      */
-    private CombinedSynapseInfoPanel synapseEditingPanel;
+    private SynapsePropertiesPanel synapseEditingPanel;
 
     /**
      * Help Button. Links to information about the currently selected synapse
@@ -94,7 +94,7 @@ public final class SynapseDialog extends StandardDialog {
      */
     private SynapseDialog(final Collection<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
-        synapseEditingPanel = CombinedSynapseInfoPanel
+        synapseEditingPanel = SynapsePropertiesPanel
                 .createCombinedSynapseInfoPanel(synapseList, this);
         initializeLayout();
         updateHelp();

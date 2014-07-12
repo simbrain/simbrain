@@ -47,7 +47,7 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
+public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
@@ -65,7 +65,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
      * The extra data panel. Includes: increment, upper bound, lower bound, and
      * priority.
      */
-    private final ExtendedNeuronInfoPanel extraDataPanel;
+    private final NeuronPropertiesExtended extraDataPanel;
 
     /** The neurons being modified. */
     private final List<Neuron> neuronList;
@@ -97,7 +97,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
      * @param parent the parent window for dynamic resizing.
      * @return A basic neuron info panel with the specified parameters
      */
-    public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
+    public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
             final List<Neuron> neuronList, final Window parent) {
         return createBasicNeuronInfoPanel(neuronList, parent,
                 !(neuronList == null || neuronList.size() != 1));
@@ -116,10 +116,10 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
      * @param displayIDInfo whether or not to display ID info
      * @return A basic neuron info panel with the specified parameters
      */
-    public static BasicNeuronInfoPanel createBasicNeuronInfoPanel(
+    public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
             final List<Neuron> neuronList, final Window parent,
             final boolean displayIDInfo) {
-        BasicNeuronInfoPanel bnip = new BasicNeuronInfoPanel(neuronList,
+        NeuronPropertiesSimple bnip = new NeuronPropertiesSimple(neuronList,
                 parent, displayIDInfo);
         bnip.addListeners();
         return bnip;
@@ -131,14 +131,14 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
      * @param parent
      * @param displayIDInfo
      */
-    private BasicNeuronInfoPanel(final List<Neuron> neuronList,
+    private NeuronPropertiesSimple(final List<Neuron> neuronList,
             final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
                 "Less", parent);
-        extraDataPanel = new ExtendedNeuronInfoPanel(this.neuronList, parent);
+        extraDataPanel = new NeuronPropertiesExtended(this.neuronList, parent);
         initializeLayout();
         fillFieldValues();
     }
@@ -295,7 +295,7 @@ public class BasicNeuronInfoPanel extends JPanel implements EditablePanel {
     /**
      * @return the extraDataPanel
      */
-    public ExtendedNeuronInfoPanel getExtraDataPanel() {
+    public NeuronPropertiesExtended getExtraDataPanel() {
         return extraDataPanel;
     }
 

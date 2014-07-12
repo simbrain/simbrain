@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
@@ -37,7 +37,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 /**
  * <b>HebbianThresholdSynapsePanel</b>.
  */
-public class HebbianThresholdRulePanel extends AbstractSynapsePanel {
+public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
 
     /** Learning rate field. */
     private final JTextField tfLearningRate = new JTextField();

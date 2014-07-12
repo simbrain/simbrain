@@ -39,7 +39,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * @author ztosi
  */
 @SuppressWarnings("serial")
-public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
+public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * The default vertical gap between the basic neuron info panel and the
@@ -54,10 +54,10 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
     private static final boolean DEFAULT_NUSP_DISPLAY_STATE = false;
 
     /** The basic neuron info panel. */
-    private BasicNeuronInfoPanel neuronInfoPanel;
+    private NeuronPropertiesSimple neuronInfoPanel;
 
     /** The neuron update settings panel. */
-    private NeuronUpdateSettingsPanel updateInfoPanel;
+    private SpecificNeuronRulePanel updateInfoPanel;
 
     /**
      * Creates a combined neuron info panel, which includes the basic neuron
@@ -70,7 +70,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      * @param parent
      *            the parent window, made available for easy resizing.
      */
-    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+    public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
             final List<Neuron> neuronList, final Window parent) {
         return createCombinedNeuronInfoPanel(neuronList, parent,
                 DEFAULT_NUSP_DISPLAY_STATE);
@@ -92,10 +92,10 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      *            whether or not to display the neuron update rule's details
      *            initially
      */
-    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+    public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
             final List<Neuron> neuronList, final Window parent,
             final boolean nuspExtendedDisplay) {
-        CombinedNeuronInfoPanel cnip = new CombinedNeuronInfoPanel(neuronList,
+        NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList,
                 parent, nuspExtendedDisplay);
         cnip.initializeLayout();
         cnip.addListeners();
@@ -123,10 +123,10 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      *            manually sets whether or not neuron id information is
      *            displayed. rule's details initially
      */
-    public static CombinedNeuronInfoPanel createCombinedNeuronInfoPanel(
+    public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
             final List<Neuron> neuronList, final Window parent,
             final boolean nuspExtendedDisplay, final boolean displayIDInfo) {
-        CombinedNeuronInfoPanel cnip = new CombinedNeuronInfoPanel(neuronList,
+        NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList,
                 parent, nuspExtendedDisplay, displayIDInfo);
         cnip.initializeLayout();
         cnip.addListeners();
@@ -145,11 +145,11 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      *            whether or not to display the neuron update rule's details
      *            initially
      */
-    private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
+    private NeuronPropertiesPanel(final List<Neuron> neuronList,
             final Window parent, final boolean nuspExtendedDisplay) {
-        neuronInfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+        neuronInfoPanel = NeuronPropertiesSimple.createBasicNeuronInfoPanel(
                 neuronList, parent);
-        updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
+        updateInfoPanel = new SpecificNeuronRulePanel(neuronList, parent,
                 nuspExtendedDisplay);
     }
 
@@ -167,12 +167,12 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
      *            manually sets whether or not neuron id information is
      *            displayed. rule's details initially
      */
-    private CombinedNeuronInfoPanel(final List<Neuron> neuronList,
+    private NeuronPropertiesPanel(final List<Neuron> neuronList,
             final Window parent, final boolean nuspExtendedDisplay,
             final boolean displayIDInfo) {
-        neuronInfoPanel = BasicNeuronInfoPanel.createBasicNeuronInfoPanel(
+        neuronInfoPanel = NeuronPropertiesSimple.createBasicNeuronInfoPanel(
                 neuronList, parent, displayIDInfo);
-        updateInfoPanel = new NeuronUpdateSettingsPanel(neuronList, parent,
+        updateInfoPanel = new SpecificNeuronRulePanel(neuronList, parent,
                 nuspExtendedDisplay);
     }
 
@@ -202,7 +202,7 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                AbstractNeuronPanel np = updateInfoPanel
+                                AbstractNeuronRulePanel np = updateInfoPanel
                                         .getNeuronPanel();
                                 neuronInfoPanel.getExtraDataPanel()
                                         .updateFieldVisibility(
@@ -248,19 +248,19 @@ public class CombinedNeuronInfoPanel extends JPanel implements EditablePanel {
         return this;
     }
 
-    public BasicNeuronInfoPanel getNeuroninfoPanel() {
+    public NeuronPropertiesSimple getNeuroninfoPanel() {
         return neuronInfoPanel;
     }
 
-    public void setNeuroninfoPanel(BasicNeuronInfoPanel neuroninfoPanel) {
+    public void setNeuroninfoPanel(NeuronPropertiesSimple neuroninfoPanel) {
         this.neuronInfoPanel = neuroninfoPanel;
     }
 
-    public NeuronUpdateSettingsPanel getUpdateInfoPanel() {
+    public SpecificNeuronRulePanel getUpdateInfoPanel() {
         return updateInfoPanel;
     }
 
-    public void setUpdateInfoPanel(NeuronUpdateSettingsPanel updateInfoPanel) {
+    public void setUpdateInfoPanel(SpecificNeuronRulePanel updateInfoPanel) {
         this.updateInfoPanel = updateInfoPanel;
     }
 

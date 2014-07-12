@@ -26,14 +26,14 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 
 /**
  * <b>LogisticNeuronPanel</b> TODO: Work into new Input Generator Framework,
  * currently no implementation.
  */
-public class LogisticGeneratorPanel extends AbstractNeuronPanel {
+public class LogisticGeneratorPanel extends AbstractNeuronRulePanel {
 
     /** Growth rate field. */
     private JTextField tfGrowthRate = new JTextField();

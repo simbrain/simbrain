@@ -38,7 +38,7 @@ import javax.swing.border.Border;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.dialogs.synapse.CombinedSynapseInfoPanel;
+import org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesPanel;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -50,19 +50,19 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
+public class ConnectionSynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * A synapse info panel containing basic synapse properties and synapse
      * update rule properties for excitatory synapses.
      */
-    private CombinedSynapseInfoPanel excitatoryInfoPanel;
+    private SynapsePropertiesPanel excitatoryInfoPanel;
 
     /**
      * A synapse info panel containing basic synapse properties and synapse
      * update rule properties for inhibitory synapses.
      */
-    private CombinedSynapseInfoPanel inhibitoryInfoPanel;
+    private SynapsePropertiesPanel inhibitoryInfoPanel;
 
     /** The apply button for editing associated with excitatory synapses. */
     private JButton exApplyButton = new JButton("Apply");
@@ -97,9 +97,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param synapseGroup
      * @return
      */
-    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
         final Window parent, final SynapseGroup synapseGroup) {
-        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent,
+        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent,
             synapseGroup);
         spp.initApplyListeners();
         return spp;
@@ -111,9 +111,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param synapses
      * @return
      */
-    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
         final Window parent, final Collection<Synapse> synapses) {
-        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent,
+        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent,
             synapses);
         spp.initApplyListeners();
         return spp;
@@ -125,9 +125,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param synapses
      * @return
      */
-    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
+    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
         final Window parent) {
-        SynapsePropertiesPanel spp = new SynapsePropertiesPanel(parent);
+        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent);
         spp.initApplyListeners();
         return spp;
     }
@@ -137,7 +137,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param parentWindow
      * @param synapseGroup
      */
-    private SynapsePropertiesPanel(final Window parentWindow,
+    private ConnectionSynapsePropertiesPanel(final Window parentWindow,
         final SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
         creationPanel = synapseGroup.isEmpty();
@@ -151,9 +151,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         inhibitorySynapses = synapseGroup.hasInhibitory()
             ? synapseGroup.getInhibitorySynapses()
             : Collections.singleton(synapseGroup.getInhibitoryPrototype());
-        excitatoryInfoPanel = CombinedSynapseInfoPanel
+        excitatoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+        inhibitoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
         init();
     }
@@ -163,7 +163,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param parentWindow
      * @param synapses
      */
-    private SynapsePropertiesPanel(final Window parentWindow,
+    private ConnectionSynapsePropertiesPanel(final Window parentWindow,
         final Collection<Synapse> synapses) {
         synapseGroup = null;
         templateExcitatorySynapse = Synapse.getTemplateSynapse();
@@ -182,9 +182,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
             inhibitorySynapses = Collections.singleton(
                 getTemplateInhibitorySynapse());
         }
-        excitatoryInfoPanel = CombinedSynapseInfoPanel
+        excitatoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+        inhibitoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
         init();
     }
@@ -195,7 +195,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param parentWindow
      * @param synapses
      */
-    private SynapsePropertiesPanel(final Window parentWindow) {
+    private ConnectionSynapsePropertiesPanel(final Window parentWindow) {
         synapseGroup = null;
         creationPanel = true;
         templateExcitatorySynapse = Synapse.getTemplateSynapse();
@@ -210,9 +210,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
             getTemplateExcitatorySynapse());
         inhibitorySynapses = Collections.singleton(
             getTemplateInhibitorySynapse());
-        excitatoryInfoPanel = CombinedSynapseInfoPanel
+        excitatoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = CombinedSynapseInfoPanel
+        inhibitoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
         init();
     }

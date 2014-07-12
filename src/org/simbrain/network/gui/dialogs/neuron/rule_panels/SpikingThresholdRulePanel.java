@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
@@ -37,7 +37,7 @@ import org.simbrain.util.Utils;
  * <b>ProbabilisticSpikingNeuronPanel</b>. TODO: Deactivated until discussion
  * about "SpikingNeuronUpdateRule".
  */
-public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
+public class SpikingThresholdRulePanel extends AbstractNeuronRulePanel {
 
     /** Time step field. */
     private JTextField tfThreshold = new JTextField();

@@ -40,7 +40,7 @@ import org.simbrain.util.widgets.TristateDropDown;
  * @author Zach Tosi
  *
  */
-public class ExtendedSynapseInfoPanel extends JPanel {
+public class SynapsePropertiesExtended extends JPanel {
 
     /** Freeze synapse field. */
     private TristateDropDown frozenDD = new TristateDropDown();
@@ -65,7 +65,7 @@ public class ExtendedSynapseInfoPanel extends JPanel {
      * @param synapseList
      *            The list of synapses being edited.
      */
-    public ExtendedSynapseInfoPanel(final Collection<Synapse> synapseList) {
+    public SynapsePropertiesExtended(final Collection<Synapse> synapseList) {
         fillFieldValues(synapseList);
         initializeLayout();
     }

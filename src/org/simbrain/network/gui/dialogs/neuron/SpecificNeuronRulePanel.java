@@ -52,7 +52,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * @author jyoshimi
  */
 @SuppressWarnings("serial")
-public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
+public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
@@ -68,13 +68,13 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
     private final JComboBox<String> cbNeuronType;
 
     /** Associations between names of rules and panels for editing them. */
-    private final LinkedHashMap<String, AbstractNeuronPanel> ruleMap;
+    private final LinkedHashMap<String, AbstractNeuronRulePanel> ruleMap;
 
     /** The neurons being modified. */
     private final List<Neuron> neuronList;
 
     /** Neuron panel. */
-    private AbstractNeuronPanel neuronPanel;
+    private AbstractNeuronRulePanel neuronPanel;
 
     /** For showing/hiding the neuron panel. */
     public final DropDownTriangle displayNPTriangle;
@@ -90,7 +90,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      * writing to already existing neuron update rules or replacing them with
      * new rules.
      */
-    private final AbstractNeuronPanel startingPanel;
+    private final AbstractNeuronRulePanel startingPanel;
 
     /**
      * Create a the panel with the default starting visibility (visible) for the
@@ -101,7 +101,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      * @param parent
      *            the parent window referenced for resizing purposes
      */
-    public NeuronUpdateSettingsPanel(List<Neuron> neuronList, Window parent) {
+    public SpecificNeuronRulePanel(List<Neuron> neuronList, Window parent) {
         this(neuronList, parent, DEFAULT_NP_DISPLAY_STATE);
     }
 
@@ -116,12 +116,12 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      *            the starting state of whether or not details of the rule are
      *            initially visible
      */
-    public NeuronUpdateSettingsPanel(List<Neuron> neuronList, Window parent,
+    public SpecificNeuronRulePanel(List<Neuron> neuronList, Window parent,
             boolean startingState) {
         this.neuronList = neuronList;
         this.parent = parent;
-        ruleMap = AbstractNeuronPanel.RULE_MAP;
-        cbNeuronType = new JComboBox<String>(AbstractNeuronPanel.getRulelist());
+        ruleMap = AbstractNeuronRulePanel.RULE_MAP;
+        cbNeuronType = new JComboBox<String>(AbstractNeuronRulePanel.getRulelist());
         displayNPTriangle = new DropDownTriangle(UpDirection.LEFT,
                 startingState, "Settings", "Settings", parent);
         initNeuronType();
@@ -278,7 +278,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
      * @return the currently displayed neuron update rule panel
      */
-    public AbstractNeuronPanel getNeuronPanel() {
+    public AbstractNeuronRulePanel getNeuronPanel() {
         return neuronPanel;
     }
 
@@ -286,7 +286,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      * @param neuronPanel
      *            the desired neuron update rule panel to be displayed
      */
-    public void setNeuronPanel(AbstractNeuronPanel neuronPanel) {
+    public void setNeuronPanel(AbstractNeuronRulePanel neuronPanel) {
         this.neuronPanel = neuronPanel;
     }
 
@@ -311,7 +311,7 @@ public class NeuronUpdateSettingsPanel extends JPanel implements EditablePanel {
      *
      * @author ztosi
      */
-    private class EmptyRulePanel extends AbstractNeuronPanel {
+    private class EmptyRulePanel extends AbstractNeuronRulePanel {
 
         @Override
         public void fillFieldValues(List<NeuronUpdateRule> ruleList) {

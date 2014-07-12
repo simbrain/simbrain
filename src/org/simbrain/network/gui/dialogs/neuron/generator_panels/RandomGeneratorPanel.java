@@ -22,13 +22,13 @@ import java.util.List;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronPanel;
+import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 
 /**
  * <b>RandomNeuronPanel</b> Currently unimplemented pending decisions about
  * changing random neurons into "input generators".
  */
-public class RandomGeneratorPanel extends AbstractNeuronPanel {
+public class RandomGeneratorPanel extends AbstractNeuronRulePanel {
 
     // /** Random pane. */
     // private RandomizerPanel rp = new RandomizerPanel();

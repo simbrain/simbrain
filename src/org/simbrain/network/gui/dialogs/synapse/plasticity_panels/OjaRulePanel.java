@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.synapse.AbstractSynapsePanel;
+import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.OjaRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
@@ -35,7 +35,7 @@ import org.simbrain.util.Utils;
 /**
  * <b>OjaSynapsePanel</b>.
  */
-public class OjaRulePanel extends AbstractSynapsePanel {
+public class OjaRulePanel extends AbstractSynapseRulePanel {
 
     /** Learning rate field. */
     private final JTextField tfLearningRate = new JTextField();

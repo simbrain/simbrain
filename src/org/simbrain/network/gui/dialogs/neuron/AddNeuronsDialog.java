@@ -98,7 +98,7 @@ public class AddNeuronsDialog extends StandardDialog {
      * The panel containing basic information on the neurons as well as options
      * for setting their update rule and its parameters.
      */
-    private CombinedNeuronInfoPanel combinedNeuronInfoPanel;
+    private NeuronPropertiesPanel combinedNeuronInfoPanel;
 
     /** A panel where layout settings can be edited. */
     private MainLayoutPanel selectLayout;
@@ -122,7 +122,7 @@ public class AddNeuronsDialog extends StandardDialog {
     public static AddNeuronsDialog createAddNeuronsDialog(
             final NetworkPanel networkPanel) {
         final AddNeuronsDialog addND = new AddNeuronsDialog(networkPanel);
-        addND.combinedNeuronInfoPanel = CombinedNeuronInfoPanel
+        addND.combinedNeuronInfoPanel = NeuronPropertiesPanel
                 .createCombinedNeuronInfoPanel(
                         Collections.singletonList(addND.baseNeuron), addND,
                         false, false);

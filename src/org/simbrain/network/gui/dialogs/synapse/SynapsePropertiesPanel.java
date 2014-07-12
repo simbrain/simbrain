@@ -37,7 +37,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
-public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
+public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     /**
      * The default vertical gap between the basic synapse info panel and the
@@ -51,10 +51,10 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
     private static final boolean DEFAULT_DISPLAY_PARAMS = false;
 
     /** The basic synapse info panel. */
-    private BasicSynapseInfoPanel synapseInfoPanel;
+    private SynapsePropertiesSimple synapseInfoPanel;
 
     /** The synapse update settings panel. */
-    private SynapseUpdateSettingsPanel updateInfoPanel;
+    private SpecificNeuronRulePanel updateInfoPanel;
 
     /** Panel to edit spike responders. */
     private SpikeResponderSettingsPanel editSpikeResponders;
@@ -71,7 +71,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * @param parent
      *            the parent window, made available for easy resizing.
      */
-    public static CombinedSynapseInfoPanel createCombinedSynapseInfoPanel(
+    public static SynapsePropertiesPanel createCombinedSynapseInfoPanel(
         final Collection<Synapse> synapseList, final Window parent) {
         return createCombinedSynapseInfoPanel(synapseList, parent,
             DEFAULT_DISPLAY_PARAMS);
@@ -93,10 +93,10 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      *            whether or not to display the synapse update rule's details
      *            initially
      */
-    public static CombinedSynapseInfoPanel createCombinedSynapseInfoPanel(
+    public static SynapsePropertiesPanel createCombinedSynapseInfoPanel(
         final Collection<Synapse> synapseList, final Window parent,
         final boolean showSpecificRuleParams) {
-        CombinedSynapseInfoPanel cnip = new CombinedSynapseInfoPanel(
+        SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
             synapseList, parent, showSpecificRuleParams);
         cnip.initializeLayout();
         return cnip;
@@ -114,11 +114,11 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      *            whether or not to display the synapse update rule's details
      *            initially.
      */
-    private CombinedSynapseInfoPanel(final Collection<Synapse> synapseList,
+    private SynapsePropertiesPanel(final Collection<Synapse> synapseList,
         final Window parent, final boolean showSpecificRuleParams) {
-        synapseInfoPanel = BasicSynapseInfoPanel.createBasicSynapseInfoPanel(
+        synapseInfoPanel = SynapsePropertiesSimple.createBasicSynapseInfoPanel(
             synapseList, parent);
-        updateInfoPanel = new SynapseUpdateSettingsPanel(synapseList, parent,
+        updateInfoPanel = new SpecificNeuronRulePanel(synapseList, parent,
             showSpecificRuleParams);
         if (SynapseDialog.containsASpikeResponder(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
@@ -185,7 +185,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
     /**
      * @return the updateInfoPanel
      */
-    public SynapseUpdateSettingsPanel getUpdateInfoPanel() {
+    public SpecificNeuronRulePanel getUpdateInfoPanel() {
         return updateInfoPanel;
     }
 
@@ -193,7 +193,7 @@ public class CombinedSynapseInfoPanel extends JPanel implements EditablePanel {
      * @param updateInfoPanel
      *            the updateInfoPanel to set
      */
-    public void setUpdateInfoPanel(SynapseUpdateSettingsPanel updateInfoPanel) {
+    public void setUpdateInfoPanel(SpecificNeuronRulePanel updateInfoPanel) {
         this.updateInfoPanel = updateInfoPanel;
     }
 

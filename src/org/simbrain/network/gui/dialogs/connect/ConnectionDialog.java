@@ -53,7 +53,7 @@ public class ConnectionDialog extends StandardDialog {
 
     private JPanel mainPanel;
 
-    private SynapsePropertiesPanel propertiesPanel;
+    private ConnectionSynapsePropertiesPanel propertiesPanel;
 
     private SynapsePolarityAndRandomizerPanel eirPanel;
 
@@ -93,7 +93,7 @@ public class ConnectionDialog extends StandardDialog {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(connectionPanel);
-        propertiesPanel = SynapsePropertiesPanel
+        propertiesPanel = ConnectionSynapsePropertiesPanel
             .createSynapsePropertiesPanel(this);
         mainPanel.add(propertiesPanel);
         eirPanel = SynapsePolarityAndRandomizerPanel

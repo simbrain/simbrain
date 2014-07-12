@@ -67,11 +67,11 @@ import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRu
  * for large numbers of neurons.
  */
 @SuppressWarnings("serial")
-public abstract class AbstractNeuronPanel extends JPanel {
+public abstract class AbstractNeuronRulePanel extends JPanel {
 
     /** Associations between names of rules and panels for editing them. */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> RULE_MAP =
-        new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronRulePanel> RULE_MAP =
+        new LinkedHashMap<String, AbstractNeuronRulePanel>();
 
     // Populate the Rule Map
     static {
@@ -99,8 +99,8 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * Associations between names of activity generators and panels for editing
      * them.
      */
-    public static final LinkedHashMap<String, AbstractNeuronPanel> GENERATOR_MAP =
-        new LinkedHashMap<String, AbstractNeuronPanel>();
+    public static final LinkedHashMap<String, AbstractNeuronRulePanel> GENERATOR_MAP =
+        new LinkedHashMap<String, AbstractNeuronRulePanel>();
 
     // Populate the Generator Map
     static {
@@ -128,7 +128,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * This method is the default constructor.
      */
-    public AbstractNeuronPanel() {
+    public AbstractNeuronRulePanel() {
         this.setLayout(new BorderLayout());
     }
 

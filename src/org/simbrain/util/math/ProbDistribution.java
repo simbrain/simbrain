@@ -36,58 +36,104 @@ import umontreal.iro.lecuyer.rng.WELL1024;
 
 public enum ProbDistribution {
 
-    UNIFORM {
+    EXPONENTIAL {
 
-        /**
-         * @param floor
-         *            the lowest value of the interval
-         * @param ceil
-         *            the highest value of the interval
-         */
         @Override
-        public double nextRand(double floor, double ceil) {
-            return UniformGen.nextDouble(DEFAULT_RANDOM_STREAM, floor, ceil);
-        }
-
-        /**
-         * @param floor
-         *            the lowest value of the interval
-         * @param ceil
-         *            the highest value of the interval
-         */
-        @Override
-        public int nextRandInt(int floor, int ceil) {
-            return (int) nextRand(floor, ceil);
+        public double nextRand(double lambda, double nullVar) {
+            return ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda);
         }
 
         @Override
-        public UniformDist getBestFit(double[] observations, int numObs) {
-            return UniformDist.getInstanceFromMLE(observations, numObs);
+        public int nextRandInt(int lambda, int nullVar) {
+            return (int) nextRand(lambda, nullVar);
+        }
+
+        @Override
+        public Distribution getBestFit(double[] observations, int numObs) {
+            return ExponentialDist.getInstanceFromMLE(observations, numObs);
         }
 
         @Override
         public double[] getBestFitParams(double[] observations, int numObs) {
-            return UniformDist.getMLE(observations, numObs);
+            return ExponentialDist.getMLE(observations, numObs);
         }
 
         @Override
         public String toString() {
-            return "Uniform";
+            return "Exponential";
         }
 
         @Override
         public String getParam1Name() {
-            return "Floor";
+            return "Rate (\u03BB)";
         }
 
         @Override
         public String getParam2Name() {
-            return "Ceiling";
+            return null;
         }
 
         @Override
         public double getDefaultParam1() {
+            return 1;
+        }
+
+        @Override
+        public double getDefaultParam2() {
+            return Double.NaN;
+        }
+
+        @Override
+        public double getDefaultUpBound() {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        @Override
+        public double getDefaultLowBound() {
             return 0;
+        }
+
+    },
+    GAMMA {
+
+        @Override
+        public double nextRand(double shape, double scale) {
+            return GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale);
+        }
+
+        @Override
+        public int nextRandInt(int shape, int scale) {
+            return (int) nextRand(shape, scale);
+        }
+
+        @Override
+        public Distribution getBestFit(double[] observations, int numObs) {
+            return GammaDist.getInstanceFromMLE(observations, numObs);
+        }
+
+        @Override
+        public double[] getBestFitParams(double[] observations, int numObs) {
+            return GammaDist.getMLE(observations, numObs);
+        }
+
+        @Override
+        public String toString() {
+            return "Gamma";
+        }
+
+        @Override
+        public String getParam1Name() {
+            return "Shape (k)";
+        }
+
+        @Override
+        public String getParam2Name() {
+            return "Scale (\u03B8)";
+        }
+
+        @Override
+        public double getDefaultParam1() {
+            return 2;
         }
 
         @Override
@@ -97,7 +143,73 @@ public enum ProbDistribution {
 
         @Override
         public double getDefaultUpBound() {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        @Override
+        public double getDefaultLowBound() {
+            return 0;
+        }
+
+    },
+    LOGNORMAL {
+
+        @Override
+        public double nextRand(double mean, double std) {
+            // Convert mean and std so that they are the mean and
+            // standard deviation of the resulting lognormal distribution
+            // rather than the mean and standard deviation of the normal
+            // distribution beneath it.
+            double mos = std / mean;
+            double correctedStd = Math.sqrt(Math.log((mos * mos) + 1));
+            double correctedMean = Math.log(mean / correctedStd);
+            return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM,
+                correctedMean, correctedStd);
+        }
+
+        @Override
+        public int nextRandInt(int mean, int std) {
+            return (int) nextRand(mean, std);
+        }
+
+        @Override
+        public Distribution getBestFit(double[] observations, int numObs) {
+            return LognormalDist.getInstanceFromMLE(observations, numObs);
+        }
+
+        @Override
+        public double[] getBestFitParams(double[] observations, int numObs) {
+            return LognormalDist.getMLE(observations, numObs);
+        }
+
+        @Override
+        public String toString() {
+            return "Log-Normal";
+        }
+
+        @Override
+        public String getParam1Name() {
+            return "Mean (\u03BC)";
+        }
+
+        @Override
+        public String getParam2Name() {
+            return "Std. Dev. (\u03C3)";
+        }
+
+        @Override
+        public double getDefaultParam1() {
             return 1;
+        }
+
+        @Override
+        public double getDefaultParam2() {
+            return 0.5;
+        }
+
+        @Override
+        public double getDefaultUpBound() {
+            return Double.POSITIVE_INFINITY;
         }
 
         @Override
@@ -176,188 +288,6 @@ public enum ProbDistribution {
         }
 
     },
-    GAMMA {
-
-        @Override
-        public double nextRand(double shape, double scale) {
-            return GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale);
-        }
-
-        @Override
-        public int nextRandInt(int shape, int scale) {
-            return (int) nextRand(shape, scale);
-        }
-
-        @Override
-        public Distribution getBestFit(double[] observations, int numObs) {
-            return GammaDist.getInstanceFromMLE(observations, numObs);
-        }
-
-        @Override
-        public double[] getBestFitParams(double[] observations, int numObs) {
-            return GammaDist.getMLE(observations, numObs);
-        }
-
-        @Override
-        public String toString() {
-            return "Gamma";
-        }
-
-        @Override
-        public String getParam1Name() {
-            return "Shape (k)";
-        }
-
-        @Override
-        public String getParam2Name() {
-            return "Scale (\u03B8)";
-        }
-
-        @Override
-        public double getDefaultParam1() {
-            return 2;
-        }
-
-        @Override
-        public double getDefaultParam2() {
-            return 1;
-        }
-
-        @Override
-        public double getDefaultUpBound() {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        @Override
-        public double getDefaultLowBound() {
-            return 0;
-        }
-
-    },
-    LOGNORMAL {
-
-        @Override
-        public double nextRand(double mean, double std) {
-            // Convert mean and std so that they are the mean and
-            // standard deviation of the resulting lognormal distribution
-            // rather than the mean and standard deviation of the normal
-            // distribution beneath it.
-            double mos = std / mean;
-            double correctedStd = Math.sqrt(Math.log((mos * mos) + 1));
-            double correctedMean = Math.log(mean / correctedStd);
-            return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM,
-                    correctedMean, correctedStd);
-        }
-
-        @Override
-        public int nextRandInt(int mean, int std) {
-            return (int) nextRand(mean, std);
-        }
-
-        @Override
-        public Distribution getBestFit(double[] observations, int numObs) {
-            return LognormalDist.getInstanceFromMLE(observations, numObs);
-        }
-
-        @Override
-        public double[] getBestFitParams(double[] observations, int numObs) {
-            return LognormalDist.getMLE(observations, numObs);
-        }
-
-        @Override
-        public String toString() {
-            return "Log-Normal";
-        }
-
-        @Override
-        public String getParam1Name() {
-            return "Mean (\u03BC)";
-        }
-
-        @Override
-        public String getParam2Name() {
-            return "Std. Dev. (\u03C3)";
-        }
-
-        @Override
-        public double getDefaultParam1() {
-            return 1;
-        }
-
-        @Override
-        public double getDefaultParam2() {
-            return 0.5;
-        }
-
-        @Override
-        public double getDefaultUpBound() {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        @Override
-        public double getDefaultLowBound() {
-            return 0;
-        }
-
-    },
-    EXPONENTIAL {
-
-        @Override
-        public double nextRand(double lambda, double nullVar) {
-            return ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda);
-        }
-
-        @Override
-        public int nextRandInt(int lambda, int nullVar) {
-            return (int) nextRand(lambda, nullVar);
-        }
-
-        @Override
-        public Distribution getBestFit(double[] observations, int numObs) {
-            return ExponentialDist.getInstanceFromMLE(observations, numObs);
-        }
-
-        @Override
-        public double[] getBestFitParams(double[] observations, int numObs) {
-            return ExponentialDist.getMLE(observations, numObs);
-        }
-
-        @Override
-        public String toString() {
-            return "Exponential";
-        }
-
-        @Override
-        public String getParam1Name() {
-            return "Rate (\u03BB)";
-        }
-
-        @Override
-        public String getParam2Name() {
-            return null;
-        }
-
-        @Override
-        public double getDefaultParam1() {
-            return 1;
-        }
-
-        @Override
-        public double getDefaultParam2() {
-            return Double.NaN;
-        }
-
-        @Override
-        public double getDefaultUpBound() {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        @Override
-        public double getDefaultLowBound() {
-            return 0;
-        }
-
-    },
     PARETO {
 
         @Override
@@ -415,6 +345,76 @@ public enum ProbDistribution {
             return getDefaultParam2();
         }
 
+    },
+    UNIFORM {
+
+        /**
+         * @param floor
+         *            the lowest value of the interval
+         * @param ceil
+         *            the highest value of the interval
+         */
+        @Override
+        public double nextRand(double floor, double ceil) {
+            return UniformGen.nextDouble(DEFAULT_RANDOM_STREAM, floor, ceil);
+        }
+
+        /**
+         * @param floor
+         *            the lowest value of the interval
+         * @param ceil
+         *            the highest value of the interval
+         */
+        @Override
+        public int nextRandInt(int floor, int ceil) {
+            return (int) nextRand(floor, ceil);
+        }
+
+        @Override
+        public UniformDist getBestFit(double[] observations, int numObs) {
+            return UniformDist.getInstanceFromMLE(observations, numObs);
+        }
+
+        @Override
+        public double[] getBestFitParams(double[] observations, int numObs) {
+            return UniformDist.getMLE(observations, numObs);
+        }
+
+        @Override
+        public String toString() {
+            return "Uniform";
+        }
+
+        @Override
+        public String getParam1Name() {
+            return "Floor";
+        }
+
+        @Override
+        public String getParam2Name() {
+            return "Ceiling";
+        }
+
+        @Override
+        public double getDefaultParam1() {
+            return 0;
+        }
+
+        @Override
+        public double getDefaultParam2() {
+            return 1;
+        }
+
+        @Override
+        public double getDefaultUpBound() {
+            return 1;
+        }
+
+        @Override
+        public double getDefaultLowBound() {
+            return 0;
+        }
+
     };
 
     // POISSON { //TODO: Move somewhere else, because of single parameter and
@@ -463,7 +463,8 @@ public enum ProbDistribution {
 
     public abstract Distribution getBestFit(double[] observations, int numObs);
 
-    public abstract double[] getBestFitParams(double[] observations, int numObs);
+    public abstract double[]
+        getBestFitParams(double[] observations, int numObs);
 
     @Override
     public abstract String toString();
@@ -512,8 +513,9 @@ public enum ProbDistribution {
         for (int i = 0, n = observations[0].length - 1; i < n; i++) {
             interval = observations[0][i + 1] - observations[0][i];
             distProb = d.cdf(observations[0][i + 1])
-                    - d.cdf(observations[0][i]);
-            tot += ((Math.log(interval * observations[1][i]) / Math.log(2)) / (Math
+                - d.cdf(observations[0][i]);
+            tot +=
+                ((Math.log(interval * observations[1][i]) / Math.log(2)) / (Math
                     .log(distProb) / Math.log(2)))
                     * (interval * observations[1][i]);
         }
@@ -528,7 +530,8 @@ public enum ProbDistribution {
      * @return
      */
     public static double[][] observationsToProbDist(double[][] observations) {
-        double[][] retObs = new double[observations.length][observations[0].length];
+        double[][] retObs =
+            new double[observations.length][observations[0].length];
         retObs[0] = SimbrainMath.normalizeVec(observations[0]);
         retObs[1] = observations[1];
         return retObs;

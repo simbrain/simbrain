@@ -73,7 +73,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 setBoundsEnabled(clipping.getSelectedIndex() == TristateDropDown
-                        .getTRUE());
+                    .getTRUE());
             }
 
         });
@@ -132,11 +132,13 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     /**
      * Construct the panel representing the provided neurons.
      *
-     * @param neuronList list of neurons to represent.
-     * @param parent parent window so pack can be called
+     * @param neuronList
+     *            list of neurons to represent.
+     * @param parent
+     *            parent window so pack can be called
      */
     public NeuronPropertiesExtended(final List<Neuron> neuronList,
-            final Window parent) {
+        final Window parent) {
         this.neuronList = neuronList;
         this.parent = parent;
         fillFieldValues();
@@ -202,18 +204,18 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
      * @throws ClassCastException
      */
     private void upBoundConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
         double upBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                .getUpperBound();
+            .getUpperBound();
         boolean upDiscrepancy = false;
         for (NeuronUpdateRule nur : ruleList) {
             // Does the upper bound of the first neuron equal the upper bound
             // of this one? upDiscrepancy is true if it does not.
             if (upBound != ((BoundedUpdateRule) nur).getUpperBound()) {
-                upDiscrepancy = false;
-            } else {
                 upDiscrepancy = true;
+            } else {
+                upDiscrepancy = false;
             }
             if (upDiscrepancy) { // There is at least one discrepancy
                                  // so we can't assign tfCeiling a value
@@ -237,10 +239,10 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
      * @throws ClassCastException
      */
     private void lowBoundConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
         double lowBound = ((BoundedUpdateRule) neuronRef.getUpdateRule())
-                .getLowerBound();
+            .getLowerBound();
         boolean lowDiscrepancy = false;
         for (NeuronUpdateRule nur : ruleList) {
             // Does the lower bound of the first neuron equal the lower bound
@@ -272,10 +274,10 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
      * @throws ClassCastException
      */
     private void clippingConsistencyCheckAndAssign(
-            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        List<NeuronUpdateRule> ruleList) throws ClassCastException {
         Neuron neuronRef = neuronList.get(0);
         boolean clipped = ((ClippableUpdateRule) neuronRef.getUpdateRule())
-                .isClipped();
+            .isClipped();
         boolean discrepancy = false;
         for (NeuronUpdateRule nur : ruleList) {
             // Is the first neuron clipped, but not this one? If so
@@ -339,16 +341,16 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
 
         // Handle Increment
         if (!NetworkUtils.isConsistent(Neuron.getRuleList(neuronList),
-                NeuronUpdateRule.class, "getIncrement")) {
+            NeuronUpdateRule.class, "getIncrement")) {
             tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(neuronRef.getUpdateRule()
-                    .getIncrement()));
+                .getIncrement()));
         }
 
         // Handle Priority
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getUpdatePriority")) {
+            "getUpdatePriority")) {
             tfPriority.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfPriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
@@ -364,13 +366,14 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     /**
      * Initialize the panel with default field values.
      *
-     * @param rule rule to use for setting the default values.
+     * @param rule
+     *            rule to use for setting the default values.
      */
     private void initializeDefaultValues(NeuronUpdateRule rule) {
         tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
-                .getUpperBound()));
+            .getUpperBound()));
         tfFloor.setText(Double.toString(((BoundedUpdateRule) rule)
-                .getLowerBound()));
+            .getLowerBound()));
         tfIncrement.setText(Double.toString(rule.getIncrement()));
         tfPriority.setText(Integer.toString(0));
     }
@@ -378,7 +381,8 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     /**
      * Update field visibility based on whether rule is bounded and/or clipped.
      *
-     * @param rule the current rule
+     * @param rule
+     *            the current rule
      */
     public void updateFieldVisibility(NeuronUpdateRule rule) {
         boolean bounded = rule instanceof BoundedUpdateRule;
@@ -407,7 +411,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
                 boolean clippingSelected = clipping.isSelected();
                 for (int i = 0; i < numNeurons; i++) {
                     ((ClippableUpdateRule) neuronList.get(i).getUpdateRule())
-                            .setClipped(clippingSelected);
+                        .setClipped(clippingSelected);
                 }
             }
             if (boundsVisible && boundsEnabled) {
@@ -416,26 +420,26 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
                 if (!Double.isNaN(ceiling)) {
                     for (int i = 0; i < numNeurons; i++) {
                         ((BoundedUpdateRule) neuronList.get(i).getUpdateRule())
-                                .setUpperBound(ceiling);
+                            .setUpperBound(ceiling);
                     }
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
                     success &= tfCeiling.getText().matches(
-                            SimbrainConstants.NULL_STRING);
+                        SimbrainConstants.NULL_STRING);
                 }
                 // Lower Bound
                 double floor = Utils.doubleParsable(tfFloor);
                 if (!Double.isNaN(floor)) {
                     for (int i = 0; i < numNeurons; i++) {
                         ((BoundedUpdateRule) neuronList.get(i).getUpdateRule())
-                                .setLowerBound(floor);
+                            .setLowerBound(floor);
                     }
                 } else {
                     // Only successful if the field can't be parsed because
                     // it is a NULL_STRING standing in for multiple values
                     success &= tfFloor.getText().matches(
-                            SimbrainConstants.NULL_STRING);
+                        SimbrainConstants.NULL_STRING);
                 }
             }
 
@@ -451,7 +455,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
             success &= tfIncrement.getText().matches(
-                    SimbrainConstants.NULL_STRING);
+                SimbrainConstants.NULL_STRING);
         }
 
         // Priority
@@ -466,7 +470,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values
             success &= tfPriority.getText().matches(
-                    SimbrainConstants.NULL_STRING);
+                SimbrainConstants.NULL_STRING);
         }
 
         // Clamped
@@ -495,7 +499,8 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
      * if not then the text fields should be disabled and clipping should be
      * turned off.
      *
-     * @param enabled are upper and lower bounds fields enabled?
+     * @param enabled
+     *            are upper and lower bounds fields enabled?
      */
     public void setBoundsEnabled(boolean enabled) {
         boundsEnabled = enabled;
@@ -508,7 +513,8 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     /**
      * Whether or not to display the bounds sub-panel.
      *
-     * @param visible are upper and lower bound fields visible?
+     * @param visible
+     *            are upper and lower bound fields visible?
      */
     public void setBoundsVisible(boolean visible) {
         boundsVisible = visible;
@@ -520,7 +526,8 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     /**
      * Whether or not to display the clipping drop down.
      *
-     * @param visible should the clipping stuff be visible or not
+     * @param visible
+     *            should the clipping stuff be visible or not
      */
     public void setClippingVisible(boolean visible) {
         clippingVisible = visible;

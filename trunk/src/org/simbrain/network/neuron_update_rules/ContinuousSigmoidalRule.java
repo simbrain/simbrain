@@ -39,26 +39,28 @@ import org.simbrain.util.randomizer.Randomizer;
  *
  */
 public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
-        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-        BoundedUpdateRule, NoisyUpdateRule {
+    BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
+    BoundedUpdateRule, NoisyUpdateRule {
 
-	/**
-	 * The default squashing function, informs the default upper and
-	 * lower bounds.
-	 */
-	public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
-			SquashingFunction.LOGISTIC;
+    /**
+     * The default squashing function, informs the default upper and lower
+     * bounds.
+     */
+    public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
+        SquashingFunction.LOGISTIC;
 
     /** Default time constant (ms). */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;
 
+    public static final double DEFAULT_LEAK_CONSTANT = 1.0;
+
     /** The Default upper bound. */
     public static final double DEFAULT_UPPER_BOUND =
-    		DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
+        DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
 
     /** The Default lower bound. */
     public static final double DEFAULT_LOWER_BOUND =
-    		DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
+        DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
 
     /** Current implementation. */
     private SquashingFunction sFunction = DEFAULT_SQUASHING_FUNCTION;
@@ -82,12 +84,19 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
-     * The time constant of these neurons. If the time constant is equal to the
-     * network time-step (or vice versa), behavior is equivalent to discrete
-     * sigmoid. The larger the time constant relative to the time-step, the more
-     * slowly inputs will be integrated.
+     * The <b>time constant</b> of these neurons. If <b>timeConstant *
+     * leakConstant == network time-step</b> (or vice versa), behavior is
+     * equivalent to discrete sigmoid. The larger the time constant relative to
+     * the time-step, the more slowly inputs will be integrated.
      */
-    private double timeConstant = DEFAULT_TIME_CONSTANT;
+    private double tau = DEFAULT_TIME_CONSTANT;
+
+    /**
+     * The leak constant: how strongly the neuron will be attracted to its base
+     * activation. If <b>timeConstant * leakConstant == network time-step</b>
+     * (or vice versa), behavior is equivalent to discrete sigmoid.
+     */
+    private double leak = DEFAULT_LEAK_CONSTANT;
 
     /**
      * The net value of this neuron. This is the value that is integrated over
@@ -119,29 +128,52 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     /**
      * {@inheritDoc}
      */
-    public TimeType getTimeType() {
-        return TimeType.CONTINUOUS;
+    @Override
+    public ContinuousSigmoidalRule deepCopy() {
+        ContinuousSigmoidalRule sn = new ContinuousSigmoidalRule();
+        sn.setTimeConstant(getTimeConstant());
+        sn.setLeakConstant(getLeakConstant());
+        sn.setBias(getBias());
+        sn.setSquashFunctionType(getSquashFunctionType());
+        sn.setSlope(getSlope());
+        sn.setAddNoise(getAddNoise());
+        sn.setUpperBound(getUpperBound());
+        sn.setLowerBound(getLowerBound());
+        sn.noiseGenerator = new Randomizer(noiseGenerator);
+        return sn;
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * Where x_i(t) is the net activation of neuron i at time t, r(t) is the
+     * output activation after being put through a sigmoid squashing function at
+     * time t, a is the leak constant, and c is the time constant:
+     * 
+     *<b>c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)</b>
+     * Discretizing using euler integration:
+     *<b>x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))</b>
+     * Factorting out x_i: 
+     *<b>x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))</b>
+     * 
      */
     public void update(Neuron neuron) {
 
-        double timeVal = neuron.getNetwork().getTimeStep() / timeConstant;
+        double dt = neuron.getNetwork().getTimeStep();
 
-        double val = timeVal * (neuron.getWeightedInputs() + bias);
+        double inputTerm = (dt / tau) * (neuron.getWeightedInputs() + bias);
 
-        netActivation = (netActivation * (1 - timeVal)) + val;
+        netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;
 
-        val = sFunction.valueOf(netActivation, getUpperBound(),
-                getLowerBound(), getSlope());
+        double output = sFunction.valueOf(netActivation, getUpperBound(),
+            getLowerBound(), getSlope());
 
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            output += noiseGenerator.getRandom();
         }
 
-        neuron.setBuffer(val);
+        neuron.setBuffer(output);
+
     }
 
     /**
@@ -179,6 +211,13 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
     /**
      * {@inheritDoc}
      */
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getDerivative(final double val) {
         double up = getUpperBound();
@@ -196,23 +235,6 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.inverseVal(val, up, lw, diff);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ContinuousSigmoidalRule deepCopy() {
-        ContinuousSigmoidalRule sn = new ContinuousSigmoidalRule();
-        sn.setTimeConstant(getTimeConstant());
-        sn.setBias(getBias());
-        sn.setSquashFunctionType(getSquashFunctionType());
-        sn.setSlope(getSlope());
-        sn.setAddNoise(getAddNoise());
-        sn.setUpperBound(getUpperBound());
-        sn.setLowerBound(getLowerBound());
-        sn.noiseGenerator = new Randomizer(noiseGenerator);
-        return sn;
     }
 
     /**
@@ -336,7 +358,7 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      * @return the time constant
      */
     public double getTimeConstant() {
-        return timeConstant;
+        return tau;
     }
 
     /**
@@ -344,7 +366,26 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      *            the new time constant
      */
     public void setTimeConstant(double timeConstant) {
-        this.timeConstant = timeConstant;
+        this.tau = timeConstant;
+    }
+
+    /**
+     * {@link #leak}
+     * 
+     * @return the leak constant for the neuron.
+     */
+    public double getLeakConstant() {
+        return leak;
+    }
+
+    /**
+     * {@link #leak}
+     * 
+     * @param leakConstant
+     *            the leak constant for the neuron.
+     */
+    public void setLeakConstant(double leakConstant) {
+        this.leak = leakConstant;
     }
 
 }

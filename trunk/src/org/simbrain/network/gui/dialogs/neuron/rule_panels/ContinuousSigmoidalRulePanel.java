@@ -50,12 +50,14 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
     /** Implementation combo box. */
     private JComboBox<SquashingFunction> cbImplementation =
-            new JComboBox<SquashingFunction>(new SquashingFunction[] {
-                SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
-                SquashingFunction.TANH, });
+        new JComboBox<SquashingFunction>(new SquashingFunction[] {
+            SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
+            SquashingFunction.TANH, });
 
     /** Time constant field. */
     private JTextField tfTimeConstant = new JTextField();
+
+    private JTextField tfLeakConstant = new JTextField();
 
     /** Bias field. */
     private JTextField tfBias = new JTextField();
@@ -77,7 +79,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
     /** A reference to the neuron rule being edited. */
     private static final ContinuousSigmoidalRule prototypeRule =
-            new ContinuousSigmoidalRule();
+        new ContinuousSigmoidalRule();
 
     /**
      * The initially selected squashing function (or NULL_STRING), used for
@@ -100,6 +102,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);
         mainTab.addItem("Time Constant", tfTimeConstant);
+        mainTab.addItem("Leak Constant", tfLeakConstant);
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Slope", tfSlope);
         mainTab.addItem("Add Noise", isAddNoise);
@@ -110,7 +113,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SquashingFunction currentFunc = (SquashingFunction)
-                        cbImplementation.getSelectedItem();
+                    cbImplementation.getSelectedItem();
                 if (!currentFunc.equals(initialSfunction)) {
                     prototypeRule.setSquashFunctionType(currentFunc);
                     fillDefaultValues();
@@ -126,38 +129,48 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
     @Override
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
         ContinuousSigmoidalRule neuronRef = (ContinuousSigmoidalRule) ruleList
-                .get(0);
+            .get(0);
 
         // (Below) Handle consistency of multiple selections
 
         // Handle Implementation/Type
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
-                "getSquashFunctionType"))
+            "getSquashFunctionType"))
         {
             if ((cbImplementation.getItemCount()
-                    == SquashingFunction.values().length - 1))
+            == SquashingFunction.values().length - 1))
             {
                 cbImplementation.addItem(SquashingFunction.NULL_STRING);
             }
             cbImplementation
-                    .setSelectedIndex(SquashingFunction.values().length - 1);
+                .setSelectedIndex(SquashingFunction.values().length - 1);
         } else {
             cbImplementation.setSelectedItem(neuronRef.getSquashFunctionType());
         }
 
         // Handle Time Constant
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
-                "getTimeConstant"))
+            "getTimeConstant"))
         {
             tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTimeConstant
-                    .setText(Double.toString(neuronRef.getTimeConstant()));
+                .setText(Double.toString(neuronRef.getTimeConstant()));
+        }
+
+        // Handle Leak Constant
+        if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
+            "getLeakConstant"))
+        {
+            tfLeakConstant.setText(SimbrainConstants.NULL_STRING);
+        } else {
+            tfLeakConstant
+                .setText(Double.toString(neuronRef.getLeakConstant()));
         }
 
         // Handle Bias
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
-                "getBias"))
+            "getBias"))
         {
             tfBias.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -166,7 +179,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         // Handle Slope
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
-                "getSlope"))
+            "getSlope"))
         {
             tfSlope.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -175,7 +188,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, ContinuousSigmoidalRule.class,
-                "getAddNoise"))
+            "getAddNoise"))
         {
             isAddNoise.setNull();
         } else {
@@ -184,23 +197,24 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         randTab.fillFieldValues(getRandomizers(ruleList));
         initialSfunction = (SquashingFunction) cbImplementation.
-                getSelectedItem();
+            getSelectedItem();
     }
 
     /**
      * Gets all the randomizers associated with some list of neuron update
      * rules.
      *
-     * @param ruleList the list of rules from which randomizers are extracted
+     * @param ruleList
+     *            the list of rules from which randomizers are extracted
      * @return List of randomizers.
      */
     private ArrayList<Randomizer> getRandomizers(
-            List<NeuronUpdateRule> ruleList) {
+        List<NeuronUpdateRule> ruleList) {
         ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((ContinuousSigmoidalRule) ruleList.get(i))
-                    .getNoiseGenerator());
+                .getNoiseGenerator());
         }
 
         return ret;
@@ -212,8 +226,10 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
     @Override
     public void fillDefaultValues() {
         cbImplementation.setSelectedItem(prototypeRule.getSquashFunctionType());
-        tfTimeConstant
-                .setText(Double.toString(prototypeRule.getTimeConstant()));
+        tfTimeConstant.setText(Double.toString(prototypeRule
+            .getTimeConstant()));
+        tfLeakConstant.setText(Double.toString(prototypeRule
+            .getLeakConstant()));
         tfBias.setText(Double.toString(prototypeRule.getBias()));
         tfSlope.setText(Double.toString(prototypeRule.getSlope()));
         isAddNoise.setSelected(prototypeRule.getAddNoise());
@@ -260,13 +276,13 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         // Implementation: Logistic/Tanh/Arctan
         if (!cbImplementation.getSelectedItem().equals(
-                SquashingFunction.NULL_STRING))
+            SquashingFunction.NULL_STRING))
         {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setSquashFunctionType((SquashingFunction)
-                                cbImplementation
-                                .getSelectedItem());
+                    .setSquashFunctionType((SquashingFunction)
+                    cbImplementation
+                        .getSelectedItem());
             }
         }
 
@@ -275,7 +291,16 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         if (!Double.isNaN(timeConstant)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setTimeConstant(timeConstant);
+                    .setTimeConstant(timeConstant);
+            }
+        }
+
+        // Leak Constant
+        double leakConstant = Utils.doubleParsable(tfLeakConstant);
+        if (!Double.isNaN(leakConstant)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
+                    .setLeakConstant(leakConstant);
             }
         }
 
@@ -284,7 +309,7 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         if (!Double.isNaN(bias)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setBias(bias);
+                    .setBias(bias);
             }
         }
 
@@ -293,17 +318,18 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         if (!Double.isNaN(slope)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setSlope(slope);
+                    .setSlope(slope);
             }
         }
 
         // Add Noise?
         if (!isAddNoise.isNull()) {
-            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+            boolean addNoise =
+                isAddNoise.getSelectedIndex() == TristateDropDown
                     .getTRUE();
             for (int i = 0; i < numNeurons; i++) {
                 ((ContinuousSigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setAddNoise(addNoise);
+                    .setAddNoise(addNoise);
             }
             if (addNoise) {
                 randTab.commitRandom(neurons);

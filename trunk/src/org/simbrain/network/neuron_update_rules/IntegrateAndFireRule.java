@@ -28,11 +28,11 @@ import org.simbrain.util.randomizer.Randomizer;
  * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
- *
+ * 
  * TODO: Add custom tooltip
  */
 public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
-        NoisyUpdateRule {
+    NoisyUpdateRule {
 
     /** Resistance. */
     private double resistance = 1;
@@ -46,7 +46,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     /** Reset potential (mV) */
     private double resetPotential = 13.5;
 
-    /** Resting potential (mV)  Default: 0.0 */
+    /** Resting potential (mV) Default: 0.0 */
     private double restingPotential;
 
     /** Background Current (nA) . */
@@ -66,12 +66,12 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
         ifn.setRestingPotential(getRestingPotential());
         ifn.setResetPotential(getResetPotential());
         ifn.setThreshold(getThreshold());
+        ifn.setBackgroundCurrent(getBackgroundCurrent());
         ifn.setTimeConstant(getTimeConstant());
         ifn.setResistance(getResistance());
         ifn.setIncrement(getIncrement());
         ifn.setAddNoise(getAddNoise());
         ifn.noiseGenerator = new Randomizer(noiseGenerator);
-
         return ifn;
     }
 
@@ -92,21 +92,21 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
         /*
          * Formula:
-         *
+         * 
          * dV/dt = ( -(Vm - Vr) + Rm * (Isyn + Ibg) ) / tau
-         *
+         * 
          * Vm > theta ? Vm <- Vreset ; spike
-         *
+         * 
          * Vm: membrane potential Vr: resting potential* Rm: membrane resistance
          * Isyn: synaptic input current Ibg: background input current tau: time
          * constant Vreset: reset potential theta: threshold
          */
 
         double dVm =
-                timeStep
+            timeStep
                 * (-(memPotential - restingPotential) + resistance
-                        * (iSyn + backgroundCurrent))
-                        / timeConstant;
+                    * (iSyn + backgroundCurrent))
+                / timeConstant;
 
         memPotential += dVm;
 
@@ -128,7 +128,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
         return 2 * (threshold - restingPotential) * Math.random()
-                + restingPotential;
+            + restingPotential;
     }
 
     /**

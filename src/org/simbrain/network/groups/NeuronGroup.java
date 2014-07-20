@@ -67,7 +67,7 @@ public class NeuronGroup extends Group {
      * neurons in the group, above which to use grid layout instead of line
      * layout.
      */
-    private int gridThreshold = 20;
+    private int gridThreshold = 30;
 
     /** Space between neurons within a layer. */
     private int betweenNeuronInterval = 50;
@@ -825,11 +825,11 @@ public class NeuronGroup extends Group {
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {
-        return incomingSgs;
+        return new HashSet<SynapseGroup>(incomingSgs);
     }
 
     public HashSet<SynapseGroup> getOutgoingSg() {
-        return outgoingSgs;
+        return new HashSet<SynapseGroup>(outgoingSgs);
     }
 
     public boolean containsAsIncoming(SynapseGroup sg) {

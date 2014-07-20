@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -46,7 +47,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -296,8 +296,8 @@ public class NetworkPanel extends JPanel {
     private JPanel toolbars;
 
     /** Map associating network model objects with Piccolo Pnodes. */
-    private final HashMap<Object, PNode> objectNodeMap =
-        new HashMap<Object, PNode>();
+    private final Map<Object, PNode> objectNodeMap =
+        Collections.synchronizedMap(new HashMap<Object, PNode>());
 
     /**
      * Point where new neurons, neurongroups, and subnetworks should be added.
@@ -856,7 +856,6 @@ public class NetworkPanel extends JPanel {
      */
     private void
         addSynapseGroupBidirectional(SynapseGroup sg1, SynapseGroup sg2) {
-        System.out.println("Created " + counter++ + " BiSynGroups");
         SynapseGroupNodeBidirectional synGBD = SynapseGroupNodeBidirectional
             .createBidirectionalSynapseGN(this, sg1, sg2);
         canvas.getLayer().addChild(synGBD);
@@ -975,28 +974,44 @@ public class NetworkPanel extends JPanel {
         if (synapseGroup.isDisplaySynapses()) {
             addSynapseGroupFull(synapseGroup);
         } else {
-            Set<SynapseGroup> targetGroupOutgoing = synapseGroup
-                .getTargetNeuronGroup().getOutgoingSg();
-            Set<SynapseGroup> sourceGroupIncoming = synapseGroup
-                .getSourceNeuronGroup().getIncomingSgs();
-            targetGroupOutgoing.retainAll(sourceGroupIncoming);
             if (synapseGroup.getTargetNeuronGroup().equals(
-                synapseGroup.getSourceNeuronGroup())) {
+                synapseGroup.getSourceNeuronGroup())) { // Synapse group is
+                // recurrent...
                 addSynapseGroupRecurrent(synapseGroup);
-            } else if (targetGroupOutgoing.size() != 0) {
-                final SynapseGroup reverse = (SynapseGroup) targetGroupOutgoing
-                    .toArray()[0];
-                removeGroup(reverse);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        addSynapseGroupBidirectional(synapseGroup, reverse);
-                    }
-                });
+            } else { // Test if there isn't already a synapse group going in
+                     // the opposite direction.
+                // The synapse groups which _originate_ from this synapse groups's
+                // target neuron group
+                Set<SynapseGroup> targetGroupOutgoing = synapseGroup
+                    .getTargetNeuronGroup().getOutgoingSg();
+                // The synapse groups which _terminate_ at this synapse group's
+                // source neuron group
+                Set<SynapseGroup> sourceGroupIncoming = synapseGroup
+                    .getSourceNeuronGroup().getIncomingSgs();
 
-                return;
-            } else {
-                addSynapseGroupSimple(synapseGroup);
+                // If there exists a synapse group that _originates_ in this
+                // synapse group's target neuron group and _terminates_ in this
+                // synapse group's source neuron group, then .retainAll between
+                // the two above sets will contain that group
+                targetGroupOutgoing.retainAll(sourceGroupIncoming);
+
+                if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
+                    // group going in the opposite direction between the same 
+                    // two neuron groups.
+                    final SynapseGroup reverse =
+                        (SynapseGroup) targetGroupOutgoing.toArray()[0];
+                    if (objectNodeMap.get(reverse) != null) {
+                        removeGroup(reverse);
+                        addSynapseGroupBidirectional(synapseGroup, reverse);
+                    } else {
+                        addSynapseGroupSimple(synapseGroup);
+                    }
+                    return;
+                } else { // Not recurrent, no synapse group going in the opposite
+                    // direction, and is not displaying individual synapses...
+                    // add group normally
+                    addSynapseGroupSimple(synapseGroup);
+                }
             }
         }
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
@@ -1105,7 +1120,7 @@ public class NetworkPanel extends JPanel {
      *            the group to add.
      */
     private void addSubnetwork(Subnetwork subnet) {
-        List<PNode> nodes = new ArrayList<PNode>();
+        Set<PNode> nodes = new HashSet<PNode>();
         // Add neuron groups
         for (NeuronGroup neuronGroup : ((Subnetwork) subnet)
             .getNeuronGroupList()) {
@@ -1118,10 +1133,11 @@ public class NetworkPanel extends JPanel {
         // Add synapse groups
         for (SynapseGroup synapseGroup : ((Subnetwork) subnet)
             .getSynapseGroupList()) {
-            addGroup(synapseGroup);
-            SynapseGroupNode synapseGroupNode =
-                (SynapseGroupNode) objectNodeMap
-                    .get(synapseGroup);
+            addSynapseGroup(synapseGroup);
+        }
+        for (SynapseGroup synapseGroup : ((Subnetwork) subnet)
+            .getSynapseGroupList()) {
+            PNode synapseGroupNode = objectNodeMap.get(synapseGroup);
             nodes.add(synapseGroupNode);
         }
 
@@ -1191,13 +1207,6 @@ public class NetworkPanel extends JPanel {
      */
     private void removeGroup(Group group) {
         PNode node = objectNodeMap.get(group);
-        // if (group instanceof NeuronGroup) {
-        // node = (NeuronGroupNode) objectNodeMap.get(group);
-        // } else if (group instanceof SynapseGroup) {
-        // node = (SynapseGroupNode) objectNodeMap.get(group);
-        // } else if (group instanceof Subnetwork) {
-        // node = (SubnetworkNode) objectNodeMap.get(group);
-        // }
         if (node != null) {
             node.removeFromParent();
             objectNodeMap.remove(group);
@@ -1384,7 +1393,8 @@ public class NetworkPanel extends JPanel {
         this.editMode = newEditMode;
         if (editMode == EditMode.WAND) {
             editMode.resetWandCursor();
-        } else if ((editMode == EditMode.ZOOM_IN) || (editMode == EditMode.ZOOM_OUT)) {
+        } else if ((editMode == EditMode.ZOOM_IN)
+            || (editMode == EditMode.ZOOM_OUT)) {
             this.setAutoZoomMode(false);
         }
         firePropertyChange("editMode", oldEditMode, this.editMode);
@@ -2799,15 +2809,16 @@ public class NetworkPanel extends JPanel {
     public GenericFrame displayPanel(final JPanel panel, String title) {
         GenericFrame frame = new GenericJDialog();
         if (frame instanceof JInternalFrame) {
-            ((JInternalFrame)frame).addInternalFrameListener(new InternalFrameAdapter(
-                    ) {
-                @Override
-                public void internalFrameClosed(InternalFrameEvent e) {
-                    if (panel instanceof EditablePanel) {
-                        ((EditablePanel)panel).commitChanges();
+            ((JInternalFrame) frame)
+                .addInternalFrameListener(new InternalFrameAdapter(
+                ) {
+                    @Override
+                    public void internalFrameClosed(InternalFrameEvent e) {
+                        if (panel instanceof EditablePanel) {
+                            ((EditablePanel) panel).commitChanges();
+                        }
                     }
-                }
-            });
+                });
         }
         frame.setContentPane(panel);
         frame.pack();
@@ -2819,7 +2830,7 @@ public class NetworkPanel extends JPanel {
     /**
      * @return the objectNodeMap
      */
-    public HashMap<Object, PNode> getObjectNodeMap() {
+    public Map<Object, PNode> getObjectNodeMap() {
         return objectNodeMap;
     }
 

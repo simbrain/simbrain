@@ -54,7 +54,7 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
+public class SpecificSynapseRulePanel extends JPanel implements EditablePanel {
 
     /**
      * The default display state of the synapse panel. Currently, True, that is,
@@ -102,7 +102,7 @@ public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
      *            the swing window within which this panel will be placed. Here
      *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SpecificNeuronRulePanel(Collection<Synapse> synapseList,
+    public SpecificSynapseRulePanel(Collection<Synapse> synapseList,
         final Window parent) {
         this(synapseList, parent, DEFAULT_SP_DISPLAY_STATE);
     }
@@ -122,7 +122,7 @@ public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
      *            the swing window within which this panel will be placed. Here
      *            so that "pack()" can be called when this panel resizes itself.
      */
-    public SpecificNeuronRulePanel(Collection<Synapse> synapseList,
+    public SpecificSynapseRulePanel(Collection<Synapse> synapseList,
         final Window parent, boolean startingState) {
         this.synapseCollection = synapseList;
         this.parent = parent;

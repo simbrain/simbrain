@@ -54,7 +54,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     private SynapsePropertiesSimple synapseInfoPanel;
 
     /** The synapse update settings panel. */
-    private SpecificNeuronRulePanel updateInfoPanel;
+    private SpecificSynapseRulePanel updateInfoPanel;
 
     /** Panel to edit spike responders. */
     private SpikeResponderSettingsPanel editSpikeResponders;
@@ -118,7 +118,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         final Window parent, final boolean showSpecificRuleParams) {
         synapseInfoPanel = SynapsePropertiesSimple.createBasicSynapseInfoPanel(
             synapseList, parent);
-        updateInfoPanel = new SpecificNeuronRulePanel(synapseList, parent,
+        updateInfoPanel = new SpecificSynapseRulePanel(synapseList, parent,
             showSpecificRuleParams);
         if (SynapseDialog.containsASpikeResponder(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
@@ -185,7 +185,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     /**
      * @return the updateInfoPanel
      */
-    public SpecificNeuronRulePanel getUpdateInfoPanel() {
+    public SpecificSynapseRulePanel getUpdateInfoPanel() {
         return updateInfoPanel;
     }
 
@@ -193,7 +193,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param updateInfoPanel
      *            the updateInfoPanel to set
      */
-    public void setUpdateInfoPanel(SpecificNeuronRulePanel updateInfoPanel) {
+    public void setUpdateInfoPanel(SpecificSynapseRulePanel updateInfoPanel) {
         this.updateInfoPanel = updateInfoPanel;
     }
 

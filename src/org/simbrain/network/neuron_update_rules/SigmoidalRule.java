@@ -20,52 +20,19 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>SigmoidalNeuron</b> provides various implementations of a standard
+ * <b>SigmoidalRule</b> provides various implementations of a standard
  * sigmoidal neuron.
+ *
+ * TODO: Discuss renaming "DiscreteSigmoidalRule"
  *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public class SigmoidalRule extends NeuronUpdateRule implements
-        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-        BoundedUpdateRule, NoisyUpdateRule {
-
-    /** The Default upper bound. */
-    private static final double DEFAULT_UPPER_BOUND = 1.0;
-
-    /** The Default lower bound. */
-    private static final double DEFAULT_LOWER_BOUND = 0.0;
-
-    /** Current implementation. */
-    private SquashingFunction sFunction = SquashingFunction.LOGISTIC;
-
-    /** Bias. */
-    private double bias;
-
-    /** Slope. */
-    private double slope = 1;
-
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
-
-    /** Adds noise to neuron. */
-    private boolean addNoise;
-
-    /** The upper bound of the activity if clipping is used. */
-    private double upperBound = DEFAULT_UPPER_BOUND;
-
-    /** The lower bound of the activity if clipping is used. */
-    private double lowerBound = DEFAULT_LOWER_BOUND;
+public class SigmoidalRule extends AbstractSigmoidalRule {
 
     /**
      * Default sigmoidal.
@@ -77,13 +44,11 @@ public class SigmoidalRule extends NeuronUpdateRule implements
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction the squashing function implementation to use.
+     * @param sFunction
+     *            the squashing function implementation to use.
      */
     public SigmoidalRule(SquashingFunction sFunction) {
-        super();
-        this.sFunction = sFunction;
-        setUpperBound(sFunction.getDefaultUpperBound());
-        setLowerBound(sFunction.getDefaultLowerBound());
+        super(sFunction);
     }
 
     /**
@@ -100,11 +65,14 @@ public class SigmoidalRule extends NeuronUpdateRule implements
 
         double val = neuron.getWeightedInputs() + bias;
 
-        val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
-
+        // TODO: Discuss how noise is added
         if (addNoise) {
             val += noiseGenerator.getRandom();
         }
+
+        val =
+            sFunction
+                .valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
         neuron.setBuffer(val);
     }
@@ -156,17 +124,6 @@ public class SigmoidalRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public double getInverse(double val) {
-        double up = getUpperBound();
-        double lw = getLowerBound();
-        double diff = up - lw;
-        return sFunction.inverseVal(val, up, lw, diff);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SigmoidalRule deepCopy() {
         SigmoidalRule sn = new SigmoidalRule();
         sn.setBias(getBias());
@@ -177,119 +134,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements
         return sn;
     }
 
-    /**
-     * @return Returns the inflectionPoint.
-     */
-    @Override
-    public double getBias() {
-        return bias;
-    }
-
-    /**
-     * @param inflectionY The inflectionY to set.
-     */
-    @Override
-    public void setBias(final double inflectionY) {
-        this.bias = inflectionY;
-    }
-
-    /**
-     * @return Returns the inflectionPointSlope.
-     */
-    public double getSlope() {
-        return slope;
-    }
-
-    /**
-     * @param inflectionPointSlope The inflectionPointSlope to set.
-     */
-    public void setSlope(final double inflectionPointSlope) {
-        this.slope = inflectionPointSlope;
-    }
-
-    /**
-     * @return Returns the noise.
-     */
-    public Randomizer getNoiseGenerator() {
-        return noiseGenerator;
-    }
-
-    /**
-     * @param noise The noise to set.
-     */
-    public void setNoiseGenerator(final Randomizer noise) {
-        this.noiseGenerator = noise;
-    }
-
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
-
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
-
     @Override
     public String getDescription() {
         return "Sigmoidal (Discrete)";
-    }
-
-    /**
-     * @return the type
-     */
-    public SquashingFunction getSquashFunctionType() {
-        if (sFunction == null) {
-            sFunction = SquashingFunction.LOGISTIC; // TODO: Explain (backwards
-            // compat)
-        }
-        return sFunction;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setSquashFunctionType(SquashingFunction type) {
-        this.sFunction = type;
-        setUpperBound(type.getDefaultUpperBound());
-        setLowerBound(type.getDefaultLowerBound());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setUpperBound(double ceiling) {
-        this.upperBound = ceiling;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLowerBound(double floor) {
-        this.lowerBound = floor;
     }
 
 }

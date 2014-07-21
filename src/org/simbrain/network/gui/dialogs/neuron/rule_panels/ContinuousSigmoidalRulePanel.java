@@ -20,84 +20,67 @@ package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JComboBox;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
  *
- * @author zach
+ * @author Zach Tosi
  *
  */
-public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
-
-    /** Implementation combo box. */
-    private JComboBox<SquashingFunction> cbImplementation =
-        new JComboBox<SquashingFunction>(new SquashingFunction[] {
-            SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
-            SquashingFunction.TANH, });
+@SuppressWarnings("serial")
+public class ContinuousSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
 
     /** Time constant field. */
     private JTextField tfTimeConstant = new JTextField();
 
     private JTextField tfLeakConstant = new JTextField();
 
-    /** Bias field. */
-    private JTextField tfBias = new JTextField();
-
-    /** Slope field. */
-    private JTextField tfSlope = new JTextField();
-
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
-
-    /** Random tab. */
-    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
-
-    /** Add noise combo box. */
-    private TristateDropDown isAddNoise = new TristateDropDown();
-
     /** A reference to the neuron rule being edited. */
-    private static final ContinuousSigmoidalRule prototypeRule =
-        new ContinuousSigmoidalRule();
+    private static ContinuousSigmoidalRule prototypeRule;
 
     /**
-     * The initially selected squashing function (or NULL_STRING), used for
-     * determining how to fill field values based on the selected
-     * implementation.
+     * Creates a fully functional continuous sigmoidal rule panel.
+     * 
+     * @return
      */
-    private SquashingFunction initialSfunction;
-
-    /** The upper bound for whatever state the panel starts in. */
-    private String initialUBound;
-
-    /** The lower bound for whatever state the panel starts in. */
-    private String initialLBound;
+    public static ContinuousSigmoidalRulePanel
+        createContinuousSigmoidalRulePanel() {
+        prototypeRule = new ContinuousSigmoidalRule();
+        ContinuousSigmoidalRulePanel csrp = new ContinuousSigmoidalRulePanel();
+        csrp.cbImplementation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SquashingFunction currentFunc = (SquashingFunction)
+                    csrp.cbImplementation.getSelectedItem();
+                if (!currentFunc.equals(csrp.initialSfunction)) {
+                    prototypeRule.setSquashFunctionType(currentFunc);
+                    csrp.fillDefaultValues();
+                }
+                csrp.repaint();
+            }
+        });
+        csrp.fillDefaultValues();
+        return csrp;
+    }
 
     /**
-     *
+     * Creates the continuous sigmoidal rule panel, but does not initialize the
+     * listeners responsible for altering the panel in response to the selected
+     * squashing function.
      */
-    public ContinuousSigmoidalRulePanel() {
+    private ContinuousSigmoidalRulePanel() {
         super();
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);
@@ -108,19 +91,6 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         mainTab.addItem("Add Noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
-        cbImplementation.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SquashingFunction currentFunc = (SquashingFunction)
-                    cbImplementation.getSelectedItem();
-                if (!currentFunc.equals(initialSfunction)) {
-                    prototypeRule.setSquashFunctionType(currentFunc);
-                    fillDefaultValues();
-                }
-                repaint();
-            }
-        });
     }
 
     /**
@@ -198,26 +168,6 @@ public class ContinuousSigmoidalRulePanel extends AbstractNeuronRulePanel {
         randTab.fillFieldValues(getRandomizers(ruleList));
         initialSfunction = (SquashingFunction) cbImplementation.
             getSelectedItem();
-    }
-
-    /**
-     * Gets all the randomizers associated with some list of neuron update
-     * rules.
-     *
-     * @param ruleList
-     *            the list of rules from which randomizers are extracted
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(
-        List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((ContinuousSigmoidalRule) ruleList.get(i))
-                .getNoiseGenerator());
-        }
-
-        return ret;
     }
 
     /**

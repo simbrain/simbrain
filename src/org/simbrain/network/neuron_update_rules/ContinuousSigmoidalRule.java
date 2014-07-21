@@ -20,68 +20,25 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>Continuous Sigmoidal Neuron</b> provides various squashing function
- * implementations of a sigmoidal neuron numerically integrated continuously
+ * <b>Continuous Sigmoidal Rule</b> provides various squashing function
+ * ouputs for a neuron whose activation is numerically integrated continuously
  * over time.
  *
  * @author Zach Tosi
  * @author Jeff Yoshimi
  *
  */
-public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
-    BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule,
-    BoundedUpdateRule, NoisyUpdateRule {
-
-    /**
-     * The default squashing function, informs the default upper and lower
-     * bounds.
-     */
-    public static final SquashingFunction DEFAULT_SQUASHING_FUNCTION =
-        SquashingFunction.LOGISTIC;
+public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     /** Default time constant (ms). */
     public static final double DEFAULT_TIME_CONSTANT = 10.0;
 
+    /** Default leak constant {@link #leak}. */
     public static final double DEFAULT_LEAK_CONSTANT = 1.0;
-
-    /** The Default upper bound. */
-    public static final double DEFAULT_UPPER_BOUND =
-        DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
-
-    /** The Default lower bound. */
-    public static final double DEFAULT_LOWER_BOUND =
-        DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
-
-    /** Current implementation. */
-    private SquashingFunction sFunction = DEFAULT_SQUASHING_FUNCTION;
-
-    /** Bias. */
-    private double bias;
-
-    /** Slope. */
-    private double slope = 1;
-
-    /** Noise dialog. */
-    private Randomizer noiseGenerator = new Randomizer();
-
-    /** Adds noise to neuron. */
-    private boolean addNoise;
-
-    /** The upper bound of the activity if clipping is used. */
-    private double upperBound = DEFAULT_UPPER_BOUND;
-
-    /** The lower bound of the activity if clipping is used. */
-    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /**
      * The <b>time constant</b> of these neurons. If <b>timeConstant *
@@ -106,6 +63,8 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      * being numerically integrated.
      */
     private double netActivation;
+
+    private double inputTerm;
 
     /**
      * Default sigmoidal.
@@ -150,10 +109,14 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
      * output activation after being put through a sigmoid squashing function at
      * time t, a is the leak constant, and c is the time constant:
      * 
-     *<b>c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)</b>
-     * Discretizing using euler integration:
+     *<b>c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)</b> 
+     *
+     *  Discretizing using euler integration:
+     *  
      *<b>x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))</b>
-     * Factorting out x_i: 
+     *
+     * Factorting out x_i(t):
+     * 
      *<b>x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))</b>
      * 
      */
@@ -161,16 +124,17 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
 
         double dt = neuron.getNetwork().getTimeStep();
 
-        double inputTerm = (dt / tau) * (neuron.getWeightedInputs() + bias);
+        if (addNoise) {
+            inputTerm = (dt / tau) * (neuron.getWeightedInputs() + bias
+                + noiseGenerator.getRandom());
+        } else {
+            inputTerm = (dt / tau) * (neuron.getWeightedInputs() + bias);
+        }
 
         netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;
 
         double output = sFunction.valueOf(netActivation, getUpperBound(),
             getLowerBound(), getSlope());
-
-        if (addNoise) {
-            output += noiseGenerator.getRandom();
-        }
 
         neuron.setBuffer(output);
 
@@ -224,17 +188,6 @@ public class ContinuousSigmoidalRule extends NeuronUpdateRule implements
         double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.derivVal(val, up, lw, diff);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getInverse(double val) {
-        double up = getUpperBound();
-        double lw = getLowerBound();
-        double diff = up - lw;
-        return sFunction.inverseVal(val, up, lw, diff);
     }
 
     /**

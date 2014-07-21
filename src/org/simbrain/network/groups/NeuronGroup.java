@@ -638,9 +638,9 @@ public class NeuronGroup extends Group {
 
     public double getMaxDim() {
         if (getWidth() > getHeight()) {
-            return getHeight();
-        } else {
             return getWidth();
+        } else {
+            return getHeight();
         }
     }
 

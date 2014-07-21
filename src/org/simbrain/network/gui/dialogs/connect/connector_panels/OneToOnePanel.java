@@ -43,6 +43,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      * Default constructor.
      */
     public OneToOnePanel(final OneToOne connection) {
+        this.connection = connection;
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         // setSynapseType.setText(connection.getBaseSynapse().getType());
         addItem("Orientation: ", orientationBox);

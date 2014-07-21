@@ -72,6 +72,7 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
         }
+        inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
         this.connectNeuronGroups(inputLayer, som);
         layoutNetwork();

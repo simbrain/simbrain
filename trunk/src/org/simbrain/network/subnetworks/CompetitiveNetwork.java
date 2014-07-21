@@ -73,6 +73,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
         }
+        inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
         this.connectNeuronGroups(inputLayer, competitive);
         // TODO: Check if all positive synapses was the intention

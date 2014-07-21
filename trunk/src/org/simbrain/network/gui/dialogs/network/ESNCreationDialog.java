@@ -767,7 +767,7 @@ public class ESNCreationDialog extends StandardDialog {
                     .createContinuousSigmoidalRulePanel();
             }
             // Update the Type Label based on the selection in the combobox
-            JComboBox<SquashingFunction> impCb =
+            final JComboBox<SquashingFunction> impCb =
                 rulePanel.getCbImplementation();
             impCb.setSelectedItem(DEFAULT_INITIAL_FUNCTION);
             impCb.addActionListener(new ActionListener() {

@@ -58,7 +58,8 @@ public class ContinuousSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
     public static ContinuousSigmoidalRulePanel
         createContinuousSigmoidalRulePanel() {
         prototypeRule = new ContinuousSigmoidalRule();
-        ContinuousSigmoidalRulePanel csrp = new ContinuousSigmoidalRulePanel();
+        final ContinuousSigmoidalRulePanel csrp =
+            new ContinuousSigmoidalRulePanel();
         csrp.cbImplementation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

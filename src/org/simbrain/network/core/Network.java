@@ -790,16 +790,16 @@ public class Network {
         }
 
         // Special creation for subnetworks
-        if (group instanceof Subnetwork) {
-            for (NeuronGroup neuronGroup : ((Subnetwork) group)
-                .getNeuronGroupList()) {
-                addGroup(neuronGroup);
-            }
-            for (SynapseGroup synapseGroup : ((Subnetwork) group)
-                .getSynapseGroupList()) {
-                addGroup(synapseGroup);
-            }
-        }
+        //        if (group instanceof Subnetwork) {
+        //            for (NeuronGroup neuronGroup : ((Subnetwork) group)
+        //                .getNeuronGroupList()) {
+        //                addGroup(neuronGroup);
+        //            }
+        //            for (SynapseGroup synapseGroup : ((Subnetwork) group)
+        //                .getSynapseGroupList()) {
+        //                addGroup(synapseGroup);
+        //            }
+        //        }
 
         if (group.isTopLevelGroup()) {
             groupList.add(group);

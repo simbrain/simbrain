@@ -54,7 +54,7 @@ public class SigmoidalRulePanel extends AbstractSigmoidalRulePanel {
      */
     public static SigmoidalRulePanel createSigmoidalRulePanel() {
         prototypeRule = new SigmoidalRule();
-        SigmoidalRulePanel dsrp = new SigmoidalRulePanel();
+        final SigmoidalRulePanel dsrp = new SigmoidalRulePanel();
         dsrp.cbImplementation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

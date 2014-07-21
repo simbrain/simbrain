@@ -49,11 +49,14 @@ public class SynapseGroup extends Group {
 
     public static final double DEFAULT_EXCITATORY_RATIO = 1.0;
 
+    /** All to All. */
     public static final ConnectNeurons DEFAULT_CONNECTION_MANAGER =
         new AllToAll();
 
+    /** A set containing all the excitatory (wt > 0) synapses in the group. */
     private Set<Synapse> exSynapseSet = new HashSet<Synapse>();
 
+    /** A set containing all the inhibitory (wt < 0) synapses in the group. */
     private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
 
     /** Reference to source neuron group. */
@@ -62,16 +65,56 @@ public class SynapseGroup extends Group {
     /** Reference to target neuron group. */
     private final NeuronGroup targetNeuronGroup;
 
+    /**
+     * The connect neurons object associated with this group, for alterning
+     * connection parameters dynamically.
+     */
     private ConnectNeurons connectionManager;
 
+    /** 
+     * The percent of synapses that are excitatory. This parameter represents
+     * the ideal value of {@link #exSynapseSet}.size() / {@link #size()} 
+     * (the <b>actual</b> excitatory ratio).
+     * This value is a mutable parameter the changing of which will cause the
+     * synapse group to attempt to make:
+     * {@link #exSynapseSet}.size() / {@link #size()}
+     * as close to the excitatoryRatio value as possible 
+     * (see {@link #setExcitatoryRatio(double)}). This means that this value
+     * is an ideal that (usually) the actual excitatory ratio is near, but
+     * seldom exactly equal to. 
+     * Because of the way polarity is chosen for new synapses added to the group
+     * this value represents a central limit that the synapse group would
+     * absolutely reach exactly given an infinite number of synapses.
+     * If the source neurons of this group are themselves polarized the
+     * actual excitatory ratio of the synapses in this group will reflect
+     * the excitatory ratio of the source neurons <b>not<b> this variable. The
+     * group will however attempt to get as close to this ratio as possible
+     * without ever assigning a synapse to a source neuron of opposing polarity.
+     */
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
+    /** 
+     * A template synapse which can be edited to inform the group as to what
+     * parameters a new "blank" excitatory synapse should be given.
+     */
     private Synapse excitatoryPrototype = Synapse.getTemplateSynapse();
 
+    /** 
+     * A template synapse which can be edited to inform the group as to what
+     * parameters a new "blank" inhibitory synapse should be given.
+     */
     private Synapse inhibitoryPrototype = Synapse.getTemplateSynapse();
 
+    /** 
+     * The randomizer governing excitatory synapses. If null new synapses are
+     * not randomized.
+     */
     private PolarizedRandomizer exciteRand;
 
+    /** 
+     * The randomizer governing inhibitory synapses. If null new synapses are
+     * not randomized.
+     */
     private PolarizedRandomizer inhibRand;
 
     /**
@@ -80,10 +123,12 @@ public class SynapseGroup extends Group {
      */
     private boolean displaySynapses;
 
+    /** Whether or not this synapse group is recurrent. */
     private boolean recurrent;
 
     /**
-     *
+     * Completely creates a synapse group between the two neuron groups with
+     * all default parameters. This method creates the individual connections.
      * @param source
      * @param target
      * @return
@@ -94,7 +139,23 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * Completely creates a synapse group with the desired parameters. That is
+     * the connections (individual synapses) are created along with the group.
+     * @param source
+     * @param target
+     * @param connectionManager
+     * @param excitatoryRatio
+     * @return
+     */
+    public static SynapseGroup createSynapseGroup(final NeuronGroup source,
+        final NeuronGroup target, final double excitatoryRatio) {
+        return createSynapseGroup(source, target, DEFAULT_CONNECTION_MANAGER,
+            excitatoryRatio, DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
+    }
+
+    /**
+     * Completely creates a synapse group with the desired parameters. That is
+     * the connections (individual synapses) are created along with the group.
      * @param source
      * @param target
      * @param connectionManager
@@ -107,7 +168,8 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * Completely creates a synapse group with the desired parameters. That is
+     * the connections (individual synapses) are created along with the group.
      * @param source
      * @param target
      * @param connectionManager
@@ -122,7 +184,8 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * Completely creates a synapse group with the desired parameters. That is
+     * the connections (individual synapses) are created along with the group.
      * @param source
      * @param target
      * @param connectionManager
@@ -144,7 +207,11 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * Creates a blank synapse group between a source and target neuron group
+     * using the default connection manager.
+     * Until {@link #makeConnections()} is called this group will be empty and
+     * will not be added to the source or target neuron groups' respective
+     * outgoing and incoming synapse group sets.
      * @param source
      * @param target
      */
@@ -152,14 +219,15 @@ public class SynapseGroup extends Group {
         super(source.getParentNetwork());
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
-        source.addOutgoingSg(this);
-        target.addIncomingSg(this);
         recurrent = testRecurrent();
         initializeSynapseVisibility();
     }
 
     /**
-     * Create a new synapse group.
+     * Creates a blank synapse group between a source and target neuron group.
+     * Until {@link #makeConnections()} is called this group will be empty and
+     * will not be added to the source or target neuron groups' respective
+     * outgoing and incoming synapse group sets.
      *
      * @param source
      *            source neuron group
@@ -174,24 +242,30 @@ public class SynapseGroup extends Group {
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         this.connectionManager = connectionManager;
-        source.addOutgoingSg(this);
-        target.addIncomingSg(this);
         recurrent = testRecurrent();
         initializeSynapseVisibility();
     }
 
     /**
-     *
+     * The "build" method which actually constructs the group in terms of
+     * populating it with synapses. If called on a synapse group which has
+     * already been made (i.e. already has synapses populating it) those
+     * synapses will be destroyed and the current connection manager and
+     * parameters used to create new connections. This method adds the
+     * current synapse group the the source neuron group's outgoing synapse
+     * set and the target neuron group's incoming synapse set. 
      */
     public void makeConnections() {
         clear();
+        sourceNeuronGroup.addOutgoingSg(this);
+        targetNeuronGroup.addIncomingSg(this);
         connectionManager.connectNeurons(this);
     }
 
     /**
-     *
+     * 
      */
-    public synchronized void randomizeConnections() {
+    public synchronized void randomizeConnectionWeights() {
         randomizeExcitatoryConnections();
         randomizeInhibitoryConnections();
     }
@@ -306,12 +380,21 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Returns the excitatory ratio.
+     * Returns the excitatory ratio <b>parameter</b>. For the actual value
+     * 
      *
      * @return the ration of excitatory synapses in this group
      */
     public double getExcitatoryRatio() {
         return excitatoryRatio;
+    }
+
+    /**
+     * @return the <b>actual</b> excitatory ratio measured as the number
+     * of excitatory synapses divided by the total.
+     */
+    public double getExcitatoryRatioPrecise() {
+        return exSynapseSet.size() / (double) size();
     }
 
     /**
@@ -410,7 +493,10 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * Adds a new synapse (one which is "blank") to the synapse group. This is
+     * the <b>preferred</b> method to use for adding synapses to the synapse
+     * group over {@link #addSynapse(Synapse)} because it makes the added
+     * synapse conform to the global parameters of this synapse group.
      * @param synapse
      */
     public void addNewSynapse(final Synapse synapse) {
@@ -423,7 +509,9 @@ public class SynapseGroup extends Group {
             }
         } else {
             double rand = Math.random();
-            if (rand < excitatoryRatio) {
+            double correctionTerm = size() == 0 ? 0
+                : excitatoryRatio - (exSynapseSet.size() / (double) size());
+            if (rand < (excitatoryRatio + correctionTerm)) {
                 addNewExcitatorySynapse(synapse);
             } else {
                 addNewInhibitorySynapse(synapse);
@@ -663,7 +751,7 @@ public class SynapseGroup extends Group {
      * made. Thus after the bulk of the algorithm is completed this method can
      * be called to sort synapses into their appropriate sets.
      */
-    public void checkAndFixInconsistencies() {
+    public void revalidateSynapseSets() {
         Iterator<Synapse> exIterator = exSynapseSet.iterator();
         ArrayList<Synapse> exSwitches = new ArrayList<Synapse>(
             exSynapseSet.size());
@@ -704,7 +792,7 @@ public class SynapseGroup extends Group {
      * @return
      */
     private boolean testRecurrent() {
-        return sourceNeuronGroup == targetNeuronGroup ? true : false;
+        return sourceNeuronGroup == targetNeuronGroup;
     }
 
     /**
@@ -883,7 +971,8 @@ public class SynapseGroup extends Group {
     /**
      * Set delay on all synapses.
      *
-     * @param delay the delay to set
+     * @param delay
+     *            the delay to set
      */
     public void setDelay(final int delay) {
         for (Synapse s : exSynapseSet) {
@@ -956,7 +1045,8 @@ public class SynapseGroup extends Group {
     /**
      * Set the spike responders for all synapses.
      *
-     * @param responder the spike responder to set.
+     * @param responder
+     *            the spike responder to set.
      */
     public void setSpikeResponders(final SpikeResponder responder) {
         setExcitatorySpikeResponders(responder);
@@ -966,7 +1056,8 @@ public class SynapseGroup extends Group {
     /**
      * Set the spike responders for excitatory synapses.
      *
-     * @param responder the spike responder to set.
+     * @param responder
+     *            the spike responder to set.
      */
     public void setExcitatorySpikeResponders(final SpikeResponder responder) {
         for (Synapse s : exSynapseSet) {
@@ -977,7 +1068,8 @@ public class SynapseGroup extends Group {
     /**
      * Set the spike responders for inhibitory synapses.
      *
-     * @param responder the spike responder to set.
+     * @param responder
+     *            the spike responder to set.
      */
     public void setInhibitorySpikeResponders(final SpikeResponder responder) {
         for (Synapse s : inSynapseSet) {

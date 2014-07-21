@@ -18,237 +18,352 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 
-import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.gui.dialogs.connect.CondensedConnectionPanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractSigmoidalRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.ContinuousSigmoidalRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.util.widgets.StopLight;
 
 /**
- * TODO: Unimplemented/Broken... awaiting refactor to conform to new GUI api
+ * 
+ * A panel for creating and setting the parameters of an arbitrary Echo-State
+ * Network.
+ * 
+ * TODO: Include initial scaling factors of terms.
+ * TODO: Consider using simplified continuous time ESN where only leak is important
+ * 
+ * @author Zach Tosi
  *
- * @author ztosi
  */
-public class ESNCreationDialog extends StandardDialog implements
-    PropertyChangeListener {
+@SuppressWarnings("serial")
+public class ESNCreationDialog extends StandardDialog {
 
-    /** Underlying network panel */
-    private final NetworkPanel panel;
+    public static final String TITLE = "ESN Creation Wizard";
 
-    /** Dialog panel */
-    private LabelledItemPanel esnPanel = new LabelledItemPanel();
+    public static final TimeType DEFAULT_TIME_TYPE = TimeType.DISCRETE;
 
-    /** Text field: reads in number of input units */
-    private JTextField tfNumInputs = new JTextField();
+    public static final SquashingFunction DEFAULT_INITIAL_FUNCTION =
+        SquashingFunction.TANH;
 
-    /** Text field: reads in number of reservoir units */
-    private JTextField tfNumReservoir = new JTextField();
+    public static final double DEFAULT_SPECTRAL_RADIUS = 0.98;
 
-    /** Text field: reads in number of output units */
-    private JTextField tfNumOutputs = new JTextField();
+    public static final int DEFAULT_RESERVOIR_POPULATION = 256;
 
-    /** Text field: reads in desired max eigenvalue */
-    private JTextField maxEigenValue = new JTextField();
+    public static final int DEFAULT_INPUT_POPULATION = 1;
 
-    /**
-     * Opens a dialog for setting the parameters of the recurrent connections in
-     * the reservoir.
-     */
-    private JButton resSparsity = new JButton("Reservoir");
+    public static final int DEFAULT_OUTPUT_POPULATION = 1;
+
+    /** A combo box containing the two possible time types an ESN can have. */
+    private JComboBox<TimeType> cbTimeType =
+        new JComboBox<TimeType>(TimeType.values());
+
+    /** The main panel to which all non-dialog specific components are added.*/
+    private Box mainPanel = Box.createVerticalBox();
 
     /**
-     * Opens a dialog for setting the parameters of the connections between the
-     * input layer and the reservoir layer.
+     *  A panel for containing global settings about the ESN.
+     *  TODO: Add initial scaling factor values.
      */
-    private JButton inResSparsity = new JButton("In to Res");
+    private JPanel globalESNSettingsPanel = new JPanel();
 
-    /**
-     * Opens a dialog to set the parameters of the connection between the output
-     * layer and the reservoir layer if they exist.
+    /** 
+     * A specific panel for the input layer. All it requires is a number since
+     * the type must be linear.
      */
-    private JButton backSparsity = new JButton("Out to Res");
+    private JPanel inputLayerPanel = new JPanel();
 
-    /**
-     * A check-box which determines whether or not this ESN will have recurrent
-     * output weights
-     */
-    private JCheckBox recurrentOutputWeights = new JCheckBox();
-
-    /**
-     * A check-box which determines whether or not this ESN will have weights
-     * from the output layer to the reservoir.
-     */
-    private JCheckBox backWeights = new JCheckBox();
-
-    /**
-     * A check-box which determines whether or not this ESN will have weights
-     * directly from input to output
-     */
-    private JCheckBox directInOutWeights = new JCheckBox();
-
-    /**
-     * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
-     * governing desired Neuron type for a given layer
-     */
-    private HashMap<String, NeuronUpdateRule> boxMap =
-        new HashMap<String, NeuronUpdateRule>();
-
-    // Mapping of Strings to NeuronUpdateRules, currently only Logisitc, Tanh,
-    // and Linear neurons are allowed.
+    /** The population (# neurons) in the input layer field. */
+    private JTextField tfInputLayerPop = new JTextField(5);
     {
-        boxMap.put("Linear", new LinearRule());
-        SigmoidalRule sig0 = new SigmoidalRule();
-        sig0.setSquashFunctionType(SquashingFunction.LOGISTIC);
-        boxMap.put("Logistic", sig0);
-        SigmoidalRule sig1 = new SigmoidalRule();
-        sig1.setSquashFunctionType(SquashingFunction.TANH);
-        boxMap.put("Tanh", sig1);
+        // Aesthetic choice...
+        tfInputLayerPop.setHorizontalAlignment(JTextField.RIGHT);
     }
 
-    /** String values for combo-boxes (same as key values for boxMap) */
-    private String[] nTypeOptions = { "Linear", "Tanh", "Logistic" };
+    /** The neuron layer panel corresponding to the reservoir. */
+    private NeuronLayerPanel reservoirPanel;
 
-    /** Combo-box governing desired neuron type of the reservoir */
-    private JComboBox reservoirNeuronTypes = new JComboBox(nTypeOptions);
-
-    /** Combo-box governing the desired neuron type of the output layer */
-    private JComboBox outputNeuronTypes = new JComboBox(nTypeOptions);
-
-    // /**
-    // * A sparse panel for setting the connections between input and reservoir.
-    // */
-    // private SparsePanel inToRes;
-    //
-    // /** A sparse panel for setting the recurrent reservoir connections. */
-    // private SparsePanel resRecurrent;
-    //
-    // /**
-    // * A sparse panel for setting the connections between output and reservoir
-    // * if they exist.
-    // */
-    // private SparsePanel outToRes;
+    /** The neuron layer panel corresponding to the output layer. */
+    private NeuronLayerPanel outputPanel;
 
     /**
-     * A status light indicating whether or not the parameters of the
-     * connections between input and reservoir have been properly set.
+     * A connection panel governing the connections between the input and
+     * the reservoir.
      */
-    private StopLight inToResReady = new StopLight();
+    private CondensedConnectionPanel inToResPanel;
 
     /**
-     * A status light indicating whether or not the parameters of the recurrent
-     * reservoir connections have been properly set.
+     * A connection panel governing the recurrent reservoir connections. By
+     * default randomizers are on.
      */
-    private StopLight resRecurrentReady = new StopLight();
+    private CondensedConnectionPanel resToResPanel;
 
     /**
-     * A status light indicating whether or not the parameters of the
-     * connections between the output and the reservoir have been properly set.
-     * Is not visible if backWeights is not selected.
+     * A connection panel governing the connections from the output to the 
+     * reservoir.
      */
-    private StopLight outToResReady = new StopLight();
+    private CondensedConnectionPanel outToResPanel;
+
+    /** The tabbed pane containing the conneciton panels. */
+    private final JTabbedPane connectionPanels = new JTabbedPane();
+
+    /** 
+     * The text field where the maximum eigenvalue of the recurrent weight
+     * matrix is set.
+     */
+    private final JTextField spectralRadius = new JTextField(15);
+
+    /** Whether or not to create a connection from the output to the reservoir.
+     *  */
+    private final JCheckBox allowOutToRes = new JCheckBox();
 
     /**
-     * Creation dialog constructor.
-     *
-     * @param panel
-     *            Underlying network panel
+     * Whether or not the output should have its own recurrent weights.
+     * Seeing as how these weights are trained the option to set their
+     * parameters is not present to the user.
      */
-    public ESNCreationDialog(final NetworkPanel panel) {
-        this.panel = panel;
-        // Create panels to set individual properties of each user-defined
-        // connection
-        // inToRes = SparsePanel.createSparsePanel(new Sparse(), panel);
-        // resRecurrent = SparsePanel.createSparsePanel(new Sparse(), panel);
-        // outToRes = SparsePanel.createSparsePanel(new Sparse(), panel);
+    private final JCheckBox allowRecurrentOutputs = new JCheckBox();
 
-        // For customized values
-        GridBagConstraints gbc = new GridBagConstraints();
+    /**
+     * Whether or not the input should connect directly to the output.
+     * Seeing as how these weights are trained the option to set their
+     * parameters is not present to the user.
+     */
+    private final JCheckBox directInputToOutput = new JCheckBox();
 
-        setTitle("Build Echo-State Network ");
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        esnPanel.setMyNextItemRow(1);
-        gbc.gridy = esnPanel.getMyNextItemRow();
-        // Align to upper left
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+    /** The network panel where this is all taking place. */
+    private final NetworkPanel networkPanel;
 
-        // Create section for network parameters
-        sectionSeparator("Network Parameters", gbc, 1);
+    /**
+     * A static initializer.
+     * TODO: References to "this" escape in the constructor, however constraints
+     * relating to the use of reflection to summon this dialog prevent a safe
+     * static initializer from being used.
+     * @param network
+     * @return
+     */
+    public static ESNCreationDialog createESNDialog(NetworkPanel network) {
+        ESNCreationDialog ed = new ESNCreationDialog(network);
+        //        ed.initGlobalESNSettingsPanel();
+        //        ed.initConnectionPanels();
+        //        ed.init();
+        //        ed.initListeners();
+        return ed;
+    }
 
-        // Add text-fields
-        tfNumInputs.setColumns(5);
-        esnPanel.addItem("Input Nodes:", tfNumInputs);
-        esnPanel.addItem(new JLabel("Reservoir Neuron Type:"),
-            reservoirNeuronTypes, 2);
-        esnPanel.addItem("Reservoir Nodes:", tfNumReservoir);
-        esnPanel.addItem(new JLabel("Output Neuron Type:"), outputNeuronTypes,
-            2);
-        esnPanel.addItem("Output Nodes:", tfNumOutputs);
+    /**
+     * Creates an dialog for creating and setting the parameters of an 
+     * Echo State Network in a given networkPanel
+     * @param networkPanel
+     */
+    public ESNCreationDialog(NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+        setTitle("ESN Creation Dialog");
+        // TODO: BAD! But currently the way the action manager handles opening
+        // this panel make it so that everything must happen in the constructor.
+        // References to "this" escape before construction is finished as a
+        // result.
+        initGlobalESNSettingsPanel();
+        initConnectionPanels();
+        init();
+        initListeners();
+    }
 
-        // GridBagConstraints for next section
-        int row = esnPanel.getMyNextItemRow();
-        row += 3;
-        // Moves everything down
-        esnPanel.setMyNextItemRow(row);
-        gbc.gridx = 0;
-        gbc.gridy = esnPanel.getMyNextItemRow();
+    /**
+     * 
+     */
+    private void initGlobalESNSettingsPanel() {
 
-        // Adds section for connectivity parameters
-        sectionSeparator("Connectivity Parameters", gbc, row);
+        // Set up the global esn settings panel
+        GridLayout gl = new GridLayout(0, 2);
+        gl.setVgap(5);
+        JPanel gESNSubPanel = new JPanel(gl);
 
-        // Add connectivity parameter check-boxes and buttons
-        JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        tempPanel.add(inToResReady);
-        esnPanel.addItem(tempPanel, 2);
-        esnPanel.addItem(inResSparsity, 3);
-        esnPanel.addItem("Recurrent output weights:", recurrentOutputWeights);
+        // ESN Settings: Time type
+        gESNSubPanel.add(new JLabel("Time Type: "));
+        gESNSubPanel.add(cbTimeType);
 
-        JPanel tempPanel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        tempPanel1.add(resRecurrentReady);
-        esnPanel.addItem(tempPanel1, 2);
-        esnPanel.addItem(resSparsity, 3);
-        esnPanel.addItem("Direct input to output weights:", directInOutWeights);
-        JPanel tempPanel2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        tempPanel2.add(outToResReady);
-        esnPanel.addItem(tempPanel2, 2);
-        esnPanel.addItem(backSparsity, 3);
+        // ESN Settings: Spectral Radius
+        gESNSubPanel.add(new JLabel("Spectral Radius: "));
+        spectralRadius.setText(Double.toString(DEFAULT_SPECTRAL_RADIUS));
+        gESNSubPanel.add(spectralRadius);
 
-        // Default is disabled
-        backSparsity.setEnabled(false);
-        outToResReady.setVisible(false);
-        esnPanel.addItem("Back weights:", backWeights);
-        row = esnPanel.getMyNextItemRow();
-        esnPanel.setMyNextItemRow(row++);
-        esnPanel.addItem(new JLabel("Spectral radius:"), maxEigenValue, 2);
+        GridLayout gl2 = new GridLayout(0, 4);
+        gl2.setVgap(10);
+        JPanel chkBxSubPanel = new JPanel(gl2);
 
-        addActionListeners();
-        addPropertyChangeListeners();
+        // ESN Settings: Recurrent outputs
+        chkBxSubPanel.add(new JLabel("Output\u2192 Output * "));
+        chkBxSubPanel.add(allowRecurrentOutputs);
 
-        setContentPane(esnPanel);
-        fillFieldValues();
+        // ESN Settings: Direct input to output
+        chkBxSubPanel.add(new JLabel("Input\u2192 Output * "));
+        chkBxSubPanel.add(directInputToOutput);
+
+        // ESN Settings: Output to reservoir
+        chkBxSubPanel.add(new JLabel("Output\u2192 Res. "));
+        chkBxSubPanel.add(allowOutToRes);
+
+        // Links the user to the help page for ESNs in case confusion arises
+        // as to the fact that out->out and in->out do not spawn settings 
+        // panels like out->res.
+        JLabel helpIcon = new JLabel(ResourceManager.getImageIcon("Help.png"));
+        chkBxSubPanel.add(new JLabel("* Trained Weights"));
+        chkBxSubPanel.add(helpIcon);
+        helpIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    /** @see Runnable */
+                    public void run() {
+                        Utils.showHelpPage(
+                            "Pages/Network/network/echostatenetwork.html");
+                    }
+                });
+
+            }
+
+        });
+
+        gESNSubPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        chkBxSubPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        globalESNSettingsPanel = new JPanel(new BorderLayout());
+        globalESNSettingsPanel.add(gESNSubPanel, BorderLayout.NORTH);
+        globalESNSettingsPanel.add(chkBxSubPanel, BorderLayout.SOUTH);
+
+    }
+
+    /**
+     * 
+     */
+    private void initConnectionPanels() {
+        // Create panels
+        inToResPanel = new CondensedConnectionPanel(networkPanel, this,
+            DEFAULT_RESERVOIR_POPULATION);
+        inToResPanel.getConnectorPanel().setRecurrent(false);
+        resToResPanel = new CondensedConnectionPanel(networkPanel, this,
+            DEFAULT_RESERVOIR_POPULATION);
+        resToResPanel.getConnectorPanel().setRecurrent(true);
+        outToResPanel = new CondensedConnectionPanel(networkPanel, this,
+            DEFAULT_RESERVOIR_POPULATION);
+        outToResPanel.getConnectorPanel().setRecurrent(false);
+
+        // Create aesthetic borders
+        ((Box) inToResPanel.getMainPanel())
+            .setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+        ((Box) resToResPanel.getMainPanel())
+            .setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+        ((Box) outToResPanel.getMainPanel())
+            .setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+    }
+
+    /**
+     * 
+     */
+    private void init() {
+
+        globalESNSettingsPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+            "Global Settings"));
+        mainPanel.add(globalESNSettingsPanel);
+
+        mainPanel.add(Box.createVerticalStrut(5));
+
+        Box neuronLayerPanels = Box.createVerticalBox();
+        neuronLayerPanels.add(Box.createVerticalStrut(5));
+
+        GridLayout gl = new GridLayout(1, 4);
+        gl.setVgap(5);
+        inputLayerPanel.setLayout(gl);
+        inputLayerPanel.add(new JLabel("Neuron Type: "));
+        JPanel inTypeSub = new JPanel(new FlowLayout());
+        inTypeSub.add(new JLabel("N/A"));
+        inputLayerPanel.add(inTypeSub);
+        inputLayerPanel.add(new JLabel("Population: "));
+        tfInputLayerPop.setText(Integer.toString(DEFAULT_INPUT_POPULATION));
+        JPanel inPopSub = new JPanel(new FlowLayout());
+        inPopSub.add(tfInputLayerPop);
+        inputLayerPanel.add(inPopSub);
+        // Create a 5, 5, 5, 5 insets...
+        inputLayerPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
+        JPanel insetPanel = new JPanel(new BorderLayout());
+        insetPanel.add(inputLayerPanel, BorderLayout.CENTER);
+        insetPanel.setBorder(BorderFactory
+            .createTitledBorder("Input"));
+        neuronLayerPanels.add(insetPanel);
+
+        reservoirPanel = NeuronLayerPanel.createNeuronLayerPanel(this,
+            (TimeType) cbTimeType.getSelectedItem(),
+            DEFAULT_INITIAL_FUNCTION, DEFAULT_RESERVOIR_POPULATION);
+        reservoirPanel.setBorder(BorderFactory
+            .createTitledBorder("Reservoir"));
+        neuronLayerPanels.add(reservoirPanel);
+
+        outputPanel = NeuronLayerPanel.createNeuronLayerPanel(this,
+            (TimeType) cbTimeType.getSelectedItem(),
+            DEFAULT_INITIAL_FUNCTION, DEFAULT_OUTPUT_POPULATION);
+        outputPanel.setBorder(BorderFactory.createTitledBorder("Output"));
+        neuronLayerPanels.add(outputPanel);
+
+        neuronLayerPanels.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+            "Neuron Layer Settings"));
+        neuronLayerPanels.add(Box.createVerticalStrut(10));
+        mainPanel.add(neuronLayerPanels);
+
+        connectionPanels.add(inToResPanel.getMainPanel(), "Input \u2192 Res.");
+        connectionPanels.add(resToResPanel.getMainPanel(), "Res. \u2192 Res.");
+        connectionPanels.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+            "Synaptic Connections"));
+        mainPanel.add(connectionPanels);
+
+        JScrollPane scroller = new JScrollPane(mainPanel);
+        scroller.setBorder(null);
+
+        this.setContentPane(scroller);
 
         // Add a help button
         JButton helpButton = new JButton("Help");
@@ -260,192 +375,416 @@ public class ESNCreationDialog extends StandardDialog implements
     }
 
     /**
-     * Adds all appropriate action listeners to each button and/or checkbox.
+     * 
      */
-    private void addActionListeners() {
+    private void initListeners() {
 
-        // Enables/Disables the button for setting parameters from outputs to
-        // inputs.
-        backWeights.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                if (backWeights.isSelected()) {
-                    backSparsity.setEnabled(true);
-                    outToResReady.setVisible(true);
+        // Adds a CondensedConnectionPanel to the tabbed pane if back-weights
+        // are allowed
+        allowOutToRes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (allowOutToRes.isSelected()) {
+                    connectionPanels.add(outToResPanel.getMainPanel(),
+                        "Out \u2192 Res.");
                 } else {
-                    backSparsity.setEnabled(false);
-                    outToResReady.setVisible(false);
+                    connectionPanels.remove(outToResPanel.getMainPanel());
                 }
+                connectionPanels.repaint();
             }
         });
 
-        // // Opens the sparse panels for each of the user defined connections
-        // resSparsity.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent arg0) {
-        // ConnectionDialog dialog = new ConnectionDialog(resRecurrent);
-        // dialog.getOkButton().addActionListener(resRecurrentReady);
-        // dialog.setLocationRelativeTo(null);
-        // dialog.pack();
-        // dialog.setVisible(true);
-        // }
-        // });
-        // inResSparsity.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent arg0) {
-        // ConnectionDialog dialog = new ConnectionDialog(inToRes);
-        // dialog.getOkButton().addActionListener(inToResReady);
-        // dialog.setLocationRelativeTo(null);
-        // dialog.pack();
-        // dialog.setVisible(true);
-        // }
-        // });
-        // backSparsity.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent arg0) {
-        // ConnectionDialog dialog = new ConnectionDialog(outToRes);
-        // dialog.getOkButton().addActionListener(outToResReady);
-        // dialog.setLocationRelativeTo(null);
-        // dialog.pack();
-        // dialog.setVisible(true);
-        // }
-        // });
+        // Change the rule panel and repaint/pack if the time type is
+        // changed
+        JComboBox<TimeType> ttCb = cbTimeType;
+        ttCb.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reservoirPanel.setTimeType((TimeType) cbTimeType
+                    .getSelectedItem());
+            }
+        });
 
-    }
+        reservoirPanel.getTfPopulation().addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // TODO Auto-generated method stub
 
-    /**
-     * Adds ESNCreationDialog as a proptery change listener to each of the
-     * StopLights. This allows ESNCreationDialog to perform a check to determine
-     * whether or not enough parameters have been set to create an ESN.
-     */
-    private void addPropertyChangeListeners() {
-
-        outToResReady.addPropertyChangeListener(this);
-        resRecurrentReady.addPropertyChangeListener(this);
-        inToResReady.addPropertyChangeListener(this);
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * Checks if each of the used connections has been properly set and either
-     * enables or disables the Ok button accordingly.
-     *
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
-     * PropertyChangeEvent)
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
-
-        boolean check1 = inToResReady.getState();
-        boolean check2 = resRecurrentReady.getState();
-        boolean check3 = outToResReady.getState() || !backSparsity.isSelected();
-
-        if (check1 && check2 && check3) {
-            enableOkButton();
-        } else {
-            disableOkButton();
-        }
-
-    }
-
-    /**
-     * Creates a new dialog section given a title and using a JSeparator. TODO:
-     * This should really be in utils somewhere. Perhaps added to
-     * LabelledItemPanel or made into its own class?
-     *
-     * @param label
-     *            name of the section
-     * @param gbc
-     *            current GridBagConstraints, to align label and separators
-     * @param cRow
-     *            current row relative to LabeledItemPanel
-     */
-    public void
-        sectionSeparator(String label, GridBagConstraints gbc, int cRow) {
-        // Section label
-        esnPanel.add(new JLabel(label), gbc);
-
-        // Place separator directly below label
-        cRow++;
-        esnPanel.setMyNextItemRow(cRow);
-        gbc.gridy = esnPanel.getMyNextItemRow();
-
-        // Add separators incrementing grix each time to cover each column
-        esnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        gbc.gridx = 1;
-        esnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        gbc.gridx = 2;
-        esnPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-
-        // Ensures section content will be below section separator
-        cRow++;
-        esnPanel.setMyNextItemRow(cRow);
-        // Reset column value
-        gbc.gridx = 0;
-    }
-
-    /**
-     * Populate fields with default data.
-     */
-    public void fillFieldValues() {
-
-        disableOkButton(); // Connection parameters have not been set...
-        tfNumInputs.setText("" + 1);
-        tfNumReservoir.setText("" + 64);
-        tfNumOutputs.setText("" + 1);
-        recurrentOutputWeights.setSelected(false);
-        directInOutWeights.setSelected(false);
-        backWeights.setSelected(false);
-        maxEigenValue.setText("" + 0.98);
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.simbrain.util.StandardDialog#closeDialogOk()
-     */
-    @Override
-    protected void closeDialogOk() {
-
-        try {
-
-            if (Integer.parseInt(tfNumReservoir.getText()) < 10) {
-                JOptionPane.showMessageDialog(null,
-                    "Too few reservoir neurons", "Warning!",
-                    JOptionPane.WARNING_MESSAGE);
-                return;
             }
 
-            // Initialize logical network builder
-            int numInputs = Integer.parseInt(tfNumInputs.getText());
-            int numRes = Integer.parseInt(tfNumReservoir.getText());
-            int numOut = Integer.parseInt(tfNumOutputs.getText());
-            EchoStateNetwork esn = new EchoStateNetwork(panel.getNetwork(),
-                numInputs, numRes, numOut, panel.getWhereToAdd());
+            @Override
+            public void focusLost(FocusEvent e) {
+                Integer numTargs = Utils.parseInteger(reservoirPanel
+                    .getTfPopulation());
+                if (numTargs == null) {
+                    return;
+                }
+                inToResPanel.getConnectorPanel().setNumTargs(numTargs);
+                resToResPanel.getConnectorPanel().setNumTargs(numTargs);
+                outToResPanel.getConnectorPanel().setNumTargs(numTargs);
+            }
 
-            esn.setSpectralRadius(Double.parseDouble(maxEigenValue.getText()));
-            esn.setRecurrentOutWeights(recurrentOutputWeights.isSelected());
-            esn.setDirectInOutWeights(directInOutWeights.isSelected());
-            esn.setBackWeights(backWeights.isSelected());
-            NeuronUpdateRule resUp = boxMap.get(reservoirNeuronTypes
-                .getSelectedItem());
-            esn.setReservoirNeuronType(resUp);
-            NeuronUpdateRule outUp = boxMap.get(outputNeuronTypes
-                .getSelectedItem());
-            esn.setOutputNeuronType(outUp);
+        });
 
-            // Build network
-            esn.buildNetwork();
-            // esn.connectLayers(inToRes.getConnection(),
-            // resRecurrent.getConnection(), outToRes.getConnection());
-            panel.getNetwork().addGroup(esn);
+    }
 
-            dispose();
+    /**
+     * Create an ESN from the data entered in this panel
+     * @return and ESN based on the data in the panel
+     */
+    public EchoStateNetwork commitChanges() {
 
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "Inappropriate Field Values:"
-                + "\nNetwork construction failed.", "Error",
-                JOptionPane.ERROR_MESSAGE);
-            nfe.printStackTrace();
+        Network net = networkPanel.getNetwork();
+
+        // Create constituent neuron groups...
+
+        // Input layer
+        Integer numIns = Utils.parseInteger(tfInputLayerPop);
+        if (numIns == null) {
+            throw new IllegalArgumentException("Non-Number input population.");
+        }
+        NeuronGroup inputLayer = new NeuronGroup(net, numIns);
+        if (inputLayer.size() > inputLayer.getGridThreshold()) {
+            inputLayer.setLayout(new org.simbrain.network.layouts.GridLayout());
+        }
+        inputLayer.applyLayout();
+
+        // Reservoir layer
+        NeuronGroup reservoirLayer = reservoirPanel.createLayerFromData();
+        //        for (Neuron n : reservoirLayer.getNeuronList()) {
+        //            ((NoisyUpdateRule) n.getUpdateRule()).setAddNoise(true);
+        //        }
+        if (reservoirLayer.size() > reservoirLayer.getGridThreshold()) {
+            reservoirLayer
+                .setLayout(new org.simbrain.network.layouts.GridLayout());
+        }
+        reservoirLayer.applyLayout();
+
+        // Reservoir's synapse group must be initialized alongside the reservoir
+        // neuron group
+        SynapseGroup resSynapses = resToResPanel.createSynapseGroup(
+            reservoirLayer, reservoirLayer);
+        resSynapses.setLabel("Res \u2192 Res");
+
+        // Output layer
+        NeuronGroup outputLayer = outputPanel.createLayerFromData();
+        outputLayer.applyLayout();
+        if (outputLayer.size() > outputLayer.getGridThreshold()) {
+            outputLayer
+                .setLayout(new org.simbrain.network.layouts.GridLayout());
+        }
+
+        // Make a bare ESN (no neuron or synapse groups)
+        EchoStateNetwork esn = new EchoStateNetwork(net, networkPanel
+            .getLastClickedPosition());
+
+        // Set gloabl ESN settings
+        esn.setBackWeights(allowOutToRes.isSelected());
+        esn.setDirectInOutWeights(directInputToOutput.isSelected());
+        esn.setRecurrentOutWeights(allowRecurrentOutputs.isSelected());
+        esn.setTimeType((TimeType) cbTimeType.getSelectedItem());
+        double maxEig = Utils.doubleParsable(spectralRadius);
+        if (Double.isNaN(maxEig)) {
+            throw new IllegalArgumentException("Non-Number spectral radius.");
+        }
+
+        // Initialize Neuron Groups
+        esn.initializeInputLayer(inputLayer);
+        esn.initializeReservoir(reservoirLayer, resSynapses, maxEig);
+        esn.initializeOutput(outputLayer);
+
+        // Initialize Synapse Groups
+        SynapseGroup itr = inToResPanel.createSynapseGroup(inputLayer,
+            reservoirLayer);
+        itr.setLabel("In \u2192 Res");
+        esn.addSynapseGroup(itr);
+
+        SynapseGroup rto = SynapseGroup.createSynapseGroup(reservoirLayer,
+            outputLayer, 0.5);
+        rto.setLabel("Res \u2192 Out");
+        esn.addSynapseGroup(rto);
+        if (allowRecurrentOutputs.isSelected()) {
+            SynapseGroup oto = SynapseGroup.createSynapseGroup(outputLayer,
+                outputLayer, 0.5);
+            oto.setLabel("Out \u2192 Out");
+            esn.addSynapseGroup(oto);
+        }
+        if (allowOutToRes.isSelected()) {
+            SynapseGroup otr = outToResPanel.createSynapseGroup(outputLayer,
+                reservoirLayer);
+            otr.setLabel("Out \u2192 Res.");
+            esn.addSynapseGroup(otr);
+        }
+        if (directInputToOutput.isSelected()) {
+            SynapseGroup ito = SynapseGroup.createSynapseGroup(inputLayer,
+                outputLayer, 0.5);
+            ito.setLabel("In \u2192 Out");
+            esn.addSynapseGroup(ito);
+        }
+        esn.positionLayers();
+
+        return esn;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * If any fields are invalid does not close dialog. In such a case a 
+     * pop-up dialog is used to indicate that there was an error and the user
+     * has the opportunity to correct the mistake.
+     */
+    @Override
+    public void closeDialogOk() {
+        try {
+            EchoStateNetwork esn = commitChanges();
+            networkPanel.addGroup(esn); //Add the esn to the network
+            networkPanel.getNetwork().addGroup(esn);
+            networkPanel.getNetwork().fireNetworkChanged();
+            super.closeDialogOk(); // close dialog normally
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            ex.printStackTrace();
+            // Something went wrong... user probably put a non-sensical value
+            // in one of the fields.
+            JOptionPane.showMessageDialog(new JFrame(), "BUILD FAILURE:"
+                + "\nOne or more entered parameters are invalid. "
+                + "\nCheck all fields for invalid variable assignments.",
+                "Network Creation Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * 
+     * A panel for creating neuron layers appropriate for ESNs... that is ones
+     * which only specify a population and constrain the update rule to
+     * be sigmoidal. Here as a convenience. 
+     * 
+     * @author Zach Tosi
+     *
+     */
+    private static class NeuronLayerPanel extends JPanel {
+
+        public static final Color TANH_COLOR = new Color(20, 100, 0);
+
+        public static final Color LOG_COLOR = new Color(120, 120, 0);
+
+        public static final Color ARCT_COLOR = new Color(120, 0, 120);
+
+        private JTextField tfPopulation = new JTextField(5);
+
+        {
+            tfPopulation.setHorizontalAlignment(JTextField.RIGHT);
+        }
+
+        /** The label that displays the type of squashing function being used.*/
+        private JLabel typeLabel;
+
+        /** 
+         * The triangle that when clicked displays or hides {@link #rulePanel}
+         * so that specific attributes of the neuron update rule can be set.
+         */
+        private DropDownTriangle editTriangle;
+
+        /** The sigmoidal rule panel: either discrete or continuous. */
+        private AbstractSigmoidalRulePanel rulePanel;
+
+        /** The parent dialog for resizing. */
+        private final ESNCreationDialog parent;
+
+        /**
+         * 
+         * @param parent
+         * @param timeType
+         * @param initialFunc
+         * @param initPop
+         * @return
+         */
+        public static NeuronLayerPanel createNeuronLayerPanel(
+            ESNCreationDialog parent,
+            TimeType timeType, SquashingFunction initialFunc, int initPop) {
+            NeuronLayerPanel nlp = new NeuronLayerPanel(parent, timeType,
+                initialFunc, initPop);
+            nlp.setTimeType(timeType);
+            nlp.rulePanel.getCbImplementation().setSelectedItem(initialFunc);
+            nlp.initListeners();
+            nlp.init();
+            // TODO: Cleanup/generalize
+            nlp.typeLabel.setForeground(TANH_COLOR);
+            return nlp;
+        }
+
+        /**
+         * 
+         * @param parent
+         * @param timeType
+         * @param initialFunc
+         * @param initPop
+         */
+        private NeuronLayerPanel(ESNCreationDialog parent, TimeType timeType,
+            SquashingFunction initialFunc, int initPop) {
+            this.parent = parent;
+            tfPopulation.setText(Integer.toString(initPop));
+            editTriangle =
+                new DropDownTriangle(UpDirection.LEFT, false, "Edit",
+                    "Edit", parent);
+
+        }
+
+        /**
+         * 
+         */
+        private void init() {
+
+            this.setLayout(new BorderLayout());
+
+            // Add the basic info (pop and type label) panel
+            GridLayout gl = new GridLayout(1, 4);
+            gl.setVgap(5);
+            JPanel basicPanel = new JPanel(gl);
+            basicPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 5));
+            basicPanel.add(new JLabel("Neuron Type: "));
+            typeLabel = new JLabel(rulePanel.getCbImplementation()
+                .getSelectedItem().toString());
+            JPanel tSub = new JPanel(new FlowLayout());
+            tSub.add(typeLabel);
+            basicPanel.add(tSub);
+            basicPanel.add(new JLabel("Population: "));
+            JPanel tfSub = new JPanel(new FlowLayout());
+            tfSub.add(tfPopulation);
+            basicPanel.add(tfSub);
+            this.add(basicPanel, BorderLayout.NORTH);
+
+            // Add the drop-down triangle
+            JPanel editWrapper =
+                new JPanel(new FlowLayout(FlowLayout.TRAILING));
+            editWrapper
+                .setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 15));
+            editWrapper.add(editTriangle);
+            this.add(editWrapper, BorderLayout.CENTER);
+
+            // Add the rule panel
+            rulePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            rulePanel.setVisible(editTriangle.isDown());
+            this.add(rulePanel, BorderLayout.SOUTH);
+
+            resetLabelColors();
+            repaint();
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public JTextField getTfPopulation() {
+            return tfPopulation;
+        }
+
+        /**
+         * 
+         */
+        private void initListeners() {
+
+            // Make the extra details about the implementation visible/invisible
+            editTriangle.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    rulePanel.setVisible(editTriangle.isDown());
+                    repaint();
+                    parent.pack();
+                }
+
+                // Does nothing...
+                @Override
+                public void mousePressed(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                }
+            });
+
+        }
+
+        /**
+         * 
+         */
+        public void resetLabelColors() {
+            JComboBox<SquashingFunction> impCb =
+                rulePanel.getCbImplementation();
+            SquashingFunction func =
+                (SquashingFunction) impCb.getSelectedItem();
+            typeLabel.setText(func.toString());
+            // TODO: Cleanup/generalize
+            if (func == SquashingFunction.TANH) {
+                typeLabel.setForeground(TANH_COLOR);
+            } else if (func == SquashingFunction.LOGISTIC) {
+                typeLabel.setForeground(LOG_COLOR);
+            } else {
+                // TODO: Better assertion. Check ALL Squashing functions.
+                assert func == SquashingFunction.ARCTAN : "No such squashing function";
+                typeLabel.setForeground(ARCT_COLOR);
+            }
+        }
+
+        /**
+         * 
+         * @return
+         * @throws IllegalArgumentException
+         */
+        public NeuronGroup createLayerFromData()
+            throws IllegalArgumentException {
+            Integer numNeurons = Utils.parseInteger(tfPopulation);
+            if (numNeurons == null) {
+                throw new IllegalArgumentException("Non-number population"
+                    + " value.");
+            }
+            ArrayList<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
+            for (int i = 0; i < numNeurons; i++) {
+                neurons.add(new Neuron(parent.networkPanel.getNetwork()));
+            }
+            rulePanel.commitChanges(neurons);
+            return new NeuronGroup(parent.networkPanel.getNetwork(), neurons);
+        }
+
+        /**
+         * Changes the time type and alters the update rule panel accordingly.
+         * Also resizes/repaints the frame/panel.
+         * @param timeType
+         */
+        public void setTimeType(TimeType timeType) {
+            if (timeType == TimeType.DISCRETE) {
+                rulePanel = SigmoidalRulePanel
+                    .createSigmoidalRulePanel();
+            } else {
+                rulePanel = ContinuousSigmoidalRulePanel
+                    .createContinuousSigmoidalRulePanel();
+            }
+            // Update the Type Label based on the selection in the combobox
+            JComboBox<SquashingFunction> impCb =
+                rulePanel.getCbImplementation();
+            impCb.setSelectedItem(DEFAULT_INITIAL_FUNCTION);
+            impCb.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SquashingFunction func =
+                        (SquashingFunction) impCb.getSelectedItem();
+                    typeLabel.setText(func.toString());
+                    // TODO: Cleanup/generalize
+                    resetLabelColors();
+                    repaint();
+                }
+            });
+            removeAll();
+            init();
+            revalidate();
+            parent.pack();
         }
 
     }

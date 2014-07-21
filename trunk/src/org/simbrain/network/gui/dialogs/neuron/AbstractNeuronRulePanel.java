@@ -86,9 +86,9 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
         RULE_MAP.put(new NakaRushtonRule().getDescription(),
             new NakaRushtonRulePanel());
         RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
-            new ContinuousSigmoidalRulePanel());
+            ContinuousSigmoidalRulePanel.createContinuousSigmoidalRulePanel());
         RULE_MAP.put(new SigmoidalRule().getDescription(),
-            new SigmoidalRulePanel());
+            SigmoidalRulePanel.createSigmoidalRulePanel());
         RULE_MAP.put(new SpikingThresholdRule().getDescription(),
             new SpikingThresholdRulePanel());
         RULE_MAP.put(new ThreeValueRule().getDescription(),

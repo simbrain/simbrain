@@ -56,10 +56,10 @@ public class FeedForward extends Subnetwork {
      *            the type of Neuron to use for the input layer
      */
     public FeedForward(final Network network, int[] nodesPerLayer,
-            Point2D initialPosition, final Neuron inputNeuronTemplate) {
+        Point2D initialPosition, final Neuron inputNeuronTemplate) {
         super(network);
         buildNetwork(network, nodesPerLayer, initialPosition,
-                inputNeuronTemplate);
+            inputNeuronTemplate);
     }
 
     /**
@@ -76,7 +76,7 @@ public class FeedForward extends Subnetwork {
      *            upper left corner where network will be placed.
      */
     public FeedForward(final Network network, int[] nodesPerLayer,
-            Point2D initialPosition) {
+        Point2D initialPosition) {
         super(network);
         LinearRule rule = new LinearRule();
         Neuron neuron = new Neuron(network, rule);
@@ -100,7 +100,7 @@ public class FeedForward extends Subnetwork {
      *            the type of Neuron to use for the input layer
      */
     private void buildNetwork(final Network network, int[] nodesPerLayer,
-            Point2D initialPosition, final Neuron inputNeuronTemplate) {
+        Point2D initialPosition, final Neuron inputNeuronTemplate) {
 
         setLabel("Layered Network");
 
@@ -135,16 +135,16 @@ public class FeedForward extends Subnetwork {
             }
 
             NeuronGroup hiddenLayer = new NeuronGroup(network,
-                    hiddenLayerNeurons);
+                hiddenLayerNeurons);
             hiddenLayer.setLayoutBasedOnSize();
             addNeuronGroup(hiddenLayer);
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,
-                    Direction.NORTH, betweenLayerInterval);
+                Direction.NORTH, betweenLayerInterval);
 
             AllToAll connection = new AllToAll();
             SynapseGroup lh = connectNeuronGroups(lastLayer, hiddenLayer,
-                    connection);
-            lh.randomizeConnections();
+                connection);
+            lh.randomizeConnectionWeights();
 
             // Reset last layer
             lastLayer = hiddenLayer;

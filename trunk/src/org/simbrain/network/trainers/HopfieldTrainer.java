@@ -75,7 +75,7 @@ public class HopfieldTrainer extends Trainer {
         }
         vals = SimbrainMath.multVector(vals, normConstant);
         // Make sure excitatory/inhibitory are in proper lists
-        hopfield.getSynapseGroup().checkAndFixInconsistencies();
+        hopfield.getSynapseGroup().revalidateSynapseSets();
         hopfield.getParentNetwork().fireNetworkChanged();
     }
 

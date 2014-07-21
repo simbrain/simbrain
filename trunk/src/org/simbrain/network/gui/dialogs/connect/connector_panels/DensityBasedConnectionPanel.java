@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -93,6 +94,8 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private JCheckBox allowSelfConnectChkBx = new JCheckBox();
 
+    private JPanel allowSelfConnectPanel = new JPanel();
+
     /**
      * The sparse connection object to which changes to this panel will be
      * committed.
@@ -121,7 +124,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      * The number of target neurons being connected to. Used for determining the
      * number of efferents per source neuron when efferents are equalized.
      */
-    private final int numTargs;
+    private int numTargs;
 
     private boolean allowSelfConnect = false;
 
@@ -184,7 +187,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
             NeuronGroup target =
                 networkPanel.getSelectedModelNeuronGroups().get(0);
             numTargs = target.size();
-            recurrentConnection = source.equals(target);
+            setRecurrent(source.equals(target));
         } else {
             Set<Neuron> sources =
                 new HashSet<Neuron>(networkPanel.getSelectedModelNeurons());
@@ -195,7 +198,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
             int newSize = sources.size();
             // Counts as recurrent iff all the source neurons are the same as
             // all the target neurons.
-            recurrentConnection = sourcesSize == newSize;
+            setRecurrent(sourcesSize == newSize);
         }
     }
 
@@ -211,7 +214,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         // Equalize Efferents
         // Allow Self-Connection
         JPanel sparseTextPanel = new JPanel(new FlowLayout());
-        sparseTextPanel.add(new JLabel("Connection Density: "));
+        sparseTextPanel.add(new JLabel("Density: "));
         Dimension sSize = densityTf.getPreferredSize();
         sSize.width = 40;
         densityTf.setPreferredSize(sSize);
@@ -225,7 +228,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         synsPerSource.setPreferredSize(sSize);
         equalizerPanel.add(synsPerSource);
 
-        JPanel allowSelfConnectPanel = new JPanel(new FlowLayout());
+        allowSelfConnectPanel = new JPanel(new FlowLayout());
         allowSelfConnectPanel.add(new JLabel("Self Connections: "));
         allowSelfConnectPanel.add(allowSelfConnectChkBx);
 
@@ -265,7 +268,12 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.NORTHEAST;
-        this.add(allowSelfConnectPanel, gbc);
+        if (recurrentConnection) {
+            this.add(allowSelfConnectPanel, gbc);
+        } else {
+            this.add(Box.createRigidArea(allowSelfConnectPanel
+                .getPreferredSize()), gbc);
+        }
 
         densityTfListener.enable();
         synsPerSourceListener.enable();
@@ -567,6 +575,14 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         return recurrentConnection;
     }
 
+    public void setRecurrent(boolean recurrent) {
+        recurrentConnection = recurrent;
+        if (densityTfListener != null && synsPerSourceListener != null
+            && sliderListener != null) {
+            refresh();
+        }
+    }
+
     /**
      * @return the number of target neurons.
      */
@@ -575,12 +591,38 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
+     * 
+     * @param numTargs
+     */
+    public void setNumTargs(int numTargs) {
+        this.numTargs = numTargs;
+        int nt = allowSelfConnect ? numTargs : numTargs - 1;
+        int sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
+        synsPerSource.setValue(new Integer(sps));
+    }
+
+    /**
+     * 
+     * @param density
+     */
+    public void setDensity(double density) {
+        densityTf.setText(Double.toString(density));
+        sliderListener.enable();
+        connectionDensitySlider.setValue((int) (density * 100));
+        sliderListener.disable();
+    }
+
+    /**
      * Refreshes the panel's view.
      */
     public void refresh() {
+        densityTfListener.disable();
         double density = Utils.doubleParsable(densityTf);
         densityTf.setText(Double.toString(density));
-        densityTfListener.disable();
+        densityTfListener.enable();
+        this.removeAll();
+        initializeLayout();
+        this.repaint();
     }
 
     @Override

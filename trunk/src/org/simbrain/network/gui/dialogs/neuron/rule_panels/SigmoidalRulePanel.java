@@ -20,77 +20,63 @@ package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JComboBox;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SquashingFunction;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * <b>SigmoidalNeuronPanel</b>.
+ * <b>SigmoidalRulePanel</b>. A rule panel for editing neurons which use
+ * a discrete sigmoid squashing function as their update rule.
+ * 
+ * TODO: Discuss renaming to "DiscreteSigmoidalRulePanel".
+ * 
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  */
-public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
-
-    /** Implementation combo box. */
-    private JComboBox<SquashingFunction> cbImplementation =
-            new JComboBox<SquashingFunction>(new SquashingFunction[] {
-                SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
-                SquashingFunction.TANH, });
-
-    /** Bias field. */
-    private JTextField tfBias = new JTextField();
-
-    /** Slope field. */
-    private JTextField tfSlope = new JTextField();
-
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
-
-    /** Random tab. */
-    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
-
-    /** Add noise combo box. */
-    private TristateDropDown isAddNoise = new TristateDropDown();
+@SuppressWarnings("serial")
+public class SigmoidalRulePanel extends AbstractSigmoidalRulePanel {
 
     /** A reference to the neuron rule being edited. */
-    private static final SigmoidalRule prototypeRule = new SigmoidalRule();
+    private static SigmoidalRule prototypeRule;
 
     /**
-     * The initially selected squashing function (or NULL_STRING), used for
-     * determining how to fill field values based on the selected
-     * implementation.
+     * Creates a fully functional discrete sigmoidal rule panel.
+     * 
+     * @return
      */
-    private SquashingFunction initialSfunction;
-
-    /** The upper bound for whatever state the panel starts in. */
-    private String initialUBound;
-
-    /** The lower bound for whatever state the panel starts in. */
-    private String initialLBound;
+    public static SigmoidalRulePanel createSigmoidalRulePanel() {
+        prototypeRule = new SigmoidalRule();
+        SigmoidalRulePanel dsrp = new SigmoidalRulePanel();
+        dsrp.cbImplementation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SquashingFunction currentFunc = (SquashingFunction)
+                    dsrp.cbImplementation.getSelectedItem();
+                if (!currentFunc.equals(dsrp.initialSfunction)) {
+                    prototypeRule.setSquashFunctionType(currentFunc);
+                    dsrp.fillDefaultValues();
+                }
+                dsrp.repaint();
+            }
+        });
+        dsrp.fillDefaultValues();
+        return dsrp;
+    }
 
     /**
-     * Creates an instance of this panel.
-     *
+     * Creates the discrete sigmoidal rule panel, but does not initialize the
+     * listeners responsible for altering the panel in response to the selected
+     * squashing function.
      */
-    public SigmoidalRulePanel() {
+    private SigmoidalRulePanel() {
         super();
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);
@@ -99,19 +85,6 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
         mainTab.addItem("Add Noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
-        cbImplementation.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SquashingFunction currentFunc = (SquashingFunction)
-                        cbImplementation.getSelectedItem();
-                if (!currentFunc.equals(initialSfunction)) {
-                    prototypeRule.setSquashFunctionType(currentFunc);
-                    fillDefaultValues();
-                }
-                repaint();
-            }
-        });
     }
 
     /**
@@ -119,27 +92,28 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 
-        SigmoidalRule neuronRef = (SigmoidalRule) ruleList.get(0);
+        SigmoidalRule neuronRef =
+            (SigmoidalRule) ruleList.get(0);
 
         // (Below) Handle consistency of multiple selections
 
         // Handle Implementation/Type
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getSquashFunctionType"))
+            "getSquashFunctionType"))
         {
             if ((cbImplementation.getItemCount()
-                    == SquashingFunction.values().length - 1))
+            == SquashingFunction.values().length - 1))
             {
                 cbImplementation.addItem(SquashingFunction.NULL_STRING);
             }
             cbImplementation
-                    .setSelectedIndex(SquashingFunction.values().length - 1);
+                .setSelectedIndex(SquashingFunction.values().length - 1);
         } else {
             cbImplementation.setSelectedItem(neuronRef.getSquashFunctionType());
         }
         // Handle Bias
         if (!NetworkUtils
-                .isConsistent(ruleList, SigmoidalRule.class, "getBias"))
+            .isConsistent(ruleList, SigmoidalRule.class, "getBias"))
         {
             tfBias.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -147,7 +121,7 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
         }
         // Handle Slope
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getSlope"))
+            "getSlope"))
         {
             tfSlope.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -156,7 +130,7 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalRule.class,
-                "getAddNoise"))
+            "getAddNoise"))
         {
             isAddNoise.setNull();
         } else {
@@ -164,23 +138,7 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
         }
         randTab.fillFieldValues(getRandomizers(ruleList));
         initialSfunction = (SquashingFunction) cbImplementation.
-                getSelectedItem();
-    }
-
-    /**
-     * @param ruleList the list of neuron update rules from which to extract
-     *  randomizers.
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(
-            List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((SigmoidalRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
+            getSelectedItem();
     }
 
     /**
@@ -234,12 +192,12 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
 
         // Implementation: Logistic/Tanh/Arctan
         if (!cbImplementation.getSelectedItem().equals(
-                SquashingFunction.NULL_STRING))
+            SquashingFunction.NULL_STRING))
         {
             for (int i = 0; i < numNeurons; i++) {
                 ((SigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setSquashFunctionType((SquashingFunction)
-                                cbImplementation.getSelectedItem());
+                    .setSquashFunctionType((SquashingFunction)
+                    cbImplementation.getSelectedItem());
             }
         }
 
@@ -247,7 +205,8 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
         double bias = Utils.doubleParsable(tfBias);
         if (!Double.isNaN(bias)) {
             for (int i = 0; i < numNeurons; i++) {
-                ((SigmoidalRule) neurons.get(i).getUpdateRule()).setBias(bias);
+                ((SigmoidalRule) neurons.get(i).getUpdateRule())
+                    .setBias(bias);
             }
         }
 
@@ -256,17 +215,18 @@ public class SigmoidalRulePanel extends AbstractNeuronRulePanel {
         if (!Double.isNaN(slope)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((SigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setSlope(slope);
+                    .setSlope(slope);
             }
         }
 
         // Add Noise?
         if (!isAddNoise.isNull()) {
-            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+            boolean addNoise =
+                isAddNoise.getSelectedIndex() == TristateDropDown
                     .getTRUE();
             for (int i = 0; i < numNeurons; i++) {
                 ((SigmoidalRule) neurons.get(i).getUpdateRule())
-                        .setAddNoise(addNoise);
+                    .setAddNoise(addNoise);
             }
             if (addNoise) {
                 randTab.commitRandom(neurons);

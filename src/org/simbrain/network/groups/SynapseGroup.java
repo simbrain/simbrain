@@ -1118,7 +1118,13 @@ public class SynapseGroup extends Group {
      * @return true if all synapses are frozen, false otherwise
      */
     public boolean isFrozen() {
-        return isAllExcitatoryFrozen() && isAllInhibitoryFrozen();
+        if (exSynapseSet.isEmpty() && !inSynapseSet.isEmpty()) {
+            return isAllInhibitoryFrozen();
+        } else if (!exSynapseSet.isEmpty() && inSynapseSet.isEmpty())  {
+            return isAllExcitatoryFrozen();
+        } else {
+            return isAllExcitatoryFrozen() && isAllInhibitoryFrozen();
+        }
     }
 
     /**
@@ -1171,11 +1177,17 @@ public class SynapseGroup extends Group {
      * @return true if all synapses are enabled, false otherwise
      */
     public boolean isEnabled() {
-        return isAllExcitatoryEnabled() && isAllInhibitoryEnabled();
+        if (exSynapseSet.isEmpty() && !inSynapseSet.isEmpty()) {
+            return isAllInhibitoryEnabled();
+        } else if (!exSynapseSet.isEmpty() && inSynapseSet.isEmpty())  {
+            return isAllExcitatoryEnabled();
+        } else {
+            return isAllExcitatoryEnabled() && isAllInhibitoryEnabled();
+        }
     }
 
     /**
-     * @return
+     * @return true if all excitatory synapses are enabled, false otherwise
      */
     public boolean isAllExcitatoryEnabled() {
         Iterator<Synapse> exIter = exSynapseSet.iterator();
@@ -1185,7 +1197,7 @@ public class SynapseGroup extends Group {
                 return false; // Not _all_ the excitatory synapses are enabled
             } else {
                 while (exIter.hasNext()) {
-                    if (!exIter.next().isFrozen()) {
+                    if (!exIter.next().isEnabled()) {
                         return false;
                     }
                 }
@@ -1197,7 +1209,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * @return
+     * @return true if all inhibitory synapses are enabled, false otherwise
      */
     public boolean isAllInhibitoryEnabled() {
         Iterator<Synapse> inIter = inSynapseSet.iterator();
@@ -1207,7 +1219,7 @@ public class SynapseGroup extends Group {
                 return false; // Not _all_ the inhibitory synapses are enabled
             } else {
                 while (inIter.hasNext()) {
-                    if (!inIter.next().isFrozen()) {
+                    if (!inIter.next().isEnabled()) {
                         return false;
                     }
                 }

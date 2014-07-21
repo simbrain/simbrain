@@ -537,9 +537,7 @@ public class ESNCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
             EchoStateNetwork esn = commitChanges();
-            networkPanel.addGroup(esn); //Add the esn to the network
             networkPanel.getNetwork().addGroup(esn);
-            networkPanel.getNetwork().fireNetworkChanged();
             super.closeDialogOk(); // close dialog normally
         } catch (IllegalArgumentException | IllegalStateException ex) {
             ex.printStackTrace();

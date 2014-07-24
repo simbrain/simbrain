@@ -119,6 +119,9 @@ public class NetworkPropertiesPanel extends JPanel {
     /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
 
+    /** Network time step text field. */
+    private JTextField timeStepField = new JTextField();
+
     /** Wand radius. */
     private JTextField wandRadiusField = new JTextField();
 
@@ -174,9 +177,10 @@ public class NetworkPropertiesPanel extends JPanel {
 
         // Other properties
         LabelledItemPanel miscPanel = new LabelledItemPanel();
-        nudgeAmountField.setColumns(3);
+        miscPanel.addItem("Network time step", timeStepField);
         miscPanel.addItem("Synapse visibility threshold",
                 tfSynapseVisibilityThreshold);
+        nudgeAmountField.setColumns(3);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
         miscPanel.addItem("Wand radius", wandRadiusField);
         // TODO: tooltips for all this
@@ -278,6 +282,8 @@ public class NetworkPropertiesPanel extends JPanel {
         showTimeBox.setSelected(networkPanel.getShowTime());
         wandRadiusField.setText(Integer.toString(EditMode
                 .getWandRadius()));
+        timeStepField.setText(Double.toString(networkPanel.getNetwork()
+                .getTimeStep()));
         nudgeAmountField.setText(Double.toString(NetworkPanel
                 .getNudgeAmount()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(Network
@@ -289,6 +295,8 @@ public class NetworkPropertiesPanel extends JPanel {
      * these unchanged.
      */
     public void commitChanges() {
+        networkPanel.getNetwork().setTimeStep(
+                Double.parseDouble(timeStepField.getText()));
         NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
         Network.setSynapseVisibilityThreshold(Integer

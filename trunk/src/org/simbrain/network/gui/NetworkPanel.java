@@ -577,15 +577,18 @@ public class NetworkPanel extends JPanel {
      * representation.
      */
     private void updatePersistentNodes() {
-        for (PNode node : getPersistentNodes()) {
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.update();
-            } else if (node instanceof SynapseNode) {
-                if (node.getVisible()) {
-                    SynapseNode synapseNode = (SynapseNode) node;
-                    synapseNode.updateColor();
-                    synapseNode.updateDiameter();
+        //        System.out.println(guiOn);
+        if (this.guiOn) {
+            for (PNode node : getPersistentNodes()) {
+                if (node instanceof NeuronNode) {
+                    NeuronNode neuronNode = (NeuronNode) node;
+                    neuronNode.update();
+                } else if (node instanceof SynapseNode) {
+                    if (node.getVisible()) {
+                        SynapseNode synapseNode = (SynapseNode) node;
+                        synapseNode.updateColor();
+                        synapseNode.updateDiameter();
+                    }
                 }
             }
         }
@@ -816,7 +819,7 @@ public class NetworkPanel extends JPanel {
      * @param group
      *            the group to add
      */
-    public void addGroup(Group group) {
+    private void addGroup(Group group) {
 
         // If the object has already been added don't keep going.
         if (objectNodeMap.get(group) != null) {
@@ -846,8 +849,6 @@ public class NetworkPanel extends JPanel {
         }
         clearSelection();
     }
-
-    private static int counter = 0;
 
     /**
      *
@@ -927,7 +928,7 @@ public class NetworkPanel extends JPanel {
      *            the neuron group to create a piccolo node for
      * @return the node
      */
-    protected NeuronGroupNode createNeuronGroupNode(NeuronGroup neuronGroup) {
+    private NeuronGroupNode createNeuronGroupNode(NeuronGroup neuronGroup) {
         NeuronGroupNode ret;
         if (neuronGroup instanceof SOMGroup) {
             ret = new SOMGroupNode(NetworkPanel.this, (SOMGroup) neuronGroup);
@@ -969,7 +970,7 @@ public class NetworkPanel extends JPanel {
      * @param synapseGroup
      *            the SynapseGroup to add
      */
-    protected void addSynapseGroup(final SynapseGroup synapseGroup) {
+    private void addSynapseGroup(final SynapseGroup synapseGroup) {
         // Create visible or invisible synapse group depending on settings
         if (synapseGroup.isDisplaySynapses()) {
             addSynapseGroupFull(synapseGroup);
@@ -979,7 +980,7 @@ public class NetworkPanel extends JPanel {
                 // recurrent...
                 addSynapseGroupRecurrent(synapseGroup);
             } else { // Test if there isn't already a synapse group going in
-                     // the opposite direction.
+                // the opposite direction.
                 // The synapse groups which _originate_ from this synapse groups's
                 // target neuron group
                 Set<SynapseGroup> targetGroupOutgoing = synapseGroup
@@ -1162,7 +1163,7 @@ public class NetworkPanel extends JPanel {
      *            the model subnetwork
      * @return the pnode representing the subnetwork.
      */
-    protected SubnetworkNode createSubnetworkNode(Subnetwork subnet) {
+    private SubnetworkNode createSubnetworkNode(Subnetwork subnet) {
 
         SubnetworkNode ret = null;
 
@@ -2639,18 +2640,21 @@ public class NetworkPanel extends JPanel {
      */
     public void setGuiOn(final boolean guiOn) {
         // TODO: Revive from dead?
-        // actionManager.getShowGUIAction().setState(guiOn);
+        //         actionManager.getShowGUIAction().setState(guiOn);
+        System.out.println(guiOn);
         if (guiOn) {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
                 .hasNext();) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency(1);
+                pnode.setVisible(true);
             }
         } else {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
                 .hasNext();) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency((float) .6);
+                pnode.setVisible(false);
             }
 
         }

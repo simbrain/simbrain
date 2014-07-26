@@ -27,7 +27,8 @@ import javax.swing.JComboBox;
  * and null. It is used where it needs to be determined if multiple items have
  * the same value. (e.g. Multiple selected neurons.)
  */
-public class TristateDropDown extends JComboBox {
+@SuppressWarnings("serial")
+public class TristateDropDown extends JComboBox<String> {
 
     /** Integer value for true. */
     private static final int TRUE = 0;

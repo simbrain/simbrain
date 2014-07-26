@@ -32,8 +32,8 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
 public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
-        DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule,
-        NoisyUpdateRule {
+    DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule,
+    NoisyUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_UPPER_BOUND = 1.0;
@@ -91,7 +91,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = neuron.getWeightedInputs() + bias;
+        double wtdInput = inputType.getInput(neuron) + bias;
         double val = slope * wtdInput;
 
         if (addNoise) {

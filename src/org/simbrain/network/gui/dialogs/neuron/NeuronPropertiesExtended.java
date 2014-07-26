@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
@@ -101,6 +102,9 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
 
     /** Priority Field. */
     private final JTextField tfPriority = new JTextField();
+
+    private final TristateDropDown inputType = new TristateDropDown(
+        InputType.WEIGHTED.toString(), InputType.SYNAPTIC.toString());
 
     /** True if this neuron update rule implements BoundedUpdateRule interface. */
     private boolean boundsVisible;
@@ -187,6 +191,8 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         subP.add(tfIncrement);
         subP.add(new JLabel("Priority:"));
         subP.add(tfPriority);
+        subP.add(new JLabel("Input Type:"));
+        subP.add(inputType);
         subP.setAlignmentX(CENTER_ALIGNMENT);
         this.add(subP);
 
@@ -340,7 +346,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         }
 
         // Handle Increment
-        if (!NetworkUtils.isConsistent(Neuron.getRuleList(neuronList),
+        if (!NetworkUtils.isConsistent(ruleList,
             NeuronUpdateRule.class, "getIncrement")) {
             tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
@@ -361,21 +367,15 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         } else {
             clamped.setSelected(neuronList.get(0).isClamped());
         }
-    }
 
-    /**
-     * Initialize the panel with default field values.
-     *
-     * @param rule
-     *            rule to use for setting the default values.
-     */
-    private void initializeDefaultValues(NeuronUpdateRule rule) {
-        tfCeiling.setText(Double.toString(((BoundedUpdateRule) rule)
-            .getUpperBound()));
-        tfFloor.setText(Double.toString(((BoundedUpdateRule) rule)
-            .getLowerBound()));
-        tfIncrement.setText(Double.toString(rule.getIncrement()));
-        tfPriority.setText(Integer.toString(0));
+        // Handle input type
+        if (!NetworkUtils.isConsistent(ruleList, NeuronUpdateRule.class,
+            "getInputType")) {
+            inputType.setNull();
+        } else {
+            inputType.setSelectedItem(ruleList.get(0).getInputType()
+                .toString());
+        }
     }
 
     /**
@@ -394,6 +394,7 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         }
         setClippingVisible(clip);
         setBoundsEnabled(bounded);
+        inputType.setSelectedItem(rule.getInputType().toString());
     }
 
     /**
@@ -405,6 +406,15 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
     public boolean commitChanges() {
         int numNeurons = neuronList.size();
         boolean success = true;
+
+        // Clamped
+        if (!clamped.isNull()) {
+            boolean clamp = clamped.isSelected();
+            for (int i = 0; i < numNeurons; i++) {
+                neuronList.get(i).setClamped(clamp);
+            }
+        }
+
         if (boundsVisible) {
             // Clipping?
             if (!clipping.isNull() && clippingVisible) {
@@ -459,12 +469,11 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         }
 
         // Priority
-        double priority = Utils.doubleParsable(tfPriority);
-        if (!Double.isNaN(priority)) {
-            int p = (int) priority; // Cast to integer (there is no NaN value
+        Integer priority = Utils.parseInteger(tfPriority);
+        if (priority != null) {
             // for integers to use as a flag).
             for (int i = 0; i < numNeurons; i++) {
-                neuronList.get(i).setUpdatePriority(p);
+                neuronList.get(i).setUpdatePriority(priority);
             }
         } else {
             // Only successful if the field can't be parsed because
@@ -473,11 +482,16 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
                 SimbrainConstants.NULL_STRING);
         }
 
-        // Clamped
-        if (!clamped.isNull()) {
-            boolean clamp = clamped.isSelected();
-            for (int i = 0; i < numNeurons; i++) {
-                neuronList.get(i).setClamped(clamp);
+        // Input type
+        if (((String) inputType.getSelectedItem())
+            .matches(InputType.WEIGHTED.toString())) {
+            for (Neuron n : neuronList) {
+                n.getUpdateRule().setInputType(InputType.WEIGHTED);
+            }
+        } else if (((String) inputType.getSelectedItem())
+            .matches(InputType.SYNAPTIC.toString())) {
+            for (Neuron n : neuronList) {
+                n.getUpdateRule().setInputType(InputType.SYNAPTIC);
             }
         }
 

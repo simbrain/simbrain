@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -138,6 +139,8 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     /** The field for learning rate. */
     private JTextField learningRateField = new JTextField();
 
+    private JCheckBox useGlobalSettings = new JCheckBox();
+
     /**
      * Constructs the summary panel based on a neuron group. Names the incoming
      * and outgoing labels appropriately (Incoming/Outgoing).
@@ -191,6 +194,10 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         } else {
             this.add(populationField);
         }
+        if (group instanceof SynapseGroup) {
+            this.add(new JLabel("Optimize as Group:"));
+            this.add(useGlobalSettings);
+        }
         this.add(excitatoryTypeLabel);
         this.add(excitatoryTypeField);
         this.add(inhibitoryTypeLabel);
@@ -221,8 +228,8 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     private void fillFieldValues(final NeuronGroup ng) {
         if (ng.getId() == null || ng.getId().isEmpty()) {
             idField.setText(ng.getParentNetwork().getGroupIdGenerator()
-                    .getHypotheticalId()); // ng hasn't been added to the
-                                           // network
+                .getHypotheticalId()); // ng hasn't been added to the
+                                       // network
             // yet
         } else {
             idField.setText(ng.getId());
@@ -235,15 +242,15 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         if (ng.getNeuronList().size() > 0) {
             if (isEditable()) {
                 editablePopulationField.setText(Integer.toString(ng
-                        .getNeuronList().size()));
+                    .getNeuronList().size()));
             } else {
                 populationField.setText(Integer.toString(ng.getNeuronList()
-                        .size()));
+                    .size()));
             }
             if (NetworkUtils.isConsistent(ng.getNeuronList(), Neuron.class,
-                    "getUpdateRuleDescription")) {
+                "getUpdateRuleDescription")) {
                 excitatoryTypeField.setText(ng.getNeuronList().get(0)
-                        .getUpdateRule().getDescription());
+                    .getUpdateRule().getDescription());
             } else {
                 excitatoryTypeField.setText("Mixed");
             }
@@ -251,9 +258,9 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             if (isEditable()) {
                 // Is a creation dialog
                 editablePopulationField.setText(Integer
-                        .toString(NeuronGroup.DEFAULT_GROUP_SIZE));
+                    .toString(NeuronGroup.DEFAULT_GROUP_SIZE));
                 excitatoryTypeField.setText(Neuron.DEFAULT_UPDATE_RULE
-                        .getDescription());
+                    .getDescription());
             } else {
                 // Handles if an empty neuron group is selected
                 // (for some reason)...
@@ -262,7 +269,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             }
         }
         parentGroupField.setText(ng.getParentGroup() == null ? "None" : ng
-                .getParentGroup().getLabel());
+            .getParentGroup().getLabel());
         // if (ng.getIncomingSg() == null) {
         // if (ng.getIncomingWeights() != null
         // && ng.getIncomingWeights().size() > 0)
@@ -295,9 +302,9 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     private void fillFieldValues(final SynapseGroup sg) {
         if (sg.getId() == null || sg.getId().isEmpty()) {
             idField.setText(sg.getParentNetwork().getGroupIdGenerator()
-                    .getHypotheticalId()); // sg hasn't been added to the
-                                           // network
-                                           // yet
+                .getHypotheticalId()); // sg hasn't been added to the
+                                       // network
+                                       // yet
         } else {
             idField.setText(sg.getId());
         }
@@ -308,9 +315,11 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         }
         populationField.setText(Integer.toString(sg.size()));
 
+        useGlobalSettings.setSelected(sg.isUseGroupLevelSettings());
+
         if (sg instanceof SynapseGroupWithLearningRate) {
             learningRateField.setText(""
-                    + ((SynapseGroupWithLearningRate) sg).getLearningRate());
+                + ((SynapseGroupWithLearningRate) sg).getLearningRate());
         }
 
         if (sg.size() > 0) {
@@ -324,14 +333,14 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 discrepancy = false;
                 while (synIter.hasNext()) {
                     if (!synIter.next().getLearningRule().getClass()
-                            .equals(protoSyn.getLearningRule().getClass())) {
+                        .equals(protoSyn.getLearningRule().getClass())) {
                         discrepancy = true;
                         break;
                     }
                 }
                 if (!discrepancy) {
                     excitatoryTypeField.setText(protoSyn.getLearningRule()
-                            .getDescription());
+                        .getDescription());
                 } else {
                     excitatoryTypeField.setText("Mixed");
                 }
@@ -345,14 +354,14 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 discrepancy = false;
                 while (synIter.hasNext()) {
                     if (!synIter.next().getLearningRule().getClass()
-                            .equals(protoSyn.getLearningRule().getClass())) {
+                        .equals(protoSyn.getLearningRule().getClass())) {
                         discrepancy = true;
                         break;
                     }
                 }
                 if (!discrepancy) {
                     inhibitoryTypeField.setText(protoSyn.getLearningRule()
-                            .getDescription());
+                        .getDescription());
                 } else {
                     inhibitoryTypeField.setText("Mixed");
                 }
@@ -365,7 +374,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             inhibitoryTypeField.setText("None");
         }
         parentGroupField.setText(sg.getParentGroup() == null ? "None" : sg
-                .getParentGroup().getLabel());
+            .getParentGroup().getLabel());
         incomingField.setText(sg.getSourceNeuronGroup().getLabel());
         outgoingField.setText(sg.getTargetNeuronGroup().getLabel());
     }
@@ -377,9 +386,13 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     public boolean commitChanges() {
         group.setLabel(nameField.getText());
 
-        if (group instanceof SynapseGroupWithLearningRate) {
-            ((SynapseGroupWithLearningRate) group).setLearningRate(Double
+        if (group instanceof SynapseGroup) {
+            ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
+                .isSelected());
+            if (group instanceof SynapseGroupWithLearningRate) {
+                ((SynapseGroupWithLearningRate) group).setLearningRate(Double
                     .parseDouble(learningRateField.getText()));
+            }
         }
 
         return true; // Always Successful: the only field it makes sense to

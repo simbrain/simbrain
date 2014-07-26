@@ -30,7 +30,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * faster/cooler. Just a thought.
  */
 public class IzhikevichRule extends SpikingNeuronUpdateRule implements
-        NoisyUpdateRule {
+    NoisyUpdateRule {
 
     /** Recovery. */
     private double recovery;
@@ -77,7 +77,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     @Override
     public void update(Neuron neuron) {
         double timeStep = neuron.getNetwork().getTimeStep();
-        double inputs = neuron.getWeightedInputs();
+        double inputs = inputType.getInput(neuron);
         double activation = neuron.getActivation();
 
         if (addNoise) {
@@ -87,9 +87,9 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
         double val = activation
-                + (timeStep * (((.04 * (activation * activation))
-                        + (5 * activation) + 140)
-                        - recovery + inputs));
+            + (timeStep * (((.04 * (activation * activation))
+                + (5 * activation) + 140)
+                - recovery + inputs));
 
         if (val >= threshold) {
             val = c;

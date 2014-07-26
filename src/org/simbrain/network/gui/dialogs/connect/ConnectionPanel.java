@@ -11,7 +11,6 @@ import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -19,7 +18,6 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.QuickConnectPreferences.ConnectType;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -131,14 +129,14 @@ public class ConnectionPanel {
         return mainPanel;
     }
 
-    public static void main(String[] args) {
-        NetworkPanel np = new NetworkPanel(new Network());
-        JFrame frame = new JFrame();
-        ConnectionPanel cp = createConnectionPanel(frame, np);
-        frame.setContentPane(cp.getPanel());
-        cp.getPanel().setVisible(true);
-        frame.setVisible(true);
-        frame.pack();
-    }
+    //    public static void main(String[] args) {
+    //        NetworkPanel np = new NetworkPanel(new Network());
+    //        JFrame frame = new JFrame();
+    //        ConnectionPanel cp = createConnectionPanel(frame, np);
+    //        frame.setContentPane(cp.getPanel());
+    //        cp.getPanel().setVisible(true);
+    //        frame.setVisible(true);
+    //        frame.pack();
+    //    }
 
 }

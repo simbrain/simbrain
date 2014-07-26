@@ -28,6 +28,10 @@ import org.simbrain.network.core.Network.TimeType;
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
+    {
+        inputType = InputType.SYNAPTIC;
+    }
+
     /** Time of last spike. */
     private double lastSpikeTime;
 

@@ -410,19 +410,31 @@ public class Neuron {
     }
 
     /**
-     * Sums the weighted signals that are sent to this node.
+     * Sums the weighted signals that are sent to this node. This sums all the
+     * weighted inputs to a neuron in a connectionist sense. No spike responders
+     * are called and thus this is <b>not</b> appropriate for most biological
+     *  models.
      *
      * @return weighted input to this node
      */
     public double getWeightedInputs() {
         double wtdSum = inputValue;
-        if (fanIn.size() > 0) {
-            for (int j = 0; j < fanIn.size(); j++) {
-                Synapse w = fanIn.get(j);
-                if (w.isSendWeightedInput()) {
-                    wtdSum += w.getValue();
-                }
-            }
+        for (Synapse w : fanIn) {
+            wtdSum += w.getWeightedSum();
+        }
+        return wtdSum;
+    }
+
+    /**
+     * Sums the weighted <b>synaptic</b> inputs to a given neuron based on that
+     * synapse's spike responder. This is usually only appropriate for
+     * biological model neurons.
+     * @return
+     */
+    public double getSynapticInput() {
+        double wtdSum = inputValue;
+        for (Synapse s : fanIn) {
+            wtdSum += s.getValue();
         }
         return wtdSum;
     }

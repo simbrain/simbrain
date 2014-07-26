@@ -6,6 +6,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
 /**
  * Hodgkin-Huxley Neuron.
@@ -13,7 +14,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
  * Adapted from software written by Anthony Fodor, with help from Jonathan
  * Vickrey. TODO: No implementation.
  */
-public class HodgkinHuxleyRule extends NeuronUpdateRule {
+public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
 
     /** Sodium Channels */
     private float perNaChannels = 100f;
@@ -78,7 +79,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule {
     public void update(Neuron neuron) {
         // Advances the model by dt and returns the new voltage
 
-        double v = neuron.getActivation();
+        double v = inputType.getInput(neuron);
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
         dh = (ah * (1 - h) - bh * h) * dt;

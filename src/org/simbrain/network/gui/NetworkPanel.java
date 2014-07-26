@@ -577,18 +577,15 @@ public class NetworkPanel extends JPanel {
      * representation.
      */
     private void updatePersistentNodes() {
-        //        System.out.println(guiOn);
-        if (this.guiOn) {
-            for (PNode node : getPersistentNodes()) {
-                if (node instanceof NeuronNode) {
-                    NeuronNode neuronNode = (NeuronNode) node;
-                    neuronNode.update();
-                } else if (node instanceof SynapseNode) {
-                    if (node.getVisible()) {
-                        SynapseNode synapseNode = (SynapseNode) node;
-                        synapseNode.updateColor();
-                        synapseNode.updateDiameter();
-                    }
+        for (PNode node : getPersistentNodes()) {
+            if (node instanceof NeuronNode) {
+                NeuronNode neuronNode = (NeuronNode) node;
+                neuronNode.update();
+            } else if (node instanceof SynapseNode) {
+                if (node.getVisible()) {
+                    SynapseNode synapseNode = (SynapseNode) node;
+                    synapseNode.updateColor();
+                    synapseNode.updateDiameter();
                 }
             }
         }
@@ -2641,7 +2638,6 @@ public class NetworkPanel extends JPanel {
     public void setGuiOn(final boolean guiOn) {
         // TODO: Revive from dead?
         //         actionManager.getShowGUIAction().setState(guiOn);
-        System.out.println(guiOn);
         if (guiOn) {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
                 .hasNext();) {

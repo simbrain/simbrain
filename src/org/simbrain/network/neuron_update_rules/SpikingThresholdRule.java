@@ -42,7 +42,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
     @Override
     public void update(Neuron neuron) {
 
-        if (neuron.getWeightedInputs() >= threshold) {
+        if (inputType.getInput(neuron) >= threshold) {
             setHasSpiked(true, neuron);
             neuron.setBuffer(1);
         } else {

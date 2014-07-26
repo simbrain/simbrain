@@ -328,26 +328,6 @@ public class Network {
         return neuronList.get(index);
     }
 
-    // /**
-    // * Return a list of neurons in a specific radius of a specified neuron.
-    // *
-    // * @param source
-    // * the source neuron.
-    // * @param radius
-    // * the radius to search within.
-    // * @return list of neurons in the given radius.
-    // */
-    // public ArrayList<Neuron> getNeuronsInRadius(final Neuron source,
-    // final double radius) {
-    // ArrayList<Neuron> ret = new ArrayList<Neuron>();
-    // for (Neuron neuron : neuronList) {
-    // if (getDistance(source, neuron) < radius) {
-    // ret.add(neuron);
-    // }
-    // }
-    // return ret;
-    // }
-
     /**
      * Find a neuron with a given string id.
      *
@@ -776,7 +756,10 @@ public class Network {
     }
 
     /**
-     * Add a group to the network.
+     * Add a group to the network. This works for both singular groups like
+     * neuron groups and synapse groups as well as for composite groups
+     * like any subclass of Subnetwork. NetworkPanel adds the constituent groups
+     * of composite groups and therefore it is unnecessary here.
      *
      * @param group
      *            group of network elements
@@ -788,19 +771,6 @@ public class Network {
         if (group.getLabel() == null) {
             group.setLabel(id.replaceAll("_", " "));
         }
-
-        // Special creation for subnetworks
-        //        if (group instanceof Subnetwork) {
-        //            for (NeuronGroup neuronGroup : ((Subnetwork) group)
-        //                .getNeuronGroupList()) {
-        //                addGroup(neuronGroup);
-        //            }
-        //            for (SynapseGroup synapseGroup : ((Subnetwork) group)
-        //                .getSynapseGroupList()) {
-        //                addGroup(synapseGroup);
-        //            }
-        //        }
-
         if (group.isTopLevelGroup()) {
             groupList.add(group);
         }

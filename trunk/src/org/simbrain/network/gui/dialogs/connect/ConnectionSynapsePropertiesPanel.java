@@ -50,7 +50,8 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class ConnectionSynapsePropertiesPanel extends JPanel implements EditablePanel {
+public class ConnectionSynapsePropertiesPanel extends JPanel implements
+    EditablePanel {
 
     /**
      * A synapse info panel containing basic synapse properties and synapse
@@ -97,10 +98,12 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
      * @param synapseGroup
      * @return
      */
-    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
-        final Window parent, final SynapseGroup synapseGroup) {
-        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent,
-            synapseGroup);
+    public static ConnectionSynapsePropertiesPanel
+        createSynapsePropertiesPanel(
+            final Window parent, final SynapseGroup synapseGroup) {
+        ConnectionSynapsePropertiesPanel spp =
+            new ConnectionSynapsePropertiesPanel(parent,
+                synapseGroup);
         spp.initApplyListeners();
         return spp;
     }
@@ -111,10 +114,12 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
      * @param synapses
      * @return
      */
-    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
-        final Window parent, final Collection<Synapse> synapses) {
-        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent,
-            synapses);
+    public static ConnectionSynapsePropertiesPanel
+        createSynapsePropertiesPanel(
+            final Window parent, final Collection<Synapse> synapses) {
+        ConnectionSynapsePropertiesPanel spp =
+            new ConnectionSynapsePropertiesPanel(parent,
+                synapses);
         spp.initApplyListeners();
         return spp;
     }
@@ -125,9 +130,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
      * @param synapses
      * @return
      */
-    public static ConnectionSynapsePropertiesPanel createSynapsePropertiesPanel(
-        final Window parent) {
-        ConnectionSynapsePropertiesPanel spp = new ConnectionSynapsePropertiesPanel(parent);
+    public static ConnectionSynapsePropertiesPanel
+        createSynapsePropertiesPanel(
+            final Window parent) {
+        ConnectionSynapsePropertiesPanel spp =
+            new ConnectionSynapsePropertiesPanel(parent);
         spp.initApplyListeners();
         return spp;
     }
@@ -147,10 +154,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
         Set<Synapse> inhibitorySynapses;
         excitatorySynapses = synapseGroup.hasExcitatory()
             ? synapseGroup.getExcitatorySynapses()
-            : Collections.singleton(synapseGroup.getExcitatoryPrototype());
+            : Collections.singleton(templateExcitatorySynapse);
         inhibitorySynapses = synapseGroup.hasInhibitory()
             ? synapseGroup.getInhibitorySynapses()
-            : Collections.singleton(synapseGroup.getInhibitoryPrototype());
+            : Collections.singleton(templateInhibitorySynapse);
         excitatoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
@@ -301,6 +308,12 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements Editable
         boolean success = true;
         success &= excitatoryInfoPanel.commitChanges();
         success &= inhibitoryInfoPanel.commitChanges();
+        if (synapseGroup != null) {
+            synapseGroup.setAndConformToTemplateExcitatory(
+                templateExcitatorySynapse);
+            synapseGroup.setAndConformToTemplateInhibitory(
+                templateInhibitorySynapse);
+        }
         // Ensure that strengths have been set within appropriate boundaries...
         templateExcitatorySynapse.setStrength( // Always positive
             Math.abs(templateExcitatorySynapse.getStrength()));

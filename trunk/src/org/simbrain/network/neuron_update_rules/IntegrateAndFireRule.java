@@ -80,7 +80,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
      */
     public void update(Neuron neuron) {
 
-        double iSyn = neuron.getWeightedInputs();
+        double iSyn = inputType.getInput(neuron);
 
         if (addNoise) {
             iSyn += noiseGenerator.getRandom();

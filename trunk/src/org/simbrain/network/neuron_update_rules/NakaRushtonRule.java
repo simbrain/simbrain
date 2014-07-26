@@ -31,7 +31,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Spikes, Decisions, and Action.
  */
 public class NakaRushtonRule extends NeuronUpdateRule implements
-        BoundedUpdateRule, NoisyUpdateRule {
+    BoundedUpdateRule, NoisyUpdateRule {
 
     /** The default activation ceiling. */
     public static final int DEFAULT_UPPER_BOUND = 100;
@@ -108,30 +108,32 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
 
         // See Spikes (Hugh Wilson), pp. 20-21
 
-        double p = neuron.getWeightedInputs();
+        double p = inputType.getInput(neuron);
         double val = neuron.getActivation();
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
             a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant)
-                    * (adaptationParameter * val - a);
+                * (adaptationParameter * val - a);
         } else {
             a = 0;
         }
 
         if (p > 0) {
             s = (getUpperBound() * Math.pow(p, steepness))
-                    / (Math.pow(semiSaturationConstant + a, steepness) + Math
-                            .pow(p, steepness));
+                / (Math.pow(semiSaturationConstant + a, steepness) + Math
+                    .pow(p, steepness));
         } else {
             s = 0;
         }
 
         if (addNoise) {
-            val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
+            val +=
+                (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
                     .getRandom()));
         } else {
-            val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val +=
+                (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         neuron.setBuffer(val);

@@ -63,7 +63,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
      */
     public void update(Neuron neuron) {
 
-        double val = neuron.getWeightedInputs() + bias;
+        double val = inputType.getInput(neuron) + bias;
 
         // TODO: Discuss how noise is added
         if (addNoise) {

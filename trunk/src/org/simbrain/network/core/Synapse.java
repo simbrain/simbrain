@@ -64,13 +64,10 @@ public class Synapse {
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
 
     /** Synapse id. */
-    private String id;
+    private String id = "";
 
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 2;
-
-    // /** Number of parameters. */
-    // public static final int NUM_PARAMETERS = 8;
 
     /** Strength of synapse. */
     private double strength = 0;
@@ -120,6 +117,7 @@ public class Synapse {
      */
     public Synapse(Neuron source, Neuron target) {
         setSourceAndTarget(source, target);
+        initSpikeResponder();
         if (source != null) {
             parentNetwork = source.getNetwork();
         }
@@ -155,6 +153,7 @@ public class Synapse {
     public Synapse(Neuron source, Neuron target,
         SynapseUpdateRule learningRule) {
         setSourceAndTarget(source, target);
+        initSpikeResponder();
         setLearningRule(learningRule);
         if (source != null) {
             parentNetwork = source.getNetwork();
@@ -179,6 +178,7 @@ public class Synapse {
         SynapseUpdateRule learningRule, Synapse templateSynapse) {
         this(templateSynapse); // invoke the copy constructor
         setSourceAndTarget(source, target);
+        initSpikeResponder();
         setLearningRule(learningRule);
         if (source != null) {
             parentNetwork = source.getNetwork();
@@ -202,6 +202,7 @@ public class Synapse {
         SynapseUpdateRule learningRule, Network parent) {
         setSourceAndTarget(source, target);
         setLearningRule(learningRule);
+        initSpikeResponder();
         parentNetwork = parent;
     }
 
@@ -221,6 +222,20 @@ public class Synapse {
         setSendWeightedInput(s.isSendWeightedInput());
         setDelay(s.getDelay());
         setFrozen(s.isFrozen());
+        s.initSpikeResponder();
+    }
+
+    /**
+     * Makes a deep copy of a template synapse (one with no source or target). 
+     * @param s
+     * @return
+     */
+    public static Synapse copyTemplateSynapse(Synapse s) {
+        if (s.getSource() != null || s.getTarget() != null) {
+            throw new IllegalArgumentException("Synapse is not template"
+                + " synapse.");
+        }
+        return new Synapse(s);
     }
 
     /**
@@ -254,20 +269,30 @@ public class Synapse {
      * @return Value
      */
     public double getValue() {
-        if (spikeResponder == null) {
-            spikeResponder = new JumpAndDecay();
-        }
-        if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+        if (!sendWeightedInput) {
+            return 0;
+        } else {
             spikeResponder.update(this);
+            if (delay == 0) {
+                return psr;
+            } else {
+                enqueu(psr);
+                return dequeu();
+            }
+        }
+    }
+
+    public double getWeightedSum() {
+        if (!sendWeightedInput) {
+            return 0;
         } else {
             psr = source.getActivation() * strength;
-        }
-
-        if (delayManager == null) {
-            return psr;
-        } else {
-            enqueu(psr);
-            return dequeu();
+            if (delay != 0) {
+                enqueu(psr);
+                return dequeu();
+            } else {
+                return psr;
+            }
         }
     }
 
@@ -605,8 +630,10 @@ public class Synapse {
     public String toString() {
         String ret = new String();
         ret += ("Synapse [" + getId() + "]: " + getStrength());
-        ret += ("  Connects neuron " + getSource().getId() + " to neuron "
-            + getTarget().getId() + "\n");
+        ret += ("  Connects neuron " + (getSource() == null ? "[null]"
+            : getSource().getId()) + " to neuron "
+            + (getTarget() == null ? "[null]" : getTarget().getId())
+            + "\n");
         return ret;
     }
 

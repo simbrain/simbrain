@@ -51,7 +51,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      * The default initial display state of the neuron update setting panel's
      * neuron update rule panel.
      */
-    private static final boolean DEFAULT_NUSP_DISPLAY_STATE = false;
+    private static final boolean DEFAULT_NUSP_DISPLAY_STATE = true;
 
     /** The basic neuron info panel. */
     private NeuronPropertiesSimple neuronInfoPanel;
@@ -71,9 +71,9 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            the parent window, made available for easy resizing.
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
-            final List<Neuron> neuronList, final Window parent) {
+        final List<Neuron> neuronList, final Window parent) {
         return createCombinedNeuronInfoPanel(neuronList, parent,
-                DEFAULT_NUSP_DISPLAY_STATE);
+            DEFAULT_NUSP_DISPLAY_STATE);
     }
 
     /**
@@ -93,10 +93,10 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            initially
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
-            final List<Neuron> neuronList, final Window parent,
-            final boolean nuspExtendedDisplay) {
+        final List<Neuron> neuronList, final Window parent,
+        final boolean nuspExtendedDisplay) {
         NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList,
-                parent, nuspExtendedDisplay);
+            parent, nuspExtendedDisplay);
         cnip.initializeLayout();
         cnip.addListeners();
         return cnip;
@@ -124,10 +124,10 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            displayed. rule's details initially
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
-            final List<Neuron> neuronList, final Window parent,
-            final boolean nuspExtendedDisplay, final boolean displayIDInfo) {
+        final List<Neuron> neuronList, final Window parent,
+        final boolean nuspExtendedDisplay, final boolean displayIDInfo) {
         NeuronPropertiesPanel cnip = new NeuronPropertiesPanel(neuronList,
-                parent, nuspExtendedDisplay, displayIDInfo);
+            parent, nuspExtendedDisplay, displayIDInfo);
         cnip.initializeLayout();
         cnip.addListeners();
         return cnip;
@@ -146,11 +146,11 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            initially
      */
     private NeuronPropertiesPanel(final List<Neuron> neuronList,
-            final Window parent, final boolean nuspExtendedDisplay) {
+        final Window parent, final boolean nuspExtendedDisplay) {
         neuronInfoPanel = NeuronPropertiesSimple.createBasicNeuronInfoPanel(
-                neuronList, parent);
+            neuronList, parent);
         updateInfoPanel = new SpecificNeuronRulePanel(neuronList, parent,
-                nuspExtendedDisplay);
+            nuspExtendedDisplay);
     }
 
     /**
@@ -168,12 +168,12 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            displayed. rule's details initially
      */
     private NeuronPropertiesPanel(final List<Neuron> neuronList,
-            final Window parent, final boolean nuspExtendedDisplay,
-            final boolean displayIDInfo) {
+        final Window parent, final boolean nuspExtendedDisplay,
+        final boolean displayIDInfo) {
         neuronInfoPanel = NeuronPropertiesSimple.createBasicNeuronInfoPanel(
-                neuronList, parent, displayIDInfo);
+            neuronList, parent, displayIDInfo);
         updateInfoPanel = new SpecificNeuronRulePanel(neuronList, parent,
-                nuspExtendedDisplay);
+            nuspExtendedDisplay);
     }
 
     /**
@@ -195,23 +195,23 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      */
     private void addListeners() {
         updateInfoPanel.getCbNeuronType().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
+            new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
 
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                AbstractNeuronRulePanel np = updateInfoPanel
-                                        .getNeuronPanel();
-                                neuronInfoPanel.getExtraDataPanel()
-                                        .updateFieldVisibility(
-                                                np.getPrototypeRule());
-                                repaint();
-                            }
-                        });
-                    }
-                });
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            AbstractNeuronRulePanel np = updateInfoPanel
+                                .getNeuronPanel();
+                            neuronInfoPanel.getExtraDataPanel()
+                                .updateFieldVisibility(
+                                    np.getPrototypeRule());
+                            repaint();
+                        }
+                    });
+                }
+            });
     }
 
     /**

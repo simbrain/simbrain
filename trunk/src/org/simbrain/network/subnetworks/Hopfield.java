@@ -228,7 +228,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                     Synapse newSynapse = new Synapse(source, target,
                             new StaticSynapseRule());
                     newSynapse.setStrength(0);
-                    getSynapseGroup().addSynapse(newSynapse);
+                    getSynapseGroup().addSynapseUnsafe(newSynapse);
                 }
             }
         }

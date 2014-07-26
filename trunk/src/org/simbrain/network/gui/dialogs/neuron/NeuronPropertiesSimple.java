@@ -98,9 +98,9 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * @return A basic neuron info panel with the specified parameters
      */
     public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
-            final List<Neuron> neuronList, final Window parent) {
+        final List<Neuron> neuronList, final Window parent) {
         return createBasicNeuronInfoPanel(neuronList, parent,
-                !(neuronList == null || neuronList.size() != 1));
+            !(neuronList == null || neuronList.size() != 1));
     }
 
     /**
@@ -117,10 +117,10 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * @return A basic neuron info panel with the specified parameters
      */
     public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
-            final List<Neuron> neuronList, final Window parent,
-            final boolean displayIDInfo) {
+        final List<Neuron> neuronList, final Window parent,
+        final boolean displayIDInfo) {
         NeuronPropertiesSimple bnip = new NeuronPropertiesSimple(neuronList,
-                parent, displayIDInfo);
+            parent, displayIDInfo);
         bnip.addListeners();
         return bnip;
     }
@@ -132,12 +132,12 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * @param displayIDInfo
      */
     private NeuronPropertiesSimple(final List<Neuron> neuronList,
-            final Window parent, final boolean displayIDInfo) {
+        final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
-        detailTriangle = new DropDownTriangle(UpDirection.LEFT, false, "More",
-                "Less", parent);
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT, true, "More",
+            "Less", parent);
         extraDataPanel = new NeuronPropertiesExtended(this.neuronList, parent);
         initializeLayout();
         fillFieldValues();
@@ -243,7 +243,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
 
         // Handle Activation
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-                "getActivation")) {
+            "getActivation")) {
             tfActivation.setText(NULL_STRING);
         } else {
             tfActivation.setText(Double.toString(neuronRef.getActivation()));
@@ -268,7 +268,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
         if (!Double.isNaN(act)) {
             for (int i = 0; i < neuronList.size(); i++) {
                 neuronList.get(i).forceSetActivation(
-                        Double.parseDouble(tfActivation.getText()));
+                    Double.parseDouble(tfActivation.getText()));
             }
         } else {
             // Only successful if the field can't be parsed because

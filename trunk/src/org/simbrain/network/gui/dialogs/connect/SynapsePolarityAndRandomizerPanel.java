@@ -471,7 +471,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      *            the connection being used to determine the field values
      */
     public void fillFieldValues(SynapseGroup synGrp) {
-        double exRatio = synGrp.getExcitatoryRatio();
+        double exRatio = synGrp.getExcitatoryRatioParameter();
         eRatio.setValue((int) (exRatio * 100));
         iRatio.setValue((int) ((1 - exRatio) * 100));
         ratioSlider.setValue((int) (exRatio * 100));

@@ -29,11 +29,57 @@ import org.simbrain.util.Utils;
  */
 public abstract class NeuronUpdateRule {
 
+    /**
+     * An enum specifying how a neuron sums its inputs. The enum both specifies
+     * and provides the appropriate method for the distinct ways this can
+     * happen. At its core it represents the connectionist (matrix 
+     * multiplication equivalent/algebraic) vs biological (convolution or other
+     * function of a "spike" represented as a Dirac delta function) weighted
+     * sums.
+     * 
+     * @author Zach Tosi
+     */
+    public static enum InputType {
+        WEIGHTED {
+            /**
+             * Gets the weighted sum of the pre-synaptic neurons' activation 
+             * values.
+             */
+            @Override
+            public double getInput(Neuron n) {
+                return n.getWeightedInputs();
+            }
+
+            @Override
+            public String toString() {
+                return "Weighted";
+            }
+        },
+        SYNAPTIC {
+            /**
+             * Gets the synaptic sum of the pre-synaptic neurons' firing state
+             * weighted by synapses and processed through a spike responder.
+             */
+            @Override
+            public double getInput(Neuron n) {
+                return n.getSynapticInput();
+            }
+
+            @Override
+            public String toString() {
+                return "Synaptic";
+            }
+        };
+        public abstract double getInput(Neuron n);
+    }
+
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 9;
 
     /** The default increment of a neuron using this rule. */
     public static final double DEFAULT_INCREMENT = 0.1;
+
+    protected InputType inputType = InputType.WEIGHTED;
 
     /** Amount by which to increment or decrement neuron. */
     protected double increment = DEFAULT_INCREMENT;
@@ -101,10 +147,11 @@ public abstract class NeuronUpdateRule {
      */
     public double getRandomValue() {
         if (this instanceof BoundedUpdateRule) {
-            return (((BoundedUpdateRule) this).getUpperBound() - ((BoundedUpdateRule) this)
-                    .getLowerBound())
-                    * Math.random()
-                    + ((BoundedUpdateRule) this).getLowerBound();
+            return (((BoundedUpdateRule) this).getUpperBound()
+                - ((BoundedUpdateRule) this)
+                .getLowerBound())
+                * Math.random()
+                + ((BoundedUpdateRule) this).getLowerBound();
         } else {
             return 2 * Math.random() - 1;
         }
@@ -138,7 +185,7 @@ public abstract class NeuronUpdateRule {
      */
     public String getToolTipText(final Neuron neuron) {
         return "(" + neuron.getId() + ") Activation: "
-                + Utils.round(neuron.getActivation(), MAX_DIGITS);
+            + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
     /**
@@ -160,6 +207,14 @@ public abstract class NeuronUpdateRule {
      */
     public static double getDefaultIncrement() {
         return DEFAULT_INCREMENT;
+    }
+
+    public InputType getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(InputType inputType) {
+        this.inputType = inputType;
     }
 
 }

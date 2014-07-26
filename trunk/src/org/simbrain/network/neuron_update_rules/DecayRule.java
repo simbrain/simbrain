@@ -30,7 +30,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
 public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
-        ClippableUpdateRule, NoisyUpdateRule {
+    ClippableUpdateRule, NoisyUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_CEILING = 1.0;
@@ -99,7 +99,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
      * @{inheritDoc
      */
     public void update(Neuron neuron) {
-        double val = neuron.getActivation() + neuron.getWeightedInputs();
+        double val = neuron.getActivation() + inputType.getInput(neuron);
         double decayVal = 0;
 
         if (relAbs == RELATIVE) {

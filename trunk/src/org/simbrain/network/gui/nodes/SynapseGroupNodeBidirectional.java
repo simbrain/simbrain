@@ -46,7 +46,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  */
 @SuppressWarnings("serial")
 public class SynapseGroupNodeBidirectional extends PNode implements
-        PropertyChangeListener, SynapseGroupArrow {
+    PropertyChangeListener, SynapseGroupArrow {
 
     /** The default thickness. */
     private static final float DEFAULT_ARROW_THICKNESS = 30;
@@ -162,18 +162,19 @@ public class SynapseGroupNodeBidirectional extends PNode implements
      *            the synapse group
      */
     public static SynapseGroupNodeBidirectional createBidirectionalSynapseGN(
-            final NetworkPanel networkPanel, final SynapseGroup synGroup1,
-            final SynapseGroup synGroup2) {
-        SynapseGroupNodeBidirectional synGNBi = new SynapseGroupNodeBidirectional(
+        final NetworkPanel networkPanel, final SynapseGroup synGroup1,
+        final SynapseGroup synGroup2) {
+        SynapseGroupNodeBidirectional synGNBi =
+            new SynapseGroupNodeBidirectional(
                 networkPanel, synGroup1, synGroup2);
         synGNBi.addChild(synGNBi.arrow1);
         synGNBi.addChild(synGNBi.arrow2);
         synGNBi.addChild(synGNBi.synGroup1Box);
         synGNBi.addChild(synGNBi.synGroup2Box);
         synGNBi.srcGroupNode.addPropertyChangeListener(PNode.PROPERTY_BOUNDS,
-                synGNBi);
+            synGNBi);
         synGNBi.tarGroupNode.addPropertyChangeListener(PNode.PROPERTY_BOUNDS,
-                synGNBi);
+            synGNBi);
         return synGNBi;
     }
 
@@ -186,7 +187,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
      *            the synapse group
      */
     private SynapseGroupNodeBidirectional(final NetworkPanel networkPanel,
-            final SynapseGroup synGroup1, final SynapseGroup synGroup2) {
+        final SynapseGroup synGroup1, final SynapseGroup synGroup2) {
         consistencyCheck(synGroup1, synGroup2);
         this.networkPanel = networkPanel;
         this.synGroup1 = synGroup1;
@@ -196,13 +197,13 @@ public class SynapseGroupNodeBidirectional extends PNode implements
         srcNGroup = synGroup1.getSourceNeuronGroup();
         tarNGroup = synGroup1.getTargetNeuronGroup();
         srcGroupNode = (NeuronGroupNode) networkPanel.getObjectNodeMap().get(
-                srcNGroup);
+            srcNGroup);
         tarGroupNode = (NeuronGroupNode) networkPanel.getObjectNodeMap().get(
-                tarNGroup);
+            tarNGroup);
         arrow1 = new DirectedCubicArrow(BezierTemplate.BIDIRECTIONAL,
-                DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
+            DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
         arrow2 = new DirectedCubicArrow(BezierTemplate.BIDIRECTIONAL,
-                DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
+            DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
 
         synGroup1Box.setText(synGroup1.getLabel());
         synGroup2Box.setText(synGroup2.getLabel());
@@ -229,26 +230,26 @@ public class SynapseGroupNodeBidirectional extends PNode implements
      *             bidirectional when taken together.
      */
     private void consistencyCheck(SynapseGroup group1, SynapseGroup group2)
-            throws IllegalStateException {
+        throws IllegalStateException {
         boolean state1Error = !(group1.getTargetNeuronGroup().equals(group2
-                .getSourceNeuronGroup()));
+            .getSourceNeuronGroup()));
         boolean state2Error = !(group1.getSourceNeuronGroup().equals(group2
-                .getTargetNeuronGroup()));
+            .getTargetNeuronGroup()));
         if (state1Error || state2Error) {
             String errMsg = "Illegal instance of a bidirectional"
-                    + " synapse group node: ";
+                + " synapse group node: ";
             if (state1Error) {
                 errMsg.concat("The target group of " + group1.getLabel()
-                        + " does not equal the source group of "
-                        + group2.getLabel());
+                    + " does not equal the source group of "
+                    + group2.getLabel());
             }
             if (state2Error) {
                 if (state1Error) {
                     errMsg.concat(" and ");
                 }
                 errMsg.concat("The target group of " + group2.getLabel()
-                        + " does not equal the source group of "
-                        + group1.getLabel());
+                    + " does not equal the source group of "
+                    + group1.getLabel());
             }
             throw new IllegalArgumentException(errMsg);
         } else {
@@ -290,41 +291,41 @@ public class SynapseGroupNodeBidirectional extends PNode implements
         Point2D endOffset = getOffset(getTheta(tarPort), offset);
 
         Point2D ar1StPt = new Point2D.Float(
-                (float) (src.getX() + stOffset.getX()),
-                (float) (src.getY() + stOffset.getY()));
+            (float) (src.getX() + stOffset.getX()),
+            (float) (src.getY() + stOffset.getY()));
         Point2D ar1EndPt = new Point2D.Float(
-                (float) (tar.getX() - endOffset.getX()),
-                (float) (tar.getY() - endOffset.getY()));
+            (float) (tar.getX() - endOffset.getX()),
+            (float) (tar.getY() - endOffset.getY()));
 
         Point2D ar2StPt = new Point2D.Float(
-                (float) (tar.getX() + endOffset.getX()),
-                (float) (tar.getY() + endOffset.getY()));
+            (float) (tar.getX() + endOffset.getX()),
+            (float) (tar.getY() + endOffset.getY()));
         Point2D ar2EndPt = new Point2D.Float(
-                (float) (src.getX() - stOffset.getX()),
-                (float) (src.getY() - stOffset.getY()));
+            (float) (src.getX() - stOffset.getX()),
+            (float) (src.getY() - stOffset.getY()));
 
         arrow1.layoutChildren(ar1StPt, srcPort, ar1EndPt, tarPort);
         arrow2.layoutChildren(ar2StPt, tarPort, ar2EndPt, srcPort);
 
         Point2D.Float bezAr1 = arrow1.getTemplate().getBez1(ar1StPt, ar1EndPt,
-                srcPort);
+            srcPort);
         Point2D.Float bez2Ar1 = arrow1.getTemplate().getBez2(ar1StPt, ar1EndPt,
-                tarPort);
+            tarPort);
         Point2D middleAr1 = SimbrainMath.cubicBezierMidpoint(ar1StPt, bezAr1,
-                bez2Ar1, ar1EndPt);
+            bez2Ar1, ar1EndPt);
 
         Point2D.Float bezAr2 = arrow2.getTemplate().getBez1(ar2StPt, ar2EndPt,
-                tarPort);
+            tarPort);
         Point2D.Float bez2Ar2 = arrow2.getTemplate().getBez2(ar2StPt, ar2EndPt,
-                srcPort);
+            srcPort);
         Point2D middleAr2 = SimbrainMath.cubicBezierMidpoint(ar2StPt, bezAr2,
-                bez2Ar2, ar2EndPt);
+            bez2Ar2, ar2EndPt);
 
         synGroup1Box.setOffset(middleAr1.getX() - synGroup1Box.getWidth() / 2,
-                middleAr1.getY() - synGroup1Box.getHeight() / 2);
+            middleAr1.getY() - synGroup1Box.getHeight() / 2);
 
         synGroup2Box.setOffset(middleAr2.getX() - synGroup2Box.getWidth() / 2,
-                middleAr2.getY() - synGroup2Box.getHeight() / 2);
+            middleAr2.getY() - synGroup2Box.getHeight() / 2);
 
         synGroup1Box.raiseToTop();
         synGroup2Box.raiseToTop();
@@ -333,18 +334,18 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     private static float getTheta(Port port) {
         double theta = 0;
         switch (port) {
-        case NORTH:
-            theta = Math.PI / 2;
-            break;
-        case SOUTH:
-            theta = -Math.PI / 2;
-            break;
-        case EAST:
-            theta = Math.PI;
-            break;
-        case WEST:
-            theta = 0;
-            break;
+            case NORTH:
+                theta = Math.PI / 2;
+                break;
+            case SOUTH:
+                theta = -Math.PI / 2;
+                break;
+            case EAST:
+                theta = Math.PI;
+                break;
+            case WEST:
+                theta = 0;
+                break;
         }
         return (float) theta;
     }
@@ -411,19 +412,21 @@ public class SynapseGroupNodeBidirectional extends PNode implements
         float centerYTar = (float) tarNGroup.getCenterY();
 
         float distance = (float) Point2D.distance(centerXSrc, centerYSrc,
-                centerXTar, centerYTar);
+            centerXTar, centerYTar);
 
         float theta = (float) Math.atan2(centerYSrc - centerYTar, centerXTar
-                - centerXSrc);
+            - centerXSrc);
 
         float zoneModifier = distance * distance / 5000;
 
-        boolean left = tarNGroup.getMaxX() < (srcNGroup.getMinX() - zoneModifier);
-        boolean right = tarNGroup.getMinX() > (srcNGroup.getMaxX() + zoneModifier);
+        boolean left =
+            tarNGroup.getMaxX() < (srcNGroup.getMinX() - zoneModifier);
+        boolean right =
+            tarNGroup.getMinX() > (srcNGroup.getMaxX() + zoneModifier);
         boolean above = tarNGroup.getMinY() > srcNGroup.getMaxY()
-                + zoneModifier;
+            + zoneModifier;
         boolean below = tarNGroup.getMaxY() < srcNGroup.getMinY()
-                - zoneModifier;
+            - zoneModifier;
 
         if (theta <= srcZoneBoundaries[0] && theta >= srcZoneBoundaries[3]) {
             startPort = Port.EAST;
@@ -441,7 +444,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
                 }
             }
         } else if (theta > srcZoneBoundaries[0]
-                && theta <= srcZoneBoundaries[1]) {
+            && theta <= srcZoneBoundaries[1]) {
             startPort = Port.SOUTH;
             if (left || right) {
                 if (left) { // Offset left (I/IIIa)
@@ -470,7 +473,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
                 }
             }
         } else if (theta > srcZoneBoundaries[1]
-                || theta <= srcZoneBoundaries[2]) {
+            || theta <= srcZoneBoundaries[2]) {
             startPort = Port.WEST;
             if (above || below) {
                 if (above) {
@@ -524,9 +527,9 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     @Override
     public Point2D getOpposingDefaultPosition(NeuronGroup ng) {
         if (synGroup1.getSourceNeuronGroup() != ng
-                && synGroup1.getTargetNeuronGroup() != ng) {
+            && synGroup1.getTargetNeuronGroup() != ng) {
             throw new IllegalArgumentException("Synapse group does not begin"
-                    + " or end in this group.");
+                + " or end in this group.");
         }
         NeuronGroup opposite;
         Port opPort;
@@ -581,18 +584,18 @@ public class SynapseGroupNodeBidirectional extends PNode implements
                     return;
                 }
                 if (srcNGroup.isMarkedForDeletion()
-                        || tarNGroup.isMarkedForDeletion()) {
+                    || tarNGroup.isMarkedForDeletion()) {
                     return;
                 }
                 if (!networkPanel.isSelected(synGroup1Box)
-                        && networkPanel.isSelected(synGroup2Box)) {
+                    && networkPanel.isSelected(synGroup2Box)) {
                     networkPanel.getObjectNodeMap().remove(synGroup1);
                     networkPanel.getNetwork().addGroup(synGroup1);
                 }
                 if (networkPanel.isSelected(synGroup1Box)
-                        && !networkPanel.isSelected(synGroup2Box)) {
+                    && !networkPanel.isSelected(synGroup2Box)) {
                     networkPanel.getObjectNodeMap().remove(synGroup2);
-                    networkPanel.addGroup(synGroup2);
+                    networkPanel.getNetwork().addGroup(synGroup2);
                 }
             }
 
@@ -626,7 +629,7 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     @Override
     public float getRequiredSpacing() {
         return arrow1.getStrokeWidth() * 2 + DEFAULT_BUFFER
-                + arrow2.getStrokeWidth() * 2;
+            + arrow2.getStrokeWidth() * 2;
     }
 
 }

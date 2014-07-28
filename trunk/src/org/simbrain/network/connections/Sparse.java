@@ -101,6 +101,21 @@ public class Sparse extends DensityBasedConnector {
     }
 
     /**
+     * Construct a sparse object from main arguments.  Used in scripts.
+     *
+     * @param sparsity sparsity level
+     * @param equalizeEfferents whether to equalize efferents
+     * @param selfConnectionAllowed whether self-connections should be allowed.
+     */
+    public Sparse(double sparsity, boolean equalizeEfferents,
+            boolean selfConnectionAllowed) {
+        super();
+        this.connectionDensity = sparsity;
+        this.equalizeEfferents = equalizeEfferents;
+        this.selfConnectionAllowed = selfConnectionAllowed;
+    }
+
+    /**
      * Connect source to target neurons using this instance of the sparse
      * object's properties to set all parameters of the connections.
      *

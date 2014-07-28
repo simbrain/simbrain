@@ -186,12 +186,7 @@ public class CompetitiveGroup extends NeuronGroup {
      *            winning neuron.
      */
     private void squireAlvarezWeightUpdate(final Neuron neuron) {
-        double rate = learningRate;
         for (Synapse synapse : neuron.getFanIn()) {
-            if (synapse.getParentGroup() instanceof SynapseGroupWithLearningRate) {
-                rate = ((SynapseGroupWithLearningRate) synapse.getParentGroup())
-                        .getLearningRate();
-            }
             double deltaw = learningRate
                     * synapse.getTarget().getActivation()
                     * (synapse.getSource().getActivation() - synapse
@@ -462,52 +457,6 @@ public class CompetitiveGroup extends NeuronGroup {
      */
     public void setUpdateMethod(UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
-    }
-
-    /**
-     * Subclass of neuron group that simply adds a settable learning rate. For
-     * use with competitive networks where it is desirable to have different
-     * learning rates for different synapse groups.
-     *
-     * TODO: Generalize this for other cases, e.g. SOM.
-     */
-    public static class SynapseGroupWithLearningRate extends SynapseGroup {
-
-        /** The learning rate. */
-        private double learningRate = .1;
-
-        /**
-         * Construct the synapse group with learning rate.
-         *
-         * @param net
-         *            parent net
-         * @param source
-         *            source neuron group
-         * @param target
-         *            target neuron group
-         * @param connection
-         *            the connection to be used in creating this synapse group
-         */
-        public SynapseGroupWithLearningRate(NeuronGroup source,
-                NeuronGroup target, ConnectNeurons connection) {
-            super(source, target, connection);
-        }
-
-        /**
-         * @return the learningRate
-         */
-        public double getLearningRate() {
-            return learningRate;
-        }
-
-        /**
-         * @param learningRate
-         *            the learningRate to set
-         */
-        public void setLearningRate(double learningRate) {
-            this.learningRate = learningRate;
-        }
-
     }
 
 }

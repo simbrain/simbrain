@@ -22,6 +22,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -29,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -51,7 +53,17 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      * The default initial display state of the neuron update setting panel's
      * neuron update rule panel.
      */
-    private static final boolean DEFAULT_NUSP_DISPLAY_STATE = true;
+    private static boolean DEFAULT_NUSP_DISPLAY_STATE;
+
+    /** Static initializer */
+    static {
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("useNativeFileChooser")) {
+            DEFAULT_NUSP_DISPLAY_STATE = Boolean.parseBoolean(properties
+                .getProperty("initializeNeuronDialogToExpandedState"));
+        }
+
+    }
 
     /** The basic neuron info panel. */
     private NeuronPropertiesSimple neuronInfoPanel;

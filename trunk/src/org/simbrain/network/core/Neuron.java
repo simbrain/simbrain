@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
@@ -204,6 +205,13 @@ public class Neuron {
         // TODO: Add checks?
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
+        // Todo: Backwards compatibility for before r3061. Maybe be removable
+        // if all existing workspaces are replaced.
+        if (updateRule instanceof SpikingNeuronUpdateRule) {
+            updateRule.inputType = InputType.SYNAPTIC;
+        } else {
+            updateRule.inputType = InputType.WEIGHTED;
+        }
     }
 
     /**

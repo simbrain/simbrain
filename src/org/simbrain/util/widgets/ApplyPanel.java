@@ -69,7 +69,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
      *
      * @param mainPanel the editable panel to which changes may be applied
      */
-    public ApplyPanel(EditablePanel mainPanel) {
+    private ApplyPanel(EditablePanel mainPanel) {
         this.mainPanel = mainPanel;
         masterLayout();
     }

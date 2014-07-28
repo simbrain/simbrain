@@ -67,22 +67,21 @@ public class SynapseGroup extends Group {
     private final NeuronGroup targetNeuronGroup;
 
     /**
-     * The connect neurons object associated with this group, for alterning
-     * connection parameters dynamically.
+     * The connect neurons object associated with this group.
      */
     private ConnectNeurons connectionManager;
 
-    /** 
+    /**
      * The percent of synapses that are excitatory. This parameter represents
-     * the ideal value of {@link #exSynapseSet}.size() / {@link #size()} 
+     * the ideal value of {@link #exSynapseSet}.size() / {@link #size()}
      * (the <b>actual</b> excitatory ratio).
      * This value is a mutable parameter the changing of which will cause the
      * synapse group to attempt to make:
      * {@link #exSynapseSet}.size() / {@link #size()}
-     * as close to the excitatoryRatio value as possible 
+     * as close to the excitatoryRatio value as possible
      * (see {@link #setExcitatoryRatio(double)}). This means that this value
      * is an ideal that (usually) the actual excitatory ratio is near, but
-     * seldom exactly equal to. 
+     * seldom exactly equal to.
      * Because of the way polarity is chosen for new synapses added to the group
      * this value represents a central limit that the synapse group would
      * absolutely reach exactly given an infinite number of synapses.
@@ -94,25 +93,25 @@ public class SynapseGroup extends Group {
      */
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
-    /** 
+    /**
      * A template synapse which can be edited to inform the group as to what
      * parameters a new "blank" excitatory synapse should be given.
      */
     private Synapse excitatoryPrototype = Synapse.getTemplateSynapse();
 
-    /** 
+    /**
      * A template synapse which can be edited to inform the group as to what
      * parameters a new "blank" inhibitory synapse should be given.
      */
     private Synapse inhibitoryPrototype = Synapse.getTemplateSynapse();
 
-    /** 
+    /**
      * The randomizer governing excitatory synapses. If null new synapses are
      * not randomized.
      */
     private PolarizedRandomizer exciteRand;
 
-    /** 
+    /**
      * The randomizer governing inhibitory synapses. If null new synapses are
      * not randomized.
      */
@@ -127,7 +126,7 @@ public class SynapseGroup extends Group {
     /** Whether or not this synapse group is recurrent. */
     private boolean recurrent;
 
-    /** 
+    /**
      * Whether or not the synapse update rules specified by this synapse group
      * are static.
      */
@@ -264,7 +263,7 @@ public class SynapseGroup extends Group {
      * synapses will be destroyed and the current connection manager and
      * parameters used to create new connections. This method adds the
      * current synapse group the the source neuron group's outgoing synapse
-     * set and the target neuron group's incoming synapse set. 
+     * set and the target neuron group's incoming synapse set.
      */
     public void makeConnections() {
         clear();
@@ -580,7 +579,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Add a synapse to this synapse group adding it to the appropriate 
+     * Add a synapse to this synapse group adding it to the appropriate
      * synapse set (excitatory or inhibitory if it's weight is above or below
      * zero respecively). Using this method is <b>NOT RECOMMENDED</b> under most
      * circumstances. This is because no checks are performed on the synapse to
@@ -589,8 +588,8 @@ public class SynapseGroup extends Group {
      * group no longer accurately apply to the whole group. This is not as
      * problematic as say not connecting neurons which are in this synapse
      * group's source and/or target neuron groups, but it does undermine the
-     * purpose of having synapse groups. 
-     * 
+     * purpose of having synapse groups.
+     *
      * Possible Use Case: When it is known beforehand that the synapse(s) being
      * added all conform to the parameters of this synapse group.
      *
@@ -607,7 +606,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to 
+     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to
      * excitatory synapses. This is even less safe however because an inhibitory
      * synapse could potentially be added to the excitatory set.
      * @param synapse the synapse to add.
@@ -622,7 +621,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to 
+     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to
      * inhibitory synapses. This is even less safe however because an excitatory
      * synapse could potentially be added to the inhibitory set.
      * @param synapse the synapse to add.
@@ -703,7 +702,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Sets the strength of a single synapse in the group specified as a 
+     * Sets the strength of a single synapse in the group specified as a
      * paremeter. If the synapse does not exist in this group returns false.
      * If the this makes the synapse change polarity it will be removed from
      * its current set and added to the appropriate set.
@@ -747,7 +746,7 @@ public class SynapseGroup extends Group {
      * Randomizes the weights of the excitatory connections in this group
      * based on the parameters of {@link #exciteRand}. Assumes that all
      * synapses in {@link #exSynapseSet} are--in fact--excitatory. If some
-     * action on the synapses may have corrupted that assumption call 
+     * action on the synapses may have corrupted that assumption call
      * {@link #revalidateSynapseSets()} first.
      */
     public void randomizeExcitatoryConnections() {
@@ -759,7 +758,7 @@ public class SynapseGroup extends Group {
      * Randomizes the weights of the inhibitory connections in this group
      * based on the parameters of {@link #inhibRand}. Assumes that all
      * synapses in {@link #inSynapseSet} are--in fact--inhibitory. If some
-     * action on the synapses may have corrupted that assumption call 
+     * action on the synapses may have corrupted that assumption call
      * {@link #revalidateSynapseSets()} first.
      */
     public void randomizeInhibitoryConnections() {
@@ -863,7 +862,7 @@ public class SynapseGroup extends Group {
     /**
      * Returns the excitatory ratio <b>parameter</b>. For the <i>actual</i>
      * value use {@link #getExcitatoryRatioPrecise()}.
-     * 
+     *
      *
      * @return the ration of excitatory synapses in this group
      */
@@ -1318,7 +1317,7 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the excitatory prototype synapse, allowing more detailed synapse
      * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplateExcitatory(Synapse)} 
+     * many values call {@link #setAndConformToTemplateExcitatory(Synapse)}
      * @return
      */
     public Synapse getExcitatoryPrototype() {
@@ -1328,7 +1327,7 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the inhibitory prototype synapse, allowing more detailed synapse
      * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplateInhibitory(Synapse)} 
+     * many values call {@link #setAndConformToTemplateInhibitory(Synapse)}
      *
      * @return
      */
@@ -1337,7 +1336,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * 
+     *
      * @param excitatoryPrototype
      */
     public void setAndConformToTemplateExcitatory(Synapse excitatoryPrototype) {
@@ -1408,7 +1407,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * 
+     *
      * @param inhibitoryPrototype
      */
     public void setAndConformToTemplateInhibitory(Synapse inhibitoryPrototype) {

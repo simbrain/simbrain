@@ -28,7 +28,7 @@ import org.simbrain.network.core.Synapse;
  *
  * @author Zach Tosi
  */
-public abstract class DensityBasedConnector extends ConnectNeurons {
+public abstract class DensityBasedConnector implements ConnectNeurons {
 
     /**
      * The default preference as to whether or not self connections are allowed.

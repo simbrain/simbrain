@@ -32,12 +32,14 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.StandardDialog;
@@ -80,8 +82,10 @@ public final class SynapseGroupDialog extends StandardDialog {
     /** Panel for editing synapses in the group. */
     private ConnectionSynapsePropertiesPanel editSynapsesPanel;
 
+    /** Panel for adjusting the connection object. */
     private ConnectionPanel connectionPanel;
 
+    /** Panel for adjusting the synapse group */
     private SynapseGroupAdjustmentPanel adjustmentPanel;
 
     /** If true this is a creation panel. Otherwise it is an edit panel. */
@@ -201,9 +205,9 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         if (isCreationPanel) {
             connectionPanel = ConnectionPanel.createConnectionPanel(this,
-                networkPanel);
-            JScrollPane connectWrapper = new JScrollPane(connectionPanel
-                .getPanel());
+                    networkPanel);
+            JScrollPane connectWrapper = new JScrollPane(
+                    connectionPanel.getMainPanel());
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection", new JPanel());
@@ -224,12 +228,20 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(adjustSynScrollPane);
         tabAdjust.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         adjustmentPanel = SynapseGroupAdjustmentPanel
-            .creatSynapseGroupAdjustmentPanel(this, synapseGroup);
+            .createSynapseGroupAdjustmentPanel(this, synapseGroup);
         tabAdjust.add(adjustmentPanel);
         tabbedPane.addTab("Adjust Weights", new JPanel());
 
         // Weight Matrix Editor Tabs
         if (!isCreationPanel) {
+            if (synapseGroup.getConnectionManager() instanceof Sparse) {
+                DensityBasedConnectionPanel sparsePanel = DensityBasedConnectionPanel
+                        .createSparsityAdjustmentPanel(
+                                (Sparse) synapseGroup.getConnectionManager(),
+                                networkPanel);
+                storedComponents.add(ApplyPanel.createApplyPanel(sparsePanel));
+                tabbedPane.addTab("Sparsity", new JPanel());
+            }
             // Weight Matrix
             JScrollPane matrixScrollPane = new JScrollPane(tabMatrix);
             matrixScrollPane.setBorder(null);

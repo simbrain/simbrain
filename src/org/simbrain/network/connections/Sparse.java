@@ -92,33 +92,26 @@ public class Sparse extends DensityBasedConnector {
     /** The synapse group associated with this connection object. */
     private SynapseGroup synapseGroup;
 
-    /** {@inheritDoc} */
+    /**
+     * Default constructor.
+     */
     public Sparse() {
         super();
         this.connectionDensity = DEFAULT_CONNECTION_DENSITY;
     }
 
     /**
-     * See super class description.
+     * Connect source to target neurons using this instance of the sparse
+     * object's properties to set all parameters of the connections.
      *
-     * @param network
-     *            network with neurons to be connected.
-     * @param neurons
-     *            source neurons.
-     * @param neurons2
-     *            target neurons.
+     * @param sourceNeurons the source neurons
+     * @param targetNeurons the target neurons
+     * @return the newly creates synapses connecting source to target
      */
-    public Sparse(double sparsity, boolean equalizeEfferents,
-        boolean selfConnectionAllowed) {
-        this.connectionDensity = sparsity;
-        this.equalizeEfferents = equalizeEfferents;
-        this.selfConnectionAllowed = selfConnectionAllowed;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "Sparse";
+    public List<Synapse> connectSparse(List<Neuron> sourceNeurons,
+            List<Neuron> targetNeurons) {
+        return connectSparse(sourceNeurons, targetNeurons, connectionDensity,
+                selfConnectionAllowed, equalizeEfferents, true);
     }
 
     /**
@@ -135,11 +128,11 @@ public class Sparse extends DensityBasedConnector {
      * @return
      */
     public static List<Synapse> connectSparse(List<Neuron> sourceNeurons,
-        List<Neuron> targetNeurons, double sparsity,
-        boolean selfConnectionAllowed, boolean equalizeEfferents,
-        boolean looseSynapses) {
+            List<Neuron> targetNeurons, double sparsity,
+            boolean selfConnectionAllowed, boolean equalizeEfferents,
+            boolean looseSynapses) {
         boolean recurrent = ConnectionUtilities.testRecurrence(sourceNeurons,
-            targetNeurons);
+                targetNeurons);
         Neuron source;
         Neuron target;
         Synapse synapse;
@@ -153,12 +146,10 @@ public class Sparse extends DensityBasedConnector {
             }
             int numSyns;
             if (!selfConnectionAllowed && sourceNeurons == targetNeurons) {
-                numSyns =
-                    (int) (sparsity * sourceNeurons.size() * (targetNeurons
+                numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons
                         .size() - 1));
             } else {
-                numSyns =
-                    (int) (sparsity * sourceNeurons.size() * targetNeurons
+                numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons
                         .size());
             }
             int synsPerSource = numSyns / sourceNeurons.size();
@@ -227,9 +218,9 @@ public class Sparse extends DensityBasedConnector {
         int numSrc = synapseGroup.getSourceNeurons().size();
         int numTar = synapseGroup.getTargetNeurons().size();
         sourceNeurons = synapseGroup.getSourceNeurons().toArray(
-            new Neuron[numSrc]);
+                new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup
-            .getTargetNeurons().toArray(new Neuron[numTar]);
+                .getTargetNeurons().toArray(new Neuron[numTar]);
         generateSparseOrdering(recurrent);
         if (equalizeEfferents) {
             connectEqualized(synapseGroup);
@@ -255,11 +246,9 @@ public class Sparse extends DensityBasedConnector {
         int numConnectsPerSrc;
         int expectedNumSyns;
         if (synapseGroup.isRecurrent() && !selfConnectionAllowed) {
-            numConnectsPerSrc =
-                (int) (connectionDensity * (sourceNeurons.length - 1));
+            numConnectsPerSrc = (int) (connectionDensity * (sourceNeurons.length - 1));
         } else {
-            numConnectsPerSrc =
-                (int) (connectionDensity * targetNeurons.length);
+            numConnectsPerSrc = (int) (connectionDensity * targetNeurons.length);
         }
         expectedNumSyns = numConnectsPerSrc * sourceNeurons.length;
         synapseGroup.preAllocateSynapses(expectedNumSyns);
@@ -287,16 +276,14 @@ public class Sparse extends DensityBasedConnector {
      */
     private void connectRandom(SynapseGroup synapseGroup) {
         currentOrderingIndices = new int[sourceNeurons.length];
-        int numTars =
-            synapseGroup.isRecurrent() && !selfConnectionAllowed
-                ? (sourceNeurons.length - 1)
+        int numTars = synapseGroup.isRecurrent() && !selfConnectionAllowed ? (sourceNeurons.length - 1)
                 : targetNeurons.length;
         synapseGroup
-            .preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
+                .preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
         for (int i = 0, n = sourceNeurons.length; i < n; i++) {
             currentOrderingIndices[i] = BinomialGen.nextInt(
-                SimbrainMath.DEFAULT_RANDOM_STREAM, numTars,
-                connectionDensity);
+                    SimbrainMath.DEFAULT_RANDOM_STREAM, numTars,
+                    connectionDensity);
             Neuron src = sourceNeurons[i];
             Neuron tar;
             for (int j = 0; j < currentOrderingIndices[i]; j++) {
@@ -319,7 +306,7 @@ public class Sparse extends DensityBasedConnector {
             sparseOrdering = new int[sourceNeurons.length][tarLen];
             for (int i = 0; i < srcLen; i++) {
                 sparseOrdering[i] = SimbrainMath.randPermuteWithExclusion(0,
-                    tarLen + 1, i);
+                        tarLen + 1, i);
             }
         } else {
             int tarLen = targetNeurons.length;
@@ -336,16 +323,12 @@ public class Sparse extends DensityBasedConnector {
      * passed to it, so situations where this would be undesirable should pass
      * this method a copy.
      *
-     * @param inds
-     *            a list of integers. This methods WILL shuffle inds, so pass a
+     * @param inds a list of integers. This methods WILL shuffle inds, so pass a
      *            copy unless inds being shuffled is not a problem.
-     * @param k
-     *            how many elements will be shuffled
-     * @param rand
-     *            a random number generator
+     * @param k how many elements will be shuffled
+     * @param rand a random number generator
      */
-    public static void randShuffleK(ArrayList<Integer> inds, int k,
-        Random rand) {
+    public static void randShuffleK(ArrayList<Integer> inds, int k, Random rand) {
         for (int i = 0; i < k; i++) {
             Collections.swap(inds, i, rand.nextInt(inds.size()));
         }
@@ -358,14 +341,13 @@ public class Sparse extends DensityBasedConnector {
      * @return
      */
     public List<Synapse> removeToSparsity(double newSparsity,
-        boolean returnRemoved) {
+            boolean returnRemoved) {
         if (newSparsity >= connectionDensity) {
             throw new IllegalArgumentException("Cannot 'removeToSparsity' to"
-                + " a higher connectivity density.");
+                    + " a higher connectivity density.");
         }
         Network net = sourceNeurons[0].getNetwork();
-        int removeTotal = (synapseGroup.size() - (int) (newSparsity
-            * getMaxPossibleConnections()));
+        int removeTotal = (synapseGroup.size() - (int) (newSparsity * getMaxPossibleConnections()));
         List<Synapse> removeList = null;
         if (returnRemoved) {
             removeList = new ArrayList<Synapse>(removeTotal);
@@ -377,7 +359,7 @@ public class Sparse extends DensityBasedConnector {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 for (int j = curNumConPerSource - 1; j >= finalNumConPerSource; j--) {
                     Synapse toRemove = Network.getSynapse(sourceNeurons[i],
-                        targetNeurons[sparseOrdering[i][j]]);
+                            targetNeurons[sparseOrdering[i][j]]);
                     if (returnRemoved) {
                         removeList.add(toRemove);
                     }
@@ -388,13 +370,13 @@ public class Sparse extends DensityBasedConnector {
         } else {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 int numToRemove = BinomialGen.nextInt(
-                    SimbrainMath.DEFAULT_RANDOM_STREAM,
-                    currentOrderingIndices[i],
-                    1 - (newSparsity / connectionDensity));
+                        SimbrainMath.DEFAULT_RANDOM_STREAM,
+                        currentOrderingIndices[i],
+                        1 - (newSparsity / connectionDensity));
                 for (int j = currentOrderingIndices[i] - 1; j >= currentOrderingIndices[i]
-                    - numToRemove; j--) {
+                        - numToRemove; j--) {
                     Synapse toRemove = Network.getSynapse(sourceNeurons[i],
-                        targetNeurons[sparseOrdering[i][j]]);
+                            targetNeurons[sparseOrdering[i][j]]);
                     if (returnRemoved) {
                         removeList.add(toRemove);
                     }
@@ -415,10 +397,10 @@ public class Sparse extends DensityBasedConnector {
     public List<Synapse> addToSparsity(double newSparsity) {
         if (newSparsity <= connectionDensity) {
             throw new IllegalArgumentException("Cannot 'addToSparsity' to"
-                + " a lower connectivity density.");
+                    + " a lower connectivity density.");
         }
-        int addTotal = ((int) (newSparsity * getMaxPossibleConnections())
-            - synapseGroup.size());
+        int addTotal = ((int) (newSparsity * getMaxPossibleConnections()) - synapseGroup
+                .size());
         List<Synapse> addList = new ArrayList<Synapse>(addTotal);
         if (equalizeEfferents) {
             int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
@@ -430,7 +412,7 @@ public class Sparse extends DensityBasedConnector {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 for (int j = curNumConPerSource; j < finalNumConPerSource; j++) {
                     Synapse toAdd = new Synapse(sourceNeurons[i],
-                        targetNeurons[sparseOrdering[i][j]]);
+                            targetNeurons[sparseOrdering[i][j]]);
                     addList.add(toAdd);
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
@@ -438,16 +420,16 @@ public class Sparse extends DensityBasedConnector {
         } else {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 int numToAdd = BinomialGen.nextInt(
-                    SimbrainMath.DEFAULT_RANDOM_STREAM,
-                    currentOrderingIndices[i],
-                    1 - (connectionDensity / newSparsity));
+                        SimbrainMath.DEFAULT_RANDOM_STREAM,
+                        currentOrderingIndices[i],
+                        1 - (connectionDensity / newSparsity));
                 int finalNumConPerSource = currentOrderingIndices[i] + numToAdd;
                 if (finalNumConPerSource > sparseOrdering[i].length) {
                     finalNumConPerSource = sparseOrdering[i].length;
                 }
                 for (int j = currentOrderingIndices[i]; j < finalNumConPerSource; j++) {
                     Synapse toAdd = new Synapse(sourceNeurons[i],
-                        targetNeurons[sparseOrdering[i][j]]);
+                            targetNeurons[sparseOrdering[i][j]]);
                     addList.add(toAdd);
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
@@ -496,6 +478,20 @@ public class Sparse extends DensityBasedConnector {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns a short name for this connection type, used in combo boxes.
+     *
+     * @return the name for this connection type
+     */
+    public static String getName() {
+        return "Sparse";
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }

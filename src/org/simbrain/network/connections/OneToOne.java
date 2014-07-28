@@ -25,10 +25,9 @@ import org.simbrain.network.util.OrientationComparator;
 /**
  * Connect each source neuron to a single target.
  *
- *
  * @author jyoshimi
  */
-public class OneToOne extends ConnectNeurons {
+public class OneToOne implements ConnectNeurons {
 
     public static boolean DEFAULT_BIDIRECT_PREF;
 
@@ -42,21 +41,16 @@ public class OneToOne extends ConnectNeurons {
     /** Orientation of how to connect neurons. */
     private OrientationComparator connectOrientation = DEFAULT_ORIENTATION;
 
-    /** {@inheritDoc} */
-    public OneToOne() {
-        super();
-    }
-
     /**
-     * {@inheritDoc}
+     * Use this connection object to make connections.
+     *
+     * @param sourceNeurons
+     * @param targetNeurons
+     * @return the new synapses
      */
-    public OneToOne(final boolean useBidirectionalConnections) {
-        this.useBidirectionalConnections = useBidirectionalConnections;
-    }
-
-    @Override
-    public String toString() {
-        return "One to one";
+    public List<Synapse> connectOneToOne(List<Neuron> sourceNeurons, final List<Neuron> targetNeurons) {
+        return connectOneToOne(sourceNeurons, targetNeurons, connectOrientation,
+                useBidirectionalConnections, true);
     }
 
     /**
@@ -75,6 +69,15 @@ public class OneToOne extends ConnectNeurons {
         list.addAll(neuronList);
         Collections.sort(list, comparator);
         return list;
+    }
+
+    @Override
+    public void connectNeurons(SynapseGroup synGroup) {
+        List<Synapse> syns = connectOneToOne(synGroup.getSourceNeurons(),
+                synGroup.getTargetNeurons(), useBidirectionalConnections, false);
+        for (Synapse s : syns) {
+            synGroup.addNewSynapse(s);
+        }
     }
 
     /**
@@ -220,15 +223,6 @@ public class OneToOne extends ConnectNeurons {
         return syns;
     }
 
-    @Override
-    public void connectNeurons(SynapseGroup synGroup) {
-        List<Synapse> syns = connectOneToOne(synGroup.getSourceNeurons(),
-                synGroup.getTargetNeurons(), useBidirectionalConnections, false);
-        for (Synapse s : syns) {
-            synGroup.addNewSynapse(s);
-        }
-    }
-
     /**
      * @return the useBidirectionalConnections
      */
@@ -268,6 +262,20 @@ public class OneToOne extends ConnectNeurons {
      */
     public static OrientationComparator[] getOrientationTypes() {
         return OrientationComparator.values();
+    }
+
+    /**
+     * Returns a short name for this connection type, used in combo boxes.
+     *
+     * @return the name for this connection type
+     */
+    public static String getName() {
+        return "One to one";
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }

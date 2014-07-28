@@ -26,6 +26,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.RadialPanel;
@@ -73,9 +74,8 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
         String title = "Connect ";
 
         if (connection instanceof AllToAll) {
-            optionsPanel =
-                DensityBasedConnectionPanel.createAllToAllAdjustmentPanel(
-                    (AllToAll) connection, networkPanel);
+            optionsPanel = new AllToAllPanel((AllToAll) connection,
+                    networkPanel);
             title += "All to All";
         } else if (connection instanceof OneToOne) {
             optionsPanel = new OneToOnePanel((OneToOne) connection);

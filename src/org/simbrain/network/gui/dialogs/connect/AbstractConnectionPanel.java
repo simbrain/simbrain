@@ -16,8 +16,6 @@ package org.simbrain.network.gui.dialogs.connect;
 import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
@@ -36,31 +34,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /**
-     * Adds a new item.
-     *
-     * @param text
-     *            Text to add
-     * @param comp
-     *            SimbrainComponent to add
-     */
-    public void addItem(final String text, final JComponent comp) {
-        mainPanel.addItem(text, comp);
-    }
-
-    /**
-     * Adds a new item label.
-     *
-     * @param text
-     *            Text to add
-     * @param comp
-     *            Component to add.
-     */
-    public void addItemLabel(final JLabel text, final JComponent comp) {
-        mainPanel.addItemLabel(text, comp);
-    }
-
-    /**
-     * This method is the default constructor.
+     * Default constructor for connection panels.
      */
     public AbstractConnectionPanel() {
         this.setLayout(new BorderLayout());
@@ -69,38 +43,31 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Populates fields with data from a connect neurons object.
+     */
+    public abstract void fillFieldValues();
+
+    /**
+     * Commit any changes made in the panel to the connection object being
+     * represented.
      *
-     * @param connection
-     * @throws ClassCastException
-     *             may occur if a sub-class of connect neurons not consistent
-     *             with one of the sub-classes of AbstractConnectionPanel is
-     *             passed into this method.
+     * @return a success condition.  Not used by all connection panels.
      */
-    public abstract void fillFieldValues(ConnectNeurons connection)
-        throws ClassCastException;
+    public abstract boolean commitChanges();
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public abstract void commitChanges();
-
-    public abstract List<Synapse> commitChanges(List<Neuron> source,
-        List<Neuron> target);
-
-    /**
-     * Add notes or other text to bottom of panel. Can be html formatted.
+     * Apply this connection panel's connection to the provided source and
+     * target neurons.
      *
-     * @param text
-     *            Text to be added
+     * @param source the source neurons
+     * @param target the target neurons
+     * @return the newly created synapses
      */
-    public void addBottomText(final String text) {
-        JPanel labelPanel = new JPanel();
-        JLabel theLabel = new JLabel(text);
-        labelPanel.add(theLabel);
-        this.add(labelPanel, BorderLayout.SOUTH);
-    }
+    public abstract List<Synapse> applyConnection(List<Neuron> source,
+            List<Neuron> target);
 
     /**
+     * Get the underlying connection object.
+     *
      * @return the ConnectNeurons object
      */
     public abstract ConnectNeurons getConnection();

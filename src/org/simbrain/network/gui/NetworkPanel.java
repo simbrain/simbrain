@@ -58,7 +58,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.QuickConnectPreferences;
+import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
@@ -294,6 +294,9 @@ public class NetworkPanel extends JPanel {
 
     /** Toolbar panel. */
     private JPanel toolbars;
+
+    /** Manages keyboard-based connections. */
+    private final QuickConnectionManager quickConnector = new QuickConnectionManager();
 
     /** Map associating network model objects with Piccolo Pnodes. */
     private final Map<Object, PNode> objectNodeMap =
@@ -994,7 +997,7 @@ public class NetworkPanel extends JPanel {
                 targetGroupOutgoing.retainAll(sourceGroupIncoming);
 
                 if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
-                    // group going in the opposite direction between the same 
+                    // group going in the opposite direction between the same
                     // two neuron groups.
                     final SynapseGroup reverse =
                         (SynapseGroup) targetGroupOutgoing.toArray()[0];
@@ -2455,8 +2458,7 @@ public class NetworkPanel extends JPanel {
      */
     public void connectSourceToTargetElements() {
         // Connect neurons
-        ConnectNeurons connection = QuickConnectPreferences
-            .getCurrentConnection().getDefaultInstance();
+        ConnectNeurons connection = quickConnector.getCurrentConnector();
         // Connect neuron groups
         for (NeuronGroup sng : getSourceModelGroups()) {
             for (NeuronGroup tng : getSelectedModelNeuronGroups()) {
@@ -2974,6 +2976,13 @@ public class NetworkPanel extends JPanel {
      */
     public Point2D.Double getWhereToAdd() {
         return whereToAdd;
+    }
+
+    /**
+     * @return the quickConnector
+     */
+    public QuickConnectionManager getQuickConnector() {
+        return quickConnector;
     }
 
 }

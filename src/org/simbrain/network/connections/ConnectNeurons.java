@@ -21,35 +21,15 @@ package org.simbrain.network.connections;
 import org.simbrain.network.groups.SynapseGroup;
 
 /**
- * Subclasses create connections (collections of synapses) between groups of
- * neurons.
- *
- * TODO: Keep? If not, demote to interface?
+ * Implementing classes create connections (collections of synapses) between
+ * groups of neurons.
  *
  * @author Zach Tosi
  */
-public abstract class ConnectNeurons {
+public interface ConnectNeurons {
 
     /**
-     * Default constructor.
-     */
-    public ConnectNeurons() {
-
-    }
-
-    /**
-     * Apply connection using specified parameters.
-     *
-     * @param network
-     *            reference to parent network
-     * @param neurons
-     *            source neurons
-     * @param neurons2
-     *            target neurons
-     * @param looseSynapses
-     *            true if the connections that are being created are "loose";
-     *            false if the connections will be placed in a synapse group
-     * @return the synapses that were created
+     * Apply connection to a synapose group using specified parameters.
      */
     public abstract void connectNeurons(final SynapseGroup synGroup);
 

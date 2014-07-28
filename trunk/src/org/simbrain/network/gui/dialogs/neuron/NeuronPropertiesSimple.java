@@ -25,6 +25,7 @@ import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -51,6 +52,19 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
+
+    /** The default initial display for extended information. */
+    public static boolean DEFAULT_INIT_EXTENDED_DISPLAY;
+
+    /** Static initializer */
+    static {
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("useNativeFileChooser")) {
+            DEFAULT_INIT_EXTENDED_DISPLAY = Boolean.parseBoolean(properties
+                .getProperty("initializeNeuronDialogToExpandedState"));
+        }
+
+    }
 
     /** Activation field. */
     private JTextField tfActivation = new JTextField();
@@ -136,8 +150,8 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
-        detailTriangle = new DropDownTriangle(UpDirection.LEFT, true, "More",
-            "Less", parent);
+        detailTriangle = new DropDownTriangle(UpDirection.LEFT,
+            DEFAULT_INIT_EXTENDED_DISPLAY, "More", "Less", parent);
         extraDataPanel = new NeuronPropertiesExtended(this.neuronList, parent);
         initializeLayout();
         fillFieldValues();

@@ -41,7 +41,6 @@ import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
-import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.EditablePanel;
@@ -320,11 +319,6 @@ public final class SynapseGroupDialog extends StandardDialog {
     public void fillFieldValues() {
         if (!isCreationPanel) {
             tfSynapseGroupLabel.setText(synapseGroup.getLabel());
-            if (synapseGroup instanceof SynapseGroupWithLearningRate) {
-                tfRateLabel.setText(""
-                    + ((SynapseGroupWithLearningRate) synapseGroup)
-                        .getLearningRate());
-            }
         } else {
             tfSynapseGroupLabel.setText("Synapse group");
         }

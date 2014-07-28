@@ -42,7 +42,6 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
-import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
@@ -1656,16 +1655,8 @@ public class Network {
     public void connectNeuronGroups(final NeuronGroup sng,
         final NeuronGroup tng, final ConnectNeurons connection) {
 
-        final SynapseGroup group;
-
-        // TODO: Below is temporary rule. As more rules are added something more
-        // sophisticated
-        // might be needed.
-        if (tng instanceof CompetitiveGroup) {
-            group = new SynapseGroupWithLearningRate(sng, tng, connection);
-        } else {
-            group = SynapseGroup.createSynapseGroup(sng, tng, connection);
-        }
+        final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng,
+                connection);
         addGroup(group);
     }
 

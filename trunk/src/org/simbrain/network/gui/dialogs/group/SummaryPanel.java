@@ -32,7 +32,6 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.subnetworks.CompetitiveGroup.SynapseGroupWithLearningRate;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -210,12 +209,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             this.add(outgoingGroupLabel);
             this.add(outgoingField);
         }
-        // TODO: Below will have to be refactored if more customized synpase
-        // groups are added
-        if (group instanceof SynapseGroupWithLearningRate) {
-            this.add(learningRateLabel);
-            this.add(learningRateField);
-        }
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
@@ -317,11 +310,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
 
         useGlobalSettings.setSelected(sg.isUseGroupLevelSettings());
 
-        if (sg instanceof SynapseGroupWithLearningRate) {
-            learningRateField.setText(""
-                + ((SynapseGroupWithLearningRate) sg).getLearningRate());
-        }
-
         if (sg.size() > 0) {
             Iterator<Synapse> synIter;
             Synapse protoSyn;
@@ -389,10 +377,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         if (group instanceof SynapseGroup) {
             ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
                 .isSelected());
-            if (group instanceof SynapseGroupWithLearningRate) {
-                ((SynapseGroupWithLearningRate) group).setLearningRate(Double
-                    .parseDouble(learningRateField.getText()));
-            }
         }
 
         return true; // Always Successful: the only field it makes sense to

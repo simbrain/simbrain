@@ -33,7 +33,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
  * @author Zach Tosi
  *
  */
-public class Radial extends DensityBasedConnector {
+public class Radial extends Sparse {
 
     public static final double DEFAULT_DIST_CONST = 0.25;
 

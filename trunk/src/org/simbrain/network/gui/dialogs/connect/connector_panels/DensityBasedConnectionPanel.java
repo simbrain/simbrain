@@ -44,7 +44,7 @@ import javax.swing.event.ChangeEvent;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.DensityBasedConnector;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -102,7 +102,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
      * The sparse connection object to which changes to this panel will be
      * committed.
      */
-    private DensityBasedConnector connection;
+    private Sparse connection;
 
     /**
      * A property change listener for the density text field which can be
@@ -162,7 +162,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
      * @param numTargs
      *            the number of target neurons being connected to
      */
-    private DensityBasedConnectionPanel(DensityBasedConnector connection,
+    private DensityBasedConnectionPanel(Sparse connection,
         NetworkPanel networkPanel) {
         super();
         this.connection = connection;
@@ -527,20 +527,6 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
         synsPerSource.setValue(new Integer(sps));
     }
 
-    /**
-     * Sets the panel to the proper configuration when AllToAll connections are
-     * being viewed/edited.
-     */
-    public void allToAllView() {
-        connectionDensitySlider.setValue(100);
-        allowSelfConnectChkBx.setSelected(true);
-        allowSelfConnect = true;
-        connectionDensitySlider.setEnabled(false);
-        equalizeEfferentsChkBx.setSelected(true);
-        equalizeEfferentsChkBx.setEnabled(false);
-        synsPerSource.setEditable(false);
-        densityTf.setEnabled(false);
-    }
 
     public boolean isRecurrentConnection() {
         return recurrentConnection;

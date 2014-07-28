@@ -32,11 +32,13 @@ import org.simbrain.util.math.SimbrainMath;
 import umontreal.iro.lecuyer.randvar.BinomialGen;
 
 /**
- * Connect neurons sparsely.
+ * A superclass for all connectors whose primary parameter is related to base
+ * connection density, taking no other major factors into account insofar as
+ * selecting which neurons should be connected goes.
  *
  * @author Zach Tosi
  */
-public class Sparse extends DensityBasedConnector {
+public class Sparse implements ConnectNeurons {
 
     /**
      * The default preference as to whether or not self connections are allowed.
@@ -93,15 +95,28 @@ public class Sparse extends DensityBasedConnector {
     private SynapseGroup synapseGroup;
 
     /**
+     * Generally speaking the connectionDensity parameter represents a
+     * probability reflecting how many possible connections between a given
+     * source neuron and all available target neurons will actually be made.
+     */
+    protected double connectionDensity;
+
+    /**
+     * Whether or not connections where the source and target are the same
+     * neuron are allowed. Only applicable if the source and target neuron sets
+     * are the same.
+     */
+    protected boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
+
+    /**
      * Default constructor.
      */
     public Sparse() {
-        super();
         this.connectionDensity = DEFAULT_CONNECTION_DENSITY;
     }
 
     /**
-     * Construct a sparse object from main arguments.  Used in scripts.
+     * Construct a sparse object from main arguments. Used in scripts.
      *
      * @param sparsity sparsity level
      * @param equalizeEfferents whether to equalize efferents
@@ -109,7 +124,6 @@ public class Sparse extends DensityBasedConnector {
      */
     public Sparse(double sparsity, boolean equalizeEfferents,
             boolean selfConnectionAllowed) {
-        super();
         this.connectionDensity = sparsity;
         this.equalizeEfferents = equalizeEfferents;
         this.selfConnectionAllowed = selfConnectionAllowed;
@@ -470,19 +484,26 @@ public class Sparse extends DensityBasedConnector {
     }
 
     public void setEqualizeEfferents(boolean equalizeEfferents) {
-
         this.equalizeEfferents = equalizeEfferents;
     }
 
-    /** {@inheritDoc} */
-    @Override
     public double getConnectionDensity() {
         return connectionDensity;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
+    /**
+     * Set how dense the connections are between source and target neurons,
+     * generally speaking the connectionDensity parameter represents a
+     * probability reflecting how many possible connections between a given
+     * source neuron and all available target neurons will actually be made.
+     *
+     * @param connectionDensity
+     * @return the connections added or removed to achieve the desired density
+     *         if density is being changed after connections have already been
+     *         made
+     */
+    public Collection<Synapse> setConnectionDensity(
+            final double connectionDensity) {
         if (sparseOrdering == null) {
             this.connectionDensity = connectionDensity;
         } else {
@@ -493,6 +514,24 @@ public class Sparse extends DensityBasedConnector {
             }
         }
         return null;
+    }
+
+    /**
+     * @return whether or not self connections (connections where the source and
+     *         target neuron are the same neuron) are allowed.
+     */
+    public boolean isSelfConnectionAllowed() {
+        return selfConnectionAllowed;
+    }
+
+    /**
+     * Set whether or not self connections (connections where the source and
+     * target neuron are the same neuron) are allowed.
+     *
+     * @param selfConnectionAllowed
+     */
+    public void setSelfConnectionAllowed(boolean selfConnectionAllowed) {
+        this.selfConnectionAllowed = selfConnectionAllowed;
     }
 
     /**

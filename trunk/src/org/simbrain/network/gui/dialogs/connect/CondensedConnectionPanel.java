@@ -24,7 +24,7 @@ import java.awt.Window;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 
-import org.simbrain.network.connections.DensityBasedConnector;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -33,15 +33,15 @@ import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPane
 import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
 
 /**
- * A panel that combines a DensityBasedConnectionPanel (Sparse) with a 
+ * A panel that combines a DensityBasedConnectionPanel (Sparse) with a
  * SynapsePolarityAndRandomizerPanel with the ability to create a synapse group
  * with the given properties given a source and target neuron group. Meant for
  * cases where a limited number of properties can be set for a given synapse
- * group. 
- * 
+ * group.
+ *
  * For the very common case where a variable density, variable polarity,
  * random synapse group is desired.
- * 
+ *
  * @author Zach Tosi
  *
  */
@@ -80,7 +80,8 @@ public class CondensedConnectionPanel {
 
     /**
      * Creates a synapse group from the parameters in the panel and between
-     * two neuron groups
+     * two neuron groups.
+     *
      * @param source the source neuron group
      * @param target the target neuron group
      * @return the synapse group connecting them
@@ -89,7 +90,7 @@ public class CondensedConnectionPanel {
         NeuronGroup target) {
 
         connectorPanel.commitChanges();
-        DensityBasedConnector dbc = (DensityBasedConnector) connectorPanel
+        Sparse dbc = (Sparse) connectorPanel
             .getConnection();
 
         SynapseGroup synGrp = new SynapseGroup(source, target, dbc);
@@ -103,7 +104,7 @@ public class CondensedConnectionPanel {
     }
 
     /**
-     * Returns the density based connection panel so that other classes can 
+     * Returns the density based connection panel so that other classes can
      * set certain properties of the panel independent of this class.
      * @return
      */

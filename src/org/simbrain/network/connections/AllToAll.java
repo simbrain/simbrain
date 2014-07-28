@@ -26,7 +26,19 @@ import org.simbrain.network.groups.SynapseGroup;
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public class AllToAll extends DensityBasedConnector {
+public class AllToAll implements ConnectNeurons {
+
+    /**
+     * The default preference as to whether or not self connections are allowed.
+     */
+    private static final boolean DEFAULT_SELF_CONNECT_PREF = false;
+
+    /**
+     * Whether or not connections where the source and target are the same
+     * neuron are allowed. Only applicable if the source and target neuron sets
+     * are the same.
+     */
+    private boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
 
     /**
      * Construct to all to all connector.
@@ -38,12 +50,7 @@ public class AllToAll extends DensityBasedConnector {
     /**
      * Construct all to all connection object.
      *
-     * @param network
-     *            parent network
-     * @param neurons
-     *            base neurons
-     * @param neurons2
-     *            target neurons
+     * @param allowSelfConnect whether to allow self connections or not
      */
     public AllToAll(boolean allowSelfConnect) {
         this.selfConnectionAllowed = allowSelfConnect;
@@ -63,7 +70,6 @@ public class AllToAll extends DensityBasedConnector {
         return getName();
     }
 
-
     /**
      * Connect all to all using underlying connection object to store
      * parameters. Used by quick connect.
@@ -77,6 +83,7 @@ public class AllToAll extends DensityBasedConnector {
         return connectAllToAll(sourceNeurons, targetNeurons, false,
                 selfConnectionAllowed, true);
     }
+
     /**
      * Connects every source neuron to every target neuron. The only exception
      * being that if the source and target neuron lists are the same, then no
@@ -84,24 +91,30 @@ public class AllToAll extends DensityBasedConnector {
      * aren't allowed. Will produce n^2 synapses if self connections are allowed
      * and n(n-1) if they are not.
      *
-     * @param sourceNeurons
-     * @param targetNeurons
-     * @param allowSelfConnection
-     * @param looseSynapses
-     * @return
+     * @param sourceNeurons the source neurons
+     * @param targetNeurons the target neurons
+     * @param recurrent whether the source and target neurons overlap
+     * @param allowSelfConnection whether to allow self-connections
+     * @param looseSynapses whether the synapses being connected are loose or in
+     *            a synapse group
+     * @return the synapses created.
      */
     public static List<Synapse> connectAllToAll(
-        final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons,
-        final boolean recurrent, final boolean allowSelfConnection,
-        final boolean looseSynapses) {
+            final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons,
+            final boolean recurrent, final boolean allowSelfConnection,
+            final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>(
-            (int) (targetNeurons.size() * sourceNeurons.size()));
+                (int) (targetNeurons.size() * sourceNeurons.size()));
+        // First case is where we have to worry about avoiding self-connections.
+        // This case can be optimized as below.
         if (recurrent && !allowSelfConnection) {
             int i = 0;
             int j;
             for (Neuron source : sourceNeurons) {
                 j = 0;
                 for (Neuron target : targetNeurons) {
+                    // Optimization: equals check between integers than between
+                    // source and target neurons
                     if (i != j) {
                         Synapse s = new Synapse(source, target);
                         syns.add(s);
@@ -111,6 +124,7 @@ public class AllToAll extends DensityBasedConnector {
                 i++;
             }
         } else {
+            // The case where we don't need to worry about self-connections
             for (Neuron source : sourceNeurons) {
                 for (Neuron target : targetNeurons) {
                     Synapse s = new Synapse(source, target);
@@ -128,39 +142,21 @@ public class AllToAll extends DensityBasedConnector {
     }
 
     /**
-     * AllToAll is in some respects a special case of VariableDensityConnector,
-     * with connection density always set to 1.
-     */
-    @Override
-    public double getConnectionDensity() {
-        return 1;
-    }
-
-
-    @Override
-    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
-        // No implementation.  Should not be used.
-        return null;
-    }
-
-    /**
      * Connects neurons such that every source neuron is connected to every
      * target neuron. The only exception to this case is if the source neuron
      * group is the target neuron group and self-connections are not allowed.
      *
-     * @param synGroup
-     *            the synapse group to which the synapses created by this
+     * @param synGroup the synapse group to which the synapses created by this
      *            connection class will be added.
      */
-    @Override
     public void connectNeurons(SynapseGroup synGroup) {
         List<Synapse> syns = connectAllToAll(synGroup.getSourceNeurons(),
-            synGroup.getTargetNeurons(), synGroup.isRecurrent(),
-            selfConnectionAllowed, false);
-        // Set the capacity of the synapse group's list to accomodate the
+                synGroup.getTargetNeurons(), synGroup.isRecurrent(),
+                selfConnectionAllowed, false);
+        // Set the capacity of the synapse group's list to accommodate the
         // synapses this group will add.
         synGroup.preAllocateSynapses(synGroup.getSourceNeuronGroup().size()
-            * synGroup.getTargetNeuronGroup().size());
+                * synGroup.getTargetNeuronGroup().size());
         for (Synapse s : syns) {
             synGroup.addNewSynapse(s);
         }
@@ -171,7 +167,6 @@ public class AllToAll extends DensityBasedConnector {
      *         where the source and target neuron are the same neuron is
      *         allowed.
      */
-    @Override
     public boolean isSelfConnectionAllowed() {
         return selfConnectionAllowed;
     }
@@ -181,7 +176,6 @@ public class AllToAll extends DensityBasedConnector {
      *
      * @param allowSelfConnect
      */
-    @Override
     public void setSelfConnectionAllowed(boolean allowSelfConnect) {
         this.selfConnectionAllowed = allowSelfConnect;
     }

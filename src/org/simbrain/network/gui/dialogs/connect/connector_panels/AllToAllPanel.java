@@ -34,9 +34,9 @@ import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 
 /**
  * The <b>AllToAllPanel</b> is panel for editing all to all connections.
- * 
+ *
  * @author Zach Tosi
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class AllToAllPanel extends AbstractConnectionPanel {

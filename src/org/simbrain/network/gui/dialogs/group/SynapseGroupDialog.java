@@ -72,9 +72,6 @@ public final class SynapseGroupDialog extends StandardDialog {
     /** Label Field. */
     private final JTextField tfSynapseGroupLabel = new JTextField();
 
-    /** Rate Field. */
-    private final JTextField tfRateLabel = new JTextField();
-
     /** Panel with basic neuron group info. */
     private JPanel summaryInfoPanel;
 

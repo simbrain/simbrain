@@ -68,7 +68,8 @@ public class RadialPanel extends AbstractConnectionPanel {
     /**
      * {@inheritDoc}
      */
-    public void commitChanges() {
+    public boolean commitChanges() {
+        return true;
     }
 
     /**
@@ -83,14 +84,8 @@ public class RadialPanel extends AbstractConnectionPanel {
     }
 
     @Override
-    public List<Synapse>
-        commitChanges(List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
         return null;
-    }
-
-    @Override
-    public void fillFieldValues(ConnectNeurons connection)
-        throws ClassCastException {
     }
 
 }

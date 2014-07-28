@@ -28,10 +28,9 @@ import org.simbrain.network.groups.SynapseGroup;
  */
 public class AllToAll extends DensityBasedConnector {
 
-    /** {@inheritDoc}. By definition is always 1.0 for All To All. */
-    private final double connectionDensity = 1.0;
-
-    /** {@inheritDoc} */
+    /**
+     * Construct to all to all connector.
+     */
     public AllToAll() {
         super();
     }
@@ -51,13 +50,33 @@ public class AllToAll extends DensityBasedConnector {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a short name for this connection type, used in combo boxes.
+     *
+     * @return the name for this connection type
      */
-    @Override
-    public String toString() {
+    public static String getName() {
         return "All to all";
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+
+    /**
+     * Connect all to all using underlying connection object to store
+     * parameters. Used by quick connect.
+     *
+     * @param sourceNeurons the source neurons
+     * @param targetNeurons the target neurons
+     * @return the new synapses
+     */
+    public List<Synapse> connectAllToAll(List<Neuron> sourceNeurons,
+            List<Neuron> targetNeurons) {
+        return connectAllToAll(sourceNeurons, targetNeurons, false,
+                selfConnectionAllowed, true);
+    }
     /**
      * Connects every source neuron to every target neuron. The only exception
      * being that if the source and target neuron lists are the same, then no
@@ -114,29 +133,13 @@ public class AllToAll extends DensityBasedConnector {
      */
     @Override
     public double getConnectionDensity() {
-        return connectionDensity;
+        return 1;
     }
 
-    /**
-     * Throws and catches an UnsupportedOperationException if the
-     * specifiedConnectionDensity does not equal 1.0. This is because by
-     * definition the connection density of the connections resulting from an
-     * AllToAll connector must have a density of 1.0. If the
-     * connectionDensityParameter is 1.0, nothing happens. This functionality is
-     * provided so that "instanceof" checks can be avoided.
-     */
-    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
-        try {
-            if (connectionDensity != 1.0) {
-                throw new UnsupportedOperationException(
-                    "The connection density of"
-                        + " an AllToAll connector cannot be"
-                        + " changed, by definition it is always 1.0");
-            }
-        } catch (UnsupportedOperationException uoe) {
-            uoe.printStackTrace();
 
-        }
+    @Override
+    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
+        // No implementation.  Should not be used.
         return null;
     }
 

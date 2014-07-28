@@ -54,6 +54,7 @@ import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
+import org.simbrain.util.widgets.EditablePanel;
 
 /**
  * The <b>SparsityAdjustmentPanel</b> is a sub-panel for other connection panels
@@ -66,7 +67,7 @@ import org.simbrain.util.Utils;
  *
  */
 @SuppressWarnings("serial")
-public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
+public class DensityBasedConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
 
     /** A slider for setting the sparsity of the connections. */
     private JSlider connectionDensitySlider = new JSlider(JSlider.HORIZONTAL,
@@ -94,6 +95,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private JCheckBox allowSelfConnectChkBx = new JCheckBox();
 
+    /** Panel for self connection check box. */
     private JPanel allowSelfConnectPanel = new JPanel();
 
     /**
@@ -126,46 +128,28 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private int numTargs;
 
+    /** Whether to allow self connections. */
     private boolean allowSelfConnect = false;
 
+    /** Whether to allow recurrent connections. */
     private boolean recurrentConnection = false;
 
     /**
+     * Create the sparsity based connection panel.
      *
-     * @param connection
-     * @param networkPanel
-     * @return
+     * @param connection the connection object to adjust
+     * @param networkPanel the parent panel
+     * @return the constructed panel
      */
     public static DensityBasedConnectionPanel createSparsityAdjustmentPanel(
         Sparse connection, NetworkPanel networkPanel) {
         DensityBasedConnectionPanel sap =
             new DensityBasedConnectionPanel(connection, networkPanel);
-        sap.fillFieldValues(connection);
+        sap.fillFieldValues();
         sap.initializeSparseSlider();
         sap.addChangeListeners();
         sap.addActionListeners();
         sap.initializeLayout();
-        return sap;
-    }
-
-    /**
-     *
-     * @param connection
-     * @param networkPanel
-     * @return
-     */
-    public static DensityBasedConnectionPanel createAllToAllAdjustmentPanel(
-        AllToAll connection, NetworkPanel networkPanel) {
-        DensityBasedConnectionPanel sap =
-            new DensityBasedConnectionPanel(connection, networkPanel);
-        sap.fillFieldValues(connection);
-        sap.initializeSparseSlider();
-        sap.addChangeListeners();
-        sap.addActionListeners();
-        sap.initializeLayout();
-        // Set the enabled fields appropriately given that all to all is
-        // selected.
-        sap.allToAllView();
         return sap;
     }
 
@@ -180,6 +164,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
      */
     private DensityBasedConnectionPanel(DensityBasedConnector connection,
         NetworkPanel networkPanel) {
+        super();
         this.connection = connection;
         // Assumes only one source and one target group are slected if any are
         if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
@@ -479,18 +464,8 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
 
     }
 
-    /**
-     * Fills the field values for this panel based on an already existing
-     * connection tied to a synapse group. This method also sets the underlying
-     * connect neurons object to the connection parameter.
-     *
-     * @param connection
-     *            the connection object used to determine field values for this
-     *            panel.
-     */
     @Override
-    public void fillFieldValues(ConnectNeurons connection_) {
-        this.connection = (DensityBasedConnector) connection_;
+    public void fillFieldValues() {
         double connectivity = connection.getConnectionDensity();
         equalizeEfferentsChkBx
             .setSelected(connection.isSelfConnectionAllowed());
@@ -499,39 +474,35 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
         densityTf.setValue(connectivity);
     }
 
-    /**
-     * Commits the values set in this panels fields to the model connection
-     * object
-     */
-    public void commitChanges() {
-        if (equalizeEfferentsChkBx.isEnabled()) {
-            // Should always be disabled if the connection is AllToAll
-            ((Sparse) connection).setEqualizeEfferents(equalizeEfferentsChkBx
-                .isSelected());
-        }
-        double connectivity = Utils.doubleParsable(densityTf);
-        if (!Double.isNaN(connectivity)) {
-            connection.setConnectionDensity(connectivity);
+    @Override
+    public boolean commitChanges() {
+        if (connection instanceof Sparse) {
+            if (equalizeEfferentsChkBx.isEnabled()) {
+                // Should always be disabled if the connection is AllToAll
+                ((Sparse) connection)
+                        .setEqualizeEfferents(equalizeEfferentsChkBx
+                                .isSelected());
+            }
+            double connectivity = Utils.doubleParsable(densityTf);
+            if (!Double.isNaN(connectivity)) {
+                connection.setConnectionDensity(connectivity);
+            }
         }
         connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Synapse>
-        commitChanges(List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
-                return AllToAll.connectAllToAll(source, target, source
-                    .equals(target),
-                    allowSelfConnect, true);
+                return AllToAll.connectAllToAll(source, target,
+                        source.equals(target), allowSelfConnect, true);
             } else {
                 return Sparse.connectSparse(source, target, density,
-                    allowSelfConnect,
-                    equalizeEfferentsChkBx.isSelected(), true);
+                        allowSelfConnect, equalizeEfferentsChkBx.isSelected(),
+                        true);
             }
         }
         return null;
@@ -591,7 +562,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      * @param numTargs
      */
     public void setNumTargs(int numTargs) {
@@ -602,7 +573,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     }
 
     /**
-     * 
+     *
      * @param density
      */
     public void setDensity(double density) {
@@ -628,6 +599,11 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel {
     @Override
     public ConnectNeurons getConnection() {
         return connection;
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return this;
     }
 
 }

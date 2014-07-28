@@ -33,36 +33,36 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
- *
  * Dialog wrapper for all connection panels.
  *
  * @author jyoshimi
  * @author ztosi
- *
  */
 @SuppressWarnings("serial")
 public class ConnectionDialog extends StandardDialog {
 
+    /** Parent network panel. */
     private final NetworkPanel networkPanel;
 
     /** The connection panel wrapped in this dialog. */
     private AbstractConnectionPanel connectionPanel;
 
-    /** The connection object associated with the connection panel. */
-    private ConnectNeurons connection;
-
+    /** The main panel. */
     private JPanel mainPanel;
 
+    /** The connection properties panel. */
     private ConnectionSynapsePropertiesPanel propertiesPanel;
 
+    /** The excitatory ratio and randomizer panel. */
     private SynapsePolarityAndRandomizerPanel eirPanel;
 
     /**
+     * Create an instance of a connection dialog.
      *
-     * @param optionsPanel
-     * @param connection
-     * @param networkPanel
-     * @return
+     * @param optionsPanel the connection panel
+     * @param connection the connection object
+     * @param networkPanel the parent panel
+     * @return the constructed dialog
      */
     public static ConnectionDialog createConnectionDialog(
         final AbstractConnectionPanel optionsPanel,
@@ -74,20 +74,20 @@ public class ConnectionDialog extends StandardDialog {
     }
 
     /**
+     * Construct the dialog.
      *
-     * @param networkPanel
-     * @param optionsPanel
-     * @param connection
+     * @param networkPanel parent panel
+     * @param optionsPanel the option panel for this connection type
+     * @param connection the underlyign connection object
      */
     private ConnectionDialog(final AbstractConnectionPanel optionsPanel,
         final ConnectNeurons connection, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         this.connectionPanel = optionsPanel;
-        this.connection = connection;
     }
 
     /**
-     *
+     * Initialize the connection panel.
      */
     private void init() {
         mainPanel = new JPanel();
@@ -115,9 +115,11 @@ public class ConnectionDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
+        connectionPanel.commitChanges();
         List<Neuron> source = networkPanel.getSourceModelNeurons();
         List<Neuron> target = networkPanel.getSelectedModelNeurons();
-        List<Synapse> synapses = connectionPanel.commitChanges(source, target);
+        List<Synapse> synapses = connectionPanel
+                .applyConnection(source, target);
         ConnectionUtilities.polarizeSynapses(synapses,
             eirPanel.getPercentExcitatory());
         propertiesPanel.commitChanges();
@@ -133,23 +135,7 @@ public class ConnectionDialog extends StandardDialog {
             ConnectionUtilities.randomizeInhibitorySynapses(synapses,
                 eirPanel.getInRandomizer());
         }
-        networkPanel.revalidate();
-        networkPanel.repaint();
+        networkPanel.getNetwork().fireNetworkChanged();
     }
 
-    public AbstractConnectionPanel getOptionsPanel() {
-        return connectionPanel;
-    }
-
-    public void setOptionsPanel(AbstractConnectionPanel optionsPanel) {
-        this.connectionPanel = optionsPanel;
-    }
-
-    public ConnectNeurons getConnection() {
-        return connection;
-    }
-
-    public void setConnection(ConnectNeurons connection) {
-        this.connection = connection;
-    }
 }

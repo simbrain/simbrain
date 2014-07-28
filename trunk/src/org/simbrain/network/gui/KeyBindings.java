@@ -19,7 +19,6 @@
 package org.simbrain.network.gui;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -27,7 +26,6 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.SceneGraphBrowser;
@@ -221,12 +219,11 @@ public class KeyBindings {
                         .sourceAndTargetNeuronGroupsSelected(panel)) {
                     AddSynapseGroupAction.displaySynapseGroupDialog(panel);
                 } else {
-                    QuickConnectPreferences.getCurrentConnection()
-                            .applyConnection(panel.getSourceModelNeurons(),
-                                    panel.getSelectedModelNeurons());
+                    panel.getQuickConnector().applyCurrentConnection(
+                            panel.getSourceModelNeurons(),
+                            panel.getSelectedModelNeurons());
                     panel.getNetwork().fireNetworkChanged();
                 }
-
             }
         });
 

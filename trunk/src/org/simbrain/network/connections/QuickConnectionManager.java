@@ -103,8 +103,15 @@ public class QuickConnectionManager {
             retList = ((Sparse) currentConnector).connectSparse(source, target);
         }
         if (retList != null) {
-            ConnectionUtilities.randomizeAndPolarizeSynapses(retList,
-                    exRandomizer, inRandomizer, excitatoryRatio);
+            ConnectionUtilities.polarizeSynapses(retList, excitatoryRatio);
+            if (this.isUseExcitatoryRandomization()) {
+                ConnectionUtilities.randomizeExcitatorySynapses(retList,
+                        exRandomizer);
+            }
+            if (this.isUseInhibitoryRandomization()) {
+                ConnectionUtilities.randomizeInhibitorySynapses(retList,
+                        exRandomizer);
+            }
         }
 
     }

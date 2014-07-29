@@ -178,7 +178,11 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private void init() {
 
-        setTitle("Edit Synapse Group");
+        if (isCreationPanel) {
+            setTitle("Create Synapse Group");
+        } else {
+            setTitle("Edit Synapse Group");
+        }
 
         setMinimumSize(new Dimension(isCreationPanel ? 500 : 600, 300));
 
@@ -206,7 +210,7 @@ public final class SynapseGroupDialog extends StandardDialog {
                     connectionPanel.getMainPanel());
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
-            tabbedPane.addTab("Connection", new JPanel());
+            tabbedPane.addTab("Connection Type", new JPanel());
         }
 
         // Tab for editing synapses
@@ -216,7 +220,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             ((EditablePanel) editSynapsesPanel).getPanel());
         editSynapseScrollPane.setBorder(null);
         storedComponents.add(editSynapseScrollPane);
-        tabbedPane.addTab("Edit Synapses", new JPanel());
+        tabbedPane.addTab("Synapse Type", new JPanel());
 
         // Synapse Adjustment Panel
         JScrollPane adjustSynScrollPane = new JScrollPane(tabAdjust);
@@ -226,7 +230,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         adjustmentPanel = SynapseGroupAdjustmentPanel
             .createSynapseGroupAdjustmentPanel(this, synapseGroup);
         tabAdjust.add(adjustmentPanel);
-        tabbedPane.addTab("Adjust Weights", new JPanel());
+        tabbedPane.addTab("Synapse Values", new JPanel());
 
         // Weight Matrix Editor Tabs
         if (!isCreationPanel) {

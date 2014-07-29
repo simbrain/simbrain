@@ -111,9 +111,10 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     private SynapseGroupAdjustmentPanel(Window parent, SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
         creationPanel = synapseGroup.isEmpty();
-        histogramPanel.setEnabled(!creationPanel);
+        synTypeSelector.setVisible(!creationPanel);
+        histogramPanel.setVisible(!creationPanel);
         statPanel.update();
-        statPanel.setEnabled(!creationPanel);
+        statPanel.setVisible(!creationPanel);
         excitatoryPercentPanel = SynapsePolarityAndRandomizerPanel
                 .createPolarityRatioPanel(parent, synapseGroup);
         init();

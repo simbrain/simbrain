@@ -67,7 +67,7 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class DensityBasedConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
+public class SparseConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
 
     /** A slider for setting the sparsity of the connections. */
     private JSlider connectionDensitySlider = new JSlider(JSlider.HORIZONTAL,
@@ -141,10 +141,10 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
      * @param networkPanel the parent panel
      * @return the constructed panel
      */
-    public static DensityBasedConnectionPanel createSparsityAdjustmentPanel(
+    public static SparseConnectionPanel createSparsityAdjustmentPanel(
         Sparse connection, NetworkPanel networkPanel) {
-        DensityBasedConnectionPanel sap =
-            new DensityBasedConnectionPanel(connection, networkPanel);
+        SparseConnectionPanel sap =
+            new SparseConnectionPanel(connection, networkPanel);
         sap.fillFieldValues();
         sap.initializeSparseSlider();
         sap.addChangeListeners();
@@ -162,7 +162,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
      * @param numTargs
      *            the number of target neurons being connected to
      */
-    private DensityBasedConnectionPanel(Sparse connection,
+    private SparseConnectionPanel(Sparse connection,
         NetworkPanel networkPanel) {
         super();
         this.connection = connection;
@@ -498,7 +498,7 @@ public class DensityBasedConnectionPanel extends AbstractConnectionPanel impleme
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
                 return AllToAll.connectAllToAll(source, target,
-                        source.equals(target), allowSelfConnect, true);
+                        Utils.intersects(source, target), allowSelfConnect, true);
             } else {
                 return Sparse.connectSparse(source, target, density,
                         allowSelfConnect, equalizeEfferentsChkBx.isSelected(),

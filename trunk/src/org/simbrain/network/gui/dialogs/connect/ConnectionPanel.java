@@ -40,7 +40,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
 
 /**
@@ -113,7 +113,7 @@ public final class ConnectionPanel {
         connectPanel.setLayout(new CardLayout());
         connectorPanels[0] = new AllToAllPanel(allToAll, networkPanel);
         connectorPanels[1] = new OneToOnePanel(oneToOne);
-        connectorPanels[2] = DensityBasedConnectionPanel
+        connectorPanels[2] = SparseConnectionPanel
                 .createSparsityAdjustmentPanel(sparse, networkPanel);
         connectPanel.add(connectorPanels[0], AllToAll.getName());
         connectPanel.add(connectorPanels[1], OneToOne.getName());

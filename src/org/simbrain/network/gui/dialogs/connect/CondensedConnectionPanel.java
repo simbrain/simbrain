@@ -30,7 +30,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel.RandBehavior;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 
 /**
  * A panel that combines a DensityBasedConnectionPanel (Sparse) with a
@@ -48,7 +48,7 @@ import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedCon
 public class CondensedConnectionPanel {
 
     /** The connection panel for changing the density. */
-    private final DensityBasedConnectionPanel connectorPanel;
+    private final SparseConnectionPanel connectorPanel;
 
     /** The panel responsible for chaning polarity ratio and randomizers. */
     private final SynapsePolarityAndRandomizerPanel polarityPanel;
@@ -65,7 +65,7 @@ public class CondensedConnectionPanel {
      */
     public CondensedConnectionPanel(final NetworkPanel networkPanel,
         final Window parent, final int numTargs) {
-        connectorPanel = DensityBasedConnectionPanel
+        connectorPanel = SparseConnectionPanel
             .createSparsityAdjustmentPanel(new Sparse(), networkPanel);
         connectorPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createEmptyBorder(5, 5, 10, 5)));
@@ -108,7 +108,7 @@ public class CondensedConnectionPanel {
      * set certain properties of the panel independent of this class.
      * @return
      */
-    public DensityBasedConnectionPanel getConnectorPanel() {
+    public SparseConnectionPanel getConnectorPanel() {
         return connectorPanel;
     }
 

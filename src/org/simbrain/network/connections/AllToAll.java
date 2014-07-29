@@ -19,6 +19,7 @@ import java.util.List;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.Utils;
 
 /**
  * Connect every source neuron to every target neuron.
@@ -80,7 +81,8 @@ public class AllToAll implements ConnectNeurons {
      */
     public List<Synapse> connectAllToAll(List<Neuron> sourceNeurons,
             List<Neuron> targetNeurons) {
-        return connectAllToAll(sourceNeurons, targetNeurons, false,
+        return connectAllToAll(sourceNeurons, targetNeurons,
+                Utils.intersects(sourceNeurons, targetNeurons),
                 selfConnectionAllowed, true);
     }
 
@@ -93,7 +95,9 @@ public class AllToAll implements ConnectNeurons {
      *
      * @param sourceNeurons the source neurons
      * @param targetNeurons the target neurons
-     * @param recurrent whether the source and target neurons overlap
+     * @param recurrent whether the source and target neurons overlap. Some
+     *            classes know ahead of time if the connection will be recurrent
+     *            and knowing this allows a slight performance improvement.
      * @param allowSelfConnection whether to allow self-connections
      * @param looseSynapses whether the synapses being connected are loose or in
      *            a synapse group
@@ -105,23 +109,16 @@ public class AllToAll implements ConnectNeurons {
             final boolean looseSynapses) {
         ArrayList<Synapse> syns = new ArrayList<Synapse>(
                 (int) (targetNeurons.size() * sourceNeurons.size()));
-        // First case is where we have to worry about avoiding self-connections.
-        // This case can be optimized as below.
+        // Optimization: separately handle case where we have to worry about
+        // avoiding self-connections, so an equals check is required.
         if (recurrent && !allowSelfConnection) {
-            int i = 0;
-            int j;
             for (Neuron source : sourceNeurons) {
-                j = 0;
                 for (Neuron target : targetNeurons) {
-                    // Optimization: equals check between integers than between
-                    // source and target neurons
-                    if (i != j) {
+                    if (!(source.equals(target))) {
                         Synapse s = new Synapse(source, target);
                         syns.add(s);
                     }
-                    j++;
                 }
-                i++;
             }
         } else {
             // The case where we don't need to worry about self-connections

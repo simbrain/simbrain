@@ -39,7 +39,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.connect.ConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSynapsePropertiesPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ApplyPanel;
@@ -231,7 +231,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         // Weight Matrix Editor Tabs
         if (!isCreationPanel) {
             if (synapseGroup.getConnectionManager() instanceof Sparse) {
-                DensityBasedConnectionPanel sparsePanel = DensityBasedConnectionPanel
+                SparseConnectionPanel sparsePanel = SparseConnectionPanel
                         .createSparsityAdjustmentPanel(
                                 (Sparse) synapseGroup.getConnectionManager(),
                                 networkPanel);

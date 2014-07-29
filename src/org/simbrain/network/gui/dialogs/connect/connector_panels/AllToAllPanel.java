@@ -31,6 +31,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
+import org.simbrain.util.Utils;
 
 /**
  * The <b>AllToAllPanel</b> is panel for editing all to all connections.
@@ -85,7 +86,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
     @Override
     public List<Synapse> applyConnection(List<Neuron> source,
             List<Neuron> target) {
-        return AllToAll.connectAllToAll(source, target, false,
+        return AllToAll.connectAllToAll(source, target,
+                Utils.intersects(source, target),
                 connection.isSelfConnectionAllowed(), true);
     }
 

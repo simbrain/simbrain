@@ -27,7 +27,7 @@ import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.AllToAllPanel;
-import org.simbrain.network.gui.dialogs.connect.connector_panels.DensityBasedConnectionPanel;
+import org.simbrain.network.gui.dialogs.connect.connector_panels.SparseConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.connector_panels.RadialPanel;
 
@@ -84,7 +84,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
             optionsPanel = new RadialPanel((Radial) connection);
             title += "Radial";
         } else if (connection instanceof Sparse) {
-            optionsPanel = DensityBasedConnectionPanel
+            optionsPanel = SparseConnectionPanel
                 .createSparsityAdjustmentPanel((Sparse) connection,
                     networkPanel);
             title += "Sparse";

@@ -135,7 +135,7 @@ public class ConnectionDialog extends StandardDialog {
             ConnectionUtilities.randomizeInhibitorySynapses(synapses,
                 eirPanel.getInRandomizer());
         }
-        networkPanel.getNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireSynapsesUpdated(synapses);
     }
 
 }

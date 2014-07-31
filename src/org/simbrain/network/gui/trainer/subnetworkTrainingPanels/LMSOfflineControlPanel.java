@@ -306,7 +306,9 @@ public class LMSOfflineControlPanel extends JPanel {
                 // progressBar.setIndeterminate(false);
                 progressBar.setValue(100);
                 setCursor(null); // Turn off wait cursor
-                networkPanel.getNetwork().fireNetworkChanged();
+                // TODO: Only update neurons and synapses in this network
+                networkPanel.getNetwork().fireSynapsesUpdated();
+                networkPanel.getNetwork().fireNeuronsUpdated();
             }
 
             @Override

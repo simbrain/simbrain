@@ -178,8 +178,7 @@ public final class SynapseDialog extends StandardDialog {
         synapseEditingPanel.commitChanges();
 
         // Notify the network that changes have been made
-        synapseList.get(0).getNetwork().fireNetworkChanged();
-
+        synapseList.get(0).getNetwork().fireSynapsesUpdated(synapseList);
     }
 
     /**

@@ -60,6 +60,7 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().forceSetStrength(0);
         }
-        networkPanel.getNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireSynapsesUpdated();
+        networkPanel.getNetwork().fireNeuronsUpdated();
     }
 }

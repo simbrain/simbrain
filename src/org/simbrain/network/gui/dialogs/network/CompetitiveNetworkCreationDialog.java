@@ -107,7 +107,7 @@ public class CompetitiveNetworkCreationDialog extends StandardDialog {
         competitive.applyLayout();
         competitiveNet.layoutNetwork(); // Must layout competitive net first
         networkPanel.getNetwork().addGroup(competitiveNet);
-        networkPanel.getNetwork().fireNetworkChanged();
+        //networkPanel.getNetwork().fireNetworkChanged();
         super.closeDialogOk();
 
     }

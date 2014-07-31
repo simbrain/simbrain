@@ -177,7 +177,10 @@ public class SOMTrainerControlsPanel extends JPanel {
 			} else {
 				// Stop running
 				trainer.setUpdateCompleted(true);
-				panel.getNetwork().fireNetworkChanged();
+	            panel.getNetwork().fireNeuronsUpdated(
+	                    network.getSom().getNeuronList());
+	            panel.getNetwork().fireSynapsesUpdated(
+	                    network.getSom().getIncomingWeights());
 				putValue(SMALL_ICON,
 						ResourceManager.getImageIcon("Play.png"));
 			}
@@ -235,7 +238,10 @@ public class SOMTrainerControlsPanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			network.getSom().reset();
 			trainer.setIteration(0);
-			panel.getNetwork().fireNetworkChanged();
+            panel.getNetwork().fireNeuronsUpdated(
+                    network.getSom().getNeuronList());
+            panel.getNetwork().fireSynapsesUpdated(
+                    network.getSom().getIncomingWeights());
 		}
 	};
 	/**
@@ -256,7 +262,10 @@ public class SOMTrainerControlsPanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			network.getSom().randomizeIncomingWeights();
 			update();
-			panel.getNetwork().fireNetworkChanged();
+            panel.getNetwork().fireNeuronsUpdated(
+                    network.getSom().getNeuronList());
+            panel.getNetwork().fireSynapsesUpdated(
+                    network.getSom().getIncomingWeights());
 		}
 	};
 }

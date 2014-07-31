@@ -101,7 +101,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
         som.offset(networkPanel.getWhereToAdd().getX(), networkPanel
                 .getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(som);
-        networkPanel.getNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireNeuronsUpdated();
         super.closeDialogOk();
 
     }

@@ -18,6 +18,11 @@
  */
 package org.simbrain.network.listeners;
 
+import java.util.List;
+
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+
 /**
  * Listener interface for receiving general network events. Classes interested
  * in responding to such events are registered with a Network, which broadcasts
@@ -26,9 +31,27 @@ package org.simbrain.network.listeners;
 public interface NetworkListener {
 
     /**
-     * Invoked during network update, when the structure of a network does not
-     * change, but activations, synapse strengths, etc. change.
+     * Neuron states have been updated.
      */
-    void networkChanged();
+    void updateNeurons();
+
+    /**
+     * Neuron states in specified neurons have been updated.
+     *
+     * @param neurons the list of neurons to update.
+     */
+    void updateNeurons(List<Neuron> neurons);
+
+    /**
+     * Synapse states have been updated.
+     */
+    void updateSynapses();
+
+    /**
+     * Synapse states in specified synapses have been updated.
+     *
+     * @param synapses the list of synapses to update.
+     */
+    void updateSynapses(List<Synapse> synapses);
 
 }

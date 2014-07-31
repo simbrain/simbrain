@@ -47,9 +47,10 @@ public class CompetitiveGroupNode extends NeuronGroupNode {
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
                 "Randomize Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveGroup) getNeuronGroup()).randomize();
-                ((CompetitiveGroup) getNeuronGroup()).getParentNetwork()
-                        .fireNetworkChanged();
+                CompetitiveGroup group = ((CompetitiveGroup) getNeuronGroup());
+                group.randomize();
+                group.getParentNetwork()
+                        .fireSynapsesUpdated(group.getIncomingWeights());
             }
         }));
 

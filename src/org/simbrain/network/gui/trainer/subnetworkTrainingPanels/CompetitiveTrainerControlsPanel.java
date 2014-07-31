@@ -159,7 +159,10 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
 				// Stop running
 				trainer.setUpdateCompleted(true);
 				update();
-				panel.getNetwork().fireNetworkChanged();
+	            panel.getNetwork().fireNeuronsUpdated(
+	                    network.getCompetitive().getNeuronList());
+	            panel.getNetwork().fireSynapsesUpdated(
+	                    network.getCompetitive().getIncomingWeights());
 				putValue(SMALL_ICON,
 						ResourceManager.getImageIcon("Play.png"));
 			}
@@ -190,7 +193,10 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
 			try {
 				trainer.apply();
 				update();
-				panel.getNetwork().fireNetworkChanged();
+	            panel.getNetwork().fireNeuronsUpdated(
+	                    network.getCompetitive().getNeuronList());
+	            panel.getNetwork().fireSynapsesUpdated(
+	                    network.getCompetitive().getIncomingWeights());
 			} catch (DataNotInitializedException e) {
 				JOptionPane.showOptionDialog(null, e.getMessage(),
 						"Warning", JOptionPane.DEFAULT_OPTION,
@@ -218,7 +224,10 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			network.getCompetitive().randomize();
 			trainer.setIteration(0);
-			panel.getNetwork().fireNetworkChanged();
+            panel.getNetwork().fireNeuronsUpdated(
+                    network.getCompetitive().getNeuronList());
+            panel.getNetwork().fireSynapsesUpdated(
+                    network.getCompetitive().getIncomingWeights());
 		}
 	};
 	/**
@@ -239,8 +248,9 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			network.getCompetitive().randomize();
 			update();
-			panel.getNetwork().fireNetworkChanged();
-		}
+            panel.getNetwork().fireSynapsesUpdated(
+                    network.getCompetitive().getIncomingWeights());
+        }
 	};
 }
 

@@ -27,19 +27,20 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 
 /**
  * PNode representation of SOM Network.
- *
+ * 
  * @author jyoshimi
  */
 public class SOMNetworkNode extends SubnetworkNode {
 
     /**
      * Create a SOM Network PNode.
-     *
+     * 
      * @param networkPanel parent panel
      * @param group the SOM network
      */
@@ -50,9 +51,9 @@ public class SOMNetworkNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getSubnetwork());
+        return new SOMTrainingDialog(getNetworkPanel(),
+                (SOMNetwork) getSubnetwork());
     }
-
 
     /**
      * Sets custom menu for SOM Network node.
@@ -67,19 +68,22 @@ public class SOMNetworkNode extends SubnetworkNode {
         menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getSubnetwork()).update();
-                ((SOMNetwork) getSubnetwork()).getParentNetwork()
-                        .fireNetworkChanged();
+                SOMNetwork net = ((SOMNetwork) getSubnetwork());
+                net.update();
+                net.getParentNetwork().fireNeuronsUpdated(
+                        net.getFlatNeuronList());
+                net.getParentNetwork().fireSynapsesUpdated(
+                        net.getFlatSynapseList());
             }
         };
         menu.add(trainNet);
         menu.addSeparator();
-        Action randomizeNet = new AbstractAction(
-                "Randomize synapses") {
+        Action randomizeNet = new AbstractAction("Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMNetwork) getSubnetwork()).getSom().randomizeIncomingWeights();
-                ((SOMNetwork) getSubnetwork()).getParentNetwork()
-                        .fireNetworkChanged();
+                SOMNetwork net = ((SOMNetwork) getSubnetwork());
+                net.getSom().randomizeIncomingWeights();
+                net.getParentNetwork().fireSynapsesUpdated(
+                        net.getFlatSynapseList());
             }
         };
         menu.add(randomizeNet);

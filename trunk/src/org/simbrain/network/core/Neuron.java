@@ -895,6 +895,7 @@ public class Neuron {
         for (Synapse synapse : getFanIn()) {
             synapse.randomize();
         }
+
     }
 
     /**

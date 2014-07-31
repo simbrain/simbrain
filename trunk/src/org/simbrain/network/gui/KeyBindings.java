@@ -222,7 +222,7 @@ public class KeyBindings {
                     panel.getQuickConnector().applyCurrentConnection(
                             panel.getSourceModelNeurons(),
                             panel.getSelectedModelNeurons());
-                    panel.getNetwork().fireNetworkChanged();
+                    panel.getNetwork().fireSynapsesUpdated();
                 }
             }
         });

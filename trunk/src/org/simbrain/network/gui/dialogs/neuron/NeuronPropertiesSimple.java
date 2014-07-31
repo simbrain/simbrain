@@ -297,7 +297,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
             }
         }
         if (!neuronList.isEmpty()) {
-            neuronList.get(0).getNetwork().fireNetworkChanged();
+            neuronList.get(0).getNetwork().fireNeuronsUpdated(neuronList);
         }
 
         success &= extraDataPanel.commitChanges();

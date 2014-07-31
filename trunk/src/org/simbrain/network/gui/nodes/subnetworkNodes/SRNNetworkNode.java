@@ -129,7 +129,8 @@ public class SRNNetworkNode extends SubnetworkNode {
         public void actionPerformed(ActionEvent arg0) {
             SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
             network.initNetwork();
-            network.getParentNetwork().fireNetworkChanged();
+            network.getParentNetwork().fireNeuronsUpdated(
+                    network.getFlatNeuronList());
         }
     };
 

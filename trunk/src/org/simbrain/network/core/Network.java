@@ -66,8 +66,7 @@ public class Network {
     private final List<Group> groupList = new ArrayList<Group>();
 
     /** Text objects. */
-    private List<NetworkTextObject> textList =
-        new ArrayList<NetworkTextObject>();
+    private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /** The update manager for this network. */
     private NetworkUpdateManager updateManager;
@@ -104,16 +103,13 @@ public class Network {
     private TimeType timeType = TimeType.DISCRETE;
 
     /** List of objects registered to observe general network events. */
-    private List<NetworkListener> networkListeners =
-        new ArrayList<NetworkListener>();
+    private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
 
     /** List of objects registered to observe neuron-related network events. */
-    private List<NeuronListener> neuronListeners =
-        new ArrayList<NeuronListener>();
+    private List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
 
     /** List of objects registered to observe synapse-related network events. */
-    private List<SynapseListener> synapseListeners =
-        new ArrayList<SynapseListener>();
+    private List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
 
     /** List of objects registered to observe group-related network events. */
     private List<GroupListener> groupListeners = new ArrayList<GroupListener>();
@@ -152,7 +148,7 @@ public class Network {
     {
         try {
             synapseVisibilityThreshold = SimbrainPreferences
-                .getInt("networkSynapseVisibilityThreshold");
+                    .getInt("networkSynapseVisibilityThreshold");
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
         }
@@ -181,7 +177,8 @@ public class Network {
         }
 
         // Notify network listeners
-        this.fireNetworkChanged();
+        this.fireSynapsesUpdated();
+        this.fireNeuronsUpdated();
 
         // Clear input nodes
         clearInputs();
@@ -314,8 +311,7 @@ public class Network {
     }
 
     /**
-     * @param index
-     *            Number of neuron in array list.
+     * @param index Number of neuron in array list.
      * @return Neuron at the point of the index
      */
     public Neuron getNeuron(final int index) {
@@ -325,8 +321,7 @@ public class Network {
     /**
      * Find a neuron with a given string id.
      *
-     * @param id
-     *            id to search for.
+     * @param id id to search for.
      * @return neuron with that id, null otherwise
      */
     public Neuron getNeuron(final String id) {
@@ -341,8 +336,7 @@ public class Network {
     /**
      * Find a group with a given string id.
      *
-     * @param id
-     *            id to search for.
+     * @param id id to search for.
      * @return group with that id, null otherwise
      */
     public Group getGroup(final String id) {
@@ -357,8 +351,7 @@ public class Network {
     /**
      * Find groups with a given label, or null if none found.
      *
-     * @param label
-     *            label to search for.
+     * @param label label to search for.
      * @return list of groups with that label found, null otherwise
      */
     public List<Group> getGroupsByLabel(final String label) {
@@ -378,8 +371,7 @@ public class Network {
     /**
      * Find group with a given label, or null if none found.
      *
-     * @param label
-     *            label to search for.
+     * @param label label to search for.
      * @return list of groups with that label found, null otherwise
      */
     public Group getGroupByLabel(final String label) {
@@ -421,10 +413,8 @@ public class Network {
      * Returns the synapse group between some source neuron group and some
      * target neuron group, if it exists. Returns null otherwise.
      *
-     * @param src
-     *            the source neuron group
-     * @param targ
-     *            the target neuron group
+     * @param src the source neuron group
+     * @param targ the target neuron group
      * @return the synapse group between src and targ, null if there is none
      */
     public SynapseGroup getSynapseGroup(NeuronGroup src, NeuronGroup targ) {
@@ -434,7 +424,7 @@ public class Network {
         for (Group g : groupList) {
             if (g instanceof SynapseGroup) {
                 if (src == ((SynapseGroup) g).getSourceNeuronGroup()
-                    && targ == ((SynapseGroup) g).getTargetNeuronGroup())
+                        && targ == ((SynapseGroup) g).getTargetNeuronGroup())
                     s = (SynapseGroup) g;
             }
         }
@@ -446,8 +436,7 @@ public class Network {
     /**
      * Find a synapse with a given string id.
      *
-     * @param id
-     *            id to search for.
+     * @param id id to search for.
      * @return synapse with that id, null otherwise
      */
     public Synapse getSynapse(final String id) {
@@ -462,8 +451,7 @@ public class Network {
     /**
      * Adds a new neuron.
      *
-     * @param neuron
-     *            Type of neuron to add
+     * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
         neuronList.add(neuron);
@@ -476,8 +464,7 @@ public class Network {
      * Adds a weight to the neuron network, where that weight already has
      * designated source and target neurons.
      *
-     * @param synapse
-     *            the weight object to add
+     * @param synapse the weight object to add
      */
     public void addSynapse(final Synapse synapse) {
         synapse.initSpikeResponder();
@@ -501,8 +488,7 @@ public class Network {
     /**
      * Deletes a neuron from the network.
      *
-     * @param toDelete
-     *            neuron to delete
+     * @param toDelete neuron to delete
      */
     public void removeNeuron(final Neuron toDelete) {
 
@@ -515,8 +501,7 @@ public class Network {
         // Remove the neuron itself. Either from a parent group that holds it,
         // or from the root network.
         if (toDelete.getParentGroup() != null) {
-            ((NeuronGroup) toDelete.getParentGroup())
-                .removeNeuron(toDelete);
+            ((NeuronGroup) toDelete.getParentGroup()).removeNeuron(toDelete);
             if (toDelete.getParentGroup().isEmpty()) {
                 removeGroup(toDelete.getParentGroup());
             }
@@ -532,8 +517,7 @@ public class Network {
     /**
      * Delete a specified weight.
      *
-     * @param toDelete
-     *            the weight to delete
+     * @param toDelete the weight to delete
      */
     public void removeSynapse(final Synapse toDelete) {
 
@@ -573,10 +557,8 @@ public class Network {
      * wants they can be put in a group) This is not part of the standard neuron
      * group creation process.
      *
-     * @param list
-     *            the list of neurons to transfer
-     * @param group
-     *            the group to transfer them to
+     * @param list the list of neurons to transfer
+     * @param group the group to transfer them to
      */
     public void transferNeuronsToGroup(List<Neuron> list, NeuronGroup group) {
         for (Neuron neuron : list) {
@@ -603,20 +585,19 @@ public class Network {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             }
         }
-        fireNetworkChanged();
+        fireNeuronsUpdated(getFlatNeuronList());
     }
 
     /**
      * Sets all neurons to a specified value.
      *
-     * @param value
-     *            value to set
+     * @param value value to set
      */
     public void setActivations(final double value) {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.setActivation(value);
         }
-        fireNetworkChanged();
+        fireNeuronsUpdated(getFlatNeuronList());
     }
 
     /**
@@ -624,8 +605,7 @@ public class Network {
      * these activations are applied to the network in whatever order the
      * neurons were added.
      *
-     * @param activationArray
-     *            array of values to apply to network
+     * @param activationArray array of values to apply to network
      */
     public void setActivations(final double[] activationArray) {
         // TODO: Sort by id
@@ -641,8 +621,7 @@ public class Network {
     /**
      * Sets all weights to a specified value.
      *
-     * @param value
-     *            value to set
+     * @param value value to set
      */
     public void setWeights(final double value) {
         for (Synapse synapse : this.getFlatSynapseList()) {
@@ -697,10 +676,8 @@ public class Network {
     /**
      * Randomize all biased neurons.
      *
-     * @param lower
-     *            lower bound for randomization.
-     * @param upper
-     *            upper bound for randomization.
+     * @param lower lower bound for randomization.
+     * @param upper upper bound for randomization.
      */
     public void randomizeBiases(double lower, double upper) {
         for (Neuron neuron : neuronList) {
@@ -711,8 +688,7 @@ public class Network {
     /**
      * Add an array of neurons and set their parents to this.
      *
-     * @param neurons
-     *            list of neurons to add
+     * @param neurons list of neurons to add
      */
     protected void addNeuronList(final ArrayList<Neuron> neurons) {
         for (Neuron n : neurons) {
@@ -724,10 +700,8 @@ public class Network {
      * Returns a reference to the synapse connecting two neurons, or null if
      * there is none.
      *
-     * @param src
-     *            source neuron
-     * @param tar
-     *            target neuron
+     * @param src source neuron
+     * @param tar target neuron
      *
      * @return synapse from source to target
      */
@@ -738,10 +712,8 @@ public class Network {
     /**
      * Gets the synapse at particular point.
      *
-     * @param i
-     *            Neuron number
-     * @param j
-     *            Weight to get
+     * @param i Neuron number
+     * @param j Weight to get
      * @return Weight at the points defined
      */
     // TODO: Either fix this or make its assumptions explicit
@@ -751,12 +723,11 @@ public class Network {
 
     /**
      * Add a group to the network. This works for both singular groups like
-     * neuron groups and synapse groups as well as for composite groups
-     * like any subclass of Subnetwork. NetworkPanel adds the constituent groups
-     * of composite groups and therefore it is unnecessary here.
+     * neuron groups and synapse groups as well as for composite groups like any
+     * subclass of Subnetwork. NetworkPanel adds the constituent groups of
+     * composite groups and therefore it is unnecessary here.
      *
-     * @param group
-     *            group of network elements
+     * @param group group of network elements
      */
     public void addGroup(final Group group) {
         // Generate group id
@@ -774,8 +745,7 @@ public class Network {
     /**
      * Remove the specified group.
      *
-     * @param toDelete
-     *            the group to delete.
+     * @param toDelete the group to delete.
      */
     public void removeGroup(final Group toDelete) {
 
@@ -893,8 +863,7 @@ public class Network {
      * calling each neuron's update function (which sets a buffer), and then
      * setting each neuron's activation to the buffer state.
      *
-     * @param neuronList
-     *            the list of neurons to be updated
+     * @param neuronList the list of neurons to be updated
      */
     public static void updateNeurons(List<Neuron> neuronList) {
         // TODO: Update by priority if priority based update?
@@ -909,8 +878,7 @@ public class Network {
     /**
      * Get the activations associated with a list of neurons.
      *
-     * @param neuronList
-     *            the neurons whose activations to get.
+     * @param neuronList the neurons whose activations to get.
      * @return vector of activations
      */
     public static double[] getActivationVector(List<Neuron> neuronList) {
@@ -990,14 +958,14 @@ public class Network {
                 synapse.getTarget().addAfferent(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
-                    + " has null fanIn");
+                        + " has null fanIn");
                 removeSynapse(synapse);
             }
             if (synapse.getSource().getFanOut() != null) {
                 synapse.getSource().addEfferent(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
-                    + " has null fanOut");
+                        + " has null fanOut");
                 removeSynapse(synapse);
             }
         }
@@ -1025,8 +993,7 @@ public class Network {
     /**
      * Set the current time.
      *
-     * @param i
-     *            the current time
+     * @param i the current time
      */
     public void setTime(final double i) {
         time = i;
@@ -1040,7 +1007,7 @@ public class Network {
             return "" + (int) time + " " + getUnits()[1];
         } else {
             return "" + BigDecimal.valueOf((long) time, getTimeStepPrecision())
-                + " " + getUnits()[0];
+                    + " " + getUnits()[0];
         }
     }
 
@@ -1101,8 +1068,7 @@ public class Network {
     }
 
     /**
-     * @param timeStep
-     *            The timeStep to set.
+     * @param timeStep The timeStep to set.
      */
     public void setTimeStep(final double timeStep) {
         this.timeStep = timeStep;
@@ -1111,8 +1077,7 @@ public class Network {
     /**
      * Fire a neuron deleted event to all registered model listeners.
      *
-     * @param deleted
-     *            neuron which has been deleted
+     * @param deleted neuron which has been deleted
      */
     public void fireNeuronRemoved(final Neuron deleted) {
         for (NeuronListener listener : neuronListeners) {
@@ -1121,19 +1086,55 @@ public class Network {
     }
 
     /**
-     * Fire a network changed event to all registered model listeners.
+     * Fire this event when the visible state of a neuron (e.g. its activation)
+     * has been changed and this should be reflected in the GUI.
      */
-    public void fireNetworkChanged() {
+    public void fireNeuronsUpdated() {
         for (NetworkListener listener : networkListeners) {
-            listener.networkChanged();
+            listener.updateNeurons();
+        }
+    }
+
+    /**
+     * Fire this event when the visible state of a specified list of neuron
+     * (e.g. their activations) has been changed and this should be reflected in
+     * the GUI.
+     *
+     * @param neurons the neurons whose state has changed
+     */
+    public void fireNeuronsUpdated(List<Neuron> neurons) {
+        for (NetworkListener listener : networkListeners) {
+            listener.updateNeurons(neurons);
+        }
+    }
+
+    /**
+     * Fire this event when the visible state of a synapse (e.g. its strength)
+     * has been changed and this should be reflected in the GUI.
+     */
+    public void fireSynapsesUpdated() {
+        for (NetworkListener listener : networkListeners) {
+            listener.updateSynapses();
+        }
+    }
+
+    /**
+     * Fire this event when the visible state of a specified list of synapses
+     * (e.g. their strengths) has been changed and this should be reflected in
+     * the GUI.
+     *
+     * @param synapses the synapses whose state has changed
+     */
+    public void fireSynapsesUpdated(List<Synapse> synapses) {
+        for (NetworkListener listener : networkListeners) {
+            listener.updateSynapses(synapses);
         }
     }
 
     /**
      * Fire a network changed event to all registered model listeners.
      *
-     * @param moved
-     *            Neuron that has been moved
+     * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
         for (NeuronListener listener : neuronListeners) {
@@ -1144,8 +1145,7 @@ public class Network {
     /**
      * Fire a neuron added event to all registered model listeners.
      *
-     * @param added
-     *            neuron which was added
+     * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
         for (NeuronListener listener : neuronListeners) {
@@ -1156,24 +1156,21 @@ public class Network {
     /**
      * Fire a neuron type changed event to all registered model listeners.
      *
-     * @param old
-     *            the old update rule
-     * @param changed
-     *            the new update rule
+     * @param old the old update rule
+     * @param changed the new update rule
      */
     public void fireNeuronTypeChanged(final NeuronUpdateRule old,
-        final NeuronUpdateRule changed) {
+            final NeuronUpdateRule changed) {
         for (NeuronListener listener : neuronListeners) {
             listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this,
-                old, changed));
+                    old, changed));
         }
     }
 
     /**
      * Fire a neuron changed event to all registered model listeners.
      *
-     * @param changed
-     *            neuron
+     * @param changed neuron
      */
     public void fireNeuronChanged(final Neuron changed) {
         for (NeuronListener listener : neuronListeners) {
@@ -1184,8 +1181,7 @@ public class Network {
     /**
      * Fire a label changed event to all registered model listeners.
      *
-     * @param changed
-     *            neuron
+     * @param changed neuron
      */
     public void fireNeuronLabelChanged(final Neuron changed) {
         for (NeuronListener listener : neuronListeners) {
@@ -1196,8 +1192,7 @@ public class Network {
     /**
      * Fire a neuron added event to all registered model listeners.
      *
-     * @param added
-     *            synapse which was added
+     * @param added synapse which was added
      */
     public void fireSynapseAdded(final Synapse added) {
         for (SynapseListener listener : synapseListeners) {
@@ -1208,8 +1203,7 @@ public class Network {
     /**
      * Fire a synapse deleted event to all registered model listeners.
      *
-     * @param deleted
-     *            synapse which was deleted
+     * @param deleted synapse which was deleted
      */
     public void fireSynapseRemoved(final Synapse deleted) {
         for (SynapseListener listener : synapseListeners) {
@@ -1220,8 +1214,7 @@ public class Network {
     /**
      * Fire a synapse changed event to all registered model listeners.
      *
-     * @param changed
-     *            new, changed synapse
+     * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse changed) {
         for (SynapseListener listener : synapseListeners) {
@@ -1232,24 +1225,21 @@ public class Network {
     /**
      * Fire a synapse type changed event to all registered model listeners.
      *
-     * @param oldRule
-     *            old synapse, before the change
-     * @param learningRule
-     *            new, changed synapse
+     * @param oldRule old synapse, before the change
+     * @param learningRule new, changed synapse
      */
     public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule,
-        final SynapseUpdateRule learningRule) {
+            final SynapseUpdateRule learningRule) {
         for (SynapseListener listener : synapseListeners) {
             listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(
-                this, oldRule, learningRule));
+                    this, oldRule, learningRule));
         }
     }
 
     /**
      * Fire a text added event to all registered model listeners.
      *
-     * @param added
-     *            text which was deleted
+     * @param added text which was deleted
      */
     public void fireTextAdded(final NetworkTextObject added) {
         for (TextListener listener : textListeners) {
@@ -1260,8 +1250,7 @@ public class Network {
     /**
      * Fire a text deleted event to all registered model listeners.
      *
-     * @param deleted
-     *            text which was deleted
+     * @param deleted text which was deleted
      */
     public void fireTextRemoved(final NetworkTextObject deleted) {
         for (TextListener listener : textListeners) {
@@ -1274,8 +1263,7 @@ public class Network {
      *
      * TODO: Not currently used.
      *
-     * @param changed
-     *            text which was changed
+     * @param changed text which was changed
      */
     public void fireTextChanged(final NetworkTextObject changed) {
         for (TextListener listener : textListeners) {
@@ -1297,8 +1285,7 @@ public class Network {
      * Used by Network thread to ensure that an update cycle is complete before
      * updating again.
      *
-     * @param b
-     *            whether the network has been updated or not.
+     * @param b whether the network has been updated or not.
      */
     public void setUpdateCompleted(final boolean b) {
         updateCompleted = b;
@@ -1307,8 +1294,7 @@ public class Network {
     /**
      * Fire a group added event to all registered model listeners.
      *
-     * @param added
-     *            Group that has been added
+     * @param added Group that has been added
      */
     public void fireGroupAdded(final Group added) {
         for (GroupListener listener : groupListeners) {
@@ -1319,8 +1305,7 @@ public class Network {
     /**
      * Fire a group deleted event to all registered model listeners.
      *
-     * @param deleted
-     *            Group to be deleted
+     * @param deleted Group to be deleted
      */
     public void fireGroupRemoved(final Group deleted) {
         for (GroupListener listener : groupListeners) {
@@ -1333,19 +1318,16 @@ public class Network {
      * desription describes the change and is used by listeners to handle the
      * event. Old group is not currently used but may be in the future.
      *
-     * @param old
-     *            Old group
-     * @param changed
-     *            New changed group
-     * @param changeDescription
-     *            A description of the
+     * @param old Old group
+     * @param changed New changed group
+     * @param changeDescription A description of the
      */
     public void fireGroupChanged(final Group old, final Group changed,
-        final String changeDescription) {
+            final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
             listener.groupChanged(new NetworkEvent<Group>(this, old, changed),
-                changeDescription);
+                    changeDescription);
         }
     }
 
@@ -1353,13 +1335,11 @@ public class Network {
      * This version of fireGroupChanged fires a pre-set event, which may have an
      * auxiliary object set.
      *
-     * @param event
-     *            the network changed event.
-     * @param changeDescription
-     *            A description of the
+     * @param event the network changed event.
+     * @param changeDescription A description of the
      */
     public void fireGroupChanged(final NetworkEvent<Group> event,
-        final String changeDescription) {
+            final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
             listener.groupChanged(event, changeDescription);
@@ -1369,13 +1349,12 @@ public class Network {
     /**
      * Fire a group parameters changed event.
      *
-     * @param group
-     *            reference to group whose parameters changed
+     * @param group reference to group whose parameters changed
      */
     public void fireGroupParametersChanged(final Group group) {
         for (GroupListener listener : groupListeners) {
             listener.groupParameterChanged(new NetworkEvent<Group>(this, group,
-                group));
+                    group));
         }
     }
 
@@ -1429,8 +1408,7 @@ public class Network {
     /**
      * Register a network listener.
      *
-     * @param listener
-     *            the observer to register
+     * @param listener the observer to register
      */
     public void addNetworkListener(final NetworkListener listener) {
         networkListeners.add(listener);
@@ -1439,8 +1417,7 @@ public class Network {
     /**
      * Remove a network listener.
      *
-     * @param networkListener
-     *            the observer to remove
+     * @param networkListener the observer to remove
      */
     public void removeNetworkListener(NetworkListener networkListener) {
         networkListeners.remove(networkListener);
@@ -1449,8 +1426,7 @@ public class Network {
     /**
      * Register a neuron listener.
      *
-     * @param listener
-     *            the observer to register
+     * @param listener the observer to register
      */
     public void addNeuronListener(final NeuronListener listener) {
         neuronListeners.add(listener);
@@ -1459,8 +1435,7 @@ public class Network {
     /**
      * Register a synapse listener.
      *
-     * @param listener
-     *            the observer to register
+     * @param listener the observer to register
      */
     public void addSynapseListener(final SynapseListener listener) {
         synapseListeners.add(listener);
@@ -1469,8 +1444,7 @@ public class Network {
     /**
      * Register a text listener.
      *
-     * @param listener
-     *            the observer to register
+     * @param listener the observer to register
      */
     public void addTextListener(final TextListener listener) {
         textListeners.add(listener);
@@ -1479,8 +1453,7 @@ public class Network {
     /**
      * Remove a synapse listener.
      *
-     * @param synapseListener
-     *            the observer to remove
+     * @param synapseListener the observer to remove
      */
     public void removeSynapseListener(SynapseListener synapseListener) {
         synapseListeners.remove(synapseListener);
@@ -1489,8 +1462,7 @@ public class Network {
     /**
      * Register a group listener.
      *
-     * @param listener
-     *            the observer to register
+     * @param listener the observer to register
      */
     public void addGroupListener(final GroupListener listener) {
         groupListeners.add(listener);
@@ -1499,8 +1471,7 @@ public class Network {
     /**
      * Remove a group listener.
      *
-     * @param listener
-     *            the observer to remove
+     * @param listener the observer to remove
      */
     public void removeGroupListener(final GroupListener listener) {
         groupListeners.remove(listener);
@@ -1510,8 +1481,7 @@ public class Network {
      * Search for a neuron by label. If there are more than one with the same
      * label only the first one found is returned.
      *
-     * @param inputString
-     *            label of neuron to search for
+     * @param inputString label of neuron to search for
      * @return list of matched neurons, or null if none are found
      */
     public List<Neuron> getNeuronsByLabel(String inputString) {
@@ -1531,8 +1501,7 @@ public class Network {
     /**
      * Returns the first neuron in the array returned by getNeuronsByLabel.
      *
-     * @param inputString
-     *            label of neuron to search for
+     * @param inputString label of neuron to search for
      * @return matched Neuron, if any
      */
     public Neuron getNeuronByLabel(String inputString) {
@@ -1554,8 +1523,7 @@ public class Network {
     /**
      * Add a network text object.
      *
-     * @param text
-     *            text object to add.
+     * @param text text object to add.
      */
     public void addText(final NetworkTextObject text) {
         textList.add(text);
@@ -1565,8 +1533,7 @@ public class Network {
     /**
      * Delete a network text object.
      *
-     * @param text
-     *            text object to add
+     * @param text text object to add
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
@@ -1587,8 +1554,7 @@ public class Network {
      * Add an update action to the network' action list (the sequence of actions
      * invoked on each iteration of the network).
      *
-     * @param action
-     *            new action
+     * @param action new action
      */
     public void addUpdateAction(NetworkUpdateAction action) {
         updateManager.addAction(action);
@@ -1604,8 +1570,7 @@ public class Network {
     /**
      * Adds a list of network elements to this network. Used in copy / paste.
      *
-     * @param toAdd
-     *            list of objects to add.
+     * @param toAdd list of objects to add.
      */
     public void addObjects(final List<?> toAdd) {
         for (Object object : toAdd) {
@@ -1626,10 +1591,8 @@ public class Network {
     /**
      * Translate all neurons (the only objects with position information).
      *
-     * @param offsetX
-     *            x offset for translation.
-     * @param offsetY
-     *            y offset for translation.
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
      */
     public void translate(final double offsetX, final double offsetY) {
         for (Neuron neuron : this.getFlatNeuronList()) {
@@ -1642,26 +1605,22 @@ public class Network {
      * Connect a source neuron group to a target neuron group using a connection
      * object.
      *
-     * @param sng
-     *            source neuron group
-     * @param tng
-     *            target neuron group
-     * @param connection
-     *            conection object
+     * @param sng source neuron group
+     * @param tng target neuron group
+     * @param connection conection object
      */
     public void connectNeuronGroups(final NeuronGroup sng,
-        final NeuronGroup tng, final ConnectNeurons connection) {
+            final NeuronGroup tng, final ConnectNeurons connection) {
 
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng,
-            connection);
+                connection);
         addGroup(group);
     }
 
     /**
      * Freeze or unfreeze all synapses in the network.
      *
-     * @param freeze
-     *            frozen if true; unfrozen if false
+     * @param freeze frozen if true; unfrozen if false
      */
     public void freezeSynapses(final boolean freeze) {
         // Freeze synapses in synapse groups
@@ -1712,8 +1671,7 @@ public class Network {
     }
 
     /**
-     * @param synapseVisibilityThreshold
-     *            the synapseVisibilityThreshold to set
+     * @param synapseVisibilityThreshold the synapseVisibilityThreshold to set
      */
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;

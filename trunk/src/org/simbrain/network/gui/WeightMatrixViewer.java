@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.listeners.NetworkAdapter;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -138,9 +138,10 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         this.setTable(table);
 
         // Add network listener
-        panel.getNetwork().addNetworkListener(new NetworkListener() {
+        panel.getNetwork().addNetworkListener(new NetworkAdapter() {
 
-            public void networkChanged() {
+            @Override
+            public void updateSynapses() {
                 repaint();
             }
 

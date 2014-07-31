@@ -266,7 +266,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 }
             }
         }
-        getParentNetwork().fireNetworkChanged();
+        getParentNetwork().fireSynapsesUpdated(this.getFlatSynapseList());
     }
 
     @Override
@@ -318,7 +318,8 @@ public class Hopfield extends Subnetwork implements Trainable {
                     w.getStrength() + src.getActivation()
                     * tar.getActivation());
         }
-        getParentNetwork().fireNetworkChanged();
+        getParentNetwork().fireSynapsesUpdated(
+                this.getSynapseGroup().getAllSynapses());
     }
 
     /**

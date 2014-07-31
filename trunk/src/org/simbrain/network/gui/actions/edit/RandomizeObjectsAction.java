@@ -60,6 +60,9 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().randomize();
         }
-        networkPanel.getNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireNeuronsUpdated(
+                networkPanel.getSelectedModelNeurons());
+        networkPanel.getNetwork().fireSynapsesUpdated(
+                networkPanel.getSelectedModelSynapses());
     }
 }

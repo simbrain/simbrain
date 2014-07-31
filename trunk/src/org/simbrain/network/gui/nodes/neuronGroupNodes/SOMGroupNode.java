@@ -25,7 +25,7 @@ import javax.swing.JMenuItem;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.listeners.NetworkAdapter;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.Utils;
 
@@ -48,9 +48,10 @@ public class SOMGroupNode extends NeuronGroupNode {
         setCustomMenuItems();
         setInteractionBox(new SOMInteractionBox(networkPanel));
         // setOutlinePadding(15f);
-        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
+        networkPanel.getNetwork().addNetworkListener(new NetworkAdapter() {
 
-            public void networkChanged() {
+            @Override
+            public void updateNeurons() {
                 group.setStateInfo("Learning rate ("
                         + Utils.round(group.getAlpha(), 2) + ") N-size ("
                         + Utils.round(group.getNeighborhoodSize(), 2) + ")");
@@ -98,25 +99,30 @@ public class SOMGroupNode extends NeuronGroupNode {
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
                 "Reset SOM Network") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getNeuronGroup()).reset();
-                ((SOMGroup) getNeuronGroup()).getParentNetwork()
-                        .fireNetworkChanged();
+                SOMGroup group = ((SOMGroup) getNeuronGroup());
+                group.reset();
+                group.getParentNetwork().fireNeuronsUpdated(
+                        group.getNeuronList());
+                group.getParentNetwork().fireSynapsesUpdated(
+                        group.getIncomingWeights());
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
                 "Recall SOM Memory") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getNeuronGroup()).recall();
-                ((SOMGroup) getNeuronGroup()).getParentNetwork()
-                        .fireNetworkChanged();
+                SOMGroup group = ((SOMGroup) getNeuronGroup());
+                group.recall();
+                group.getParentNetwork().fireNeuronsUpdated(
+                        group.getNeuronList());
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
                 "Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
-                ((SOMGroup) getNeuronGroup()).randomizeIncomingWeights();
-                ((SOMGroup) getNeuronGroup()).getParentNetwork()
-                        .fireNetworkChanged();
+                SOMGroup group = ((SOMGroup) getNeuronGroup());
+                group.randomizeIncomingWeights();
+                group.getParentNetwork()
+                        .fireSynapsesUpdated(group.getIncomingWeights());
             }
         }));
     }

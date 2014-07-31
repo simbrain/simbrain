@@ -69,9 +69,12 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveNetwork) getSubnetwork()).update();
-                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
-                        .fireNetworkChanged();
+                CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
+                net.update();
+                net.getParentNetwork().fireNeuronsUpdated(
+                        net.getNeuronGroup().getNeuronList());
+                net.getParentNetwork().fireSynapsesUpdated(
+                        net.getSynapseGroup().getAllSynapses());
             }
         };
         menu.add(trainNet);
@@ -79,10 +82,10 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         Action randomizeNet = new AbstractAction(
                 "Randomize synapses") {
             public void actionPerformed(final ActionEvent event) {
-                ((CompetitiveNetwork) getSubnetwork()).getCompetitive()
-                        .randomize();
-                ((CompetitiveNetwork) getSubnetwork()).getParentNetwork()
-                        .fireNetworkChanged();
+                CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
+                net.getCompetitive().randomize();
+                net.getParentNetwork().fireSynapsesUpdated(
+                        net.getSynapseGroup().getAllSynapses());
             }
         };
         menu.add(randomizeNet);

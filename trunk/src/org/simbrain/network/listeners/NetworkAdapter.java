@@ -18,6 +18,11 @@
  */
 package org.simbrain.network.listeners;
 
+import java.util.List;
+
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+
 /**
  * Adapter class for NeuronListener.
  *
@@ -26,7 +31,19 @@ package org.simbrain.network.listeners;
 public class NetworkAdapter implements NetworkListener {
 
     @Override
-    public void networkChanged() {
+    public void updateNeurons() {
+    }
+
+    @Override
+    public void updateNeurons(List<Neuron> neurons) {
+    }
+
+    @Override
+    public void updateSynapses() {
+    }
+
+    @Override
+    public void updateSynapses(List<Synapse> synapses) {
     }
 
 }

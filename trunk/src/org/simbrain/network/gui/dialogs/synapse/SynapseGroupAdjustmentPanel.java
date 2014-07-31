@@ -18,10 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -152,6 +154,10 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         gbc.gridy = 1;
         gbc.gridx = 0;
 
+        // Set initial size of histogram panel based on screen size
+        int height = (int) (.25 * Toolkit.getDefaultToolkit().getScreenSize().height);
+        int width = this.getPreferredSize().width;
+        histogramPanel.setPreferredSize(new Dimension(width, height));
         this.add(histogramPanel, gbc);
 
         gbc.gridy += HistogramPanel.GRID_HEIGHT;

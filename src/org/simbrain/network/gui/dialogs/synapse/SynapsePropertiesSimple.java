@@ -292,11 +292,11 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
 
         // Handle Enabled
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
-            "isSendWeightedInput")) {
+            "isEnabled")) {
             synapseEnabled.setNull();
         } else {
             synapseEnabled
-                .setSelectedIndex(synapseRef.isSendWeightedInput()
+                .setSelectedIndex(synapseRef.isEnabled()
                     ? TristateDropDown
                         .getTRUE() : TristateDropDown.getFALSE());
         }
@@ -319,7 +319,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
             .getTRUE();
         if (synapseEnabled.getSelectedIndex() != TristateDropDown.getNULL()) {
             for (Synapse s : synapseList) {
-                s.setSendWeightedInput(enabled);
+                s.setEnabled(enabled);
             }
         }
 

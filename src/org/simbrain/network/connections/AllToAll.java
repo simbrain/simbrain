@@ -80,10 +80,10 @@ public class AllToAll implements ConnectNeurons {
      * @return the new synapses
      */
     public List<Synapse> connectAllToAll(List<Neuron> sourceNeurons,
-            List<Neuron> targetNeurons) {
+        List<Neuron> targetNeurons) {
         return connectAllToAll(sourceNeurons, targetNeurons,
                 Utils.intersects(sourceNeurons, targetNeurons),
-                selfConnectionAllowed, true);
+            selfConnectionAllowed, true);
     }
 
     /**

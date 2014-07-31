@@ -92,9 +92,9 @@ public class Synapse {
 
     /**
      * Boolean flag, indicating whether this type of synapse participates in the
-     * computation of weighted input Set to a default value of true.
+     * computation of weighted input. Set to a default value of true.
      */
-    private boolean sendWeightedInput = true;
+    private boolean enabled = true;
 
     /**
      * Boolean flag, indicating whether or not this synapse's strength can be
@@ -219,7 +219,7 @@ public class Synapse {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
-        setSendWeightedInput(s.isSendWeightedInput());
+        setEnabled(s.isEnabled());
         setDelay(s.getDelay());
         setFrozen(s.isFrozen());
         s.initSpikeResponder();
@@ -266,10 +266,10 @@ public class Synapse {
      * synapse strength. For non-spiking neurons, returns the pre-synaptic
      * activation times the synapse strength.
      *
-     * @return Value
+     * @return the post-synaptic response as determined by a spike responder.
      */
-    public double getValue() {
-        if (!sendWeightedInput) {
+    public double calcPSR() {
+        if (!enabled) {
             return 0;
         } else {
             spikeResponder.update(this);
@@ -282,8 +282,14 @@ public class Synapse {
         }
     }
 
-    public double getWeightedSum() {
-        if (!sendWeightedInput) {
+    /**
+     * For non-spiking neurons returns the weighted sum, i.e. the activation
+     * of the pre-synaptic (source) neuron multiplied by the strength of this
+     * synapse.
+     * @return 
+     */
+    public double calcWeightedSum() {
+        if (!enabled) {
             return 0;
         } else {
             psr = source.getActivation() * strength;
@@ -645,13 +651,6 @@ public class Synapse {
     }
 
     /**
-     * @return sendWeightedInput for the synapse
-     */
-    public boolean isSendWeightedInput() {
-        return sendWeightedInput;
-    }
-
-    /**
      * A better name than setSendWeightedInput. Forwarding to
      * setSendWeightedInput for now. Possibly change name for 3.0. have not done
      * so yet so as note to break a bunch of simulations.
@@ -660,7 +659,7 @@ public class Synapse {
      *            true if enabled, false otherwise.
      */
     public void setEnabled(final boolean enabled) {
-        setSendWeightedInput(enabled);
+        this.enabled = enabled;
     }
 
     /**
@@ -669,15 +668,7 @@ public class Synapse {
      * @return true if enabled, false otherwise.
      */
     public boolean isEnabled() {
-        return this.isSendWeightedInput();
-    }
-
-    /**
-     * @param sendWeightedInput
-     *            to set.
-     */
-    public void setSendWeightedInput(boolean sendWeightedInput) {
-        this.sendWeightedInput = sendWeightedInput;
+        return enabled;
     }
 
     /**

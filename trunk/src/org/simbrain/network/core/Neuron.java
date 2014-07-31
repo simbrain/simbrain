@@ -428,7 +428,7 @@ public class Neuron {
     public double getWeightedInputs() {
         double wtdSum = inputValue;
         for (Synapse w : fanIn) {
-            wtdSum += w.getWeightedSum();
+            wtdSum += w.calcWeightedSum();
         }
         return wtdSum;
     }
@@ -442,7 +442,7 @@ public class Neuron {
     public double getSynapticInput() {
         double wtdSum = inputValue;
         for (Synapse s : fanIn) {
-            wtdSum += s.getValue();
+            wtdSum += s.calcPSR();
         }
         return wtdSum;
     }

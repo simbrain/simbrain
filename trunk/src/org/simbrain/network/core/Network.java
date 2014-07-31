@@ -28,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
@@ -41,7 +40,6 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
@@ -57,9 +55,6 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * weights themselves, as well as in special groups.
  */
 public class Network {
-
-    /** Logger. */
-    private Logger logger = Logger.getLogger(Network.class);
 
     /** Array list of neurons. */
     private final List<Neuron> neuronList = new ArrayList<Neuron>();
@@ -951,6 +946,8 @@ public class Network {
 
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
+        // TODO: Backwards compatible
+        xstream.omitField(Synapse.class, "sendWeightedInput");
 
         return xstream;
     }
@@ -1656,7 +1653,7 @@ public class Network {
         final NeuronGroup tng, final ConnectNeurons connection) {
 
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng,
-                connection);
+            connection);
         addGroup(group);
     }
 

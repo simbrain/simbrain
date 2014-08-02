@@ -626,7 +626,10 @@ public class NetworkPanel extends JPanel {
      */
     private void updateNeuronNodes(List<Neuron> neurons) {
         for (Neuron neuron : neurons) {
-            ((NeuronNode) objectNodeMap.get(neuron)).update();
+            NeuronNode neuronNode  = ((NeuronNode) objectNodeMap.get(neuron));
+            if (neuronNode != null) {
+                neuronNode.update();
+            }
         }
         timeLabel.update();
         network.setUpdateCompleted(true);
@@ -655,7 +658,7 @@ public class NetworkPanel extends JPanel {
     private void updateSynapseNodes(List<Synapse> synapses) {
         for (Synapse synapse : synapses) {
             SynapseNode node = ((SynapseNode) objectNodeMap.get(synapse));
-            if (node.getVisible()) {
+            if (node != null) {
                 node.updateColor();
                 node.updateDiameter();
             }

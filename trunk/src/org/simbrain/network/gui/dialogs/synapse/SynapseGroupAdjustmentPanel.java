@@ -87,7 +87,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     private final SynapseGroup synapseGroup;
 
     /** Whether or not this is being used for creation. */
-    private final boolean creationPanel;
+    private boolean creationPanel;
 
     /**
      * Create the synapse group adjustment panel.
@@ -97,10 +97,11 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      * @return the constructed panel
      */
     public static SynapseGroupAdjustmentPanel createSynapseGroupAdjustmentPanel(
-            Window parent, SynapseGroup synapseGroup) {
+            Window parent, SynapseGroup synapseGroup, boolean isCreation) {
         SynapseGroupAdjustmentPanel sgap = new SynapseGroupAdjustmentPanel(
                 parent, synapseGroup);
         sgap.addListeners();
+        sgap.creationPanel = isCreation;
         return sgap;
     }
 
@@ -112,7 +113,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      */
     private SynapseGroupAdjustmentPanel(Window parent, SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
-        creationPanel = synapseGroup.isEmpty();
         synTypeSelector.setVisible(!creationPanel);
         histogramPanel.setVisible(!creationPanel);
         statPanel.update();

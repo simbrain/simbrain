@@ -45,9 +45,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 public class HopfieldPropertiesPanel extends JPanel implements
         GroupPropertiesPanel {
 
-    /** Default number of neurons. */
-    private static final int DEFAULT_NUM_NEURONS = 9;
-
     /** Parent Network Panel. */
     private NetworkPanel networkPanel;
 
@@ -182,8 +179,8 @@ public class HopfieldPropertiesPanel extends JPanel implements
     @Override
     public void fillFieldValues() {
         if (isCreationPanel) {
-            hopfield = new Hopfield(null, DEFAULT_NUM_NEURONS);
-            tfNumNeurons.setText("" + DEFAULT_NUM_NEURONS);
+            hopfield = new Hopfield(null, hopfield.DEFAULT_NUM_UNITS);
+            tfNumNeurons.setText("" + hopfield.DEFAULT_NUM_UNITS);
         }
         cbUpdateOrder.setSelectedItem(hopfield.getUpdateFunc().getName());
         priorityChkBx.setSelected(hopfield.isByPriority());

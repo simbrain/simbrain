@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -130,12 +133,21 @@ public class SOMGroup extends NeuronGroup {
      * Pushes the weight values of an SOM neuron onto the input neurons.
      */
     public void recall() {
-        winDistance = 0;
-        Neuron winner = calculateWinner();
-        for (Synapse incoming : winner.getFanIn()) {
-            incoming.getSource().setActivation(incoming.getStrength());
+        double maxActivation = Double.MIN_VALUE;
+        Neuron mostActivatedNeuron = null;
+        for (Neuron neuron : this.getNeuronList()) {
+            if (neuron.getActivation() > maxActivation) {
+                mostActivatedNeuron = neuron;
+            }
         }
-
+        if (mostActivatedNeuron != null) {
+            List<Neuron> incomingNeurons = new ArrayList<Neuron>();
+            for (Synapse incoming : mostActivatedNeuron.getFanIn()) {
+                incoming.getSource().forceSetActivation(incoming.getStrength());
+                incomingNeurons.add(incoming.getSource());
+            }
+            getParentNetwork().fireNeuronsUpdated(incomingNeurons);
+        }
     }
 
     /**

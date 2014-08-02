@@ -65,9 +65,13 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
         inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
         inputLayer.setLayoutBasedOnSize();
+
+        // In this case the network object is being used by to store default
+        // values for the competitive network creation panel
         if (net == null) {
             return;
         }
+
         this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {

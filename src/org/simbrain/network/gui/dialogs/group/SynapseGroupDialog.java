@@ -84,8 +84,8 @@ public final class SynapseGroupDialog extends StandardDialog {
     /** Panel for adjusting the synapse group */
     private SynapseGroupAdjustmentPanel adjustmentPanel;
 
-    /** If true this is a creation panel. Otherwise it is an edit panel. */
-    private boolean isCreationPanel = false;
+    /** If true this is a creation dialog. Otherwise it is an edit dialog. */
+    private boolean isCreationDialog = false;
 
     /** Reference to source neuron group. */
     private NeuronGroup sourceNeuronGroup = null;
@@ -155,7 +155,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         networkPanel = np;
         this.sourceNeuronGroup = src;
         this.targetNeuronGroup = tar;
-        isCreationPanel = true;
+        isCreationDialog = true;
         init();
     }
 
@@ -178,19 +178,19 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private void init() {
 
-        if (isCreationPanel) {
+        if (isCreationDialog) {
             setTitle("Create Synapse Group");
         } else {
             setTitle("Edit Synapse Group");
         }
 
-        setMinimumSize(new Dimension(isCreationPanel ? 500 : 600, 300));
+        setMinimumSize(new Dimension(isCreationDialog ? 500 : 600, 300));
 
         fillFieldValues();
         setContentPane(tabbedPane);
 
         // Summary panel tab
-        if (isCreationPanel) {
+        if (isCreationDialog) {
             synapseGroup = new SynapseGroup(sourceNeuronGroup,
                 targetNeuronGroup);
             summaryInfoPanel = new SummaryPanel(synapseGroup);
@@ -203,7 +203,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(summaryScrollWrapper);
         tabbedPane.addTab("Properties", summaryScrollWrapper);
 
-        if (isCreationPanel) {
+        if (isCreationDialog) {
             connectionPanel = ConnectionPanel.createConnectionPanel(this,
                     networkPanel);
             JScrollPane connectWrapper = new JScrollPane(
@@ -228,12 +228,13 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(adjustSynScrollPane);
         tabAdjust.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         adjustmentPanel = SynapseGroupAdjustmentPanel
-            .createSynapseGroupAdjustmentPanel(this, synapseGroup);
+                .createSynapseGroupAdjustmentPanel(this, synapseGroup,
+                        isCreationDialog);
         tabAdjust.add(adjustmentPanel);
         tabbedPane.addTab("Synapse Values", new JPanel());
 
         // Weight Matrix Editor Tabs
-        if (!isCreationPanel) {
+        if (!isCreationDialog) {
             if (synapseGroup.getConnectionManager() instanceof Sparse) {
                 SparseConnectionPanel sparsePanel = SparseConnectionPanel
                         .createSparsityAdjustmentPanel(
@@ -265,7 +266,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         helpAction = new ShowHelpAction("Pages/Network/groups.html");
         addButton(new JButton(helpAction));
 
-        if (!isCreationPanel) {
+        if (!isCreationDialog) {
             // If editing, make this dialog based on a done button, rather than
             // ok and cancel. All edits are done with apply
             setAsDoneDialog();
@@ -318,7 +319,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * Set the initial values of dialog components.
      */
     public void fillFieldValues() {
-        if (!isCreationPanel) {
+        if (!isCreationDialog) {
             tfSynapseGroupLabel.setText(synapseGroup.getLabel());
         } else {
             tfSynapseGroupLabel.setText("Synapse group");
@@ -329,7 +330,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * Commit changes.
      */
     public void commitChanges() {
-        if (isCreationPanel) {
+        if (isCreationDialog) {
             connectionPanel.commitChanges(synapseGroup);
 
             ((EditablePanel) summaryInfoPanel).commitChanges();
@@ -347,7 +348,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        if (isCreationPanel) {
+        if (isCreationDialog) {
             commitChanges();
         }
     }

@@ -45,6 +45,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
@@ -133,6 +134,7 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
         this.networkPanel = networkPanel;
         this.neuronGroup = group;
+
         outlinedObjects = new OutlinedObjects();
         outlinedObjects.setFillBackground(false);
         interactionBox = new NeuronGroupInteractionBox(networkPanel);
@@ -141,6 +143,13 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         addChild(interactionBox);
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
+        if (group.getParentGroup() instanceof Subnetwork) {
+            if (!((Subnetwork) group.getParentGroup()).displayNeuronGroups()) {
+                interactionBox.setVisible(false);
+                outlinedObjects.setOutlinePadding(0);
+                outlinedObjects.setDrawOutline(false);
+            }
+        }
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
     }

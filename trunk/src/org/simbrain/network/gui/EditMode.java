@@ -49,11 +49,11 @@ public final class EditMode {
     public static final EditMode PAN = new EditMode("pan", "Pan.png");
 
     /** Zoom in edit mode. */
-    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomInLarge.png");
+    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
 
     /** Zoom out edit mode. */
     public static final EditMode ZOOM_OUT = new EditMode("zoom out",
-            "ZoomOutLarge.png");
+            "ZoomOut.png");
 
     /** Text edit mode. */
     public static final EditMode TEXT = new EditMode("text", "Text.png");

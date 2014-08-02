@@ -362,7 +362,7 @@ public class SynapseGroup extends Group {
         ArrayList<Synapse> inSwitches = new ArrayList<Synapse>(
             inSynapseSet.size());
         while (inIterator.hasNext()) {
-            Synapse s = exIterator.next();
+            Synapse s = inIterator.next();
             if (s.getStrength() > 0) {
                 inSwitches.add(s);
                 inIterator.remove();

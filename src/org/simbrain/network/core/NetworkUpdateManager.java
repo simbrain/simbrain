@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.listeners.GroupListener;
+import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
@@ -87,7 +87,7 @@ public class NetworkUpdateManager {
      * group update actions are added or removed as groups are added or removed.
      */
     private void addListeners() {
-        network.addGroupListener(new GroupListener() {
+        network.addGroupListener(new GroupAdapter() {
 
             public void groupAdded(NetworkEvent<Group> e) {
                 if (e.getObject().isTopLevelGroup()) {
@@ -98,15 +98,6 @@ public class NetworkUpdateManager {
             public void groupRemoved(NetworkEvent<Group> e) {
                 // Find corresponding group update action and remove it
                 removeGroupAction(e.getObject());
-            }
-
-            public void groupChanged(NetworkEvent<Group> networkEvent,
-                    String changeDescription) {
-
-            }
-
-            public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
-                // no action
             }
 
         });

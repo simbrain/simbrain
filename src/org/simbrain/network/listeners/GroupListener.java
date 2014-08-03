@@ -56,4 +56,13 @@ public interface GroupListener {
      */
     void groupParameterChanged(NetworkEvent<Group> networkEvent);
 
+    /**
+     * The state of the neurons or synapses in the group has changed.  This is
+     * for basic updating, as opposed to specialized parameter changes or other
+     * changes.
+     *
+     * @param group the group that changed.
+     */
+    void groupUpdated(Group group);
+
 }

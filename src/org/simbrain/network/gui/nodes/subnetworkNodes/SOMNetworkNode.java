@@ -33,14 +33,14 @@ import org.simbrain.util.StandardDialog;
 
 /**
  * PNode representation of SOM Network.
- * 
+ *
  * @author jyoshimi
  */
 public class SOMNetworkNode extends SubnetworkNode {
 
     /**
      * Create a SOM Network PNode.
-     * 
+     *
      * @param networkPanel parent panel
      * @param group the SOM network
      */
@@ -70,10 +70,7 @@ public class SOMNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.update();
-                net.getParentNetwork().fireNeuronsUpdated(
-                        net.getFlatNeuronList());
-                net.getParentNetwork().fireSynapsesUpdated(
-                        net.getFlatSynapseList());
+                net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
@@ -82,8 +79,7 @@ public class SOMNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.getSom().randomizeIncomingWeights();
-                net.getParentNetwork().fireSynapsesUpdated(
-                        net.getFlatSynapseList());
+                net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(randomizeNet);

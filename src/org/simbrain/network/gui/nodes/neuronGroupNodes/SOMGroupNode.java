@@ -58,6 +58,15 @@ public class SOMGroupNode extends NeuronGroupNode {
                 SOMGroupNode.this.updateText();
             }
 
+//            @Override
+//            public void groupUpdated(Group theGroup) {
+//                SOMGroup group = (SOMGroup) theGroup;
+//                group.setStateInfo("Learning rate ("
+//                        + Utils.round(group.getAlpha(), 2) + ") N-size ("
+//                        + Utils.round(group.getNeighborhoodSize(), 2) + ")");
+//                SOMGroupNode.this.updateText();
+//            }
+
         });
     }
 
@@ -101,10 +110,7 @@ public class SOMGroupNode extends NeuronGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.reset();
-                group.getParentNetwork().fireNeuronsUpdated(
-                        group.getNeuronList());
-                group.getParentNetwork().fireSynapsesUpdated(
-                        group.getIncomingWeights());
+                group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
@@ -112,8 +118,7 @@ public class SOMGroupNode extends NeuronGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.recall();
-                group.getParentNetwork().fireNeuronsUpdated(
-                        group.getNeuronList());
+                group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
         super.addCustomMenuItem(new JMenuItem(new AbstractAction(
@@ -121,8 +126,7 @@ public class SOMGroupNode extends NeuronGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMGroup group = ((SOMGroup) getNeuronGroup());
                 group.randomizeIncomingWeights();
-                group.getParentNetwork()
-                        .fireSynapsesUpdated(group.getIncomingWeights());
+                group.getParentNetwork().fireGroupUpdated(group);
             }
         }));
     }

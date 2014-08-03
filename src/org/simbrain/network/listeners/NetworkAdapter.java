@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.simbrain.network.core.Neuron;
@@ -35,7 +36,7 @@ public class NetworkAdapter implements NetworkListener {
     }
 
     @Override
-    public void updateNeurons(List<Neuron> neurons) {
+    public void updateNeurons(Collection<Neuron> neurons) {
     }
 
     @Override
@@ -43,7 +44,7 @@ public class NetworkAdapter implements NetworkListener {
     }
 
     @Override
-    public void updateSynapses(List<Synapse> synapses) {
+    public void updateSynapses(Collection<Synapse> synapses) {
     }
 
 }

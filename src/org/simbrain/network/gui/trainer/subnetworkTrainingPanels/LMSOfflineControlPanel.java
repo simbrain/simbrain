@@ -43,6 +43,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
@@ -306,9 +307,10 @@ public class LMSOfflineControlPanel extends JPanel {
                 // progressBar.setIndeterminate(false);
                 progressBar.setValue(100);
                 setCursor(null); // Turn off wait cursor
-                // TODO: Only update neurons and synapses in this network
-                networkPanel.getNetwork().fireSynapsesUpdated();
-                networkPanel.getNetwork().fireNeuronsUpdated();
+                // BELOW causes hard crash
+//                networkPanel.getNetwork().fireGroupUpdated(
+//                        ((LMSNetwork) trainer.getTrainableNetwork()
+//                                .getNetwork()).getSynapseGroup());
             }
 
             @Override

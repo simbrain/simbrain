@@ -16,6 +16,7 @@ package org.simbrain.network.subnetworks;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -57,4 +58,8 @@ public class LMSNetwork extends FeedForward implements Trainable {
     public void initNetwork() {
     }
 
+    @Override
+    public Group getNetwork() {
+        return this;
+    }
 }

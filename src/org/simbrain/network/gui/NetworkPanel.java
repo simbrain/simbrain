@@ -439,7 +439,7 @@ public class NetworkPanel extends JPanel {
             }
 
             @Override
-            public void updateNeurons(final List<Neuron> neurons) {
+            public void updateNeurons(final Collection<Neuron> neurons) {
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateNeuronNodes(neurons);
@@ -457,7 +457,7 @@ public class NetworkPanel extends JPanel {
             }
 
             @Override
-            public void updateSynapses(final List<Synapse> synapses) {
+            public void updateSynapses(final Collection<Synapse> synapses) {
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateSynapseNodes(synapses);
@@ -603,6 +603,11 @@ public class NetworkPanel extends JPanel {
                     }
                 }
             }
+
+            @Override
+            public void groupUpdated(Group group) {
+                updateGroupNode(group);
+            }
         });
 
     }
@@ -611,6 +616,7 @@ public class NetworkPanel extends JPanel {
      * Update visible state of all neurons nodes.
      */
     private void updateNeuronNodes() {
+        //System.out.println("In update neuron nodes");
         for (NeuronNode node : getNeuronNodes()) {
             node.update();
         }
@@ -624,7 +630,9 @@ public class NetworkPanel extends JPanel {
      *
      * @param neurons the neurons whose corresponding pnode should be updated.
      */
-    private void updateNeuronNodes(List<Neuron> neurons) {
+    private void updateNeuronNodes(Collection<Neuron> neurons) {
+        // System.out.println("In update neuron nodes.  Updating " +
+        // neurons.size() + " neurons");
         for (Neuron neuron : neurons) {
             NeuronNode neuronNode  = ((NeuronNode) objectNodeMap.get(neuron));
             if (neuronNode != null) {
@@ -635,10 +643,50 @@ public class NetworkPanel extends JPanel {
         network.setUpdateCompleted(true);
     }
 
+
+    /**
+     * Update graphical state of all visible group nodes.
+     *
+     * @param group the group to update
+     */
+    private void updateGroupNode(Group group) {
+        //System.out.println("In update group node.  Updating group: " + group);
+        if (group instanceof NeuronGroup) {
+            NeuronGroupNode groupNode = ((NeuronGroupNode) objectNodeMap
+                    .get(group));
+            if (groupNode != null) {
+                updateNeuronNodes(groupNode.getNeuronGroup().getNeuronList());
+            }
+        } else if (group instanceof SynapseGroup) {
+            SynapseGroupNode groupNode = ((SynapseGroupNode) objectNodeMap
+                    .get(group));
+            if (groupNode != null) {
+                if (groupNode.getSynapseGroup().isDisplaySynapses()) {
+                    updateSynapseNodes(groupNode.getSynapseGroup()
+                            .getAllSynapses());
+                }
+            }
+        } else if (group instanceof Subnetwork) {
+            SubnetworkNode groupNode = ((SubnetworkNode) objectNodeMap
+                    .get(group));
+            if (groupNode != null) {
+                for (NeuronGroup neuronGroup : groupNode.getSubnetwork()
+                        .getNeuronGroupList()) {
+                    updateGroupNode(neuronGroup);
+                }
+                for (SynapseGroup synapseGroup : groupNode.getSubnetwork()
+                        .getSynapseGroupList()) {
+                    updateGroupNode(synapseGroup);
+                }
+            }
+        }
+    }
+
     /**
      * Update visible state of all synapse nodes.
      */
     private void updateSynapseNodes() {
+        //System.out.println("In update synapse nodes");
         for (SynapseNode node : this.getSynapseNodes()) {
             if (node.getVisible()) {
                 node.updateColor();
@@ -655,7 +703,9 @@ public class NetworkPanel extends JPanel {
      * @param synapses the synapses whose corresponding pnodes should be
      *            updated.
      */
-    private void updateSynapseNodes(List<Synapse> synapses) {
+    private void updateSynapseNodes(Collection<Synapse> synapses) {
+        // System.out.println("In update synapse nodes.  Updating " +
+        // synapses.size() + " synapses");
         for (Synapse synapse : synapses) {
             SynapseNode node = ((SynapseNode) objectNodeMap.get(synapse));
             if (node != null) {
@@ -2012,18 +2062,25 @@ public class NetworkPanel extends JPanel {
         repaint();
     }
 
-    // /**
-    // * Returns information about the Network in String form.
-    // *
-    // * @return String description about this NeuronNode.
-    // */
-    // public String toString() {
-    // String ret = new String();
-    // for (PNode node : getPersistentNodes()) {
-    // ret += node.toString();
-    // }
-    // return ret;
-    // }
+    @Override
+    public String toString() {
+        String ret = "";
+        Iterator it = objectNodeMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            if (pairs.getKey() instanceof Neuron) {
+                ret = ret + ((Neuron) pairs.getKey()).getId() + " --> "
+                        + pairs.getValue();
+            } else if (pairs.getKey() instanceof Synapse) {
+                ret = ret + ((Synapse) pairs.getKey()).getId() + " --> "
+                        + pairs.getValue();
+            } else if (pairs.getKey() instanceof Group) {
+                ret = ret + ((Group) pairs.getKey()).getId() + " --> "
+                        + pairs.getValue();
+            }
+        }
+        return ret;
+    }
 
     /**
      * @return Returns the Network.

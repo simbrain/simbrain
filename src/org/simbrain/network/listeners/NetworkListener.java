@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -40,7 +40,7 @@ public interface NetworkListener {
      *
      * @param neurons the list of neurons to update.
      */
-    void updateNeurons(List<Neuron> neurons);
+    void updateNeurons(Collection<Neuron> neurons);
 
     /**
      * Synapse states have been updated.
@@ -52,6 +52,6 @@ public interface NetworkListener {
      *
      * @param synapses the list of synapses to update.
      */
-    void updateSynapses(List<Synapse> synapses);
+    void updateSynapses(Collection<Synapse> synapses);
 
 }

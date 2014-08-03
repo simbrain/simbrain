@@ -27,6 +27,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -435,6 +436,11 @@ public class EchoStateNetwork extends Subnetwork {
 
             @Override
             public void initNetwork() {
+            }
+
+            @Override
+            public Group getNetwork() {
+                return EchoStateNetwork.this;
             }
 
         };

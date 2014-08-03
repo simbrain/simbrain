@@ -195,10 +195,7 @@ public class SOMTrainerControlsPanel extends JPanel {
             } else {
                 // Stop running
                 trainer.setUpdateCompleted(true);
-                panel.getNetwork().fireNeuronsUpdated(
-                        network.getSom().getNeuronList());
-                panel.getNetwork().fireSynapsesUpdated(
-                        network.getSom().getIncomingWeights());
+                panel.getNetwork().fireGroupUpdated(network);
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             }
 
@@ -228,6 +225,7 @@ public class SOMTrainerControlsPanel extends JPanel {
             try {
                 trainer.apply();
                 updatePanel();
+                panel.getNetwork().fireGroupUpdated(network);
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
                         JOptionPane.DEFAULT_OPTION,
@@ -255,10 +253,7 @@ public class SOMTrainerControlsPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             network.getSom().reset();
             trainer.setIteration(0);
-            panel.getNetwork().fireNeuronsUpdated(
-                    network.getSom().getNeuronList());
-            panel.getNetwork().fireSynapsesUpdated(
-                    network.getSom().getIncomingWeights());
+            panel.getNetwork().fireGroupUpdated(network);
             updatePanel();
         }
     };
@@ -280,10 +275,8 @@ public class SOMTrainerControlsPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             network.getSom().randomizeIncomingWeights();
             updatePanel();
-            panel.getNetwork().fireNeuronsUpdated(
-                    network.getSom().getNeuronList());
-            panel.getNetwork().fireSynapsesUpdated(
-                    network.getSom().getIncomingWeights());
+            panel.getNetwork().fireGroupUpdated(
+                    network.getSynapseGroup());
         }
     };
 }

@@ -240,9 +240,9 @@ public class IterativeControlsPanel extends JPanel {
                                 if (showUpdates.isSelected()) {
                                     panel.getNetwork()
                                             .setUpdateCompleted(false);
-                                    // TODO: Only update synapses in the trained
-                                    // net
-                                    panel.getNetwork().fireSynapsesUpdated();
+                                    panel.getNetwork().fireGroupUpdated(
+                                            trainer.getTrainableNetwork()
+                                                    .getNetwork());
                                     while (!panel.getNetwork()
                                             .isUpdateCompleted()) {
                                         try {
@@ -294,8 +294,8 @@ public class IterativeControlsPanel extends JPanel {
             try {
                 trainer.iterate();
                 if (showUpdates.isSelected()) {
-                    //TODO: Only update neurons in this network
-                    panel.getNetwork().fireNeuronsUpdated();
+                    panel.getNetwork().fireGroupUpdated(
+                            trainer.getTrainableNetwork().getNetwork());
                 }
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
@@ -325,8 +325,8 @@ public class IterativeControlsPanel extends JPanel {
             initTrainer(true);
             if (trainer != null) {
                 trainer.randomize();
-                //TODO: Only change neurons in this network
-                panel.getNetwork().fireNeuronsUpdated();
+                panel.getNetwork().fireGroupUpdated(
+                        trainer.getTrainableNetwork().getNetwork());
             }
         }
     };

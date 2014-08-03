@@ -101,7 +101,7 @@ public class SOMGroupCreationDialog extends StandardDialog {
         som.offset(networkPanel.getWhereToAdd().getX(), networkPanel
                 .getWhereToAdd().getY());
         networkPanel.getNetwork().addGroup(som);
-        networkPanel.getNetwork().fireNeuronsUpdated();
+        networkPanel.getNetwork().fireNeuronsUpdated(); //todo: why won't fireGroupUpdated(som) work (label not created).
         super.closeDialogOk();
 
     }

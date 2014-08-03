@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
@@ -121,4 +122,8 @@ public class SOMNetwork  extends Subnetwork implements Trainable {
         return inputLayer;
     }
 
+    @Override
+    public Group getNetwork() {
+        return this;
+    }
 }

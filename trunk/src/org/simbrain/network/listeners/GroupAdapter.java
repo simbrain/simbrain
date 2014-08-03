@@ -44,4 +44,8 @@ public class GroupAdapter implements GroupListener {
     public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
     }
 
+    @Override
+    public void groupUpdated(Group group) {
+    }
+
 }

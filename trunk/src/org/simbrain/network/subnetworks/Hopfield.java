@@ -26,6 +26,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
@@ -134,7 +135,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 }
             }
         }
-        getParentNetwork().fireSynapsesUpdated(this.getFlatSynapseList());
+        getParentNetwork().fireGroupUpdated(this.getSynapseGroup());
     }
 
     @Override
@@ -186,8 +187,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                     w.getStrength() + src.getActivation()
                     * tar.getActivation());
         }
-        getParentNetwork().fireSynapsesUpdated(
-                this.getSynapseGroup().getAllSynapses());
+        getParentNetwork().fireGroupUpdated(getSynapseGroup());
     }
 
     /**
@@ -232,6 +232,11 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public void setByPriority(boolean byPriority) {
         this.byPriority = byPriority;
+    }
+
+    @Override
+    public Group getNetwork() {
+        return this;
     }
 
     /**

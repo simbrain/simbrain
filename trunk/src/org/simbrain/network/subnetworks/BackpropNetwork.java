@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -51,6 +52,11 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
+    }
+
+    @Override
+    public Group getNetwork() {
+        return this;
     }
 
     @Override

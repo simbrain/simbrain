@@ -26,6 +26,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -277,4 +278,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         return "Hidden layer, copy hidden to context, update layer";
     }
 
+    @Override
+    public Group getNetwork() {
+        return this;
+    }
 }

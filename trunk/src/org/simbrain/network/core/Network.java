@@ -40,6 +40,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
@@ -176,9 +177,12 @@ public class Network {
             action.invoke();
         }
 
-        // Notify network listeners
-        this.fireSynapsesUpdated();
-        this.fireNeuronsUpdated();
+        // Fire update events for GUI update.  Loose items, then groups.
+        fireSynapsesUpdated(synapseList); // Loose synapses
+        fireNeuronsUpdated(neuronList); // Loose neurons
+        for (Group group : groupList) { // Groups
+            fireGroupUpdated(group);
+        }
 
         // Clear input nodes
         clearInputs();
@@ -1102,7 +1106,7 @@ public class Network {
      *
      * @param neurons the neurons whose state has changed
      */
-    public void fireNeuronsUpdated(List<Neuron> neurons) {
+    public void fireNeuronsUpdated(Collection<Neuron> neurons) {
         for (NetworkListener listener : networkListeners) {
             listener.updateNeurons(neurons);
         }
@@ -1125,7 +1129,7 @@ public class Network {
      *
      * @param synapses the synapses whose state has changed
      */
-    public void fireSynapsesUpdated(List<Synapse> synapses) {
+    public void fireSynapsesUpdated(Collection<Synapse> synapses) {
         for (NetworkListener listener : networkListeners) {
             listener.updateSynapses(synapses);
         }
@@ -1355,6 +1359,17 @@ public class Network {
         for (GroupListener listener : groupListeners) {
             listener.groupParameterChanged(new NetworkEvent<Group>(this, group,
                     group));
+        }
+    }
+
+    /**
+     * Fire a group update event event.
+     *
+     * @param group reference to group that has been updated.
+     */
+    public void fireGroupUpdated(final Group group) {
+        for (GroupListener listener : groupListeners) {
+            listener.groupUpdated(group);
         }
     }
 
@@ -1676,5 +1691,6 @@ public class Network {
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
     }
+
 
 }

@@ -150,7 +150,8 @@ public class KeyBindings {
                 "debug");
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println(panel.getNetwork().toString());
+                System.out.println(panel.getNetwork());
+                //System.out.println(panel);
             }
         });
 

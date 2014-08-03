@@ -16,6 +16,7 @@ package org.simbrain.network.trainers;
 import java.util.List;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Group;
 
 /**
  * Interface that must be implemented by any object that can be trained by a
@@ -26,6 +27,13 @@ import org.simbrain.network.core.Neuron;
  *
  */
 public interface Trainable {
+
+    /**
+     * Returns a reference to the subnetwork being trained.
+     *
+     * @return the network being trained.
+     */
+    Group getNetwork();
 
     /**
      * Returns the list of input neurons.

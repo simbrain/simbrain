@@ -79,10 +79,7 @@ public class HopfieldTrainer extends Trainer {
         hopfield.getSynapseGroup().revalidateSynapseSets();
 
         // Update GUI
-        hopfield.getParentNetwork().fireNeuronsUpdated(
-                hopfield.getFlatNeuronList());
-        hopfield.getParentNetwork().fireSynapsesUpdated(
-                hopfield.getFlatSynapseList());
+        hopfield.getParentNetwork().fireGroupUpdated(hopfield);
     }
 
 }

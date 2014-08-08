@@ -450,29 +450,6 @@ public class EchoStateNetwork extends Subnetwork {
         };
         // Create the offline trainer.
         LMSOffline trainer = new LMSOffline(trainable);
-        trainer.addListener(new TrainerListener() {
-
-            @Override
-            public void beginTraining() {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void endTraining() {
-                for (SynapseGroup sg : outputLayer.getIncomingSgs()) {
-                    sg.revalidateSynapseSets();
-                }
-            }
-
-            @Override
-            public void progressUpdated(String progressUpdate,
-                int percentComplete) {
-                // TODO Auto-generated method stub
-
-            }
-
-        });
         return trainer;
 
     }

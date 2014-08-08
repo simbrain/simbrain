@@ -248,6 +248,7 @@ public class BackpropTrainer extends IterableTrainer {
             neuron.randomizeFanIn();
             neuron.randomizeBias(-.5, .5);
         }
+        revalidateSynapseGroups();
     }
 
     /**

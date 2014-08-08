@@ -307,6 +307,7 @@ public class LMSOfflineControlPanel extends JPanel {
                 // progressBar.setIndeterminate(false);
                 progressBar.setValue(100);
                 setCursor(null); // Turn off wait cursor
+
                 // BELOW causes hard crash
 //                networkPanel.getNetwork().fireGroupUpdated(
 //                        ((LMSNetwork) trainer.getTrainableNetwork()

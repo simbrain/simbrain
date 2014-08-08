@@ -34,6 +34,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
@@ -264,6 +266,7 @@ public class IterativeControlsPanel extends JPanel {
             } else {
                 // Stop running
                 trainer.setUpdateCompleted(true);
+                trainer.revalidateSynapseGroups();
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             }
 
@@ -297,6 +300,7 @@ public class IterativeControlsPanel extends JPanel {
                     panel.getNetwork().fireGroupUpdated(
                             trainer.getTrainableNetwork().getNetwork());
                 }
+                trainer.revalidateSynapseGroups();
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",
                         JOptionPane.DEFAULT_OPTION,

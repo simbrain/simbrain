@@ -32,6 +32,8 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.Matrices;
@@ -131,7 +133,17 @@ public class LMSOffline extends Trainer {
                     + "'MoorePenrose' or 'WeinerHopf'.");
         }
 
+        // Make sure excitatory/inhibitory are in proper lists
+        if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
+            SynapseGroup group = ((Subnetwork) getTrainableNetwork()
+                    .getNetwork()).getSynapseGroup();
+            if (group != null) {
+                group.revalidateSynapseSets();
+            }
+        }
+
         fireTrainingEnd();
+        revalidateSynapseGroups();
 
     }
 

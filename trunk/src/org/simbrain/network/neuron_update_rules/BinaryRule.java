@@ -133,4 +133,14 @@ public class BinaryRule extends NeuronUpdateRule {
         this.floor = floor;
     }
 
+    @Override
+    public double getGraphicalLowerBound() {
+        return floor - 1;
+    }
+
+    @Override
+    public double getGraphicalUpperBound() {
+        return ceiling + 1;
+    }
+
 }

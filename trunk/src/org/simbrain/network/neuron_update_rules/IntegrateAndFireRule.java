@@ -28,7 +28,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
- * 
+ *
  * TODO: Add custom tooltip
  */
 public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
@@ -92,11 +92,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
         /*
          * Formula:
-         * 
+         *
          * dV/dt = ( -(Vm - Vr) + Rm * (Isyn + Ibg) ) / tau
-         * 
+         *
          * Vm > theta ? Vm <- Vreset ; spike
-         * 
+         *
          * Vm: membrane potential Vr: resting potential* Rm: membrane resistance
          * Isyn: synaptic input current Ibg: background input current tau: time
          * constant Vreset: reset potential theta: threshold
@@ -262,5 +262,15 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     @Override
     public String getDescription() {
         return "Integrate and Fire";
+    }
+
+    @Override
+    public double getGraphicalLowerBound() {
+        return resetPotential - 30;
+    }
+
+    @Override
+    public double getGraphicalUpperBound() {
+        return restingPotential + 30;
     }
 }

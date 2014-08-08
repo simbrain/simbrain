@@ -21,6 +21,8 @@ package org.simbrain.network.gui.dialogs.network;
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
 
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,6 +37,7 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SquashingFunction;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * Creates a GUI dialog to set the parameters for and then build a simple
@@ -124,6 +127,11 @@ public class SRNCreationDialog extends StandardDialog {
 
         // Fill fields with default values
         fillFieldValues();
+
+        // Help button
+        Action helpAction = new ShowHelpAction(
+                "Pages/Network/network/srn.html");
+        addButton(new JButton(helpAction));
 
         setContentPane(srnPanel);
     }

@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -25,9 +27,12 @@ import javax.swing.event.ChangeListener;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
+import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
  * <b>SupervisedTrainingDialog</b> is the superclass of edit dialogs associated
@@ -114,6 +119,17 @@ public class SupervisedTrainingDialog extends StandardDialog {
             }
         };
         tabbedPane.addChangeListener(changeListener);
+
+        // Set up help
+        if (trainable instanceof LMSNetwork) {
+            Action helpAction = new ShowHelpAction(
+                    "Pages/Network/network/lmsnetwork.html");
+            addButton(new JButton(helpAction));
+        } else if (trainable instanceof BackpropNetwork) {
+            Action helpAction = new ShowHelpAction(
+                    "Pages/Network/network/backpropnetwork.html");
+            addButton(new JButton(helpAction));
+        }
 
     }
 

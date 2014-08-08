@@ -41,6 +41,7 @@ import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SquashingFunction;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -168,7 +169,8 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Initializes the input layer from a neuron group and adds it to the ESN
+     * Initializes the input layer from a neuron group and adds it to the ESN.
+     *
      * @param neuronGroup
      */
     public void initializeInputLayer(NeuronGroup neuronGroup) {
@@ -179,6 +181,7 @@ public class EchoStateNetwork extends Subnetwork {
         inputLayer = neuronGroup;
         numInputs = inputLayer.size();
         inputLayer.setLabel("Inputs");
+        inputLayer.setClamped(true);
         addNeuronGroup(neuronGroup);
     }
 
@@ -209,7 +212,8 @@ public class EchoStateNetwork extends Subnetwork {
     }
 
     /**
-     * Initializes the output layer and adds it to the ESN
+     * Initializes the output layer and adds it to the ESN.
+     *
      * @param neuronGroup
      */
     public void initializeOutput(NeuronGroup neuronGroup) {
@@ -718,6 +722,46 @@ public class EchoStateNetwork extends Subnetwork {
 
     public void setTimeType(TimeType timeType) {
         this.timeType = timeType;
+    }
+    
+    /**
+     * Wrap input data in a DataMatrix Object.
+     *
+     * @return the data matrix containing this data.
+     */
+    public NumericMatrix getInputDataMatrix() {
+        return new NumericMatrix() {
+
+            @Override
+            public void setData(double[][] data) {
+                setInputData(data);
+            }
+
+            @Override
+            public double[][] getData() {
+                return getInputData();
+            }
+        };
+    }
+
+    /**
+     * Wrap target data in a DataMatrix Object.
+     *
+     * @return the data matrix containing this data.
+     */
+    public NumericMatrix getTargetDataMatrix() {
+        return new NumericMatrix() {
+
+            @Override
+            public void setData(double[][] data) {
+                setTargetData(data);
+            }
+
+            @Override
+            public double[][] getData() {
+                return getTargetData();
+            }
+        };
     }
 
 }

@@ -19,21 +19,16 @@
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.util.math.NumericMatrix;
 
 /**
  * Panel for training ESN's.
@@ -52,27 +47,17 @@ public class ESNOfflineTrainingPanel extends JPanel {
     /** Reference to the controls panel. */
     private final LMSOfflineControlPanel controlPanel;
 
-    /** Reference to training set panel. */
-    private final TrainingSetPanel trainingSetPanel;
-
     /** Reservoir utils panel. */
     private final ReservoirUtilsPanel rUtilsPanel;
-
-    /** The parent frame. */
-    private final Window frame;
 
     /**
      * Construct an ESN Training Panel.
      *
-     * @param panel
-     *            the parent network panel
-     * @param esn
-     *            the underlying network
+     * @param panel the parent network panel
+     * @param esn the underlying network
      */
     public ESNOfflineTrainingPanel(final NetworkPanel panel,
-        final EchoStateNetwork esn, final Window frame) {
-
-        this.frame = frame;
+            final EchoStateNetwork esn, final Window frame) {
         // Initialize control panel with no trainer. It has to be set
         // After the apply button is pressed
         controlPanel = new LMSOfflineControlPanel(panel);
@@ -80,38 +65,6 @@ public class ESNOfflineTrainingPanel extends JPanel {
         // Set up main controls
         GridBagConstraints controlPanelConstraints = new GridBagConstraints();
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
-
-        // Reference to the input data in the esn
-        final NumericMatrix inputData = new NumericMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                esn.setInputData(data);
-            }
-
-            @Override
-            public double[][] getData() {
-                return esn.getInputData();
-            }
-
-        };
-        // Reference to the target data in the esn
-        final NumericMatrix targetData = new NumericMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                esn.setTargetData(data); //
-            }
-
-            @Override
-            public double[][] getData() {
-                return esn.getTargetData();
-            }
-
-        };
-
-        // Training Set Panel
-        trainingSetPanel = new TrainingSetPanel(esn.getInputLayer()
-            .getNeuronList(), inputData, esn.getOutputLayer()
-            .getNeuronList(), targetData, 3);
 
         // Res Utils
         rUtilsPanel = new ReservoirUtilsPanel(esn, frame);
@@ -121,47 +74,19 @@ public class ESNOfflineTrainingPanel extends JPanel {
         controlPanelConstraints.gridy = 4;
         controlPanel.add(rUtilsPanel, controlPanelConstraints);
 
-        // Set overall layout
-        setLayout(new GridBagLayout());
-        GridBagConstraints wholePanelConstraints = new GridBagConstraints();
-        // Control Panel
-        wholePanelConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        wholePanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        wholePanelConstraints.insets = new Insets(10, 10, 10, 10);
-        wholePanelConstraints.weightx = 0;
-        wholePanelConstraints.weighty = 0.5;
-        wholePanelConstraints.gridx = 0;
-        wholePanelConstraints.gridy = 0;
-        add(controlPanel, wholePanelConstraints);
-        // Training Set
-        wholePanelConstraints.anchor = GridBagConstraints.PAGE_START;
-        wholePanelConstraints.fill = GridBagConstraints.BOTH;
-        wholePanelConstraints.insets = new Insets(10, 10, 10, 10);
-        wholePanelConstraints.weightx = 1;
-        wholePanelConstraints.weighty = 0.5;
-        wholePanelConstraints.gridx = 1;
-        wholePanelConstraints.gridy = 0;
-        add(trainingSetPanel, wholePanelConstraints);
+        // Add the panel
+        add(controlPanel);
 
         controlPanel.getApplyButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                if (inputData.getData() == null) {
-                    JOptionPane.showOptionDialog(null, "Input data not set",
-                        "Warning", JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
-                } else if (targetData.getData() == null) {
-                    JOptionPane.showOptionDialog(null, "Target data not set",
-                        "Warning", JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, null, null);
-                } else {
-                    if (controlPanel.getTrainer() == null) {
-                        controlPanel.setTrainer((LMSOffline) esn.getTrainer());
-                        controlPanel.addTrainerListeners();
-                    }
-                    controlPanel.runTrainer();
+                if (controlPanel.getTrainer() == null) {
+                    controlPanel.setTrainer((LMSOffline) esn.getTrainer());
+                    controlPanel.addTrainerListeners();
                 }
+                controlPanel.runTrainer();
             }
+
         });
 
     }

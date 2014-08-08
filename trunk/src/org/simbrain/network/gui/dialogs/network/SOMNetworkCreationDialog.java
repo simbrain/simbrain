@@ -102,7 +102,6 @@ public class SOMNetworkCreationDialog extends StandardDialog {
         som.applyLayout();
         somNet.layoutNetwork(); // Must layout som first
         networkPanel.getNetwork().addGroup(somNet);
-        //networkPanel.getNetwork().fireGroupUpdated(somNet);
         super.closeDialogOk();
     }
 

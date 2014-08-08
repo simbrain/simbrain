@@ -137,15 +137,6 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Set the table
         this.setTable(table);
 
-        // Add network listener
-        panel.getNetwork().addNetworkListener(new NetworkAdapter() {
-
-            @Override
-            public void updateSynapses() {
-                repaint();
-            }
-
-        });
     }
 
     /**

@@ -23,9 +23,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.listeners.NetworkAdapter;
+import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.util.Utils;
 
@@ -48,26 +49,7 @@ public class SOMGroupNode extends NeuronGroupNode {
         setCustomMenuItems();
         setInteractionBox(new SOMInteractionBox(networkPanel));
         // setOutlinePadding(15f);
-        networkPanel.getNetwork().addNetworkListener(new NetworkAdapter() {
-
-            @Override
-            public void updateNeurons() {
-                group.setStateInfo("Learning rate ("
-                        + Utils.round(group.getAlpha(), 2) + ") N-size ("
-                        + Utils.round(group.getNeighborhoodSize(), 2) + ")");
-                SOMGroupNode.this.updateText();
-            }
-
-//            @Override
-//            public void groupUpdated(Group theGroup) {
-//                SOMGroup group = (SOMGroup) theGroup;
-//                group.setStateInfo("Learning rate ("
-//                        + Utils.round(group.getAlpha(), 2) + ") N-size ("
-//                        + Utils.round(group.getNeighborhoodSize(), 2) + ")");
-//                SOMGroupNode.this.updateText();
-//            }
-
-        });
+        updateText();
     }
 
     /**
@@ -96,8 +78,11 @@ public class SOMGroupNode extends NeuronGroupNode {
 
     @Override
     public void updateText() {
-        getInteractionBox().setText(
-                ((SOMGroup) getNeuronGroup()).getStateInfo());
+        SOMGroup group = (SOMGroup) getNeuronGroup();
+        group.setStateInfo("Learning rate (" + Utils.round(group.getAlpha(), 2)
+                + ") N-size (" + Utils.round(group.getNeighborhoodSize(), 2)
+                + ")");
+        getInteractionBox().setText(group.getStateInfo());
         getInteractionBox().updateText();
     };
 

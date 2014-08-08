@@ -54,6 +54,8 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        // TODO: Consider just updating the nodes while we have them
+        //  (though this breaks model-view separation)
         for (NeuronNode node : networkPanel.getSelectedNeurons()) {
             node.getNeuron().randomize();
         }

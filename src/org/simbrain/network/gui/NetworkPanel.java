@@ -606,17 +606,20 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
-                updateGroupNode(group);
+                updateConstituentNodes(group);
             }
         });
 
     }
 
     /**
-     * Update visible state of all neurons nodes.
+     * Update visible state of all neurons nodes. This is not used much
+     * internally, because it is preferred to updated the specific nodes that
+     * need to be updated. It is here mainly for convenience (e.g. for use in
+     * scripts).
      */
     private void updateNeuronNodes() {
-        //System.out.println("In update neuron nodes");
+        // System.out.println("In update neuron nodes");
         for (NeuronNode node : getNeuronNodes()) {
             node.update();
         }
@@ -634,7 +637,7 @@ public class NetworkPanel extends JPanel {
         // System.out.println("In update neuron nodes.  Updating " +
         // neurons.size() + " neurons");
         for (Neuron neuron : neurons) {
-            NeuronNode neuronNode  = ((NeuronNode) objectNodeMap.get(neuron));
+            NeuronNode neuronNode = ((NeuronNode) objectNodeMap.get(neuron));
             if (neuronNode != null) {
                 neuronNode.update();
             }
@@ -643,50 +646,76 @@ public class NetworkPanel extends JPanel {
         network.setUpdateCompleted(true);
     }
 
+    /**
+     * Update graphical state of neuron group node.
+     *
+     * @param group the neuron group to update
+     */
+    private void updateConstituentNodes(NeuronGroup group) {
+        //System.out.println("In update neuron group node.  Updating group: "
+        //        + group);
+        NeuronGroupNode groupNode = ((NeuronGroupNode) objectNodeMap.get(group));
+        if (groupNode != null) {
+            updateNeuronNodes(groupNode.getNeuronGroup().getNeuronList());
+        }
+        groupNode.updateText();
+    }
 
     /**
-     * Update graphical state of all visible group nodes.
+     * Update graphical state of synapse group. Only update synapse nodes if
+     * "display synapses" is true.
      *
-     * @param group the group to update
+     * @param group the neuron group to update
      */
-    private void updateGroupNode(Group group) {
-        //System.out.println("In update group node.  Updating group: " + group);
-        if (group instanceof NeuronGroup) {
-            NeuronGroupNode groupNode = ((NeuronGroupNode) objectNodeMap
-                    .get(group));
-            if (groupNode != null) {
-                updateNeuronNodes(groupNode.getNeuronGroup().getNeuronList());
-            }
-        } else if (group instanceof SynapseGroup) {
-            SynapseGroupNode groupNode = ((SynapseGroupNode) objectNodeMap
-                    .get(group));
-            if (groupNode != null) {
-                if (groupNode.getSynapseGroup().isDisplaySynapses()) {
-                    updateSynapseNodes(groupNode.getSynapseGroup()
-                            .getAllSynapses());
-                }
-            }
-        } else if (group instanceof Subnetwork) {
-            SubnetworkNode groupNode = ((SubnetworkNode) objectNodeMap
-                    .get(group));
-            if (groupNode != null) {
-                for (NeuronGroup neuronGroup : groupNode.getSubnetwork()
-                        .getNeuronGroupList()) {
-                    updateGroupNode(neuronGroup);
-                }
-                for (SynapseGroup synapseGroup : groupNode.getSubnetwork()
-                        .getSynapseGroupList()) {
-                    updateGroupNode(synapseGroup);
-                }
+    private void updateConstituentNodes(SynapseGroup group) {
+        SynapseGroupNode groupNode = ((SynapseGroupNode) objectNodeMap
+                .get(group));
+        if (groupNode != null) {
+            if (groupNode.getSynapseGroup().isDisplaySynapses()) {
+                updateSynapseNodes(groupNode.getSynapseGroup().getAllSynapses());
             }
         }
     }
 
     /**
-     * Update visible state of all synapse nodes.
+     * Update graphical state of an arbitrary group node. Currently this is only
+     * for subntworks.
+     *
+     * @param group the neuron group to update
+     */
+    private void updateConstituentNodes(Group group) {
+
+        // TODO: Discuss w Tosi.
+        if (group instanceof NeuronGroup) {
+            updateConstituentNodes((NeuronGroup) group);
+        } else if (group instanceof SynapseGroup) {
+            updateConstituentNodes((SynapseGroup) group);
+        }
+        if (!(group instanceof Subnetwork)) {
+            return;
+        }
+        SubnetworkNode groupNode = ((SubnetworkNode) objectNodeMap.get(group));
+        if (groupNode != null) {
+            for (NeuronGroup neuronGroup : groupNode.getSubnetwork()
+                    .getNeuronGroupList()) {
+                updateConstituentNodes(neuronGroup);
+            }
+            for (SynapseGroup synapseGroup : groupNode.getSubnetwork()
+                    .getSynapseGroupList()) {
+                updateConstituentNodes(synapseGroup);
+            }
+            groupNode.updateText();
+        }
+    }
+
+    /**
+     * Update visible state of all synapse nodes. This is not used much
+     * internally, because it is preferred to updated the specific nodes that
+     * need to be updated. It is here mainly for convenience (e.g. for use in
+     * scripts).
      */
     private void updateSynapseNodes() {
-        //System.out.println("In update synapse nodes");
+        // System.out.println("In update synapse nodes");
         for (SynapseNode node : this.getSynapseNodes()) {
             if (node.getVisible()) {
                 node.updateColor();

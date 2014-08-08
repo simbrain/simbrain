@@ -155,9 +155,6 @@ public abstract class Group {
      */
     public void setStateInfo(String stateInfo) {
         this.stateInfo = stateInfo;
-        if (parentNetwork != null) {
-            parentNetwork.fireGroupParametersChanged(this);
-        }
     }
 
     /**

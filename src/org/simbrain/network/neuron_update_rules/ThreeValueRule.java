@@ -191,4 +191,14 @@ public class ThreeValueRule extends NeuronUpdateRule {
         return "Three Value";
     }
 
+    @Override
+    public double getGraphicalLowerBound() {
+        return lowerValue - 1;
+    }
+
+    @Override
+    public double getGraphicalUpperBound() {
+        return upperValue + 1;
+    }
+
 }

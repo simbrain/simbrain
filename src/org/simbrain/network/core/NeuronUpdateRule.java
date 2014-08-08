@@ -32,17 +32,17 @@ public abstract class NeuronUpdateRule {
     /**
      * An enum specifying how a neuron sums its inputs. The enum both specifies
      * and provides the appropriate method for the distinct ways this can
-     * happen. At its core it represents the connectionist (matrix 
+     * happen. At its core it represents the connectionist (matrix
      * multiplication equivalent/algebraic) vs biological (convolution or other
      * function of a "spike" represented as a Dirac delta function) weighted
      * sums.
-     * 
+     *
      * @author Zach Tosi
      */
     public static enum InputType {
         WEIGHTED {
             /**
-             * Gets the weighted sum of the pre-synaptic neurons' activation 
+             * Gets the weighted sum of the pre-synaptic neurons' activation
              * values.
              */
             @Override
@@ -147,15 +147,44 @@ public abstract class NeuronUpdateRule {
      */
     public double getRandomValue() {
         if (this instanceof BoundedUpdateRule) {
-            return (((BoundedUpdateRule) this).getUpperBound()
-                - ((BoundedUpdateRule) this)
-                .getLowerBound())
-                * Math.random()
-                + ((BoundedUpdateRule) this).getLowerBound();
+            return (((BoundedUpdateRule) this).getUpperBound() - ((BoundedUpdateRule) this)
+                    .getLowerBound())
+                    * Math.random()
+                    + ((BoundedUpdateRule) this).getLowerBound();
         } else {
             return 2 * Math.random() - 1;
         }
 
+    }
+
+    /**
+     * Returns a value for lower bound to be used in computing the saturation of
+     * neuron nodes. Override this to produce nicer graphics, and fine tune
+     * based on display of neurons in common use cases for a given neuron type.
+     *
+     * @return the graphical lower bound
+     */
+    public double getGraphicalLowerBound() {
+        if (this instanceof BoundedUpdateRule) {
+            return ((BoundedUpdateRule) this).getLowerBound();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Returns a value for upper bound to be used in computing the saturation of
+     * neuron nodes. Override this to produce nicer graphics, and fine tune
+     * based on display of neurons in common use cases for a given neuron type.
+     *
+     * @return the graphical upper bound
+     */
+    public double getGraphicalUpperBound() {
+        if (this instanceof BoundedUpdateRule) {
+            return ((BoundedUpdateRule) this).getLowerBound();
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -185,7 +214,7 @@ public abstract class NeuronUpdateRule {
      */
     public String getToolTipText(final Neuron neuron) {
         return "(" + neuron.getId() + ") Activation: "
-            + Utils.round(neuron.getActivation(), MAX_DIGITS);
+                + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
     /**

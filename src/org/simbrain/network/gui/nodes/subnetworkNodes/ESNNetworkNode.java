@@ -26,12 +26,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
+import org.simbrain.network.gui.dialogs.network.ESNTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.ESNOfflineTrainingPanel;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 /**
@@ -56,15 +60,15 @@ public class ESNNetworkNode extends SubnetworkNode {
      * Sets custom menu.
      */
     private void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
+        JPopupMenu menu = new JPopupMenu();
+        editAction.putValue("Name", "Edit / Train ESN...");
+        menu.add(editAction);
+        menu.add(renameAction);
+        menu.add(removeAction);
         menu.addSeparator();
-        menu.add(new JMenuItem(trainOfflineAction));
-        menu.addSeparator();
-
         final EchoStateNetwork esn = (EchoStateNetwork) getSubnetwork();
         final TrainingSet trainingSet = new TrainingSet(esn.getInputData(),
             esn.getTargetData());
-
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
             esn.getInputLayer().getNeuronList(),
@@ -75,6 +79,13 @@ public class ESNNetworkNode extends SubnetworkNode {
         menu.add(dataActions);
         setContextMenu(menu);
     }
+
+    @Override
+    protected StandardDialog getPropertyDialog() {
+        return new ESNTrainingDialog(getNetworkPanel(),
+                (EchoStateNetwork) getSubnetwork());
+    }
+
 
     /**
      * Action to train ESN Offline

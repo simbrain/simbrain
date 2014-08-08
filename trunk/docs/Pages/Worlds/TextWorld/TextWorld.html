@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p>
+                <span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a>
+                &gt; <a href="../../World.html">World</a>
+                &gt; DataWorld</p>
+        </div>
+        <div id="menu">
+            <p class="menubold">Contents</p>
+            <blockquote>
+                <p>
+                    Menus
+                    <br>Toolbars
+                    <br>
+                </p>
+            </blockquote>
+        </div>
+
+        <h1>Text World</h1>
+
+        <p>There are two kinds of text worlds. Display worlds and Reader worlds.These worlds can be used to model language, for example, to make networks that respond to sentences or that "talk". With text worlds the way you set up couplings (see <a href="../../Workspace/Couplings.html">couplings</a>) is especially important, so a review of that could help.</p>
+        <p><b>Reader worlds</b> convert text to numbers and vectors of numbers. They can be used to model reading. The most common use would be to set up a reader world to produce inputs to a neural network</p>
+        <p>To set up a reader world, you need to decided on a method of coupling. You can either set it up so that letters are associated with values, or words. This can be set in the Word / Character radio button at the bottom of the window (see figure below).
+            <center>
+                <img src="../../../Images/ReaderWorld.png" border="1" </img>
+            </center>
+            <br>
+            <p>Letter mode: each time the workspace is updated, the current character is parsed. Letters can be associated with numbers using scalar couplings. For example in a network you could right click on the network, and in the context menu choose "ReaderWorld1" and then "a" to make it respond to the letter a being parsed.</p>
+            <p>Word mode: each time the workspace is updated, the current word (delimted by whitespace and other characers; see preferences) is parsed. To set what values the word is associated with, use the dictionary (the grid icon). Associate each word of interest with a vector of values in that window. This vector-valued coupling can then be sent to a neuron group in a neural network window.</p>
+            <p></p>
+            <p><b>Display worlds</b> convert numbers to text. They can be used to model speaking. The most common use would be to use a display world to interpret outputs from a neural network.</p>
+            <p>Display worlds take numeric values in and convert them to characters of words (They can also receive text directly via a text-based couplin, though this is not used much curently).
+            To set up a display world, you begin by loading a dictionary, which is just a text file. Every word in that text file then becomes a potential consumer for the display world. Then you couple (for example) a neuron to that consumer, and when the neuron's activation is above a threshold (by default, .5; it can be set in the preferences), that word is produced in the display world.</p>
+
+    </div>
+
+</body>
+
+</html>

@@ -142,7 +142,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         // Help Menu
         menuBar.add(help);
         ShowHelpAction helpAction = new ShowHelpAction(
-                "Pages/World.html");
+                "Pages/Worlds/TextWorld/TextWorld.html");
         helpItem.setAction(helpAction);
         help.add(helpItem);
 

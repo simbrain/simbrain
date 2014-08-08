@@ -125,6 +125,7 @@ public class LMSIterative extends IterableTrainer {
                         .random());
             }
         }
+        revalidateSynapseGroups();
     }
 
     /**

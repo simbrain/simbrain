@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
+
 /**
  * Superclass for all trainer classes, which trains a trainable object,
  * typically a network.
@@ -144,6 +147,21 @@ public abstract class Trainer {
             super(message);
         }
 
+    }
+
+    /**
+     * Helper function to update synapse groups whose synapses may have changed
+     * based on training.
+     */
+    public void revalidateSynapseGroups() {
+        if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
+            for (SynapseGroup group : ((Subnetwork) getTrainableNetwork()
+                    .getNetwork()).getSynapseGroupList()) {
+                if (group != null) {
+                    group.revalidateSynapseSets();
+                }
+            }
+        }
     }
 
 }

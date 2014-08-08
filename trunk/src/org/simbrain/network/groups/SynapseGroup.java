@@ -40,15 +40,16 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  */
 public class SynapseGroup extends Group {
 
-    /** 
-     * The <b>default>/b> polarized randomizer associated with excitatory
+    /**
+     * The <b>default>/b> polarized randomizer associated with excitatory.
+     *
      * synapse strengths for all synapse groups.
      */
     private static final PolarizedRandomizer DEFAULT_EX_RANDOMIZER =
         new PolarizedRandomizer(
             Polarity.EXCITATORY);
 
-    /** 
+    /**
      * The <b>default>/b> polarized randomizer associated with inhibitory
      * synapse strengths for all synapse groups.
      */
@@ -143,7 +144,7 @@ public class SynapseGroup extends Group {
      * inhibitory synapses are not static. It is used as an optimization
      * along with {@link #useGroupLevelSettings} to determine whether or not
      * all the inhibitory synapses should be iterated over during update. This
-     * flag will have no effect on panels or update procedure if 
+     * flag will have no effect on panels or update procedure if
      * {@link #useGroupLevelSettings} is <b>false</b>, however if it is
      * <b>true</b> this flag will be dominant over the actual state of synapses
      * for the purpose of updating.
@@ -156,7 +157,7 @@ public class SynapseGroup extends Group {
      * excitatory synapses are not static. It is used as an optimization
      * along with {@link #useGroupLevelSettings} to determine whether or not
      * all the excitatory synapses should be iterated over during update. This
-     * flag will have no effect on panels or update procedure if 
+     * flag will have no effect on panels or update procedure if
      * {@link #useGroupLevelSettings} is <b>false</b>, however if it is
      * <b>true</b> this flag will be dominant over the actual state of synapses
      * for the purpose of updating.
@@ -173,8 +174,8 @@ public class SynapseGroup extends Group {
      * {@link #isExcitatoryFrozen()}, then instead of iterating over all the
      * synapses in the group to supply an answer, the method will return the
      * result of {@link #excitatoryPrototype}.isFrozen(). This is useful for
-     * cases where synapses within synapse groups are entirely governed by 
-     * group level attributes and it is known to the user that individual 
+     * cases where synapses within synapse groups are entirely governed by
+     * group level attributes and it is known to the user that individual
      * synapse settings will/should not be changed apart from the group.
      */
     private boolean useGroupLevelSettings = true;
@@ -1251,7 +1252,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * If {@link #useGroupLevelSettings} then this returns whether or not 
+     * If {@link #useGroupLevelSettings} then this returns whether or not
      * {@link #excitatoryPrototype} is frozen, which ideally is also whether or
      * not all the synapses in this group are frozen. If not, then all the
      * synapses are checked and this method returns false if <b>any</b> of the
@@ -1281,7 +1282,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * If {@link #useGroupLevelSettings} then this returns whether or not 
+     * If {@link #useGroupLevelSettings} then this returns whether or not
      * {@link #excitatoryPrototype} is frozen, which ideally is also whether or
      * not all the synapses in this group are frozen. If not, then all the
      * synapses are checked and this method returns false if <b>any</b> of the

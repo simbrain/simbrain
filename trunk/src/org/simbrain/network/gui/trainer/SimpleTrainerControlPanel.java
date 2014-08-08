@@ -101,6 +101,7 @@ public class SimpleTrainerControlPanel extends JPanel {
                         JOptionPane.DEFAULT_OPTION,
                         JOptionPane.WARNING_MESSAGE, null, null, null);
             }
+
         }
 
     };

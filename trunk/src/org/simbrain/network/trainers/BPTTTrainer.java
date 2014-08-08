@@ -251,6 +251,7 @@ public class BPTTTrainer extends IterableTrainer {
     public void randomize() {
         randomize(bptt.getHiddenLayer().getNeuronList());
         randomize(bptt.getOutputLayer().getNeuronList());
+        revalidateSynapseGroups();
     }
 
     /**

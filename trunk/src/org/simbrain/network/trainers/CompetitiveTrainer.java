@@ -67,6 +67,9 @@ public class CompetitiveTrainer extends Trainer {
         }
         incrementIteration();
 
+        // Make sure excitatory/inhibitory are in proper lists
+        revalidateSynapseGroups();
+
     }
 
     /**

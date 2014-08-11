@@ -159,6 +159,7 @@ public class EchoStateNetwork extends Subnetwork {
     /**
      * Creates an empty ESN where neuron groups and synapse groups must be
      * manually added.
+     *
      * @param network
      * @param initialPosition
      */
@@ -191,6 +192,7 @@ public class EchoStateNetwork extends Subnetwork {
      * reservoir. This method scales the weights of the synapse group to
      * conform the desired spectral radius and sets the spectral radius of this
      * esn accordingly.
+     *
      * @param neuronGroup
      * @param synapseGroup
      */
@@ -202,6 +204,8 @@ public class EchoStateNetwork extends Subnetwork {
         }
         this.spectralRadius = spectralRadius;
         reservoirLayer = neuronGroup;
+        reservoirLayer.setGridThreshold(9);
+        reservoirLayer.setLayoutBasedOnSize();
         reservoirLayer.setLabel("Reservoir");
         numResNodes = reservoirLayer.size();
         addNeuronGroup(neuronGroup);
@@ -248,45 +252,6 @@ public class EchoStateNetwork extends Subnetwork {
         inputLayer.update();
         reservoirLayer.update();
         outputLayer.update();
-    }
-
-    /**
-     * Builds an echo-state network ready to be trained based on the parameters
-     * of the class. Does not create any synapses to the output layer.
-     */
-    public void buildNetwork() {
-
-        // initialize the Layers
-        List<Neuron> inputLayerNeurons = initializeLayer(new LinearRule(),
-            numInputs);
-        List<Neuron> reservoirLayerNeurons = initializeLayer(
-            reservoirNeuronType, numResNodes);
-        List<Neuron> outputLayerNeurons = initializeLayer(new LinearRule(),
-            numOutputs);
-
-        // Input Layer
-        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-        inputLayer.setLayoutBasedOnSize(initialPosition);
-        inputLayer.setLabel("Inputs");
-        addNeuronGroup(inputLayer);
-
-        // Reservoir Layer
-        reservoirLayer = new NeuronGroup(getParentNetwork(),
-            reservoirLayerNeurons);
-        reservoirLayer.setLayoutBasedOnSize();
-        addNeuronGroup(reservoirLayer);
-        reservoirLayer.setLabel("Reservoir");
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer,
-            Direction.NORTH, betweenLayerInterval);
-
-        // Output Layer
-        outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
-        outputLayer.setLayoutBasedOnSize();
-        outputLayer.setLabel("Outputs");
-        addNeuronGroup(outputLayer);
-        NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer,
-            Direction.NORTH, betweenLayerInterval);
-
     }
 
     /**
@@ -700,7 +665,7 @@ public class EchoStateNetwork extends Subnetwork {
     public void setTimeType(TimeType timeType) {
         this.timeType = timeType;
     }
-    
+
     /**
      * Wrap input data in a DataMatrix Object.
      *

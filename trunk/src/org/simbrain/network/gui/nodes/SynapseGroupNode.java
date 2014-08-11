@@ -26,7 +26,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * PNode representation of a group of synapses. Superclass of two more specific
+ * PNode representation of a group of synapses. Superclass of  more specific
  * types of synapsegroupnodes, where the contained synapses are either
  * individually visible or only visible through a single line representing the
  * whole group. For a sense of the design of this class (in to an interaction
@@ -34,7 +34,7 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends PNode implements PropertyChangeListener {
+public class SynapseGroupNode extends PNode implements GroupNode, PropertyChangeListener {
 
     /** Parent network panel. */
     protected final NetworkPanel networkPanel;
@@ -118,5 +118,17 @@ public class SynapseGroupNode extends PNode implements PropertyChangeListener {
     public void updateText() {
         interactionBox.setText(synapseGroup.getLabel());
         interactionBox.updateText();
-    };
+    }
+
+    @Override
+    public void updateConstituentNodes() {
+        if (getSynapseGroup().isDisplaySynapses()) {
+            for (Object node : outlinedObjects.getChildrenReference()) {
+                if (node instanceof SynapseNode) {
+                    ((SynapseNode) node).updateColor();
+                    ((SynapseNode) node).updateDiameter();
+                }
+            }
+        }
+    }
 }

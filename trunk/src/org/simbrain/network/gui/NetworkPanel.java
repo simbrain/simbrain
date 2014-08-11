@@ -81,6 +81,7 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
 import org.simbrain.network.gui.filters.Filters;
+import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -606,8 +607,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
-                updateConstituentNodes(group);
+                updateGroupNode(group);
             }
+
         });
 
     }
@@ -647,64 +649,15 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Update graphical state of neuron group node.
+     * Update visible state of group nodes.
      *
-     * @param group the neuron group to update
+     * @param group the group to update
      */
-    private void updateConstituentNodes(NeuronGroup group) {
-        //System.out.println("In update neuron group node.  Updating group: "
-        //        + group);
-        NeuronGroupNode groupNode = ((NeuronGroupNode) objectNodeMap.get(group));
-        if (groupNode != null) {
-            updateNeuronNodes(groupNode.getNeuronGroup().getNeuronList());
-        }
-        groupNode.updateText();
-    }
-
-    /**
-     * Update graphical state of synapse group. Only update synapse nodes if
-     * "display synapses" is true.
-     *
-     * @param group the neuron group to update
-     */
-    private void updateConstituentNodes(SynapseGroup group) {
-        SynapseGroupNode groupNode = ((SynapseGroupNode) objectNodeMap
-                .get(group));
-        if (groupNode != null) {
-            if (groupNode.getSynapseGroup().isDisplaySynapses()) {
-                updateSynapseNodes(groupNode.getSynapseGroup().getAllSynapses());
-            }
-        }
-    }
-
-    /**
-     * Update graphical state of an arbitrary group node. Currently this is only
-     * for subntworks.
-     *
-     * @param group the neuron group to update
-     */
-    private void updateConstituentNodes(Group group) {
-
-        // TODO: Discuss w Tosi.
-        if (group instanceof NeuronGroup) {
-            updateConstituentNodes((NeuronGroup) group);
-        } else if (group instanceof SynapseGroup) {
-            updateConstituentNodes((SynapseGroup) group);
-        }
-        if (!(group instanceof Subnetwork)) {
-            return;
-        }
-        SubnetworkNode groupNode = ((SubnetworkNode) objectNodeMap.get(group));
-        if (groupNode != null) {
-            for (NeuronGroup neuronGroup : groupNode.getSubnetwork()
-                    .getNeuronGroupList()) {
-                updateConstituentNodes(neuronGroup);
-            }
-            for (SynapseGroup synapseGroup : groupNode.getSubnetwork()
-                    .getSynapseGroupList()) {
-                updateConstituentNodes(synapseGroup);
-            }
-            groupNode.updateText();
+    private void updateGroupNode(Group group) {
+        //System.out.println("In update group node.  Updating group " + group);
+        PNode groupNode = objectNodeMap.get(group);
+        if (groupNode instanceof GroupNode) {
+            ((GroupNode) groupNode).updateConstituentNodes();
         }
     }
 

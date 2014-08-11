@@ -60,7 +60,7 @@ import org.simbrain.util.math.SimbrainMath;
  *
  * @author Jeff Yoshimi
  */
-public class NeuronGroupNode extends PNode implements PropertyChangeListener {
+public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeListener {
 
     public enum Port {
         NORTH, SOUTH, EAST, WEST, ;
@@ -951,4 +951,13 @@ public class NeuronGroupNode extends PNode implements PropertyChangeListener {
         }
     };
 
+    @Override
+    public void updateConstituentNodes() {
+        for (Object object : outlinedObjects.getChildrenReference()) {
+            if (object instanceof NeuronNode) {
+                ((NeuronNode) object).update();
+            }
+        }
+        updateText();
+    }
 }

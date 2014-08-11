@@ -30,7 +30,9 @@ import javax.swing.JPopupMenu;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
@@ -47,7 +49,7 @@ import org.simbrain.util.StandardDialog;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends PPath.Float implements PropertyChangeListener {
+public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyChangeListener {
 
     /** Parent network panel. */
     private final NetworkPanel networkPanel;
@@ -311,4 +313,12 @@ public class SubnetworkNode extends PPath.Float implements PropertyChangeListene
         }
     };
 
+    @Override
+    public void updateConstituentNodes() {
+        for (Object object : outlinedObjects.getChildrenReference()) {
+            if (object instanceof GroupNode) {
+                ((GroupNode) object).updateConstituentNodes();
+            }
+        }
+    }
 }

@@ -181,7 +181,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         if (pickedNode instanceof NeuronNode) {
             networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
             // To ensure fire neuron moving events don't affect these
-            // neurons. TODO: Is this still needed?
+            // neurons.
             ((NeuronNode) pickedNode).setMoving(true);
         }
 
@@ -244,34 +244,18 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
         // Handle interaction box dragging
         if (pickedNode instanceof InteractionBox) {
             if (pickedNode.getParent() instanceof NeuronGroupNode) {
-
-                // Move the neurongroupnode
                 pickedNode.getParent().offset(delta.getWidth(),
                         delta.getHeight());
-
-                // Update model.  Need to do this so that attached synapse group
-                //  nodes are updated properly
-                ((NeuronGroupNode) pickedNode.getParent())
-                        .pushViewPositionToModel();
             } else if (pickedNode.getParent() instanceof SubnetworkNode) {
                 pickedNode.getParent().offset(delta.getWidth(),
                         delta.getHeight());
             }
         }
 
-        // Continue to drag node that have already been selected
+        // Continue to drag nodes that have already been selected
         for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof ScreenElement) {
-                //TODO: If parent is being dragged don't drag this?
-
-                // //TODO: Check if these ever happens or is needed
-                // if (pickedNode instanceof NeuronNode) {
-                // ((NeuronNode) pickedNode)
-                // .pushViewPositionToModel();
-                // } else if (pickedNode instanceof TextNode) {
-                // ((TextNode) pickedNode).pushViewPositionToModel();
-                // }
                 ScreenElement screenElement = (ScreenElement) node;
                 if (screenElement.isDraggable()) {
                     screenElement.localToParent(delta);
@@ -294,35 +278,6 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             marquee = null;
             marqueeStartPosition = null;
             return;
-        }
-
-        // Write changes to model nodes
-        for (PNode node : networkPanel.getSelection()) {
-            if (node instanceof NeuronNode) {
-                // Ensure fire neuron moving events don't affect moved neurons
-                ((NeuronNode) node).setMoving(false);
-                ((NeuronNode) node).pushViewPositionToModel();
-            } else if (node instanceof TextNode) {
-                ((TextNode) node).pushViewPositionToModel();
-            } else if (node instanceof InteractionBox) {
-                if (pickedNode.getParent() instanceof NeuronGroupNode) {
-                    ((NeuronGroupNode) pickedNode.getParent())
-                            .pushViewPositionToModel();
-                }
-//                else if (pickedNode.getParent() instanceof SubnetworkNode) {
-//                    for (Object subnetChildNode : ((SubnetworkNode) pickedNode
-//                            .getParent()).getOutlinedObjects()
-//                            .getChildrenReference()) {
-//                        //System.out.println(subnetChildNode);
-//                        if (subnetChildNode instanceof NeuronGroupNode) {
-//                            ((NeuronGroupNode) subnetChildNode)
-//                                    .pushViewPositionToModel();
-//                        }
-//                    }
-//
-//                }
-
-            }
         }
 
         // Reset the beginning of a sequence of pastes, but keep the old

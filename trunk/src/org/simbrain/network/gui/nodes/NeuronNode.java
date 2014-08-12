@@ -426,9 +426,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return getContextMenu();
     }
 
-    /** @see PropertyChangeListener */
+    @Override
     public void propertyChange(final PropertyChangeEvent event) {
         updateSynapseNodePositions();
+    }
+
+    @Override
+    public void offset(double dx, double dy) {
+        super.offset(dx, dy);
+        pushViewPositionToModel();
     }
 
     /**
@@ -581,4 +587,5 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     public static void setSpikingColor(Color spikingColor) {
         NeuronNode.spikingColor = spikingColor;
     }
+
 }

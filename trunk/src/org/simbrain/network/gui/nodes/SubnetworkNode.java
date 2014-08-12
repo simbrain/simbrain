@@ -320,5 +320,23 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
                 ((GroupNode) object).updateConstituentNodes();
             }
         }
+//        for (SynapseGroup sg : this.getSubnetwork().getSynapseGroupList()) {
+//            if (sg.isDisplaySynapses()) {
+//                SynapseGroupNodeFull sgf = (SynapseGroupNodeFull) networkPanel
+//                        .getObjectNodeMap().get(sg);
+//                sgf.updateConstituentNodes();
+//            }
+//        }
+    }
+
+
+    @Override
+    public void offset(double dx, double dy) {
+        //super.offset(dx, dy);
+        for (Object object : outlinedObjects.getChildrenReference()) {
+            if (object instanceof NeuronGroupNode) {
+                ((NeuronGroupNode) object).offset(dx, dy);
+            }
+        }
     }
 }

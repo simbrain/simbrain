@@ -182,6 +182,12 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         getTextObject().setY(p.getY());
     }
 
+    @Override
+    public void offset(double dx, double dy) {
+        super.offset(dx, dy);
+        pushViewPositionToModel();
+    }
+
     /**
      * Updates the position of the view text based on the position of the model
      * text object.

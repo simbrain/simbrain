@@ -78,9 +78,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-//        if (evt.getSource() instanceof NeuronGroupNode) {
-//            System.out.println();
-//        }
         layoutChildren();
     };
 
@@ -106,13 +103,6 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
     }
 
     /**
-     * @return the outlinedObjects
-     */
-    public OutlinedObjects getOutlinedObjects() {
-        return outlinedObjects;
-    }
-
-    /**
      * Update the text in the interaction box.
      */
     public void updateText() {
@@ -122,13 +112,7 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
 
     @Override
     public void updateConstituentNodes() {
-        if (getSynapseGroup().isDisplaySynapses()) {
-            for (Object node : outlinedObjects.getChildrenReference()) {
-                if (node instanceof SynapseNode) {
-                    ((SynapseNode) node).updateColor();
-                    ((SynapseNode) node).updateDiameter();
-                }
-            }
-        }
+        // Do nothing since there are no constituent nodes. Synpases are
+        // invisible.
     }
 }

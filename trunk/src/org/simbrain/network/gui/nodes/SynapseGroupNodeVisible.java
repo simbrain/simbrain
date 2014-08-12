@@ -27,7 +27,7 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * @author jyoshimi
  */
-public class SynapseGroupNodeFull extends SynapseGroupNode {
+public class SynapseGroupNodeVisible extends SynapseGroupNode {
 
     /**
      * Create a Synapse Group PNode.
@@ -35,10 +35,10 @@ public class SynapseGroupNodeFull extends SynapseGroupNode {
      * @param networkPanel parent panel
      * @param group the synapse group
      */
-    public SynapseGroupNodeFull(final NetworkPanel networkPanel,
+    public SynapseGroupNodeVisible(final NetworkPanel networkPanel,
             final SynapseGroup group) {
         super(networkPanel, group);
-        this.setPaint(null);
+        outlinedObjects.setPaint(null);
     }
 
 
@@ -90,6 +90,32 @@ public class SynapseGroupNodeFull extends SynapseGroupNode {
 //              bounds = null;
 //          }
 
+    }
+
+    @Override
+    public void updateConstituentNodes() {
+        for (Object node : outlinedObjects.getChildrenReference()) {
+            ((SynapseNode) node).updateColor();
+            ((SynapseNode) node).updateDiameter();
+        }
+    }
+
+    /**
+     * Add a synapse node to the group node.
+     *
+     * @param node to add
+     */
+    public void addSynapseNode(SynapseNode node) {
+        outlinedObjects.addChild(node);
+    }
+
+    /**
+     * Remove a synapse node from the group node.
+     *
+     * @param node to remove
+     */
+    public void removeSynapseNode(SynapseNode node) {
+        outlinedObjects.removeChild(node);
     }
 
 }

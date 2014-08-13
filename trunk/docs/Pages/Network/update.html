@@ -1,14 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
-
-  
+<html><head>
+  <title>Simbrain Documentation</title>
 
   
   
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+  <link href="../../Styles.css" rel="stylesheet" type="text/css">
+
+</head><body>
 <a href="../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -21,10 +22,13 @@
 <h1>Network Update</h1>
 <p>Each time the step button is pressed in the network panel--the
 network moves forward in time by one iteration; that is, it takes on a
-new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. On each update, the "time" label
+new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. On each
+update, the "time" label
 is updated as well.
 </p>
-<p>There are multiple ways to go about updating a a construct as complex as an artificial neural network. Artificial neural networks are essentially graphs, a collection of
+<p>There are multiple ways to go about updating a a construct as
+complex as an artificial neural network. Artificial neural networks are
+essentially graphs, a collection of
 nodes connected by vertices (the vertices are neurons and the
 connections are synapses). The whole network has three lists: a list of
 nodes, a list
@@ -37,22 +41,26 @@ stored as a buffer within each network component. In this way, an
 update method can be thought of as the specific way or order in which
 buffered values are transformed into actual values. <br>
 </p>
-<p>To allow for custom updating includes two built in update types: buffered (default) and
+<p>To allow for custom updating includes two built in update types:
+buffered (default) and
 priority-based. For more advanced users Simbrain also includes the
-option of creating custom update method, and a dialog for creating custom updates.<br>
+option of creating custom update method, and a dialog for creating
+custom updates.<br>
 </p>
 <p> At the network level update
 rules can be changed by going to File &gt; Network Preferences (or
-"ctrl + ,"), and selecting the "update" tab. From there the update method can be customized.<br>
+"ctrl + ,"), and selecting the "update" tab. From there the update
+method can be customized.<br>
 </p>
-
 <div style="text-align: center;"><img style="width: 370px; height: 303px;" alt="Update Network" src="../../Images/UpdateNetwork.png">&nbsp;<br>
 </div>
 <br>
-The general operation of this panel is identical to the <a href="../Workspace/Update.html">workspace updater.</a>&nbsp;&nbsp; Refer to that page for more on how to use it.<br>
+The general operation of this panel is identical to the <a href="../Workspace/Update.html">workspace updater.</a>&nbsp;&nbsp;
+Refer to that page for more on how to use it.<br>
 <br>
+<span class="heading">Update Types</span><br>
 <br>
-<p><span class="heading"><span class="heading2">Buffered Update</span></span><br>
+<p><span class="heading2">Buffered Update</span><br>
 </p>
 <p>Buffered update is the default update rule in Simbrain. For every
 component of the network, the new value at time <i>t</i> is calculated
@@ -72,7 +80,47 @@ Components with the same priority are ordered arbitrarily in this queue.</p>
 <p><span class="heading"><span class="heading2"><a name="CustomUpdate"></a>Custom
 Update </span></span><br>
 </p>
-<p>Create a custom update action.&nbsp; Users have access to the underlying <span style="text-decoration: underline;">network</span> object and the gui <span style="text-decoration: underline;">networkpanel.</span> </p>
+<p>Create a custom update action.&nbsp; Users have access to the
+underlying <span style="text-decoration: underline;">network</span>
+object and the gui <span style="text-decoration: underline;">networkpanel.<br>
+</span></p>
+<span class="heading">Update Types</span><br>
+<br>
+
+<p><span class="heading2">Add Action</span>: TODO<br>
+</p>
+<p><span class="heading2">Add Custom Action:</span> TODO<br>
+</p>
+
+<p><span class="heading2">Remove Action(s):</span> TODO<br>
+</p>
+
+<p><span class="heading2">Move Up In Sequence</span>: TODO<br>
+</p>
+
+<p><span class="heading2">Move To Top Of Sequence:</span> TODO<br>
+</p>
+
+
+<p><span class="heading2">Move Down In Sequence</span>: TODO<br>
+</p>
+
+
+
+<p><span class="heading2">Move To Bottom Of Sequence</span>: TODO<br>
+</p>
+
+<p><br>
+</p>
+
+<p><br>
+</p>
+<p><br>
+</p>
+<p><br>
+</p>
+<p></p>
+
 <p>&nbsp;</p>
 </div>
 

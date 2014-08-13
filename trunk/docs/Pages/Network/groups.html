@@ -1,5 +1,45 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+            <p>
+                <span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Groups</p>
+        </div>
+        <div id="menu">
+            <p class="menubold">Specific Group Types</p>
+            <blockquote>
+                    <br>
+                    <a href="groups/NeuronGroup.html">Neuron Groups</a>
+                    <br>
+                    <a href="groups/SynapseGroup.html">Synapse Groups</a>
+                    <br>
+                    <a href="subnetwork.html">Subnetworks</a>
+            </blockquote>
+        </div>
+        <p></p>
+        <h1>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Groups</h1>
+        <blockquote>
+
+            <p>These are&nbsp; logical groupings of neurons and / or synapses, and of other groups. &nbsp; There are many reasons to collect neurons and synpases together into more organized sets.&nbsp; For example, it can be useful to move specific groups of neurons around as a unit, or to randomize or otherwise permute them.&nbsp; It is also useful to be able to associate some groups of elements with special operations and data structures. Perhaps the most important groups are <a href="subnetwork.html">subnetworks</a>, which are discussed separately.
+                <br>
+            </p>
+            <p>Here is an example of a group, a backprop network, which is itself comprised of 5 subgroups: 3 neuron groups and 2 weight groups.&nbsp; You can click on any of&nbsp; the interaction tabs and the associated elements will be selected.&nbsp; This can be useful for randomizing, moving, and deleting elements.
+                <br>
+            </p>
 
 
 
@@ -10,122 +50,98 @@
 
 
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Groups</p>
-  </div>
-  <p></p><h1>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Groups</h1><blockquote>
-  
-  <p>These
-are&nbsp; logical groupings of neurons and / or synapses, and of other
-groups. &nbsp; There
-are many reasons to collect neurons and synpases together into more
-organized sets.&nbsp; For
-example, it can be useful to move specific groups of neurons around as
-a unit, or to randomize or otherwise permute them.&nbsp; It is also
-useful to be able to associate some groups of elements with special
-operations and data structures. Perhaps the most important groups are <a href="subnetwork.html">subnetworks</a>, which are discussed separately. <br>
-</p>
-  <p>Here is an example of a group, a backprop network, which is itself
-comprised of 5 subgroups: 3 neuron groups and 2 weight groups.&nbsp;
-You can click on any of&nbsp; the interaction tabs and the associated
-elements will be selected.&nbsp; This can be useful for randomizing,
-moving, and deleting elements.<br>
-  </p>
+            <p>
+                <span class="heading">Interaction Box</span>
+                <br>
+            </p>
+            <p>Groups are distinguished by being surrounded by a gray line, with a special tab, often in the upper left-hand corner. This box is the your interface with the subnetwork and its properties.&nbsp;
+                <br>
+            </p>
+            <p>
+                <span class="heading2">Single Click</span>
+            </p>
+            <p style="margin-left: 40px;">Single clicking on the interaction box of a group highlights all of that groups nodes and / or weights.&nbsp;&nbsp; They can be dragged around as a unit,which is often very convenient.&nbsp; They can also be modified by any comand that only modifies selected elements. For example they can be randomized, incremented, decremented (using the up and down arrows) or "cleared" (set to 0).</p>
+            <p>
+                <span class="heading2">Right click&nbsp; / Group Actions</span>
+                <br>
+            </p>
+            <p style="margin-left: 40px;">By right-clicking on a group's interaction box various actions arise.&nbsp; Many of these are customized to a particular group type.&nbsp;</p>
+            <p class="heading">
+                <span class="heading2">Double Click</span>
+            </p>
 
 
 
 
+            <blockquote>
+                <p>If you double-click on the subnetwork tab it calls up that network's properties dialog, if a property dialog is defined for that group.</p>
+            </blockquote>
+            <p>
 
-  
-  
+            </p>
+            <p>
+                <span class="heading">Default Group Actions</span>
+                <br>
 
+            </p>
 
-  
-  
-  <p><span class="heading">Interaction Box</span><br>
-  </p>
-  <p>Groups are distinguished by being surrounded by a gray line,
-with
-a special tab, often in the upper left-hand corner. This box is the your
-interface with the subnetwork and its properties.&nbsp; <br>
-</p>
-  <p><span class="heading2">Single Click</span></p>
-  <p style="margin-left: 40px;">Single clicking on the interaction box
-of a group highlights all of that groups nodes and / or
-weights.&nbsp;&nbsp; They can be dragged around as a unit,which is
-often very convenient.&nbsp; They can also be modified by any comand
-that only modifies selected elements. For example they can be
-randomized, incremented, decremented (using the up and down arrows) or
-"cleared" (set to 0).</p>
-  <p><span class="heading2">Right click&nbsp; / Group Actions</span><br>
-  </p>
-  <p style="margin-left: 40px;">By right-clicking on a group's interaction box various actions
-arise.&nbsp; Many of these are customized to a particular group
-type.&nbsp; </p>
-  <p class="heading"><span class="heading2">Double Click</span></p>
+            <p>&nbsp;All groups have the following default actions defined:
+                <br>
+            </p>
 
 
+            <p class="heading">
+                <span class="heading2">Remove group
+                    <br>
+                </span>
+            </p>
 
-  
-  <blockquote>
-  <p>If
-you double-click on the subnetwork tab it calls up that network's
-properties dialog, if a property dialog is defined for that group.</p>
-  </blockquote>
-  <p>
+            <blockquote>
+                <p>Delete the group and all its constituents.
+                    <br>
+                </p>
+            </blockquote>
 
-  </p>
-<p><span class="heading">Default Group Actions</span><br>
-
-  </p>
-  
-  <p>&nbsp;All groups have the following default actions defined:<br>
-  </p>
-
-
-  <p class="heading"><span class="heading2">Remove group<br>
-</span></p>
-
-  <blockquote>
-  <p>Delete the group and all its constituents.<br>
- </p>
-  </blockquote>
-
-  <p class="heading"><span class="heading2">Edit group name<br>
-</span></p>
+            <p class="heading">
+                <span class="heading2">Edit group name
+                    <br>
+                </span>
+            </p>
 
 
-  <blockquote>
-  <p>Edit the name of the group which appears in the interaction tab.<br>
- </p>
-  </blockquote>
+            <blockquote>
+                <p>Edit the name of the group which appears in the interaction tab.
+                    <br>
+                </p>
+            </blockquote>
 
 
-  <span class="heading2"></span><br>
-  <p><span class="heading">Neuron and Synapse Groups</span></p>
+            <span class="heading2"></span>
+            <br>
+            <p>
+                <span class="heading">Neuron and Synapse Groups</span>
+            </p>
 
-  
-  <p>Neuron Groups and synpase groups can be created from existing
-collections of neurons or synapses.&nbsp;&nbsp; This can be useful for
-organizing a complex network.</p>
-  <p><span class="heading2">Neuron Group</span><br>
-  </p>
 
-  
-  <p style="margin-left: 40px;">To create a neuron group <a href="buildingnets.html#SelectNodes">select</a> the neurons&nbsp; you want to add to the group and in the network or popup menu select&nbsp;Edit &gt; Group &gt; Neuron Group.</p>
-  <p><span class="heading2">Synapse Group</span><br>
-  </p>
+            <p>Neuron Groups and synpase groups can be created from existing collections of neurons or synapses.&nbsp;&nbsp; This can be useful for organizing a complex network.</p>
+            <p>
+                <span class="heading2">Neuron Group</span>
+                <br>
+            </p>
 
-  <span class="command"></span>
-  
-  <p style="margin-left: 40px;">To create a synpase group select the syanpses you want to add to
-the group and in the network or popup menu select&nbsp;Edit &gt; Group
-&gt; Synapse Group.</p>
-<br>
-</blockquote></div></body></html>
+
+            <p style="margin-left: 40px;">To create a neuron group <a href="buildingnets.html#SelectNodes">select</a> the neurons&nbsp; you want to add to the group and in the network or popup menu select&nbsp;Edit &gt; Group &gt; Neuron Group.</p>
+            <p>
+                <span class="heading2">Synapse Group</span>
+                <br>
+            </p>
+
+            <span class="command"></span>
+
+            <p style="margin-left: 40px;">To create a synpase group select the syanpses you want to add to the group and in the network or popup menu select&nbsp;Edit &gt; Group &gt; Synapse Group.</p>
+            <br>
+        </blockquote>
+    </div>
+</body>
+
+</html>

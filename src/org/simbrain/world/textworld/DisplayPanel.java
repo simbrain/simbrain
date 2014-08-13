@@ -18,13 +18,15 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JToolBar;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -46,18 +48,43 @@ public class DisplayPanel extends JPanel {
     private JTextArea textArea = new JTextArea();
 
     /**
+     * Toolbar for opening and closing the world. Must be defined at component
+     * level.
+     */
+    private JToolBar openCloseToolBar = null;
+
+    /**
      * Construct a reader panel to represent data in a text world.
      *
-     * @param world the world to represent
+     * @param theWorld the world
+     * @param toolbar pass in open / close toolbar
+     * @return the constructed panel
      */
-    public DisplayPanel(DisplayWorld theWorld) {
+    public DisplayPanel(DisplayWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
-        // textArea.addKeyListener(this);
-        // textArea.addMouseListener(this);
+        this.openCloseToolBar = toolbar;
 
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        
+        // Set up toolbar
+        JPanel topToolbarPanel = new JPanel();
+        topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        if (openCloseToolBar != null) {
+            topToolbarPanel.add(openCloseToolBar);
+        }
+        JToolBar dictionaryToolBar = new JToolBar();
+        dictionaryToolBar
+                .add(TextWorldActions.showDictionaryEditor(world));
+        topToolbarPanel.add(dictionaryToolBar);
+        add(topToolbarPanel, BorderLayout.NORTH);
+
+        // Force a bit of room at bottom
+        add(new JLabel("  "), BorderLayout.SOUTH);
+
+        // Set up main text area
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-
         textArea.addCaretListener(new CaretListener() {
 
             public void caretUpdate(CaretEvent arg0) {
@@ -94,19 +121,7 @@ public class DisplayPanel extends JPanel {
         final JScrollPane inputScrollPane = new JScrollPane(textArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(inputScrollPane);
-
-        // Force component to fill up parent panel
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
-                inputScrollPane.setPreferredSize(new Dimension(
-                        DisplayPanel.this.getPreferredSize().width - 25,
-                        DisplayPanel.this.getPreferredSize().height - 25));
-                // inputScrollPane.revalidate();
-            }
-        });
+        add(inputScrollPane, BorderLayout.CENTER);
 
         world.addListener(new TextListener() {
 

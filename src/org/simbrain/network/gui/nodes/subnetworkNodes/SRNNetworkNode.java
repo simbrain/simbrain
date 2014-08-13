@@ -66,7 +66,7 @@ public class SRNNetworkNode extends SubnetworkNode {
      */
     private void setContextMenu() {
         JPopupMenu menu = new JPopupMenu();
-        editAction.putValue("Name", "Edit / Train Backprop...");
+        editAction.putValue("Name", "Edit / Train SRN Network...");
         menu.add(editAction);
         menu.add(renameAction);
         menu.add(removeAction);

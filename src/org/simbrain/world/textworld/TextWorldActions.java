@@ -18,32 +18,21 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
-import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.SimbrainJTableScrollPanel;
-import org.simbrain.util.table.TextTable;
 
 /**
  * Contains actions relating to Text World.
@@ -60,18 +49,18 @@ public class TextWorldActions {
      * @param world the world whose dictionary should be loaded
      * @return the action
      */
-    public static Action getLoadDictionaryAction(final TextWorld world) {
+    public static Action getExtractDictionaryAction(final DisplayWorld world) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                putValue(NAME, "Load dictionary...");
+                putValue(NAME, "Extract dictionary...");
                 putValue(SHORT_DESCRIPTION,
                         "Extract dictionary from text file...");
-                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-                putValue(ACCELERATOR_KEY, keyStroke);
+                //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
+                //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                //putValue(ACCELERATOR_KEY, keyStroke);
             }
 
             /**
@@ -118,65 +107,7 @@ public class TextWorldActions {
     }
 
     /**
-     * Action for displaying the contents of the text world dictionary.
-     *
-     * @param world the world whose dictionary should be displayed
-     * @return the action
-     */
-    public static Action getShowDictionaryAction(final TextWorld world) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, "Display dictionary");
-                putValue(SHORT_DESCRIPTION, "Display dictionary");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-
-                // Should really enable / disable the action depending
-                // on if the dictionary is empty or not, but time is limited...
-                if (world.getDictionary().size() == 0) {
-                    return;
-                }
-                StandardDialog dialog = new StandardDialog();
-                dialog.setTitle("View / Edit Dictionary");
-                JPanel mainPanel = new JPanel(new BorderLayout());
-                SimbrainJTable table = SimbrainJTable
-                        .createTable(new TextTable(world.getDictionary()));
-                table.setShowCSVInPopupMenu(false);
-                table.setShowDeleteColumnPopupMenu(false);
-                table.setShowInsertColumnPopupMenu(false);
-                table.setShowEditInPopupMenu(false);
-                SimbrainJTableScrollPanel scroller = new SimbrainJTableScrollPanel(
-                        table);
-                JPanel toolbarPanel = new JPanel();
-                toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-                toolbarPanel.add(table.getToolbarEditRows());
-                mainPanel.add(toolbarPanel, BorderLayout.NORTH);
-                scroller.setMaxVisibleRows(10);
-                table.setDisplayColumnHeadings(false);
-                mainPanel.add(scroller, BorderLayout.CENTER);
-
-                // Display dialog
-                dialog.setContentPane(mainPanel);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                if (!dialog.hasUserCancelled()) {
-                    world.resetDictionary((List<String>) table.getData().asFlatList());
-                }
-            }
-        };
-
-    }
-
-    /**
-     * Action for showing the vector dictionary editor.
+     * Action for showing the vector dictionary editor, used in reader world.
      *
      * @param world the world whose dictionary should be displayed
      * @return the action
@@ -187,7 +118,7 @@ public class TextWorldActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, "Token > vector map");
+                putValue(NAME, "Edit dictionary...");
                 putValue(SHORT_DESCRIPTION, "Display token > vector map");
             }
 
@@ -205,6 +136,37 @@ public class TextWorldActions {
         };
 
     }
+
+    /**
+     * Action for showing the dictionary editor, used in display world.
+     *
+     * @param world the world whose dictionary should be displayed
+     * @return the action
+     */
+    public static Action showDictionaryEditor(final DisplayWorld world) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(NAME, "Edit dictionary...");
+                putValue(SHORT_DESCRIPTION, "Display and edit dictionary");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                DictionaryEditor dialog = DictionaryEditor
+                        .createDictionaryEditor(world);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+
+            }
+        };
+    }
+
 
     /**
      * Action for displaying a preference dialog.
@@ -227,7 +189,7 @@ public class TextWorldActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
-                editor.setExcludeList(new String[] { "text", "position" });
+                editor.setExcludeList(new String[] { "text", "position", "parseStyle" });
                 editor.setUseSuperclass(false);
                 editor.setObject(world);
                 JDialog dialog = editor.getDialog();

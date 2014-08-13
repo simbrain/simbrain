@@ -47,12 +47,6 @@ public abstract class TextWorld {
     /** Last position in the text. */
     private int lastPosition = 0;
 
-    //TODO: Remove and create separate dictionaries for the two types of world?
-    /** Word list for word parsing in both directions (reading and display). */
-    private Set<String> dictionary = new TreeSet<String>();
-
-    // TODO: Listeners may no longer be needed since there will no longer be
-    // separate attributes for each word
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
 
@@ -202,51 +196,6 @@ public abstract class TextWorld {
      */
     public int getLastPosition() {
         return lastPosition;
-    }
-
-    /**
-     * @return the wordList
-     */
-    public Set<String> getDictionary() {
-        return Collections.unmodifiableSet(dictionary);
-    }
-
-    /**
-     * Add a word to the dictionary.
-     *
-     * @param word the word to add
-     */
-    public void addWordToDictionary(String word) {
-        dictionary.add(word);
-        fireDictionaryChangedEvent();
-    }
-
-    /**
-     * Reset the dictionary.
-     *
-     * @param newDictionary new words for the dictionary.
-     */
-    public void resetDictionary(List<String> newDictionary) {
-        dictionary.clear();
-        for (String word : newDictionary) {
-            dictionary.add(word);
-        }
-        fireDictionaryChangedEvent();
-    }
-
-    /**
-     * Check to see if the dictionary contains the provided word. Used for
-     * localist representations of words at component level.
-     *
-     * @param word word to check for
-     * @return 1 if found, false otherwise
-     */
-    public double checkForWordInDictionary(String word) {
-        if (dictionary.contains(word)) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     /**

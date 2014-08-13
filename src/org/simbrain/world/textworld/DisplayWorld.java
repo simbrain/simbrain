@@ -18,13 +18,32 @@
  */
 package org.simbrain.world.textworld;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.simbrain.util.Utils;
+
 import com.thoughtworks.xstream.XStream;
 
 /**
- * <b>TextWorld</b> is a text world which is for display of text, and number >
- * text conversion.
+ * <b>DisplayWorld</b> is a text world which is for display of text, and number
+ * to text conversion.
  */
 public class DisplayWorld extends TextWorld {
+
+    /** A set of strings that can be displayed via couplings in the world. */
+    protected Set<String> dictionary = new TreeSet<String>();
+
+    // Initialize dictionary with sample entries
+    {
+        dictionary.add("mouse");
+        dictionary.add("cheese");
+        dictionary.add("flower");
+        dictionary.add("poison");
+        dictionary.add("yum!");
+        dictionary.add("yuck!");
+    }
 
     /** Threshold for displaying text. */
     private double displayThreshold = .5;
@@ -61,14 +80,30 @@ public class DisplayWorld extends TextWorld {
      * by consumers reading data from (e.g) neural networks. If node activation
      * > threshold then display a particular word.
      *
-     * @param string text to add
      * @param value value to check against threshold
+     * @param string text to add
      */
     public void addTextIfAboveThreshold(final double value, final String string) {
         if (value > displayThreshold) {
             addText(string + " "); // TODO: Replace space with user-specified
                                    // "buffer" string
         }
+    }
+
+    /**
+     * @return the wordList
+     */
+    public Set<String> getDictionary() {
+        return Collections.unmodifiableSet(dictionary);
+    }
+
+    /**
+     * Add a word to the dictionary.
+     *
+     * @param word the word to add
+     */
+    public void addWordToDictionary(String word) {
+        dictionary.add(word);
     }
 
     /**
@@ -93,6 +128,19 @@ public class DisplayWorld extends TextWorld {
      */
     public void setDisplayThreshold(double displayThreshold) {
         this.displayThreshold = displayThreshold;
+    }
+
+    /**
+     * Reset the dictionary (e.g. after it's been edited.)
+     *
+     * @param newDict the new dictionary entries
+     */
+    public void resetDictionary(String[][] newDict) {
+        dictionary.clear();
+        for (int i = 0; i < newDict.length; i++) {
+            dictionary.add(newDict[i][0]);
+        }
+        fireDictionaryChangedEvent();
     }
 
 }

@@ -68,7 +68,7 @@ public class DisplayComponent extends WorkspaceComponent {
      */
     private void init() {
         addConsumerType(new AttributeType(this, "StringReader", String.class,
-                true));
+                false));
         addConsumerType(new AttributeType(this, "WordReader", double.class,
                 true));
         world.addListener(new TextListener() {

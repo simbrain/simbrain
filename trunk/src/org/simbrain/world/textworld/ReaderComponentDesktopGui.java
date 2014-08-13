@@ -57,10 +57,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
     private JMenu edit = new JMenu("Edit");
 
     /** Opens the dialog to define TextWorld Dictionary. */
-    private JMenuItem loadDictionary = new JMenuItem("Load dictionary");
-
-    /** Show dictionary. */
-    private JMenuItem showDictionary = new JMenuItem("Show dictionary");
+    private JMenuItem loadDictionary = new JMenuItem("Edit dictionary...");
 
     /** Opens user preferences dialog. */
     private JMenuItem preferences = new JMenuItem("Preferences");
@@ -128,13 +125,10 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
         // Edit menu
         loadDictionary.setAction(TextWorldActions
-                .getLoadDictionaryAction(world));
-        showDictionary.setAction(TextWorldActions
-                .getShowDictionaryAction(world));
+                .showVectorDictionaryEditor(world));
         preferences.setAction(TextWorldActions
                 .getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);
-        edit.add(showDictionary);
         edit.addSeparator();
         edit.add(preferences);
         menuBar.add(edit);

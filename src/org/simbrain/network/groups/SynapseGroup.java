@@ -13,6 +13,7 @@
 package org.simbrain.network.groups;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,12 +23,15 @@ import java.util.Set;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
+import org.simbrain.network.connections.ConnectionUtilities.CheckSynapse;
+import org.simbrain.network.connections.ConnectionUtilities.SetSynapse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
@@ -389,12 +393,14 @@ public class SynapseGroup extends Group {
         // Will skip updating all synapses if we are using group level settings
         // and we know that either all the synapses are static or all the
         // synapses are frozen.
-        if (!((exStatic || isExcitatoryFrozen()) && useGroupLevelSettings)) {
+        if (!((exStatic || isFrozen(Polarity.EXCITATORY))
+        && useGroupLevelSettings)) {
             for (Synapse synapse : exSynapseSet) {
                 synapse.update();
             }
         }
-        if (!((inStatic || isInhibitoryFrozen()) && useGroupLevelSettings)) {
+        if (!((inStatic || isFrozen(Polarity.INHIBITORY))
+        && useGroupLevelSettings)) {
             for (Synapse synapse : inSynapseSet) {
                 synapse.update();
             }
@@ -510,6 +516,7 @@ public class SynapseGroup extends Group {
         } else {
             inSynapseSet.remove(toDelete);
         }
+        this.excitatoryRatio = getExcitatoryRatioPrecise();
         if (isDisplaySynapses()) {
             toDelete.getNetwork().fireSynapseRemoved(toDelete);
         }
@@ -577,6 +584,7 @@ public class SynapseGroup extends Group {
      * @param synapse
      */
     public void addNewExcitatorySynapse(final Synapse synapse) {
+        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapse.setParentGroup(this);
         if (exciteRand != null) {
@@ -603,6 +611,7 @@ public class SynapseGroup extends Group {
      * @param synapse
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
+        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapse.setParentGroup(this);
         if (inhibRand != null) {
@@ -679,6 +688,118 @@ public class SynapseGroup extends Group {
             synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
             synapse.setParentGroup(this);
         }
+    }
+
+    /**
+     * Changes the ratio of synapses in this group that are excitatory subject
+     * to two constraints: <b>1)</b> If neurons in the source neuron group have
+     * their own polarity ratio, the desired excitatoryRatio may not be
+     * possible. In this case, this class will <b>NOT</b> add or remove synapses
+     * to achieve this number. If not all source neurons are polarized, however
+     * this class will attempt to get as close as possible to the desired
+     * excitatoryRatio. <b>2)</b> Changes in weights performed to achieve the
+     * desired excitatoryRatio will result from sign changes to synapses. The
+     * absolute value of synapse strengths will not be changed.
+     *
+     * @param excitatoryRatio
+     *            the ratio of synapses which will be made excitatory, value
+     *            must be in the range [0, 1]
+     */
+    public void setExcitatoryRatio(double excitatoryRatio)
+        throws IllegalArgumentException {
+        if (excitatoryRatio > 1 || excitatoryRatio < 0) {
+            throw new IllegalArgumentException("The parameter"
+                + " 'excitatoryRatio' passed to setExcitatoryRatio"
+                + " must be on [0, 1]");
+        }
+
+        // Return if there is no change or the group is empty.
+        if (excitatoryRatio == getExcitatoryRatioPrecise())
+            return;
+        if (isEmpty()) {
+            this.excitatoryRatio = excitatoryRatio;
+            return;
+        }
+
+        if (excitatoryRatio < getExcitatoryRatioPrecise()) {
+            int numSwitch =
+                (int) ((this.excitatoryRatio * size()) - (excitatoryRatio
+                * size()));
+            Iterator<Synapse> setIterator = exSynapseSet.iterator();
+            while (setIterator.hasNext()) {
+                Synapse s = setIterator.next();
+                if (!s.getSource().isPolarized() && numSwitch > 0) {
+                    setIterator.remove();
+                    if (inhibRand != null) {
+                        s.setStrength(inhibRand.getRandom());
+                    } else {
+                        s.setStrength(ConnectionUtilities
+                            .DEFAULT_INHIBITORY_STRENGTH);
+                    }
+                    s.setLearningRule(inhibitoryPrototype.getLearningRule()
+                        .deepCopy());
+                    s.setFrozen(inhibitoryPrototype.isFrozen());
+                    s.setEnabled(inhibitoryPrototype.isEnabled());
+                    s.setDelay(inhibitoryPrototype.getDelay());
+                    s.setIncrement(inhibitoryPrototype.getIncrement());
+                    s.setUpperBound(inhibitoryPrototype.getUpperBound());
+                    s.setLowerBound(inhibitoryPrototype.getLowerBound());
+                    s.setSpikeResponder(inhibitoryPrototype
+                        .getSpikeResponder());
+                    inSynapseSet.add(s);
+                    numSwitch--;
+                }
+            }
+        } else {
+            int numSwitch =
+                (int) ((excitatoryRatio * size()) - (getExcitatoryRatioPrecise()
+                * size()));
+            Iterator<Synapse> setIterator = inSynapseSet.iterator();
+            while (setIterator.hasNext()) {
+                Synapse s = setIterator.next();
+                if (!s.getSource().isPolarized() && numSwitch > 0) {
+                    setIterator.remove();
+                    if (exciteRand != null) {
+                        s.setStrength(exciteRand.getRandom());
+                    } else {
+                        s.setStrength(ConnectionUtilities
+                            .DEFAULT_EXCITATORY_STRENGTH);
+                    }
+                    s.setLearningRule(excitatoryPrototype.getLearningRule()
+                        .deepCopy());
+                    s.setFrozen(excitatoryPrototype.isFrozen());
+                    s.setEnabled(excitatoryPrototype.isEnabled());
+                    s.setDelay(excitatoryPrototype.getDelay());
+                    s.setIncrement(excitatoryPrototype.getIncrement());
+                    s.setUpperBound(excitatoryPrototype.getUpperBound());
+                    s.setLowerBound(excitatoryPrototype.getLowerBound());
+                    s.setSpikeResponder(excitatoryPrototype
+                        .getSpikeResponder());
+                    exSynapseSet.add(s);
+                    numSwitch--;
+                }
+            }
+        }
+        this.excitatoryRatio = excitatoryRatio;
+    }
+
+    /**
+     * Returns the excitatory ratio <b>parameter</b>. For the <i>actual</i>
+     * value use {@link #getExcitatoryRatioPrecise()}.
+     *
+     *
+     * @return the ration of excitatory synapses in this group
+     */
+    public double getExcitatoryRatioParameter() {
+        return excitatoryRatio;
+    }
+
+    /**
+     * @return the <b>actual</b> excitatory ratio measured as the number
+     * of excitatory synapses divided by the total.
+     */
+    public double getExcitatoryRatioPrecise() {
+        return exSynapseSet.size() / (double) size();
     }
 
     /**
@@ -810,118 +931,6 @@ public class SynapseGroup extends Group {
     public void randomizeInhibitoryConnections() {
         ConnectionUtilities.randomizeInhibitorySynapsesUnsafe(inSynapseSet,
             inhibRand);
-    }
-
-    /**
-     * Changes the ratio of synapses in this group that are excitatory subject
-     * to two constraints: <b>1)</b> If neurons in the source neuron group have
-     * their own polarity ratio, the desired excitatoryRatio may not be
-     * possible. In this case, this class will <b>NOT</b> add or remove synapses
-     * to achieve this number. If not all source neurons are polarized, however
-     * this class will attempt to get as close as possible to the desired
-     * excitatoryRatio. <b>2)</b> Changes in weights performed to achieve the
-     * desired excitatoryRatio will result from sign changes to synapses. The
-     * absolute value of synapse strengths will not be changed.
-     *
-     * @param excitatoryRatio
-     *            the ratio of synapses which will be made excitatory, value
-     *            must be in the range [0, 1]
-     */
-    public void setExcitatoryRatio(double excitatoryRatio)
-        throws IllegalArgumentException {
-        if (excitatoryRatio > 1 || excitatoryRatio < 0) {
-            throw new IllegalArgumentException("The parameter"
-                + " 'excitatoryRatio' passed to setExcitatoryRatio"
-                + " must be on [0, 1]");
-        }
-
-        // Return if there is no change or the group is empty.
-        if (excitatoryRatio == this.excitatoryRatio)
-            return;
-        if (isEmpty()) {
-            this.excitatoryRatio = excitatoryRatio;
-            return;
-        }
-
-        if (excitatoryRatio < this.excitatoryRatio) {
-            int numSwitch =
-                (int) ((this.excitatoryRatio * size()) - (excitatoryRatio
-                * size()));
-            Iterator<Synapse> setIterator = exSynapseSet.iterator();
-            while (setIterator.hasNext()) {
-                Synapse s = setIterator.next();
-                if (!s.getSource().isPolarized() && numSwitch > 0) {
-                    setIterator.remove();
-                    if (inhibRand != null) {
-                        s.setStrength(inhibRand.getRandom());
-                    } else {
-                        s.setStrength(ConnectionUtilities
-                            .DEFAULT_INHIBITORY_STRENGTH);
-                    }
-                    s.setLearningRule(inhibitoryPrototype.getLearningRule()
-                        .deepCopy());
-                    s.setFrozen(inhibitoryPrototype.isFrozen());
-                    s.setEnabled(inhibitoryPrototype.isEnabled());
-                    s.setDelay(inhibitoryPrototype.getDelay());
-                    s.setIncrement(inhibitoryPrototype.getIncrement());
-                    s.setUpperBound(inhibitoryPrototype.getUpperBound());
-                    s.setLowerBound(inhibitoryPrototype.getLowerBound());
-                    s.setSpikeResponder(inhibitoryPrototype
-                        .getSpikeResponder());
-                    inSynapseSet.add(s);
-                    numSwitch--;
-                }
-            }
-        } else {
-            int numSwitch =
-                (int) ((excitatoryRatio * size()) - (this.excitatoryRatio
-                * size()));
-            Iterator<Synapse> setIterator = inSynapseSet.iterator();
-            while (setIterator.hasNext()) {
-                Synapse s = setIterator.next();
-                if (!s.getSource().isPolarized() && numSwitch > 0) {
-                    setIterator.remove();
-                    if (exciteRand != null) {
-                        s.setStrength(exciteRand.getRandom());
-                    } else {
-                        s.setStrength(ConnectionUtilities
-                            .DEFAULT_EXCITATORY_STRENGTH);
-                    }
-                    s.setLearningRule(excitatoryPrototype.getLearningRule()
-                        .deepCopy());
-                    s.setFrozen(excitatoryPrototype.isFrozen());
-                    s.setEnabled(excitatoryPrototype.isEnabled());
-                    s.setDelay(excitatoryPrototype.getDelay());
-                    s.setIncrement(excitatoryPrototype.getIncrement());
-                    s.setUpperBound(excitatoryPrototype.getUpperBound());
-                    s.setLowerBound(excitatoryPrototype.getLowerBound());
-                    s.setSpikeResponder(excitatoryPrototype
-                        .getSpikeResponder());
-                    exSynapseSet.add(s);
-                    numSwitch--;
-                }
-            }
-        }
-        this.excitatoryRatio = excitatoryRatio;
-    }
-
-    /**
-     * Returns the excitatory ratio <b>parameter</b>. For the <i>actual</i>
-     * value use {@link #getExcitatoryRatioPrecise()}.
-     *
-     *
-     * @return the ration of excitatory synapses in this group
-     */
-    public double getExcitatoryRatioParameter() {
-        return excitatoryRatio;
-    }
-
-    /**
-     * @return the <b>actual</b> excitatory ratio measured as the number
-     * of excitatory synapses divided by the total.
-     */
-    public double getExcitatoryRatioPrecise() {
-        return exSynapseSet.size() / (double) size();
     }
 
     /**
@@ -1073,304 +1082,6 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Set all weight strengths to a specified value.
-     *
-     * @param value
-     *            the value to set the synapses to
-     */
-    public void setStrengths(final double value) {
-        if (value > 0) {
-            exSynapseSet.addAll(inSynapseSet);
-            inSynapseSet.clear();
-            excitatoryRatio = 1;
-            for (Synapse s : exSynapseSet) {
-                s.setStrength(value);
-            }
-        } else {
-            inSynapseSet.addAll(exSynapseSet);
-            exSynapseSet.clear();
-            excitatoryRatio = 0;
-            for (Synapse s : inSynapseSet) {
-                s.setStrength(value);
-            }
-        }
-    }
-
-    /**
-     * Sets all excitatory synapses to a certain value. If value is negative,
-     * uses abs(value) instead.
-     *
-     * @param value
-     */
-    public void setAllExcitatoryStrengths(double value) {
-        value = Math.abs(value);
-        for (Synapse s : exSynapseSet) {
-            s.setStrength(value);
-        }
-    }
-
-    /**
-     * Sets all inhibitory synapses to a certain value. If value is positive
-     * uses -abs(value) instead.
-     *
-     * @param value
-     */
-    public void setAllInhibitoryStrengths(double value) {
-        value = -Math.abs(value);
-        for (Synapse s : inSynapseSet) {
-            s.setStrength(value);
-        }
-    }
-
-    /**
-     * Set delay on all synapses.
-     *
-     * @param delay
-     *            the delay to set
-     */
-    public void setDelay(final int delay) {
-        for (Synapse s : exSynapseSet) {
-            s.setDelay(delay);
-        }
-        for (Synapse s : inSynapseSet) {
-            s.setDelay(delay);
-        }
-    }
-
-    /**
-     * Enable or disable all synapses in this group.
-     *
-     * @param enabled
-     *            true to enable them all; false to disable them all
-     */
-    public void setEnabled(final boolean enabled) {
-        setExcitatoryEnabled(enabled);
-        setInhibitoryEnabled(enabled);
-    }
-
-    /**
-     *
-     * @param enabled
-     */
-    public void setExcitatoryEnabled(final boolean enabled) {
-        excitatoryPrototype.setEnabled(enabled);
-        for (Synapse s : exSynapseSet) {
-            s.setEnabled(enabled);
-        }
-    }
-
-    /**
-     *
-     * @param enabled
-     */
-    public void setInhibitoryEnabled(final boolean enabled) {
-        inhibitoryPrototype.setEnabled(enabled);
-        for (Synapse s : inSynapseSet) {
-            s.setEnabled(enabled);
-        }
-    }
-
-    /**
-     * Set the spike responders for all synapses.
-     *
-     * @param responder
-     *            the spike responder to set.
-     */
-    public void setSpikeResponders(final SpikeResponder responder) {
-        setExcitatorySpikeResponders(responder);
-        setInhibitorySpikeResponders(responder);
-    }
-
-    /**
-     * Set the spike responders for excitatory synapses.
-     *
-     * @param responder
-     *            the spike responder to set.
-     */
-    public void setExcitatorySpikeResponders(final SpikeResponder responder) {
-        excitatoryPrototype.setSpikeResponder(responder.deepCopy());
-        for (Synapse s : exSynapseSet) {
-            s.setSpikeResponder(responder.deepCopy());
-        }
-    }
-
-    /**
-     * Set the spike responders for inhibitory synapses.
-     *
-     * @param responder
-     *            the spike responder to set.
-     */
-    public void setInhibitorySpikeResponders(final SpikeResponder responder) {
-        inhibitoryPrototype.setSpikeResponder(responder.deepCopy());
-        for (Synapse s : inSynapseSet) {
-            s.setSpikeResponder(responder.deepCopy());
-        }
-    }
-
-    /**
-     * Freeze or unfreeze all synapses in this group.
-     *
-     * @param freeze
-     *            true to freeze the group; false to unfreeze it
-     */
-    public void setFrozen(final boolean freeze) {
-        setExcitatoryFrozen(freeze);
-        setInhibitoryFrozen(freeze);
-    }
-
-    /**
-     * Freeze or unfreeze all the excitatory synapses in this group
-     *
-     * @param frozen
-     */
-    public void setExcitatoryFrozen(final boolean frozen) {
-        excitatoryPrototype.setFrozen(frozen);
-        for (Synapse s : exSynapseSet) {
-            s.setFrozen(frozen);
-        }
-    }
-
-    /**
-     * Freeze or unfreeze all the inhibitorySynapses in this group.
-     *
-     * @param frozen
-     */
-    public void setInhibitoryFrozen(final boolean frozen) {
-        inhibitoryPrototype.setFrozen(frozen);
-        for (Synapse s : inSynapseSet) {
-            s.setFrozen(frozen);
-        }
-    }
-
-    /**
-     * Returns true if all the synapses in this group are frozen.
-     *
-     * @return true if all synapses are frozen, false otherwise
-     */
-    public boolean isFrozen() {
-        return isExcitatoryFrozen() && isInhibitoryFrozen();
-    }
-
-    /**
-     * If {@link #useGroupLevelSettings} then this returns whether or not
-     * {@link #excitatoryPrototype} is frozen, which ideally is also whether or
-     * not all the synapses in this group are frozen. If not, then all the
-     * synapses are checked and this method returns false if <b>any</b> of the
-     * excitatory synapses are not frozen.
-     * @return if the excitatory synapses are frozen
-     */
-    public boolean isExcitatoryFrozen() {
-        if (useGroupLevelSettings) {
-            return excitatoryPrototype.isFrozen();
-        }
-        Iterator<Synapse> exIter = exSynapseSet.iterator();
-        if (exIter.hasNext()) {
-            Synapse s = exIter.next();
-            if (!s.isFrozen()) {
-                return false; // Not _all_ the excitatory synapses are frozen
-            } else {
-                while (exIter.hasNext()) {
-                    if (!exIter.next().isFrozen()) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * If {@link #useGroupLevelSettings} then this returns whether or not
-     * {@link #excitatoryPrototype} is frozen, which ideally is also whether or
-     * not all the synapses in this group are frozen. If not, then all the
-     * synapses are checked and this method returns false if <b>any</b> of the
-     * excitatory synapses are not frozen.
-     * @return if the inhibitory synapses are frozen
-     */
-    public boolean isInhibitoryFrozen() {
-        if (useGroupLevelSettings) {
-            return inhibitoryPrototype.isFrozen();
-        }
-        Iterator<Synapse> inIter = inSynapseSet.iterator();
-        if (inIter.hasNext()) {
-            Synapse s = inIter.next();
-            if (!s.isFrozen()) {
-                return false; // Not _all_ the inhibitory synapses are frozen
-            } else {
-                while (inIter.hasNext()) {
-                    if (!inIter.next().isFrozen()) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Returns true if all the synapses in this group are enabled.
-     *
-     * @return true if all synapses are enabled, false otherwise
-     */
-    public boolean isEnabled() {
-        return isExcitatoryEnabled() && isInhibitoryEnabled();
-    }
-
-    /**
-     * @return true if all excitatory synapses are enabled, false otherwise
-     */
-    public boolean isExcitatoryEnabled() {
-        if (useGroupLevelSettings) {
-            return excitatoryPrototype.isEnabled();
-        }
-        Iterator<Synapse> exIter = exSynapseSet.iterator();
-        if (exIter.hasNext()) {
-            Synapse s = exIter.next();
-            if (!s.isEnabled()) {
-                return false; // Not _all_ the excitatory synapses are enabled
-            } else {
-                while (exIter.hasNext()) {
-                    if (!exIter.next().isEnabled()) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @return true if all inhibitory synapses are enabled, false otherwise
-     */
-    public boolean isInhibitoryEnabled() {
-        if (useGroupLevelSettings) {
-            return inhibitoryPrototype.isEnabled();
-        }
-        Iterator<Synapse> inIter = inSynapseSet.iterator();
-        if (inIter.hasNext()) {
-            Synapse s = inIter.next();
-            if (!s.isEnabled()) {
-                return false; // Not _all_ the inhibitory synapses are enabled
-            } else {
-                while (inIter.hasNext()) {
-                    if (!inIter.next().isEnabled()) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Reveals the excitatory prototype synapse, allowing more detailed synapse
      * values to be queried at the group level. To use a prototype to change
      * many values call {@link #setAndConformToTemplateExcitatory(Synapse)}
@@ -1391,215 +1102,375 @@ public class SynapseGroup extends Group {
         return Synapse.copyTemplateSynapse(inhibitoryPrototype);
     }
 
-    /**
-     *
-     * @param excitatoryPrototype
-     */
-    public void setAndConformToTemplateExcitatory(Synapse excitatoryPrototype) {
-        // Ignore strength... must be set separately
-
-        // Upper bound
-        double upperBound = excitatoryPrototype.getUpperBound();
-        if (this.excitatoryPrototype.getUpperBound() != upperBound
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setUpperBound(upperBound);
-            }
-            this.excitatoryPrototype.setUpperBound(upperBound);
-        }
-
-        // Lower Bound
-        double lowerBound = excitatoryPrototype.getLowerBound();
-        if (this.excitatoryPrototype.getLowerBound() != lowerBound
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setLowerBound(upperBound);
-            }
-            this.excitatoryPrototype.setLowerBound(upperBound);
-        }
-
-        // Increment
-        double increment = excitatoryPrototype.getIncrement();
-        if (this.excitatoryPrototype.getIncrement() != increment
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setIncrement(increment);
-            }
-            this.excitatoryPrototype.setIncrement(increment);
-        }
-
-        // Enabled
-        boolean enabled = excitatoryPrototype.isEnabled();
-        if (this.excitatoryPrototype.isEnabled() != enabled
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setEnabled(enabled);
-            }
-            this.excitatoryPrototype.setEnabled(enabled);
-        }
-
-        // Delay
-        int delay = excitatoryPrototype.getDelay();
-        if (this.excitatoryPrototype.getDelay() != delay
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setDelay(delay);
-            }
-            this.excitatoryPrototype.setDelay(delay);
-        }
-
-        // Frozen
-        boolean frozen = excitatoryPrototype.isFrozen();
-        if (this.excitatoryPrototype.isFrozen() != frozen
-            || !useGroupLevelSettings) {
-            for (Synapse s : exSynapseSet) {
-                s.setFrozen(frozen);
-            }
-            this.excitatoryPrototype.setFrozen(frozen);
-        }
-        this.setExcitatorySpikeResponders(excitatoryPrototype
-            .getSpikeResponder());
-        this.setExcitatoryRule(excitatoryPrototype.getLearningRule());
-    }
-
-    /**
-     *
-     * @param inhibitoryPrototype
-     */
-    public void setAndConformToTemplateInhibitory(Synapse inhibitoryPrototype) {
-        // Ignore strength... must be set separately
-
-        // Upper bound
-        double upperBound = inhibitoryPrototype.getUpperBound();
-        if (this.inhibitoryPrototype.getUpperBound() != upperBound
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setUpperBound(upperBound);
-            }
-            this.inhibitoryPrototype.setUpperBound(upperBound);
-        }
-
-        // Lower Bound
-        double lowerBound = inhibitoryPrototype.getLowerBound();
-        if (this.inhibitoryPrototype.getLowerBound() != lowerBound
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setLowerBound(upperBound);
-            }
-            this.inhibitoryPrototype.setLowerBound(upperBound);
-        }
-
-        // Increment
-        double increment = inhibitoryPrototype.getIncrement();
-        if (this.inhibitoryPrototype.getIncrement() != increment
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setIncrement(increment);
-            }
-            this.inhibitoryPrototype.setIncrement(increment);
-        }
-
-        // Enabled
-        boolean enabled = inhibitoryPrototype.isEnabled();
-        if (this.inhibitoryPrototype.isEnabled() != enabled
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setEnabled(enabled);
-            }
-            this.inhibitoryPrototype.setEnabled(enabled);
-        }
-
-        // Delay
-        int delay = inhibitoryPrototype.getDelay();
-        if (this.inhibitoryPrototype.getDelay() != delay
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setDelay(delay);
-            }
-            this.inhibitoryPrototype.setDelay(delay);
-        }
-
-        // Frozen
-        boolean frozen = inhibitoryPrototype.isFrozen();
-        if (this.inhibitoryPrototype.isFrozen() != frozen
-            || !useGroupLevelSettings) {
-            for (Synapse s : inSynapseSet) {
-                s.setFrozen(frozen);
-            }
-            this.inhibitoryPrototype.setFrozen(frozen);
-        }
-        this.setInhibitorySpikeResponders(inhibitoryPrototype
-            .getSpikeResponder());
-        this.setInhibitoryRule(inhibitoryPrototype.getLearningRule());
-    }
-
-    /**
-     * @return the excitatory update rule
-     */
-    public SynapseUpdateRule getExcitatoryRule() {
-        if (useGroupLevelSettings || exSynapseSet.isEmpty()) {
-            return excitatoryPrototype.getLearningRule();
-        }
-        Iterator<Synapse> synIter = exSynapseSet.iterator();
-        SynapseUpdateRule sur = synIter.next().getLearningRule();
-        while (synIter.hasNext()) {
-            if (sur.getClass() != synIter.next().getLearningRule().getClass()) {
-                return null;
-            }
-        }
-        return sur;
-    }
-
-    /**
-     * Sets the update rule of all excitatory synapses to the specified rule.
-     *
-     * @param excitatoryRule
-     */
-    public void setExcitatoryRule(SynapseUpdateRule excitatoryRule) {
-        excitatoryPrototype.setLearningRule(excitatoryRule.deepCopy());
-        for (Synapse s : exSynapseSet) {
-            s.setLearningRule(excitatoryRule.deepCopy());
-        }
-        exStatic = excitatoryRule instanceof StaticSynapseRule;
-    }
-
-    /**
-     * @return the inhibitory update rule
-     */
-    public SynapseUpdateRule getInhibitoryRule() {
-        if (useGroupLevelSettings || inSynapseSet.isEmpty()) {
-            return inhibitoryPrototype.getLearningRule();
-        }
-        Iterator<Synapse> synIter = inSynapseSet.iterator();
-        SynapseUpdateRule sur = synIter.next().getLearningRule();
-        while (synIter.hasNext()) {
-            if (sur.getClass() != synIter.next().getLearningRule().getClass()) {
-                return null;
-            }
-        }
-        return sur;
-    }
-
-    /**
-     * Sets the update rule of all the inhibitory synapses to the specified
-     * rule.
-     *
-     * @param inhibitoryRule
-     */
-    public void setInhibitoryRule(SynapseUpdateRule inhibitoryRule) {
-        inhibitoryPrototype.setLearningRule(inhibitoryRule.deepCopy());
-        for (Synapse s : inSynapseSet) {
-            s.setLearningRule(inhibitoryRule.deepCopy());
-        }
-        inStatic = inhibitoryRule instanceof StaticSynapseRule;
-    }
-
     public boolean isUseGroupLevelSettings() {
         return useGroupLevelSettings;
     }
 
+    /**
+     * 
+     * @param useGroupLevelSettings
+     */
     public void setUseGroupLevelSettings(boolean useGroupLevelSettings) {
         this.useGroupLevelSettings = useGroupLevelSettings;
+    }
+
+    /**
+     *
+     * @param template
+     */
+    public void setAndConformToTemplate(Synapse template, Polarity polarity) {
+        setDelay(template.getDelay(), polarity);
+        setEnabled(template.isEnabled(), polarity);
+        setFrozen(template.isFrozen(), polarity);
+        setIncrement(template.getIncrement(), polarity);
+        setLearningRule(template.getLearningRule(), polarity);
+        setLowerBound(template.getLowerBound(), polarity);
+        setSpikeResponder(template.getSpikeResponder(), polarity);
+        setUpperBound(template.getUpperBound(), polarity);
+    }
+
+    /**
+     * 
+     * @param delay
+     * @param polarity
+     */
+    public void setDelay(int delay, Polarity polarity) {
+        SetSynapse<Integer> setDelay = new SetSynapse<Integer>() {
+            @Override
+            public void setSynapse(Synapse synapse, Integer val) {
+                synapse.setDelay(val);
+            }
+        };
+        setSynapses(setDelay, delay, polarity);
+    }
+
+    /**
+     * 
+     * @param enabled
+     * @param polarity
+     */
+    public void setEnabled(boolean enabled, Polarity polarity) {
+        SetSynapse<Boolean> setEnabled = new SetSynapse<Boolean>() {
+            @Override
+            public void setSynapse(Synapse synapse, Boolean val) {
+                synapse.setEnabled(val);
+            }
+        };
+        setSynapses(setEnabled, enabled, polarity);
+    }
+
+    /**
+     * 
+     * @param frozen
+     * @param polarity
+     */
+    public void setFrozen(boolean frozen, Polarity polarity) {
+        SetSynapse<Boolean> setFrozen = new SetSynapse<Boolean>() {
+            @Override
+            public void setSynapse(Synapse synapse, Boolean val) {
+                synapse.setFrozen(val);
+            }
+        };
+        setSynapses(setFrozen, frozen, polarity);
+    }
+
+    /**
+     * 
+     * @param increment
+     * @param polarity
+     */
+    public void setIncrement(double increment, Polarity polarity) {
+        SetSynapse<Double> setIncrement = new SetSynapse<Double>() {
+            @Override
+            public void setSynapse(Synapse synapse, Double val) {
+                synapse.setIncrement(val);
+            }
+        };
+        setSynapses(setIncrement, increment, polarity);
+    }
+
+    /**
+     * 
+     * @param sur
+     * @param polarity
+     */
+    public void setLearningRule(SynapseUpdateRule sur, Polarity polarity) {
+        SetSynapse<SynapseUpdateRule> setSUR =
+            new SetSynapse<SynapseUpdateRule>() {
+                @Override
+                public void setSynapse(Synapse synapse, SynapseUpdateRule val) {
+                    synapse.setLearningRule(val.deepCopy());
+                }
+            };
+        setSynapses(setSUR, sur, polarity);
+        if (Polarity.EXCITATORY == polarity) {
+            exStatic = sur instanceof StaticSynapseRule;
+        } else if (Polarity.INHIBITORY == polarity) {
+            inStatic = sur instanceof StaticSynapseRule;
+        } else {
+            exStatic = sur instanceof StaticSynapseRule;
+            inStatic = sur instanceof StaticSynapseRule;
+        }
+    }
+
+    /**
+     * 
+     * @param lowerBound
+     * @param polarity
+     */
+    public void setLowerBound(double lowerBound, Polarity polarity) {
+        SetSynapse<Double> setLowBound = new SetSynapse<Double>() {
+            @Override
+            public void setSynapse(Synapse synapse, Double val) {
+                synapse.setLowerBound(val);
+            }
+        };
+        setSynapses(setLowBound, lowerBound, polarity);
+    }
+
+    /**
+     * 
+     * @param spr
+     * @param polarity
+     */
+    public void setSpikeResponder(SpikeResponder spr, Polarity polarity) {
+        SetSynapse<SpikeResponder> setSPR =
+            new SetSynapse<SpikeResponder>() {
+                @Override
+                public void setSynapse(Synapse synapse, SpikeResponder val) {
+                    synapse.setSpikeResponder(val.deepCopy());
+                }
+            };
+        setSynapses(setSPR, spr, polarity);
+    }
+
+    /**
+     * 
+     * @param strength
+     * @param polarity
+     */
+    public void setStrength(double strength, Polarity polarity) {
+        strength = polarity.value(strength);
+        SetSynapse<Double> setStrength = new SetSynapse<Double>() {
+            @Override
+            public void setSynapse(Synapse synapse, Double val) {
+                synapse.setStrength(val);
+            }
+        };
+        setSynapses(setStrength, strength, polarity);
+        if (Polarity.BOTH == polarity) {
+            if (strength > 0) {
+                exSynapseSet.addAll(inSynapseSet);
+                inSynapseSet.clear();
+                excitatoryRatio = 1;
+            } else {
+                inSynapseSet.addAll(exSynapseSet);
+                exSynapseSet.clear();
+                excitatoryRatio = 0;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param upperBound
+     * @param polarity
+     */
+    public void setUpperBound(double upperBound, Polarity polarity) {
+        SetSynapse<Double> setUpBound = new SetSynapse<Double>() {
+            @Override
+            public void setSynapse(Synapse synapse, Double val) {
+                synapse.setUpperBound(val);
+            }
+        };
+        setSynapses(setUpBound, upperBound, polarity);
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public Integer getDelay(Polarity polarity) {
+        CheckSynapse<Integer> delayCheck = new CheckSynapse<Integer>() {
+            @Override
+            public Integer check(Synapse synapse) {
+                return synapse.getDelay();
+            }
+        };
+        return checkSynapses(delayCheck, polarity);
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public Boolean isEnabled(Polarity polarity) {
+        CheckSynapse<Boolean> enabledCheck = new CheckSynapse<Boolean>() {
+            @Override
+            public Boolean check(Synapse synapse) {
+                return synapse.isEnabled();
+            }
+        };
+        return checkSynapses(enabledCheck, polarity);
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public Boolean isFrozen(Polarity polarity) {
+        CheckSynapse<Boolean> frozenCheck = new CheckSynapse<Boolean>() {
+            @Override
+            public Boolean check(Synapse synapse) {
+                return synapse.isFrozen();
+            }
+        };
+        return checkSynapses(frozenCheck, polarity);
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public double getIncrement(Polarity polarity) {
+        CheckSynapse<Double> incrementCheck = new CheckSynapse<Double>() {
+            @Override
+            public Double check(Synapse synapse) {
+                return synapse.getIncrement();
+            }
+        };
+        Double increment = checkSynapses(incrementCheck, polarity);
+        return increment == null ? Double.NaN : increment;
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public String getLearningRuleDescription(Polarity polarity) {
+        CheckSynapse<String> updateRuleCheck = new CheckSynapse<String>() {
+            @Override
+            public String check(Synapse synapse) {
+                return synapse.getLearningRule().getDescription();
+            }
+        };
+        String rule = checkSynapses(updateRuleCheck, polarity);
+        return rule == null ? SimbrainConstants.NULL_STRING : rule;
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public double getLowerBound(Polarity polarity) {
+        CheckSynapse<Double> lowBoundCheck = new CheckSynapse<Double>() {
+            @Override
+            public Double check(Synapse synapse) {
+                return synapse.getLowerBound();
+            }
+        };
+        Double lowB = checkSynapses(lowBoundCheck, polarity);
+        return lowB == null ? Double.NaN : lowB;
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public String getSpikeResponderDescription(Polarity polarity) {
+        CheckSynapse<String> spikeResponderCheck = new CheckSynapse<String>() {
+            @Override
+            public String check(Synapse synapse) {
+                return synapse.getSpikeResponder().getDescription();
+            }
+        };
+        String rule = checkSynapses(spikeResponderCheck, polarity);
+        return rule == null ? SimbrainConstants.NULL_STRING : rule;
+    }
+
+    /**
+     * 
+     * @param polarity
+     * @return
+     */
+    public double getUpperBound(Polarity polarity) {
+        CheckSynapse<Double> upBoundCheck = new CheckSynapse<Double>() {
+            @Override
+            public Double check(Synapse synapse) {
+                return synapse.getUpperBound();
+            }
+        };
+        Double upB = checkSynapses(upBoundCheck, polarity);
+        return upB == null ? Double.NaN : upB;
+    }
+
+    /**
+     * 
+     * @param check
+     * @param synapses
+     * @param prototype
+     * @return
+     */
+    public <T> T checkSynapses(CheckSynapse<T> check, Polarity polarity) {
+        Collection<Synapse> synapses;
+        Synapse prototype;
+        if (Polarity.EXCITATORY == polarity) {
+            synapses = exSynapseSet;
+            prototype = excitatoryPrototype;
+            if (useGroupLevelSettings || synapses.isEmpty()) {
+                return check.check(prototype);
+            }
+        } else if (Polarity.INHIBITORY == polarity) {
+            synapses = inSynapseSet;
+            prototype = inhibitoryPrototype;
+            if (useGroupLevelSettings || synapses.isEmpty()) {
+                return check.check(prototype);
+            }
+        } else {
+            synapses = getAllSynapses();
+            if (synapses.isEmpty()) {
+                return null;
+            }
+        }
+        Iterator<Synapse> synIter = synapses.iterator();
+        T first = check.check(synIter.next());
+        while (synIter.hasNext()) {
+            if (!first.equals(check.check(synIter.next()))) {
+                return null;
+            }
+        }
+        return first;
+    }
+
+    /**
+     * 
+     * @param set
+     * @param val
+     * @param polarity
+     */
+    public <T> void setSynapses(SetSynapse<T> set, T val, Polarity polarity) {
+        Collection<Synapse> synapses;
+        if (Polarity.EXCITATORY == polarity) {
+            synapses = exSynapseSet;
+            set.setSynapse(excitatoryPrototype, val);
+        } else if (Polarity.INHIBITORY == polarity) {
+            synapses = inSynapseSet;
+            set.setSynapse(inhibitoryPrototype, val);
+        } else {
+            synapses = getAllSynapses();
+            set.setSynapse(excitatoryPrototype, val);
+            set.setSynapse(inhibitoryPrototype, val);
+        }
+        for (Synapse s : synapses) {
+            set.setSynapse(s, val);
+        }
     }
 
 }

@@ -32,12 +32,17 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 public class StaticSynapsePanel extends AbstractSynapseRulePanel {
 
     /** Synapse reference. */
-    private static final StaticSynapseRule prototypeRule = new StaticSynapseRule();
+    private static final StaticSynapseRule prototypeRule =
+        new StaticSynapseRule();
 
     /**
      * This method is the default constructor.
      */
     public StaticSynapsePanel() {
+    }
+
+    public StaticSynapsePanel deepCopy() {
+        return new StaticSynapsePanel();
     }
 
     /**

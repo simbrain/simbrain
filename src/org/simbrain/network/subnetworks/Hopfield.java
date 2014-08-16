@@ -32,6 +32,7 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.util.SimbrainConstants.Polarity;
 
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
@@ -102,7 +103,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         AllToAll connection = new AllToAll();
         connection.setSelfConnectionAllowed(false);
         connectNeuronGroups(neuronGroup, neuronGroup, connection);
-        getSynapseGroup().setStrengths(0);
+        getSynapseGroup().setStrength(0, Polarity.BOTH);
 
     }
 
@@ -122,14 +123,14 @@ public class Hopfield extends Subnetwork implements Trainable {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             for (int j = 0; j < i; j++) {
                 Synapse w = Network.getSynapse(getNeuronGroup().getNeuronList()
-                        .get(i), getNeuronGroup().getNeuronList().get(j));
+                    .get(i), getNeuronGroup().getNeuronList().get(j));
                 if (w != null) {
                     w.randomize();
                     w.setStrength(Math.round(w.getStrength()));
                 }
                 Synapse w2 = Network.getSynapse(getNeuronGroup()
-                        .getNeuronList().get(j), getNeuronGroup()
-                        .getNeuronList().get(i));
+                    .getNeuronList().get(j), getNeuronGroup()
+                    .getNeuronList().get(i));
                 if (w2 != null) {
                     w2.setStrength(w.getStrength());
                 }
@@ -184,7 +185,7 @@ public class Hopfield extends Subnetwork implements Trainable {
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
             getSynapseGroup().setSynapseStrength(w,
-                    w.getStrength() + src.getActivation()
+                w.getStrength() + src.getActivation()
                     * tar.getActivation());
         }
         getParentNetwork().fireGroupUpdated(getSynapseGroup());
@@ -260,7 +261,7 @@ public class Hopfield extends Subnetwork implements Trainable {
             @Override
             public String getDescription() {
                 return "Randomly ordered sequential update (different every"
-                        + " time)";
+                    + " time)";
             }
 
             @Override
@@ -276,7 +277,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 List<Neuron> neurons;
                 if (hop.isByPriority()) {
                     neurons = hop.getParentNetwork()
-                            .getPrioritySortedNeuronList();
+                        .getPrioritySortedNeuronList();
                     for (Neuron n : neurons) {
                         // TODO: Hack to allow hopfield networks to be updated
                         // within based on priority, without having to sort
@@ -339,7 +340,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 }
             }
             throw new IllegalArgumentException("No such Hopfield update"
-                    + "function");
+                + "function");
         }
 
         public static String[] getUpdateFuncNames() {

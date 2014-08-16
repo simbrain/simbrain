@@ -100,11 +100,11 @@ public class LMSOffline extends Trainer {
 
         if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
             throw new DataNotInitializedException(
-                    "Input data not initalized");
+                "Input data not initalized");
         }
         if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
             throw new DataNotInitializedException(
-                    "Target data not initalized");
+                "Target data not initalized");
         }
 
         fireTrainingBegin();
@@ -113,12 +113,12 @@ public class LMSOffline extends Trainer {
         for (Neuron n : network.getOutputNeurons()) {
             if (n.getUpdateRule() instanceof SigmoidalRule) {
                 for (int i = 0; i < network.getTrainingSet()
-                        .getTargetData().length; i++)
+                    .getTargetData().length; i++)
                 {
-                        network.getTrainingSet().getTargetData()[i][index] =
+                    network.getTrainingSet().getTargetData()[i][index] =
                         ((SigmoidalRule) n.getUpdateRule())
                             .getInverse(network.getTrainingSet()
-                                    .getTargetData()[i][index]);
+                                .getTargetData()[i][index]);
                 }
             }
             index++;
@@ -130,13 +130,13 @@ public class LMSOffline extends Trainer {
             moorePenroseSolution(network);
         } else {
             throw new IllegalArgumentException("Solution type must be "
-                    + "'MoorePenrose' or 'WeinerHopf'.");
+                + "'MoorePenrose' or 'WeinerHopf'.");
         }
 
         // Make sure excitatory/inhibitory are in proper lists
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
             SynapseGroup group = ((Subnetwork) getTrainableNetwork()
-                    .getNetwork()).getSynapseGroup();
+                .getNetwork()).getSynapseGroup();
             if (group != null) {
                 group.revalidateSynapseSets();
             }
@@ -153,47 +153,52 @@ public class LMSOffline extends Trainer {
      * @param network the trainable network being trained
      */
     public void weinerHopfSolution(Trainable network) {
-
         long start = System.nanoTime();
-        double [][] inputMatrix = network.getTrainingSet().getInputData();
-        double [][] trainingMatrix = network.getTrainingSet().getTargetData();
+        double[][] inputMatrix = network.getTrainingSet().getInputData();
+        double[][] trainingMatrix = network.getTrainingSet()
+            .getTargetData();
+        try {
 
-        Factory<?> mf = PrimitiveMatrix.FACTORY;
+            Factory<?> mf = PrimitiveMatrix.FACTORY;
 
-        Builder<?> tmpBuilder = mf.getBuilder(inputMatrix.length,
+            Builder<?> tmpBuilder = mf.getBuilder(inputMatrix.length,
                 inputMatrix[0].length);
-        for (int i = 0; i < tmpBuilder.countRows(); i++) {
-            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
-                tmpBuilder.set(i, j, inputMatrix[i][j]);
+            for (int i = 0; i < tmpBuilder.countRows(); i++) {
+                for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                    tmpBuilder.set(i, j, inputMatrix[i][j]);
+                }
             }
-        }
 
-        BasicMatrix stateMat = (BasicMatrix) tmpBuilder.build();
+            BasicMatrix stateMat = (BasicMatrix) tmpBuilder.build();
 
-        tmpBuilder = mf.getBuilder(trainingMatrix.length,
+            tmpBuilder = mf.getBuilder(trainingMatrix.length,
                 trainingMatrix[0].length);
-        for (int i = 0; i < tmpBuilder.countRows(); i++) {
-            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
-                tmpBuilder.set(i, j, trainingMatrix[i][j]);
+            for (int i = 0; i < tmpBuilder.countRows(); i++) {
+                for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                    tmpBuilder.set(i, j, trainingMatrix[i][j]);
+                    if (Double.isInfinite(trainingMatrix[i][j])
+                        || Double.isNaN(trainingMatrix[i][j])) {
+                        throw new NumberFormatException("Invalid target"
+                            + " values.");
+                    }
+                }
             }
-        }
 
-        BasicMatrix teachMat = (BasicMatrix) tmpBuilder.build();
+            BasicMatrix teachMat = (BasicMatrix) tmpBuilder.build();
 
-        fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
-        teachMat = stateMat.transpose().multiplyRight(teachMat);
+            fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
+            teachMat = stateMat.transpose().multiplyRight(teachMat);
 
-        fireProgressUpdate(
+            fireProgressUpdate(
                 "Cross-Correlating States with Teacher data (P = S'D)...",
                 15);
-        stateMat = stateMat.transpose().multiplyRight(stateMat);
+            stateMat = stateMat.transpose().multiplyRight(stateMat);
 
-        fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
-        try {
+            fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
 
             if (ridgeRegression) {
                 tmpBuilder = mf.getBuilder((int) stateMat.countRows(),
-                        (int) stateMat.countColumns());
+                    (int) stateMat.countColumns());
                 for (int i = 0, n = (int) stateMat.countColumns(); i < n; i++) {
                     tmpBuilder.set(i, i, alpha * alpha);
                 }
@@ -205,10 +210,10 @@ public class LMSOffline extends Trainer {
 
             fireProgressUpdate("Computing Weights...", 80);
             tmpBuilder =
-                    stateMat.multiplyRight(teachMat).copyToBuilder();
+                stateMat.multiplyRight(teachMat).copyToBuilder();
             BasicMatrix finalMat = (BasicMatrix) tmpBuilder.build();
-            double [][] wOut = new double [(int) tmpBuilder.countRows()]
-                    [(int) tmpBuilder.countColumns()];
+            double[][] wOut = new double[(int) tmpBuilder.countRows()]
+                [(int) tmpBuilder.countColumns()];
             for (int i = 0, n = (int) tmpBuilder.countRows(); i < n; i++) {
                 for (int j = 0, m = (int) tmpBuilder.countColumns(); j < m; j++)
                 {
@@ -217,14 +222,16 @@ public class LMSOffline extends Trainer {
             }
             fireProgressUpdate("Setting Weights...", 95);
             SimnetUtils.setWeights(network.getInputNeurons(),
-                    network.getOutputNeurons(), wOut);
+                network.getOutputNeurons(), wOut);
             fireProgressUpdate("Done!", 100);
 
             // TODO: What error does JAMA actually throw for singular Matrices?
         } catch (RuntimeException e) {
             JOptionPane.showMessageDialog(new JFrame(), ""
-                    + "State Correlation Matrix is Singular",
-                    "Training Failed", JOptionPane.ERROR_MESSAGE);
+                + "State Correlation Matrix is Singular."
+                + "\nCheck that target values are in range of output units."
+                + "\nOtherwise, input matrix is rank-deficient.",
+                "Training Failed", JOptionPane.ERROR_MESSAGE);
             fireProgressUpdate("Training Failed", 0);
         }
 
@@ -241,9 +248,9 @@ public class LMSOffline extends Trainer {
      */
     public void moorePenroseSolution(Trainable network) {
         Matrix inputMatrix =
-                new Matrix(network.getTrainingSet().getInputData());
+            new Matrix(network.getTrainingSet().getInputData());
         Matrix trainingMatrix =
-                new Matrix(network.getTrainingSet().getTargetData());
+            new Matrix(network.getTrainingSet().getTargetData());
 
         fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
@@ -254,7 +261,7 @@ public class LMSOffline extends Trainer {
 
         fireProgressUpdate("Setting Weights...", 75);
         SimnetUtils.setWeights(network.getInputNeurons(),
-                network.getOutputNeurons(), wOut);
+            network.getOutputNeurons(), wOut);
         fireProgressUpdate("Done!", 100);
 
         inputMatrix = null;
@@ -314,57 +321,57 @@ public class LMSOffline extends Trainer {
     public void setAlpha(double alpha) {
         this.alpha = alpha;
     }
-//
-//    /**
-//     *
-//     * @param args args
-//     */
-//    public static void main(String[] args) {
-//        try {
-//            FileWriter fw = new FileWriter("SinContIn.csv");
-//            PrintWriter pw = new PrintWriter(fw);
-//
-//            int samples = 20;
-//            int tPerSample = 5000;
-//
-//            ArrayList<Double> frequencies = new ArrayList<Double>();
-//            double [] sineWave = new double [samples * tPerSample];
-//            double delta_t = 0.1; //ms
-//
-//            for (int i = 0; i < 20; i++) {
-//                frequencies.add(1.0 + (double) i / 10.0);
-//            }
-//            Collections.shuffle(frequencies);
-//            for (int i = 0; i < samples; i++) {
-//                for (int j = 0; j < tPerSample; j++) {
-//
-//                    sineWave[(i * tPerSample) + j] = Math.sin((j/10.0)
-//                            * frequencies.get(i));
-//                    System.out.println((j/100.0) * frequencies.get(i));
-//
-//                }
-//            }
-//
-//            for (int i = 0; i < tPerSample * samples; i++) {
-//                pw.println(frequencies.get((int) Math.floor(i/tPerSample))
-//                        + "");
-//            }
-//
-//            fw.close();
-//            pw.close();
-//            FileWriter fw2 = new FileWriter("SinContTeach.csv");
-//            PrintWriter pw2 = new PrintWriter(fw2);
-//
-//            for (int i = 0; i < tPerSample * samples; i++) {
-//                pw2.println(sineWave[i] + "");
-//            }
-//
-//            pw2.close();
-//            fw2.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
+    //
+    //    /**
+    //     *
+    //     * @param args args
+    //     */
+    //    public static void main(String[] args) {
+    //        try {
+    //            FileWriter fw = new FileWriter("SinContIn.csv");
+    //            PrintWriter pw = new PrintWriter(fw);
+    //
+    //            int samples = 20;
+    //            int tPerSample = 5000;
+    //
+    //            ArrayList<Double> frequencies = new ArrayList<Double>();
+    //            double [] sineWave = new double [samples * tPerSample];
+    //            double delta_t = 0.1; //ms
+    //
+    //            for (int i = 0; i < 20; i++) {
+    //                frequencies.add(1.0 + (double) i / 10.0);
+    //            }
+    //            Collections.shuffle(frequencies);
+    //            for (int i = 0; i < samples; i++) {
+    //                for (int j = 0; j < tPerSample; j++) {
+    //
+    //                    sineWave[(i * tPerSample) + j] = Math.sin((j/10.0)
+    //                            * frequencies.get(i));
+    //                    System.out.println((j/100.0) * frequencies.get(i));
+    //
+    //                }
+    //            }
+    //
+    //            for (int i = 0; i < tPerSample * samples; i++) {
+    //                pw.println(frequencies.get((int) Math.floor(i/tPerSample))
+    //                        + "");
+    //            }
+    //
+    //            fw.close();
+    //            pw.close();
+    //            FileWriter fw2 = new FileWriter("SinContTeach.csv");
+    //            PrintWriter pw2 = new PrintWriter(fw2);
+    //
+    //            for (int i = 0; i < tPerSample * samples; i++) {
+    //                pw2.println(sineWave[i] + "");
+    //            }
+    //
+    //            pw2.close();
+    //            fw2.close();
+    //
+    //        } catch (IOException e) {
+    //            e.printStackTrace();
+    //        }
+    //    }
+    //
 }

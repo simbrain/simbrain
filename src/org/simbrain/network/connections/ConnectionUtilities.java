@@ -114,13 +114,13 @@ public class ConnectionUtilities {
      * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
      */
     public static void randomizeAndPolarizeSynapses(
-            Collection<Synapse> synapses, double excitatoryRatio) {
+        Collection<Synapse> synapses, double excitatoryRatio) {
         PolarizedRandomizer exciteRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY);
+            Polarity.EXCITATORY);
         PolarizedRandomizer inhibRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY);
+            Polarity.INHIBITORY);
         randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand,
-                excitatoryRatio);
+            excitatoryRatio);
     }
 
     /**
@@ -454,6 +454,26 @@ public class ConnectionUtilities {
                 s.setLearningRule(exciteRule);
             }
         }
+    }
+
+    /**
+     * 
+     * @author zach
+     *
+     * @param <T>
+     */
+    public static interface SetSynapse<T> {
+        void setSynapse(Synapse synapse, T val);
+    }
+
+    /**
+     * 
+     * @author zach
+     *
+     * @param <T>
+     */
+    public static interface CheckSynapse<T> {
+        T check(Synapse synapse);
     }
 
 }

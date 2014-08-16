@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -180,6 +182,11 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     @Override
     public void fillFieldValues() {
+    }
+
+    public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
+        synapseInfoPanel.fillFieldValues(synapseGroup, polarity);
+
     }
 
     /**

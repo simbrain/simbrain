@@ -49,10 +49,12 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
     private final JTextField tfOutputThreshold = new JTextField();
 
     /** Output threshold combo box. */
-    private final TristateDropDown isOutputThresholdSliding = new TristateDropDown();
+    private final TristateDropDown isOutputThresholdSliding =
+        new TristateDropDown();
 
     /** Synapse refernece. */
-    private static final HebbianThresholdRule prototypeRule = new HebbianThresholdRule();
+    private static final HebbianThresholdRule prototypeRule =
+        new HebbianThresholdRule();
 
     /**
      * This method is the default constructor.
@@ -65,6 +67,21 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HebbianThresholdRulePanel deepCopy() {
+        HebbianThresholdRulePanel copy = new HebbianThresholdRulePanel();
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        copy.tfOutputThreshold.setText(tfOutputThreshold.getText());
+        copy.tfOutputThresholdMomentum.setText(tfOutputThresholdMomentum
+            .getText());
+        copy.isOutputThresholdSliding.setSelectedIndex(isOutputThresholdSliding
+            .getSelectedIndex());
+        return copy;
+    }
+
+    /**
      * Populate fields with current data.
      *
      * @param ruleList
@@ -73,44 +90,44 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
         HebbianThresholdRule synapseRef = (HebbianThresholdRule) ruleList
-                .get(0);
+            .get(0);
 
         // (Below) Handle consistency of multiply selections
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
-                "getLearningRate")) {
+            "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
         // Handle Threshold Momentum
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
-                "getOutputThresholdMomentum")) {
+            "getOutputThresholdMomentum")) {
             tfOutputThresholdMomentum.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfOutputThresholdMomentum.setText(Double.toString(synapseRef
-                    .getOutputThresholdMomentum()));
+                .getOutputThresholdMomentum()));
         }
 
         // Handle Output Threshold
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
-                "getOutputThreshold")) {
+            "getOutputThreshold")) {
             tfOutputThreshold.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfOutputThreshold.setText(Double.toString(synapseRef
-                    .getOutputThreshold()));
+                .getOutputThreshold()));
         }
 
         // Handle Output Threshold Slider
         if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdRule.class,
-                "getUseSlidingOutputThreshold")) {
+            "getUseSlidingOutputThreshold")) {
             isOutputThresholdSliding.setNull();
         } else {
             isOutputThresholdSliding.setSelected(synapseRef
-                    .getUseSlidingOutputThreshold());
+                .getUseSlidingOutputThreshold());
         }
 
     }
@@ -120,14 +137,14 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
      */
     public void fillDefaultValues() {
         tfLearningRate.setText(Double
-                .toString(HebbianThresholdRule.DEFAULT_LEARNING_RATE));
+            .toString(HebbianThresholdRule.DEFAULT_LEARNING_RATE));
         tfOutputThresholdMomentum
-                .setText(Double
-                        .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD_MOMENTUM));
+            .setText(Double
+                .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD_MOMENTUM));
         tfOutputThreshold.setText(Double
-                .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD));
+            .toString(HebbianThresholdRule.DEFAULT_OUTPUT_THRESHOLD));
         isOutputThresholdSliding
-                .setSelected(HebbianThresholdRule.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
+            .setSelected(HebbianThresholdRule.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
     }
 
     /**
@@ -170,7 +187,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
                 ((HebbianThresholdRule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                    .setLearningRate(learningRate);
             }
         }
 
@@ -179,7 +196,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(tm)) {
             for (Synapse s : synapses) {
                 ((HebbianThresholdRule) s.getLearningRule())
-                        .setOutputThresholdMomentum(tm);
+                    .setOutputThresholdMomentum(tm);
             }
         }
 
@@ -188,7 +205,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(outputThreshold)) {
             for (Synapse s : synapses) {
                 ((HebbianThresholdRule) s.getLearningRule())
-                        .setOutputThreshold(tm);
+                    .setOutputThreshold(tm);
             }
         }
 
@@ -197,7 +214,7 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
             boolean slidingThreshold = isOutputThresholdSliding.isSelected();
             for (Synapse s : synapses) {
                 ((HebbianThresholdRule) s.getLearningRule())
-                        .setUseSlidingOutputThreshold(slidingThreshold);
+                    .setUseSlidingOutputThreshold(slidingThreshold);
             }
         }
 

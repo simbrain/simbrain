@@ -21,6 +21,7 @@ package org.simbrain.network.trainers;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 
 /**
@@ -53,17 +54,17 @@ public class HopfieldTrainer extends Trainer {
             throw new DataNotInitializedException("Input data not initalized");
         }
 
-        hopfield.getSynapseGroup().setStrengths(0);
+        hopfield.getSynapseGroup().setStrength(0, Polarity.BOTH);
         int numRows = hopfield.getTrainingSet().getInputData().length;
-        int numInputs =  hopfield.getInputNeurons().size();
+        int numInputs = hopfield.getInputNeurons().size();
         float normConstant = 1 / (float) numRows;
 
         double[] vals = new double[numInputs * numInputs - numInputs];
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
             int k = 0;
-            Neuron [] neurons = hopfield.getSynapseGroup().getSourceNeurons()
-                    .toArray(new Neuron[pattern.length]);
+            Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons()
+                .toArray(new Neuron[pattern.length]);
             for (int i = 0; i < pattern.length; i++) {
                 for (int j = 0; j < pattern.length; j++) {
                     if (i != j) {

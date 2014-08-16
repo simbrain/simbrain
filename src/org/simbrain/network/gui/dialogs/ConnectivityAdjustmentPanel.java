@@ -23,15 +23,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,6 +39,7 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.Utils;
 
 /**
  * Panel for adjusting the connectivity between a source and target set of
@@ -60,26 +58,10 @@ public class ConnectivityAdjustmentPanel extends JPanel {
     private JFormattedTextField sparsity = new JFormattedTextField(
         NumberFormat.getNumberInstance());
 
-    /**
-     * A text field allowing the user to specify the number of outgoing synapses
-     * per source neuron.
-     */
-    private JFormattedTextField synsPerSource = new JFormattedTextField(
-        NumberFormat.getNumberInstance());
-
-    /**
-     * A check box for determining if the number of outgoing synapses per source
-     * neuron should be equalized.
-     */
-    private JCheckBox sparseSpecific = new JCheckBox();
-
-    /** A check box for determining if self-connections are to be allowed. */
-    private JCheckBox allowSelfConnect = new JCheckBox();
-
     /** The number of target neurons. */
     private final int numTargs;
 
-    JButton applyButton = new JButton("Apply");
+    private final JButton applyButton = new JButton("Apply");
 
     /**
      * A flag determining if an action was initiated by a user (useful for
@@ -87,13 +69,15 @@ public class ConnectivityAdjustmentPanel extends JPanel {
      */
     private boolean userFlag = true;
 
+    private Sparse connection;
+
     public ConnectivityAdjustmentPanel(final Sparse connection,
         final NetworkPanel networkPanel) {
+        this.connection = connection;
         numTargs = networkPanel.getSelectedModelNeurons().size();
         // fillFieldValues();
         initializeSparseSlider();
         addChangeListeners();
-        addActionListeners();
         initializeLayout();
     }
 
@@ -116,13 +100,6 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         gbc.gridheight = 4;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
-
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
-
-        gbc.gridx = 2;
-        sparseContainer.add(allowSelfConnect, gbc);
 
     }
 
@@ -159,19 +136,6 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         sparsity.setPreferredSize(sSize);
         ssp.add(sparsity, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        ssp.add(new JLabel("Equalize Connections/Source:"), gbc);
-
-        gbc.gridx = 1;
-        ssp.add(sparseSpecific, gbc);
-
-        gbc.gridx = 2;
-        sSize = synsPerSource.getPreferredSize();
-        sSize.width = 40;
-        synsPerSource.setPreferredSize(sSize);
-        ssp.add(synsPerSource, gbc);
-
         return ssp;
     }
 
@@ -207,9 +171,6 @@ public class ConnectivityAdjustmentPanel extends JPanel {
                         userFlag = false;
                         double val = (double) (sparsitySlider.getValue()) / 100;
                         sparsity.setValue(new Double(val));
-                        int sps = (int) (val * numTargs);
-                        synsPerSource.setValue(new Integer(sps));
-
                     } else {
                         userFlag = true;
                     }
@@ -219,41 +180,14 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
         });
 
-        synsPerSource.addPropertyChangeListener("value",
-            new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent arg0) {
-                    if (arg0.getSource() == synsPerSource
-                        && sparseSpecific.isSelected()) {
-                        double sparse;
-                        if (userFlag) {
-                            userFlag = false;
-                            if (synsPerSource != null) {
-                                sparse = ((Number) synsPerSource.getValue())
-                                    .doubleValue() / numTargs;
-                                sparsity.setValue(new Double(sparse));
-                                int sVal = (int) (sparse * 100);
-                                sparsitySlider.setValue(new Integer(sVal));
-                            }
-                        } else {
-                            userFlag = true;
-                        }
-                    }
-                }
-            });
-
         sparsity.addPropertyChangeListener("value",
             new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getSource() == sparsity) {
-                        int sps;
                         if (userFlag) {
                             userFlag = false;
                             if (sparsity.getValue() != null) {
-                                sps = (int) (((Number) sparsity.getValue())
-                                    .doubleValue() * numTargs);
-                                synsPerSource.setValue(new Integer(sps));
                                 int sVal = (int) (((Number) sparsity
                                     .getValue()).doubleValue() * 100);
                                 sparsitySlider.setValue(new Integer(sVal));
@@ -268,55 +202,29 @@ public class ConnectivityAdjustmentPanel extends JPanel {
     }
 
     /**
-     * Adds action listeners specific to sparse panel: sparse specific check
-     * box.
+     * {@inheritDoc}
      */
-    private void addActionListeners() {
-
-        sparseSpecific.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent arg0) {
-                if (arg0.getSource() == sparseSpecific) {
-                    if (sparseSpecific.isSelected()) {
-                        synsPerSource.setEnabled(true);
-                    } else {
-                        synsPerSource.setEnabled(false);
-                    }
-                }
+    public void commitChanges() {
+        double density = Utils.doubleParsable(sparsity.getText());
+        if (!Double.isNaN(density)) {
+            if (density > connection.getConnectionDensity()) {
+                connection.addToSparsity(density);
+            } else if (density < connection.getConnectionDensity()) {
+                connection.removeToSparsity(density);
             }
-        });
-
+        }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void fillFieldValues() {
+        if (connection == null || !(connection instanceof Sparse)) {
+            sparsity.setValue(new Double(Sparse.DEFAULT_CONNECTION_DENSITY));
+
+        } else {
+            sparsity.setValue(((Sparse) connection).getConnectionDensity());
+        }
+    }
+
 }
-
-// /**
-// * {@inheritDoc}
-// */
-// public void commitChanges() {
-// ((Sparse) connection).setSparseSpecific(sparseSpecific.isSelected());
-// ((Sparse) connection).setSparsity(((Number) sparsity.getValue())
-// .doubleValue());
-// ((Sparse) connection).setAllowSelfConnection(allowSelfConnect
-// .isSelected());
-// eipPanel.commitChanges();
-// }
-//
-// /**
-// * {@inheritDoc}
-// */
-// public void fillFieldValues() {
-// if (connection == null || !(connection instanceof Sparse)) {
-// sparsity.setValue(new Double(Sparse.getDEFAULT_SPARSITY()));
-//
-// } else {
-// sparsity.setValue(((Sparse) connection).getSparsity());
-// }
-// synsPerSource.setValue(new Integer((int) (numTargs * ((Number) sparsity
-// .getValue()).doubleValue())));
-// synsPerSource.setEnabled(false);
-// }
-//
-// public Sparse getConnection(){
-// return (Sparse) connection;
-// }
-

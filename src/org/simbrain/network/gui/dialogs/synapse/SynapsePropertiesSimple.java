@@ -36,8 +36,10 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
@@ -301,6 +303,37 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
                         .getTRUE() : TristateDropDown.getFALSE());
         }
 
+    }
+
+    /**
+     * Fills field values based on a given synapse group's values and which
+     * synapse polarity it should use to get those values.
+     * @param synapseGroup
+     * @param polarity
+     */
+    public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
+        double[] weights = null;
+        synapseEnabled.setSelected(synapseGroup.isEnabled(polarity));
+        if (Polarity.EXCITATORY == polarity) {
+            weights = synapseGroup.getExcitatoryStrengths();
+        } else if (Polarity.INHIBITORY == polarity) {
+            weights = synapseGroup.getInhibitoryStrengths();
+        } else {
+            weights = synapseGroup.getWeightVector();
+        }
+        if (weights.length == 0)
+            return;
+        double first = weights[0];
+        boolean consistent = true;
+        for (int i = 1, n = weights.length; i < n; i++) {
+            consistent = first == weights[i];
+            if (!consistent) {
+                break;
+            }
+        }
+        tfStrength.setText(consistent ? Double.toString(first)
+            : SimbrainConstants.NULL_STRING);
+        extraDataPanel.fillFieldValues(synapseGroup, polarity);
     }
 
     @Override

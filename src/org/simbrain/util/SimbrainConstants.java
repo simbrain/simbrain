@@ -64,6 +64,17 @@ public class SimbrainConstants {
             public String title() {
                 return "Inhibitory";
             }
+        },
+        BOTH {
+            @Override
+            public double value(double val) {
+                return val;
+            }
+
+            @Override
+            public String title() {
+                return "None";
+            }
         };
 
         /**

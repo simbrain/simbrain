@@ -66,6 +66,19 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HebbianCPCARulePanel deepCopy() {
+        HebbianCPCARulePanel copy = new HebbianCPCARulePanel();
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        copy.tfM.setText(tfM.getText());
+        copy.tfTheta.setText(tfTheta.getText());
+        copy.tfLambda.setText(tfLambda.getText());
+        return copy;
+    }
+
+    /**
      * Populate fields with current data.
      *
      * @param ruleList
@@ -79,11 +92,11 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLearningRate")) {
+            "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
         // Handle M
@@ -95,7 +108,7 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
 
         // Handle Theta
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getTheta")) {
+            "getTheta")) {
             tfTheta.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTheta.setText(Double.toString(synapseRef.getTheta()));
@@ -103,7 +116,7 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
 
         // Handle Lambda
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
-                "getLambda")) {
+            "getLambda")) {
             tfLambda.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLambda.setText(Double.toString(synapseRef.getLambda()));
@@ -117,7 +130,7 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
     public void fillDefaultValues() {
         // HebbianCPCA synapseRef = new HebbianCPCA();
         tfLearningRate.setText(Double
-                .toString(HebbianCPCARule.DEFAULT_LEARNING_RATE));
+            .toString(HebbianCPCARule.DEFAULT_LEARNING_RATE));
         tfM.setText(Double.toString(HebbianCPCARule.DEFAULT_M));
         tfTheta.setText(Double.toString(HebbianCPCARule.DEFAULT_THETA));
         tfLambda.setText(Double.toString(HebbianCPCARule.DEFAULT_LAMBDA));
@@ -164,7 +177,7 @@ public class HebbianCPCARulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
                 ((HebbianCPCARule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                    .setLearningRate(learningRate);
             }
         }
 

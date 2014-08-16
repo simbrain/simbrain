@@ -41,6 +41,7 @@ import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -294,8 +295,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * disabled.
      */
     private void setFreezeActionsEnabled() {
-        freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen());
-        unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen());
+        freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
+        unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
     }
 
     /**
@@ -312,7 +313,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setFrozen(true);
+            synapseGroup.setFrozen(true, Polarity.BOTH);
         }
     };
 
@@ -330,7 +331,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setFrozen(false);
+            synapseGroup.setFrozen(false, Polarity.BOTH);
         }
     };
 
@@ -348,8 +349,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * is disabled.
      */
     private void setSynapseEnablingActionsEnabled() {
-        enableSynapsesAction.setEnabled(!synapseGroup.isEnabled());
-        disableSynapsesAction.setEnabled(synapseGroup.isEnabled());
+        enableSynapsesAction.setEnabled(!synapseGroup.isEnabled(Polarity.BOTH));
+        disableSynapsesAction.setEnabled(synapseGroup.isEnabled(Polarity.BOTH));
     }
 
     /**
@@ -367,7 +368,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setEnabled(true);
+            synapseGroup.setEnabled(true, Polarity.BOTH);
         }
     };
 
@@ -386,7 +387,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setEnabled(false);
+            synapseGroup.setEnabled(false, Polarity.BOTH);
         }
     };
 

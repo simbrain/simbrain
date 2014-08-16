@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -53,9 +54,8 @@ public class HopfieldNode extends SubnetworkNode {
     @Override
     protected StandardDialog getPropertyDialog() {
         return new HopfieldEditTrainDialog(
-                getNetworkPanel(), (Hopfield) getSubnetwork());
+            getNetworkPanel(), (Hopfield) getSubnetwork());
     }
-
 
     /**
      * Sets custom menu for Hopfield node.
@@ -77,16 +77,18 @@ public class HopfieldNode extends SubnetworkNode {
         //menu.add(trainNet);
         menu.addSeparator();
         Action randomizeNet = new AbstractAction(
-                "Randomize synapses symmetrically") {
+            "Randomize synapses symmetrically") {
             public void actionPerformed(final ActionEvent event) {
                 ((Hopfield) getSubnetwork()).randomize();
             }
         };
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction(
-                "Set weights to zero") {
+            "Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrengths(0);
+                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrength(0,
+                    Polarity.BOTH);
+                ;
             }
         };
         menu.add(clearWeights);

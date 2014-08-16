@@ -59,8 +59,13 @@ public class ApplyPanel extends JPanel implements EditablePanel {
      * @return the wrapped apply panel
      */
     public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
-        ApplyPanel ap = new ApplyPanel(mainPanel);
-        ap.addListener();
+        final ApplyPanel ap = new ApplyPanel(mainPanel);
+        ap.applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                ap.commitChanges();
+            }
+        });
         return ap;
     }
 
@@ -121,15 +126,11 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * Add the apply button listener.
+     * Allows outside parties to add other listeners to the apply panel's apply
+     * button.
      */
-    private void addListener() {
-        applyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                commitChanges();
-            }
-        });
+    public void addActionListener(ActionListener l) {
+        applyButton.addActionListener(l);
     }
 
     @Override

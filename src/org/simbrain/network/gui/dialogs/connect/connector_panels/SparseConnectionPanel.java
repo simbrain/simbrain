@@ -45,7 +45,6 @@ import javax.swing.event.ChangeEvent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -67,7 +66,8 @@ import org.simbrain.util.widgets.EditablePanel;
  *
  */
 @SuppressWarnings("serial")
-public class SparseConnectionPanel extends AbstractConnectionPanel implements EditablePanel {
+public class SparseConnectionPanel extends AbstractConnectionPanel implements
+    EditablePanel {
 
     /** A slider for setting the sparsity of the connections. */
     private JSlider connectionDensitySlider = new JSlider(JSlider.HORIZONTAL,
@@ -134,6 +134,8 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
     /** Whether to allow recurrent connections. */
     private boolean recurrentConnection = false;
 
+    private final boolean editing;
+
     /**
      * Create the sparsity based connection panel.
      *
@@ -165,25 +167,34 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
     private SparseConnectionPanel(Sparse connection,
         NetworkPanel networkPanel) {
         super();
+        editing = connection.getSynapseGroup() != null;
         this.connection = connection;
-        // Assumes only one source and one target group are slected if any are
-        if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
-            NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
-            NeuronGroup target =
-                networkPanel.getSelectedModelNeuronGroups().get(0);
-            numTargs = target.size();
-            setRecurrent(source.equals(target));
+        if (editing) {
+            numTargs = connection.getSynapseGroup().getTargetNeuronGroup()
+                .size();
+            setRecurrent(connection.getSynapseGroup().isRecurrent());
+            allowSelfConnect = connection.isSelfConnectionAllowed();
         } else {
-            Set<Neuron> sources =
-                new HashSet<Neuron>(networkPanel.getSelectedModelNeurons());
-            List<Neuron> targets = networkPanel.getSourceModelNeurons();
-            numTargs = targets.size();
-            int sourcesSize = sources.size();
-            sources.retainAll(targets);
-            int newSize = sources.size();
-            // Counts as recurrent iff all the source neurons are the same as
-            // all the target neurons.
-            setRecurrent(sourcesSize == newSize);
+            // Assumes only one source and one target group are slected if any 
+            // are
+            if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
+                NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
+                NeuronGroup target =
+                    networkPanel.getSelectedModelNeuronGroups().get(0);
+                numTargs = target.size();
+                setRecurrent(source.equals(target));
+            } else {
+                Set<Neuron> sources =
+                    new HashSet<Neuron>(networkPanel.getSelectedModelNeurons());
+                List<Neuron> targets = networkPanel.getSourceModelNeurons();
+                numTargs = targets.size();
+                int sourcesSize = sources.size();
+                sources.retainAll(targets);
+                int newSize = sources.size();
+                // Counts as recurrent iff all the source neurons are the same 
+                // as all the target neurons.
+                setRecurrent(sourcesSize == newSize);
+            }
         }
     }
 
@@ -464,45 +475,70 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
 
     }
 
+    /**
+     * 
+     */
     @Override
     public void fillFieldValues() {
         double connectivity = connection.getConnectionDensity();
         equalizeEfferentsChkBx
-            .setSelected(connection.isSelfConnectionAllowed());
+            .setSelected(connection.isEqualizeEfferents());
+        allowSelfConnectChkBx.setSelected(connection.isSelfConnectionAllowed());
         synsPerSource.setValue((int) (connectivity * numTargs));
         connectionDensitySlider.setValue((int) (connectivity * 100));
         densityTf.setValue(connectivity);
+        synsPerSource.setEnabled(!editing);
+        equalizeEfferentsChkBx.setEnabled(!editing);
+        allowSelfConnectChkBx.setEnabled(!editing);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean commitChanges() {
-        if (connection instanceof Sparse) {
-            if (equalizeEfferentsChkBx.isEnabled()) {
-                // Should always be disabled if the connection is AllToAll
-                ((Sparse) connection)
-                        .setEqualizeEfferents(equalizeEfferentsChkBx
-                                .isSelected());
-            }
-            double connectivity = Utils.doubleParsable(densityTf);
-            if (!Double.isNaN(connectivity)) {
+        if (equalizeEfferentsChkBx.isEnabled()) {
+            // Should always be disabled if the connection is AllToAll
+            ((Sparse) connection)
+                .setEqualizeEfferents(equalizeEfferentsChkBx
+                    .isSelected());
+        }
+        double connectivity = Utils.doubleParsable(densityTf);
+        if (!Double.isNaN(connectivity)) {
+            if (!editing)
+                // Just set the density
                 connection.setConnectionDensity(connectivity);
+            else {
+                // Tell the sparse connection to change its density
+                if (connectivity > connection.getConnectionDensity()) {
+                    connection.addToSparsity(connectivity);
+                } else if (connectivity < connection.getConnectionDensity()) {
+                    connection.removeToSparsity(connectivity);
+                }
             }
         }
-        connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
+        if (allowSelfConnectChkBx.isEnabled()) {
+            connection.setSelfConnectionAllowed(allowSelfConnectChkBx
+                .isSelected());
+        }
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> applyConnection(List<Neuron> source,
+        List<Neuron> target) {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
                 return AllToAll.connectAllToAll(source, target,
-                        Utils.intersects(source, target), allowSelfConnect, true);
+                    Utils.intersects(source, target), allowSelfConnect, true);
             } else {
                 return Sparse.connectSparse(source, target, density,
-                        allowSelfConnect, equalizeEfferentsChkBx.isSelected(),
-                        true);
+                    allowSelfConnect, equalizeEfferentsChkBx.isSelected(),
+                    true);
             }
         }
         return null;
@@ -526,7 +562,6 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
         int sps = (int) (((Number) densityTf.getValue()).doubleValue() * nt);
         synsPerSource.setValue(new Integer(sps));
     }
-
 
     public boolean isRecurrentConnection() {
         return recurrentConnection;
@@ -582,11 +617,17 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements Ed
         this.repaint();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ConnectNeurons getConnection() {
         return connection;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JPanel getPanel() {
         return this;

@@ -55,6 +55,17 @@ public class OjaRulePanel extends AbstractSynapseRulePanel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OjaRulePanel deepCopy() {
+        OjaRulePanel copy = new OjaRulePanel();
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        copy.tfNormalize.setText(tfNormalize.getText());
+        return copy;
+    }
+
+    /**
      * Populate fields with current data.
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
@@ -65,20 +76,20 @@ public class OjaRulePanel extends AbstractSynapseRulePanel {
 
         // Handle Normalization Factor
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getNormalizationFactor")) {
+            "getNormalizationFactor")) {
             tfNormalize.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfNormalize.setText(Double.toString(synapseRef
-                    .getNormalizationFactor()));
+                .getNormalizationFactor()));
         }
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
-                "getLearningRate")) {
+            "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -89,7 +100,7 @@ public class OjaRulePanel extends AbstractSynapseRulePanel {
     public void fillDefaultValues() {
         // OjaSynapse synapseRef = new OjaSynapse();
         tfNormalize.setText(Double
-                .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
+            .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
         tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
     }
 
@@ -134,7 +145,7 @@ public class OjaRulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(normalize)) {
             for (Synapse s : synapses) {
                 ((OjaRule) s.getLearningRule())
-                        .setNormalizationFactor(normalize);
+                    .setNormalizationFactor(normalize);
             }
         }
 

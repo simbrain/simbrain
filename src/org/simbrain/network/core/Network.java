@@ -40,8 +40,8 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.SimpleId;
@@ -67,7 +67,8 @@ public class Network {
     private final List<Group> groupList = new ArrayList<Group>();
 
     /** Text objects. */
-    private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
+    private List<NetworkTextObject> textList =
+        new ArrayList<NetworkTextObject>();
 
     /** The update manager for this network. */
     private NetworkUpdateManager updateManager;
@@ -104,13 +105,16 @@ public class Network {
     private TimeType timeType = TimeType.DISCRETE;
 
     /** List of objects registered to observe general network events. */
-    private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
+    private List<NetworkListener> networkListeners =
+        new ArrayList<NetworkListener>();
 
     /** List of objects registered to observe neuron-related network events. */
-    private List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
+    private List<NeuronListener> neuronListeners =
+        new ArrayList<NeuronListener>();
 
     /** List of objects registered to observe synapse-related network events. */
-    private List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
+    private List<SynapseListener> synapseListeners =
+        new ArrayList<SynapseListener>();
 
     /** List of objects registered to observe group-related network events. */
     private List<GroupListener> groupListeners = new ArrayList<GroupListener>();
@@ -149,7 +153,7 @@ public class Network {
     {
         try {
             synapseVisibilityThreshold = SimbrainPreferences
-                    .getInt("networkSynapseVisibilityThreshold");
+                .getInt("networkSynapseVisibilityThreshold");
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
         }
@@ -428,7 +432,7 @@ public class Network {
         for (Group g : groupList) {
             if (g instanceof SynapseGroup) {
                 if (src == ((SynapseGroup) g).getSourceNeuronGroup()
-                        && targ == ((SynapseGroup) g).getTargetNeuronGroup())
+                    && targ == ((SynapseGroup) g).getTargetNeuronGroup())
                     s = (SynapseGroup) g;
             }
         }
@@ -962,14 +966,14 @@ public class Network {
                 synapse.getTarget().addAfferent(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
-                        + " has null fanIn");
+                    + " has null fanIn");
                 removeSynapse(synapse);
             }
             if (synapse.getSource().getFanOut() != null) {
                 synapse.getSource().addEfferent(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
-                        + " has null fanOut");
+                    + " has null fanOut");
                 removeSynapse(synapse);
             }
         }
@@ -1011,7 +1015,7 @@ public class Network {
             return "" + (int) time + " " + getUnits()[1];
         } else {
             return "" + BigDecimal.valueOf((long) time, getTimeStepPrecision())
-                    + " " + getUnits()[0];
+                + " " + getUnits()[0];
         }
     }
 
@@ -1164,10 +1168,10 @@ public class Network {
      * @param changed the new update rule
      */
     public void fireNeuronTypeChanged(final NeuronUpdateRule old,
-            final NeuronUpdateRule changed) {
+        final NeuronUpdateRule changed) {
         for (NeuronListener listener : neuronListeners) {
             listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this,
-                    old, changed));
+                old, changed));
         }
     }
 
@@ -1194,7 +1198,7 @@ public class Network {
     }
 
     /**
-     * Fire a neuron added event to all registered model listeners.
+     * Fire a synapse added event to all registered model listeners.
      *
      * @param added synapse which was added
      */
@@ -1233,10 +1237,10 @@ public class Network {
      * @param learningRule new, changed synapse
      */
     public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule,
-            final SynapseUpdateRule learningRule) {
+        final SynapseUpdateRule learningRule) {
         for (SynapseListener listener : synapseListeners) {
             listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(
-                    this, oldRule, learningRule));
+                this, oldRule, learningRule));
         }
     }
 
@@ -1327,11 +1331,11 @@ public class Network {
      * @param changeDescription A description of the
      */
     public void fireGroupChanged(final Group old, final Group changed,
-            final String changeDescription) {
+        final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
             listener.groupChanged(new NetworkEvent<Group>(this, old, changed),
-                    changeDescription);
+                changeDescription);
         }
     }
 
@@ -1343,7 +1347,7 @@ public class Network {
      * @param changeDescription A description of the
      */
     public void fireGroupChanged(final NetworkEvent<Group> event,
-            final String changeDescription) {
+        final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
             listener.groupChanged(event, changeDescription);
@@ -1358,7 +1362,7 @@ public class Network {
     public void fireGroupParametersChanged(final Group group) {
         for (GroupListener listener : groupListeners) {
             listener.groupParameterChanged(new NetworkEvent<Group>(this, group,
-                    group));
+                group));
         }
     }
 
@@ -1625,10 +1629,10 @@ public class Network {
      * @param connection conection object
      */
     public void connectNeuronGroups(final NeuronGroup sng,
-            final NeuronGroup tng, final ConnectNeurons connection) {
+        final NeuronGroup tng, final ConnectNeurons connection) {
 
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng,
-                connection);
+            connection);
         addGroup(group);
     }
 
@@ -1640,7 +1644,7 @@ public class Network {
     public void freezeSynapses(final boolean freeze) {
         // Freeze synapses in synapse groups
         for (SynapseGroup group : getSynapseGroups()) {
-            group.setFrozen(freeze);
+            group.setFrozen(freeze, Polarity.BOTH);
         }
         // Freeze loose synapses
         for (Synapse synapse : this.getSynapseList()) {
@@ -1691,6 +1695,5 @@ public class Network {
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
     }
-
 
 }

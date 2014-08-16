@@ -39,6 +39,7 @@ import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesPanel;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -285,7 +286,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 excitatoryInfoPanel.commitChanges();
                 double exStrength = excitatoryInfoPanel.getStrength();
                 if (!Double.isNaN(exStrength) && synapseGroup != null) {
-                    synapseGroup.setAllExcitatoryStrengths(exStrength);
+                    synapseGroup.setStrength(exStrength, Polarity.EXCITATORY);
                 }
             }
         });
@@ -295,10 +296,27 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 inhibitoryInfoPanel.commitChanges();
                 double inStrength = inhibitoryInfoPanel.getStrength();
                 if (!Double.isNaN(inStrength) && synapseGroup != null) {
-                    synapseGroup.setAllInhibitoryStrengths(inStrength);
+                    synapseGroup.setStrength(inStrength,
+                        Polarity.INHIBITORY);
                 }
             }
         });
+    }
+
+    /**
+     * 
+     * @param l
+     */
+    public void addApplyListenerEx(ActionListener l) {
+        exApplyButton.addActionListener(l);
+    }
+
+    /**
+     * 
+     * @param l
+     */
+    public void addApplyListenerIn(ActionListener l) {
+        inApplyButton.addActionListener(l);
     }
 
     /**
@@ -309,10 +327,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         success &= excitatoryInfoPanel.commitChanges();
         success &= inhibitoryInfoPanel.commitChanges();
         if (synapseGroup != null) {
-            synapseGroup.setAndConformToTemplateExcitatory(
-                templateExcitatorySynapse);
-            synapseGroup.setAndConformToTemplateInhibitory(
-                templateInhibitorySynapse);
+            synapseGroup.setAndConformToTemplate(templateExcitatorySynapse,
+                Polarity.EXCITATORY);
+            synapseGroup.setAndConformToTemplate(templateInhibitorySynapse,
+                Polarity.INHIBITORY);
         }
         // Ensure that strengths have been set within appropriate boundaries...
         templateExcitatorySynapse.setStrength( // Always positive
@@ -329,6 +347,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      */
     @Override
     public void fillFieldValues() {
+        if (synapseGroup != null) {
+            excitatoryInfoPanel.fillFieldValues();
+            inhibitoryInfoPanel.fillFieldValues();
+        }
     }
 
     /**

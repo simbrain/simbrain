@@ -57,25 +57,27 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
      * A mapping of available update rules to their respective panels. Used as a
      * reference (especially for combo-boxes) by GUI classes.
      */
-    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP = new LinkedHashMap<String, AbstractSynapseRulePanel>();
+    public static final LinkedHashMap<String, AbstractSynapseRulePanel> RULE_MAP =
+        new LinkedHashMap<String, AbstractSynapseRulePanel>();
 
     // Populate synapse rule map
     static {
         // TODO: Backwards compatibility. Remove for 3.0 after converting all
         // sims
         RULE_MAP.put(new StaticSynapseRule().getDescription(),
-                new StaticSynapsePanel());
-        RULE_MAP.put(new HebbianRule().getDescription(), new HebbianRulePanel());
+            new StaticSynapsePanel());
+        RULE_MAP
+            .put(new HebbianRule().getDescription(), new HebbianRulePanel());
         RULE_MAP.put(new HebbianCPCARule().getDescription(),
-                new HebbianCPCARulePanel());
+            new HebbianCPCARulePanel());
         RULE_MAP.put(new HebbianThresholdRule().getDescription(),
-                new HebbianThresholdRulePanel());
+            new HebbianThresholdRulePanel());
         RULE_MAP.put(new OjaRule().getDescription(), new OjaRulePanel());
         RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
-                new ShortTermPlasticityRulePanel());
+            new ShortTermPlasticityRulePanel());
         RULE_MAP.put(new STDPRule().getDescription(), new STDPRulePanel());
         RULE_MAP.put(new SubtractiveNormalizationRule().getDescription(),
-                new SubtractiveNormalizationRulePanel());
+            new SubtractiveNormalizationRulePanel());
     }
 
     /**
@@ -126,12 +128,19 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
     }
 
     /**
+     * 
+     * @return
+     */
+    public abstract AbstractSynapseRulePanel deepCopy();
+
+    /**
      * Populate fields with current data.
      *
      * @param ruleList
      *            the list of rules from which variables will be displayed
      */
-    public abstract void fillFieldValues(final List<SynapseUpdateRule> ruleList);
+    public abstract void
+        fillFieldValues(final List<SynapseUpdateRule> ruleList);
 
     /**
      * Populate fields with default data.
@@ -175,7 +184,7 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
      *            the neurons whose rules are being <b>edited</b>, not replaced.
      */
     protected abstract void writeValuesToRules(
-            final Collection<Synapse> synapses);
+        final Collection<Synapse> synapses);
 
     /**
      * Are we replacing rules or editing them? Replacing happens when

@@ -18,7 +18,6 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -123,7 +122,7 @@ public class Sparse implements ConnectNeurons {
      * @param selfConnectionAllowed whether self-connections should be allowed.
      */
     public Sparse(double sparsity, boolean equalizeEfferents,
-            boolean selfConnectionAllowed) {
+        boolean selfConnectionAllowed) {
         this.connectionDensity = sparsity;
         this.equalizeEfferents = equalizeEfferents;
         this.selfConnectionAllowed = selfConnectionAllowed;
@@ -138,9 +137,9 @@ public class Sparse implements ConnectNeurons {
      * @return the newly creates synapses connecting source to target
      */
     public List<Synapse> connectSparse(List<Neuron> sourceNeurons,
-            List<Neuron> targetNeurons) {
+        List<Neuron> targetNeurons) {
         return connectSparse(sourceNeurons, targetNeurons, connectionDensity,
-                selfConnectionAllowed, equalizeEfferents, true);
+            selfConnectionAllowed, equalizeEfferents, true);
     }
 
     /**
@@ -157,11 +156,11 @@ public class Sparse implements ConnectNeurons {
      * @return
      */
     public static List<Synapse> connectSparse(List<Neuron> sourceNeurons,
-            List<Neuron> targetNeurons, double sparsity,
-            boolean selfConnectionAllowed, boolean equalizeEfferents,
-            boolean looseSynapses) {
+        List<Neuron> targetNeurons, double sparsity,
+        boolean selfConnectionAllowed, boolean equalizeEfferents,
+        boolean looseSynapses) {
         boolean recurrent = ConnectionUtilities.testRecurrence(sourceNeurons,
-                targetNeurons);
+            targetNeurons);
         Neuron source;
         Neuron target;
         Synapse synapse;
@@ -175,10 +174,12 @@ public class Sparse implements ConnectNeurons {
             }
             int numSyns;
             if (!selfConnectionAllowed && sourceNeurons == targetNeurons) {
-                numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons
+                numSyns =
+                    (int) (sparsity * sourceNeurons.size() * (targetNeurons
                         .size() - 1));
             } else {
-                numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons
+                numSyns =
+                    (int) (sparsity * sourceNeurons.size() * targetNeurons
                         .size());
             }
             int synsPerSource = numSyns / sourceNeurons.size();
@@ -247,9 +248,9 @@ public class Sparse implements ConnectNeurons {
         int numSrc = synapseGroup.getSourceNeurons().size();
         int numTar = synapseGroup.getTargetNeurons().size();
         sourceNeurons = synapseGroup.getSourceNeurons().toArray(
-                new Neuron[numSrc]);
+            new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup
-                .getTargetNeurons().toArray(new Neuron[numTar]);
+            .getTargetNeurons().toArray(new Neuron[numTar]);
         generateSparseOrdering(recurrent);
         if (equalizeEfferents) {
             connectEqualized(synapseGroup);
@@ -275,9 +276,11 @@ public class Sparse implements ConnectNeurons {
         int numConnectsPerSrc;
         int expectedNumSyns;
         if (synapseGroup.isRecurrent() && !selfConnectionAllowed) {
-            numConnectsPerSrc = (int) (connectionDensity * (sourceNeurons.length - 1));
+            numConnectsPerSrc =
+                (int) (connectionDensity * (sourceNeurons.length - 1));
         } else {
-            numConnectsPerSrc = (int) (connectionDensity * targetNeurons.length);
+            numConnectsPerSrc =
+                (int) (connectionDensity * targetNeurons.length);
         }
         expectedNumSyns = numConnectsPerSrc * sourceNeurons.length;
         synapseGroup.preAllocateSynapses(expectedNumSyns);
@@ -305,14 +308,16 @@ public class Sparse implements ConnectNeurons {
      */
     private void connectRandom(SynapseGroup synapseGroup) {
         currentOrderingIndices = new int[sourceNeurons.length];
-        int numTars = synapseGroup.isRecurrent() && !selfConnectionAllowed ? (sourceNeurons.length - 1)
+        int numTars =
+            synapseGroup.isRecurrent() && !selfConnectionAllowed
+                ? (sourceNeurons.length - 1)
                 : targetNeurons.length;
         synapseGroup
-                .preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
+            .preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
         for (int i = 0, n = sourceNeurons.length; i < n; i++) {
             currentOrderingIndices[i] = BinomialGen.nextInt(
-                    SimbrainMath.DEFAULT_RANDOM_STREAM, numTars,
-                    connectionDensity);
+                SimbrainMath.DEFAULT_RANDOM_STREAM, numTars,
+                connectionDensity);
             Neuron src = sourceNeurons[i];
             Neuron tar;
             for (int j = 0; j < currentOrderingIndices[i]; j++) {
@@ -335,7 +340,7 @@ public class Sparse implements ConnectNeurons {
             sparseOrdering = new int[sourceNeurons.length][tarLen];
             for (int i = 0; i < srcLen; i++) {
                 sparseOrdering[i] = SimbrainMath.randPermuteWithExclusion(0,
-                        tarLen + 1, i);
+                    tarLen + 1, i);
             }
         } else {
             int tarLen = targetNeurons.length;
@@ -357,7 +362,8 @@ public class Sparse implements ConnectNeurons {
      * @param k how many elements will be shuffled
      * @param rand a random number generator
      */
-    public static void randShuffleK(ArrayList<Integer> inds, int k, Random rand) {
+    public static void
+        randShuffleK(ArrayList<Integer> inds, int k, Random rand) {
         for (int i = 0; i < k; i++) {
             Collections.swap(inds, i, rand.nextInt(inds.size()));
         }
@@ -369,18 +375,15 @@ public class Sparse implements ConnectNeurons {
      * @param returnRemoved
      * @return
      */
-    public List<Synapse> removeToSparsity(double newSparsity,
-            boolean returnRemoved) {
+    public void removeToSparsity(double newSparsity) {
         if (newSparsity >= connectionDensity) {
             throw new IllegalArgumentException("Cannot 'removeToSparsity' to"
-                    + " a higher connectivity density.");
+                + " a higher connectivity density.");
         }
         Network net = sourceNeurons[0].getNetwork();
-        int removeTotal = (synapseGroup.size() - (int) (newSparsity * getMaxPossibleConnections()));
-        List<Synapse> removeList = null;
-        if (returnRemoved) {
-            removeList = new ArrayList<Synapse>(removeTotal);
-        }
+        int removeTotal =
+            (synapseGroup.size() - (int) (newSparsity
+            * getMaxPossibleConnections()));
         if (equalizeEfferents) {
             int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
             int removePerSource = removeTotal / sourceNeurons.length;
@@ -388,10 +391,7 @@ public class Sparse implements ConnectNeurons {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 for (int j = curNumConPerSource - 1; j >= finalNumConPerSource; j--) {
                     Synapse toRemove = Network.getSynapse(sourceNeurons[i],
-                            targetNeurons[sparseOrdering[i][j]]);
-                    if (returnRemoved) {
-                        removeList.add(toRemove);
-                    }
+                        targetNeurons[sparseOrdering[i][j]]);
                     net.removeSynapse(toRemove);
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
@@ -399,23 +399,23 @@ public class Sparse implements ConnectNeurons {
         } else {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 int numToRemove = BinomialGen.nextInt(
-                        SimbrainMath.DEFAULT_RANDOM_STREAM,
-                        currentOrderingIndices[i],
-                        1 - (newSparsity / connectionDensity));
-                for (int j = currentOrderingIndices[i] - 1; j >= currentOrderingIndices[i]
-                        - numToRemove; j--) {
-                    Synapse toRemove = Network.getSynapse(sourceNeurons[i],
-                            targetNeurons[sparseOrdering[i][j]]);
-                    if (returnRemoved) {
-                        removeList.add(toRemove);
+                    SimbrainMath.DEFAULT_RANDOM_STREAM, synapseGroup
+                        .getTargetNeuronGroup().size(), newSparsity);
+                if (numToRemove < currentOrderingIndices[i]) {
+                    List<Synapse> remove = decreaseDensity(i, numToRemove);
+                    for (Synapse s : remove) {
+                        synapseGroup.removeSynapse(s);
                     }
-                    net.removeSynapse(toRemove);
+                } else {
+                    List<Synapse> add = increaseDensity(i, numToRemove);
+                    for (Synapse s : add) {
+                        synapseGroup.addNewSynapse(s);
+                    }
                 }
-                currentOrderingIndices[i] -= numToRemove;
+                currentOrderingIndices[i] = numToRemove;
             }
         }
         this.connectionDensity = newSparsity;
-        return removeList;
     }
 
     /**
@@ -423,12 +423,13 @@ public class Sparse implements ConnectNeurons {
      * @param newSparsity
      * @return
      */
-    public List<Synapse> addToSparsity(double newSparsity) {
+    public void addToSparsity(double newSparsity) {
         if (newSparsity <= connectionDensity) {
             throw new IllegalArgumentException("Cannot 'addToSparsity' to"
-                    + " a lower connectivity density.");
+                + " a lower connectivity density.");
         }
-        int addTotal = ((int) (newSparsity * getMaxPossibleConnections()) - synapseGroup
+        int addTotal =
+            ((int) (newSparsity * getMaxPossibleConnections()) - synapseGroup
                 .size());
         List<Synapse> addList = new ArrayList<Synapse>(addTotal);
         if (equalizeEfferents) {
@@ -439,9 +440,10 @@ public class Sparse implements ConnectNeurons {
                 finalNumConPerSource = sparseOrdering[0].length;
             }
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-                for (int j = curNumConPerSource; j < finalNumConPerSource; j++) {
+                for (int j = curNumConPerSource; j < finalNumConPerSource; j++)
+                {
                     Synapse toAdd = new Synapse(sourceNeurons[i],
-                            targetNeurons[sparseOrdering[i][j]]);
+                        targetNeurons[sparseOrdering[i][j]]);
                     addList.add(toAdd);
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
@@ -449,17 +451,23 @@ public class Sparse implements ConnectNeurons {
         } else {
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 int numToAdd = BinomialGen.nextInt(
-                        SimbrainMath.DEFAULT_RANDOM_STREAM,
-                        currentOrderingIndices[i],
-                        1 - (connectionDensity / newSparsity));
-                int finalNumConPerSource = currentOrderingIndices[i] + numToAdd;
+                    SimbrainMath.DEFAULT_RANDOM_STREAM, synapseGroup
+                        .getTargetNeuronGroup().size(), newSparsity);
+                int finalNumConPerSource =
+                    numToAdd >= currentOrderingIndices[i]
+                        ? numToAdd : currentOrderingIndices[i];
                 if (finalNumConPerSource > sparseOrdering[i].length) {
                     finalNumConPerSource = sparseOrdering[i].length;
                 }
-                for (int j = currentOrderingIndices[i]; j < finalNumConPerSource; j++) {
-                    Synapse toAdd = new Synapse(sourceNeurons[i],
-                            targetNeurons[sparseOrdering[i][j]]);
-                    addList.add(toAdd);
+                if (finalNumConPerSource >= currentOrderingIndices[i]) {
+                    addList.addAll(increaseDensity(i, finalNumConPerSource));
+                } else {
+                    List<Synapse> remove = decreaseDensity(i,
+                        finalNumConPerSource);
+                    for (Synapse s : remove) {
+                        synapseGroup.removeSynapse(s);
+                    }
+
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
             }
@@ -468,7 +476,41 @@ public class Sparse implements ConnectNeurons {
             synapseGroup.addNewSynapse(s);
         }
         this.connectionDensity = newSparsity;
-        return addList;
+    }
+
+    /**
+     * 
+     * @param i
+     * @param finalNumConnections
+     * @return
+     */
+    private List<Synapse> increaseDensity(int i, int finalNumConnections) {
+        List<Synapse> added = new ArrayList<Synapse>(finalNumConnections
+            - currentOrderingIndices[i]);
+        for (int j = currentOrderingIndices[i]; j < finalNumConnections; j++) {
+            Synapse toAdd = new Synapse(sourceNeurons[i],
+                targetNeurons[sparseOrdering[i][j]]);
+            added.add(toAdd);
+        }
+        return added;
+    }
+
+    /**
+     * 
+     * @param i
+     * @param finalNumConnections
+     * @return
+     */
+    private List<Synapse> decreaseDensity(int i, int finalNumConnections) {
+        List<Synapse> removed =
+            new ArrayList<Synapse>(currentOrderingIndices[i]
+                - finalNumConnections);
+        for (int j = currentOrderingIndices[i] - 1; j >= finalNumConnections; j--) {
+            Synapse toRemove = Network.getSynapse(sourceNeurons[i],
+                targetNeurons[sparseOrdering[i][j]]);
+            removed.add(toRemove);
+        }
+        return removed;
     }
 
     public int getMaxPossibleConnections() {
@@ -502,18 +544,17 @@ public class Sparse implements ConnectNeurons {
      *         if density is being changed after connections have already been
      *         made
      */
-    public Collection<Synapse> setConnectionDensity(
-            final double connectionDensity) {
+    public void setConnectionDensity(
+        final double connectionDensity) {
         if (sparseOrdering == null) {
             this.connectionDensity = connectionDensity;
         } else {
             if (connectionDensity > this.connectionDensity) {
-                return addToSparsity(connectionDensity);
+                addToSparsity(connectionDensity);
             } else if (connectionDensity < this.connectionDensity) {
-                return removeToSparsity(connectionDensity, true);
+                removeToSparsity(connectionDensity);
             }
         }
-        return null;
     }
 
     /**
@@ -531,7 +572,34 @@ public class Sparse implements ConnectNeurons {
      * @param selfConnectionAllowed
      */
     public void setSelfConnectionAllowed(boolean selfConnectionAllowed) {
-        this.selfConnectionAllowed = selfConnectionAllowed;
+        if (this.selfConnectionAllowed != selfConnectionAllowed) {
+            this.selfConnectionAllowed = selfConnectionAllowed;
+            if (!selfConnectionAllowed && synapseGroup != null) {
+                // Self connections were allowed but no longer and we're editing
+                // an extant synapse group...
+                if (synapseGroup.isRecurrent()) {
+                    // Only matters if the synapse group is recurrent
+                    for (Neuron n : synapseGroup.getSourceNeurons()) {
+                        // Connects the neuron to itself
+                        Synapse toRemove = n.getFanOut().get(n);
+                        if (toRemove != null) {
+                            // Remove from the synapse group
+                            synapseGroup.removeSynapse(toRemove);
+                            // Remove from the neuron
+                            n.removeEfferent(toRemove);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    /**
+     * @return the synapse group tied to this sparse object.
+     */
+    public SynapseGroup getSynapseGroup() {
+        return synapseGroup;
     }
 
     /**

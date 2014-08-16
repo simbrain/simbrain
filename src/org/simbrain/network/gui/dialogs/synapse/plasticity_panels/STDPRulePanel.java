@@ -70,6 +70,20 @@ public class STDPRulePanel extends AbstractSynapseRulePanel {
      * {@inheritDoc}
      */
     @Override
+    public STDPRulePanel deepCopy() {
+        STDPRulePanel copy = new STDPRulePanel();
+        copy.tfTauMinus.setText(tfTauMinus.getText());
+        copy.tfTauPlus.setText(tfTauPlus.getText());
+        copy.tfWMinus.setText(tfWMinus.getText());
+        copy.tfWPlus.setText(tfWPlus.getText());
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
         STDPRule synapseRef = (STDPRule) ruleList.get(0);
@@ -78,7 +92,7 @@ public class STDPRulePanel extends AbstractSynapseRulePanel {
 
         // Handle Tau Minus
         if (!NetworkUtils
-                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
+            .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
             tfTauMinus.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
@@ -107,11 +121,11 @@ public class STDPRulePanel extends AbstractSynapseRulePanel {
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
-                "getLearningRate")) {
+            "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }

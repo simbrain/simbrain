@@ -35,13 +35,15 @@ import org.simbrain.util.Utils;
 /**
  * <b>SubtractiveNormalizationSynapsePanel</b>.
  */
-public class SubtractiveNormalizationRulePanel extends AbstractSynapseRulePanel {
+public class SubtractiveNormalizationRulePanel extends
+    AbstractSynapseRulePanel {
 
     /** Learning rate field. */
     private final JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private static final SubtractiveNormalizationRule prototypeRule = new SubtractiveNormalizationRule();
+    private static final SubtractiveNormalizationRule prototypeRule =
+        new SubtractiveNormalizationRule();
 
     /**
      * This method is the default constructor.
@@ -53,20 +55,32 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapseRulePanel 
     /**
      * {@inheritDoc}
      */
+    @Override
+    public SubtractiveNormalizationRulePanel deepCopy() {
+        SubtractiveNormalizationRulePanel copy =
+            new SubtractiveNormalizationRulePanel();
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 
-        SubtractiveNormalizationRule synapseRef = (SubtractiveNormalizationRule) ruleList
+        SubtractiveNormalizationRule synapseRef =
+            (SubtractiveNormalizationRule) ruleList
                 .get(0);
 
         // (Below) Handle consistency of multiply selections
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList,
-                SubtractiveNormalizationRule.class, "getLearningRate")) {
+            SubtractiveNormalizationRule.class, "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -76,7 +90,7 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapseRulePanel 
      */
     public void fillDefaultValues() {
         tfLearningRate.setText(Double
-                .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
+            .toString(SubtractiveNormalizationRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
@@ -120,7 +134,7 @@ public class SubtractiveNormalizationRulePanel extends AbstractSynapseRulePanel 
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
                 ((SubtractiveNormalizationRule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                    .setLearningRate(learningRate);
             }
         }
 

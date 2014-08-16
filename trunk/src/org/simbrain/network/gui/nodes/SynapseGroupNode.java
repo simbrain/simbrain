@@ -34,7 +34,8 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * @author Jeff Yoshimi
  */
-public class SynapseGroupNode extends PNode implements GroupNode, PropertyChangeListener {
+public class SynapseGroupNode extends PNode implements GroupNode,
+    PropertyChangeListener {
 
     /** Parent network panel. */
     protected final NetworkPanel networkPanel;
@@ -53,7 +54,7 @@ public class SynapseGroupNode extends PNode implements GroupNode, PropertyChange
      * of synpases in a synapse group has changed.
      */
     public static final String SYNAPSE_VISIBILITY_CHANGED =
-            "synapseVisibilityChanged";
+        "synapseVisibilityChanged";
 
     /**
      * Create a Synapse Group PNode.

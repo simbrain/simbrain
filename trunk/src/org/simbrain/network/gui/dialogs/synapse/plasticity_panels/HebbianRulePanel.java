@@ -51,6 +51,16 @@ public class HebbianRulePanel extends AbstractSynapseRulePanel {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HebbianRulePanel deepCopy() {
+        HebbianRulePanel copy = new HebbianRulePanel();
+        copy.tfLearningRate.setText(tfLearningRate.getText());
+        return copy;
+    }
+
+    /**
      * Populate fields with current data.
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
@@ -61,11 +71,11 @@ public class HebbianRulePanel extends AbstractSynapseRulePanel {
 
         // Handle Learning Rate
         if (!NetworkUtils.isConsistent(ruleList, HebbianRule.class,
-                "getLearningRate")) {
+            "getLearningRate")) {
             tfLearningRate.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLearningRate
-                    .setText(Double.toString(synapseRef.getLearningRate()));
+                .setText(Double.toString(synapseRef.getLearningRate()));
         }
 
     }
@@ -75,7 +85,7 @@ public class HebbianRulePanel extends AbstractSynapseRulePanel {
      */
     public void fillDefaultValues() {
         tfLearningRate.setText(Double
-                .toString(HebbianRule.DEFAULT_LEARNING_RATE));
+            .toString(HebbianRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
@@ -118,7 +128,7 @@ public class HebbianRulePanel extends AbstractSynapseRulePanel {
         if (!Double.isNaN(learningRate)) {
             for (Synapse s : synapses) {
                 ((HebbianRule) s.getLearningRule())
-                        .setLearningRate(learningRate);
+                    .setLearningRate(learningRate);
             }
         }
 

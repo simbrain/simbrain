@@ -322,11 +322,12 @@ public class NetworkPanel extends JPanel {
     private JPanel toolbars;
 
     /** Manages keyboard-based connections. */
-    private final QuickConnectionManager quickConnector = new QuickConnectionManager();
+    private final QuickConnectionManager quickConnector =
+        new QuickConnectionManager();
 
     /** Map associating network model objects with Piccolo Pnodes. */
     private final Map<Object, PNode> objectNodeMap = Collections
-            .synchronizedMap(new HashMap<Object, PNode>());
+        .synchronizedMap(new HashMap<Object, PNode>());
 
     /**
      * Point where new neurons, neurongroups, and subnetworks should be added.
@@ -357,7 +358,8 @@ public class NetworkPanel extends JPanel {
         // Always render in high quality
         canvas.setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         canvas.setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-        canvas.setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+        canvas
+            .setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 
         editMode = DEFAULT_BUILD_MODE;
         selectionModel = new NetworkSelectionModel(this);
@@ -388,7 +390,7 @@ public class NetworkPanel extends JPanel {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("showNetworkHierarchyPanel")) {
             showNetworkHierarchyPanel = Boolean.parseBoolean(properties
-                    .getProperty("showNetworkHierarchyPanel"));
+                .getProperty("showNetworkHierarchyPanel"));
         }
         // networkHierarchyPanel = new NetworkHierarchyPanel(this);
         // splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -515,7 +517,8 @@ public class NetworkPanel extends JPanel {
             }
 
             @Override
-            public void neuronTypeChanged(final NetworkEvent<NeuronUpdateRule> e) {
+            public void
+                neuronTypeChanged(final NetworkEvent<NeuronUpdateRule> e) {
             }
 
             @Override
@@ -545,7 +548,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void synapseTypeChanged(
-                    final NetworkEvent<SynapseUpdateRule> e) {
+                final NetworkEvent<SynapseUpdateRule> e) {
             }
 
             @Override
@@ -593,10 +596,10 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupChanged(final NetworkEvent<Group> e,
-                    final String description) {
+                final String description) {
                 Group group = e.getObject();
                 if (description
-                        .equals(SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED)) {
+                    .equals(SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED)) {
                     if (group instanceof SynapseGroup) {
                         toggleSynapseVisibility(((SynapseGroup) group));
                     }
@@ -613,19 +616,19 @@ public class NetworkPanel extends JPanel {
             public void groupParameterChanged(NetworkEvent<Group> event) {
                 if (event.getObject() instanceof NeuronGroup) {
                     NeuronGroupNode node = (NeuronGroupNode) objectNodeMap
-                            .get(event.getObject());
+                        .get(event.getObject());
                     if (node != null) {
                         node.updateText();
                     }
                 } else if (event.getObject() instanceof SynapseGroup) {
                     SynapseGroupNode node = (SynapseGroupNode) objectNodeMap
-                            .get(event.getObject());
+                        .get(event.getObject());
                     if (node != null) {
                         node.updateText();
                     }
                 } else if (event.getObject() instanceof Subnetwork) {
                     SubnetworkNode node = (SubnetworkNode) objectNodeMap
-                            .get(event.getObject());
+                        .get(event.getObject());
                     if (node != null) {
                         node.updateText();
                     }
@@ -775,7 +778,7 @@ public class NetworkPanel extends JPanel {
             // Clean up parent neuron group, if any
             if (neuron.getParentGroup() != null) {
                 NeuronGroupNode groupNode = (NeuronGroupNode) objectNodeMap
-                        .get(neuron.getParentGroup());
+                    .get(neuron.getParentGroup());
                 if (groupNode != null) {
                     groupNode.removeNeuronNode(node);
                 }
@@ -791,7 +794,7 @@ public class NetworkPanel extends JPanel {
      * @param layout the layout to use in adding them
      */
     public void addNeuronsToPanel(final List<Neuron> neurons,
-            final Layout layout) {
+        final Layout layout) {
         Network net = getNetwork();
         ArrayList<NeuronNode> nodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : neurons) {
@@ -808,7 +811,7 @@ public class NetworkPanel extends JPanel {
         // New objects are added to the right of the last group of
         // neurons added.
         whereToAdd.setLocation(neurons.get(neurons.size() - 1).getX()
-                + DEFAULT_SPACING + 10, whereToAdd.getY());
+            + DEFAULT_SPACING + 10, whereToAdd.getY());
         repaint();
 
         // No Implementation
@@ -896,7 +899,7 @@ public class NetworkPanel extends JPanel {
         }
 
         SynapseNode node = new SynapseNode(NetworkPanel.this, source, target,
-                synapse);
+            synapse);
         canvas.getLayer().addChild(node);
         objectNodeMap.put(synapse, node);
         // System.out.println(objectNodeMap.size());
@@ -918,7 +921,8 @@ public class NetworkPanel extends JPanel {
             objectNodeMap.remove(synapse);
             // If synapsenode exists in a visible synapse group node, remove it
             if (synapse.getParentGroup() != null) {
-                SynapseGroupNode parentGroupNode = (SynapseGroupNode) objectNodeMap
+                SynapseGroupNode parentGroupNode =
+                    (SynapseGroupNode) objectNodeMap
                         .get(synapse.getParentGroup());
                 if (parentGroupNode != null) {
                     if (parentGroupNode instanceof SynapseGroupNodeVisible) {
@@ -961,7 +965,7 @@ public class NetworkPanel extends JPanel {
             // last neuron group added
             if (ng.isTopLevelGroup()) {
                 whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING,
-                        whereToAdd.getY() + DEFAULT_SPACING);
+                    whereToAdd.getY() + DEFAULT_SPACING);
             }
         } else if (group instanceof SynapseGroup) {
 
@@ -971,7 +975,7 @@ public class NetworkPanel extends JPanel {
             // New objects are added diagonally below and to the right of the
             // last subnetwork added
             whereToAdd.setLocation(whereToAdd.getX() + DEFAULT_SPACING,
-                    whereToAdd.getY() + DEFAULT_SPACING);
+                whereToAdd.getY() + DEFAULT_SPACING);
         }
         clearSelection();
     }
@@ -1027,11 +1031,11 @@ public class NetworkPanel extends JPanel {
                 // the opposite direction. The synapse groups which _originate_
                 // from this synapse groups's target neuron group
                 Set<SynapseGroup> targetGroupOutgoing = synapseGroup
-                        .getTargetNeuronGroup().getOutgoingSg();
+                    .getTargetNeuronGroup().getOutgoingSg();
                 // The synapse groups which _terminate_ at this synapse group's
                 // source neuron group
                 Set<SynapseGroup> sourceGroupIncoming = synapseGroup
-                        .getSourceNeuronGroup().getIncomingSgs();
+                    .getSourceNeuronGroup().getIncomingSgs();
 
                 // If there exists a synapse group that _originates_ in this
                 // synapse group's target neuron group and _terminates_ in this
@@ -1042,7 +1046,8 @@ public class NetworkPanel extends JPanel {
                 if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
                     // group going in the opposite direction between the same
                     // two neuron groups.
-                    final SynapseGroup reverse = (SynapseGroup) targetGroupOutgoing
+                    final SynapseGroup reverse =
+                        (SynapseGroup) targetGroupOutgoing
                             .toArray()[0];
                     if (objectNodeMap.get(reverse) != null) {
                         removeGroup(reverse);
@@ -1061,22 +1066,22 @@ public class NetworkPanel extends JPanel {
             }
         }
         SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
-                .get(synapseGroup);
+            .get(synapseGroup);
 
         // TODO: Clean up listeners if the synapsegroup is removed.
         NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap
-                .get(synapseGroup.getSourceNeuronGroup());
+            .get(synapseGroup.getSourceNeuronGroup());
         // System.out.println("Source" + srcNode);
         if (srcNode != null) {
             srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-                    synapseGroupNode);
+                synapseGroupNode);
         }
         NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap
-                .get(synapseGroup.getTargetNeuronGroup());
+            .get(synapseGroup.getTargetNeuronGroup());
         // System.out.println("Target" + tarNode);
         if (tarNode != null) {
             tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-                    synapseGroupNode);
+                synapseGroupNode);
         }
 
     }
@@ -1106,7 +1111,7 @@ public class NetworkPanel extends JPanel {
         }
         // Add synapse nodes to group node
         SynapseGroupNodeVisible synapseGroupNode = new SynapseGroupNodeVisible(this,
-                synapseGroup);
+            synapseGroup);
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
 
@@ -1135,7 +1140,7 @@ public class NetworkPanel extends JPanel {
     private void addSynapseGroupSimple(SynapseGroup synapseGroup) {
         // System.out.println("Add invisible synapse group");
         SynapseGroupNodeSimple synapseGroupNode = new SynapseGroupNodeSimple(
-                this, synapseGroup);
+            this, synapseGroup);
         canvas.getLayer().addChild(synapseGroupNode);
         objectNodeMap.put(synapseGroup, synapseGroupNode);
         // Make this a child node of parent, if any
@@ -1215,20 +1220,20 @@ public class NetworkPanel extends JPanel {
         Set<PNode> nodes = new HashSet<PNode>();
         // Add neuron groups
         for (NeuronGroup neuronGroup : ((Subnetwork) subnet)
-                .getNeuronGroupList()) {
+            .getNeuronGroupList()) {
             addGroup(neuronGroup);
             NeuronGroupNode neuronGroupNode = (NeuronGroupNode) objectNodeMap
-                    .get(neuronGroup);
+                .get(neuronGroup);
             nodes.add(neuronGroupNode);
         }
 
         // Add synapse groups
         for (SynapseGroup synapseGroup : ((Subnetwork) subnet)
-                .getSynapseGroupList()) {
+            .getSynapseGroupList()) {
             addSynapseGroup(synapseGroup);
         }
         for (SynapseGroup synapseGroup : ((Subnetwork) subnet)
-                .getSynapseGroupList()) {
+            .getSynapseGroupList()) {
             PNode synapseGroupNode = objectNodeMap.get(synapseGroup);
             nodes.add(synapseGroupNode);
         }
@@ -1354,21 +1359,22 @@ public class NetworkPanel extends JPanel {
             ret = new HopfieldNode(NetworkPanel.this, (Hopfield) subnet);
         } else if (subnet instanceof CompetitiveNetwork) {
             ret = new CompetitiveNetworkNode(NetworkPanel.this,
-                    (CompetitiveNetwork) subnet);
+                (CompetitiveNetwork) subnet);
         } else if (subnet instanceof SOMNetwork) {
             ret = new SOMNetworkNode(NetworkPanel.this, (SOMNetwork) subnet);
         } else if (subnet instanceof EchoStateNetwork) {
             ret = new ESNNetworkNode(NetworkPanel.this,
-                    (EchoStateNetwork) subnet);
+                (EchoStateNetwork) subnet);
         } else if (subnet instanceof SimpleRecurrentNetwork) {
             ret = new SRNNetworkNode(NetworkPanel.this,
-                    (SimpleRecurrentNetwork) subnet);
+                (SimpleRecurrentNetwork) subnet);
         } else if (subnet instanceof FeedForward) {
             if (subnet instanceof BackpropNetwork) {
                 ret = new BackpropNetworkNode(NetworkPanel.this,
-                        (BackpropNetwork) subnet);
+                    (BackpropNetwork) subnet);
             } else if (subnet instanceof LMSNetwork) {
-                ret = new LMSNetworkNode(NetworkPanel.this, (LMSNetwork) subnet);
+                ret =
+                    new LMSNetworkNode(NetworkPanel.this, (LMSNetwork) subnet);
             } else if (subnet instanceof BPTTNetwork) {
                 ret = new BPTTNode(NetworkPanel.this, (BPTTNetwork) subnet);
             } else {
@@ -1438,7 +1444,8 @@ public class NetworkPanel extends JPanel {
         CustomToolBar runTools = new CustomToolBar();
 
         runTools.add(actionManager.getIterateNetworkAction());
-        runTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
+        runTools
+            .add(new ToggleButton(actionManager.getNetworkControlActions()));
 
         return runTools;
     }
@@ -1544,7 +1551,7 @@ public class NetworkPanel extends JPanel {
         if (editMode == EditMode.WAND) {
             editMode.resetWandCursor();
         } else if ((editMode == EditMode.ZOOM_IN)
-                || (editMode == EditMode.ZOOM_OUT)) {
+            || (editMode == EditMode.ZOOM_OUT)) {
             this.setAutoZoomMode(false);
         }
         firePropertyChange("editMode", oldEditMode, this.editMode);
@@ -1582,13 +1589,13 @@ public class NetworkPanel extends JPanel {
             } else if (selectedNode instanceof InteractionBox) {
                 if (selectedNode.getParent() instanceof NeuronGroupNode) {
                     network.removeGroup(((NeuronGroupNode) selectedNode
-                            .getParent()).getNeuronGroup());
+                        .getParent()).getNeuronGroup());
                 } else if (selectedNode.getParent() instanceof SynapseGroupNode) {
                     network.removeGroup(((SynapseGroupNode) selectedNode
-                            .getParent()).getSynapseGroup());
+                        .getParent()).getSynapseGroup());
                 } else if (selectedNode.getParent() instanceof SubnetworkNode) {
                     network.removeGroup(((SubnetworkNode) selectedNode
-                            .getParent()).getSubnetwork());
+                        .getParent()).getSubnetwork());
                 }
             }
         }
@@ -1631,7 +1638,7 @@ public class NetworkPanel extends JPanel {
         Clipboard.clear();
         setNumberOfPastes(0);
         setBeginPosition(SimnetUtils
-                .getUpperLeft((ArrayList) getSelectedModelElements()));
+            .getUpperLeft((ArrayList) getSelectedModelElements()));
         Clipboard.add((ArrayList) this.getSelectedModelElements());
     }
 
@@ -1694,7 +1701,7 @@ public class NetworkPanel extends JPanel {
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new NeuronComparator(
-                NeuronComparator.Type.COMPARE_X));
+            NeuronComparator.Type.COMPARE_X));
 
         double min = sortedNeurons.get(0).getX();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getX();
@@ -1718,7 +1725,7 @@ public class NetworkPanel extends JPanel {
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new NeuronComparator(
-                NeuronComparator.Type.COMPARE_Y));
+            NeuronComparator.Type.COMPARE_Y));
 
         double min = sortedNeurons.get(0).getY();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getY();
@@ -1738,7 +1745,7 @@ public class NetworkPanel extends JPanel {
      */
     public void showSelectedNeuronProperties() {
         NeuronDialog dialog = NeuronDialog
-                .createNeuronDialog(getSelectedNeurons());
+            .createNeuronDialog(getSelectedNeurons());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -1750,7 +1757,7 @@ public class NetworkPanel extends JPanel {
      */
     public void showSelectedSynapseProperties() {
         SynapseDialog dialog = SynapseDialog.createSynapseDialog(this
-                .getSelectedModelSynapses());
+            .getSelectedModelSynapses());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -1915,7 +1922,7 @@ public class NetworkPanel extends JPanel {
      */
     public ArrayList<TextNode> getSelectedText() {
         return new ArrayList(Utils.select(getSelection(),
-                Filters.getTextNodeFilter()));
+            Filters.getTextNodeFilter()));
     }
 
     /**
@@ -2014,7 +2021,7 @@ public class NetworkPanel extends JPanel {
                     ret.add(((NeuronGroupNode) e.getParent()).getNeuronGroup());
                 } else if (e.getParent() instanceof SynapseGroupNode) {
                     ret.add(((SynapseGroupNode) e.getParent())
-                            .getSynapseGroup());
+                        .getSynapseGroup());
                 } else if (e.getParent() instanceof SubnetworkNode) {
                     ret.add(((SubnetworkNode) e.getParent()).getSubnetwork());
                 }
@@ -2030,7 +2037,7 @@ public class NetworkPanel extends JPanel {
      */
     public Collection<NeuronNode> getNeuronNodes() {
         return canvas.getLayer().getAllNodes(Filters.getNeuronNodeFilter(),
-                null);
+            null);
     }
 
     /**
@@ -2040,7 +2047,7 @@ public class NetworkPanel extends JPanel {
      */
     public Collection<SynapseNode> getSynapseNodes() {
         return canvas.getLayer().getAllNodes(Filters.getSynapseNodeFilter(),
-                null);
+            null);
     }
 
     /**
@@ -2059,7 +2066,7 @@ public class NetworkPanel extends JPanel {
      */
     public Collection getParentNodes() {
         return canvas.getLayer().getAllNodes(Filters.getParentNodeFilter(),
-                null);
+            null);
     }
 
     /**
@@ -2070,7 +2077,7 @@ public class NetworkPanel extends JPanel {
      */
     public Collection<ScreenElement> getSelectableNodes() {
         return canvas.getLayer().getAllNodes(Filters.getSelectableFilter(),
-                null);
+            null);
     }
 
     /**
@@ -2081,7 +2088,7 @@ public class NetworkPanel extends JPanel {
      */
     public Collection<ScreenElement> getSelectedScreenElements() {
         return new ArrayList<ScreenElement>(Utils.select(getSelection(),
-                Filters.getSelectableFilter()));
+            Filters.getSelectableFilter()));
     }
 
     /**
@@ -2117,13 +2124,13 @@ public class NetworkPanel extends JPanel {
             Map.Entry pairs = (Map.Entry) it.next();
             if (pairs.getKey() instanceof Neuron) {
                 ret = ret + ((Neuron) pairs.getKey()).getId() + " --> "
-                        + pairs.getValue();
+                    + pairs.getValue();
             } else if (pairs.getKey() instanceof Synapse) {
                 ret = ret + ((Synapse) pairs.getKey()).getId() + " --> "
-                        + pairs.getValue();
+                    + pairs.getValue();
             } else if (pairs.getKey() instanceof Group) {
                 ret = ret + ((Group) pairs.getKey()).getId() + " --> "
-                        + pairs.getValue();
+                    + pairs.getValue();
             }
         }
         return ret;
@@ -2151,7 +2158,7 @@ public class NetworkPanel extends JPanel {
     public Point2D getLastClickedPosition() {
         if (lastClickedPosition == null) {
             lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET,
-                    DEFAULT_NEWPOINT_OFFSET);
+                DEFAULT_NEWPOINT_OFFSET);
         }
         return lastClickedPosition;
     }
@@ -2175,8 +2182,8 @@ public class NetworkPanel extends JPanel {
                 }
             }
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 10,
-                    filtered.getY() - 10, filtered.getWidth() + 20,
-                    filtered.getHeight() + 20);
+                filtered.getY() - 10, filtered.getWidth() + 20,
+                filtered.getHeight() + 20);
             camera.setViewBounds(adjustedFiltered);
         }
     }
@@ -2255,7 +2262,7 @@ public class NetworkPanel extends JPanel {
      * @param selectConstituents whether to select the grouped items or not.
      */
     public void unGroup(final ViewGroupNode vgn,
-            final boolean selectConstituents) {
+        final boolean selectConstituents) {
         for (ScreenElement element : vgn.getGroupedObjects()) {
             element.setPickable(true);
             if (selectConstituents) {
@@ -2341,7 +2348,7 @@ public class NetworkPanel extends JPanel {
         // }
 
         if ((network != null) && (canvas.getLayer().getChildrenCount() > 0)
-                && (!editMode.isPan())) {
+            && (!editMode.isPan())) {
             centerCamera();
         }
     }
@@ -2449,7 +2456,7 @@ public class NetworkPanel extends JPanel {
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.getNeuron().getUpdateRule()
-                        .incrementActivation(neuronNode.getNeuron());
+                    .incrementActivation(neuronNode.getNeuron());
             } else if (node instanceof SynapseNode) {
                 SynapseNode synapseNode = (SynapseNode) node;
                 synapseNode.getSynapse().incrementWeight();
@@ -2468,7 +2475,7 @@ public class NetworkPanel extends JPanel {
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.getNeuron().getUpdateRule()
-                        .decrementActivation(neuronNode.getNeuron());
+                    .decrementActivation(neuronNode.getNeuron());
                 neuronNode.update();
             } else if (node instanceof SynapseNode) {
                 SynapseNode synapseNode = (SynapseNode) node;
@@ -2488,7 +2495,7 @@ public class NetworkPanel extends JPanel {
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.getNeuron().getUpdateRule()
-                        .contextualIncrement(neuronNode.getNeuron());
+                    .contextualIncrement(neuronNode.getNeuron());
             }
         }
     }
@@ -2502,7 +2509,7 @@ public class NetworkPanel extends JPanel {
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.getNeuron().getUpdateRule()
-                        .contextualDecrement(neuronNode.getNeuron());
+                    .contextualDecrement(neuronNode.getNeuron());
             }
         }
     }
@@ -2518,9 +2525,9 @@ public class NetworkPanel extends JPanel {
     protected void nudge(final int offsetX, final int offsetY) {
         for (NeuronNode node : getSelectedNeurons()) {
             node.getNeuron().setX(
-                    node.getNeuron().getX() + (offsetX * nudgeAmount));
+                node.getNeuron().getX() + (offsetX * nudgeAmount));
             node.getNeuron().setY(
-                    node.getNeuron().getY() + (offsetY * nudgeAmount));
+                node.getNeuron().getY() + (offsetY * nudgeAmount));
         }
         repaint();
     }
@@ -2613,7 +2620,7 @@ public class NetworkPanel extends JPanel {
         this.prioritiesVisible = prioritiesOn;
         actionManager.getShowPrioritiesAction().setState(prioritiesOn);
         for (Iterator<NeuronNode> neuronNodes = this.getNeuronNodes()
-                .iterator(); neuronNodes.hasNext();) {
+            .iterator(); neuronNodes.hasNext();) {
             NeuronNode node = neuronNodes.next();
             node.setPriorityView(prioritiesVisible);
         }
@@ -2627,7 +2634,7 @@ public class NetworkPanel extends JPanel {
     public void setHierarchyPanelVisible(boolean showIt) {
         this.showNetworkHierarchyPanel = showIt;
         actionManager.getShowNetworkHierarchyPanel().setState(
-                showNetworkHierarchyPanel);
+            showNetworkHierarchyPanel);
         if (!showNetworkHierarchyPanel) {
             splitPane.setLeftComponent(null);
             splitPane.setDividerSize(0);
@@ -2747,14 +2754,14 @@ public class NetworkPanel extends JPanel {
         // actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
-                    .hasNext();) {
+                .hasNext();) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency(1);
                 pnode.setVisible(true);
             }
         } else {
             for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
-                    .hasNext();) {
+                .hasNext();) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency((float) .6);
                 pnode.setVisible(false);
@@ -2912,14 +2919,14 @@ public class NetworkPanel extends JPanel {
         GenericFrame frame = new GenericJDialog();
         if (frame instanceof JInternalFrame) {
             ((JInternalFrame) frame)
-                    .addInternalFrameListener(new InternalFrameAdapter() {
-                        @Override
-                        public void internalFrameClosed(InternalFrameEvent e) {
-                            if (panel instanceof EditablePanel) {
-                                ((EditablePanel) panel).commitChanges();
-                            }
+                .addInternalFrameListener(new InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(InternalFrameEvent e) {
+                        if (panel instanceof EditablePanel) {
+                            ((EditablePanel) panel).commitChanges();
                         }
-                    });
+                    }
+                });
         }
         frame.setContentPane(panel);
         frame.pack();

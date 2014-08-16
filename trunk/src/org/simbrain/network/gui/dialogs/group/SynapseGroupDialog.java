@@ -20,6 +20,8 @@ package org.simbrain.network.gui.dialogs.group;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.Action;
@@ -29,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -69,11 +72,11 @@ public final class SynapseGroupDialog extends StandardDialog {
     /** Weight Matrix tab. */
     private JPanel tabMatrix = new JPanel();
 
-    /** Label Field. */
-    private final JTextField tfSynapseGroupLabel = new JTextField();
-
     /** Panel with basic neuron group info. */
-    private JPanel summaryInfoPanel;
+    private JPanel tabSummaryInfo;
+
+    /** Label Field. */
+    private JTextField tfSynapseGroupLabel = new JTextField();
 
     /** Panel for editing synapses in the group. */
     private ConnectionSynapsePropertiesPanel editSynapsesPanel;
@@ -190,32 +193,87 @@ public final class SynapseGroupDialog extends StandardDialog {
         setContentPane(tabbedPane);
 
         // Summary panel tab
+        final SummaryPanel sumPanel;
         if (isCreationDialog) {
             synapseGroup = new SynapseGroup(sourceNeuronGroup,
                 targetNeuronGroup);
-            summaryInfoPanel = new SummaryPanel(synapseGroup);
+            sumPanel = new SummaryPanel(synapseGroup);
+            tabSummaryInfo = sumPanel;
         } else {
-            summaryInfoPanel = ApplyPanel.createApplyPanel(new SummaryPanel(
-                synapseGroup));
+            sumPanel = new SummaryPanel(synapseGroup);
+            tabSummaryInfo = ApplyPanel
+                .createApplyPanel(sumPanel);
         }
-        JScrollPane summaryScrollWrapper = new JScrollPane(summaryInfoPanel);
+        JScrollPane summaryScrollWrapper = new JScrollPane(tabSummaryInfo);
         summaryScrollWrapper.setBorder(null);
         storedComponents.add(summaryScrollWrapper);
         tabbedPane.addTab("Properties", summaryScrollWrapper);
 
+        // Weight Matrix
+        final JScrollPane matrixScrollPane = new JScrollPane(tabMatrix);
+
+        // Connectivity panel for creation
         if (isCreationDialog) {
             connectionPanel = ConnectionPanel.createConnectionPanel(this,
-                    networkPanel);
+                networkPanel);
             JScrollPane connectWrapper = new JScrollPane(
-                    connectionPanel.getMainPanel());
+                connectionPanel.getMainPanel());
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Type", new JPanel());
+        } else { // Connectivity panel for editing and other tabs only relevant
+            // to editing.
+            // Weight Matrix Editor Tabs
+            if (synapseGroup.getConnectionManager() instanceof Sparse) {
+                SparseConnectionPanel sparsePanel = SparseConnectionPanel
+                    .createSparsityAdjustmentPanel(
+                        (Sparse) synapseGroup.getConnectionManager(),
+                        networkPanel);
+                ApplyPanel cePanel = ApplyPanel.createApplyPanel(sparsePanel);
+                cePanel.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                sumPanel.fillFieldValues(synapseGroup);
+                                sumPanel.repaint();
+                                repaint();
+                                adjustmentPanel.fullUpdate();
+                            }
+                        });
+                    }
+                });
+                storedComponents.add(cePanel);
+                tabbedPane.addTab("Sparsity", new JPanel());
+            }
+            matrixScrollPane.setBorder(null);
+            storedComponents.add(matrixScrollPane);
+            tabbedPane.addTab("Matrix", new JPanel());
+            // TODO: Sorting necessary? Alternative?
+            tabMatrix
+                .add(WeightMatrixViewer
+                    .getWeightMatrixPanel(new WeightMatrixViewer(
+                        synapseGroup.getSourceNeurons(),
+                        synapseGroup.getTargetNeurons(),
+                        networkPanel)));
         }
 
         // Tab for editing synapses
         editSynapsesPanel = ConnectionSynapsePropertiesPanel
             .createSynapsePropertiesPanel(this, synapseGroup);
+        if (!isCreationDialog) {
+            ActionListener al = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    sumPanel.fillFieldValues(synapseGroup);
+                    sumPanel.repaint();
+                    repaint();
+                }
+            };
+            editSynapsesPanel.addApplyListenerEx(al);
+            editSynapsesPanel.addApplyListenerIn(al);
+        }
         JScrollPane editSynapseScrollPane = new JScrollPane(
             ((EditablePanel) editSynapsesPanel).getPanel());
         editSynapseScrollPane.setBorder(null);
@@ -228,38 +286,10 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(adjustSynScrollPane);
         tabAdjust.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         adjustmentPanel = SynapseGroupAdjustmentPanel
-                .createSynapseGroupAdjustmentPanel(this, synapseGroup,
-                        isCreationDialog);
+            .createSynapseGroupAdjustmentPanel(this, synapseGroup,
+                isCreationDialog);
         tabAdjust.add(adjustmentPanel);
         tabbedPane.addTab("Synapse Values", new JPanel());
-
-        // Weight Matrix Editor Tabs
-        if (!isCreationDialog) {
-            if (synapseGroup.getConnectionManager() instanceof Sparse) {
-                SparseConnectionPanel sparsePanel = SparseConnectionPanel
-                        .createSparsityAdjustmentPanel(
-                                (Sparse) synapseGroup.getConnectionManager(),
-                                networkPanel);
-                storedComponents.add(ApplyPanel.createApplyPanel(sparsePanel));
-                tabbedPane.addTab("Sparsity", new JPanel());
-            }
-            // Weight Matrix
-            JScrollPane matrixScrollPane = new JScrollPane(tabMatrix);
-            matrixScrollPane.setBorder(null);
-            storedComponents.add(matrixScrollPane);
-            tabbedPane.addTab("Matrix", new JPanel());
-            // Hack... going around synapse group's getSource/TargetNeurons()
-            // method
-            // because we need to sort the lists...
-            // TODO: Sorting necessary? Alternative?
-            tabMatrix
-                .add(WeightMatrixViewer
-                    .getWeightMatrixPanel(new WeightMatrixViewer(
-                        synapseGroup.getSourceNeuronGroup()
-                            .getNeuronList(), synapseGroup
-                            .getTargetNeuronGroup()
-                            .getNeuronList(), networkPanel)));
-        }
 
         // Set up help button
         Action helpAction;
@@ -292,7 +322,7 @@ public final class SynapseGroupDialog extends StandardDialog {
                     } else {
                         JPanel tmpPanel = new JPanel();
                         // Hack...
-                        // 100 is a guess as to average px length of tabs
+                        // 120 is a guess as to average px length of tabs
                         // (not their panels, just the tabs)
                         // This is here to prevent "scrunching" of the
                         // tabs when one of the panel's widths is too small
@@ -333,7 +363,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             connectionPanel.commitChanges(synapseGroup);
 
-            ((EditablePanel) summaryInfoPanel).commitChanges();
+            ((EditablePanel) tabSummaryInfo).commitChanges();
             ((EditablePanel) editSynapsesPanel).commitChanges();
             adjustmentPanel.commitChanges();
             // Create the synapse group.
@@ -343,6 +373,40 @@ public final class SynapseGroupDialog extends StandardDialog {
             networkPanel.getNetwork().addGroup(synapseGroup);
             networkPanel.repaint();
         }
+    }
+
+    /**
+     * TODO: Pinpoint changes, this is overkill.
+     */
+    private void refresh(Component caller) {
+        for (int i = 0; i < storedComponents.size(); i++) {
+            if (storedComponents.get(i) == caller) {
+                continue;
+            }
+            if (storedComponents.get(i) == tabSummaryInfo) {
+                ((SummaryPanel) tabSummaryInfo).fillFieldValues();
+                continue;
+            }
+            if (storedComponents.get(i) == tabMatrix) {
+                tabMatrix.removeAll();
+                tabMatrix
+                    .add(WeightMatrixViewer
+                        .getWeightMatrixPanel(new WeightMatrixViewer(
+                            synapseGroup.getSourceNeurons(),
+                            synapseGroup.getTargetNeurons(),
+                            networkPanel)));
+                continue;
+            }
+            if (storedComponents.get(i) == adjustmentPanel) {
+                adjustmentPanel.fullUpdate();
+                continue;
+            }
+            if (storedComponents.get(i) == editSynapsesPanel) {
+
+            }
+
+        }
+
     }
 
     @Override

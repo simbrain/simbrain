@@ -18,7 +18,6 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.simbrain.network.core.Neuron;
@@ -351,9 +350,8 @@ public class Radial extends Sparse {
     }
 
     @Override
-    public Collection<Synapse> setConnectionDensity(double connectionDensity) {
+    public void setConnectionDensity(double connectionDensity) {
         // TODO Auto-generated method stub
-        return null;
     }
 
     public class DensityEstimator implements Runnable {

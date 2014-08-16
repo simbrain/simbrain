@@ -23,8 +23,8 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -130,6 +130,7 @@ public class SpecificSynapseRulePanel extends JPanel implements EditablePanel {
             startingState, "Settings", "Settings", parent);
         initSynapseType();
         startingPanel = synapsePanel;
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         initializeLayout();
         addListeners();
     }
@@ -138,8 +139,6 @@ public class SpecificSynapseRulePanel extends JPanel implements EditablePanel {
      * Lays out this panel.
      */
     private void initializeLayout() {
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
@@ -169,40 +168,22 @@ public class SpecificSynapseRulePanel extends JPanel implements EditablePanel {
      * Adds the listeners to this dialog.
      */
     private void addListeners() {
-        displaySPTriangle.addMouseListener(new MouseListener() {
-
+        displaySPTriangle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 synapsePanel.setVisible(displaySPTriangle.isDown());
                 repaint();
                 parent.pack();
-
             }
-
-            @Override
-            public void mouseEntered(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-            }
-
         });
 
         cbSynapseType.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                synapsePanel = AbstractSynapseRulePanel.RULE_MAP.get(cbSynapseType
-                    .getSelectedItem());
+                synapsePanel =
+                    AbstractSynapseRulePanel.RULE_MAP.get(cbSynapseType
+                        .getSelectedItem()).deepCopy();
 
                 // Is the current panel different from the starting panel?
                 boolean replace = synapsePanel != startingPanel;

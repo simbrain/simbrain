@@ -27,8 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
@@ -134,6 +136,39 @@ public class SynapsePropertiesExtended extends JPanel {
             frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
         }
 
+    }
+
+    /**
+     * 
+     * @param synapseGroup
+     * @param polarity
+     */
+    public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
+        frozenDD.setSelected(synapseGroup.isFrozen(polarity));
+        double increment = synapseGroup.getIncrement(polarity);
+        if (!Double.isNaN(increment)) {
+            tfIncrement.setText(Double.toString(increment));
+        } else {
+            tfIncrement.setText(SimbrainConstants.NULL_STRING);
+        }
+        double upBound = synapseGroup.getUpperBound(polarity);
+        if (!Double.isNaN(upBound)) {
+            tfUpBound.setText(Double.toString(upBound));
+        } else {
+            tfUpBound.setText(SimbrainConstants.NULL_STRING);
+        }
+        double lowBound = synapseGroup.getLowerBound(polarity);
+        if (!Double.isNaN(lowBound)) {
+            tfLowBound.setText(Double.toString(lowBound));
+        } else {
+            tfLowBound.setText(SimbrainConstants.NULL_STRING);
+        }
+        Integer delay = synapseGroup.getDelay(polarity);
+        if (delay != null) {
+            tfDelay.setText(delay.toString());
+        } else {
+            tfDelay.setText(SimbrainConstants.NULL_STRING);
+        }
     }
 
     /**

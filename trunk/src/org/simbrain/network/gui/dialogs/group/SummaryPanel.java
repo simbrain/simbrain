@@ -62,11 +62,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     /** A flag for whether or not the population is editable from this panel. */
     private boolean editable;
 
-    /*
-     * /**************************************************** Field Labels *
-     * ****************************************************
-     */
-
     /** Id label */
     private final JLabel idLabel = new JLabel("Group ID: ");
 
@@ -93,11 +88,6 @@ public class SummaryPanel extends JPanel implements EditablePanel {
 
     /** A label for synapse group learning rate. */
     private final JLabel learningRateLabel = new JLabel("Learning rate:");
-
-    /*
-     * /**************************************************** Fields *
-     * ****************************************************
-     */
 
     /** The field for the group id. */
     private JLabel idField = new JLabel();
@@ -218,7 +208,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
      *            the neuron group being used to fill the values of this panel's
      *            fields.
      */
-    private void fillFieldValues(final NeuronGroup ng) {
+    public void fillFieldValues(final NeuronGroup ng) {
         if (ng.getId() == null || ng.getId().isEmpty()) {
             idField.setText(ng.getParentNetwork().getGroupIdGenerator()
                 .getHypotheticalId()); // ng hasn't been added to the
@@ -292,7 +282,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
      * @param sg
      *            the synapse group being used to fill field values
      */
-    private void fillFieldValues(final SynapseGroup sg) {
+    public void fillFieldValues(final SynapseGroup sg) {
         if (sg.getId() == null || sg.getId().isEmpty()) {
             idField.setText(sg.getParentNetwork().getGroupIdGenerator()
                 .getHypotheticalId()); // sg hasn't been added to the

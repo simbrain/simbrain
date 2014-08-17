@@ -23,8 +23,8 @@ import java.util.Set;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.ConnectionUtilities.CheckSynapse;
-import org.simbrain.network.connections.ConnectionUtilities.SetSynapse;
+import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterGetter;
+import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterSetter;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -516,6 +516,8 @@ public class SynapseGroup extends Group {
         } else {
             inSynapseSet.remove(toDelete);
         }
+        toDelete.getSource().removeEfferent(toDelete);
+        toDelete.getTarget().removeAfferent(toDelete);
         this.excitatoryRatio = getExcitatoryRatioPrecise();
         if (isDisplaySynapses()) {
             toDelete.getNetwork().fireSynapseRemoved(toDelete);
@@ -1135,12 +1137,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setDelay(int delay, Polarity polarity) {
-        SetSynapse<Integer> setDelay = new SetSynapse<Integer>() {
-            @Override
-            public void setSynapse(Synapse synapse, Integer val) {
-                synapse.setDelay(val);
-            }
-        };
+        SynapseParameterSetter<Integer> setDelay =
+            new SynapseParameterSetter<Integer>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Integer val) {
+                    synapse.setDelay(val);
+                }
+            };
         setSynapses(setDelay, delay, polarity);
     }
 
@@ -1150,12 +1153,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setEnabled(boolean enabled, Polarity polarity) {
-        SetSynapse<Boolean> setEnabled = new SetSynapse<Boolean>() {
-            @Override
-            public void setSynapse(Synapse synapse, Boolean val) {
-                synapse.setEnabled(val);
-            }
-        };
+        SynapseParameterSetter<Boolean> setEnabled =
+            new SynapseParameterSetter<Boolean>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Boolean val) {
+                    synapse.setEnabled(val);
+                }
+            };
         setSynapses(setEnabled, enabled, polarity);
     }
 
@@ -1165,12 +1169,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setFrozen(boolean frozen, Polarity polarity) {
-        SetSynapse<Boolean> setFrozen = new SetSynapse<Boolean>() {
-            @Override
-            public void setSynapse(Synapse synapse, Boolean val) {
-                synapse.setFrozen(val);
-            }
-        };
+        SynapseParameterSetter<Boolean> setFrozen =
+            new SynapseParameterSetter<Boolean>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Boolean val) {
+                    synapse.setFrozen(val);
+                }
+            };
         setSynapses(setFrozen, frozen, polarity);
     }
 
@@ -1180,12 +1185,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setIncrement(double increment, Polarity polarity) {
-        SetSynapse<Double> setIncrement = new SetSynapse<Double>() {
-            @Override
-            public void setSynapse(Synapse synapse, Double val) {
-                synapse.setIncrement(val);
-            }
-        };
+        SynapseParameterSetter<Double> setIncrement =
+            new SynapseParameterSetter<Double>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Double val) {
+                    synapse.setIncrement(val);
+                }
+            };
         setSynapses(setIncrement, increment, polarity);
     }
 
@@ -1195,10 +1201,11 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setLearningRule(SynapseUpdateRule sur, Polarity polarity) {
-        SetSynapse<SynapseUpdateRule> setSUR =
-            new SetSynapse<SynapseUpdateRule>() {
+        SynapseParameterSetter<SynapseUpdateRule> setSUR =
+            new SynapseParameterSetter<SynapseUpdateRule>() {
                 @Override
-                public void setSynapse(Synapse synapse, SynapseUpdateRule val) {
+                public void setSynapseParameter(Synapse synapse,
+                    SynapseUpdateRule val) {
                     synapse.setLearningRule(val.deepCopy());
                 }
             };
@@ -1219,12 +1226,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setLowerBound(double lowerBound, Polarity polarity) {
-        SetSynapse<Double> setLowBound = new SetSynapse<Double>() {
-            @Override
-            public void setSynapse(Synapse synapse, Double val) {
-                synapse.setLowerBound(val);
-            }
-        };
+        SynapseParameterSetter<Double> setLowBound =
+            new SynapseParameterSetter<Double>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Double val) {
+                    synapse.setLowerBound(val);
+                }
+            };
         setSynapses(setLowBound, lowerBound, polarity);
     }
 
@@ -1234,10 +1242,11 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setSpikeResponder(SpikeResponder spr, Polarity polarity) {
-        SetSynapse<SpikeResponder> setSPR =
-            new SetSynapse<SpikeResponder>() {
+        SynapseParameterSetter<SpikeResponder> setSPR =
+            new SynapseParameterSetter<SpikeResponder>() {
                 @Override
-                public void setSynapse(Synapse synapse, SpikeResponder val) {
+                public void setSynapseParameter(Synapse synapse,
+                    SpikeResponder val) {
                     synapse.setSpikeResponder(val.deepCopy());
                 }
             };
@@ -1251,12 +1260,13 @@ public class SynapseGroup extends Group {
      */
     public void setStrength(double strength, Polarity polarity) {
         strength = polarity.value(strength);
-        SetSynapse<Double> setStrength = new SetSynapse<Double>() {
-            @Override
-            public void setSynapse(Synapse synapse, Double val) {
-                synapse.setStrength(val);
-            }
-        };
+        SynapseParameterSetter<Double> setStrength =
+            new SynapseParameterSetter<Double>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Double val) {
+                    synapse.setStrength(val);
+                }
+            };
         setSynapses(setStrength, strength, polarity);
         if (Polarity.BOTH == polarity) {
             if (strength > 0) {
@@ -1277,12 +1287,13 @@ public class SynapseGroup extends Group {
      * @param polarity
      */
     public void setUpperBound(double upperBound, Polarity polarity) {
-        SetSynapse<Double> setUpBound = new SetSynapse<Double>() {
-            @Override
-            public void setSynapse(Synapse synapse, Double val) {
-                synapse.setUpperBound(val);
-            }
-        };
+        SynapseParameterSetter<Double> setUpBound =
+            new SynapseParameterSetter<Double>() {
+                @Override
+                public void setSynapseParameter(Synapse synapse, Double val) {
+                    synapse.setUpperBound(val);
+                }
+            };
         setSynapses(setUpBound, upperBound, polarity);
     }
 
@@ -1292,12 +1303,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public Integer getDelay(Polarity polarity) {
-        CheckSynapse<Integer> delayCheck = new CheckSynapse<Integer>() {
-            @Override
-            public Integer check(Synapse synapse) {
-                return synapse.getDelay();
-            }
-        };
+        SynapseParameterGetter<Integer> delayCheck =
+            new SynapseParameterGetter<Integer>() {
+                @Override
+                public Integer getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getDelay();
+                }
+            };
         return checkSynapses(delayCheck, polarity);
     }
 
@@ -1307,12 +1319,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public Boolean isEnabled(Polarity polarity) {
-        CheckSynapse<Boolean> enabledCheck = new CheckSynapse<Boolean>() {
-            @Override
-            public Boolean check(Synapse synapse) {
-                return synapse.isEnabled();
-            }
-        };
+        SynapseParameterGetter<Boolean> enabledCheck =
+            new SynapseParameterGetter<Boolean>() {
+                @Override
+                public Boolean getParameterFromSynapse(Synapse synapse) {
+                    return synapse.isEnabled();
+                }
+            };
         return checkSynapses(enabledCheck, polarity);
     }
 
@@ -1322,12 +1335,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public Boolean isFrozen(Polarity polarity) {
-        CheckSynapse<Boolean> frozenCheck = new CheckSynapse<Boolean>() {
-            @Override
-            public Boolean check(Synapse synapse) {
-                return synapse.isFrozen();
-            }
-        };
+        SynapseParameterGetter<Boolean> frozenCheck =
+            new SynapseParameterGetter<Boolean>() {
+                @Override
+                public Boolean getParameterFromSynapse(Synapse synapse) {
+                    return synapse.isFrozen();
+                }
+            };
         return checkSynapses(frozenCheck, polarity);
     }
 
@@ -1337,12 +1351,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public double getIncrement(Polarity polarity) {
-        CheckSynapse<Double> incrementCheck = new CheckSynapse<Double>() {
-            @Override
-            public Double check(Synapse synapse) {
-                return synapse.getIncrement();
-            }
-        };
+        SynapseParameterGetter<Double> incrementCheck =
+            new SynapseParameterGetter<Double>() {
+                @Override
+                public Double getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getIncrement();
+                }
+            };
         Double increment = checkSynapses(incrementCheck, polarity);
         return increment == null ? Double.NaN : increment;
     }
@@ -1353,12 +1368,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public String getLearningRuleDescription(Polarity polarity) {
-        CheckSynapse<String> updateRuleCheck = new CheckSynapse<String>() {
-            @Override
-            public String check(Synapse synapse) {
-                return synapse.getLearningRule().getDescription();
-            }
-        };
+        SynapseParameterGetter<String> updateRuleCheck =
+            new SynapseParameterGetter<String>() {
+                @Override
+                public String getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getLearningRule().getDescription();
+                }
+            };
         String rule = checkSynapses(updateRuleCheck, polarity);
         return rule == null ? SimbrainConstants.NULL_STRING : rule;
     }
@@ -1369,12 +1385,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public double getLowerBound(Polarity polarity) {
-        CheckSynapse<Double> lowBoundCheck = new CheckSynapse<Double>() {
-            @Override
-            public Double check(Synapse synapse) {
-                return synapse.getLowerBound();
-            }
-        };
+        SynapseParameterGetter<Double> lowBoundCheck =
+            new SynapseParameterGetter<Double>() {
+                @Override
+                public Double getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getLowerBound();
+                }
+            };
         Double lowB = checkSynapses(lowBoundCheck, polarity);
         return lowB == null ? Double.NaN : lowB;
     }
@@ -1385,12 +1402,13 @@ public class SynapseGroup extends Group {
      * @return
      */
     public String getSpikeResponderDescription(Polarity polarity) {
-        CheckSynapse<String> spikeResponderCheck = new CheckSynapse<String>() {
-            @Override
-            public String check(Synapse synapse) {
-                return synapse.getSpikeResponder().getDescription();
-            }
-        };
+        SynapseParameterGetter<String> spikeResponderCheck =
+            new SynapseParameterGetter<String>() {
+                @Override
+                public String getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getSpikeResponder().getDescription();
+                }
+            };
         String rule = checkSynapses(spikeResponderCheck, polarity);
         return rule == null ? SimbrainConstants.NULL_STRING : rule;
     }
@@ -1401,37 +1419,42 @@ public class SynapseGroup extends Group {
      * @return
      */
     public double getUpperBound(Polarity polarity) {
-        CheckSynapse<Double> upBoundCheck = new CheckSynapse<Double>() {
-            @Override
-            public Double check(Synapse synapse) {
-                return synapse.getUpperBound();
-            }
-        };
+        SynapseParameterGetter<Double> upBoundCheck =
+            new SynapseParameterGetter<Double>() {
+                @Override
+                public Double getParameterFromSynapse(Synapse synapse) {
+                    return synapse.getUpperBound();
+                }
+            };
         Double upB = checkSynapses(upBoundCheck, polarity);
         return upB == null ? Double.NaN : upB;
     }
 
     /**
-     * 
+     * A generic method which takes in a functional interface and a polarity. It
+     * then performs that function on every synapse in the set(s) corresponding
+     * to the polarity parameter and returns a result matching the type
+     * specified by the passed function.
      * @param check
      * @param synapses
      * @param prototype
      * @return
      */
-    public <T> T checkSynapses(CheckSynapse<T> check, Polarity polarity) {
+    public <T> T checkSynapses(SynapseParameterGetter<T> check,
+        Polarity polarity) {
         Collection<Synapse> synapses;
         Synapse prototype;
         if (Polarity.EXCITATORY == polarity) {
             synapses = exSynapseSet;
             prototype = excitatoryPrototype;
             if (useGroupLevelSettings || synapses.isEmpty()) {
-                return check.check(prototype);
+                return check.getParameterFromSynapse(prototype);
             }
         } else if (Polarity.INHIBITORY == polarity) {
             synapses = inSynapseSet;
             prototype = inhibitoryPrototype;
             if (useGroupLevelSettings || synapses.isEmpty()) {
-                return check.check(prototype);
+                return check.getParameterFromSynapse(prototype);
             }
         } else {
             synapses = getAllSynapses();
@@ -1440,9 +1463,9 @@ public class SynapseGroup extends Group {
             }
         }
         Iterator<Synapse> synIter = synapses.iterator();
-        T first = check.check(synIter.next());
+        T first = check.getParameterFromSynapse(synIter.next());
         while (synIter.hasNext()) {
-            if (!first.equals(check.check(synIter.next()))) {
+            if (!first.equals(check.getParameterFromSynapse(synIter.next()))) {
                 return null;
             }
         }
@@ -1450,26 +1473,32 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * 
+     * A generic method that takes in a functional interface, a value and a
+     * polarity. The functional interface takes in a synapse and a value
+     * and the calling method specifies which parameter of synapse the function
+     * sets the value to. This method then performs that function (setting some
+     * synapse parameter) on all the synapses in the set(s) corresponding to the
+     * specified polarity.
      * @param set
      * @param val
      * @param polarity
      */
-    public <T> void setSynapses(SetSynapse<T> set, T val, Polarity polarity) {
+    public <T> void setSynapses(SynapseParameterSetter<T> set,
+        T val, Polarity polarity) {
         Collection<Synapse> synapses;
         if (Polarity.EXCITATORY == polarity) {
             synapses = exSynapseSet;
-            set.setSynapse(excitatoryPrototype, val);
+            set.setSynapseParameter(excitatoryPrototype, val);
         } else if (Polarity.INHIBITORY == polarity) {
             synapses = inSynapseSet;
-            set.setSynapse(inhibitoryPrototype, val);
+            set.setSynapseParameter(inhibitoryPrototype, val);
         } else {
             synapses = getAllSynapses();
-            set.setSynapse(excitatoryPrototype, val);
-            set.setSynapse(inhibitoryPrototype, val);
+            set.setSynapseParameter(excitatoryPrototype, val);
+            set.setSynapseParameter(inhibitoryPrototype, val);
         }
         for (Synapse s : synapses) {
-            set.setSynapse(s, val);
+            set.setSynapseParameter(s, val);
         }
     }
 

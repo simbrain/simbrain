@@ -57,6 +57,7 @@ import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
+@SuppressWarnings("serial")
 public class LMSOfflineControlPanel extends JPanel {
 
     /** Reference to trainer object. */
@@ -113,7 +114,7 @@ public class LMSOfflineControlPanel extends JPanel {
         this.frame = frame;
         noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
         noisePanel = new RandomizerPanel(frame);
-        noisePanel.fillFieldValues(trainer.getNoiseGen());
+        noisePanel.fillDefaultValues();
         init();
     }
 

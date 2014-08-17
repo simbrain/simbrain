@@ -38,9 +38,13 @@ import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
- * Implements a simple recurrent network (See, e.g, Elman 1991).
+ * Implements a simple recurrent network (See, e.g, Elman 1991). While the
+ * SRN behavior could be implemented more efficiently by using a recurrent 
+ * hidden layer and a buffered update, a context layer is here for educational
+ * and visualization purposes, as well as to more closely follow Elman's 
+ * original design.
  *
- * @author ztosi
+ * @author Zach Tosi
  * @author Jeff Yoshimi
  */
 public final class SimpleRecurrentNetwork extends Subnetwork implements
@@ -61,20 +65,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     /** Reference to the output layer. */
     private final NeuronGroup outputLayer;
 
-    /** Initial position of network (from bottom left). */
-    private Point2D initialPosition;
-
     /** space between layers */
     private int betweenLayerInterval = 150;
-
-    /** space between neurons within layers */
-    private int betweenNeuronInterval = 50;
-
-    /**
-     * If a layer has more than this many neurons, use grid layout instead of
-     * line layout.
-     */
-    private int useGridThreshold = 20;
 
     /**
      * Training set.
@@ -124,8 +116,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         NeuronUpdateRule outputNeuronType, Point2D initialPosition) {
         super(network);
 
-        this.initialPosition = initialPosition;
-
         setLabel("SRN");
 
         // Initialize layers and set node types. TODO: Can this be done at group
@@ -149,7 +139,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         // Hidden Layer
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
-        hiddenLayer.setLabel("Hidden layer");
+        hiddenLayer.setLabel("Hidden layer (x(t))");
         addNeuronGroup(hiddenLayer);
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
@@ -160,7 +150,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991). TODO
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
-        contextLayer.setLabel("Context nodes");
+        contextLayer.setLabel("Context Layer (x(t - \u0394t))");
         addNeuronGroup(contextLayer);
         contextLayer.setLayoutBasedOnSize();
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
@@ -176,11 +166,11 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         // Connect the layers
         SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer,
-                hiddenLayer, new AllToAll(false), 0.5);
+            hiddenLayer, new AllToAll(false), 0.5);
         SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer,
-                hiddenLayer, new AllToAll(false), 0.5);
+            hiddenLayer, new AllToAll(false), 0.5);
         SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer,
-                outputLayer, new AllToAll(false), 0.5);
+            outputLayer, new AllToAll(false), 0.5);
 
         addAndLabelSynapseGroup(inToHid);
         addAndLabelSynapseGroup(contToHid);
@@ -214,15 +204,14 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     @Override
     public void initNetwork() {
         clearActivations();
-        contextLayer.forceSetActivationLevels(.5);
+        hiddenLayer.forceSetActivationLevels(.5);
     }
 
     @Override
     public void update() {
 
-        // Update input then hidden layers
+        // Update input layer
         inputLayer.update();
-        hiddenLayer.update();
 
         // Update context Layer
         for (Neuron n : hiddenLayer.getNeuronList()) {
@@ -231,10 +220,17 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
             contextLayer.getNeuronList().get(index).setActivation(act);
         }
 
+        // Update hidden layer
+        hiddenLayer.update();
+
         // Update output layer
         outputLayer.update();
+
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<List<Neuron>> getNeuronGroupsAsList() {
         List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
@@ -244,16 +240,25 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Neuron> getInputNeurons() {
         return inputLayer.getNeuronList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Neuron> getOutputNeurons() {
         return outputLayer.getNeuronList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
@@ -273,11 +278,17 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         return hiddenLayer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUpdateMethodDesecription() {
         return "Hidden layer, copy hidden to context, update layer";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Group getNetwork() {
         return this;

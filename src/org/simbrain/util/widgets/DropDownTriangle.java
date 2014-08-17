@@ -207,6 +207,33 @@ public class DropDownTriangle extends JPanel implements MouseListener {
     }
 
     /**
+     * Changes the text displayed when the triangle is in the "up" state
+     * @param upText
+     */
+    public void setUpText(String upText) {
+        upTriLabel.setText(upText);
+    }
+
+    /**
+     * Changes the text displayed when the triangle is in the down state
+     * @param downText
+     */
+    public void setDownText(String downText) {
+        downTriLabel.setText(downText);
+    }
+
+    /**
+     * Changes the text displayed next to the triangle.
+     * @param upText
+     * @param downText
+     */
+    public void setBothTexts(String upText, String downText) {
+        setUpText(upText);
+        setDownText(downText);
+        repaint();
+    }
+
+    /**
      *
      * @author zach
      *

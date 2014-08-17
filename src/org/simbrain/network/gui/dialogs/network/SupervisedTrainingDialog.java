@@ -18,8 +18,14 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -44,7 +50,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
     protected NetworkPanel networkPanel;
 
     /** Main tabbed pane. */
-    protected JTabbedPane tabbedPane = new JTabbedPane();
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Reference to the trainable network being edited. */
     private Trainable trainable;
@@ -58,6 +64,8 @@ public class SupervisedTrainingDialog extends StandardDialog {
     /** Reference to validate inputs panel */
     private TestInputPanel validateInputsPanel;
 
+    private List<Component> tabs = new ArrayList<Component>();
+
     /**
      * Default constructor.
      *
@@ -65,7 +73,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
      * @param trainable edited network
      */
     public SupervisedTrainingDialog(final NetworkPanel np,
-            final Trainable trainable) {
+        final Trainable trainable) {
         networkPanel = np;
         this.trainable = trainable;
     }
@@ -80,21 +88,21 @@ public class SupervisedTrainingDialog extends StandardDialog {
 
         // Input data tab
         inputPanel = new DataPanel(trainable.getInputNeurons(),
-                trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
+            trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
         inputPanel.setFrame(this);
-        tabbedPane.addTab("Input data", inputPanel);
+        addTab("Input data", inputPanel);
 
         // Training data tab
         trainingPanel = new DataPanel(trainable.getOutputNeurons(),
-                trainable.getTrainingSet().getTargetDataMatrix(), 5, "Targets");
+            trainable.getTrainingSet().getTargetDataMatrix(), 5, "Targets");
         trainingPanel.setFrame(this);
-        tabbedPane.addTab("Target data", trainingPanel);
+        addTab("Target data", trainingPanel);
 
         // Testing tab
         validateInputsPanel = new TestInputPanel(networkPanel,
-                trainable.getInputNeurons(), trainable.getTrainingSet()
-                        .getInputDataMatrix());
-        tabbedPane.addTab("Validate Input Data", validateInputsPanel);
+            trainable.getInputNeurons(), trainable.getTrainingSet()
+                .getInputDataMatrix());
+        addTab("Validate Input Data", validateInputsPanel);
 
         // Finalize
         setContentPane(tabbedPane);
@@ -103,8 +111,30 @@ public class SupervisedTrainingDialog extends StandardDialog {
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent
-                        .getSource();
+                    .getSource();
                 int index = sourceTabbedPane.getSelectedIndex();
+                Component current = tabs.get(index);
+                int numTabs = tabs.size();
+                for (int i = 0; i < numTabs; i++) {
+                    if (i == index) {
+                        tabbedPane.setComponentAt(i, current);
+                        tabbedPane.repaint();
+                        continue;
+                    } else {
+                        JPanel tmpPanel = new JPanel();
+                        int minPx = tabbedPane.getTabCount() * 120;
+                        if (current.getPreferredSize().width < minPx) {
+                            tmpPanel.setPreferredSize(new Dimension(minPx,
+                                current.getPreferredSize().height));
+                        } else {
+                            tmpPanel.setPreferredSize(current
+                                .getPreferredSize());
+                        }
+                        tabbedPane.setComponentAt(i, tmpPanel);
+                    }
+                }
+                tabbedPane.revalidate();
+
                 if (index == 0) {
                     // When entering training tab, commit table changes
                     inputPanel.commitChanges();
@@ -113,24 +143,40 @@ public class SupervisedTrainingDialog extends StandardDialog {
                     // Set validation data to whatever input data currently is
                     if (inputPanel.getTable().getData() != null) {
                         validateInputsPanel.setData(((NumericTable) inputPanel
-                                .getTable().getData()).asDoubleArray());
+                            .getTable().getData()).asDoubleArray());
                     }
                 }
+                pack();
             }
         };
+
         tabbedPane.addChangeListener(changeListener);
 
         // Set up help
         if (trainable instanceof LMSNetwork) {
             Action helpAction = new ShowHelpAction(
-                    "Pages/Network/network/lmsnetwork.html");
+                "Pages/Network/network/lmsnetwork.html");
             addButton(new JButton(helpAction));
         } else if (trainable instanceof BackpropNetwork) {
             Action helpAction = new ShowHelpAction(
-                    "Pages/Network/network/backpropnetwork.html");
+                "Pages/Network/network/backpropnetwork.html");
             addButton(new JButton(helpAction));
         }
 
+    }
+
+    /**
+     * 
+     * @param name
+     * @param tab
+     */
+    public void addTab(String name, Component tab) {
+        if (tabs.size() == 0) {
+            tabbedPane.addTab(name, tab);
+        } else {
+            tabbedPane.addTab(name, new JPanel());
+        }
+        tabs.add(tab);
     }
 
     /**

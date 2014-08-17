@@ -20,6 +20,7 @@ package org.simbrain.util.randomizer.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
@@ -227,6 +228,27 @@ public class ProbDistPanel {
         tfUpBound.setEnabled(tsClipping.isSelected());
     }
 
+    /**
+     * @return the double value of the text in tfParam1; NaN if not double
+     *  parsable
+     */
+    public double getParam1FieldVal() {
+        return Utils.doubleParsable(tfParam1);
+    }
+
+    /**
+     * @return the double value of the text in tfParam2; NaN if not double
+     *  parsable
+     */
+    public double getParam2FieldVal() {
+        return Utils.doubleParsable(tfParam2);
+    }
+
+    /**
+     * Sets all the components of this panel to the desired enabled/disabled
+     * state.
+     * @param enabled
+     */
     public void setEnabled(boolean enabled) {
 
         boolean boundConditions = enabled
@@ -286,6 +308,18 @@ public class ProbDistPanel {
         tfParam1.addPropertyChangeListener(pc);
         tfParam2.addPropertyChangeListener(pc);
         tsClipping.addPropertyChangeListener(pc);
+    }
+
+    /**
+     * 
+     * @param fl
+     */
+    public void addFocusListenerToFields(FocusListener fl) {
+        tfUpBound.addFocusListener(fl);
+        tfLowBound.addFocusListener(fl);
+        tfParam1.addFocusListener(fl);
+        tfParam2.addFocusListener(fl);
+        tsClipping.addFocusListener(fl);
     }
 
     /**

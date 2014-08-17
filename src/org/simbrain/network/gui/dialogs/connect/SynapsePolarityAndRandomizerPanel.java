@@ -221,18 +221,21 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     }
 
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(
-            final Window parent, PolarizedRandomizer exRandomizer2,
-            PolarizedRandomizer inRandomizer2,
-            boolean useExcitatoryRandomization,
-            boolean useInhibitoryRandomization) {
-        SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(
+        final Window parent, PolarizedRandomizer exRandomizer2,
+        PolarizedRandomizer inRandomizer2,
+        boolean useExcitatoryRandomization,
+        boolean useInhibitoryRandomization) {
+        SynapsePolarityAndRandomizerPanel prPanel =
+            new SynapsePolarityAndRandomizerPanel(
                 parent, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
         prPanel.exRandomizer = exRandomizer2;
         prPanel.inRandomizer = inRandomizer2;
-        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(
+        prPanel.excitatoryRandomizerPanel =
+            prPanel.new EditableRandomizerPanel(
                 parent, exRandomizer2, useExcitatoryRandomization);
-        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(
+        prPanel.inhibitoryRandomizerPanel =
+            prPanel.new EditableRandomizerPanel(
                 parent, inRandomizer2, useInhibitoryRandomization);
         prPanel.excitatoryRandomizerPanel.initListeners();
         prPanel.inhibitoryRandomizerPanel.initListeners();
@@ -628,7 +631,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         private final JButton applyButton = new JButton("Apply");
 
         public EditableRandomizerPanel(Window parent,
-                PolarizedRandomizer randomizer, boolean enabled) {
+            PolarizedRandomizer randomizer, boolean enabled) {
             this.randomizer = randomizer;
             polarity = randomizer.getPolarity();
             randomizerPanel.fillFieldValues(randomizer);
@@ -670,28 +673,42 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         private void init() {
             randomizerPanel.fillFieldValues(randomizer);
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            setLayout(new GridBagLayout());
             Border colorBorder = BorderFactory.createLineBorder(Polarity
                 .EXCITATORY.equals(polarity) ? Color.red : Color.blue);
             this.setBorder(BorderFactory
                 .createTitledBorder(colorBorder, polarity.title()));
 
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.NORTH;
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.weighty = 0.0;
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+
             Box topPanel = Box.createHorizontalBox();
-            if (RandBehavior.FORCE_ON != randomizerState) {
+            if (RandBehavior.FORCE_ON != randomizerState && creationPanel) {
                 topPanel.add(new JLabel("Weight Randomizer"));
                 topPanel.add(Box.createHorizontalStrut(15));
                 topPanel.add(Box.createHorizontalGlue());
                 topPanel.add(enableStatusTriangle);
                 topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-                //                enableStatusTriangle.setVisible(creationPanel
-                //                    && RandBehavior.DEFAULT == randomizerState);
-                this.add(topPanel);
+                this.add(topPanel, gbc);
+                gbc.gridy += 1;
             }
 
             randomizerPanel.setVisible(enableStatusTriangle.isDown()
                 || RandBehavior.FORCE_ON == randomizerState);
-            this.add(randomizerPanel);
+            this.add(randomizerPanel, gbc);
 
+            gbc.gridy += 1;
+            gbc.fill = GridBagConstraints.VERTICAL;
+            gbc.weighty = 1.0;
+            this.add(new JPanel(), gbc);
+
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.weighty = 0.0;
+            gbc.gridy += 1;
             if (!creationPanel) {
                 JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout
                     .RIGHT));
@@ -699,7 +716,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                 bottomPanel.setPreferredSize(new Dimension(randomizerPanel
                     .getPreferredSize().width,
                     bottomPanel.getPreferredSize().height));
-                this.add(bottomPanel);
+                this.add(bottomPanel, gbc);
             }
 
         }

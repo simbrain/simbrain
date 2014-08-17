@@ -21,13 +21,13 @@ package org.simbrain.network.gui.trainer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.util.SimpleFrame;
-import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * Combines an iterative control panel and training set panel to provide the
@@ -45,7 +45,7 @@ public class IterativeTrainingPanel extends JPanel {
     private final TrainingSetPanel trainingSetPanel;
 
     /** Parent frame. */
-    private GenericFrame parentFrame;
+    private Window parentFrame;
 
     /**
      * Construct a rule chooser panel.
@@ -54,14 +54,14 @@ public class IterativeTrainingPanel extends JPanel {
      * @param trainer the trainer this panel represents
      */
     public IterativeTrainingPanel(final NetworkPanel networkPanel,
-            final IterableTrainer trainer) {
+        final IterableTrainer trainer) {
 
         iterativeControls = new IterativeControlsPanel(networkPanel, trainer);
 
         // Training Set Panel
         if (trainer != null) {
             trainingSetPanel = new TrainingSetPanel(
-                    trainer.getTrainableNetwork(), 3);
+                trainer.getTrainableNetwork(), 3);
         } else {
             trainingSetPanel = new TrainingSetPanel();
         }
@@ -93,7 +93,7 @@ public class IterativeTrainingPanel extends JPanel {
     /**
      * @param parentFrame the parentFrame to set
      */
-    public void setFrame(GenericFrame parentFrame) {
+    public void setFrame(Window parentFrame) {
         this.parentFrame = parentFrame;
         trainingSetPanel.setFrame(parentFrame);
     }

@@ -187,7 +187,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             setTitle("Edit Synapse Group");
         }
 
-        setMinimumSize(new Dimension(isCreationDialog ? 500 : 600, 300));
+        setMinimumSize(new Dimension(500, 300));
 
         fillFieldValues();
         setContentPane(tabbedPane);
@@ -266,9 +266,15 @@ public final class SynapseGroupDialog extends StandardDialog {
             ActionListener al = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    sumPanel.fillFieldValues(synapseGroup);
-                    sumPanel.repaint();
-                    repaint();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            sumPanel.fillFieldValues(synapseGroup);
+                            sumPanel.repaint();
+                            repaint();
+                            adjustmentPanel.fullUpdate();
+                        }
+                    });
                 }
             };
             editSynapsesPanel.addApplyListenerEx(al);

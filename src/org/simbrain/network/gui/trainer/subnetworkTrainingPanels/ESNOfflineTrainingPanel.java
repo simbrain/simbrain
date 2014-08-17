@@ -57,10 +57,10 @@ public class ESNOfflineTrainingPanel extends JPanel {
      * @param esn the underlying network
      */
     public ESNOfflineTrainingPanel(final NetworkPanel panel,
-            final EchoStateNetwork esn, final Window frame) {
+        final EchoStateNetwork esn, final Window frame) {
         // Initialize control panel with no trainer. It has to be set
         // After the apply button is pressed
-        controlPanel = new LMSOfflineControlPanel(panel);
+        controlPanel = new LMSOfflineControlPanel(frame);
 
         // Set up main controls
         GridBagConstraints controlPanelConstraints = new GridBagConstraints();

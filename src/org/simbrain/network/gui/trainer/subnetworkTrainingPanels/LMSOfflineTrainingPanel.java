@@ -21,6 +21,7 @@ package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -28,7 +29,6 @@ import javax.swing.JPanel;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainingSetPanel;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -51,7 +51,7 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
     private final TrainingSetPanel trainingSetPanel;
 
     /** Parent frame. */
-    private GenericFrame parentFrame;
+    private final Window parentFrame;
 
     /**
      * Build the panel.
@@ -60,17 +60,18 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
      * @param trainer the LMSOffline trainer to represent
      */
     public LMSOfflineTrainingPanel(final NetworkPanel panel,
-            final LMSOffline trainer) {
-
+        final LMSOffline trainer, final Window parentFrame) {
+        this.parentFrame = parentFrame;
         this.trainer = trainer;
-        controlPanel = new LMSOfflineControlPanel(panel, trainer);
+        controlPanel = new LMSOfflineControlPanel(trainer, parentFrame);
 
         // Set up main controls
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
 
         // Training Set Panel
         trainingSetPanel = new TrainingSetPanel(trainer.getTrainableNetwork(),
-                3);
+            3);
+        trainingSetPanel.setFrame(parentFrame);
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -92,15 +93,6 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(trainingSetPanel, gbc);
-    }
-
-    /**
-     * @param parentFrame the parentFrame to set
-     */
-    public void setFrame(GenericFrame parentFrame) {
-        this.parentFrame = parentFrame;
-        controlPanel.setFrame(parentFrame);
-        trainingSetPanel.setFrame(parentFrame);
     }
 
     @Override

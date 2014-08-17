@@ -18,9 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -80,12 +84,13 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         trainerPanel.add(cbHolder);
         trainerPanel.add(Box.createVerticalStrut(5));
         final JPanel trainerContainer = new JPanel();
+        trainerContainer.setLayout(new BorderLayout());
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         trainerPanel.add(separator);
         trainerPanel.add(trainerContainer);
 
         // Add to tabbed pane
-        tabbedPane.addTab("Train", trainerPanel);
+        addTab("Train", trainerPanel);
         updateComboBox(selectType, trainerContainer);
 
         selectType.addActionListener(new ActionListener() {
@@ -108,22 +113,35 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
      *            the container
      */
     private void updateComboBox(JComboBox<String> selectType,
-        JPanel trainerContainer) {
+        final JPanel trainerContainer) {
         trainerContainer.removeAll();
         if (selectType.getSelectedIndex() == 0) {
             LMSIterative trainer = new LMSIterative(lms);
             IterativeControlsPanel iterativeControls =
                 new IterativeControlsPanel(
                     networkPanel, trainer);
-            trainerContainer.add(iterativeControls);
+            trainerContainer.add(iterativeControls, BorderLayout.CENTER);
+            trainerContainer.setPreferredSize(iterativeControls
+                .getPreferredSize());
         } else {
             LMSOffline trainer = new LMSOffline(lms);
-            LMSOfflineControlPanel offlineControls =
-                new LMSOfflineControlPanel(
-                    networkPanel, trainer);
-            trainerContainer.removeAll();
-            trainerContainer.add(offlineControls);
+            final LMSOfflineControlPanel offlineControls =
+                new LMSOfflineControlPanel(trainer, this);
+            offlineControls.addMouseListenerToTriangle(new MouseAdapter() {
+                public void mouseClicked(MouseEvent me) {
+                    trainerContainer.setPreferredSize(offlineControls
+                        .getPreferredSize());
+                }
+            });
+            offlineControls.setBorder(BorderFactory.createEmptyBorder(5, 5, 10,
+                5));
+            trainerContainer.add(offlineControls, BorderLayout.CENTER);
+            trainerContainer.setPreferredSize(offlineControls
+                .getPreferredSize());
+
         }
+        trainerContainer.revalidate();
+        trainerContainer.repaint();
         repaint();
         pack();
         setLocationRelativeTo(null);

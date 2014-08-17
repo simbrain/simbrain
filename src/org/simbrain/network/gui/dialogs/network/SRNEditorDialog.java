@@ -60,12 +60,12 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
         // Trainer tab
         SRNTrainer trainer = new SRNTrainer(srn);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-                networkPanel, trainer);
-        tabbedPane.addTab("Train", iterativeControls);
+            networkPanel, trainer);
+        addTab("Train", iterativeControls);
 
         // Set up help
         Action helpAction = new ShowHelpAction(
-                "Pages/Network/network/srn.html");
+            "Pages/Network/network/srn.html");
         addButton(new JButton(helpAction));
     }
 

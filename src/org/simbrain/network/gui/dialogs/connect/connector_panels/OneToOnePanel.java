@@ -18,12 +18,10 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
-import org.simbrain.network.util.OrientationComparator;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
@@ -31,6 +29,10 @@ import org.simbrain.network.util.OrientationComparator;
  */
 @SuppressWarnings("serial")
 public class OneToOnePanel extends AbstractConnectionPanel {
+
+    public enum OneToOneOptions {
+        HORIZONTAL, VERTICAL, AUTO_DETECT;
+    }
 
     /** Sets the connection orientation. */
     private JComboBox orientationBox;
@@ -49,17 +51,18 @@ public class OneToOnePanel extends AbstractConnectionPanel {
         this.connection = connection;
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         // setSynapseType.setText(connection.getBaseSynapse().getType());
-        mainPanel.addItem("Orientation: ", orientationBox);
-        mainPanel.addItem("Bidirectional Connections: ", bidirectionalConnection);
+        //        mainPanel.addItem("Orientation: ", orientationBox);
+        mainPanel.addItem("Bidirectional Connections: ",
+            bidirectionalConnection);
         fillFieldValues();
     }
 
     @Override
     public void fillFieldValues() {
         bidirectionalConnection.setSelected(((OneToOne) connection)
-                .isUseBidirectionalConnections());
+            .isUseBidirectionalConnections());
         orientationBox.setSelectedItem(((OneToOne) connection)
-                .getConnectOrientation());
+            .getConnectOrientation());
     }
 
     @Override
@@ -70,18 +73,19 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     @Override
     public boolean commitChanges() {
         connection.setUseBidirectionalConnections(bidirectionalConnection
-                .isSelected());
-        connection
-                .setConnectOrientation(((OrientationComparator) orientationBox
-                        .getSelectedItem()));
+            .isSelected());
+        //        connection
+        //            .setConnectOrientation(((OrientationComparator) orientationBox
+        //                .getSelectedItem()));
         return true;
 
     }
 
     @Override
-    public List<Synapse> applyConnection(List<Neuron> source, List<Neuron> target) {
+    public List<Synapse> applyConnection(List<Neuron> source,
+        List<Neuron> target) {
         return OneToOne.connectOneToOne(source, target,
-                bidirectionalConnection.isSelected(), true);
+            bidirectionalConnection.isSelected(), true);
     }
 
 }

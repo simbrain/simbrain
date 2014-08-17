@@ -20,34 +20,35 @@ package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSOffline;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.network.trainers.TrainerListener;
-import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.randomizer.gui.RandomizerPanel;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
 /**
  * Control panel (buttons etc.) for least mean squares offline trainers. Used in
@@ -61,42 +62,21 @@ public class LMSOfflineControlPanel extends JPanel {
     /** Reference to trainer object. */
     private LMSOffline trainer;
 
-    /** Reference to network panel. */
-    private final NetworkPanel networkPanel;
-
-    /**
-     * The main LMS panel, where the start button, progress bar, and solution
-     * box reside.
-     */
-    private JPanel mainPanel = new JPanel();
-
-    /** The panel devoted to ridge regression. */
-    private JPanel regressionPanel = new JPanel();
-
     /** The button which starts training. */
     private JButton applyButton = new JButton("Start");
 
     /** The progress bar, tracking the progress of training. */
     private final JProgressBar progressBar = new JProgressBar();
 
-    /** The solution types as strings within the combo box. */
-    private String[] solutions = { "Wiener-Hopf", "Psuedoinverse" };
-
     /** A combo box containing the supported solution types. */
-    private final JComboBox solutionTypes = new JComboBox(solutions);
-
-    /** A hashmap backing the solution type combo box. */
-    private final HashMap<String, LMSOffline.SolutionType> pairing = new HashMap<String, LMSOffline.SolutionType>();
-
-    // Initializing the solution type hash map...
-    {
-        pairing.put("Wiener-Hopf", LMSOffline.SolutionType.WIENER_HOPF);
-        pairing.put("Psuedoinverse", LMSOffline.SolutionType.MOORE_PENROSE);
-    }
+    private final JComboBox<SolutionType> solutionTypes =
+        new JComboBox<SolutionType>(SolutionType.values());
 
     // This is flashy a checkbox could do the work... but this is more pretty...
     /** A button regulating the use of ridge regression. */
     private JButton regSwitch = new JButton("Off");
+
+    private JCheckBox ridgeRegChkBx = new JCheckBox();
 
     /** A flag for whether or not regression is being used. */
     private boolean regressionActive;
@@ -107,10 +87,20 @@ public class LMSOfflineControlPanel extends JPanel {
     }
 
     /** A text field containing the alpha value. */
-    private JTextField alpha = new JTextField(" 0.5 ");
+    private JTextField alpha = new JTextField(" 0.5 ", 10);
+
+    {
+        alpha.setMaximumSize(alpha.getPreferredSize());
+    }
+
+    private RandomizerPanel noisePanel;
+
+    private DropDownTriangle noiseTri;
+
+    private JCheckBox noiseChkBx = new JCheckBox();
 
     /** Parent frame. */
-    private GenericFrame frame;
+    private final Window frame;
 
     /**
      * Build the panel. No trainer is supplied. It will be supplied later once
@@ -119,8 +109,11 @@ public class LMSOfflineControlPanel extends JPanel {
      *
      * @param networkPanel the parent network panel
      */
-    public LMSOfflineControlPanel(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
+    public LMSOfflineControlPanel(Window frame) {
+        this.frame = frame;
+        noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
+        noisePanel = new RandomizerPanel(frame);
+        noisePanel.fillFieldValues(trainer.getNoiseGen());
         init();
     }
 
@@ -130,10 +123,14 @@ public class LMSOfflineControlPanel extends JPanel {
      * @param networkPanel the parent network panel
      * @param trainer the LMSOffline trainer to represent
      */
-    public LMSOfflineControlPanel(final NetworkPanel networkPanel,
-            final LMSOffline trainer) {
-        this.networkPanel = networkPanel;
+    public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {
+        this.frame = frame;
         this.trainer = trainer;
+        noisePanel = new RandomizerPanel(frame);
+        noisePanel.fillFieldValues(trainer.getNoiseGen());
+        noiseTri = new DropDownTriangle(UpDirection.LEFT, false, "", "", frame);
+        String text = noisePanel.getSummary();
+        noiseTri.setBothTexts(text, text);
         init();
     }
 
@@ -142,35 +139,53 @@ public class LMSOfflineControlPanel extends JPanel {
      */
     private void init() {
 
-        // Set up main controls
-        setLayout(new GridBagLayout());
-        GridBagConstraints controlPanelConstraints = new GridBagConstraints();
-        setBorder(BorderFactory.createTitledBorder("Controls"));
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(Box.createVerticalStrut(10));
 
-        // Main panel
-        fillMainPanel();
-        controlPanelConstraints.weightx = 0.5;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 0;
-        add(mainPanel, controlPanelConstraints);
+        // Solution type
+        Box solType = Box.createHorizontalBox();
+        solType.add(new JLabel("Solution Type: "));
+        solType.add(Box.createHorizontalGlue());
+        solType.add(Box.createHorizontalStrut(100));
+        solType.add(solutionTypes);
+        this.add(solType);
+        this.add(Box.createVerticalStrut(10));
 
-        // Separator
-        controlPanelConstraints.weightx = 1;
-        controlPanelConstraints.weighty = 1;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 1;
-        JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
-        separator2.setPreferredSize(new Dimension(250, 15));
-        add(separator2, controlPanelConstraints);
+        // Ridge Regression:
+        Box rReg = Box.createHorizontalBox();
+        rReg.add(new JLabel("Ridge Regression: "));
+        rReg.add(ridgeRegChkBx);
+        rReg.add(Box.createHorizontalGlue());
+        rReg.add(alpha);
+        alpha.setEnabled(ridgeRegChkBx.isSelected());
+        this.add(rReg);
+        this.add(Box.createVerticalStrut(10));
 
-        // Regression
-        fillRegressionPanel();
-        controlPanelConstraints.weightx = 1;
-        controlPanelConstraints.weighty = 1;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 2;
-        controlPanelConstraints.insets = new Insets(5, 15, 5, 15);
-        add(regressionPanel, controlPanelConstraints);
+        // Noise
+        Box noiseBx = Box.createHorizontalBox();
+        noiseBx.add(new JLabel("Noise: "));
+        noiseBx.add(noiseChkBx);
+        noiseBx.add(Box.createHorizontalGlue());
+        noiseBx.add(noiseTri);
+        String text = noisePanel.getSummary();
+        noiseTri.setBothTexts(text, text);
+        this.add(noiseBx);
+        this.add(Box.createVerticalStrut(5));
+
+        // Noise panel
+        noisePanel.setVisible(noiseTri.isDown());
+        noisePanel.setEnabled(noiseChkBx.isSelected());
+        this.add(noisePanel);
+        this.add(Box.createVerticalStrut(5));
+
+        Box applyPanel = Box.createHorizontalBox();
+        applyPanel.add(Box.createHorizontalStrut(5));
+        applyPanel.add(progressBar);
+        applyPanel.add(Box.createHorizontalGlue());
+        applyPanel.add(Box.createHorizontalStrut(15));
+        applyPanel.add(applyButton);
+        applyPanel.add(Box.createHorizontalStrut(5));
+        this.add(applyPanel);
 
         addActionListeners();
 
@@ -180,36 +195,8 @@ public class LMSOfflineControlPanel extends JPanel {
 
     }
 
-    /**
-     * Creates the main panel, containing the start button, progress bar, and
-     * solution type selector.
-     */
-    private void fillMainPanel() {
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 5));
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(100);
-        progressBar.setStringPainted(true);
-        row1.add(applyButton);
-        row1.add(progressBar);
-
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 5));
-        row2.add(new JLabel("Solution type"));
-        row2.add(solutionTypes);
-        mainPanel.setLayout(new GridLayout(2, 1));
-        mainPanel.add(row1);
-        mainPanel.add(row2);
-    }
-
-    /**
-     * Creates the regression panel, containing the regression switch, and a
-     * field to set alpha levels.
-     */
-    private void fillRegressionPanel() {
-        regressionPanel.setLayout(new GridLayout(1, 3));
-        regressionPanel.add(new JLabel("Ridge regression"));
-        regressionPanel.add(regSwitch);
-        alpha.setEnabled(false);
-        regressionPanel.add(alpha);
+    public void addMouseListenerToTriangle(MouseAdapter ma) {
+        noiseTri.addMouseListener(ma);
     }
 
     /**
@@ -217,6 +204,35 @@ public class LMSOfflineControlPanel extends JPanel {
      * trainer, applyButton, solutionTypes, and regSwitch.
      */
     private void addActionListeners() {
+        // If focus is lost from one of the fields in the noise panel
+        // change the summary description.
+        noisePanel.addFocusListenerToFields(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent arg0) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                String text = noisePanel.getSummary();
+                noiseTri.setBothTexts(text, text);
+            }
+        });
+
+        // If the noise distritbuion has been changed, change the summary
+        // description.
+        noisePanel.getCbDistribution().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        String text = noisePanel.getSummary();
+                        noiseTri.setBothTexts(text, text);
+                    }
+                });
+            }
+        });
+
         // Adds a listener for the start button: executes training upon firing.
         // Also activates ridge regression in LMSOffline and sets the alpha.
         applyButton.addActionListener(new ActionListener() {
@@ -241,46 +257,46 @@ public class LMSOfflineControlPanel extends JPanel {
                 }
 
                 // Sets the solution type in LMSOffline
-                trainer.setSolutionType(pairing.get(solutionTypes
-                        .getSelectedItem()));
+                trainer.setSolutionType((SolutionType) solutionTypes
+                    .getSelectedItem());
 
                 // Disables/enabled ridge regression based on selected solution
-                if (pairing.get(solutionTypes.getSelectedItem()) == LMSOffline.SolutionType.MOORE_PENROSE) {
-                    regSwitch.setText("Off");
-                    regSwitch.setForeground(Color.red);
-                    regSwitch.setEnabled(false);
+                if (solutionTypes.getSelectedItem()
+                == LMSOffline.SolutionType.MOORE_PENROSE) {
+                    ridgeRegChkBx.setSelected(false);
+                    ridgeRegChkBx.setEnabled(false);
                     alpha.setEnabled(false);
-                    regressionActive = false;
                 } else {
-                    regSwitch.setEnabled(true);
+                    ridgeRegChkBx.setEnabled(true);
+                    alpha.setEnabled(true);
                 }
             }
 
         });
 
-        // Ridge regression button listener
-        regSwitch.addActionListener(new ActionListener() {
+        ridgeRegChkBx.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alpha.setEnabled(ridgeRegChkBx.isSelected());
+            }
+        });
+
+        noiseChkBx.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // Reset progress bar
-                progressBar.setValue(0);
-
-                if (regressionActive) {
-                    regressionActive = false;
-                    regSwitch.setText("Off");
-                    regSwitch.setForeground(Color.red);
-                    alpha.setEnabled(false);
-                } else {
-                    regressionActive = true;
-                    regSwitch.setText("On");
-                    regSwitch.setForeground(Color.green);
-                    alpha.setEnabled(true);
-                }
-                if (frame != null) {
-                    frame.pack();
-                }
+                noisePanel.setEnabled(noiseChkBx.isSelected());
+                noiseTri.setEnabled(noiseChkBx.isSelected());
             }
+        });
 
+        noiseTri.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                noisePanel.setVisible(noiseTri.isDown());
+                noisePanel.repaint();
+                noisePanel.revalidate();
+                frame.pack();
+            }
         });
 
     }
@@ -303,20 +319,19 @@ public class LMSOfflineControlPanel extends JPanel {
 
             @Override
             public void endTraining() {
-                // System.out.println("Training End");
-                // progressBar.setIndeterminate(false);
+                progressBar.setIndeterminate(false);
                 progressBar.setValue(100);
                 setCursor(null); // Turn off wait cursor
 
                 // BELOW causes hard crash
-//                networkPanel.getNetwork().fireGroupUpdated(
-//                        ((LMSNetwork) trainer.getTrainableNetwork()
-//                                .getNetwork()).getSynapseGroup());
+                //                networkPanel.getNetwork().fireGroupUpdated(
+                //                        ((LMSNetwork) trainer.getTrainableNetwork()
+                //                                .getNetwork()).getSynapseGroup());
             }
 
             @Override
             public void progressUpdated(String progressUpdate,
-                    int percentComplete) {
+                int percentComplete) {
                 // System.out.println(progressUpdate + " -- " + percentComplete
                 // + "%");
                 progressBar.setValue(percentComplete);
@@ -336,14 +351,18 @@ public class LMSOfflineControlPanel extends JPanel {
         if (regressionActive) {
             trainer.setAlpha(Double.parseDouble(alpha.getText()));
         }
+        trainer.setNoiseAdded(noiseChkBx.isSelected());
+        if (noiseChkBx.isSelected()) {
+            noisePanel.commitRandom(trainer.getNoiseGen());
+        }
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             public Void doInBackground() {
                 try {
                     trainer.apply();
                 } catch (DataNotInitializedException e) {
                     JOptionPane.showOptionDialog(null, e.getMessage(),
-                            "Warning", JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, null, null);
+                        "Warning", JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, null, null);
                 }
                 return null;
             }
@@ -375,11 +394,12 @@ public class LMSOfflineControlPanel extends JPanel {
         return applyButton;
     }
 
-    /**
-     * @param frame the parentFrame to set
-     */
-    public void setFrame(GenericFrame frame) {
-        this.frame = frame;
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
+        LMSOfflineControlPanel locp = new LMSOfflineControlPanel(frame);
+        frame.setContentPane(locp);
+        frame.setVisible(true);
+        frame.pack();
     }
 
 }

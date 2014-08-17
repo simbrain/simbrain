@@ -32,7 +32,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
@@ -60,8 +59,8 @@ public class TrainerGuiActions {
      * @return an action for opening this table
      */
     public static Action getEditDataAction(final NetworkPanel networkPanel,
-            final List<Neuron> neurons, final NumericMatrix dataHolder,
-            final String name) {
+        final List<Neuron> neurons, final NumericMatrix dataHolder,
+        final String name) {
         return new AbstractAction() {
 
             // Initialize
@@ -76,7 +75,8 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 DataPanel panel = new DataPanel(neurons, dataHolder, 5, name);
-                GenericFrame frame = networkPanel.displayPanel(panel, "Edit "
+                JDialog frame =
+                    networkPanel.displayPanelInWindow(panel, "Edit "
                         + name);
                 panel.setFrame(frame);
             }
@@ -94,7 +94,7 @@ public class TrainerGuiActions {
      * @return the action
      */
     public static Action getEditCombinedDataAction(
-            final NetworkPanel networkPanel, final Trainable trainable) {
+        final NetworkPanel networkPanel, final Trainable trainable) {
         return new AbstractAction() {
 
             // Initialize
@@ -109,9 +109,9 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 TrainingSetPanel combinedPanel = new TrainingSetPanel(
-                        trainable, 5);
-                GenericFrame frame = networkPanel.displayPanel(combinedPanel,
-                        "Edit Training Set");
+                    trainable, 5);
+                JDialog frame = networkPanel.displayPanelInWindow(
+                    combinedPanel, "Edit Training Set");
                 combinedPanel.setFrame(frame);
             }
 
@@ -136,7 +136,7 @@ public class TrainerGuiActions {
     public static String getDataDirectory() {
         try {
             return SimbrainPreferences
-                    .getString("networkTableDirectory");
+                .getString("networkTableDirectory");
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -153,7 +153,7 @@ public class TrainerGuiActions {
      * @return the action for opening csv files
      */
     public static Action getOpenCSVAction(final SimbrainJTable table,
-            final NumericMatrix dataHolder) {
+        final NumericMatrix dataHolder) {
         return new AbstractAction() {
 
             // Initialize
@@ -168,22 +168,22 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 SFileChooser chooser = new SFileChooser(getDataDirectory(),
-                        "comma-separated-values (csv)", "csv");
+                    "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     try {
                         ((NumericTable) table.getData()).readData(theFile,
-                                true, false);
+                            true, false);
                         dataHolder.setData(((NumericTable) table.getData())
-                                .asDoubleArray());
+                            .asDoubleArray());
                     } catch (InvalidDataException exception) {
                         JOptionPane.showMessageDialog(null,
-                                exception.getMessage(), "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                            exception.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     } catch (TableDataException e) {
                         JOptionPane.showOptionDialog(null, e.getMessage(),
-                                "Warning", JOptionPane.DEFAULT_OPTION,
-                                JOptionPane.WARNING_MESSAGE, null, null, null);
+                            "Warning", JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
                 }
                 setDataDirectory(chooser.getCurrentLocation());
@@ -198,7 +198,8 @@ public class TrainerGuiActions {
      * @param trainer the trainer
      * @return the action
      */
-    public static AbstractAction getPropertiesDialogAction(final Trainer trainer) {
+    public static AbstractAction
+        getPropertiesDialogAction(final Trainer trainer) {
         return new AbstractAction() {
 
             // Initialize
@@ -212,9 +213,10 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+                ReflectivePropertyEditor editor =
+                    new ReflectivePropertyEditor();
                 editor.setExcludeList(new String[] { "iteration",
-                        "updateCompleted" });
+                    "updateCompleted" });
                 editor.setObject(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
@@ -234,13 +236,13 @@ public class TrainerGuiActions {
      * @return the action
      */
     public static AbstractAction getShowPlotAction(final NetworkPanel panel,
-            final IterableTrainer trainer) {
+        final IterableTrainer trainer) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("CurveChart.png"));
+                    ResourceManager.getImageIcon("CurveChart.png"));
                 putValue(NAME, "Show error plot");
                 putValue(SHORT_DESCRIPTION, "Show error plot");
             }

@@ -20,6 +20,7 @@ package org.simbrain.util.randomizer.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Window;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
@@ -35,6 +36,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistribution;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
 import org.simbrain.util.widgets.TristateDropDown;
@@ -69,6 +71,25 @@ public class RandomizerPanel extends JPanel {
      */
     private JPanel cardPanel = new JPanel();
 
+    private ItemListener cbItemListener = new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                ProbDistPanel rp = null;
+                String str = SimbrainConstants.NULL_STRING;
+                cardPanel.removeAll();
+                if (!cbDistribution.getSelectedItem().equals(str)) {
+                    rp = cardMap.get(cbDistribution.getSelectedItem());
+                    cardPanel.add(rp.getPanel());
+                }
+                cardPanel.repaint();
+                repaint();
+                if (parent != null)
+                    parent.pack();
+            }
+        }
+    };
+
     private final Window parent;
 
     /**
@@ -102,10 +123,14 @@ public class RandomizerPanel extends JPanel {
     private void layoutPanel() {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
-        cardPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-        add(cardPanel, BorderLayout.CENTER);
+        //        GridBagConstraints gbc = new GridBagConstraints();
+        //        gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new LabelledItem("Distribution: ", cbDistribution),
             BorderLayout.NORTH);
+        add(cardPanel, BorderLayout.CENTER);
+
+        cbItemListener.itemStateChanged(new ItemEvent(cbDistribution,
+            ItemEvent.SELECTED, cardPanel, ItemEvent.ITEM_STATE_CHANGED));
         repaint();
         revalidate();
     }
@@ -127,24 +152,7 @@ public class RandomizerPanel extends JPanel {
      * given probability distribution.
      */
     private void addInternalListeners() {
-        cbDistribution.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    ProbDistPanel rp = null;
-                    String str = SimbrainConstants.NULL_STRING;
-                    cardPanel.removeAll();
-                    if (!cbDistribution.getSelectedItem().equals(str)) {
-                        rp = cardMap.get(cbDistribution.getSelectedItem());
-                        cardPanel.add(rp.getPanel());
-                    }
-                    cardPanel.repaint();
-                    repaint();
-                    if (parent != null)
-                        parent.pack();
-                }
-            }
-        });
+        cbDistribution.addItemListener(cbItemListener);
     }
 
     /**
@@ -227,6 +235,21 @@ public class RandomizerPanel extends JPanel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        for (ProbDistPanel pdp : cardMap.values()) {
+            pdp.getPanel().setVisible(visible);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setEnabled(boolean enabled) {
         cbDistribution.setEnabled(enabled);
         if (!cbDistribution.getSelectedItem()
@@ -239,7 +262,7 @@ public class RandomizerPanel extends JPanel {
     /**
      * @return Returns the cbDistribution.
      */
-    public JComboBox getCbDistribution() {
+    public JComboBox<ProbDistribution> getCbDistribution() {
         return cbDistribution;
     }
 
@@ -280,6 +303,45 @@ public class RandomizerPanel extends JPanel {
     }
 
     /**
+     * Provides a string summary of the field values.
+     * @return
+     */
+    public String getSummary() {
+        ProbDistribution pdf =
+            (ProbDistribution) cbDistribution.getSelectedItem();
+        ProbDistPanel pdp = cardMap.get(pdf);
+        double param1 = pdp.getParam1FieldVal();
+        double param2 = pdp.getParam2FieldVal();
+        String newText = "";
+        param1 = SimbrainMath.roundDouble(param1, 5);
+        param2 = SimbrainMath.roundDouble(param2, 5);
+        switch ((ProbDistribution) cbDistribution.getSelectedItem()) {
+            case UNIFORM:
+                newText = "Uniform: [" + param1 + ", " + param2 + "]";
+                break;
+            case NORMAL:
+                newText = "Normal: \u03BC=" + param1 + " \u03C3=" + param2;
+                break;
+            case LOGNORMAL:
+                newText = "Log-normal: \u03BC=" + param1 + " \u03C3=" + param2;
+                break;
+            case GAMMA:
+                newText = "Gamma: k=" + param1 + " \u03B8=" + param2;
+                break;
+            case EXPONENTIAL:
+                newText = "Exponential: \u03BB=" + param1;
+                break;
+            case PARETO:
+                newText = "Pareto: \u03B1=" + param1 + " min=" + param2;
+                break;
+            default:
+                newText = "???";
+                break;
+        }
+        return newText;
+    }
+
+    /**
      *
      * @param pc
      */
@@ -289,6 +351,16 @@ public class RandomizerPanel extends JPanel {
             .equals(SimbrainConstants.NULL_STRING)) {
             cardMap.get(cbDistribution.getSelectedItem())
                 .addPropertyChangeListenerToFields(pc);
+        }
+    }
+
+    /**
+    *
+    * @param pc
+    */
+    public void addFocusListenerToFields(FocusListener fl) {
+        for (ProbDistPanel pdp : cardMap.values()) {
+            pdp.addFocusListenerToFields(fl);
         }
     }
 

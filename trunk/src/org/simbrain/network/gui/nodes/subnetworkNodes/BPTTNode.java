@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -33,7 +34,6 @@ import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.trainers.BPTTTrainer;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * PNode representation of a group of a BPTT network.
@@ -66,14 +66,14 @@ public class BPTTNode extends SubnetworkNode {
         menu.addSeparator();
         JMenu dataActions = new JMenu("View / Edit Data");
         dataActions.add(TrainerGuiActions.getEditCombinedDataAction(
-                getNetworkPanel(), network));
+            getNetworkPanel(), network));
         dataActions.addSeparator();
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                network.getInputNeurons(), network.getTrainingSet()
-                        .getInputDataMatrix(), "Input"));
+            network.getInputNeurons(), network.getTrainingSet()
+                .getInputDataMatrix(), "Input"));
         dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-                network.getOutputNeurons(), network.getTrainingSet()
-                        .getTargetDataMatrix(), "Target"));
+            network.getOutputNeurons(), network.getTrainingSet()
+                .getTargetDataMatrix(), "Target"));
         menu.add(dataActions);
 
         setContextMenu(menu);
@@ -95,9 +95,9 @@ public class BPTTNode extends SubnetworkNode {
         public void actionPerformed(ActionEvent arg0) {
             BPTTNetwork network = (BPTTNetwork) getSubnetwork();
             IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
-                    getNetworkPanel(), new BPTTTrainer(network));
-            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel,
-                    "Trainer");
+                getNetworkPanel(), new BPTTTrainer(network));
+            JDialog frame = getNetworkPanel().displayPanelInWindow(
+                trainingPanel, "Trainer");
             trainingPanel.setFrame(frame);
         }
     };

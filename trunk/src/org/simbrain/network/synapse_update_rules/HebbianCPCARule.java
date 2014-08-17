@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * <b>HebbianCPCA</b>. TODO: No Doc.
@@ -33,7 +34,8 @@ public class HebbianCPCARule extends SynapseUpdateRule {
      * Default Maximum weight value (see equation 4.19 in O'Reilly and
      * Munakata).
      */
-    public static final double DEFAULT_M = .5 / .15;
+    public static final double DEFAULT_M =
+        SimbrainMath.roundDouble(.5 / .15, 4);
 
     /** Default Weight offset. */
     public static final double DEFAULT_THETA = 1;
@@ -80,7 +82,7 @@ public class HebbianCPCARule extends SynapseUpdateRule {
         double output = synapse.getTarget().getActivation();
 
         double deltaW = learningRate
-                * ((output * input) - (output * synapse.getStrength())); // Equation
+            * ((output * input) - (output * synapse.getStrength())); // Equation
         // 4.12
         // deltaW = learningRate * (output * input * (m - strength) + output *
         // (1 - input) * (-strength));

@@ -16,6 +16,7 @@ package org.simbrain.network.gui.trainer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -51,7 +51,7 @@ public class DataPanel extends JPanel implements EditablePanel {
     private static final int DEFAULT_NUM_ROWS = 5;
 
     /** Parent frame. */
-    private GenericFrame parentFrame;
+    private Window parentFrame;
 
     /** The external object that has the data being edited. */
     protected NumericMatrix dataHolder;
@@ -72,8 +72,8 @@ public class DataPanel extends JPanel implements EditablePanel {
      * @param name name for panel
      */
     public DataPanel(final List<Neuron> neurons,
-            final NumericMatrix dataHolder, final int numVisibleColumns,
-            final String name) {
+        final NumericMatrix dataHolder, final int numVisibleColumns,
+        final String name) {
 
         this.dataHolder = dataHolder;
         this.inputNeurons = neurons;
@@ -81,10 +81,10 @@ public class DataPanel extends JPanel implements EditablePanel {
         // If no data exists, create it!
         if (dataHolder.getData() == null) {
             table = SimbrainJTable.createTable(new NumericTable(
-                    DEFAULT_NUM_ROWS, neurons.size()));
+                DEFAULT_NUM_ROWS, neurons.size()));
         } else {
             table = SimbrainJTable.createTable(new NumericTable(dataHolder
-                    .getData()));
+                .getData()));
         }
 
         // Set up column headings
@@ -113,7 +113,7 @@ public class DataPanel extends JPanel implements EditablePanel {
         JToolBar fileToolBar = new JToolBar();
         fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
         fileToolBar.add(TableActionManager
-                .getSaveCSVAction((NumericTable) table.getData()));
+            .getSaveCSVAction((NumericTable) table.getData()));
         toolbars.add(fileToolBar);
 
         // Edit tools
@@ -147,7 +147,7 @@ public class DataPanel extends JPanel implements EditablePanel {
         //System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
             dataHolder
-                    .setData(((NumericTable) table.getData()).asDoubleArray());
+                .setData(((NumericTable) table.getData()).asDoubleArray());
             // Set has changed to false, so that the data only re-committed if
             // the data have changed.
             table.setHasChangedSinceLastSave(false);
@@ -161,15 +161,16 @@ public class DataPanel extends JPanel implements EditablePanel {
      */
     private void resizePanel() {
         if (parentFrame != null) {
-            int additionalParentHeight = (parentFrame.getBounds().height - scroller
+            int additionalParentHeight =
+                (parentFrame.getBounds().height - scroller
                     .getHeight());
             scroller.resize();
             int newHeight = scroller.getPreferredSize().height
-                    + additionalParentHeight;
+                + additionalParentHeight;
             // Reset height of parent frame
             if (newHeight > 300) {
-                parentFrame.setPreferredSize(new Dimension(parentFrame
-                        .getPreferredSize().width, newHeight));
+                //                parentFrame.setPreferredSize(new Dimension(parentFrame
+                //                    .getPreferredSize().width, newHeight));
                 parentFrame.pack();
                 parentFrame.setLocationRelativeTo(null);
             }
@@ -181,7 +182,7 @@ public class DataPanel extends JPanel implements EditablePanel {
      *
      * @param parentFrame the parentFrame to set
      */
-    public void setFrame(GenericFrame parentFrame) {
+    public void setFrame(Window parentFrame) {
         this.parentFrame = parentFrame;
     }
 

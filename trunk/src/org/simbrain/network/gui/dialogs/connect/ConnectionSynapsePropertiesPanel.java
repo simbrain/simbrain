@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +30,6 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -40,6 +38,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesPanel;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
@@ -66,11 +65,17 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      */
     private SynapsePropertiesPanel inhibitoryInfoPanel;
 
-    /** The apply button for editing associated with excitatory synapses. */
-    private JButton exApplyButton = new JButton("Apply");
+    /** 
+     * The apply panel associated with using {@link #excitatoryInfoPanel} for
+     * editing. 
+     */
+    private ApplyPanel exApplyPanel;
 
-    /** The apply button for editing associated with inhibitory synapses. */
-    private JButton inApplyButton = new JButton("Apply");
+    /** 
+     * The apply panel associated with using {@link #inhibitoryInfoPanel} for
+     * editing. 
+     */
+    private ApplyPanel inApplyPanel;
 
     /**
      * A template excitatory synapse used to store committed information if a
@@ -105,7 +110,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         ConnectionSynapsePropertiesPanel spp =
             new ConnectionSynapsePropertiesPanel(parent,
                 synapseGroup);
-        spp.initApplyListeners();
+        if (!spp.creationPanel) {
+            spp.initApplyListeners();
+        }
         return spp;
     }
 
@@ -121,7 +128,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         ConnectionSynapsePropertiesPanel spp =
             new ConnectionSynapsePropertiesPanel(parent,
                 synapses);
-        spp.initApplyListeners();
+        if (!spp.creationPanel) {
+            spp.initApplyListeners();
+        }
         return spp;
     }
 
@@ -136,7 +145,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             final Window parent) {
         ConnectionSynapsePropertiesPanel spp =
             new ConnectionSynapsePropertiesPanel(parent);
-        spp.initApplyListeners();
+        if (!spp.creationPanel) {
+            spp.initApplyListeners();
+        }
         return spp;
     }
 
@@ -245,33 +256,39 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         BoxLayout bxLayout = new BoxLayout(mainPanel, BoxLayout.X_AXIS);
         mainPanel.setLayout(bxLayout);
 
-        Box inBox = Box.createVerticalBox();
-        inBox.setAlignmentY(Component.TOP_ALIGNMENT);
-        inBox.add(inhibitoryInfoPanel);
-        JPanel inApButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        inApButtonPanel.add(inApplyButton);
-        inBox.add(Box.createVerticalGlue());
-        inBox.add(inApButtonPanel);
-        inApButtonPanel.setVisible(!creationPanel);
+        // Layout inhibitory panel
+        if (creationPanel) { // No apply button, creating...
+            Box inBox = Box.createVerticalBox();
+            inBox.setAlignmentY(Component.TOP_ALIGNMENT);
+            inBox.add(inhibitoryInfoPanel);
+            inBox.add(Box.createVerticalGlue());
+            inBox.setBorder(inBorder);
+            mainPanel.add(inBox);
+        } else { // Apply button/panel, editing...
+            inApplyPanel = ApplyPanel.createApplyPanel(inhibitoryInfoPanel);
+            inApplyPanel.setBorder(inBorder);
+            mainPanel.add(inApplyPanel);
+        }
 
-        inBox.add(new JPanel());
-        inBox.setBorder(inBorder);
-
-        Box exBox = Box.createVerticalBox();
-        exBox.setAlignmentY(Component.TOP_ALIGNMENT);
-        exBox.add(excitatoryInfoPanel);
-        JPanel exApButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        exApButtonPanel.add(exApplyButton);
-        exBox.add(Box.createVerticalGlue());
-        exBox.add(exApButtonPanel);
-        exApButtonPanel.setVisible(!creationPanel);
-        exBox.add(new JPanel());
-        exBox.setBorder(exBorder);
-
-        mainPanel.add(inBox);
+        // Create a space between the inhibitory and excitatory panels
         mainPanel.add(Box.createHorizontalGlue(), bxLayout);
         mainPanel.add(Box.createHorizontalStrut(10), bxLayout);
-        mainPanel.add(exBox);
+
+        // Layout excitatory panel
+        if (creationPanel) { // No apply button, creating...
+            Box exBox = Box.createVerticalBox();
+            exBox.setAlignmentY(Component.TOP_ALIGNMENT);
+            exBox.add(excitatoryInfoPanel);
+            exBox.add(Box.createVerticalGlue());
+            exBox.setBorder(exBorder);
+            mainPanel.add(exBox);
+        } else { // Apply button/panel, editing...
+            exApplyPanel = ApplyPanel.createApplyPanel(excitatoryInfoPanel);
+            exApplyPanel.setBorder(exBorder);
+            mainPanel.add(exApplyPanel);
+        }
+
+        // Add the main panel to this panel
         this.add(mainPanel);
 
     }
@@ -280,7 +297,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * Initializes the listeners associated with the apply buttons for editing.
      */
     private void initApplyListeners() {
-        exApplyButton.addActionListener(new ActionListener() {
+        exApplyPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 excitatoryInfoPanel.commitChanges();
@@ -290,7 +307,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 }
             }
         });
-        inApplyButton.addActionListener(new ActionListener() {
+        inApplyPanel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 inhibitoryInfoPanel.commitChanges();
@@ -304,19 +321,21 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
     }
 
     /**
-     * 
+     * Add a special action to the "apply" action for editing excitatory 
+     * synapses.
      * @param l
      */
     public void addApplyListenerEx(ActionListener l) {
-        exApplyButton.addActionListener(l);
+        exApplyPanel.addActionListener(l);
     }
 
     /**
-     * 
+     * Add a special action to the "apply" action for editing inhibitory
+     * synapses
      * @param l
      */
     public void addApplyListenerIn(ActionListener l) {
-        inApplyButton.addActionListener(l);
+        inApplyPanel.addActionListener(l);
     }
 
     /**

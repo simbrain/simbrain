@@ -16,6 +16,7 @@ package org.simbrain.network.gui.trainer;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -24,7 +25,6 @@ import javax.swing.JSplitPane;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.trainers.Trainable;
-import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.widgets.EditablePanel;
 
@@ -42,7 +42,7 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
     private DataPanel targetPanel;
 
     /** Parent frame. */
-    private GenericFrame parentFrame;
+    private Window parentFrame;
 
     /**
      * Construct a new pane for displaying training sets.
@@ -52,14 +52,14 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
      *            input and target data tables.
      */
     public TrainingSetPanel(final Trainable trainable,
-            final int numVisibleColumnsPerTable) {
+        final int numVisibleColumnsPerTable) {
 
         inputPanel = new DataPanel(trainable.getInputNeurons(), trainable
-                .getTrainingSet().getInputDataMatrix(),
-                numVisibleColumnsPerTable, "Input data");
+            .getTrainingSet().getInputDataMatrix(),
+            numVisibleColumnsPerTable, "Input data");
         targetPanel = new DataPanel(trainable.getOutputNeurons(), trainable
-                .getTrainingSet().getTargetDataMatrix(),
-                numVisibleColumnsPerTable, "Target data");
+            .getTrainingSet().getTargetDataMatrix(),
+            numVisibleColumnsPerTable, "Target data");
         init();
 
     }
@@ -76,12 +76,12 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
      *            input and target data tables.
      */
     public TrainingSetPanel(List<Neuron> inputNeurons, NumericMatrix inputData,
-            List<Neuron> targetNeurons, NumericMatrix targetData,
-            int numVisibleColumnsPerTable) {
+        List<Neuron> targetNeurons, NumericMatrix targetData,
+        int numVisibleColumnsPerTable) {
         inputPanel = new DataPanel(inputNeurons, inputData,
-                numVisibleColumnsPerTable, "Input data");
+            numVisibleColumnsPerTable, "Input data");
         targetPanel = new DataPanel(targetNeurons, targetData,
-                numVisibleColumnsPerTable, "Target data");
+            numVisibleColumnsPerTable, "Target data");
 
         init();
     }
@@ -156,10 +156,9 @@ public class TrainingSetPanel extends JPanel implements EditablePanel {
      *
      * @param frame frame to set
      */
-    public void setFrame(GenericFrame frame) {
+    public void setFrame(Window frame) {
         parentFrame = frame;
-        // parentFrame.setResizable(false);
-        parentFrame.setMaximizable(false);
+        //        parentFrame.setMaximizable(false);
         inputPanel.setFrame(frame);
         targetPanel.setFrame(frame);
     }

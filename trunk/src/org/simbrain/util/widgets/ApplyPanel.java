@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -86,9 +87,8 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     protected void masterLayout() {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weighty = 0.0;
         gbc.gridx = 0;
         gbc.gridy = 0;
         int jbHeight = applyButton.getPreferredSize().height;
@@ -102,8 +102,13 @@ public class ApplyPanel extends JPanel implements EditablePanel {
         this.add(mainPanel.getPanel(), gbc);
 
         gbc.gridy += gbc.gridheight;
-        gbc.gridx += gbc.gridwidth - 1;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(Box.createVerticalGlue(), gbc);
 
+        gbc.gridx += gbc.gridwidth - 1;
+        gbc.gridy += 1;
         gbc.weighty = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;

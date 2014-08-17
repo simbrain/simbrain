@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.trainer.subnetworkTrainingPanels;
 
-import java.awt.GridBagConstraints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,13 +41,11 @@ import org.simbrain.network.trainers.LMSOffline;
  * This is similar to LMSOfflineTrainingPanel, but customized in light of the
  * above.
  */
+@SuppressWarnings("serial")
 public class ESNOfflineTrainingPanel extends JPanel {
 
     /** Reference to the controls panel. */
     private final LMSOfflineControlPanel controlPanel;
-
-    /** Reservoir utils panel. */
-    private final ReservoirUtilsPanel rUtilsPanel;
 
     /**
      * Construct an ESN Training Panel.
@@ -61,18 +58,7 @@ public class ESNOfflineTrainingPanel extends JPanel {
         // Initialize control panel with no trainer. It has to be set
         // After the apply button is pressed
         controlPanel = new LMSOfflineControlPanel(frame);
-
-        // Set up main controls
-        GridBagConstraints controlPanelConstraints = new GridBagConstraints();
         controlPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
-
-        // Res Utils
-        rUtilsPanel = new ReservoirUtilsPanel(esn, frame);
-        controlPanelConstraints.weightx = 1;
-        controlPanelConstraints.weighty = 1;
-        controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 4;
-        controlPanel.add(rUtilsPanel, controlPanelConstraints);
 
         // Add the panel
         add(controlPanel);
@@ -88,7 +74,6 @@ public class ESNOfflineTrainingPanel extends JPanel {
             }
 
         });
-
     }
 
 }

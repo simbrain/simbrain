@@ -16,7 +16,6 @@ package org.simbrain.network.gui.dialogs.connect.connector_panels;
 import java.util.List;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Neuron;
@@ -30,13 +29,6 @@ import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 @SuppressWarnings("serial")
 public class OneToOnePanel extends AbstractConnectionPanel {
 
-    public enum OneToOneOptions {
-        HORIZONTAL, VERTICAL, AUTO_DETECT;
-    }
-
-    /** Sets the connection orientation. */
-    private JComboBox orientationBox;
-
     /** Sets whether connections are bidirectional. */
     private JCheckBox bidirectionalConnection = new JCheckBox();
 
@@ -49,38 +41,42 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     public OneToOnePanel(final OneToOne connection) {
         super();
         this.connection = connection;
-        orientationBox = new JComboBox(OneToOne.getOrientationTypes());
-        // setSynapseType.setText(connection.getBaseSynapse().getType());
-        //        mainPanel.addItem("Orientation: ", orientationBox);
         mainPanel.addItem("Bidirectional Connections: ",
             bidirectionalConnection);
         fillFieldValues();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void fillFieldValues() {
         bidirectionalConnection.setSelected(((OneToOne) connection)
             .isUseBidirectionalConnections());
-        orientationBox.setSelectedItem(((OneToOne) connection)
-            .getConnectOrientation());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OneToOne getConnection() {
         return connection;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean commitChanges() {
         connection.setUseBidirectionalConnections(bidirectionalConnection
             .isSelected());
-        //        connection
-        //            .setConnectOrientation(((OrientationComparator) orientationBox
-        //                .getSelectedItem()));
         return true;
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Synapse> applyConnection(List<Neuron> source,
         List<Neuron> target) {

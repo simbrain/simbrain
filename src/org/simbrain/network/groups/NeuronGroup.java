@@ -21,6 +21,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -1006,6 +1007,22 @@ public class NeuronGroup extends Group {
      */
     public void clearNeuronList() {
         neuronList.clear();
+    }
+
+    /**
+     * Utility to method (used in couplings) to get a string showing the labels
+     * of all "active" neurons (neurons with activation above .1).
+     *
+     * @return the "active labels"
+     */
+    public String getLabelsOfActiveNeurons() {
+        StringBuilder strBuilder = new StringBuilder("");
+        for (Neuron neuron : neuronList) {
+            if ((neuron.getActivation() > .1) && (!neuron.getLabel().isEmpty())) {
+                strBuilder.append(neuron.getLabel() + " ");
+            }
+        }
+        return strBuilder.toString();
     }
 
 }

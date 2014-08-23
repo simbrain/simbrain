@@ -96,9 +96,7 @@ public class DisplayComponent extends WorkspaceComponent {
             if (type.getTypeName().equalsIgnoreCase("StringReader")) {
                 for (int i = 0; i < DEFAULT_STRING_READERS; i++) {
                     String description = "String reader " + (i + 1);
-                    PotentialConsumer consumer = this.getAttributeManager()
-                            .createPotentialConsumer(world, "addText",
-                                    String.class);
+                    PotentialConsumer consumer = getStringConsumer();
                     consumer.setCustomDescription(description);
                     returnList.add(consumer);
                 }
@@ -158,4 +156,18 @@ public class DisplayComponent extends WorkspaceComponent {
     public Object getObjectFromKey(String objectKey) {
         return world;
     }
+
+    /**
+     * Returns a String consumer, which reads in from a text producer and sends
+     * that text straight to the display world. Convenient for external calls
+     * from scripts.
+     *
+     * @return the string consumer.
+     */
+    public PotentialConsumer getStringConsumer() {
+        return this.getAttributeManager()
+                .createPotentialConsumer(world, "addText",
+                        String.class);
+    }
+
 }

@@ -530,14 +530,14 @@ public class Utils {
      * @return the formatted string
      */
     public static String doubleMatrixToString(double[][] matrix) {
-        String result = "";
+        StringBuilder strBuilder = new StringBuilder("");
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                result += Utils.round(matrix[i][j], 2) + " ";
+                strBuilder.append(Utils.round(matrix[i][j], 2) + " ");
             }
-            result += "\n";
+            strBuilder.append("\n");
         }
-        return result;
+        return strBuilder.toString();
     }
 
     /**

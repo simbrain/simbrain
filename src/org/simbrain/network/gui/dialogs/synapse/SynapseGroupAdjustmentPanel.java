@@ -159,7 +159,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
 
         // Set initial size of histogram panel based on screen size
         int height =
-            (int) (.25 * Toolkit.getDefaultToolkit().getScreenSize().height);
+            (int) (.33 * Toolkit.getDefaultToolkit().getScreenSize().height);
         int width = this.getPreferredSize().width;
         histogramPanel.setPreferredSize(new Dimension(width, height));
 
@@ -503,7 +503,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
          */
         public double getStdDev(Collection<Synapse> synapses) {
             double tot = 0;
-            if (synapses.size() == 0) {
+            if (synapses.isEmpty()) {
                 return 0;
             }
             if (SynapseView.OVERLAY.equals(synapseView)) {

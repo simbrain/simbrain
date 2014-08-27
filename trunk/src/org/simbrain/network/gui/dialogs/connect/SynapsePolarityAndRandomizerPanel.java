@@ -619,22 +619,45 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      */
     public class EditableRandomizerPanel extends JPanel {
 
+    	/** 
+    	 * The Polarity Associated with the panel (inhibitory -> only
+    	 * negative values allowed; exciatory -> only positive values
+    	 * allowed).
+    	 */
         private final Polarity polarity;
 
+        /** 
+         * The PolaraizedRandomizer this panel will either use to fill field
+         * values and edit, or which this panel will create and then edit.
+         */
         private final PolarizedRandomizer randomizer;
 
+        /**
+         * The randomizer panel used as a basis for this panel.
+         */
         private final RandomizerPanel randomizerPanel =
             new RandomizerPanel(parent);
 
+        /**
+         * A DropDownTriangle used to show or hide {@link #randomizerPanel}.
+         * The state of the triangle is used on creation to decide whether
+         * or not any randomization at all occurs. Only visible on creation.
+         */
         public final DropDownTriangle enableStatusTriangle;
 
+        /** The apply button used to apply changes after editing. */
         private final JButton applyButton = new JButton("Apply");
 
+        /**
+         * @param parent for resizing
+         * @param randomizer to fill field values
+         * @param enabled start out enabled (w/ {@link #randomizerPanel}
+         *  visible)
+         */
         public EditableRandomizerPanel(Window parent,
             PolarizedRandomizer randomizer, boolean enabled) {
             this.randomizer = randomizer;
             polarity = randomizer.getPolarity();
-            randomizerPanel.fillFieldValues(randomizer);
             enableStatusTriangle =
                 new DropDownTriangle(UpDirection.LEFT, enabled,
                     "Disabled", "Enabled", parent);
@@ -644,11 +667,14 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
         }
 
+        /**
+         * @param parent
+         * @param randomizer
+         */
         public EditableRandomizerPanel(Window parent,
             PolarizedRandomizer randomizer) {
             this.randomizer = randomizer;
             polarity = randomizer.getPolarity();
-            randomizerPanel.fillFieldValues(randomizer);
             enableStatusTriangle =
                 new DropDownTriangle(UpDirection.LEFT, true,
                     "Disabled", "Enabled", parent);
@@ -657,6 +683,10 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             init();
         }
 
+        /**
+         * @param parent
+         * @param polarity
+         */
         public EditableRandomizerPanel(Window parent, Polarity polarity) {
             this.polarity = polarity;
             randomizer = new PolarizedRandomizer(polarity);

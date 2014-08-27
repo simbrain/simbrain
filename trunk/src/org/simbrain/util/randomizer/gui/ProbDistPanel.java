@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.randomizer.gui;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -96,6 +97,9 @@ public class ProbDistPanel {
                 }
 
             });
+            tsClipping.setPreferredSize(new Dimension((int) (tsClipping
+            		.getPreferredSize().width * 1.5), tsClipping
+            		.getPreferredSize().height));
             mainPanel.add(new LabelledItem("Clipping", tsClipping));
         }
         fillDefaultValues();

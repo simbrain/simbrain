@@ -147,13 +147,14 @@ public class Sparse implements ConnectNeurons {
      * source and target neurons randomly in such a way that results in
      * "sparsity" percentage of possible connections being created.
      *
-     * @param sourceNeurons
-     * @param targetNeurons
-     * @param sparsity
-     * @param selfConnectionAllowed
-     * @param equalizeEfferents
-     * @param looseSynapses
-     * @return
+     * @param sourceNeurons source neurons
+     * @param targetNeurons target neurons
+     * @param sparsity sparsity of connection
+     * @param selfConnectionAllowed whether to allow self-connections
+     * @param equalizeEfferents whether or not the number of efferents of each
+     *            source neurons should be equalized.
+     * @param looseSynapses are these loose synapses
+     * @return the new synapses
      */
     public static List<Synapse> connectSparse(List<Neuron> sourceNeurons,
         List<Neuron> targetNeurons, double sparsity,
@@ -479,7 +480,7 @@ public class Sparse implements ConnectNeurons {
     }
 
     /**
-     * 
+     *
      * @param i
      * @param finalNumConnections
      * @return
@@ -496,7 +497,7 @@ public class Sparse implements ConnectNeurons {
     }
 
     /**
-     * 
+     *
      * @param i
      * @param finalNumConnections
      * @return

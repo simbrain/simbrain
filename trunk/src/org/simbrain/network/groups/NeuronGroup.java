@@ -21,7 +21,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -41,7 +40,7 @@ import org.simbrain.util.Utils;
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
  * subclass this class. Etc.
  */
-public class NeuronGroup extends Group {
+public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     public static final int DEFAULT_GROUP_SIZE = 10;
 
@@ -167,6 +166,11 @@ public class NeuronGroup extends Group {
             this.addNeuron(new Neuron(network, neuron));
         }
     }
+
+	@Override
+	public NeuronGroup deepCopy() {
+		return new NeuronGroup(this.getParentNetwork(), this);
+	}
 
     @Override
     public void delete() {
@@ -1024,5 +1028,6 @@ public class NeuronGroup extends Group {
         }
         return strBuilder.toString();
     }
+
 
 }

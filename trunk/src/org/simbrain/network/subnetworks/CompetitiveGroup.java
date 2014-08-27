@@ -113,26 +113,39 @@ public class CompetitiveGroup extends NeuronGroup {
         }
         setLabel("Competitive Group");
     }
+    
+    /**
+     * Copy constructor.
+     *
+     * @param newParent new root network
+     * @param oldNet old network.
+     */
+    public CompetitiveGroup(Network newRoot, CompetitiveGroup oldNet) {
+    	super(newRoot, oldNet);
+    	this.learningRate = oldNet.getLearningRate();
+    	this.winValue = oldNet.getWinValue();
+    	this.loseValue = oldNet.loseValue;
+    	this.normalizeInputs = oldNet.normalizeInputs;
+    	this.useLeakyLearning = oldNet.useLeakyLearning;
+    	this.leakyLearningRate = oldNet.leakyLearningRate;
+    	this.synpaseDecayPercent = oldNet.synpaseDecayPercent;
+    	this.max = oldNet.max;
+    	this.val = oldNet.val;
+    	this.activation = oldNet.activation;
+    	this.winner = oldNet.winner;
+    	this.updateMethod = oldNet.updateMethod;
+        setLabel("Competitive Group (copy)");
+    }
+    
+    @Override
+    public CompetitiveGroup deepCopy() {
+    	return new CompetitiveGroup(this.getParentNetwork(), this);
+    }
 
     @Override
     public String getTypeDescription() {
         return "Competitive Group";
     }
-
-    // /**
-    // * Copy constructor.
-    // *
-    // * @param newParent new root network
-    // * @param oldNet old network.
-    // */
-    // public Competitive(Network newRoot, Competitive oldNet) {
-    // super(newRoot);
-    // setEpsilon(oldNet.getEpsilon());
-    // setLeakyEpsilon(oldNet.getLeakyEpsilon());
-    // setLoseValue(oldNet.getLoseValue());
-    // setWinValue(oldNet.getWinValue());
-    // setNormalizeInputs(oldNet.getNormalizeInputs());
-    // }
 
     @Override
     public void update() {

@@ -110,6 +110,29 @@ public class SOMGroup extends NeuronGroup {
         setLabel("SOM");
     }
 
+    /**
+     * Copy constructor
+     * @param newRoot
+     * @param oldNet
+     */
+    public SOMGroup(final Network newRoot, final SOMGroup oldNet) {
+        super(newRoot, oldNet);
+        this.initAlpha = oldNet.getInitAlpha();
+        this.alpha = oldNet.getAlpha();
+        this.neighborhoodSize = oldNet.getNeighborhoodSize();
+        this.winDistance = oldNet.winDistance;
+        this.distance = oldNet.distance;
+        this.val = oldNet.val;
+        this.batchSize = oldNet.getBatchSize();
+        this.alphaDecayRate = oldNet.getAlphaDecayRate();
+        this.neighborhoodDecayAmount = oldNet.getNeighborhoodDecayAmount();
+        setLabel("SOM Group (copy)");
+    }
+    
+    public SOMGroup deepCopy() {
+    	return new SOMGroup(this.getParentNetwork(), this);
+    }
+    
     @Override
     public String getTypeDescription() {
         return "Self Organizing Map";

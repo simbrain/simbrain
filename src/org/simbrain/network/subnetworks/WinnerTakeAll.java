@@ -22,6 +22,7 @@ import java.util.Random;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.CopyableGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
@@ -63,7 +64,7 @@ public class WinnerTakeAll extends NeuronGroup {
         setWinValue(oldNet.getWinValue());
         setUseRandom(oldNet.isUseRandom());
         setRandomProb(oldNet.getRandomProb());
-        setLabel("Winner take all network");
+        setLabel("WTA Group (copy)");
     }
 
     /**
@@ -81,6 +82,11 @@ public class WinnerTakeAll extends NeuronGroup {
         setLabel("Winner take all network");
     }
 
+    @Override
+    public WinnerTakeAll deepCopy() {
+    	return new WinnerTakeAll(this.getParentNetwork(), this);
+    }
+    
     @Override
     public String getTypeDescription() {
         return "Winner Take All Group";

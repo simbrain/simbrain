@@ -316,6 +316,9 @@ public class NeuronPropertiesExtended extends JPanel implements EditablePanel {
         Neuron neuronRef = neuronList.get(0);
         List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
         boolean skipClipCheck = false;
+        if (neuronRef == null) {
+        	return;
+        }
         try {
             // Check for consistency of bounded interface and consistency
             // of bounded values provided the former is consistent

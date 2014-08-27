@@ -25,6 +25,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.CopyableGroup;
 import org.simbrain.network.groups.NeuronGroup;
 
 /**
@@ -36,83 +37,82 @@ import org.simbrain.network.groups.NeuronGroup;
  */
 public class CopyPaste {
 
-    /**
-     * Creates a copy of a list of network model elements: neurons, synapses,
-     * and groups.
-     *
-     * @param newParent parent network for these objects. May be a root network
-     *            or a subnetwork.
-     * @param items the list of items to copy.
-     * @return the list of copied items.
-     */
-    public static ArrayList<?> getCopy(final Network newParent,
-            final ArrayList<?> items) {
+	/**
+	 * Creates a copy of a list of network model elements: neurons, synapses,
+	 * and groups.
+	 *
+	 * @param newParent parent network for these objects. May be a root network
+	 *            or a subnetwork.
+	 * @param items the list of items to copy.
+	 * @return the list of copied items.
+	 */
+	public static ArrayList<?> getCopy(final Network newParent,
+			final ArrayList<?> items) {
 
-        ArrayList<Object> ret = new ArrayList<Object>();
-        // Match new to old neurons for synapse adding
-        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
-        ArrayList<Synapse> synapses = new ArrayList<Synapse>();
+		ArrayList<Object> ret = new ArrayList<Object>();
+		// Match new to old neurons for synapse adding
+		Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
+		ArrayList<Synapse> synapses = new ArrayList<Synapse>();
 
-        for (Object item : items) {
-            if (item instanceof Neuron) {
-                Neuron oldNeuron = ((Neuron) item);
-                Neuron newNeuron = new Neuron(newParent, oldNeuron);
-                ret.add(newNeuron);
-                neuronMappings.put(oldNeuron, newNeuron);
-            } else if (item instanceof Synapse) {
-                if (!isStranded((Synapse) item, items)) {
-                    synapses.add((Synapse) item);
-                }
-            } else if (item instanceof NetworkTextObject) {
-                NetworkTextObject text = ((NetworkTextObject) item);
-                NetworkTextObject newText = new NetworkTextObject(newParent,
-                        text);
-                ret.add(newText);
-            } else if (item instanceof NeuronGroup) {
-                NeuronGroup oldGroup = (NeuronGroup) item;
-                NeuronGroup newGroup = new NeuronGroup(newParent, oldGroup);
-                ret.add(newGroup);
-            }
-        }
+		for (Object item : items) {
+			if (item instanceof Neuron) {
+				Neuron oldNeuron = ((Neuron) item);
+				Neuron newNeuron = new Neuron(newParent, oldNeuron);
+				ret.add(newNeuron);
+				neuronMappings.put(oldNeuron, newNeuron);
+			} else if (item instanceof Synapse) {
+				if (!isStranded((Synapse) item, items)) {
+					synapses.add((Synapse) item);
+				}
+			} else if (item instanceof NetworkTextObject) {
+				NetworkTextObject text = ((NetworkTextObject) item);
+				NetworkTextObject newText = new NetworkTextObject(newParent,
+						text);
+				ret.add(newText);
+			} else if (item instanceof CopyableGroup) {
+				Object copy = ((CopyableGroup<?>) item).deepCopy();
+				ret.add(copy);
+			}
+		}
 
-        // Copy synapses
-        for (Synapse synapse : synapses) {
-            // Parent network for the new synapses inherited from neurons
-            Synapse newSynapse = new Synapse(neuronMappings.get(synapse
-                    .getSource()), neuronMappings.get(synapse.getTarget()),
-                    synapse.getLearningRule().deepCopy(), synapse);
-            ret.add(newSynapse);
-        }
+		// Copy synapses
+		for (Synapse synapse : synapses) {
+			// Parent network for the new synapses inherited from neurons
+			Synapse newSynapse = new Synapse(neuronMappings.get(synapse
+					.getSource()), neuronMappings.get(synapse.getTarget()),
+					synapse.getLearningRule().deepCopy(), synapse);
+			ret.add(newSynapse);
+		}
 
-        return ret;
-    }
+		return ret;
+	}
 
-    /**
-     * Returns true if this synapse is not connected to two neurons (i.e. is
-     * "stranded"), false otherwise.
-     *
-     * @param synapse synapse to check
-     * @param allItems includes neurons to check
-     * @return true if this synapse is stranded, false otherwise
-     */
-    private static boolean isStranded(final Synapse synapse,
-            final ArrayList<?> allItems) {
+	/**
+	 * Returns true if this synapse is not connected to two neurons (i.e. is
+	 * "stranded"), false otherwise.
+	 *
+	 * @param synapse synapse to check
+	 * @param allItems includes neurons to check
+	 * @return true if this synapse is stranded, false otherwise
+	 */
+	private static boolean isStranded(final Synapse synapse,
+			final ArrayList<?> allItems) {
 
-        // The list of checked neurons should include neurons in the list
-        // as well as all neurons contained in networks in the list
-        ArrayList<Neuron> check = new ArrayList<Neuron>();
-        for (Object object : allItems) {
-            if (object instanceof Neuron) {
-                check.add((Neuron) object);
-            } else if (object instanceof Network) {
-                check.addAll(((Network) object).getFlatNeuronList());
-            }
-        }
+		// The list of checked neurons should include neurons in the list
+		// as well as all neurons contained in networks in the list
+		ArrayList<Neuron> check = new ArrayList<Neuron>();
+		for (Object object : allItems) {
+			if (object instanceof Neuron) {
+				check.add((Neuron) object);
+			} else if (object instanceof Network) {
+				check.addAll(((Network) object).getFlatNeuronList());
+			}
+		}
 
-        if (check.contains(synapse.getSource())
-                && (check.contains(synapse.getTarget()))) {
-            return false;
-        }
-        return true;
-    }
+		if (check.contains(synapse.getSource())
+				&& (check.contains(synapse.getTarget()))) {
+			return false;
+		}
+		return true;
+	}
 }

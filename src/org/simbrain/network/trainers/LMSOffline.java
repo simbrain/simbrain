@@ -163,9 +163,14 @@ public class LMSOffline extends Trainer {
         // Make sure excitatory/inhibitory are in proper lists
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
             SynapseGroup group = ((Subnetwork) getTrainableNetwork()
-                .getNetwork()).getSynapseGroup();
+                    .getNetwork()).getSynapseGroup();
             if (group != null) {
                 group.revalidateSynapseSets();
+            }
+        } else if (getTrainableNetwork().getNetwork() instanceof SynapseGroup) {
+            if (getTrainableNetwork().getNetwork() != null) {
+                ((SynapseGroup) getTrainableNetwork().getNetwork())
+                        .revalidateSynapseSets();
             }
         }
 

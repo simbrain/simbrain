@@ -39,10 +39,10 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     private static final double DEFAULT_FLOOR = -1.0;
 
     /** Relative. */
-    private static final int RELATIVE = 0;
+    public static final int RELATIVE = 0;
 
     /** Absolute. */
-    private static final int ABSOLUTE = 1;
+    public static final int ABSOLUTE = 1;
 
     /** Relative absolute. */
     private int relAbs = RELATIVE;

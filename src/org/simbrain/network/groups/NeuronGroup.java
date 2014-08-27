@@ -1015,14 +1015,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     /**
      * Utility to method (used in couplings) to get a string showing the labels
-     * of all "active" neurons (neurons with activation above .1).
+     * of all "active" neurons (neurons with activation above a threshold).
      *
+     * @param threshold threshold above which to consider a neuron "active"
      * @return the "active labels"
      */
-    public String getLabelsOfActiveNeurons() {
+    public String getLabelsOfActiveNeurons(double threshold) {
         StringBuilder strBuilder = new StringBuilder("");
         for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > .1) && (!neuron.getLabel().isEmpty())) {
+            if ((neuron.getActivation() > threshold)
+                    && (!neuron.getLabel().isEmpty())) {
                 strBuilder.append(neuron.getLabel() + " ");
             }
         }

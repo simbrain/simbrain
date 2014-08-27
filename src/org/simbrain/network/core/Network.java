@@ -673,7 +673,7 @@ public class Network {
     }
 
     /**
-     * Randomizes all weights.
+     * Randomizes all loose weights.
      */
     public void randomizeWeights() {
         for (Synapse s : synapseList) {

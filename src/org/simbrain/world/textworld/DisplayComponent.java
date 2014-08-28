@@ -86,6 +86,9 @@ public class DisplayComponent extends WorkspaceComponent {
             public void currentItemChanged(TextItem newItem) {
             }
 
+            public void preferencesChanged() {
+            }
+
         });
     }
 

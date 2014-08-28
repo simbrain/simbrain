@@ -110,6 +110,8 @@ public final class ReaderWorld extends TextWorld {
 
             public void currentItemChanged(TextItem newItem) {
             }
+            public void preferencesChanged() {
+            }
 
         });
         return r;
@@ -159,7 +161,7 @@ public final class ReaderWorld extends TextWorld {
                 // System.out.println("here");
                 // setCurrentItem(new TextItem(getPosition(), getPosition(),
                 // ""));
-                setPosition(1);
+                setPosition(0);
             }
         } else if (parseStyle == ParseStyle.WORD) {
             if (matcher != null) {
@@ -229,6 +231,7 @@ public final class ReaderWorld extends TextWorld {
      */
     public void setParseStyle(ComboBoxWrapper parseStyle) {
         setTheParseStyle((ParseStyle) parseStyle.getCurrentObject());
+        firePrefsChangedEvent();
     }
 
     /**

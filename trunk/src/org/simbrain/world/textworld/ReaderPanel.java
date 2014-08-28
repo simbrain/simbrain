@@ -62,6 +62,15 @@ public class ReaderPanel extends JPanel {
     /** The main scroll panel. */
     final JScrollPane inputScrollPane;
 
+    /** Displays the current parse style and allows it to be set. */
+    private final ButtonGroup parseStyle = new ButtonGroup();
+
+    /** Parse style is word-based. */
+    private final JRadioButton wordButton = new JRadioButton("Word");
+
+    /** Parse style is character based. */
+    private final JRadioButton charButton = new JRadioButton("Character");
+
     /**
      * Toolbar for opening and closing the world. Must be defined at component
      * level.
@@ -121,8 +130,8 @@ public class ReaderPanel extends JPanel {
             topToolbarPanel.add(openCloseToolBar);
         }
         JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar
-                .add(TextWorldActions.showVectorDictionaryEditor(world));
+        dictionaryToolBar.add(TextWorldActions
+                .showVectorDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
 
         add(topToolbarPanel, BorderLayout.NORTH);
@@ -130,6 +139,8 @@ public class ReaderPanel extends JPanel {
         bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         bottomToolbarPanel.add(getToolbarModeSelect());
         add(bottomToolbarPanel, BorderLayout.SOUTH);
+
+        syncParseStyleButtons();
     }
 
     /**
@@ -208,8 +219,27 @@ public class ReaderPanel extends JPanel {
                 }
             }
 
+            public void preferencesChanged() {
+                if (world.getTheParseStyle() == ParseStyle.CHARACTER) {
+                    charButton.setSelected(true);
+                } else if (world.getTheParseStyle() == ParseStyle.WORD) {
+                    wordButton.setSelected(true);
+                }
+            }
+
         });
 
+    }
+
+    /**
+     * Syncs the parse style buttons to the underlying model state.
+     */
+    public void syncParseStyleButtons() {
+        if (world.getTheParseStyle() == ParseStyle.CHARACTER) {
+            charButton.setSelected(true);
+        } else if (world.getTheParseStyle() == ParseStyle.WORD) {
+            wordButton.setSelected(true);
+        }
     }
 
     /**
@@ -277,11 +307,8 @@ public class ReaderPanel extends JPanel {
      */
     public JToolBar getToolbarModeSelect() {
         JToolBar toolbar = new JToolBar();
-        JRadioButton wordButton = new JRadioButton("Word");
-        JRadioButton charButton = new JRadioButton("Character");
-        ButtonGroup selectedMode = new ButtonGroup();
-        selectedMode.add(wordButton);
-        selectedMode.add(charButton);
+        parseStyle.add(wordButton);
+        parseStyle.add(charButton);
         wordButton.setSelected(true);
         toolbar.add(wordButton);
         toolbar.add(charButton);
@@ -304,4 +331,5 @@ public class ReaderPanel extends JPanel {
         // wordButton.addActionListener(a);
         return toolbar;
     }
+
 }

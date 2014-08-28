@@ -141,6 +141,9 @@ public class DisplayPanel extends JPanel {
 
             public void currentItemChanged(TextItem newItem) {
             }
+
+            public void preferencesChanged() {
+            }
         });
 
     }

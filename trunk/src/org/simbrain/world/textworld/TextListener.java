@@ -41,8 +41,13 @@ public interface TextListener {
     void positionChanged();
 
     /**
-     * The current item has changed
+     * The current item has changed.
      */
     void currentItemChanged(TextItem newItem);
+
+    /**
+     * The current preferences have changed.
+     */
+    void preferencesChanged();
 
 }

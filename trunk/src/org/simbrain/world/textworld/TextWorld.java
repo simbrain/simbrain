@@ -113,6 +113,15 @@ public abstract class TextWorld {
             listener.dictionaryChanged();
         }
     }
+    
+    /**
+     * Notify listeners that preferences have changed
+     */
+    protected void firePrefsChangedEvent() {
+        for (TextListener listener : listenerList) {
+            listener.preferencesChanged();
+        }
+    }
 
     /**
      * Notify listeners that the caret position has changed.

@@ -40,7 +40,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 public class Hopfield extends Subnetwork implements Trainable {
 
     /** Default update mechanism. */
-    public static final HopfieldUpdate DEFAULT_UPDATE = HopfieldUpdate.SEQ;
+    public static final HopfieldUpdate DEFAULT_UPDATE = HopfieldUpdate.SYNC;
 
     /** Default number of neurons. */
     public static final int DEFAULT_NUM_UNITS = 36;
@@ -95,7 +95,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         BinaryRule binary = new BinaryRule();
         binary.setThreshold(0);
         binary.setCeiling(1);
-        binary.setFloor(-1);
+        binary.setFloor(0);
         binary.setIncrement(1);
         neuronGroup.setNeuronType(binary);
 
@@ -185,10 +185,21 @@ public class Hopfield extends Subnetwork implements Trainable {
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
             getSynapseGroup().setSynapseStrength(w,
-                w.getStrength() + src.getActivation()
-                    * tar.getActivation());
+                w.getStrength() + bipolar(src.getActivation())
+                    * bipolar(tar.getActivation()));
         }
         getParentNetwork().fireGroupUpdated(getSynapseGroup());
+    }
+
+    /**
+     * Convenience method to convert binary values (1,0) to bipolar
+     * values(1,-1).
+     *
+     * @param in number to convert
+     * @return converted number
+     */
+    public static double bipolar(double in) {
+        return in == 0 ? -1 : in;
     }
 
     /**

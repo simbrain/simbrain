@@ -84,11 +84,11 @@ public class NTree implements Iterable<DataPoint> {
     private Map<DataPoint, Leaf> all = new LinkedHashMap<DataPoint, Leaf>();
 
     /**
-     * Constructs an NTree with the given number of dimensions
+     * Constructs an NTree with the given number of dimensions.
      *
      * @param dimensions the number of dimensions
      */
-    NTree(int dimensions) {
+    public NTree(int dimensions) {
         LOGGER.debug("Creating an NTree with " + dimensions + " dimensions.");
         this.dimensions = dimensions;
         logger = Logger.getLogger(logger.getName() + '.' + dimensions);
@@ -425,7 +425,7 @@ public class NTree implements Iterable<DataPoint> {
         for (DistancePoint dp : getClosestPoints(root, number, point)) {
             points.add(dp.point);
             // TODO: Returning multiple copies of same number
-            System.out.println(Arrays.asList(dp.point));
+            //System.out.println(Arrays.asList(dp.point));
         }
 
         return points;

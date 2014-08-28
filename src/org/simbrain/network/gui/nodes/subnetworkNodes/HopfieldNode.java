@@ -68,13 +68,12 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(removeAction);
         menu.addSeparator();
         menu.add(addInputRowAction);
-        // Below not very useful in practice for Hopfield nets.
-        //Action trainNet = new AbstractAction("Train on current pattern") {
-        //    public void actionPerformed(final ActionEvent event) {
-        //        ((Hopfield) getSubnetwork()).trainOnCurrentPattern();
-        //    }
-        //};
-        //menu.add(trainNet);
+        Action trainNet = new AbstractAction("Train on current pattern") {
+            public void actionPerformed(final ActionEvent event) {
+                ((Hopfield) getSubnetwork()).trainOnCurrentPattern();
+            }
+        };
+        menu.add(trainNet);
         menu.addSeparator();
         Action randomizeNet = new AbstractAction(
             "Randomize synapses symmetrically") {

@@ -62,14 +62,15 @@ public class HopfieldTrainer extends Trainer {
         double[] vals = new double[numInputs * numInputs - numInputs];
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
-            int k = 0;
             Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons()
                 .toArray(new Neuron[pattern.length]);
             for (int i = 0; i < pattern.length; i++) {
                 for (int j = 0; j < pattern.length; j++) {
                     if (i != j) {
                         Synapse s = neurons[i].getFanOut().get(neurons[j]);
-                        s.setStrength(s.getStrength() + pattern[i] * pattern[j]);
+                        s.setStrength(s.getStrength()
+                                + Hopfield.bipolar(pattern[i])
+                                * Hopfield.bipolar(pattern[j]));
                     }
                 }
             }

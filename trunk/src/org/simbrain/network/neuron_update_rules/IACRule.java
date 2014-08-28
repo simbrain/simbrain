@@ -31,7 +31,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
 public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
-    ClippableUpdateRule, NoisyUpdateRule {
+        ClippableUpdateRule, NoisyUpdateRule {
 
     /** The Default upper bound. */
     private static final double DEFAULT_CEILING = 1.0;
@@ -86,7 +86,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
      * @{inheritDoc
      */
     public void update(Neuron neuron) {
-        double val = inputType.getInput(neuron);
+        double val = neuron.getActivation();
         double wtdSum = 0;
 
         for (Synapse w : neuron.getFanIn()) {
@@ -98,11 +98,9 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
         }
 
         if (wtdSum > 0) {
-            val +=
-                ((wtdSum * (getUpperBound() - val)) - (decay * (val - rest)));
+            val += ((wtdSum * (getUpperBound() - val)) - (decay * (val - rest)));
         } else {
-            val +=
-                ((wtdSum * (val - getLowerBound())) - (decay * (val - rest)));
+            val += ((wtdSum * (val - getLowerBound())) - (decay * (val - rest)));
         }
 
         if (addNoise) {

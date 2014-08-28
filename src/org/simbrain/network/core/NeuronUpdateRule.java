@@ -181,7 +181,7 @@ public abstract class NeuronUpdateRule {
      */
     public double getGraphicalUpperBound() {
         if (this instanceof BoundedUpdateRule) {
-            return ((BoundedUpdateRule) this).getLowerBound();
+            return ((BoundedUpdateRule) this).getUpperBound();
         } else {
             return 1;
         }

@@ -33,8 +33,6 @@ public class DisplayWorld extends TextWorld {
     /** A set of strings that can be displayed via couplings in the world. */
     protected Set<String> dictionary = new TreeSet<String>();
 
-    public VectorDictionary vectorDict;
-
     // Initialize dictionary with sample entries
     {
         dictionary.add("mouse");

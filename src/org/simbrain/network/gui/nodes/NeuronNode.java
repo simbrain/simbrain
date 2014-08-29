@@ -298,6 +298,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             if (((SpikingNeuronUpdateRule) neuron.getUpdateRule()).hasSpiked()) {
                 circle.setStrokePaint(spikingColor);
+                circle.setPaint(spikingColor);
             } else {
                 circle.setStrokePaint(SynapseNode.getLineColor());
             }

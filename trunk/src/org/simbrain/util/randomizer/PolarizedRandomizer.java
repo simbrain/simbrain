@@ -56,6 +56,17 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
+     * 
+     * @param polarity
+     * @param pdf
+     */
+    public PolarizedRandomizer(Polarity polarity, ProbDistribution pdf) {
+    	super();
+    	this.pdf = pdf;
+    	this.polarity = polarity;
+    }
+    
+    /**
      * Copy constructor.
      *
      * @param dup the <code>RandomSource</code> to duplicate.

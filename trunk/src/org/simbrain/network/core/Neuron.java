@@ -1060,4 +1060,9 @@ public class Neuron {
         return polarity;
     }
 
+    // TODO: Unsafe discuss design of this feature.
+    public void setPolarity(Polarity polarity) {
+    	this.polarity = polarity;
+    }
+    
 }

@@ -37,13 +37,13 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     private static final double DEFAULT_CEILING = 1.0;
 
     /** The Default lower bound. */
-    private static final double DEFAULT_FLOOR = -1.0;
+    private static final double DEFAULT_FLOOR = -.2;
 
     /** Neuron decay. */
-    private double decay = 0.1;
+    private double decay = 0.05;
 
     /** Rest. */
-    private double rest = 0;
+    private double rest = .1;
 
     /** Noise dialog box. */
     private Randomizer noiseGenerator = new Randomizer();
@@ -59,6 +59,9 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
     /** The lower bound of the activity if clipping is used. */
     private double floor = DEFAULT_FLOOR;
+
+    /** Local variables as class variables for a minor performance gain. */
+    private double effect, netInput, act;
 
     /**
      * @{inheritDoc
@@ -82,36 +85,41 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
         return iac;
     }
 
-    /**
-     * @{inheritDoc
-     */
+    @Override
     public void update(Neuron neuron) {
-        double val = neuron.getActivation();
-        double wtdSum = 0;
 
+        // Notation and algorithm from McClelland 1981, Proceedings of the third
+        // annual cog-sci meeting
+
+        // Sum of the "active excitors" and "active inhibitors"
+        netInput = neuron.getInputValue();
         for (Synapse w : neuron.getFanIn()) {
-            Neuron source = w.getSource();
-
-            if (source.getActivation() > 0) {
-                wtdSum += (w.getStrength() * source.getActivation());
+            if (w.getSource().getActivation() > 0) {
+                netInput += (w.getStrength() * w.getSource().getActivation());
             }
         }
 
-        if (wtdSum > 0) {
-            val += ((wtdSum * (getUpperBound() - val)) - (decay * (val - rest)));
+        // Determine "effect" value.
+        effect = 0;
+        if (netInput >= 0) {
+            effect = (getUpperBound() - neuron.getActivation()) * netInput;
         } else {
-            val += ((wtdSum * (val - getLowerBound())) - (decay * (val - rest)));
+            effect = (neuron.getActivation() - getLowerBound()) * netInput;
         }
 
+        // Update activation using Euler integration of main ODE
+        act = neuron.getActivation() + neuron.getNetwork().getTimeStep()
+                * (effect - decay * (neuron.getActivation() - rest));
+
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            act += noiseGenerator.getRandom();
         }
 
         if (clipping) {
-            val = clip(val);
+            act = clip(act);
         }
 
-        neuron.setBuffer(val);
+        neuron.setBuffer(act);
     }
 
     /**

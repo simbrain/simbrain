@@ -341,4 +341,10 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         this.leak = leakConstant;
     }
 
+    @Override
+    public void clear(Neuron neuron) {
+        super.clear(neuron);
+        netActivation = 0;
+    }
+
 }

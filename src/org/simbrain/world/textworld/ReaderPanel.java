@@ -199,8 +199,10 @@ public class ReaderPanel extends JPanel {
 
         world.addListener(new TextListener() {
             public void textChanged() {
-                // TODO: Is the below needed?
-                // textArea.setText(world.getText(), false);
+                textArea.setText(world.getText());
+                if (world.getPosition() < textArea.getDocument().getLength()) {
+                    textArea.setCaretPosition(world.getPosition());
+                }
             }
 
             public void dictionaryChanged() {

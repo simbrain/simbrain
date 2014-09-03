@@ -121,6 +121,8 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         file.add(new SaveAction(this));
         file.add(new SaveAsAction(this));
         file.addSeparator();
+        file.add(TextWorldActions.getTextAction(world));
+        file.addSeparator();
         file.add(new CloseAction(this.getWorkspaceComponent()));
 
         // Edit menu

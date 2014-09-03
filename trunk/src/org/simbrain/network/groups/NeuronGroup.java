@@ -966,7 +966,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
             LineOrientation.HORIZONTAL);
         GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
-            betweenNeuronInterval, 10);
+            betweenNeuronInterval);
         if (neuronList.size() < gridThreshold) {
             lineLayout.setInitialLocation(initialPosition);
             setLayout(lineLayout);

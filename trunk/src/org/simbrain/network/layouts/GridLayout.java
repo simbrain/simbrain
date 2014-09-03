@@ -64,7 +64,7 @@ public class GridLayout implements Layout {
     private boolean manualColumns = DEFAULT_MANUAL_COLS;
 
     /**
-     * Create a layout.
+     * Create a grid layout with a specific number of columns.
      *
      * @param hSpacing horizontal spacing between neurons
      * @param vSpacing vertical spacing between neurons
@@ -75,7 +75,20 @@ public class GridLayout implements Layout {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;
-        //this.manualColumns = true; // else why set numColumns?
+        this.manualColumns = true; // else why set numColumns?
+    }
+
+    /**
+     * Create a grid layout that automatically produces a square
+     * grid based on number of neurons.
+     *
+     * @param hSpacing horizontal spacing between neurons
+     * @param vSpacing vertical spacing between neurons
+     */
+    public GridLayout(final double hSpacing, final double vSpacing) {
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.manualColumns = false;
     }
 
     /**

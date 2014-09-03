@@ -20,6 +20,8 @@ package org.simbrain.world.textworld;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -123,6 +125,8 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
         file.add(new OpenAction(this));
         file.add(new SaveAction(this));
         file.add(new SaveAsAction(this));
+        file.addSeparator();
+        file.add(TextWorldActions.getTextAction(world));
         file.addSeparator();
         file.add(new CloseAction(this.getWorkspaceComponent()));
 

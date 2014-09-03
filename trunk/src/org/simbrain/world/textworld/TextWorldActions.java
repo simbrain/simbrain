@@ -32,6 +32,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 /**
@@ -166,6 +167,35 @@ public class TextWorldActions {
             }
         };
     }
+
+    /**
+     * Action for loading text in to a display or reader world.
+     *
+     * @param world the world in to which text should be loaded
+     * @return the action
+     */
+    public static Action getTextAction(final TextWorld world) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(NAME, "Load text...");
+                putValue(SHORT_DESCRIPTION, "Load text.");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser chooser = new SFileChooser(".", "Text import");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    world.setText(Utils.readFileContents(theFile));
+                }
+            }
+        };
+    }
+
 
 
     /**

@@ -67,7 +67,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
      * neurons in the group, above which to use grid layout instead of line
      * layout.
      */
-    private int gridThreshold = 30;
+    private int gridThreshold = 10;
 
     /** Space between neurons within a layer. */
     private int betweenNeuronInterval = 50;
@@ -373,8 +373,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Neuron Group [" + getLabel() + "] Neuron group with "
-            + this.getNeuronList().size() + " neuron(s)\n");
+        ret += ("Neuron Group [" + getLabel() + "]. Neuron group with "
+                + this.getNeuronList().size() + " neuron(s)" + ". Located at ("
+                + Utils.round(this.getPosition().x, 2) + ","
+                + Utils.round(this.getPosition().y, 2) + ").\n");
         return ret;
     }
 

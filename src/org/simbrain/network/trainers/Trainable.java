@@ -29,7 +29,7 @@ import org.simbrain.network.groups.Group;
 public interface Trainable {
 
     /**
-     * Returns a reference to the subnetwork being trained.
+     * Returns a reference to the subnetwork or synapse group being trained.
      *
      * @return the network being trained.
      */

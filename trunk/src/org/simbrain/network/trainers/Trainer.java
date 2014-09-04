@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 
@@ -162,6 +164,38 @@ public abstract class Trainer {
                 }
             }
         }
+    }
+
+    /**
+     * Utility method for creating a trainable object.
+     *
+     * @param trainedGroup the subnet or synapse group being trained.
+     * @param inputNeurons the input neurons
+     * @param outputNeurons the output neurons
+     * @param inputData the input data
+     * @param targetData the target data
+     * @return the trainable object
+     */
+    public static Trainable getTrainable(final Group trainedGroup, final List<Neuron> inputNeurons,
+            final List<Neuron> outputNeurons, final double[][] inputData,
+            final double[][] targetData) {
+        Trainable newTrainer = new Trainable() {
+            public Group getNetwork() {
+                return trainedGroup;
+            }
+            public List<Neuron> getInputNeurons() {
+                return inputNeurons;
+            }
+            public List<Neuron> getOutputNeurons() {
+                return outputNeurons;
+            }
+            public TrainingSet getTrainingSet() {
+                return new TrainingSet(inputData, targetData);
+            }
+            public void initNetwork() {
+            }
+        };
+        return newTrainer;
     }
 
 }

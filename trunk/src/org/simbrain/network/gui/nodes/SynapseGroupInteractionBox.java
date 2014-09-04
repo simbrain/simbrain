@@ -208,12 +208,19 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(tsvCheckBox);
 
         // Coupling menu
-        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
+        JMenu consumerMenu = this.getNetworkPanel()
+                .getSynapseGroupConsumerMenu(synapseGroup);
+        JMenu producerMenu = getNetworkPanel()
+                .getSynapseGroupProducerMenu(synapseGroup);
+        if ((consumerMenu != null) || (producerMenu != null)) {
             menu.addSeparator();
-            menu.add(getProducerMenu());
-            menu.add(getConsumerMenu());
         }
-
+        if (consumerMenu != null) {
+            menu.add(consumerMenu);
+        }
+        if (producerMenu != null) {
+            menu.add(producerMenu);
+        }
         return menu;
     }
 
@@ -391,17 +398,4 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         }
     };
 
-    /**
-     * @return the consumerMenu
-     */
-    public JMenu getConsumerMenu() {
-        return getNetworkPanel().getSynapseGroupConsumerMenu(synapseGroup);
-    }
-
-    /**
-     * @return the producerMenu
-     */
-    public JMenu getProducerMenu() {
-        return getNetworkPanel().getSynapseGroupProducerMenu(synapseGroup);
-    }
 }

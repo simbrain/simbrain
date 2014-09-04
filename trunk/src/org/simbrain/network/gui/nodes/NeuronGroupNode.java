@@ -113,17 +113,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
     private final List<JMenuItem> customMenuItems = new ArrayList<JMenuItem>();
 
     /**
-     * Menu for consumer actions. Set at the workspace level by
-     * {@link NetworkPanelDesktop}.
-     */
-    private JMenu consumerMenu;
-
-    /**
-     * Menu for producer actions.
-     */
-    private JMenu producerMenu;
-
-    /**
      * Create a Neuron Group PNode.
      *
      * @param networkPanel
@@ -385,14 +374,22 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         //menu.addSeparator();
         //menu.add(testInputsAction);
 
-        // Coupling menu
-        if ((getProducerMenu() != null) && (getConsumerMenu() != null)) {
+        // Coupling menus
+        JMenu consumerMenu = networkPanel
+                .getNeuronGroupConsumerMenu(neuronGroup);
+        JMenu producerMenu = networkPanel
+                .getNeuronGroupProducerMenu(neuronGroup);
+        if ((consumerMenu != null) || (producerMenu != null)) {
             menu.addSeparator();
-            menu.add(getProducerMenu());
-            menu.add(getConsumerMenu());
+        }
+        if (consumerMenu != null) {
+            menu.add(consumerMenu);
+        }
+        if (producerMenu != null) {
+            menu.add(producerMenu);
         }
 
-        // Add the menu...
+        // Add the menu
         return menu;
     }
 
@@ -451,42 +448,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         interactionBox.setText(neuronGroup.getLabel());
         interactionBox.updateText();
     };
-
-    /**
-     * @return the consumerMenu
-     */
-    public JMenu getConsumerMenu() {
-        return consumerMenu;
-    }
-
-    /**
-     * Set at the workspace level by
-     * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     *
-     * @param consumerMenu
-     *            the consumerMenu to set
-     */
-    public void setConsumerMenu(JMenu consumerMenu) {
-        this.consumerMenu = consumerMenu;
-    }
-
-    /**
-     * @return the producerMenu
-     */
-    public JMenu getProducerMenu() {
-        return producerMenu;
-    }
-
-    /**
-     * Set at the workspace level by
-     * {@link org.simbrain.network.desktop.NetworkPanelDesktop}.
-     *
-     * @param producerMenu
-     *            the producerMenu to set
-     */
-    public void setProducerMenu(JMenu producerMenu) {
-        this.producerMenu = producerMenu;
-    }
 
     /** Action for editing the group name. */
     protected Action renameAction = new AbstractAction("Rename Group...") {

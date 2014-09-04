@@ -1,6 +1,7 @@
 help_simbrain() {
     print("");
     print("Currently there is one system variable: workspace\n");
+    print("To see available custom console commands, enter: dir(\"scripts/console\");");
     print("");
 
     print("---- SOME SAMPLE COMMANDS ----");

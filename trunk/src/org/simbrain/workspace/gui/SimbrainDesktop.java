@@ -1299,4 +1299,11 @@ public class SimbrainDesktop {
         return desktop.getVisibleRect().getHeight();
     }
 
+    /**
+     * Returns the internal desktop object. Sometimes useful in scripts.
+     */
+    public JDesktopPane getDesktop() {
+        return desktop;
+    }
+
 }

@@ -1,5 +1,4 @@
 import org.simbrain.network.*;
-import org.simnet.interfaces.*;
 
 addNetwork(String name) {
 

@@ -22,9 +22,11 @@ public class LaggedXOR {
                     inputData[i] = 0;
                 else 
                     inputData[i] = 1;
-                writer.append("" + inputData[i]);
-                writer.append("\n");
             }        
+            for(int i = 0; i < inputData.length; i++) {
+                writer.append("" + inputData[i]);
+                writer.append("\n");                
+            }
             writer.flush();
             writer.close();
             //System.out.println(Arrays.toString(inputData));
@@ -36,8 +38,10 @@ public class LaggedXOR {
                 int p = inputData[i - (timeLag + 1)];
                 int q = inputData[i - timeLag];
                 trainData[i] = p ^ q; // ^ is xor
+            }
+            for(int i = 0; i < trainData.length; i++) {
                 writer2.append("" + trainData[i]);
-                writer2.append("\n");
+                writer2.append("\n");                
             }
             writer2.flush();
             writer2.close();            

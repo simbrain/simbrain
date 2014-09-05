@@ -46,6 +46,9 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
     /** D. */
     private double d = 6;
+    
+    /** Constant background current. */
+    private double iBg;
 
     /** Threshold value to signal a spike. */
     private double threshold = 30;
@@ -83,6 +86,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
+        inputs += iBg;
 
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
@@ -168,7 +172,15 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         this.d = d;
     }
 
-    /**
+    public double getiBg() {
+		return iBg;
+	}
+
+	public void setiBg(double iBg) {
+		this.iBg = iBg;
+	}
+
+	/**
      * @return Returns the addNoise.
      */
     public boolean getAddNoise() {

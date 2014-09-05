@@ -732,21 +732,22 @@ public class Network {
     /**
      * Add a group to the network. This works for both singular groups like
      * neuron groups and synapse groups as well as for composite groups like any
-     * subclass of Subnetwork. NetworkPanel adds the constituent groups of
-     * composite groups and therefore it is unnecessary here.
+     * subclass of Subnetwork.
      *
      * @param group group of network elements
      */
     public void addGroup(final Group group) {
-        // Generate group id
-        String id = getGroupIdGenerator().getId();
-        group.setId(id);
-        if (group.getLabel() == null) {
-            group.setLabel(id.replaceAll("_", " "));
-        }
+
+        // Set id for this group and all constituent groups
+        group.recursivelySetIds(group);
+
+        // Only add top level groups to the group list.
         if (group.isTopLevelGroup()) {
             groupList.add(group);
         }
+
+        // Notify listeners (mainly network panel) that the group has been
+        // added.
         fireGroupAdded(group);
     }
 

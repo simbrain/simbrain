@@ -457,10 +457,10 @@ public class SynapseGroup extends Group {
         String ret = new String();
         ret += ("Synapse Group [" + getLabel() + "]. Contains " + this.size()
             + " synapse(s)." + " Connects "
-            + getSourceNeuronGroup().getId() + " ("
-            + getSourceNeuronGroup().getLabel() + ")" + " to "
-            + getTargetNeuronGroup().getId() + " ("
-            + getTargetNeuronGroup().getLabel() + ")\n");
+            + getSourceNeuronGroup().getId() + " ["
+            + getSourceNeuronGroup().getLabel() + "]" + " to "
+            + getTargetNeuronGroup().getId() + " ["
+            + getTargetNeuronGroup().getLabel() + "]\n");
 
         return ret;
     }

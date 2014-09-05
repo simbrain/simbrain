@@ -53,6 +53,9 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
 
     /** D field. */
     private JTextField tfD = new JTextField();
+    
+    /** A text field for entering constant background current value. */
+    private JTextField tfIBg = new JTextField();
 
     /** Add noise combo box. */
     private TristateDropDown tsNoise = new TristateDropDown();
@@ -79,6 +82,7 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
         mainTab.addItem("B", tfB);
         mainTab.addItem("C", tfC);
         mainTab.addItem("D", tfD);
+        mainTab.addItem("Ibg", tfIBg);
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
@@ -119,6 +123,12 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
         else
             tfD.setText(Double.toString(neuronRef.getD()));
 
+        // Handle iBg
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getiBg"))
+            tfIBg.setText(SimbrainConstants.NULL_STRING);
+        else
+            tfIBg.setText(Double.toString(neuronRef.getiBg()));
+        
         // Handle Noise
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
                 "getAddNoise"))
@@ -149,6 +159,7 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
         tfB.setText(Double.toString(prototypeRule.getB()));
         tfC.setText(Double.toString(prototypeRule.getC()));
         tfD.setText(Double.toString(prototypeRule.getD()));
+        tfIBg.setText(Double.toString(prototypeRule.getiBg()));
         tsNoise.setSelected(prototypeRule.getAddNoise());
         randTab.fillDefaultValues();
     }
@@ -221,6 +232,14 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
             for (int i = 0; i < numNeurons; i++) {
                 ((IzhikevichRule) neurons.get(i).getUpdateRule()).setD(d);
             }
+        }
+        
+        // iBg
+        double iBg = Utils.doubleParsable(tfIBg);
+        if (!Double.isNaN(iBg)) {
+        	for (int i = 0; i < numNeurons; i++) {
+        		((IzhikevichRule) neurons.get(i).getUpdateRule()).setiBg(iBg);
+        	}
         }
 
         // Add Noise?

@@ -217,17 +217,15 @@ public abstract class Group {
      * Set the id for this group.   A default label based
      * on the id is also set.   This is overridden  by
      * subnetowrk so that sub-groups also are given ids.
-     *
-     * @param group the group whose id should be set.
      */
-    public void recursivelySetIds(Group group) {
+    public void recursivelySetIds() {
 
         String id = getParentNetwork().getGroupIdGenerator().getId();
-        group.setId(id);
+        setId(id);
 
         // Create a default label based on the id
-        if (group.getLabel() == null) {
-            group.setLabel(id.replaceAll("_", " "));
+        if (getLabel() == null) {
+            setLabel(id.replaceAll("_", " "));
         }
     }
 

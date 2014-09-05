@@ -739,7 +739,7 @@ public class Network {
     public void addGroup(final Group group) {
 
         // Set id for this group and all constituent groups
-        group.recursivelySetIds(group);
+        group.recursivelySetIds();
 
         // Only add top level groups to the group list.
         if (group.isTopLevelGroup()) {

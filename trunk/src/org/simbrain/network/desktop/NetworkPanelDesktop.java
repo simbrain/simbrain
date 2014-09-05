@@ -347,6 +347,13 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
     @Override
     public JMenu getSynapseGroupConsumerMenu(SynapseGroup synapseGroup) {
+        //
+        // Below not implemented now for two reasons. (1) There are no obvious
+        // uses now. (2) Assigning components in a 1-d array of weights to
+        // a synapse group is a non-trivial operation and the results
+        // would be hard to predict for users. More natural would be
+        // a matrix-coupling. Matrix-couplings are not as of 2014 implemented.
+        //
         // if (component.getWorkspaceComponent() != null) {
         // PotentialConsumer consumer = component
         // .getWorkspaceComponent()

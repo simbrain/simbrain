@@ -272,14 +272,17 @@ public class Synapse {
         if (!enabled) {
             return 0;
         } else {
-            spikeResponder.update(this);
-            if (delay == 0) {
-                return psr;
-            } else {
-                enqueu(psr);
-                return dequeu();
+            if (spikeResponder != null) {
+                spikeResponder.update(this);
+                if (delay == 0) {
+                    return psr;
+                } else {
+                    enqueu(psr);
+                    return dequeu();
+                }
             }
         }
+        return 0;
     }
 
     /**

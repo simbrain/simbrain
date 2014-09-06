@@ -46,7 +46,7 @@ import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
  */
 @SuppressWarnings("serial")
 public class SynapseGroupNodeBidirectional extends PNode implements
-    PropertyChangeListener, SynapseGroupArrow {
+    PropertyChangeListener, SynapseGroupArrow, GroupNode {
 
     /** The default thickness. */
     private static final float DEFAULT_ARROW_THICKNESS = 30;
@@ -630,6 +630,11 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     public float getRequiredSpacing() {
         return arrow1.getStrokeWidth() * 2 + DEFAULT_BUFFER
             + arrow2.getStrokeWidth() * 2;
+    }
+
+    @Override
+    public void updateConstituentNodes() {
+        // TODO Auto-generated method stub
     }
 
 }

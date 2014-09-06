@@ -963,20 +963,25 @@ public class Network {
         // This should not happen but as of 1/24/11 I have not
         // determined why it happens, so the check is needed.
         for (Synapse synapse : this.getFlatSynapseList()) {
-            if (synapse.getTarget().getFanIn() != null) {
-                synapse.getTarget().addAfferent(synapse);
-            } else {
-                System.out.println("Warning:" + synapse.getId()
-                    + " has null fanIn");
-                removeSynapse(synapse);
+            if (synapse.getTarget() != null) {
+                if (synapse.getTarget().getFanIn() != null) {
+                    synapse.getTarget().addAfferent(synapse);
+                } else {
+                    System.out.println("Warning:" + synapse.getId()
+                        + " has null fanIn");
+                    removeSynapse(synapse);
+                }                
             }
-            if (synapse.getSource().getFanOut() != null) {
-                synapse.getSource().addEfferent(synapse);
-            } else {
-                System.out.println("Warning:" + synapse.getId()
-                    + " has null fanOut");
-                removeSynapse(synapse);
+            if (synapse.getSource() != null) {
+                if (synapse.getSource().getFanOut() != null) {
+                    synapse.getSource().addEfferent(synapse);
+                } else {
+                    System.out.println("Warning:" + synapse.getId()
+                        + " has null fanOut");
+                    removeSynapse(synapse);
+                }                
             }
+
         }
 
         return this;

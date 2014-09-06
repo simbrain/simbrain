@@ -26,14 +26,35 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
 
 /**
- * For each neuron, consider every neuron in an excitatory and inhibitory radius
- * from it, and make excitatory and inhibitory synapses with them.
+ *
+ * This connection type makes four types of distance-based connection
+ * probabilistically.
+ * <ol>
+ * <li>Excitatory to Excitatory (EE)</li>
+ * <li>Excitatory to Inhibitory (EI)</li>
+ * <li>Inhibitory to Inhibitory (II)</li>
+ * <li>Inhibitory to Excitatory (IE)</li>
+ * </ol>
+ *
+ * In each case, the probability of a connection is more likely the closer two
+ * neurons of the relevant type are to each other. Probabilities of connection
+ * are given by an exponential probability distribution e^-( D(a, b) / (λ^2) )
+ * where D is distance in pixels.
+ *
+ * Lambda controls the number of pixels over which to expect connections to be
+ * made.
+ *
+ * Any of the 4 constants for the 4 cases can be set to a value between 0 and 1.
+ * Set to 0, if you want no connections of that type to be made. Set to 1 to
+ * have it make the most connections possible given the exponential
+ * distribution.
  *
  * @author Zach Tosi
  *
  */
 public class Radial extends Sparse {
 
+    /** For neurons with no polarity. */
     public static final double DEFAULT_DIST_CONST = 0.25;
 
     public static final double DEFAULT_EE_CONST = 0.3;
@@ -76,9 +97,7 @@ public class Radial extends Sparse {
      * connection distance.
      */
     private double lambda = DEFAULT_LAMBDA;
-
-    private List<Synapse> removedList;
-
+    
     private SynapseGroup synapseGroup;
 
     /**

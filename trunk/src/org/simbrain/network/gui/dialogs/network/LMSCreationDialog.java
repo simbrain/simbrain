@@ -50,11 +50,13 @@ public class LMSCreationDialog extends StandardDialog {
     private void init() {
         setTitle("New LMS Network");
 
+        // TODO: These defaults should come from the model via something like
+        // fill field values
         Box panel  = Box.createVerticalBox();
         inputLayer = new LayerCreationPanel("Input layer", 5);
         inputLayer.setComboBox("Linear");
         outputLayer = new LayerCreationPanel("Output layer", 5);
-        outputLayer.setComboBox("Logistic");
+        outputLayer.setComboBox("Linear");
         panel.add(outputLayer);
         panel.add(inputLayer);
         setContentPane(panel);

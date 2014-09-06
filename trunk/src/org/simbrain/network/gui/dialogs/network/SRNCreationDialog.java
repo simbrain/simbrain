@@ -90,7 +90,7 @@ public class SRNCreationDialog extends StandardDialog {
     /** Combo box for selecting update rule for the hidden layer */
     private JComboBox hiddenNeuronTypes = new JComboBox(options);
 
-    /** Combo box for selecting the update rule for the ourput layer */
+    /** Combo box for selecting the update rule for the output layer */
     private JComboBox outputNeuronTypes = new JComboBox(options);
 
     /**
@@ -170,10 +170,12 @@ public class SRNCreationDialog extends StandardDialog {
      * Fills the fields with default values.
      */
     public void fillFieldValues() {
+        //TODO: These default values should be pulled from the model srn
         tfNumInputs.setText("" + 5);
         tfNumHidden.setText("" + 7);
         tfNumOutputs.setText("" + 5);
         hiddenNeuronTypes.setSelectedIndex(2);
+        outputNeuronTypes.setSelectedIndex(2);
     }
 
     @Override

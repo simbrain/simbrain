@@ -127,10 +127,14 @@ public class LMSOffline extends Trainer {
 
         int index = 0;
         for (Neuron n : network.getOutputNeurons()) {
+
+            // If output nodes are sigmoidal, alter the effective target data
+            // such that the desired value will result when it is put through
+            // the sigmoidal. Warning: problems can occur here if the bounds of
+            // the sigmoidal are not set properly.
             if (n.getUpdateRule() instanceof SigmoidalRule) {
                 for (int i = 0; i < network.getTrainingSet()
-                    .getTargetData().length; i++)
-                {
+                    .getTargetData().length; i++) {
                     network.getTrainingSet().getTargetData()[i][index] =
                         ((SigmoidalRule) n.getUpdateRule())
                             .getInverse(network.getTrainingSet()

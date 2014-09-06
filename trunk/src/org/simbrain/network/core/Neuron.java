@@ -128,15 +128,15 @@ public class Neuron {
 
     /**
      * Construct a neuron with all default values in the specified network.
-     * Usually this is used as the basis for a template neuron which will be
-     * edited and then copied.
+     * Sometimes used as the basis for a template neuron which will be
+     * edited and then copied.  Also used in scripts.
      *
      * @param parent
      *            The parent network of this neuron.
      */
     public Neuron(final Network parent) {
         this.parent = parent;
-        setUpdateRule(DEFAULT_UPDATE_RULE);
+        setUpdateRule(DEFAULT_UPDATE_RULE.deepCopy());
     }
 
     /**

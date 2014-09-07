@@ -20,17 +20,22 @@ package org.simbrain.world.odorworld;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Iterator;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * <b>OdorWorldFrameMenu</b>.
@@ -73,7 +78,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
     /**
      * Odor world frame menu constructor.
-     *
+     * 
      * @param frame Frame to create menu
      */
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame,
@@ -117,16 +122,29 @@ public class OdorWorldFrameMenu extends JMenuBar {
     public void setUpEditMenu() {
         add(editMenu);
 
-        editMenu.add(cutItem);
-        editMenu.add(copyItem);
-        editMenu.add(pasteItem);
-        editMenu.addSeparator();
+        //editMenu.add(cutItem);
+        //editMenu.add(copyItem);
+        //editMenu.add(pasteItem);
+        //editMenu.addSeparator();
         clearAllItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 world.deleteAllEntities();
             }
         });
         editMenu.add(clearAllItems);
+        editMenu.addSeparator();
+        JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
+        loadVectors.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                SFileChooser chooser = new SFileChooser(".", "Load vectors");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    double[][] vecs = Utils.getDoubleMatrix(theFile);
+                    world.loadStimulusVectors(vecs);
+                }
+            }
+        });
+        editMenu.add(loadVectors);
 
     }
 

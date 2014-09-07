@@ -1,0 +1,95 @@
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.workspace.*;
+import org.simbrain.util.*;
+import javax.swing.JInternalFrame;
+import java.util.*;
+
+//
+// Braitenberg Simulation
+//
+// TODO: Correct synapse ids
+//      Find biases, dispersion
+//
+{
+    
+    // Clear workspace
+	workspace.clearWorkspace();
+
+    // Open workspace
+	String FS = System.getProperty("file.separator");
+    workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "braitenberg.zip"));
+	Network vehicle1 = ((NetworkComponent) workspace.getComponent("vehicle1.xml")).getNetwork();
+	
+	Network vehicle2 = ((NetworkComponent) workspace.getComponent("vehicle2.xml")).getNetwork();
+
+    // Start making the buttons!
+    JInternalFrame internalFrame = new JInternalFrame("Set weights", true, true);
+    LabelledItemPanel panel = new LabelledItemPanel();
+
+    JButton buttonPursuer = new JButton("Make");
+    buttonPursuer.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+        }});
+    panel.addItem("Pursuers", buttonPursuer);
+
+    JButton buttonAvoider = new JButton("Make");
+    buttonAvoider.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+
+        }});
+    panel.addItem("Avoiders", buttonAvoider);
+
+    JButton buttonAvoiderPursuer = new JButton("Make");
+    buttonAvoiderPursuer.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle1.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
+            workspace.iterate();
+        }});
+    panel.addItem("Avoider-Pursuer", buttonAvoiderPursuer);
+
+    JButton buttonReverseWeights = new JButton("Do it!");
+    buttonReverseWeights.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            vehicle2.getSynapse("Synapse_2").setStrength(vehicle1.getSynapse("Synapse_2").getStrength());
+            vehicle2.getSynapse("Synapse_1").setStrength(vehicle1.getSynapse("Synapse_1").getStrength());
+            
+            workspace.iterate();
+        }});
+    panel.addItem("Reverse weights", buttonReverseWeights);
+    
+    JTextField weightl = new JTextField("100");
+    panel.addItem("Left weight", weightl);
+    JTextField weightr = new JTextField("50");
+    panel.addItem("Right weight", weightr);
+
+    // Set up Frame
+    internalFrame.setLocation(19,352);
+    internalFrame.getContentPane().add(panel);
+    internalFrame.setVisible(true);
+    internalFrame.pack();
+    desktop.addInternalFrame(internalFrame);
+
+}

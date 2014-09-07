@@ -11,7 +11,7 @@ import org.simbrain.plot.timeseries.*;
 {
 
     // Build Network
-    NetworkComponent networkComponent = new NetworkComponent("Spiking neurons");
+    NetworkComponent networkComponent = new NetworkComponent("Spiking neuron");
     workspace.addWorkspaceComponent(networkComponent);
     Network network = networkComponent.getNetwork();
     network.setTimeStep(.2);

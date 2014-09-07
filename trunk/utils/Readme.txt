@@ -1,0 +1,1 @@
+The files in this directory are used to help prepare Simbrain simulations.  Most of them are used to generate datasets for training different Simbrain networks.  We have tried to make them all compilable and runnable from this directory, with no external dependencies.

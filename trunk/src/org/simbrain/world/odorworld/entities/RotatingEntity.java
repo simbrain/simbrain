@@ -78,7 +78,9 @@ public class RotatingEntity extends OdorWorldEntity {
         if (entityType == null) {
             entityType = "Mouse";
         }
-        if (entityType.equalsIgnoreCase("Mouse")) {
+        if (entityType.equalsIgnoreCase("Circle")) {
+            imageMap = RotatingEntityManager.getCircle();
+        } if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
         } else if (entityType.equalsIgnoreCase("Amy")) {
             imageMap = RotatingEntityManager.getRotatingTileset("amy", 20);
@@ -231,7 +233,7 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Amy", "Arnold", "Boy", "Cow", "Girl",
+                return new Object[] { "Amy", "Arnold", "Boy", "Circle", "Cow", "Girl",
                         "Lion", "Mouse", "Susi", "Steve" };
             }
         };

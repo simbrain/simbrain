@@ -89,6 +89,19 @@ public class RotatingEntityManager {
     }
 
     /**
+     * Returns circle image.
+     *
+     * @return circle
+     */
+    public static TreeMap<Double, Animation> getCircle() {
+        TreeMap<Double, Animation> circleMap = new TreeMap<Double, Animation>();
+        // map all angles to same image
+        circleMap.put(1d, new Animation("circle.png"));
+        return circleMap;
+    }
+
+
+    /**
      * Tree map for a rotating image from Reiner Prokein's collection.
      *
      * Courtesy of http://reinerstileset.4players.de/englisch.html

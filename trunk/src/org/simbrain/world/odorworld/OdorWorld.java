@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -618,6 +619,27 @@ public class OdorWorld {
      */
     public double getTotalSmellVectorLength() {
         return totalSmellVectorLength;
+    }
+
+    /**
+     * Use the provided set of vectors (stored as a 2-d array of doubles, one
+     * vector per row) to set the stimulus vectors on all odor world entities,
+     * in the order in which they are stored in the internal list (which should
+     * match the order in which they were added to the world).
+     *
+     * @param stimulusVecs the 2d matrix of stimulus vectors
+     */
+    public void loadStimulusVectors(double[][] stimulusVecs) {
+        Iterator<OdorWorldEntity> entityIterator = getObjectList().iterator();
+        for (int i = 0; i < stimulusVecs.length; i++) {
+            if (entityIterator.hasNext()) {
+                OdorWorldEntity entity = entityIterator.next();
+                if (entity.getSmellSource() != null) {
+                    //System.out.println(entity);
+                    entity.getSmellSource().setStimulusVector(stimulusVecs[i]);
+                }
+            }
+        }
     }
 
 }

@@ -9,8 +9,8 @@ import javax.swing.*;
 void componentBounds() {
 	SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
     for(JInternalFrame frame : desktop.getDesktop().getAllFrames()) {
-    	print(frame.getTitle() + " (" + frame.getX() + "," + frame.getY() + "," + frame.getHeight() 
-    		+ "," + frame.getWidth() + ")");
+    	print(frame.getTitle() + " (" + frame.getX() + "," + frame.getY() + "," + frame.getWidth() 
+    		+ "," + frame.getHeight() + ")");
     }
 
 }

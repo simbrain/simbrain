@@ -364,7 +364,7 @@ public class Network {
      */
     public List<Group> getGroupsByLabel(final String label) {
         List<Group> returnList = new ArrayList<Group>();
-        for (Group group : getGroupList()) {
+        for (Group group : getFlatGroupList()) {
             if (group.getLabel().equalsIgnoreCase(label)) {
                 returnList.add(group);
             }

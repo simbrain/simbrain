@@ -103,7 +103,12 @@ public class GridLayout implements Layout {
     public void layoutNeurons(final List<Neuron> neurons) {
         int numCols = numColumns;
         if (!manualColumns) {
-            numCols = (int) Math.sqrt(neurons.size());
+            if (neurons.size() > 3) {
+                numCols = (int) Math.sqrt(neurons.size());
+            } else {
+                // Better-looking results for 3 or fewer neurons
+                numCols = 2;
+            }
         }
 
         int rowNum = -1;

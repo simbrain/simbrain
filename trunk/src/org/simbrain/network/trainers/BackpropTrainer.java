@@ -245,8 +245,13 @@ public class BackpropTrainer extends IterableTrainer {
     protected void randomize(List<Neuron> layer) {
         for (Neuron neuron : layer) {
             neuron.clear(); // Looks nicer in the GUI
-            neuron.randomizeFanIn();
-            neuron.randomizeBias(-.5, .5);
+            // Randomize uniformly in -.05,.05.
+            // TODO: Make this settable and use randomizer framework.
+            for (Synapse synapse : neuron.getFanIn()) {
+                synapse.setStrength(.1 * Math.random() - .05);
+            }
+            ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(.1 * Math
+                    .random() - .05);
         }
         revalidateSynapseGroups();
     }

@@ -1,0 +1,51 @@
+import org.simbrain.network.core.*;
+import org.simbrain.workspace.*;
+import org.simbrain.network.*;
+
+//
+// Run this script to create a script (or part of a script) that can be used build the networks in the workspace.
+// This runs on older versions of simbrain and so can be used to help recover older simulations.   
+//
+// To use this, run it from the console with the networks you want to "scriptify" open.
+// Then cut and paste the resulting text from the console window into a new script file with this format:
+//    [Import statements];
+//    {
+//          [Cut and pasted text from the console]
+//    }
+// You may have to modify some things in the resulting scripts to get it to work.
+// Then just invoke the script from the new version of Simbrain.
+// 
+// TODO:
+//    This does not yet do much, and could easily be updated to do more, e.g. copy neuron and synapse type and parameters.
+//    It could also be updated to create scripts for other workspace components, e.g. Odor Worlds.
+//    networkComponentName should strip *.xml
+// 
+void createScriptLines() {
+      for (WorkspaceComponent component : workspace.getComponentList()) {
+            if (component instanceof NetworkComponent) {
+                  String netCompName = new String("netComp_" + component.getName());
+                  Network network = ((NetworkComponent)component).getNetwork();
+                  String netName = new String("net_" + component.getName());
+                  print("NetworkComponent " + netCompName + " = new NetworkComponent(\"" + netCompName + "\");");
+                  print("workspace.addWorkspaceComponent(" + netCompName + ");");
+                  print("");
+                  print("Network " + netName + " = " + netCompName + ".getNetwork();");
+                  for(Neuron neuron : network.getFlatNeuronList()) {
+                        String neuronName = new String("nrn_" + neuron.getId());
+                        print("Neuron " + neuronName + " = new Neuron(" + netName + ");");
+                        print(neuronName + ".setX(" + neuron.getX() + ");");
+                        print(neuronName + ".setY(" + neuron.getY() + ");");
+                        print(neuronName + ".setLabel(\"" + neuron.getLabel() + "\");");
+                        print(netName + ".addNeuron(" + neuronName + ");");
+                  }
+                  for(Synapse synapse : network.getFlatSynapseList()) {
+                        String synapseName = new String("syn_" + synapse.getId());
+                        String sourceRef = new String(netName + ".getNeuron(\"" + synapse.getSource().getId() +"\")");
+                        String targetRef = new String(netName + ".getNeuron(\"" + synapse.getTarget().getId() +"\")");
+                        print("Synapse " + synapseName + " = new Synapse(" + sourceRef + "," + targetRef + "," + synapse.getStrength() + ");");
+                        print(netName + ".addSynapse(" + synapseName + ");");
+                  }
+            }
+      }
+}
+

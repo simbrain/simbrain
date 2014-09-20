@@ -91,7 +91,7 @@ public class VectorDictionaryEditor extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        world.resetVectorDictionary(table.getData().asStringArray());
+        world.loadVectorDictionary(table.getData().asStringArray());
     }
 
     /**

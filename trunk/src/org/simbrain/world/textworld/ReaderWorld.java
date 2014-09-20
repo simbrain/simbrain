@@ -344,11 +344,11 @@ public final class ReaderWorld extends TextWorld {
     }
 
     /**
-     * Reset the reader world dictionary.
+     * Loads a vector dictionary.
      *
-     * @param tableData array of strings to re-populate dictionary
+     * @param tableData the dictionary to add.
      */
-    public void resetVectorDictionary(String[][] tableData) {
+    public void loadVectorDictionary(String[][] tableData){
         vectorDictionary.clear();
         for (int i = 0; i < tableData.length; i++) {
             double[] vector = Utils.parseVectorString(tableData[i][1]);

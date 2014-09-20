@@ -52,10 +52,9 @@ public class DisplayWorld extends TextWorld {
     public DisplayWorld() {
     }
 
-    /**
-     * Advance the position in the text, and update the current item.
-     */
+    @Override
     public void update() {
+        // No implementation
     }
 
     /**

@@ -39,9 +39,9 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991). While the
- * SRN behavior could be implemented more efficiently by using a recurrent 
+ * SRN behavior could be implemented more efficiently by using a recurrent
  * hidden layer and a buffered update, a context layer is here for educational
- * and visualization purposes, as well as to more closely follow Elman's 
+ * and visualization purposes, as well as to more closely follow Elman's
  * original design.
  *
  * @author Zach Tosi
@@ -117,7 +117,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         super(network);
 
         setLabel("SRN");
-
         // Initialize layers and set node types. TODO: Can this be done at group
         // level?
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
@@ -276,6 +275,20 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
      */
     public NeuronGroup getHiddenLayer() {
         return hiddenLayer;
+    }
+
+    /**
+     * @return the input
+     */
+    public NeuronGroup getInputLayer() {
+        return inputLayer;
+    }
+
+    /**
+     * @return the input
+     */
+    public NeuronGroup getOutputLayer() {
+        return outputLayer;
     }
 
     /**

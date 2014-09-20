@@ -71,7 +71,7 @@ public class SimbrainMath {
         double y1 = src[1];
         double y2 = tar[1];
 
-        return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+        return (double) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
     /**

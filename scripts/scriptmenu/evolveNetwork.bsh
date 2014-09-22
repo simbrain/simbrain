@@ -12,6 +12,10 @@ import java.util.*;
 import org.jgap.*;
 import org.jgap.impl.*;
 
+//
+// Uses JGAP (http://jgap.sourceforge.net/) to evolve a network that produces specified dynamics
+// (see around line 140 for what those dynamics are, and to set them).
+//
 {
 	// TODO: Move num iterations of time window to top, and make a more clear set of example params
 	// TODO: Show progress in progress bar after invoking
@@ -114,13 +118,12 @@ import org.jgap.impl.*;
             GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
                     .sqrt(numNeurons));
             layout.layoutNeurons(network.getNeuronList());
-            Radial connection = new Radial(network, network.getFlatNeuronList(),
-                    network.getFlatNeuronList());
+            RadialSimple connection = new RadialSimple(network, network.getFlatNeuronList());
             connection.setExcitatoryProbability(excitProb);
             connection.setInhibitoryProbability(inhibProb);
             connection.setExcitatoryRadius(excitRadius);
             connection.setInhibitoryRadius(inhibRadius);
-            connection.connectNeurons();
+            connection.connectNeurons(true);
 
             // Currently, the default behavior is to randomize the neurons of a
             // network and update it for a set number of iterations.

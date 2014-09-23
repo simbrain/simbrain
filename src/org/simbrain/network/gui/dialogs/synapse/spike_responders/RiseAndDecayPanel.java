@@ -58,6 +58,16 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         this.addItem("Maximum response", tfMaximumResponse);
         this.addItem("Time Constant", tfTimeConstant);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public RiseAndDecayPanel deepCopy() {
+    	RiseAndDecayPanel cpy = new RiseAndDecayPanel();
+    	cpy.tfMaximumResponse.setText(this.tfMaximumResponse.getText());
+    	cpy.tfTimeConstant.setText(this.tfTimeConstant.getText());
+    	return cpy;
+    }
 
     /**
      * {@inheritDoc}

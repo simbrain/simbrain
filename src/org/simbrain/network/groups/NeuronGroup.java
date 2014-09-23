@@ -18,15 +18,23 @@
 package org.simbrain.network.groups;
 
 import java.awt.geom.Point2D;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
@@ -43,7 +51,17 @@ import org.simbrain.util.Utils;
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     public static final int DEFAULT_GROUP_SIZE = 10;
-
+//    
+//    private String outFileName = "defaultOut.dat";
+//    
+//    private RandomAccessFile outFile;
+//    
+//    private boolean recording;
+    
+    private boolean isSpikingNeuronGroup;
+    
+    private String updateRule;
+    
     /** The neurons in this group. */
     private List<Neuron> neuronList = new ArrayList<Neuron>(500);
 
@@ -90,6 +108,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
             addNeuron(neuron);
         }
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
+        updateRule = getNeuronType();
     }
 
     /**
@@ -124,6 +143,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
         layout.setInitialLocation(initialPosition);
         layout.layoutNeurons(this.getNeuronList());
+        updateRule = getNeuronType();
     }
 
     /**
@@ -165,6 +185,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         for (Neuron neuron : toCopy.getNeuronList()) {
             this.addNeuron(new Neuron(network, neuron));
         }
+        this.isSpikingNeuronGroup = toCopy.isSpikingNeuronGroup;
+        this.updateRule = toCopy.updateRule;
     }
 
 	@Override
@@ -191,6 +213,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
+//        stopRecording();
         neuronList.clear();
         Runtime.getRuntime().gc();
     }
@@ -200,6 +223,109 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         Network.updateNeurons(neuronList);
     }
 
+//    public void startRecording(String filename) {
+//    	this.outFileName = filename;
+//    	startRecording();
+//
+//    }
+//    
+//    public void startRecording() {
+//    	stopRecording();
+//    	recording = true;
+//    	File metaFile = new File(outFileName + ".metadata");
+//    	try (FileOutputStream fos = new FileOutputStream(metaFile);
+//    			ByteArrayOutputStream baos = new ByteArrayOutputStream();){
+//    		byte [][] meta = getMetaData();
+//    		for(byte [] ba : meta) {
+//    			baos.write(ba);
+//    		}
+//    		baos.writeTo(fos);
+//    		outFile = new RandomAccessFile(outFileName, "rw");
+//    	} catch (IOException e) {
+//    		e.printStackTrace();
+//    	}
+//    }
+//    
+//    public void stopRecording() {
+//    	if (outFile == null || !outFile.getChannel().isOpen()) {
+//    		return;
+//    	} else {
+//    		try {
+//    			outFile.close();
+//    		} catch (IOException e) {
+//    			e.printStackTrace();
+//    		}
+//    	}
+//    	recording = false;
+//    }
+    
+    /**
+     * Gives the metadata of this neuron group in the following form:
+     * [0] = Number of neurons
+     * [1] = NeuronType
+     * [2] = SpikeEncoding
+     * [3] = FanIn Size
+     * [4] = FanOut Size
+     * [5] = Mean Fan In
+     * [6] = Mean Fan Out
+     * @return
+     */
+    public byte[][] getMetaData () {
+    	byte [][] meta = new byte[7][];
+    	meta[0] = ByteBuffer.allocate(4).putInt(size()).array();
+    	meta[1] = getNeuronType().getBytes();
+    	meta[2] = new byte[1];
+    	meta[2][0] = isSpikingNeuronGroup ? (byte) -1 : 0;
+    	meta[3] = new byte[4 * size()];
+    	meta[4] = new byte[4 * size()];
+    	double meanOut = 0.0;
+    	double meanIn = 0.0;
+    	int ptr = 0;
+    	for (Neuron n : neuronList) {
+    		byte [] fiNum = ByteBuffer.allocate(4).putInt(n.getFanIn().size())
+    				.array();
+    		byte [] foNum = ByteBuffer.allocate(4).putInt(n.getFanOut().size())
+    				.array();
+    		for (byte b = 0; b < 4; b++) {
+    			meta[3][ptr] = fiNum[b];
+    			meta[4][ptr] = foNum[b];
+    			ptr++;
+    		}
+    		for (Synapse s : n.getFanIn()) {
+    			meanIn += s.getStrength();
+    		}
+    		for (Synapse s : n.getFanOutList()) {
+    			meanOut += s.getStrength();
+    		}
+    	}
+    	meta[5] = ByteBuffer.allocate(8).putDouble(meanIn/size()).array();
+    	meta[6] = ByteBuffer.allocate(8).putDouble(meanOut/size()).array();
+    	return meta;
+    }
+    
+
+    
+    public String getNeuronType() {
+    	String nType = "Mixed";
+    	if (size() == 0) {
+    		return nType;
+    	}
+    	Iterator<Neuron> nIter = neuronList.iterator();
+    	NeuronUpdateRule nur = nIter.next().getUpdateRule();
+    	boolean conflict = false;
+    	while (nIter.hasNext() && !conflict) {
+    		conflict = !(nur.getClass().equals(nIter.next()
+    				.getUpdateRule().getClass()));
+    	}
+    	if (conflict) {
+    		isSpikingNeuronGroup = false;
+    		return nType;
+    	} else {
+    		isSpikingNeuronGroup = nur instanceof SpikingNeuronUpdateRule;
+    		return nur.getDescription();
+    	}
+    }
+    
     /**
      * @return the neurons in this group.
      */
@@ -460,6 +586,22 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         return retArray;
     }
 
+//    public byte [] getSpikes() {
+//    	if (!isSpikingNeuronGroup) {
+//    		return null;
+//    	}
+//    	int numBytes = size() % 8 == 0 ? size()/8 : size()/8 + 1;
+//    	byte [] actArr = new byte[numBytes];
+//    	int actInt = 0;
+//    	for (int i = 0; i < size(); i++) {
+//    		if (((SpikingNeuronUpdateRule) neuronList.get(i).getUpdateRule())
+//    				.hasSpiked()) {
+//    			actInt = actInt | (1 << (i % 32));
+//    		}
+//    	}
+//    	
+//    }
+    
     /**
      * Return biases as a double array.
      *

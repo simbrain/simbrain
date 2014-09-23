@@ -37,15 +37,19 @@ import java.util.Hashtable;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
@@ -143,6 +147,16 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     private JButton sliderApply = new JButton("Apply");
 
     private final Window parent;
+    
+    private final JLabel warning =
+    		new JLabel(ResourceManager.getImageIcon("WarningGray.png"));
+    
+    {
+    	warning.setToolTipText("Failed to apply ratio within error tolerance."
+    			+ " Source neurons might be polarized.");
+    }
+    
+    private static final double ERROR_TOLERANCE = 0.05;
 
     /**
      *
@@ -321,9 +335,9 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         sliderPanel.add(ratioSlider, gbc);
 
         gbc.insets = new Insets(5, 5, 0, 5);
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         JPanel inTfPanel = new JPanel(new FlowLayout());
         Dimension iRatioSize = iRatio.getPreferredSize();
@@ -335,13 +349,15 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
         gbc.gridx = 2;
         gbc.gridwidth = 1;
+        gbc.weightx = 0;
         JPanel blank = new JPanel();
         blank.setPreferredSize(new Dimension(60, 10));
         blank.setMinimumSize(new Dimension(60, 10));
         sliderPanel.add(blank, gbc);
 
         gbc.gridx = 3;
-        gbc.gridwidth = 2;
+        gbc.weightx = 0;
+        gbc.gridwidth = 1;
         JPanel exTfPanel = new JPanel(new FlowLayout());
         Dimension eRatioSize = eRatio.getPreferredSize();
         eRatioSize.width = 40;
@@ -349,6 +365,13 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         exTfPanel.add(new JLabel("% Excitatory"));
         exTfPanel.add(eRatio);
         sliderPanel.add(exTfPanel, gbc);
+        
+        gbc.gridx = 4;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        sliderPanel.add(warning, gbc);
+        warning.setVisible(false);
 
         if (!creationPanel) {
             gbc.gridwidth = 1;
@@ -475,6 +498,18 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
                 double percentExcitatory = Utils.doubleParsable(eRatio) / 100;
                 if (!Double.isNaN(percentExcitatory)) {
                     synapseGroup.setExcitatoryRatio(percentExcitatory);
+                    if (Math.abs(percentExcitatory - synapseGroup
+                    		.getExcitatoryRatioPrecise()) > ERROR_TOLERANCE) {
+                    	warning.setVisible(true);
+                    } else {
+                    	warning.setVisible(false);
+                    }
+                    // In case some or all source neurons have polarity, reset
+                    // the slider and other field values to represent the result
+                    // of synapseGroup's attempt to match the desired excitatory
+                    // ratio.
+                    ratioSlider.setValue((int) (100
+                    		* synapseGroup.getExcitatoryRatioPrecise()));
                 }
             }
         });

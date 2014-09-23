@@ -1062,7 +1062,7 @@ public class Neuron {
 
     // TODO: Unsafe discuss design of this feature.
     public void setPolarity(Polarity polarity) {
-    	this.polarity = polarity;
+        this.polarity = polarity;
     }
-    
+
 }

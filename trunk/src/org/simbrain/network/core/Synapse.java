@@ -274,15 +274,16 @@ public class Synapse {
         } else {
             if (spikeResponder != null) {
                 spikeResponder.update(this);
-                if (delay == 0) {
-                    return psr;
-                } else {
-                    enqueu(psr);
-                    return dequeu();
-                }
+            } else {
+                psr = source.getActivation() * strength;
+            }
+            if (delay == 0) {
+                return psr;
+            } else {
+                enqueu(psr);
+                return dequeu();
             }
         }
-        return 0;
     }
 
     /**

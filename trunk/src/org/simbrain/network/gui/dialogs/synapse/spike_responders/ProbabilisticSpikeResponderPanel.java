@@ -56,6 +56,18 @@ public class ProbabilisticSpikeResponderPanel extends
         this.addItem("Activation Probability", tfActivationProbability);
         this.addItem("Response value", tfResponseValue);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ProbabilisticSpikeResponderPanel deepCopy() {
+    	ProbabilisticSpikeResponderPanel cpy =
+    			new ProbabilisticSpikeResponderPanel();
+    	cpy.tfActivationProbability.setText(this.tfActivationProbability
+    			.getText());
+    	cpy.tfResponseValue.setText(this.tfResponseValue.getText());
+    	return cpy;
+    }
 
     /**
      * {@inheritDoc}

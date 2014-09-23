@@ -261,6 +261,9 @@ public class SynapseGroup extends Group {
         synGroup.setExcitatoryRatio(excitatoryRatio);
         synGroup.setRandomizers(exciteRand, inhibRand);
         synGroup.makeConnections();
+        // Ensure that displayed ratio is consistent with actual ratio.
+        // Process of determining synapse polarity is stochastic.
+        synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
         return synGroup;
     }
 

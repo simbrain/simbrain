@@ -35,6 +35,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 
+import com.sun.org.apache.xalan.internal.utils.XMLSecurityManager.NameMap;
+
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
  * the neural network occurs here, in the update function. Subclasses must
@@ -180,6 +182,10 @@ public class Neuron {
         this.parent = parent;
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
+        // Hack, this should be done in NeuronUpdateRule... but because of
+        // current api changes would have to be made to add neuron update rule's
+        // sub classes.
+        getUpdateRule().setInputType(n.getUpdateRule().getInputType());
         forceSetActivation(n.getActivation());
         setInputValue(n.getInputValue());
         setX(n.getX());

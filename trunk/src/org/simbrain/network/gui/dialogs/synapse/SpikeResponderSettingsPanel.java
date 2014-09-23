@@ -195,7 +195,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 spikeResponderPanel = AbstractSpikeResponsePanel.RESPONDER_MAP
-                        .get(cbResponderType.getSelectedItem());
+                        .get(cbResponderType.getSelectedItem()).deepCopy();
 
                 // Is the current panel different from the starting panel?
                 boolean replace = spikeResponderPanel != startingPanel;
@@ -246,7 +246,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
         } else {
             String spikeResponderName = srList.get(0).getDescription();
             spikeResponderPanel = AbstractSpikeResponsePanel.RESPONDER_MAP
-                    .get(spikeResponderName);
+                    .get(spikeResponderName).deepCopy();
             spikeResponderPanel.fillFieldValues(srList);
             cbResponderType.setSelectedItem(spikeResponderName);
         }
@@ -307,6 +307,11 @@ public class SpikeResponderSettingsPanel extends JPanel {
         public SpikeResponder getPrototypeResponder() {
             return null;
         }
+
+		@Override
+		public AbstractSpikeResponsePanel deepCopy() {
+			return null;
+		}
 
     }
 

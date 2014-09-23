@@ -28,10 +28,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.dialogs.synapse.spike_responders.ConvolvedJumpAndDecayPanel;
 import org.simbrain.network.gui.dialogs.synapse.spike_responders.JumpAndDecayPanel;
 import org.simbrain.network.gui.dialogs.synapse.spike_responders.ProbabilisticSpikeResponderPanel;
 import org.simbrain.network.gui.dialogs.synapse.spike_responders.RiseAndDecayPanel;
 import org.simbrain.network.gui.dialogs.synapse.spike_responders.StepSpikerPanel;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
@@ -53,6 +55,8 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     static {
         RESPONDER_MAP.put(new JumpAndDecay().getDescription(),
                 new JumpAndDecayPanel());
+        RESPONDER_MAP.put(new ConvolvedJumpAndDecay().getDescription(),
+        		new ConvolvedJumpAndDecayPanel());
         RESPONDER_MAP.put(new ProbabilisticResponder().getDescription(),
                 new ProbabilisticSpikeResponderPanel());
         RESPONDER_MAP.put(new RiseAndDecay().getDescription(),
@@ -75,6 +79,8 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      */
     private boolean replacing = true;
 
+    public abstract AbstractSpikeResponsePanel deepCopy();
+    
     /**
      * Adds an item.
      *

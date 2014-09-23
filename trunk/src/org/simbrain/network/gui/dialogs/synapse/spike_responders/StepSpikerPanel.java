@@ -63,6 +63,16 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     /**
      * {@inheritDoc}
      */
+    public StepSpikerPanel deepCopy() {
+    	StepSpikerPanel cpy = new StepSpikerPanel();
+    	cpy.tfResponseDuration.setText(this.tfResponseDuration.getText());
+    	cpy.tfResponseHeight.setText(this.tfResponseHeight.getText());
+    	return cpy;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void fillDefaultValues() {
         tfResponseHeight.setText(Double.toString(PROTOTYPE_RESPONDER

@@ -48,7 +48,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     private double d = 6;
     
     /** Constant background current. */
-    private double iBg;
+    private double iBg = 14;
 
     /** Threshold value to signal a spike. */
     private double threshold = 30;

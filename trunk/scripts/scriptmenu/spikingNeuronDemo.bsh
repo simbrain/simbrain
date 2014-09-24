@@ -1,6 +1,7 @@
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.*;
 import org.simbrain.network.core.*;
+import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.layouts.*;
 import org.simbrain.network.networks.*;
 import org.simbrain.network.neuron_update_rules.*;
@@ -19,7 +20,7 @@ import org.simbrain.plot.timeseries.*;
     // Input neuron
     Neuron inputNeuron = new Neuron(network, new LinearRule());
     inputNeuron.setLocation(10,10);
-    inputNeuron.setActivation(15);
+    inputNeuron.setActivation(0);
     inputNeuron.setUpperBound(50);
     inputNeuron.setLowerBound(-50);
     inputNeuron.setIncrement(1);
@@ -30,6 +31,7 @@ import org.simbrain.plot.timeseries.*;
     // Spiking neuron
     Neuron spiker = new Neuron(network, new IzhikevichRule());
     spiker.setLocation(150,10);
+    spiker.getUpdateRule().setInputType(InputType.WEIGHTED);
     spiker.setLabel("Spiking neuron");
     ((IzhikevichRule)spiker.getUpdateRule()).setA(.02);
     ((IzhikevichRule)spiker.getUpdateRule()).setB(.2);
@@ -42,7 +44,6 @@ import org.simbrain.plot.timeseries.*;
     network.addSynapse(new Synapse(inputNeuron, spiker, 1));
 
     // Initialize network
-    networkComponent.update();  // TODO: Replace with better method
     desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10, 20, 400,300);
 
     // Make time series chart

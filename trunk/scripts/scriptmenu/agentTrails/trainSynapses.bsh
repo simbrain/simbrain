@@ -1,0 +1,63 @@
+import java.util.*;
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.layouts.*;
+
+private NetworkUpdateAction action;
+
+/**
+ * Code for training prediction network is here.
+ */
+{
+  NeuronGroup sensoryNet  = network.getGroupByLabel("Sensory");
+  NeuronGroup predictionNet  = network.getGroupByLabel("Predicted");
+  Neuron errorNeuron = network.getNeuronByLabel("Error");
+
+  double[] lastPrediction = predictionNet.getActivations();
+  double learningRate  = .1;
+
+  this.action = new NetworkUpdateAction() {
+    public void invoke() {
+      int i = 0;
+      double error = 0;
+      double sumError = 0;
+      for (Neuron neuron : predictionNet.getNeuronList()) {
+        // error = target - actual
+        // error = curent sensory - last prediction
+        error  =  sensoryNet.getNeuronList().get(i).getActivation() - lastPrediction[i];
+        sumError += error;
+        //System.out.println(i + ":" + error + ":" + neuron.getId());
+        neuron.setAuxValue(error);
+        i++;
+      }
+
+      // Update error neuron
+      errorNeuron.forceSetActivation(sumError);
+
+      // Update all value synapses 
+      for (Synapse synapse : network.getFlatSynapseList()) {
+        double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
+        synapse.setStrength(newStrength); 
+        //System.out.println(newStrength);
+      }
+
+      lastPrediction = predictionNet.getActivations();
+    }
+    
+    // This is how the action appears in the update manager dialog
+    public String getDescription() {
+      return "Train synapses";
+    }
+    
+    // This is a longer description for the tooltip
+    public String getLongDescription() {
+      return "Train synapses";
+    }
+
+  };
+}

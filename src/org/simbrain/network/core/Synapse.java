@@ -245,7 +245,8 @@ public class Synapse {
     public void initSpikeResponder() {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-                setSpikeResponder(new JumpAndDecay());
+            	if (getSpikeResponder() == null)
+            		setSpikeResponder(new JumpAndDecay());
             } else {
                 setSpikeResponder(null);
             }

@@ -21,7 +21,7 @@ import org.simbrain.workspace.*;
 {
 
     // Parameters 
-    int NUM_NEURONS = 225;
+    int NUM_NEURONS = 400;
     double GRID_SPACE = 50;
     double EE_CONST = 0.3;
     double EI_CONST = 0.2;
@@ -75,6 +75,10 @@ import org.simbrain.workspace.*;
 	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
 	sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.BOTH);
 	sg.setLabel("Recurrent Synapses");
+	for (Synapse s : sg.getAllSynapses()) {
+		double dist = Network.getEuclideanDist(s.getSource(), s.getTarget());
+		s.setDelay((int) (Math.log(dist * dist) / Math.log(2)));
+	}
 	network.addGroup(sg);
 
 	SynapseGroup outCon = SynapseGroup.createSynapseGroup(ng1, outs, new OneToOne());

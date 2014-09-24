@@ -1,0 +1,69 @@
+import java.util.*;
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.util.*;
+
+private NetworkUpdateAction action;
+
+/**
+ * Print qualia relative to a specified function
+ */
+{
+  NeuronGroup sensoryNet  = network.getGroupByLabel("Sensory");
+  Neuron errorNeuron = network.getNeuronByLabel("Error");
+
+  this.action = new NetworkUpdateAction() {
+    public void invoke() {
+        double sumSensorVals = sensoryNet.getActivations()[0] + sensoryNet.getActivations()[1] + sensoryNet.getActivations()[2];
+        System.out.print("Smell " + chaos(sumSensorVals));
+        // if (errorNeuron.getActivation() > .1) {
+        //   System.out.print("Surprise."); 
+        // }
+        System.out.println();
+    }
+    
+    // This is how the action appears in the update manager dialog
+    public String getDescription() {
+      return "Print qualia";
+    }
+    
+    // This is a longer description for the tooltip
+    public String getLongDescription() {
+      return "Print qualia";
+    }
+
+  };
+
+}
+
+String chaos(double input) {
+        if((input > 0) && (input < .2)) {
+          return "faint fish. ";
+        } else if ((input >= .2) && (input < .5)) {
+          return "strong flower. ";
+        } else if ((input >= .5) && (input < .7)) {
+          return "strong fish. ";
+        } else if ((input >= .7) && (input < .9)) {
+          return "some flower. ";
+        } else if ((input >= .9) && (input < 1.1)) {
+          return "very faint cheese. ";
+        } else if ((input >= 1.1) && (input < 1.3)) {
+          return "some fish. ";
+        } else if ((input >= 1.3) && (input < 2.5)) {
+          return "some cheese. ";
+        } else if ((input >= 2.5) && (input < 2.7)) {
+          return "very faint flower. ";
+        } else if ((input >= 2.7) && (input < 2.9)) {
+          return "strong cheese. ";
+        } else if ((input >= 2.9) && (input < 3)) {
+          return "faint flower. ";
+        } else {
+          return "very faint fish. ";
+        } // Faint cheese left out
+}

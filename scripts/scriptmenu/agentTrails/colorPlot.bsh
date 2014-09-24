@@ -1,0 +1,62 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.plot.projection.*;
+import org.simbrain.util.projection.*;
+import org.simbrain.util.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+
+
+/**
+ * Color points in plot
+ */
+{
+  Projector projector = ((ProjectionComponent) workspace.getComponent("Projection1")).getProjector();
+  Network network = ((NetworkComponent) workspace.getComponent("predicter.xml")).getNetwork();
+  NeuronGroup predicted  = network.getGroupByLabel("Predicted");
+
+ // TODO: Think and explain
+  double scale = 5;
+
+  // Customize this
+  this.action = new UpdateAction() {
+    public void invoke() {
+        double[] predictedState = predicted.getActivations();
+
+        // Iterate through points and color them
+        for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
+          double[] currentPoint = projector.getUpstairs().getPoint(i).getVector();
+          if (java.util.Arrays.equals(currentPoint, projector.getCurrentPoint().getVector())) {
+            ((DataPointColored) projector.getUpstairs().getPoint(i)).setColor(Color.green);
+            continue;
+          }
+          
+          // TODO: Use built in util.   Need to make projector 5-d      
+          double distance = 0;
+          for(int j = 0; j < predictedState.length; j++) {
+            distance += Math.pow(predictedState[j] - currentPoint[j], 2);
+          }
+          distance = Math.sqrt(distance);
+          //System.out.println(distance);        
+          float saturation =  (float)(1 - distance * scale);
+          saturation = saturation > 0 ? saturation : 0;
+          //System.out.println(saturation);
+          if (saturation > 0) {
+            ((DataPointColored) projector.getUpstairs().getPoint(i)).setColor(Color.getHSBColor(Utils.colorToFloat(Color.red), saturation, 1));
+          } else {
+            ((DataPointColored) projector.getUpstairs().getPoint(i)).setColor(Color.gray);
+          }
+        } 
+    }
+    // This is how the action appears in the update manager dialog
+    public String getDescription() {
+      return "Color projection points";
+    }
+    // This is a longer description for the tooltip
+    public String getLongDescription() {
+      return "Color projection points";
+    }
+
+  };
+}

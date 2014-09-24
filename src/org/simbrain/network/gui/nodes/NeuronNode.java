@@ -23,7 +23,9 @@ import java.awt.Font;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -240,6 +242,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
+    	Collection<NeuronNode> neurons = this.getNetworkPanel()
+    			.getSelectedNeurons();
+    	if (neurons == null || neurons.isEmpty()) {
+    		return null;
+    	}
         NeuronDialog dialog = NeuronDialog.createNeuronDialog(this
                 .getNetworkPanel().getSelectedNeurons());
         return dialog;

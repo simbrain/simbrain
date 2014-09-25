@@ -155,7 +155,13 @@ public class SimbrainDesktop {
     /** TODO: Create Javadoc comment. */
     private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
 
-    /** Desktop pane. */
+    // TODO: Review. Part of a hack solution in NeuronGroupNode
+    // and SynapseGroup dialog, useful anyway?
+    public static Map<Workspace, SimbrainDesktop> getInstances() {
+		return INSTANCES;
+	}
+
+	/** Desktop pane. */
     private JDesktopPane desktop;
 
     /** Cached context menu. */

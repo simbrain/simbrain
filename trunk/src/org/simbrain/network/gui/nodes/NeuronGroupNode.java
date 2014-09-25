@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.Dialog;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -53,6 +55,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -252,7 +255,11 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
      * @return the neuron group property dialog.
      */
     private StandardDialog getPropertyDialog() {
-        StandardDialog dialog = new StandardDialog() {
+    	// TODO: HAAAAAAAACK! Better solution is needed please review.
+    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+    			.iterator().next();
+        StandardDialog dialog = new StandardDialog(current.getFrame(),
+        		"Neuron Group Dialog") {
             private final NeuronGroupPanel panel;
             {
                 panel = NeuronGroupPanel.createNeuronGroupPanel(
@@ -267,6 +274,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
             }
         };
         dialog.setAsDoneDialog();
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
         return dialog;
     }
 

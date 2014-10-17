@@ -19,6 +19,7 @@
 package org.simbrain.network.desktop;
 
 import java.awt.Color;
+import java.awt.Dialog;
 
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -33,10 +34,15 @@ import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
+import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -45,6 +51,7 @@ import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.CouplingMenuConsumer;
 import org.simbrain.workspace.gui.CouplingMenuProducer;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting. This is
@@ -291,6 +298,54 @@ public class NetworkPanelDesktop extends NetworkPanel {
         return contextMenu;
     }
 
+    /**
+     * Creates a modeless version of the neuron group dialog relative to
+     * the SimbrainDesktop.
+     */
+    @Override
+    public StandardDialog getNeuronGroupDialog(NeuronGroupNode node) {
+    	// TODO: Why is there this map in SimbrainDesktop? Shouldn't there
+    	// only ever be one Simbrain Desktop?
+    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+    			.iterator().next();
+    	@SuppressWarnings("serial")
+		StandardDialog dialog = new StandardDialog(current.getFrame(),
+    			"Neuron Group Dialog") {
+    		private final NeuronGroupPanel panel;
+    		{
+    			panel = NeuronGroupPanel.createNeuronGroupPanel(
+    					node.getNetworkPanel(), node.getNeuronGroup(), this);
+    			setContentPane(panel);
+    		}
+
+    		@Override
+    		protected void closeDialogOk() {
+    			super.closeDialogOk();
+    			panel.commitChanges();
+    		}
+    	};
+    	dialog.setAsDoneDialog();
+    	dialog.setModalityType(Dialog.ModalityType.MODELESS);
+    	return dialog;
+    }
+
+    /**
+     * Creates a modeless version of the synapse group dialog relative to
+     * the SimbrainDesktop.
+     */
+    @Override
+    public StandardDialog getSynapseGroupDialog(
+    		SynapseGroupInteractionBox sgib) {
+    	// TODO: Why is there this map in SimbrainDesktop? Shouldn't there
+    	// only ever be one Simbrain Desktop?
+    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+    			.iterator().next();
+    	SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(
+    			current.getFrame(), this, sgib.getSynapseGroup());
+    	sgd.setModalityType(Dialog.ModalityType.MODELESS);
+    	return sgd;
+    }
+    
     @Override
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
 

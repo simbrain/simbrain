@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -71,6 +72,14 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     /** A panel displaying basic statistics about the synapses. */
     private Stats statPanel = new Stats();
 
+    private JButton revalidateButton = new JButton("Revalidate"); 
+    
+    {
+    	revalidateButton.setToolTipText("Places synapses into their"
+    			+ " appropriate (Excitatory/Inhibitory) sets if changes"
+    			+ " have been made.");
+    }
+    
     /**
      * A histogram plotting the strength of synapses over given intervals (bins)
      * against their frequency.
@@ -118,6 +127,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         this.creationPanel = isCreation;
         synTypeSelector.setVisible(!creationPanel);
         histogramPanel.setVisible(!creationPanel);
+        revalidateButton.setVisible(!creationPanel);
         statPanel.setVisible(!creationPanel);
         statPanel.update();
         excitatoryPercentPanel = SynapsePolarityAndRandomizerPanel
@@ -138,7 +148,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = HistogramPanel.GRID_WIDTH - 1;
+        gbc.gridwidth = HistogramPanel.GRID_WIDTH;
         gbc.gridheight = 1;
 
         this.add(statPanel, gbc);
@@ -165,9 +175,19 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
 
         this.add(histogramPanel, gbc);
 
-        gbc.gridy += HistogramPanel.GRID_HEIGHT;
+        gbc.gridwidth = HistogramPanel.GRID_WIDTH;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.gridheight = 1;
+        gbc.gridx = 0;
+        gbc.gridy += HistogramPanel.GRID_HEIGHT;
 
+        this.add(revalidateButton, gbc);
+        
+        gbc.gridy += 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        
         this.add(excitatoryPercentPanel, gbc);
         fullUpdate();
     }
@@ -188,6 +208,14 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
                     fullUpdate();
                 }
             }
+        });
+        
+        revalidateButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		synapseGroup.revalidateSynapseSets();
+        		fullUpdate();
+        	}
         });
 
         excitatoryPercentPanel

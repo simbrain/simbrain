@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.Dialog;
-import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -45,17 +43,14 @@ import javax.swing.JPopupMenu;
 import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -63,6 +58,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  *
  * @author Jeff Yoshimi
  */
+@SuppressWarnings("serial")
 public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeListener {
 
     public enum Port {
@@ -255,27 +251,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
      * @return the neuron group property dialog.
      */
     private StandardDialog getPropertyDialog() {
-    	// TODO: HAAAAAAAACK! Better solution is needed please review.
-    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-    			.iterator().next();
-        StandardDialog dialog = new StandardDialog(current.getFrame(),
-        		"Neuron Group Dialog") {
-            private final NeuronGroupPanel panel;
-            {
-                panel = NeuronGroupPanel.createNeuronGroupPanel(
-                        getNetworkPanel(), neuronGroup, this);
-                setContentPane(panel);
-            }
-
-            @Override
-            protected void closeDialogOk() {
-                super.closeDialogOk();
-                panel.commitChanges();
-            }
-        };
-        dialog.setAsDoneDialog();
-        dialog.setModalityType(Dialog.ModalityType.MODELESS);
-        return dialog;
+    	return getNetworkPanel().getNeuronGroupDialog(this);
     }
 
     /**

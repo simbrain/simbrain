@@ -64,11 +64,17 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         this.synapseGroup = synapseGroup;
 
     }
+    
+    /**
+     * @return the synapse group associated with this interaction box.
+     */
+    public SynapseGroup getSynapseGroup() {
+    	return synapseGroup;
+    }
 
     @Override
     protected JDialog getPropertyDialog() {
-        return SynapseGroupDialog.createSynapseGroupDialog(getNetworkPanel(),
-            synapseGroup);
+        return this.getNetworkPanel().getSynapseGroupDialog(this);
     }
 
     @Override

@@ -21,8 +21,10 @@ package org.simbrain.network.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dialog;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -77,6 +79,8 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
+import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
@@ -89,6 +93,7 @@ import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
 import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeBidirectional;
 import org.simbrain.network.gui.nodes.SynapseGroupNodeRecurrent;
@@ -128,6 +133,7 @@ import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
@@ -2845,6 +2851,51 @@ public class NetworkPanel extends JPanel {
         return node;
     }
 
+    /**
+     * Overridden by NetworkPanelDesktop to ensure modeless-ness relative to
+     * SimbrainDesktop.
+     * @param node the neuron group node to display the dialog for
+     * @return the dialog representing the neuron group node.
+     */
+    public StandardDialog getNeuronGroupDialog(NeuronGroupNode node) {
+    	@SuppressWarnings("serial")
+    	StandardDialog dialog = new StandardDialog() {
+    		private final NeuronGroupPanel panel;
+    		{
+    			panel = NeuronGroupPanel.createNeuronGroupPanel(
+    					node.getNetworkPanel(), node.getNeuronGroup(), this);
+    			setContentPane(panel);
+    		}
+
+    		@Override
+    		protected void closeDialogOk() {
+    			super.closeDialogOk();
+    			panel.commitChanges();
+    		}
+    	};
+    	dialog.setTitle("Neuron Group Dialog");
+    	dialog.setAsDoneDialog();
+    	dialog.setModalityType(Dialog.ModalityType.MODELESS);
+    	return dialog;
+    }
+
+    /**
+     * Creates a synapse group dialog from a synapse group interaction box,
+     * overrriden in NetworkPanelDesktop to make it modeless relative to the
+     * SimbrainDesktop.
+     * @param sgib must be a synapse group interaction box because SynapseGroupBidirectional
+     * does not inhereit from SynapseGroupNode and the interaction box is the only visual
+     * and interactable object with a 1:1 correspondence to synapse groups.
+     * @return
+     */
+    public StandardDialog getSynapseGroupDialog(
+    		SynapseGroupInteractionBox sgib) {
+    	SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(
+    			this, sgib.getSynapseGroup());
+    	sgd.setModalityType(Dialog.ModalityType.MODELESS);
+    	return sgd;
+    }
+    
     /**
      * Remove all nodes from panel.
      */

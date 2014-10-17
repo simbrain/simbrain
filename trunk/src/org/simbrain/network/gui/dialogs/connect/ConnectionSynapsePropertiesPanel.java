@@ -164,12 +164,24 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         templateInhibitorySynapse = synapseGroup.getInhibitoryPrototype();
         Set<Synapse> excitatorySynapses;
         Set<Synapse> inhibitorySynapses;
-        excitatorySynapses = synapseGroup.hasExcitatory()
-            ? synapseGroup.getExcitatorySynapses()
-            : Collections.singleton(templateExcitatorySynapse);
-        inhibitorySynapses = synapseGroup.hasInhibitory()
-            ? synapseGroup.getInhibitorySynapses()
-            : Collections.singleton(templateInhibitorySynapse);
+        if (!synapseGroup.hasExcitatory()
+        		|| synapseGroup.isUseGroupLevelSettings()) {
+        	excitatorySynapses = Collections
+        			.singleton(templateExcitatorySynapse);
+        } else {
+        	excitatorySynapses = synapseGroup.getExcitatorySynapses();
+        	// Ensures that the template is also edited
+        	excitatorySynapses.add(templateExcitatorySynapse);
+        }
+        if (!synapseGroup.hasInhibitory()
+        		|| synapseGroup.isUseGroupLevelSettings()) {
+        	inhibitorySynapses = Collections
+        			.singleton(templateInhibitorySynapse);
+        } else {
+        	inhibitorySynapses = synapseGroup.getInhibitorySynapses();
+        	// Ensures that the template is also edited
+        	inhibitorySynapses.add(templateInhibitorySynapse);
+        }
         excitatoryInfoPanel = SynapsePropertiesPanel
             .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
@@ -301,9 +313,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 excitatoryInfoPanel.commitChanges();
-                double exStrength = excitatoryInfoPanel.getStrength();
-                if (!Double.isNaN(exStrength) && synapseGroup != null) {
-                    synapseGroup.setStrength(exStrength, Polarity.EXCITATORY);
+                if (synapseGroup.isUseGroupLevelSettings()) {
+                	synapseGroup.setAndConformToTemplate(
+                			templateExcitatorySynapse, Polarity.EXCITATORY);
                 }
             }
         });
@@ -311,10 +323,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             @Override
             public void actionPerformed(ActionEvent e) {
                 inhibitoryInfoPanel.commitChanges();
-                double inStrength = inhibitoryInfoPanel.getStrength();
-                if (!Double.isNaN(inStrength) && synapseGroup != null) {
-                    synapseGroup.setStrength(inStrength,
-                        Polarity.INHIBITORY);
+                if (synapseGroup.isUseGroupLevelSettings()) {
+                	synapseGroup.setAndConformToTemplate(
+                			templateInhibitorySynapse, Polarity.INHIBITORY);
                 }
             }
         });

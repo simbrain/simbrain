@@ -13,11 +13,13 @@
 package org.simbrain.network.groups;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.simbrain.network.connections.AllToAll;
@@ -383,31 +385,48 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Update group. Override for special updating.
+     * Update group. Override for special updating. Recommended that overrides
+     * call super.update() some time during the custom update.
      */
     public void update() {
-        updateAllSynapses();
+    	if (useGroupLevelSettings) {
+    		if (!exStatic) { //Only iterate if excitatory synapses aren't static
+    			// Assuming they're not static, only iterate if they aren't
+    			// frozen.
+    			if (!isFrozen(Polarity.EXCITATORY)) {
+    				updateExcitatorySynapses();
+    			}
+    		}
+    		
+    		if (!inStatic) { //Only iterate if inhibitory synapses aren't static
+    			// Assuming they're not static, only iterate if they aren't
+    			// frozen.
+    			if (!isFrozen(Polarity.INHIBITORY)) {
+    				updateInhibitorySynapses();
+    			}
+    		}
+    	} else {
+    		updateExcitatorySynapses();
+    		updateInhibitorySynapses();
+    	}
     }
 
     /**
-     * Update all synapses.
+     * 
      */
-    public void updateAllSynapses() {
-        // Will skip updating all synapses if we are using group level settings
-        // and we know that either all the synapses are static or all the
-        // synapses are frozen.
-        if (!((exStatic || isFrozen(Polarity.EXCITATORY))
-        && useGroupLevelSettings)) {
-            for (Synapse synapse : exSynapseSet) {
-                synapse.update();
-            }
-        }
-        if (!((inStatic || isFrozen(Polarity.INHIBITORY))
-        && useGroupLevelSettings)) {
-            for (Synapse synapse : inSynapseSet) {
-                synapse.update();
-            }
-        }
+    private void updateExcitatorySynapses() {
+    	for (Synapse synapse : exSynapseSet) {
+    		synapse.update();
+    	}
+    }
+
+    /**
+     * 
+     */
+    private void updateInhibitorySynapses() {
+    	for (Synapse synapse : inSynapseSet) {
+    		synapse.update();
+    	}
     }
 
     /** {@inheritDoc} */
@@ -822,14 +841,14 @@ public class SynapseGroup extends Group {
      * @return the set of excitatory synapses
      */
     public Set<Synapse> getExcitatorySynapses() {
-        return Collections.unmodifiableSet(exSynapseSet);
+        return new HashSet<Synapse>(exSynapseSet);
     }
 
     /**
      * @return the set of inhibitory synapses
      */
     public Set<Synapse> getInhibitorySynapses() {
-        return Collections.unmodifiableSet(inSynapseSet);
+        return new HashSet<Synapse>(inSynapseSet);
     }
 
     /**
@@ -848,7 +867,7 @@ public class SynapseGroup extends Group {
         }
         return retArray;
     }
-
+    
     /**
      * @return the strengths of all the inhibitory synapses as a double array
      */
@@ -1111,6 +1130,102 @@ public class SynapseGroup extends Group {
         return useGroupLevelSettings;
     }
 
+    public void printCompressedGroupToFile(String filename) {
+    	double [] wts = new double [size()];
+    	int [] rowInds = new int [size()];
+    	double [][] indices = new double[getSourceNeurons().size()]
+    			[getTargetNeurons().size()];
+    	int i = 0;
+    	int j = 0;
+    	Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
+    	Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
+    	for (Neuron n : getSourceNeurons()) {
+    		sourceMap.put(n, i++);
+    	}
+    	for (Neuron n : getTargetNeurons()) {
+    		targetMap.put(n, j++);
+    	}
+    	for (Synapse s : getExcitatorySynapses()) {
+    		i = sourceMap.get(s.getSource());
+    		j = targetMap.get(s.getTarget());
+    		indices[i][j] = s.getStrength();
+    	}
+    	for (Synapse s : getInhibitorySynapses()) {
+    		i = sourceMap.get(s.getSource());
+    		j = targetMap.get(s.getTarget());
+    		indices[i][j] = s.getStrength();
+    	}
+    	i = 0;
+    	j = 0;
+    	int i_before;
+    	for (int k = 0, n = getSourceNeurons().size(); k < n; k++) {
+    		i_before = i;
+    		for (int l = 0, m = getTargetNeurons().size(); l < m; l++) {
+    			if (indices[k][l] != 0) {
+    				rowInds[i++] = l;
+    				wts[j++] = indices[k][l];
+    			}
+    		}
+    		if (i_before == i) { //empty row
+    			rowInds[i++] = -1;
+    			rowInds = Arrays.copyOf(rowInds, rowInds.length + 1);
+    		}
+    	}
+    	
+    }
+
+//	Work in progress    
+//    
+//    public byte [] createByteArray(int [] arr) {
+//    	final byte maxByte = -1;
+//    	final short maxShort = -1;
+//    	List<Byte> preByteArray = new ArrayList<Byte>();
+//    	boolean usingBytes = true;
+//    	boolean usingShorts = false;
+//    	boolean usingInts = false;
+//    	int j = 0;
+//    	for (int i = 0, n = arr.length; i < n; i++) {
+//    		if (arr[i] == -1) { //Blank row code
+//    			for (int k = 0; k < 4; k++) {
+//    				preByteArray.add(maxByte);
+//    			}
+//    			usingBytes = true;
+//    			usingShorts = false;
+//    			usingInts = false;
+//    			continue;
+//    		}
+//    		if (i > 0) {
+//    			if (arr[i - 1] >= arr[i]) {
+//        			for (int k = 0; k < 4; k++) {
+//        				preByteArray.add(maxByte);
+//        			}
+//    			}
+//    		}
+//    		
+//    		
+//    		if (usingBytes) {
+//    			usingBytes = arr[i] <= Byte.MAX_VALUE * 2;
+//    			if (!usingBytes) {
+//					preByteArray[j++] = maxByte; // Byte -> Short switch code
+//    				usingShorts = arr[i] <= Short.MAX_VALUE * 2;
+//    				if (!usingShorts) {
+//    					// 2 Byte -> Short switch codes == Short -> Int switch code
+//    					preByteArray[j++] = maxByte;
+//    					usingInts = true;
+//    				}
+//    			} else {
+//    				pre
+//    			}
+//    		}
+//    		
+//    	}
+//    	
+//    	
+//    	
+//    	
+//    }
+
+    
     /**
      * 
      * @param useGroupLevelSettings
@@ -1132,6 +1247,14 @@ public class SynapseGroup extends Group {
         setLowerBound(template.getLowerBound(), polarity);
         setSpikeResponder(template.getSpikeResponder(), polarity);
         setUpperBound(template.getUpperBound(), polarity);
+        if (Polarity.EXCITATORY == polarity) {
+        	excitatoryPrototype = template;
+        } else if (Polarity.INHIBITORY == polarity) {
+        	inhibitoryPrototype = template;
+        } else {
+        	excitatoryPrototype = Synapse.copyTemplateSynapse(template);
+        	inhibitoryPrototype = Synapse.copyTemplateSynapse(template);
+        }
     }
 
     /**

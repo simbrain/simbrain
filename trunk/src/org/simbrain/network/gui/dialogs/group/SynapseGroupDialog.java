@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.group;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
+@SuppressWarnings("serial")
 public final class SynapseGroupDialog extends StandardDialog {
 
     /** Parent network panel. */
@@ -142,6 +144,21 @@ public final class SynapseGroupDialog extends StandardDialog {
         sgd.tabbedPane.setSelectedIndex(0);
         return sgd;
     }
+    
+    /**
+     * 
+     * @param parent
+     * @param np
+     * @param sg
+     * @return
+     */
+    public static SynapseGroupDialog createSynapseGroupDialog(
+    		final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
+    	SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
+    	 sgd.addListeners();
+         sgd.tabbedPane.setSelectedIndex(0);
+         return sgd;
+    }
 
     /**
      * Create a new synapse group connecting the indicated neuron groups.
@@ -159,6 +176,21 @@ public final class SynapseGroupDialog extends StandardDialog {
         this.sourceNeuronGroup = src;
         this.targetNeuronGroup = tar;
         isCreationDialog = true;
+        init();
+    }
+    
+    /**
+     * 
+     * @param parent
+     * @param np
+     * @param src
+     * @param tar
+     */
+    private SynapseGroupDialog (final Frame parent, final NetworkPanel np,
+    		final SynapseGroup sg) {
+    	super(parent, "Synapse Group Dialog");
+        networkPanel = np;
+        synapseGroup = sg;
         init();
     }
 

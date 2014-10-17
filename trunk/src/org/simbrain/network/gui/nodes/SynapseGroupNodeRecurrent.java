@@ -61,6 +61,7 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         synGNR.addChild(synGNR.arrowHead);
         ((NeuronGroupNode) networkPanel.getObjectNodeMap().get(
             group.getTargetNeuronGroup())).addChild(synGNR);
+        synGNR.lowerToBottom();
         // ((NeuronGroupNode)
         // networkPanel.getObjectNodeMap().get(group.getTargetNeuronGroup())).addPropertyChangeListener(synGNR);
         // createArc(getSynapseGroup());
@@ -84,6 +85,10 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         arcCurve.setStrokePaint(Color.green);
         arcCurve.setTransparency(0.5f);
         arcCurve.setPaint(null);
+        arrowHead.lowerBelow(networkPanel.getObjectNodeMap()
+        		.get(group.getTargetNeuronGroup().getNeuronList().get(0)));
+        arcCurve.lowerToBottom(networkPanel.getObjectNodeMap()
+        		.get(group.getTargetNeuronGroup()));
     }
 
     @Override
@@ -130,6 +135,8 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
             recArc.getCenterX() - interactionBox.getWidth() / 2,
             recArc.getCenterY() - interactionBox.getHeight() / 2);
         interactionBox.raiseToTop();
+        arrowHead.lowerToBottom();
+        arcCurve.lowerToBottom();
     }
 
     private Polygon traceArrowHead(double theta, double tarX, double tarY) {

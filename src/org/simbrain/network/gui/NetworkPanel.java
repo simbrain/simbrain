@@ -2857,7 +2857,7 @@ public class NetworkPanel extends JPanel {
      * @param node the neuron group node to display the dialog for
      * @return the dialog representing the neuron group node.
      */
-    public StandardDialog getNeuronGroupDialog(NeuronGroupNode node) {
+    public StandardDialog getNeuronGroupDialog(final NeuronGroupNode node) {
     	@SuppressWarnings("serial")
     	StandardDialog dialog = new StandardDialog() {
     		private final NeuronGroupPanel panel;

@@ -303,7 +303,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * the SimbrainDesktop.
      */
     @Override
-    public StandardDialog getNeuronGroupDialog(NeuronGroupNode node) {
+    public StandardDialog getNeuronGroupDialog(final NeuronGroupNode node) {
     	// TODO: Why is there this map in SimbrainDesktop? Shouldn't there
     	// only ever be one Simbrain Desktop?
     	SimbrainDesktop current = SimbrainDesktop.getInstances().values()

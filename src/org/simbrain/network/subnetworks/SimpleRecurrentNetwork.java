@@ -212,7 +212,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         // Update input layer
         inputLayer.update();
 
-        // Update context Layer
+        // Copy hidden layer activations to context layer
         for (Neuron n : hiddenLayer.getNeuronList()) {
             double act = n.getActivation();
             int index = hiddenLayer.getNeuronList().indexOf(n);

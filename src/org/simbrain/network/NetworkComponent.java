@@ -176,7 +176,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      *
      * @param component network component
      * @param neuron the neuron that will produce activations
-     * @param methodName the name of the method called by this producer
+     * @param methodName the name of the method called by this consumer
      * @return the neuron consumer
      */
     public static PotentialConsumer getNeuronConsumer(

@@ -23,11 +23,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -85,20 +87,15 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        // TODO: Reimplement
-        // final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
-        // .createSynapseAdjustmentPanel(networkPanel,
-        // networkPanel.getSelectedModelSynapses());
-        // JDialog dialog = new JDialog();
-        // dialog.setTitle("Adjust selected synapses");
-        // dialog.setContentPane(synapsePanel);
-        // dialog.pack();
-        // dialog.setLocationRelativeTo(null);
-        // dialog.setVisible(true);
-        // dialog.addWindowListener(new WindowAdapter() {
-        // public void windowClosing(WindowEvent e) {
-        // synapsePanel.removeListeners();
-        // }
-        // });
+        final SynapseAdjustmentPanel synapsePanel = SynapseAdjustmentPanel
+                .createSynapseAdjustmentPanel(networkPanel,
+                        networkPanel.getSelectedModelSynapses());
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Adjust selected synapses");
+        dialog.setContentPane(synapsePanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
     }
 }

@@ -37,7 +37,7 @@ public final class NewDisplayWorldAction extends WorkspaceAction {
      * Create a new text world action with the specified workspace.
      */
     public NewDisplayWorldAction(Workspace workspace) {
-        super("TextWorld-Display (Beta)", workspace);
+        super("TextWorld-Display", workspace);
         putValue(SHORT_DESCRIPTION, "New Text World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }

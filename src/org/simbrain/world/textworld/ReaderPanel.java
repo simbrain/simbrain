@@ -131,7 +131,7 @@ public class ReaderPanel extends JPanel {
         }
         JToolBar dictionaryToolBar = new JToolBar();
         dictionaryToolBar.add(TextWorldActions
-                .showVectorDictionaryEditor(world));
+                .showDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
 
         add(topToolbarPanel, BorderLayout.NORTH);
@@ -158,7 +158,7 @@ public class ReaderPanel extends JPanel {
                 // but also need to reset the matcher in the underlying object.
                 // I wish there were a cleaner way...
                 world.setPosition(textArea.getCaretPosition(), false);
-                world.resetMatcher();
+                world.updateMatcher();
 
                 // removeHighlights(textArea);
             }

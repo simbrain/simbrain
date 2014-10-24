@@ -28,9 +28,8 @@ import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * <b>TextWorldComponent</b> is the container for the world component. Handles
- * toolbar buttons, and serializing of world data. The main environment code is
- * in {@link TextWorld}.
+ * <b>ReaderComponent</b> is the container for the readerworld, which adds
+ * producers.
  */
 public class ReaderComponent extends WorkspaceComponent {
 
@@ -66,7 +65,8 @@ public class ReaderComponent extends WorkspaceComponent {
     private void init() {
         addProducerType(new AttributeType(this, "TokenVectors", double[].class,
                 true));
-        addProducerType(new AttributeType(this, "Letters", double.class, true));
+        addProducerType(new AttributeType(this, "TokenScalars", double.class, true));
+        addProducerType(new AttributeType(this, "Letters", double.class, false));
     }
 
     @Override
@@ -85,10 +85,21 @@ public class ReaderComponent extends WorkspaceComponent {
                 for (letter = 'a'; letter <= 'z'; letter++) {
                     PotentialProducer producer = getAttributeManager()
                             .createPotentialProducer(world,
-                                    "matchCurrentLetter", double.class,
-                                    new Class[] { char.class },
-                                    new Object[] { letter });
+                                    "getMatchingScalar", double.class,
+                                    new Class[] { String.class },
+                                    new Object[] { Character.toString(letter)});
                     producer.setCustomDescription("Letter " + letter);
+                    returnList.add(producer);
+                }
+            }
+            if (type.getTypeName().equalsIgnoreCase("TokenScalars")) {
+                for(String token : world.getTokenDictionary()) {
+                    PotentialProducer producer = getAttributeManager()
+                            .createPotentialProducer(world,
+                                    "getMatchingScalar", double.class,
+                                    new Class[] { String.class },
+                                    new Object[] { token });
+                    producer.setCustomDescription("Word " + token);
                     returnList.add(producer);
                 }
             }

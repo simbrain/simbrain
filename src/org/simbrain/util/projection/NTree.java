@@ -110,6 +110,7 @@ public class NTree implements Iterable<DataPoint> {
      * @return
      */
     public DataPoint add(DataPoint point) {
+        //System.out.println(point.getDimension());
         if (logger.isDebugEnabled()) {
             logger.debug("adding point " + point);
         }
@@ -301,12 +302,14 @@ public class NTree implements Iterable<DataPoint> {
      *
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
-     * @return whether the point is unique
+     * @return the matching datapoint if it exists, null if the datapoint is unique 
      */
     public DataPoint isUnique(final DataPoint point, final double tolerance) {
         return isUnique(root, point, tolerance);
     }
 
+    //TODO: Confusing names.   rename or add methods that return booleans?
+    
     /**
      * Checks whether the given point already exists in the tree with the
      * specified tolerance.
@@ -314,7 +317,7 @@ public class NTree implements Iterable<DataPoint> {
      * @param from the node to start from
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
-     * @return whether the point is unique
+     * @return the matching datapoint if it exists, null if the datapoint is unique
      */
     private DataPoint isUnique(Node from, DataPoint point, double tolerance) {
 

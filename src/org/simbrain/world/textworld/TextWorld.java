@@ -20,7 +20,6 @@ package org.simbrain.world.textworld;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,9 +28,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * <b>TextWorld</b> is the base class for world types that involve the
- * processing and display of text in relation to (mainly for now) neural
- * networks.
+ * <b>TextWorld</b> is an environment for modeling speech and reading and other
+ * linguistic phenomena. It is the superclass for readerworld, where text is
+ * converted or "read" and used to produce activation in neural nets (reader
+ * world), and display world, where activations from neural nets can be used to
+ * display text (e.g. modeled speech).
  */
 public abstract class TextWorld {
 
@@ -54,6 +55,24 @@ public abstract class TextWorld {
     private Color highlightColor = Color.GRAY;
 
     /**
+     * Set of a strings that can be coupled to via scalar couplings. In
+     * ReaderWorld when the token is parsed a 1 is sent to consumers In
+     * DisplayWorld when a value above a threshold is consumed the token is
+     * displayed in the text area.
+     */
+    protected Set<String> tokenDictionary = new TreeSet<String>();
+
+    // Populate token dictionary with sample items
+    {
+        tokenDictionary.add("mouse");
+        tokenDictionary.add("cheese");
+        tokenDictionary.add("flower");
+        tokenDictionary.add("poison");
+        tokenDictionary.add("yum!");
+        tokenDictionary.add("yuck!");
+    }
+
+    /**
      * Constructs an instance of TextWorld.
      */
     public TextWorld() {
@@ -63,6 +82,21 @@ public abstract class TextWorld {
      * Advance the position in the text, and update the current item.
      */
     public abstract void update();
+
+    /**
+     * Add a text to the end of the underling text object.
+     *
+     * @param newText the text to add
+     */
+    public void addText(String newText) {
+        if (getText() != null) {
+            setPosition(getText().length());
+            setText(getText().concat(newText));
+        } else {
+            setText(newText);
+        }
+        fireTextChangedEvent();
+    }
 
     /**
      * Add a listener.
@@ -99,7 +133,7 @@ public abstract class TextWorld {
     /**
      * Notify listeners that the text has changed.
      */
-    protected void fireTextChangedEvent() {
+    public void fireTextChangedEvent() {
         for (TextListener listener : listenerList) {
             listener.textChanged();
         }
@@ -108,16 +142,16 @@ public abstract class TextWorld {
     /**
      * Notify listeners that the dictionary has changed.
      */
-    protected void fireDictionaryChangedEvent() {
+    public void fireDictionaryChangedEvent() {
         for (TextListener listener : listenerList) {
             listener.dictionaryChanged();
         }
     }
-    
+
     /**
-     * Notify listeners that preferences have changed
+     * Notify listeners that preferences have changed.
      */
-    protected void firePrefsChangedEvent() {
+    public void firePrefsChangedEvent() {
         for (TextListener listener : listenerList) {
             listener.preferencesChanged();
         }
@@ -126,7 +160,7 @@ public abstract class TextWorld {
     /**
      * Notify listeners that the caret position has changed.
      */
-    protected void firePositionChangedEvent() {
+    public void firePositionChangedEvent() {
         for (TextListener listener : listenerList) {
             listener.positionChanged();
         }
@@ -135,7 +169,7 @@ public abstract class TextWorld {
     /**
      * Notify listeners that the caret position has changed.
      */
-    protected void fireCurrentItemChanged(TextItem newItem) {
+    public void fireCurrentItemChanged(TextItem newItem) {
         for (TextListener listener : listenerList) {
             listener.currentItemChanged(newItem);
         }
@@ -208,6 +242,65 @@ public abstract class TextWorld {
     }
 
     /**
+     * @return the currentItem
+     */
+    public TextItem getCurrentItem() {
+        return currentItem;
+    }
+
+    /**
+     * @param currentItem the currentItem to set
+     */
+    public void setCurrentItem(TextItem currentItem) {
+        this.currentItem = currentItem;
+        fireCurrentItemChanged(currentItem);
+    }
+
+    /**
+     * Returns a "preview" of the next character in the world. Used in some
+     * scripts.
+     *
+     * @return the next character.
+     */
+    public String previewNextChar() {
+        if (position < text.length()) {
+            return text.substring(position, position + 1);
+        } else if (position == text.length()) {
+            return text.substring(0, 1);
+        }
+        return "";
+    }
+
+    /**
+     * Reset the dictionary (e.g. after it's been edited.)
+     *
+     * @param newDict the new dictionary entries
+     */
+    public void loadTokenDictionary(String[][] newDict) {
+        tokenDictionary.clear();
+        for (int i = 0; i < newDict.length; i++) {
+            tokenDictionary.add(newDict[i][0]);
+        }
+        fireDictionaryChangedEvent();
+    }
+
+    /**
+     * @return the wordList
+     */
+    public Set<String> getTokenDictionary() {
+        return tokenDictionary;
+    }
+
+    /**
+     * Add a word to the dictionary.
+     *
+     * @param word the word to add
+     */
+    public void addWordToTokenDictionary(String word) {
+        tokenDictionary.add(word);
+    }
+
+    /**
      * Returns a properly initialized xstream object.
      *
      * @return the XStream object
@@ -231,10 +324,10 @@ public abstract class TextWorld {
     }
 
     /**
-     * Represents the "current item", and includes a representation of the
-     * beginning and ending of the item in the main text.
+     * Represents the "current item" as String, and includes a representation of
+     * the beginning and ending of the item in the main text.
      */
-    class TextItem {
+    public class TextItem {
 
         /** Initial position in main text. */
         private final int beginPosition;
@@ -285,20 +378,4 @@ public abstract class TextWorld {
         }
 
     }
-
-    /**
-     * @return the currentItem
-     */
-    public TextItem getCurrentItem() {
-        return currentItem;
-    }
-
-    /**
-     * @param currentItem the currentItem to set
-     */
-    public void setCurrentItem(TextItem currentItem) {
-        this.currentItem = currentItem;
-        fireCurrentItemChanged(currentItem);
-    }
-
 }

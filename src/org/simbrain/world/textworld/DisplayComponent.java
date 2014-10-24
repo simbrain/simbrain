@@ -38,7 +38,7 @@ public class DisplayComponent extends WorkspaceComponent {
     private final DisplayWorld world;
 
     /** Default number of string reader attributes to add. */
-    private int DEFAULT_STRING_READERS = 10;
+    private int DEFAULT_NUM_STRING_READERS = 10;
 
     /**
      * Creates a new frame of type TextWorld.
@@ -67,9 +67,11 @@ public class DisplayComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        addConsumerType(new AttributeType(this, "StringReader", String.class,
+        addConsumerType(new AttributeType(this, "DisplayClosestWord",
+                double[].class, true));
+        addConsumerType(new AttributeType(this, "DisplayString", String.class,
                 false));
-        addConsumerType(new AttributeType(this, "WordReader", double.class,
+        addConsumerType(new AttributeType(this, "DisplayWord", double.class,
                 true));
         world.addListener(new TextListener() {
 
@@ -96,16 +98,16 @@ public class DisplayComponent extends WorkspaceComponent {
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("StringReader")) {
-                for (int i = 0; i < DEFAULT_STRING_READERS; i++) {
+            if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
+                for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
                     String description = "String reader " + (i + 1);
                     PotentialConsumer consumer = getStringConsumer();
                     consumer.setCustomDescription(description);
                     returnList.add(consumer);
                 }
             }
-            if (type.getTypeName().equalsIgnoreCase("WordReader")) {
-                for (String word : world.getDictionary()) {
+            if (type.getTypeName().equalsIgnoreCase("DisplayWord")) {
+                for (String word : world.getTokenDictionary()) {
                     PotentialConsumer consumer = getAttributeManager()
                             .createPotentialConsumer(
                                     world,
@@ -115,6 +117,14 @@ public class DisplayComponent extends WorkspaceComponent {
                     consumer.setCustomDescription(word);
                     returnList.add(consumer);
                 }
+            }
+            if (type.getTypeName().equalsIgnoreCase("DisplayClosestWord")) {
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(world, "displayClosestWord",
+                                double[].class);
+                consumer.setCustomDescription("Vector reader");
+                returnList.add(consumer);
+
             }
         }
         return returnList;
@@ -135,6 +145,7 @@ public class DisplayComponent extends WorkspaceComponent {
      */
     @Override
     public void save(final OutputStream output, final String format) {
+        world.preSaveInit();
         DisplayWorld.getXStream().toXML(world, output);
     }
 
@@ -168,9 +179,8 @@ public class DisplayComponent extends WorkspaceComponent {
      * @return the string consumer.
      */
     public PotentialConsumer getStringConsumer() {
-        return this.getAttributeManager()
-                .createPotentialConsumer(world, "addText",
-                        String.class);
+        return this.getAttributeManager().createPotentialConsumer(world,
+                "addText", String.class);
     }
 
 }

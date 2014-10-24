@@ -37,7 +37,7 @@ public final class NewReaderWorldAction extends WorkspaceAction {
      * Create a new text world action with the specified workspace.
      */
     public NewReaderWorldAction(Workspace workspace) {
-        super("TextWorld-Reader (Beta)", workspace);
+        super("TextWorld-Reader", workspace);
         putValue(SHORT_DESCRIPTION, "New Text World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }

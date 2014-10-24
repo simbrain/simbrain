@@ -37,7 +37,7 @@ import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * <b>ReaderComponentDesktopGui</b> is the container for the reader text world.
+ * <b>ReaderComponentDesktopGui</b> is the gui view for the reader world.
  */
 public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
@@ -127,7 +127,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
         // Edit menu
         loadDictionary.setAction(TextWorldActions
-                .showVectorDictionaryEditor(world));
+                .showDictionaryEditor(world));
         preferences.setAction(TextWorldActions
                 .getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);

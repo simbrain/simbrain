@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -34,6 +36,10 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
+import org.simbrain.world.textworld.dictionary.DictionarySelector;
+import org.simbrain.world.textworld.dictionary.TokenDictionaryPanel;
+import org.simbrain.world.textworld.dictionary.TokenToVectorPanel;
+import org.simbrain.world.textworld.dictionary.VectorToTokenPanel;
 
 /**
  * Contains actions relating to Text World.
@@ -50,12 +56,12 @@ public class TextWorldActions {
      * @param world the world whose dictionary should be loaded
      * @return the action
      */
-    public static Action getExtractDictionaryAction(final DisplayWorld world) {
+    public static Action getExtractDictionaryAction(final TextWorld world) {
         return new AbstractAction() {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
                 putValue(NAME, "Extract dictionary...");
                 putValue(SHORT_DESCRIPTION,
                         "Extract dictionary from text file...");
@@ -68,67 +74,94 @@ public class TextWorldActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(
-                        getDictionaryDirectory(), "text file", "txt");
-                chooser.addExtension("rtf"); // (Must do other stuff to support
-                // rich text)
-                File theFile = chooser.showOpenDialog();
-                if (theFile != null) {
-                    // Adapted from
-                    // http://www.javapractices.com/topic/TopicAction.do?Id=87
-                    Scanner scanner;
-                    try {
-                        scanner = new Scanner(new FileReader(theFile));
-                        try {
-                            // first use a Scanner to get each line
-                            while (scanner.hasNextLine()) {
-                                Scanner lineScan = new Scanner(
-                                        scanner.nextLine());
-                                while (lineScan.hasNext()) {
-                                    String word = lineScan.next();
-                                    world.addWordToDictionary(word);
-                                    // System.out.println("Entry is : " + word);
-                                }
-                            }
-                        } finally {
-                            // Ensure the underlying stream is always closed
-                            // this only has any effect if the item passed to
-                            // the Scanner constructor implements Closeable
-                            // (which it does
-                            // in this case).
-                            scanner.close();
-                            setDictionaryDirectory(chooser.getCurrentLocation());
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                for (String word : extractTextItems()) {
+                    world.addWordToTokenDictionary(word);
                 }
+                world.fireDictionaryChangedEvent();
             }
         };
     }
 
     /**
-     * Action for showing the vector dictionary editor, used in reader world.
+     * Extract all the text items from a file.
+     *
+     * @return the text items as a list.
+     */
+    private static List<String> extractTextItems() {
+        List<String> retList = new ArrayList<String>();
+        SFileChooser chooser = new SFileChooser(
+                getDictionaryDirectory(), "text file", "txt");
+        chooser.addExtension("rtf"); // (Must do other stuff to support
+        // rich text)
+        File theFile = chooser.showOpenDialog();
+        if (theFile != null) {
+            // Adapted from
+            // http://www.javapractices.com/topic/TopicAction.do?Id=87
+            Scanner scanner;
+            try {
+                scanner = new Scanner(new FileReader(theFile));
+                try {
+                    // first use a Scanner to get each line
+                    while (scanner.hasNextLine()) {
+                        Scanner lineScan = new Scanner(
+                                scanner.nextLine());
+                        while (lineScan.hasNext()) {
+                            String word = lineScan.next();
+                            retList.add(word);
+                            // System.out.println("Entry is : " + word);
+                        }
+                    }
+                } finally {
+                    // Ensure the underlying stream is always closed
+                    // this only has any effect if the item passed to
+                    // the Scanner constructor implements Closeable
+                    // (which it does
+                    // in this case).
+                    scanner.close();
+                    setDictionaryDirectory(chooser.getCurrentLocation());
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return retList;
+    }
+
+    /**
+     * Action for showing the vector dictionary editor, either the
+     * token-to-vector dictionary used in readerworld or the vector-to-token
+     * dictionary used in display world.
      *
      * @param world the world whose dictionary should be displayed
      * @return the action
      */
-    public static Action showVectorDictionaryEditor(final ReaderWorld world) {
+    public static Action showDictionaryEditor(final TextWorld world) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
                 putValue(NAME, "Edit dictionary...");
-                putValue(SHORT_DESCRIPTION, "Display token > vector map");
+                putValue(SHORT_DESCRIPTION, "Edit dictionary...");
             }
 
             /**
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                VectorDictionaryEditor dialog = VectorDictionaryEditor
-                        .createVectorDictionaryEditor(world);
+                TokenDictionaryPanel scalarPanel = new TokenDictionaryPanel(world);
+                DictionarySelector dialog;
+                if (world instanceof ReaderWorld) {
+                    TokenToVectorPanel vectorPanel = new TokenToVectorPanel(
+                            (ReaderWorld) world);
+                    dialog = DictionarySelector.createVectorDictionaryEditor(
+                            scalarPanel, vectorPanel);
+                } else {
+                    VectorToTokenPanel vectorPanel = new VectorToTokenPanel(
+                            (DisplayWorld) world);
+                    dialog = DictionarySelector.createVectorDictionaryEditor(
+                            scalarPanel, vectorPanel);
+                }
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
@@ -136,36 +169,6 @@ public class TextWorldActions {
             }
         };
 
-    }
-
-    /**
-     * Action for showing the dictionary editor, used in display world.
-     *
-     * @param world the world whose dictionary should be displayed
-     * @return the action
-     */
-    public static Action showDictionaryEditor(final DisplayWorld world) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                putValue(NAME, "Edit dictionary...");
-                putValue(SHORT_DESCRIPTION, "Display and edit dictionary");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                DictionaryEditor dialog = DictionaryEditor
-                        .createDictionaryEditor(world);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-
-            }
-        };
     }
 
     /**
@@ -196,10 +199,8 @@ public class TextWorldActions {
         };
     }
 
-
-
     /**
-     * Action for displaying a preference dialog.
+     * Action for displaying a default preference dialog. (Not currently used).
      *
      * @param world the world for which a dialog should be shown
      * @return the action
@@ -219,7 +220,6 @@ public class TextWorldActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
-                editor.setExcludeList(new String[] { "text", "position", "parseStyle" });
                 editor.setUseSuperclass(false);
                 editor.setObject(world);
                 JDialog dialog = editor.getDialog();

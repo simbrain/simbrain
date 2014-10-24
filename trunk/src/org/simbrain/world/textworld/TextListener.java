@@ -42,6 +42,8 @@ public interface TextListener {
 
     /**
      * The current item has changed.
+     *
+     * @param newItem the new current text item.
      */
     void currentItemChanged(TextItem newItem);
 
@@ -49,5 +51,33 @@ public interface TextListener {
      * The current preferences have changed.
      */
     void preferencesChanged();
+
+    /**
+     * Adapter class so users of the interface don't have to implement every
+     * method.
+     */
+    public class TextAdapter implements TextListener {
+
+        @Override
+        public void textChanged() {
+        }
+
+        @Override
+        public void dictionaryChanged() {
+        }
+
+        @Override
+        public void positionChanged() {
+        }
+
+        @Override
+        public void currentItemChanged(TextItem newItem) {
+        }
+
+        @Override
+        public void preferencesChanged() {
+        }
+
+    }
 
 }

@@ -23,8 +23,8 @@ import java.awt.geom.Point2D;
 import java.util.Random;
 
 import cern.colt.Arrays;
+import umontreal.iro.lecuyer.rng.LFSR258;
 import umontreal.iro.lecuyer.rng.RandomStream;
-import umontreal.iro.lecuyer.rng.WELL1024;
 
 /**
  * <b>SimbrainMath</b> is the math functions used in simbrain.
@@ -35,7 +35,7 @@ public class SimbrainMath {
      * A default random stream that can be used by any calls to SSJ
      * classes/functions.
      */
-    public static final RandomStream DEFAULT_RANDOM_STREAM = new WELL1024();
+    public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR258();
 
     /**
      * Calculates the Euclidean distance between two points. Used in World.

@@ -166,7 +166,7 @@ public class Sparse implements ConnectNeurons {
         Neuron target;
         Synapse synapse;
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
-        Random rand = new Random();
+        Random rand = new Random(System.nanoTime());
         if (equalizeEfferents) {
             ArrayList<Integer> targetList = new ArrayList<Integer>();
             ArrayList<Integer> tListCopy;

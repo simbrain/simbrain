@@ -511,32 +511,44 @@ public class SynapseGroupIO {
     	Sparse rCon = new Sparse(0.01, false, false);
     	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5,
     			exRand, inRand);
-    	System.out.println(sg.size());
+    	System.out.println("Construction complete...");
     	long start = System.nanoTime();
-    	serializeCompressedSynGroup(sg, Precision.FLOAT_64, "Test1.bin");
+    	System.out.println("Begin Serialization... ");
+    	serializeCompressedSynGroup(sg, Precision.FLOAT_32, "Test1.bin");
+    	System.out.println("SUCCESS!");
+    	long end = System.nanoTime();
+    	System.out.println("Serialization Time: " + SimbrainMath.roundDouble(
+    			(end-start) / Math.pow(10, 9), 4) + " secs.");
+    	System.out.println("Begin Deserialization... ");
+    	long start2 = System.nanoTime();
     	NeuronGroup ng2 = new NeuronGroup(net, 2048);
     	SynapseGroup sg2 = new SynapseGroup(ng2, ng2);
     	reconstructCompressedSynapseStrengths("./Test1.bin", sg2);
-    	long end = System.nanoTime();
-    	System.out.println("Time :" + SimbrainMath.roundDouble((end-start)
-    			/ Math.pow(10, 9), 4));
-    	System.out.println(sg2.size());
-    	System.out.println("Original " + sg.size());
-    	System.out.println("Reconstructed " + sg2.size());
-    	int orZeros = 0;
-    	int recZeros = 0;
-    	int weightChecks = 0;
+    	end = System.nanoTime();
+    	System.out.println("SUCCESS");
+    	System.out.println("Reconstruction Time: " + SimbrainMath.roundDouble(
+    			(end-start2) / Math.pow(10, 9), 4) + " secs.");
+    	System.out.println("TOTAL Time: " + SimbrainMath.roundDouble(
+    			(end-start) / Math.pow(10, 9), 4) + " secs.");
+    	
+    	System.out.println("Original No. Synapses: " + sg.size());
+    	System.out.println("Reconstructed No. Synapses: " + sg2.size());
+//    	int orZeros = 0;
+//    	int recZeros = 0;
+//    	int weightChecks = 0;
     	List<Neuron> ng1List = ng1.getNeuronList();
     	List<Neuron> ng2List = ng2.getNeuronList();
+		boolean error = false;
+		double errorTolerance = 0.00001;
     	for (int i = 0, n = ng1.size(); i < n; i++) {
     		Neuron n1src = ng1List.get(i);
     		Neuron n2src = ng2List.get(i);
-    		if (n1src.getFanOut().size() == 0) {
-    			orZeros++;
-    		}
-    		if (n2src.getFanOut().size() == 0) {
-    			recZeros++;
-    		}
+//    		if (n1src.getFanOut().size() == 0) {
+//    			orZeros++;
+//    		}
+//    		if (n2src.getFanOut().size() == 0) {
+//    			recZeros++;
+//    		}
     		for (int j = 0, m = ng2.size(); j < m; j++) {
     			Neuron n1tar = ng1List.get(j);
     			Neuron n2tar = ng2List.get(j);
@@ -544,25 +556,37 @@ public class SynapseGroupIO {
     			Synapse s2 = n2src.getFanOut().get(n2tar);
     			if (s1 == null && s2 != null) {
     				System.out.println("PositionError");
+    				error = true;
     				break;
     			} 
     			if (s2 == null && s1 != null) {
     				System.out.println("PositionError");
+    				error = true;
     				break;
     			} 
     			if (s1 != null && s2 != null) {
-    				weightChecks++;
-    				if (s1.getStrength() != s2.getStrength()) {
+//    				weightChecks++;
+    				if (Math.abs(s1.getStrength() - s2.getStrength())
+    						> errorTolerance) {
     					System.out.println("Weight mismatch");
     					System.out.println(s1.getStrength() + " "
     							+ s2.getStrength());
+    					error = true;
     					break;
     				}
     			}
     		}
     	}
-    	System.out.println(orZeros);
-    	System.out.println(recZeros);
-    	System.out.println(weightChecks);
+    	if (!error) {
+    		System.out.println("No strucutral/positional errors.");
+    		System.out.println("No weight mismatches greater than "
+    				+ errorTolerance);
+    	}
+    	
+    		
+    	
+//    	System.out.println(orZeros);
+//    	System.out.println(recZeros);
+//    	System.out.println(weightChecks);
     }
 }

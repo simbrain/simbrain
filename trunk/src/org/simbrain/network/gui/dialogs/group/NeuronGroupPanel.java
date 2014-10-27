@@ -244,7 +244,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 ((StandardDialog) parent).setTitle("Create neuron group");
             }
             neuronGroup = new NeuronGroup(networkPanel.getNetwork(),
-                    networkPanel.getWhereToAdd(), 9);
+                    networkPanel.getWhereToAdd(), 25);
 
             summaryPanel = new SummaryPanel(neuronGroup, true);
 

@@ -108,8 +108,8 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        contextMenu.addSeparator();
+        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
+        //contextMenu.addSeparator();
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 

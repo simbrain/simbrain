@@ -1,0 +1,32 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+
+private UpdateAction action;
+
+/**
+ * Call toString() on all workspace components and print to system.out.
+ * Not so useful on its own but provides a template for more complex
+ * actions.
+ */
+{
+
+	// Customize this
+	this.action = new UpdateAction() {
+		public void invoke() {
+			for(WorkspaceComponent component : workspace.getComponentList()) {
+				System.out.println("------------");
+				System.out.println("Component: " + component.getName());
+				System.out.println(component);								
+			}
+		}
+		// This is how the action appears in the update manager dialog
+		public String getDescription() {
+			return "Print workspace info";
+		}
+		// This is a longer description for the tooltip
+		public String getLongDescription() {
+			return "Call toString on each workspace component and print to System.out";
+		}
+
+	};
+}

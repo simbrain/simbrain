@@ -107,8 +107,8 @@ public class NetworkMenuBar {
         editMenu.add(actionManager.getZeroSelectedObjectsAction());
         editMenu.addSeparator();
         editMenu.addSeparator();
-        editMenu.add(actionManager.getGroupAction());
-        editMenu.add(actionManager.getUngroupAction());
+        //editMenu.add(actionManager.getGroupAction());
+        //editMenu.add(actionManager.getUngroupAction());
         editMenu.addSeparator();
         editMenu.add(networkPanel.createAlignMenu());
         editMenu.add(networkPanel.createSpacingMenu());

@@ -1,0 +1,42 @@
+import java.util.*;
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.layouts.*;
+import java.util.*;
+
+private NetworkUpdateAction action;
+
+/**
+ * Print outputs from the designated neuron group to System.out.
+ */
+{
+
+	// Change this name to match the label of the group to log
+	String groupLabel  = "Group_1";
+	NeuronGroup neuronGroup =  network.getGroupByLabel(groupLabel);
+
+	// Customize this
+	this.action = new NetworkUpdateAction() {
+		public void invoke() {
+			// For now just printing to system.out.   Can easily change this code
+			// so that it involves saving to a file.
+			System.out.println(Arrays.toString(neuronGroup.getActivations()));		
+		}
+		
+		// This is how the action appears in the update manager dialog
+		public String getDescription() {
+			return "Log " + groupLabel +  " activations";
+		}
+		
+		// This is a longer description for the tooltip
+		public String getLongDescription() {
+			return "Log " + groupLabel +  " activations";
+		}
+
+	};
+}

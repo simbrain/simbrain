@@ -308,8 +308,12 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * disabled.
      */
     private void setFreezeActionsEnabled() {
+    	try {
         freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
         unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
+    	} catch (NullPointerException e) {
+    		e.printStackTrace();
+    	}
     }
 
     /**

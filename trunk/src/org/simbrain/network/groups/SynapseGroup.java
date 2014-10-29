@@ -35,6 +35,7 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 /**
@@ -893,6 +894,51 @@ public class SynapseGroup extends Group {
     }
 
     /**
+     * 
+     * @return
+     */
+    public double [][] getWeightMatrix() {
+    	double [][] weightMatrix = new double[getSourceNeurons().size()]
+    			[getTargetNeurons().size()];
+    	int i = 0;
+    	int j = 0;
+    	// Create numbers for neurons... less expensive than constant
+    	// indexOf calls to array lists. 
+    	Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
+    	Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
+    	for (Neuron n : getSourceNeurons()) {
+    		sourceMap.put(n, i++);
+    	}
+    	for (Neuron n : getTargetNeurons()) {
+    		targetMap.put(n, j++);
+    	}
+    	// Construct uncompressed matrix from weights
+    	for (Synapse s : getExcitatorySynapses()) {
+    		i = sourceMap.get(s.getSource());
+    		j = targetMap.get(s.getTarget());
+    		weightMatrix[i][j] = s.getStrength();
+    	}
+    	for (Synapse s : getInhibitorySynapses()) {
+    		i = sourceMap.get(s.getSource());
+    		j = targetMap.get(s.getTarget());
+    		weightMatrix[i][j] = s.getStrength();
+    	}
+    	return weightMatrix;
+    }
+    
+    /**
+     * A forwarding method to SimbrainMath.getMatrixRowCompression(double [][]).
+     * Returns a row compressed representation of the weight matrix represented
+     * by this synapse group using the <num synapses>,<index vals>,<wt vals>
+     * format. Storing all values as longs (and the double wt vals in long-bit
+     * form). 
+     * @return
+     */
+    public long [] getRowCompressedMatrixRepresentation() {
+    	return SimbrainMath.getMatrixRowCompression(getWeightMatrix());
+    }
+    
+    /**
      * Sets the strength of a single synapse in the group specified as a
      * paremeter. If the synapse does not exist in this group returns false.
      * If the this makes the synapse change polarity it will be removed from
@@ -1126,105 +1172,15 @@ public class SynapseGroup extends Group {
         return Synapse.copyTemplateSynapse(inhibitoryPrototype);
     }
 
+    /**
+     * 
+     * @return whether or not the synapse group is using group-level properties
+     * Homogeneous within synapse type (excitatory/inhibitory) for faster
+     * indexing and optimized updating.
+     */
     public boolean isUseGroupLevelSettings() {
         return useGroupLevelSettings;
     }
-
-    public void printCompressedGroupToFile(String filename) {
-    	double [] wts = new double [size()];
-    	int [] rowInds = new int [size()];
-    	double [][] indices = new double[getSourceNeurons().size()]
-    			[getTargetNeurons().size()];
-    	int i = 0;
-    	int j = 0;
-    	Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
-    	Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
-    	for (Neuron n : getSourceNeurons()) {
-    		sourceMap.put(n, i++);
-    	}
-    	for (Neuron n : getTargetNeurons()) {
-    		targetMap.put(n, j++);
-    	}
-    	for (Synapse s : getExcitatorySynapses()) {
-    		i = sourceMap.get(s.getSource());
-    		j = targetMap.get(s.getTarget());
-    		indices[i][j] = s.getStrength();
-    	}
-    	for (Synapse s : getInhibitorySynapses()) {
-    		i = sourceMap.get(s.getSource());
-    		j = targetMap.get(s.getTarget());
-    		indices[i][j] = s.getStrength();
-    	}
-    	i = 0;
-    	j = 0;
-    	int i_before;
-    	for (int k = 0, n = getSourceNeurons().size(); k < n; k++) {
-    		i_before = i;
-    		for (int l = 0, m = getTargetNeurons().size(); l < m; l++) {
-    			if (indices[k][l] != 0) {
-    				rowInds[i++] = l;
-    				wts[j++] = indices[k][l];
-    			}
-    		}
-    		if (i_before == i) { //empty row
-    			rowInds[i++] = -1;
-    			rowInds = Arrays.copyOf(rowInds, rowInds.length + 1);
-    		}
-    	}
-    	
-    }
-
-//	Work in progress    
-//    
-//    public byte [] createByteArray(int [] arr) {
-//    	final byte maxByte = -1;
-//    	final short maxShort = -1;
-//    	List<Byte> preByteArray = new ArrayList<Byte>();
-//    	boolean usingBytes = true;
-//    	boolean usingShorts = false;
-//    	boolean usingInts = false;
-//    	int j = 0;
-//    	for (int i = 0, n = arr.length; i < n; i++) {
-//    		if (arr[i] == -1) { //Blank row code
-//    			for (int k = 0; k < 4; k++) {
-//    				preByteArray.add(maxByte);
-//    			}
-//    			usingBytes = true;
-//    			usingShorts = false;
-//    			usingInts = false;
-//    			continue;
-//    		}
-//    		if (i > 0) {
-//    			if (arr[i - 1] >= arr[i]) {
-//        			for (int k = 0; k < 4; k++) {
-//        				preByteArray.add(maxByte);
-//        			}
-//    			}
-//    		}
-//    		
-//    		
-//    		if (usingBytes) {
-//    			usingBytes = arr[i] <= Byte.MAX_VALUE * 2;
-//    			if (!usingBytes) {
-//					preByteArray[j++] = maxByte; // Byte -> Short switch code
-//    				usingShorts = arr[i] <= Short.MAX_VALUE * 2;
-//    				if (!usingShorts) {
-//    					// 2 Byte -> Short switch codes == Short -> Int switch code
-//    					preByteArray[j++] = maxByte;
-//    					usingInts = true;
-//    				}
-//    			} else {
-//    				pre
-//    			}
-//    		}
-//    		
-//    	}
-//    	
-//    	
-//    	
-//    	
-//    }
-
     
     /**
      * 

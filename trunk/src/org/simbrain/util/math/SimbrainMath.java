@@ -20,6 +20,8 @@ package org.simbrain.util.math;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import cern.colt.Arrays;
@@ -651,7 +653,78 @@ public class SimbrainMath {
         }
         return retVal / n;
     }
-
+    
+    /**
+     * Returns a row compressed representation of a weight matrix represented as
+     * a 2D array of doubles. This particular row compression begins with
+     * the first element of the returned array containing the total number of
+     * non-zero elements in <b>wtMatrix</b>. The next <b>NZ + N</b> elements
+     * of the returned array (indices 1 to  <b>NZ + N</b>) where <b>NZ</b> is
+     * the number of non-zero elements and <b>N</b> is the number of rows of
+     * <b>wtMatrix</b>, contain all the column index values for the non-zero
+     * entries with row changes separated by a marker (-1), hence NZ + N values.
+     * The remaining N entries in the returned array contain (in the same order
+     * as the index values) all the non-zero weight values in <b>wtMatrix</b>.
+     * 
+     * So the matrix:
+	 *
+	 *	0    2    1    0    0    7
+	 *	0    0    0    0    0    0
+	 *	0    5    6    0    1    1
+	 *	0    2    0    0    3    0
+	 *	2    0    0    1    2    0
+	 *
+	 * Would have its indices stored as:
+	 * 1  2  5  -1  -1  1  2  4  5  -1  1 4  -1  0  3  4 
+	 * 
+	 * And its values stored as:
+	 * 2  1  7  5  6  1  1  2  3  2  1  2
+	 * 
+	 * Thus the returned array would be:
+	 * 
+	 * [12  1  2  5  -1  -1  1  2  4  5  -1  1  4  -1  0  3  4  2  1  7  5 ...
+	 *   6  1  1  2  3  2  1  2 ]
+     * 
+     * While this ultimately doesn't save any memory, consider that the example
+     * array has a sparsity of 0.4. Sparse matrix compression should usually be
+     * used for very sparse matrices to see appreciable savings in memory,
+     * definitely less than 0.2 and usually less than 0.05.
+     * 
+     * @return
+     */
+    public static long [] getMatrixRowCompression(double [][] wtMatrix) {
+    	List<Long> wts = new ArrayList<Long>();
+    	List<Integer> colIndArrL;
+    	int numNZ = 0;
+    	colIndArrL = new ArrayList<Integer>();
+    	for (int k = 0, n = wtMatrix.length; k < n; k++) {
+    		for (int l = 0, m = wtMatrix[0].length; l < m; l++) {
+    			if (m != wtMatrix[k].length) {
+    				throw new IllegalArgumentException("Matrix does not have"
+    						+ " equal columns.");
+    			}
+    			if (wtMatrix[k][l] != 0) {
+    				numNZ++;
+    				colIndArrL.add(l);
+    				wts.add(Double.doubleToLongBits(wtMatrix[k][l]));
+    			}
+    		}
+    		// No need for a row-end code for the last row.
+    		if (k < n-1) {
+    			colIndArrL.add(-1);
+    		}
+    	}
+    	long [] rowCompression = new long[colIndArrL.size() + numNZ + 1];
+    	rowCompression[0] = numNZ;
+    	for (int w = 1, n = colIndArrL.size(); w <= n; w++) {
+    		rowCompression [w] = colIndArrL.get(w - 1).intValue();
+    	}
+    	for (int w = colIndArrL.size() + 1, n = rowCompression.length; w < n;
+    			w++) {
+    		rowCompression[w] = wts.get(w - colIndArrL.size() - 1);
+    	}
+    	return rowCompression;
+    }
     /**
      * Test randPermuteWithExclusion.
      */

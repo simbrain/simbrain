@@ -20,6 +20,7 @@ package org.simbrain.world.textworld.dictionary;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -65,6 +66,7 @@ public class DictionarySelector extends StandardDialog {
                 vectorPanel);
         editor.addButton(new JButton(new ShowHelpAction(
                 "Pages/Worlds/TextWorld/TextWorld.html")));
+        editor.setMinimumSize(new Dimension(300, 400));
         return editor;
     }
 
@@ -91,6 +93,7 @@ public class DictionarySelector extends StandardDialog {
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Select Dictionary Type:"));
         topPanel.add(dictionaryType);
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(BorderLayout.NORTH, topPanel);
         mainPanel.add(BorderLayout.CENTER, cardPanel);

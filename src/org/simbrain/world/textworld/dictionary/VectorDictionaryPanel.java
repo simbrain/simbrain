@@ -21,9 +21,11 @@ package org.simbrain.world.textworld.dictionary;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Arrays;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -71,7 +73,7 @@ public class VectorDictionaryPanel extends JPanel {
         table.setColumnHeadings(Arrays.asList("Token", "Vector"));
         SimbrainJTableScrollPanel vectorScroller = new SimbrainJTableScrollPanel(
                 table);
-        vectorScroller.setPreferredSize(new Dimension(300, 200));
+        // vectorScroller.setPreferredSize(new Dimension(300, 200));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.getColumnModel().getColumn(0).setMaxWidth(50);
         table.getColumnModel().getColumn(1).setMaxWidth(70);
@@ -79,16 +81,25 @@ public class VectorDictionaryPanel extends JPanel {
         toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbarPanel.add(table.getToolbarCSV(true, false));
         toolbarPanel.add(table.getToolbarEditRows());
-        Box vectorBox = Box.createHorizontalBox();
-        vectorBox.add(vectorScroller);
-        vectorBox.add(Box.createRigidArea(new Dimension(15, 0)));
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1.0; // Give scroller more horizontal weight
+        gbc.weighty = 1.0; // Make sure all vertical space is filled
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(vectorScroller, gbc);
         JLabel vectorInfo = new JLabel(infoText);
-        vectorInfo.setPreferredSize(new Dimension(200, 200));
-        vectorBox.add(vectorInfo);
+        vectorInfo.setPreferredSize(new Dimension(150, 200));
+        vectorInfo.setMinimumSize(new Dimension(150, 200));
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(vectorInfo, gbc);
 
         this.setLayout(new BorderLayout());
         add(toolbarPanel, BorderLayout.NORTH);
-        add(vectorBox, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
 }

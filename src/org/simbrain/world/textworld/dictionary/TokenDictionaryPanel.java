@@ -21,6 +21,9 @@ package org.simbrain.world.textworld.dictionary;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,7 +31,6 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -84,6 +86,7 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
         initTable();
 
         JPanel toolbar = new JPanel();
+
         toolbar.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbar.add(table.getToolbarCSV(true, false));
         toolbar.add(table.getToolbarEditRows());
@@ -91,10 +94,13 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
         importToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
         importToolBar.add(getExtractTokensFromVectorDict(world));
         toolbar.add(importToolBar);
-        Box box = Box.createHorizontalBox();
-        box.add(scroller);
-        box.add(Box.createRigidArea(new Dimension(15, 0)));
-        //
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1.0; // Give scroller more horizontal weight
+        gbc.weighty = 1.0; // Make sure all vertical space is filled
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(scroller, gbc);
         JLabel textLabel = new JLabel();
         String text;
         thresholdField = new JTextField();
@@ -114,14 +120,17 @@ public class TokenDictionaryPanel extends JPanel implements EditablePanel {
         }
         textLabel.setText(text);
 
-        textLabel.setPreferredSize(new Dimension(200, 200));
-        box.add(Box.createRigidArea(new Dimension(25, 0)));
-        textLabel.setBackground(null);
-        box.add(textLabel);
+        textLabel.setPreferredSize(new Dimension(150, 200));
+        textLabel.setMinimumSize(new Dimension(150, 200));
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+        mainPanel.add(textLabel, gbc);
 
         this.setLayout(new BorderLayout());
         add(toolbar, BorderLayout.NORTH);
-        add(box, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
 
         fillFieldValues();
 

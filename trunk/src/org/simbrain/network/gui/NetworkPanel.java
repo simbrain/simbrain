@@ -531,7 +531,10 @@ public class NetworkPanel extends JPanel {
             @Override
             public void neuronMoved(final NetworkEvent<Neuron> e) {
                 NeuronNode node = (NeuronNode) objectNodeMap.get(e.getSource());
-                if ((node != null) && (!node.isMoving())) {
+
+                // In previous versions checked NeuronNode.isMoving == false.
+                // See NeuronNode isMoving comments
+                if (node != null) {
                     node.pullViewPositionFromModel();
                 }
             }
@@ -2526,19 +2529,15 @@ public class NetworkPanel extends JPanel {
     /**
      * Nudge selected objects.
      *
-     * @param offsetX amount to nudge in the x direction (multipled by
+     * @param offsetX amount to nudge in the x direction (multiplied by
      *            nudgeAmount)
-     * @param offsetY amount to nudge in the y direction (multipled by
+     * @param offsetY amount to nudge in the y direction (multiplied by
      *            nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
-        for (NeuronNode node : getSelectedNeurons()) {
-            node.getNeuron().setX(
-                node.getNeuron().getX() + (offsetX * nudgeAmount));
-            node.getNeuron().setY(
-                node.getNeuron().getY() + (offsetY * nudgeAmount));
+        for (Neuron neuron: getSelectedModelNeurons()) {
+            neuron.offset(offsetX * nudgeAmount, offsetY  * nudgeAmount);
         }
-        repaint();
     }
 
     /**

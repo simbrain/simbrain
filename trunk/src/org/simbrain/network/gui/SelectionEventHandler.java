@@ -180,9 +180,8 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
 
         if (pickedNode instanceof NeuronNode) {
             networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
-            // To ensure fire neuron moving events don't affect these
-            // neurons.
-            ((NeuronNode) pickedNode).setMoving(true);
+            // NeuronNode's moving flag no longer used. See NeuronNode comments.
+            //((NeuronNode) pickedNode).setMoving(true);
         }
 
         // Either start dragging selected node(s) or toggle selection (if shift

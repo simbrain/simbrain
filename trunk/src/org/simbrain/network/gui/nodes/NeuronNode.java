@@ -75,8 +75,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Background for label text, so that background objects don't show up. */
     private PNode labelBackground;
 
-    /** Whether the node is currently moving or not. */
-    private boolean isMoving = false;
+    // This flag removed r3166 10/14. Causes problems and original purpose
+    // unclear. Leaving it in for now, but consider for deletion.  Also see
+    // NetworkPanel response to neuronMoved events and SelectionEventHandler.
+    //private boolean isMoving = false;
 
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
@@ -528,20 +530,19 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         updateColor();
     }
 
-    /**
-     * @return Returns the isMoving.
-     */
-    public boolean isMoving() {
-        return isMoving;
-    }
-
-    /**
-     * @param isMoving
-     *            The isMoving to set.
-     */
-    public void setMoving(final boolean isMoving) {
-        this.isMoving = isMoving;
-    }
+    //    /**
+    //     * @return Returns the isMoving.
+    //     */
+    //    public boolean isMoving() {
+    //        return isMoving;
+    //    }
+    //    /**
+    //     * @param isMoving
+    //     *            The isMoving to set.
+    //     */
+    //    public void setMoving(final boolean isMoving) {
+    //        this.isMoving = isMoving;
+    //    }
 
     /** @see ScreenElement. */
     public void setGrouped(final boolean isGrouped) {

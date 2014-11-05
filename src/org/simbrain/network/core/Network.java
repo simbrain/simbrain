@@ -908,6 +908,7 @@ public class Network {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
+
         xstream.omitField(Network.class, "groupListeners");
         xstream.omitField(Network.class, "neuronListeners");
         xstream.omitField(Network.class, "networkListeners");
@@ -938,8 +939,7 @@ public class Network {
      */
     private Object readResolve() {
 
-        // Initialize listeners
-
+        // Initialize listener lists
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();
         synapseListeners = new ArrayList<SynapseListener>();
@@ -954,37 +954,27 @@ public class Network {
             neuron.postUnmarshallingInit();
         }
 
-        // Initialize groups
-        // for (Group group : this.getFlatGroupList()) {
-        // group.postUnmarshallingInit();
-        // }
+        // Uncompress compressed matrix rep if needed
+        for (SynapseGroup group : this.getSynapseGroups()) {
+            group.postUnmarshallingInit();
+        }
 
-        // Check for and remove corrupt synapses.
-        // This should not happen but as of 1/24/11 I have not
-        // determined why it happens, so the check is needed.
-        for (Synapse synapse : this.getFlatSynapseList()) {
-            if (synapse.getTarget() != null) {
-                if (synapse.getTarget().getFanIn() != null) {
-                    synapse.getTarget().addAfferent(synapse);
-                } else {
-                    System.out.println("Warning:" + synapse.getId()
-                        + " has null fanIn");
-                    removeSynapse(synapse);
-                }                
-            }
-            if (synapse.getSource() != null) {
-                if (synapse.getSource().getFanOut() != null) {
-                    synapse.getSource().addEfferent(synapse);
-                } else {
-                    System.out.println("Warning:" + synapse.getId()
-                        + " has null fanOut");
-                    removeSynapse(synapse);
-                }                
-            }
-
+        //Re-populate fan-in / fan-out for loose synapses
+        for (Synapse synapse : this.getSynapseList()) {
+            synapse.postUnmarshallingInit();
         }
 
         return this;
+    }
+
+    /**
+     * Perform operations required before saving a network.
+     * Post-opening operations occur in {@link #readResolve()}.
+     */
+    public void preSaveInit() {
+        for (SynapseGroup group : this.getSynapseGroups()) {
+            group.preSaveInit();
+        }
     }
 
     /**
@@ -1660,12 +1650,14 @@ public class Network {
 
     /**
      * Convenience method to return a list of synapse groups in the network.
+     * Note this is a "flat" list of synapse groups because there is no such
+     * thing as a "loose" synapse group.
      *
      * @return list of all synapse groups
      */
     public List<SynapseGroup> getSynapseGroups() {
         List<SynapseGroup> retList = new ArrayList<SynapseGroup>();
-        for (Group group : this.getGroupList()) {
+        for (Group group : this.getFlatGroupList()) {
             if (group instanceof SynapseGroup) {
                 retList.add((SynapseGroup) group);
             }
@@ -1701,5 +1693,6 @@ public class Network {
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
     }
+
 
 }

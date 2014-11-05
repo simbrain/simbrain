@@ -182,10 +182,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     public static PotentialConsumer getNeuronConsumer(
             NetworkComponent component, Neuron neuron, String methodName) {
         PotentialConsumer consumer = component.getAttributeManager()
-                .createPotentialConsumer(neuron, methodName,
-                double.class);
-        consumer.setCustomDescription(neuron.getId() + ":"
-                + methodName);
+                .createPotentialConsumer(neuron, methodName, double.class);
+        consumer.setCustomDescription(neuron.getId() + ":" + methodName);
         return consumer;
     }
 
@@ -195,7 +193,8 @@ public final class NetworkComponent extends WorkspaceComponent {
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
-                    returnList.add(getNeuronConsumer(this, neuron, type.getMethodName()));
+                    returnList.add(getNeuronConsumer(this, neuron,
+                            type.getMethodName()));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
@@ -248,8 +247,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     public static PotentialProducer getNeuronProducer(
             NetworkComponent component, Neuron neuron, String methodName) {
         PotentialProducer producer = component.getAttributeManager()
-                .createPotentialProducer(neuron, methodName,
-                double.class);
+                .createPotentialProducer(neuron, methodName, double.class);
         producer.setCustomDescription(neuron.getId() + ":" + methodName);
         return producer;
     }
@@ -260,7 +258,8 @@ public final class NetworkComponent extends WorkspaceComponent {
         for (AttributeType type : getVisibleProducerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : network.getFlatNeuronList()) {
-                    returnList.add(getNeuronProducer(this, neuron, type.getMethodName()));
+                    returnList.add(getNeuronProducer(this, neuron,
+                            type.getMethodName()));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
@@ -340,6 +339,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public void save(final OutputStream output, final String format) {
+        network.preSaveInit();
         Network.getXStream().toXML(network, output);
     }
 

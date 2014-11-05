@@ -48,8 +48,8 @@ import org.simbrain.util.widgets.EditablePanel;
  * A panel for setting the neuron type and changing the parameters of the
  * selected update rule.
  *
- * @author ztosi
- * @author jyoshimi
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
 public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {

@@ -69,6 +69,12 @@ public class Sparse implements ConnectNeurons {
     private boolean equalizeEfferents = DEFAULT_FF_PREF;
 
     /**
+     * A tag for whether or not this sparse connector supports density editing
+     * (changing the number of connecitions) after construction.
+     */
+    private boolean permitDensityEditing = true;
+    
+    /**
      * A map of permutations governing in what order connections to target
      * neurons will be added if the connection density is raised for each source
      * neuron. Maps which index of target neuron will be the next to be given a
@@ -530,7 +536,15 @@ public class Sparse implements ConnectNeurons {
         this.equalizeEfferents = equalizeEfferents;
     }
 
-    public double getConnectionDensity() {
+    public boolean isPermitDensityEditing() {
+		return permitDensityEditing;
+	}
+
+	public void setPermitDensityEditing(boolean permitDensityEditing) {
+		this.permitDensityEditing = permitDensityEditing;
+	}
+
+	public double getConnectionDensity() {
         return connectionDensity;
     }
 
@@ -547,6 +561,10 @@ public class Sparse implements ConnectNeurons {
      */
     public void setConnectionDensity(
         final double connectionDensity) {
+    	// Don't change connection density if it's not permitted...
+    	if (!permitDensityEditing) {
+    		return;
+    	}
         if (sparseOrdering == null) {
             this.connectionDensity = connectionDensity;
         } else {

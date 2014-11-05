@@ -234,28 +234,40 @@ public class GroupSerializer {
     	Sparse rCon = new Sparse(0.01, false, false);
     	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5,
     			exRand, inRand);
-    	System.out.println("Construction complete...");
+    	System.out.println("Initial Construction complete...\n");
     	long start = System.nanoTime();
     	System.out.println("Begin Serialization... ");
-    	serializeCompressedSynGroup(sg, Precision.FLOAT_32, "Test1.bin");
+    	try {
+    		serializeCompressedSynGroup(sg, Precision.FLOAT_32, "Test1.bin");
+    	} catch (Exception e) {
+    		System.out.println("FAILURE.\n");
+    		e.printStackTrace();
+    		System.exit(1);
+    	}
     	System.out.println("SUCCESS!");
     	long end = System.nanoTime();
-    	System.out.println("Serialization Time: " + SimbrainMath.roundDouble(
-    			(end-start) / Math.pow(10, 9), 4) + " secs.");
+    	System.out.println("\tSerialization Time: " + SimbrainMath.roundDouble(
+    			(end-start) / Math.pow(10, 9), 4) + " secs.\n");
     	System.out.println("Begin Deserialization... ");
-    	long start2 = System.nanoTime();
     	NeuronGroup ng2 = new NeuronGroup(net, 2048);
     	SynapseGroup sg2 = new SynapseGroup(ng2, ng2);
-    	GroupDeserializer.reconstructCompressedSynapseStrengths("./Test1.bin", sg2);
+    	long start2 = System.nanoTime();
+    	boolean status = GroupDeserializer
+    			.reconstructCompressedSynapseStrengths("./Test1.bin", sg2);
     	end = System.nanoTime();
-    	System.out.println("SUCCESS");
-    	System.out.println("Reconstruction Time: " + SimbrainMath.roundDouble(
-    			(end-start2) / Math.pow(10, 9), 4) + " secs.");
+    	if (status) {
+    		System.out.println("SUCCESS!");
+    	} else {
+    		System.out.println("FAILURE");
+    		System.exit(1);
+    	}
+    	System.out.println("\tReconstruction Time: " + SimbrainMath.roundDouble(
+    			(end-start2) / Math.pow(10, 9), 4) + " secs.\n");
     	System.out.println("TOTAL Time: " + SimbrainMath.roundDouble(
     			(end-start) / Math.pow(10, 9), 4) + " secs.");
-    	
-    	System.out.println("Original No. Synapses: " + sg.size());
-    	System.out.println("Reconstructed No. Synapses: " + sg2.size());
+		System.out.println("\nValidating Reconstruction...");
+    	System.out.println("\tOriginal No. Synapses: " + sg.size());
+    	System.out.println("\tReconstructed No. Synapses: " + sg2.size());
 //    	int orZeros = 0;
 //    	int recZeros = 0;
 //    	int weightChecks = 0;
@@ -278,32 +290,38 @@ public class GroupSerializer {
     			Synapse s1 = n1src.getFanOut().get(n1tar);
     			Synapse s2 = n2src.getFanOut().get(n2tar);
     			if (s1 == null && s2 != null) {
-    				System.out.println("PositionError");
+    				System.out.println("\t\tPositionError");
     				error = true;
+    				i = n;
     				break;
     			} 
     			if (s2 == null && s1 != null) {
-    				System.out.println("PositionError");
+    				System.out.println("\t\tPositionError");
     				error = true;
+    				i = n;
     				break;
     			} 
     			if (s1 != null && s2 != null) {
 //    				weightChecks++;
     				if (Math.abs(s1.getStrength() - s2.getStrength())
     						> errorTolerance) {
-    					System.out.println("Weight mismatch");
+    					System.out.println("\t\tWeight mismatch");
     					System.out.println(s1.getStrength() + " "
     							+ s2.getStrength());
     					error = true;
+    					i = n;
     					break;
     				}
     			}
     		}
     	}
     	if (!error) {
-    		System.out.println("No strucutral/positional errors.");
-    		System.out.println("No weight mismatches greater than "
+    		System.out.println("\tNo strucutral/positional errors.");
+    		System.out.println("\tNo weight mismatches greater than "
     				+ errorTolerance);
+    		System.out.println("SUCCESS!");
+    	} else {
+    		System.out.println("FAILURE");
     	}
     	
 //    	System.out.println(orZeros);

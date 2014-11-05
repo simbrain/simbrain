@@ -38,7 +38,7 @@ import org.simbrain.util.widgets.EditablePanel;
  * used together and depend on each other. This panel combines the two and
  * handles changes to one being applied to the other.
  *
- * @author ztosi
+ * @author Zach Tosi
  */
 @SuppressWarnings("serial")
 public class NeuronPropertiesPanel extends JPanel implements EditablePanel {

@@ -317,21 +317,22 @@ public class Synapse {
     /**
      * Sets the source and target neurons simultaneously.
      *
-     * @param source
-     * @param target
+     * @param new_source
+     * @param new_target
      */
-    private void setSourceAndTarget(final Neuron source, final Neuron target) {
+    private void setSourceAndTarget(final Neuron new_source,
+    		final Neuron new_target) {
         if (this.source != null) {
             this.source.removeEfferent(this);
         }
         if (this.target != null) {
             this.target.removeAfferent(this);
         }
-        if (source != null && target != null) {
-            this.source = source;
-            this.target = target;
-            source.addEfferent(this);
-            target.addAfferent(this);
+        if (new_source != null && new_target != null) {
+            this.source = new_source;
+            this.target = new_target;
+            new_source.addEfferent(this);
+            new_target.addAfferent(this);
         }
     }
 

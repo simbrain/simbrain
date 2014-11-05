@@ -23,8 +23,10 @@ import java.awt.Dimension;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
@@ -42,8 +44,6 @@ import org.simbrain.workspace.gui.GuiComponent;
 public final class NetworkDesktopComponent extends
         GuiComponent<NetworkComponent> {
 
-    private static final long serialVersionUID = 1L;
-
     /** Network panel. */
     private final NetworkPanelDesktop networkPanel;
 
@@ -55,6 +55,12 @@ public final class NetworkDesktopComponent extends
 
     /** Default width. */
     private static final int DEFAULT_WIDTH = 450;
+
+    /**
+     * If a synapse group has more than this many synapses and does not have
+     * "compression" turned on, show user a warning.
+     */
+    private static final int saveWarningThreshold = 200;
 
     /**
      * Create a new network frame.
@@ -144,6 +150,54 @@ public final class NetworkDesktopComponent extends
 
     @Override
     public void closing() {
+    }
+
+    @Override
+    public void showSaveFileDialog() {
+        if (showUncompressedSynapseGroupWarning()) {
+            super.showSaveFileDialog();
+        }
+
+    }
+
+    @Override
+    public void save() {
+        if (showUncompressedSynapseGroupWarning()) {
+            super.save();
+        }
+    }
+
+    /**
+     * If at least one synapse group has a large number of synapses that are not
+     * going to be saved using compression, show the user a warning.
+     *
+     * @return true if the save operation should proceed, false if the save
+     *         operation should be cancelled.
+     */
+    private boolean showUncompressedSynapseGroupWarning() {
+        boolean showPanel = false;
+        for (SynapseGroup group : networkPanel.getNetwork().getSynapseGroups()) {
+            if (group.getAllSynapses().size() > saveWarningThreshold) {
+                if (!group.isUseGroupLevelSettings()) {
+                    showPanel = true;
+                }
+            }
+        }
+        if (showPanel) {
+            int n = JOptionPane
+                    .showConfirmDialog(
+                            null,
+                            "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. "
+                                    + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that "
+                                    + "their weight matrices are compressed.   Otherwise the save will take a "
+                                    + "long time and the saved file will be large. Click Cancel to go ahead with the save, "
+                                    + "and OK to return to the network and change settings.</body></html>",
+                            "Save Warning", JOptionPane.OK_CANCEL_OPTION);
+            if (n == JOptionPane.OK_OPTION) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

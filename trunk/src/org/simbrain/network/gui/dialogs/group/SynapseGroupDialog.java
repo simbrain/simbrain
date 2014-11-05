@@ -257,10 +257,10 @@ public final class SynapseGroupDialog extends StandardDialog {
             // to editing.
             // Weight Matrix Editor Tabs
             if (synapseGroup.getConnectionManager() instanceof Sparse) {
+            	Sparse sparseCM = (Sparse) synapseGroup.getConnectionManager();
                 SparseConnectionPanel sparsePanel = SparseConnectionPanel
-                    .createSparsityAdjustmentPanel(
-                        (Sparse) synapseGroup.getConnectionManager(),
-                        networkPanel);
+                    .createSparsityAdjustmentPanel(sparseCM, networkPanel);
+                sparsePanel.setEnabled(sparseCM.isPermitDensityEditing());
                 ApplyPanel cePanel = ApplyPanel.createApplyPanel(sparsePanel);
                 cePanel.addActionListener(new ActionListener() {
                     @Override
@@ -276,6 +276,7 @@ public final class SynapseGroupDialog extends StandardDialog {
                         });
                     }
                 });
+                cePanel.setEnabled(sparseCM.isPermitDensityEditing());
                 storedComponents.add(cePanel);
                 tabbedPane.addTab("Sparsity", new JPanel());
             }

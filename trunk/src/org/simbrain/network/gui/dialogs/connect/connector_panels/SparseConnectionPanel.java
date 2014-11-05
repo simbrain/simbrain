@@ -76,7 +76,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     /** A text field for setting the sparsity of the connections. */
     private JFormattedTextField densityTf = new JFormattedTextField(
         NumberFormat.getNumberInstance());
-
+    
     /**
      * A text field allowing the user to specify the number of outgoing synapses
      * per source neuron.
@@ -212,7 +212,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         JPanel sparseTextPanel = new JPanel(new FlowLayout());
         sparseTextPanel.add(new JLabel("Density: "));
         Dimension sSize = densityTf.getPreferredSize();
-        sSize.width = 40;
+        sSize.width = 80;
         densityTf.setPreferredSize(sSize);
         sparseTextPanel.add(densityTf);
 
@@ -220,7 +220,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         equalizerPanel.add(new JLabel("Equalize Efferents:"));
         equalizerPanel.add(equalizeEfferentsChkBx);
         sSize = synsPerSource.getPreferredSize();
-        sSize.width = 40;
+        sSize.width = 80;
         synsPerSource.setPreferredSize(sSize);
         equalizerPanel.add(synsPerSource);
 
@@ -593,6 +593,15 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         synsPerSource.setValue(new Integer(sps));
     }
 
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+    	connectionDensitySlider.setEnabled(enabled);
+    	densityTf.setEnabled(enabled);
+    	synsPerSource.setEnabled(enabled);
+    	equalizeEfferentsChkBx.setEnabled(enabled);
+    	allowSelfConnectChkBx.setEnabled(enabled);
+    }
+    
     /**
      *
      * @param density

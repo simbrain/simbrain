@@ -187,17 +187,23 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             this.add(new JLabel("Optimize as Group:"));
             this.add(useGlobalSettings);
         }
+       
         this.add(excitatoryTypeLabel);
         this.add(excitatoryTypeField);
-        this.add(inhibitoryTypeLabel);
-        this.add(inhibitoryTypeField);
+        if (group instanceof SynapseGroup || inhibitoryTypeLabel.isVisible()) {
+        	this.add(inhibitoryTypeLabel);
+        	this.add(inhibitoryTypeField);
+        }
         if (!isEditable()) {
-            this.add(parentGroupLabel);
-            this.add(parentGroupField);
-            this.add(incomingGroupLabel);
-            this.add(incomingField);
-            this.add(outgoingGroupLabel);
-            this.add(outgoingField);
+        	this.add(parentGroupLabel);
+        	this.add(parentGroupField);
+        	if (group instanceof SynapseGroup
+        			|| inhibitoryTypeLabel.isVisible()) {
+        		this.add(incomingGroupLabel);
+        		this.add(incomingField);
+        		this.add(outgoingGroupLabel);
+        		this.add(outgoingField);
+        	}
         }
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
@@ -209,6 +215,22 @@ public class SummaryPanel extends JPanel implements EditablePanel {
      *            fields.
      */
     public void fillFieldValues(final NeuronGroup ng) {
+    	// TODO: See below:
+    	// Temporary fix code. These values would be very difficult to display
+    	// in the current framework. Basically we're wating until neuron groups'
+    	// synapse group sets are actually used and we're waiting until neuron
+    	// polarity can be set in the GUI.
+    	incomingGroupLabel.setVisible(false);
+    	outgoingGroupLabel.setVisible(false);
+    	incomingField.setVisible(false);
+    	outgoingField.setVisible(false);
+    	inhibitoryTypeLabel.setVisible(false);
+    	inhibitoryTypeField.setVisible(false);
+        excitatoryTypeLabel.setText("Neuron Type");
+        removeAll();
+        initializeLayout();
+    	// End Temporary fixes.
+    	
         if (ng.getId() == null || ng.getId().isEmpty()) {
             idField.setText(ng.getParentNetwork().getGroupIdGenerator()
                 .getHypotheticalId()); // ng hasn't been added to the
@@ -230,6 +252,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 populationField.setText(Integer.toString(ng.getNeuronList()
                     .size()));
             }
+
             if (NetworkUtils.isConsistent(ng.getNeuronList(), Neuron.class,
                 "getUpdateRuleDescription")) {
                 excitatoryTypeField.setText(ng.getNeuronList().get(0)

@@ -377,10 +377,16 @@ public class Neuron {
      */
     public void addEfferent(final Synapse synapse) {
         if (fanOut != null) {
-            if (fanOut.containsKey(synapse.getTarget())) {
-                getNetwork().removeSynapse(fanOut.get(synapse.getTarget()));
-            }
-            fanOut.put(synapse.getTarget(), synapse);
+        	Synapse dup = fanOut.get(synapse.getTarget());
+        	if (dup == null) { // There is no duplicate
+                fanOut.put(synapse.getTarget(), synapse);
+        	} else { // There is a duplicate connecting src and target
+        		// Check that we're not trying to add the exact same synapse...
+        		if (!dup.equals(synapse)) {
+        			getNetwork().removeSynapse(fanOut.get(synapse.getTarget()));
+        			fanOut.put(synapse.getTarget(), synapse);
+        		} // Do nothing if we are.
+        	}
         }
     }
 

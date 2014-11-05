@@ -147,4 +147,9 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
 
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+    	applyButton.setEnabled(enabled);
+    }
+    
 }

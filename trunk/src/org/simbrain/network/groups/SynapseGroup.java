@@ -334,6 +334,11 @@ public class SynapseGroup extends Group {
         sourceNeuronGroup.addOutgoingSg(this);
         targetNeuronGroup.addIncomingSg(this);
         connectionManager.connectNeurons(this);
+        if (size() == 0) {
+        	System.out.println("Creation failed, conditions of connection"
+        			+ " resulted in zero synapses being created.");
+        	delete();
+        }
     }
 
     /**

@@ -201,6 +201,7 @@ public class Radial extends Sparse {
      * Default constructor
      */
     public Radial() {
+    	this.setPermitDensityEditing(false);
     }
 
     /**
@@ -208,6 +209,7 @@ public class Radial extends Sparse {
      * @param lambda
      */
     public Radial(double distConst, double lambda) {
+    	this();
         this.distConst = distConst;
         this.lambda = lambda;
     }
@@ -222,6 +224,7 @@ public class Radial extends Sparse {
      */
     public Radial(double eeDistConst, double eiDistConst, double ieDistConst,
         double iiDistConst, double lambda) {
+    	this();
         this.eeDistConst = eeDistConst;
         this.eiDistConst = eiDistConst;
         this.ieDistConst = ieDistConst;
@@ -260,21 +263,6 @@ public class Radial extends Sparse {
         Runtime.getRuntime().gc();
     }
 
-    public void adjustConnectivity(double density) {
-
-    }
-
-    private void removeToDensity(double density) {
-        if (connectionDensity == 0)
-            return;
-
-    }
-
-    private void addToDensity(double density) {
-        if (connectionDensity == 1)
-            return;
-    }
-
     /**
      *
      * @param src
@@ -287,7 +275,7 @@ public class Radial extends Sparse {
         double distConst, double lambda) {
         double dist = -getRawDist(src, tar);
         double exp = Math.exp(dist / (lambda * lambda));
-        if (exp == 1.0) { // Same location--same neuron: cheapest way to
+        if (exp == 1.0) { // Same location == same neuron: cheapest way to
             // prevent self connections
             exp = 0.0;
         }
@@ -361,16 +349,6 @@ public class Radial extends Sparse {
 
     public void setLambda(double lambda) {
         this.lambda = lambda;
-    }
-
-    @Override
-    public double getConnectionDensity() {
-        return 0;
-    }
-
-    @Override
-    public void setConnectionDensity(double connectionDensity) {
-        // TODO Auto-generated method stub
     }
 
     public class DensityEstimator implements Runnable {

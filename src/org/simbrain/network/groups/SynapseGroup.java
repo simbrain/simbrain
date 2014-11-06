@@ -235,7 +235,7 @@ public class SynapseGroup extends Group {
     public static SynapseGroup createSynapseGroup(final NeuronGroup source,
             final NeuronGroup target, final ConnectNeurons connectionManager) {
         return createSynapseGroup(source, target, connectionManager,
-                DEFAULT_EXCITATORY_RATIO);
+                DEFAULT_EXCITATORY_RATIO, null, null);
     }
 
     /**
@@ -1600,21 +1600,17 @@ public class SynapseGroup extends Group {
      * Perform operations required after opening a synapse group.
      */
     public void postUnmarshallingInit() {
-        
-        exSynapseSet = new HashSet<Synapse>();
-        inSynapseSet = new HashSet<Synapse>();
 
         // Rebuild weight matrix if needed.
-        if (this.isUseGroupLevelSettings()) {
+        if (this.isUseGroupLevelSettings() && compressedMatrixRep != null) {
+            exSynapseSet = new HashSet<Synapse>();
+            inSynapseSet = new HashSet<Synapse>();
             if (this.compressedMatrixRep != null) {
                 GroupDeserializer.reconstructCompressedSynapseStrengths(
                         this.compressedMatrixRep, this);
                 this.compressedMatrixRep = null;
             }
         } else {
-            // TODO: The below should always happen but it causes
-            //   problems when it is called on optimized synapse groups.
-            //  To see this move this code out of this block.
             for (Synapse synapse : this.getAllSynapses()) {
                 synapse.postUnmarshallingInit();
             }            

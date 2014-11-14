@@ -1,7 +1,5 @@
 import org.simbrain.network.*;
-import org.simbrain.network.interfaces.*;
-import org.simbrain.network.networks.*;
-import org.simbrain.network.neurons.*;
+import org.simbrain.network.core.*;
 
 /**
  * Remove any neurons that are not connected to other neurons.
@@ -9,7 +7,7 @@ import org.simbrain.network.neurons.*;
 {
     for (Neuron neuron: network.getFlatNeuronList()) {
         if ((neuron.getFanIn().size() + neuron.getFanOut().size()) == 0) {
-            network.deleteNeuron(neuron);
+            network.removeNeuron(neuron);
         }
     }
 }

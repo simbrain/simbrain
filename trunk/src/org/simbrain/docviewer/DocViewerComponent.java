@@ -40,7 +40,10 @@ public class DocViewerComponent extends WorkspaceComponent {
             + "when it is re-opened other users will know how to use it.\n<br><br>\n"
             + "Uses simple html for formatting, e.g. <b>bold text</b>.\n Click on the "
             + "Edit tab to edit the html \n or import from pre-edited html "
-            + "using the File menu.\n</body>\n</html>\n";
+            + "using the File menu.<br><br>"
+            + "Example of a local image: <img src = \"file:docs/Images/simbrainlogo.gif\"><br><br>\n"
+            + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a>\n"
+            + " \n</body>\n</html>\n";
 
     /**
      * Construct a new document viewer component.

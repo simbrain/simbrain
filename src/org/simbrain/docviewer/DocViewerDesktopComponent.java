@@ -19,20 +19,19 @@
 package org.simbrain.docviewer;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 import javax.swing.Action;
@@ -63,6 +62,12 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * A very simple component which displays html and allows it to be edited. Uses
  * a JEditorPane to display html and an RSSyntaxTextArea to edit it.
+ *
+ * Examples of html code for local links and images:
+ *
+ * <img src = "file:docs/Images/World.png">
+ * <a href = "file:docs/SimbrainDocs.html">Local link</a>.
+ *
  */
 public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> {
 
@@ -152,17 +157,6 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
         add("Center", tabs);
 
-        // Force component to fill up parent panel
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Component component = e.getComponent();
-                sp.setPreferredSize(new Dimension(component.getWidth(),
-                        component.getHeight()));
-                sp.revalidate();
-            }
-        });
-
         // Listen for tab changed events. Synchronize the editor and the
         // display tabs on these events.
         // TODO: listen for changes in the editor and only update the display
@@ -182,7 +176,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
         };
         tabs.addChangeListener(changeListener);
 
-        // Respond to clicks on hyper-links by opening a web page in the defautl
+        // Respond to clicks on hyper-links by opening a web page in the default
         // browser
         HyperlinkListener l = new HyperlinkListener() {
             @Override
@@ -190,14 +184,13 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                 if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
                     try {
                         if (e.getURL() != null) {
-                            System.out.println(e.getURL().toURI());
-                            Desktop.getDesktop().browse(e.getURL().toURI());
+                            //System.out.println(e.getURL().toURI());
+                            Desktop.getDesktop().browse(
+                                    processLocalFiles(e.getURL().toURI()));
                         }
                     } catch (IOException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     } catch (URISyntaxException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
                 }
@@ -206,6 +199,29 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
         };
         textArea.addHyperlinkListener(l);
+    }
+
+    /**
+     * Convert local paths into absolute paths for links based on the local file
+     * system.
+     *
+     * @param uri the uri to process
+     * @return an update uri if it is a file link
+     */
+    private URI processLocalFiles(URI uri) {
+        String uriStr = uri.toString();
+        if (uriStr.startsWith("file:")) {
+            uriStr = "file:" + System.getProperty("user.dir") + "/"
+                    + uriStr.substring(5);
+            URL url;
+            try {
+                url = new URL(uriStr);
+                return url.toURI();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return uri;
     }
 
     @Override

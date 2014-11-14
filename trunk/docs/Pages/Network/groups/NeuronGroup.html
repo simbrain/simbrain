@@ -18,20 +18,21 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../groups.html">Groups</a> &gt; Neuron Group</p>
         </div>
         <div id="menu">
-            <p class="menubold">Neuron Group Types [Todo: link to network versions]</p>
+            <p class="menubold">Neuron Group Types</p>
             <blockquote>
-                <p>Bare (Described here)
+                <p><a href="../network/standardnetwork.html">Bare (Neuron Group)</a>
                     <br>
-                    <a href="synapse/Hebbian.html">Competitive</a>
+                    <a href="Competitive.html">Competitive</a>
                     <br>
-                    <a href="synapse/Hebbian%20Threshold.html">SOM</a>
+                    <a href="../network/som.html">SOM</a>
                     <br>
-                    <a href="synapse/Oja.html">WTA</a>
+                    <a href="../network/winnerTakeAll.html">WTA</a>
               </p></blockquote>
             <blockquote>&nbsp;</blockquote>
         </div>
         <h1>Neuron Group</h1>
-        <p>TODO</p>
+        <p>A neuron group is a group consisting of a neuron(s) in which is represented by an enclosure of the neuron(s). The label at the top of the enclosure is the group's name (defaulted to the type of neuron group). There are various types of neuron group (listed to the right) in Simbrain, each of which has numerous parameters that can be set. This page covers properties common to all of the different neuron group types. Details of each type can be found on their respective page. </p>
+
         <p class="heading">Creation/Edit Dialog<br>
 </p>
         <blockquote>
@@ -41,22 +42,24 @@
             </p>
             <p style="margin-left: 40px;">
                 <span class="heading2"></span>
-                <span style="font-weight: bold;">Group ID</span>
+                <span style="font-weight: bold;">Group ID</span>: Labelling that identifies the group.
             </p>
             <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Label</span>
+                <span style="font-weight: bold;">Label</span>: Name of group.
             </p>
             <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Population</span>
+                <span style="font-weight: bold;">Population</span>: Number of neurons in the group.
             </p>
             <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Excitatory Type</span>
+                <span style="font-weight: bold;">Excitatory Type</span>: The type of neuronal excitation for the group. Can be changed in "Update Rule." See <a href="../neuron.html">neuron types</a> for a listing of the various types. 
             </p>
             <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Inhibitory Type</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Parent</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Incoming</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Outgoing<br>
+                <span style="font-weight: bold;">Inhibitory Type:</span> The type of neuronal inhibition for the group. See <a href="../neuron.html">neuron types</a> for a listing of the various types. </p>
+
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Parent:</span> Denotes the the parent group, if any.</p>
+
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Incoming:</span> </p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Outgoing:<br>
   </span>
             </p>
 
@@ -67,17 +70,17 @@
             </p>
             <p style="margin-left: 40px;">
                 <span class="heading2"></span>
-                <span style="font-weight: bold;"></span><span style="font-weight: bold;">Activation</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Label</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Clamped</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Clipping</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Upper Bound</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Lower Bound</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Increment</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Priority</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Input Type</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Update Rule<br>
-  </span></p>
+                <span style="font-weight: bold;"></span><span style="font-weight: bold;">Activation</span>: The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (e.g. firing rate, voltage potential, etc.). This is represented by the neuron's color, and can be seen exactly by lingering over the neuron or observing the value in the neuron's properties.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Label</span>: This field labels ALL of the neurons (within the group) with the same name. </p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Clamped</span>: Clamping the neurons fix the activation value to the current value.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Clipping</span>: If a neuron uses clipping, then if its activation exceeds its upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Upper Bound</span>: This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.
+</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Lower Bound</span>: This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Increment</span>: This field sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Priority:</span> This field lets user give priority to neurons. The lower the value, the higher the priority.</p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Input Type:</span> This field sets the input as weighted or synaptic. </p>
+  <p style="margin-left: 40px;"><span style="font-weight: bold;">Update Rule:</span> This field lets user change the neuron type.</p><br>
 
         </blockquote>
         <blockquote>
@@ -86,54 +89,58 @@
             </p>
             
   <p style="margin-left: 40px;">
-                <span class="heading2"></span><span style="font-weight: bold;">Grid</span></p>
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Horizontal Spacing</span></p>
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Vertical Spacing</span></p>
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Manual Columns</span></p>
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Number of Columns</span></p>
+                <span class="heading2"></span><span style="font-weight: bold;">Grid</span>: Neurons are laid out in a grid, beginning at an initial position and moving downward.</p>
+
+  <p style="margin-left: 80px;"><span style="font-weight: bold;">Horizontal Spacing</span>: Distance between the neurons from left to right.</p>
+  <p style="margin-left: 80px;"><span style="font-weight: bold;">Vertical Spacing</span>: Distance between the neurons up and down.</p>
+  <p style="margin-left: 80px;"><span style="font-weight: bold;">Manual Columns</span>: If checked, the default behavior is overrideen and you can choose how many columns the grid has, using the number of columns field.  Default behavior is a square grid.</p>
+  <p style="margin-left: 80px;"><span style="font-weight: bold;">Number of Columns</span>: How many columns there will be in the grid (if manully set number of columns is selected).</p>
 </blockquote>
-<p style="margin-left: 80px;"><span style="font-weight: bold;">Hex Grid</span>
+<p style="margin-left: 80px;"><span style="font-weight: bold;">Hex Grid</span>: Neurons are laid out in a hexagonal pattern.
 </p>
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Horizontal Spacing</span></p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Horizontal Spacing</span>: Distance between the neurons from left to right.</p>
 
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Vertical Spacing</span></p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Vertical Spacing</span>:  Distance between the neurons up and down.</p>
 
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Manual Columns</span></p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Manual Columns</span>: If checked, the default behavior is overrideen and you can choose how many columns the grid has, using the number of columns field.  Default behavior is a square grid.</p>
 
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Number of Columns</span></p>
-<p style="margin-left: 80px;"><span style="font-weight: bold;">Line</span></p>
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Layout Style</span></p>
-<p style="margin-left: 120px;"><span style="font-weight: bold;">Spacing</span></p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Number of Columns</span>: How many columns there will be in the grid (if manully set number of columns is selected).</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;">Line</span>: Neurons are laid out in a line, beginning at an initial position.</p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Layout Style</span>: Whether the neurons are laid out horizontally or vertically.</p>
+<p style="margin-left: 120px;"><span style="font-weight: bold;">Spacing</span>: Distance between the neurons.</p>
 <p style="margin-left: 40px;"><span class="heading2">Input Data<br>
 </span></p>
-
+<blockquote></blockquote>
+ <p style="margin-left: 80px;">
+               Input data for neurons. User can upload .csv data files. </p>
 <blockquote>
         </blockquote>
 <blockquote><span class="heading2"></span>
         </blockquote>
         <p class="heading">Right Click Menu</p>
+
         <blockquote class="heading2">
-            <span class="heading2">Edit</span>: -
+            <span class="heading2">Edit: </span>Edit group properties.
             <br>
-            <span class="heading2">Rename Group</span>: -
+            <span class="heading2">Rename Group: </span> Input another name for the group.
             <br>
-            <span class="heading2">Remove Group</span>: -
+            <span class="heading2">Remove Group: </span> Delete the group.
             <br>
-            <span class="heading2">Select Neurons</span>: -
+            <span class="heading2">Select Neurons: </span>Select all neurons in the group.
             <br>
             <span class="heading2"></span>Select Incoming Synapses: -
             <br>
             <span class="heading2"></span>Select Outgoing Synapses: -
             <br>
-            <span class="heading2">Clamp Neurons</span>: -
+            <span class="heading2">Clamp Neurons: </span>Clamp all neurons in the group. See <a href="../neuron.html#clamping">Clamping</a>.
             <br>
-            <span class="heading2">Unclamp Neurons</span>: -
+            <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
             <br>
-            <span class="heading2">Set Group </span>as Source: -
+            <span class="heading2">Set Group as Source: </span> Set the group as source group.
             <br>
-            <span class="heading2">Clear Source Neuron Groups</span>: -
+            <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
             <br>
-            <span class="heading2">Connect Neuron Group with Synapse Group</span>: -
+            <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
             <br>
             <span class="heading2"></span>
         </blockquote>

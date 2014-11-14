@@ -24,7 +24,7 @@ voltage potential, and when that number passes a threshold the neuron
 "fires," and typically the activation then drops to a lower value. </p>
   <p>Currently two neurons are spiking neurons:</p>
   <blockquote>
-    <p><a href="neuron/integrateAndFire.html">Integrate and Fire</a><br>
+    <p><a href="neuron/Integrate%20and%20Fire.html">Integrate and Fire</a><br>
       <a href="neuron/izhikevich.html">Izhikivech</a></p>
   </blockquote>
   <p>The
@@ -36,15 +36,14 @@ normally would be for a synapse of that type, but an additional tab is
 added, a "spike response" tab. This tab determines how spike events
 will be converted into activation. In general, one of these synapses is
 referred to as a <a href="synapse/spikeResponder.html">spike responder</a>.</p><br>
-<p><span style="text-decoration: underline;">New Text [todo]</span><br>
+<p><span style="text-decoration: underline;">Weights of Spiking Networks:</span><br>
 </p>
 <p>Simbrain allows interaction between connectionist type units and
-more biologically realistic model elements.&nbsp;&nbsp;&nbsp; "Weights"
-mean different things in the two contexts.For incoming neurons it's not
+more biologically realistic model elements.&nbsp;&nbsp;&nbsp;"Weights" mean different things in the two contexts. For incoming neurons, it's not
 too hard.&nbsp; It's just weighted input (incoming activation x weight
-value) It's stranger in the "outgoing" direction. To deal with the
+value). It's stranger in the "outgoing" direction. To deal with the
 situation, we associate weights attaching to a spiking neuron with a
-"Spike responder" that converts weighted input (incoming activation x
+"<a href="synapse/spikeResponder.html">Spike responder</a>" that converts weighted input (incoming activation x
 weight value) into an input current.<br>
 <br>
 <br>

@@ -23,7 +23,7 @@
 <blockquote>
   <p><a href="neuron/additive.html">Additive</a><br />
   <a href="neuron/Binary.html">Binary</a><br />
-  <a href="neuron/Clamped.html">Clamped</a><br />
+  <a href="synapse/Clamped%20%28no%20learning%29.html">Clamped</a><br />
   <a href="neuron/Decay.html">Decay</a><br />
   <a href="neuron/IAC.html">IAC</a><br />
   <a href="neuron/Integrate%20and%20Fire.html">Integrate and fire</a>
@@ -35,7 +35,7 @@
   <a href="neuron/Naka-Rushton.html">Naka-Rushton</a><br />
   <a href="neuron/Point%20Neuron%20%28Leabra%29.html">Point</a><br />
   <a href="neuron/Random.html">Random<br />
-  </a> <a href="neuron/Sigmoidal.html">Sigmoidal</a><br />
+  </a> <a href="neuron/SigmoidalDiscrete.html">Sigmoidal</a><br />
   <a href="neuron/Sinusoidal.html">Sinusoidal</a><br />
   <a href="neuron/Stochastic.html">Stochastic</a> <br />
   <a href="neuron/Three%20Value.html">Three valued<br />
@@ -93,14 +93,15 @@ observing the value in the neuron's properties. </p>
   <p class="heading2">Label<br />
 </p>
 <blockquote>
-<p>TODO </p>
+<p>Label neuron with a name. </p>
 </blockquote>
   
-  <p class="heading2">Clamped<br />
+  <p class="heading2">Clamped 
+
   </p>
 
   <blockquote>
-<p>TODO<br />
+<p>See <a href="#clamping">below</a>.<br />
  </p>
   </blockquote>
   <p class="heading2"><a name="clipping" id="LowBound">Clipping<br />
@@ -151,7 +152,7 @@ feature does not affect the neuron while the network is being iterated.</p>
 
 
   <blockquote>
-<p>TODO<br />
+<p>This field sets the neuron with a desired priority. The lower the value, the higher the priority.<br />
  </p>
   </blockquote>
 
@@ -160,7 +161,7 @@ feature does not affect the neuron while the network is being iterated.</p>
 
 
   <blockquote>
-<p>TODO<br />
+<p>This field sets the input as <a href="#wtdinput">weighted</a> or synaptic. <br />
  </p>
   </blockquote>
   <br />
@@ -173,9 +174,9 @@ is "clamped" to its current value. There are two ways to clamp neurons
 and synapses in Simbrain.<br />
 </p>
 <blockquote>
-  <p>(1) Set the type of a synapse to <a href="synapse/clamped.html">clamped
+  <p>(1) Set the type of a synapse to <a href="synapse/Clamped%20%28no%20learning%29.html">clamped
 synapse</a> or the type of a
-neuron to <a href="neuron/clamped.html">clamped neuron</a>. This
+neuron to <a href="synapse/Clamped%20%28no%20learning%29.html">clamped neuron</a>. This
 allows specific subsets of synapses or neurons to be permanently
 clamped.<br />
   </p>
@@ -204,7 +205,7 @@ node by <em>a</em><sub>i</sub>. The weighted input is then:<br />
 </p>
 <p><a name="wtdinput" id="wtdinput"> </a> Note that a sensory input
 term <em>I</em>
-is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
+is also added to the weighted input if the node has a <a href="../Workspace/Couplings.html">sensory coupling</a> attached to it. </p>
 <p>When a source neuron is a spiking neuron (see <a href="spikingnetworks.html">spiking networks</a>) the weight times
 activation term for that neuron is replaced by something more complex.
 See <a href="spikingnetworks.html">spiking networks</a>.</p>

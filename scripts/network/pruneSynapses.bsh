@@ -1,4 +1,4 @@
-import org.simbrain.network.interfaces.*;
+import org.simbrain.network.core.*;
 
 /**
  * Remove selected synapses whose absolute value is below the specified
@@ -9,7 +9,7 @@ import org.simbrain.network.interfaces.*;
 
     for (Synapse synapse: networkPanel.getSelectedModelSynapses()) {
         if (Math.abs(synapse.getStrength()) < THRESHOLD) {
-            network.deleteSynapse(synapse);
+            network.removeSynapse(synapse);
         }
     }
 }

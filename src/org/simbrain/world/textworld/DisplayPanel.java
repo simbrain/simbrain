@@ -20,6 +20,8 @@ package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -27,8 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -58,7 +58,6 @@ public class DisplayPanel extends JPanel {
      *
      * @param theWorld the world
      * @param toolbar pass in open / close toolbar
-     * @return the constructed panel
      */
     public DisplayPanel(DisplayWorld theWorld, JToolBar toolbar) {
         this.world = theWorld;
@@ -66,7 +65,7 @@ public class DisplayPanel extends JPanel {
 
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        
+
         // Set up toolbar
         JPanel topToolbarPanel = new JPanel();
         topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -85,34 +84,36 @@ public class DisplayPanel extends JPanel {
         // Set up main text area
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-        textArea.addCaretListener(new CaretListener() {
 
-            public void caretUpdate(CaretEvent arg0) {
-                // Tricky here. Need to set the position without firing an event
-                // (and then infinite loop),
-                // but also need to reset the matcher in the underlying object.
-                // I wish there were a cleaner way...
+        // Reset text position when user clicks in text area
+        textArea.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
                 world.setPosition(textArea.getCaretPosition(), false);
             }
 
         });
+
+        // Listener for changes in the textarea (i.e. adding or removing text
+        // directly in the area).
         textArea.getDocument().addDocumentListener(new DocumentListener() {
 
             public void changedUpdate(DocumentEvent arg0) {
                 // TODO: Check if needed in all places, migrate to separate
                 // method
                 // Careful of infinite loops later if this fires events in world
-                // System.out.println("changedUpdate");
+                //System.out.println("display world: changedUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
-                // System.out.println("insertUpdate");
+                //System.out.println("display world: insertUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
-                // System.out.println("removeUpdate");
+                //System.out.println("display world: removeUpdate");
                 world.setText(textArea.getText(), false);
             }
 

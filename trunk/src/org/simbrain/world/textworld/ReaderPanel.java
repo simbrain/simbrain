@@ -26,6 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -34,8 +36,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -148,38 +148,33 @@ public class ReaderPanel extends JPanel {
      */
     private void initListeners() {
 
-        textArea.addCaretListener(new CaretListener() {
+        // Reset text position when user clicks in text area
+        textArea.addMouseListener(new MouseAdapter() {
 
-            public void caretUpdate(CaretEvent arg0) {
-                // System.out.println("caretUpdate");
-
-                // Tricky here. Need to set the position without firing an event
-                // (and then infinite loop),
-                // but also need to reset the matcher in the underlying object.
-                // I wish there were a cleaner way...
+            @Override
+            public void mousePressed(MouseEvent e) {
                 world.setPosition(textArea.getCaretPosition(), false);
                 world.updateMatcher();
-
-                // removeHighlights(textArea);
             }
 
         });
 
-        // Listener for changes in the textarea
+        // Listener for changes in the textarea (i.e. adding or removing text
+        // directly in the area).
         textArea.getDocument().addDocumentListener(new DocumentListener() {
 
             public void changedUpdate(DocumentEvent arg0) {
-                // System.out.println("changedUpdate");
+                //System.out.println("readerworld: changedUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
-                // System.out.println("insertUpdate");
+                //System.out.println("readerworld: insertUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
-                // System.out.println("removeUpdate");
+                //System.out.println("readerworld: removeUpdate");
                 world.setText(textArea.getText(), false);
             }
 

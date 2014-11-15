@@ -214,6 +214,20 @@ public class SimbrainJTable extends JXTable {
             }
         });
         hasChangedSinceLastSave = false;
+
+        // Force edits to take effect right away. Has some slightly odd
+        // side effects. Would be nice if the cells behaved more like excel.
+        // See e.g.
+        // http://tips4java.wordpress.com/2008/10/20/table-select-all-editor/
+        this.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (SimbrainJTable.this.getCellEditor() != null) {
+                    SimbrainJTable.this.getCellEditor().stopCellEditing();
+                }
+            }
+        });
     }
 
     /**

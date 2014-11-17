@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JTabbedPane;
@@ -80,7 +83,7 @@ public class SOMTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Network Properties", somPropsPanel);
 
         // Set up training tab
-        SOMTrainerControlsPanel controlPanel = new SOMTrainerControlsPanel(panel,
+        final SOMTrainerControlsPanel controlPanel = new SOMTrainerControlsPanel(panel,
                 new SOMTrainer(network), network);
         tabbedPane.addTab("Train Network", controlPanel);
 
@@ -126,6 +129,13 @@ public class SOMTrainingDialog extends StandardDialog {
         // Finish configuration
         setContentPane(tabbedPane);
 
+        // Stop trainer from running any time the window is closed
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                controlPanel.getTrainer().setUpdateCompleted(true);
+            }
+        });
     }
 
     @Override

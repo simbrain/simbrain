@@ -174,7 +174,8 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         this.parent = parent;
         neuronGroup = ng;
         isCreationPanel = false;
-        layoutPanel = new MainLayoutPanel(false, parent);
+        layoutPanel = new MainLayoutPanel(ng.getLayout().getDescription(),
+                false, parent);
     }
 
     /**

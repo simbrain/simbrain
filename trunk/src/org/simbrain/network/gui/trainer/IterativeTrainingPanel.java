@@ -22,8 +22,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.IterableTrainer;
@@ -33,6 +36,8 @@ import org.simbrain.util.SimpleFrame;
  * Combines an iterative control panel and training set panel to provide the
  * primary access point for training neural networks using iterative methods.
  * Currently used by backprop and lms.
+ *
+ * TODO: This is no longer being used and should be considered for deletion (JKY, 11/14)
  *
  * @author Jeff Yoshimi
  */

@@ -51,17 +51,11 @@ import org.simbrain.util.Utils;
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     public static final int DEFAULT_GROUP_SIZE = 10;
-//    
-//    private String outFileName = "defaultOut.dat";
-//    
-//    private RandomAccessFile outFile;
-//    
-//    private boolean recording;
-    
+
     private boolean isSpikingNeuronGroup;
-    
+
     private String updateRule;
-    
+
     /** The neurons in this group. */
     private List<Neuron> neuronList = new ArrayList<Neuron>(500);
 
@@ -228,7 +222,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 //    	startRecording();
 //
 //    }
-//    
+//
 //    public void startRecording() {
 //    	stopRecording();
 //    	recording = true;
@@ -245,7 +239,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 //    		e.printStackTrace();
 //    	}
 //    }
-//    
+//
 //    public void stopRecording() {
 //    	if (outFile == null || !outFile.getChannel().isOpen()) {
 //    		return;
@@ -258,7 +252,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 //    	}
 //    	recording = false;
 //    }
-    
+
     /**
      * Gives the metadata of this neuron group in the following form:
      * [0] = Number of neurons
@@ -302,9 +296,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     	meta[6] = ByteBuffer.allocate(8).putDouble(meanOut/size()).array();
     	return meta;
     }
-    
 
-    
+
+
     public String getNeuronType() {
     	String nType = "Mixed";
     	if (size() == 0) {
@@ -325,7 +319,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     		return nur.getDescription();
     	}
     }
-    
+
     /**
      * @return the neurons in this group.
      */
@@ -503,6 +497,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
                 + this.getNeuronList().size() + " neuron(s)" + ". Located at ("
                 + Utils.round(this.getPosition().x, 2) + ","
                 + Utils.round(this.getPosition().y, 2) + ").\n");
+        ret += layout.toString();
         return ret;
     }
 
@@ -599,9 +594,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 //    			actInt = actInt | (1 << (i % 32));
 //    		}
 //    	}
-//    	
+//
 //    }
-    
+
     /**
      * Return biases as a double array.
      *

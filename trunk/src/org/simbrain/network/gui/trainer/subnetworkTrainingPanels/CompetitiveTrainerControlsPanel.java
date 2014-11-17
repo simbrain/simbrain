@@ -261,5 +261,12 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
             panel.getNetwork().fireGroupUpdated(network);
         }
 	};
+
+    /**
+     * @return the trainer
+     */
+    public CompetitiveTrainer getTrainer() {
+        return trainer;
+    }
 }
 

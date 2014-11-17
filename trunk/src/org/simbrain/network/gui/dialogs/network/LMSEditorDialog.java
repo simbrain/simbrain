@@ -47,6 +47,9 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
     /** Reference to the lms network being edited. */
     private LMSNetwork lms;
 
+    /** Reference to iterative trainer. */
+    private LMSIterative trainer;
+
     /**
      * Default constructor.
      *
@@ -116,7 +119,7 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         final JPanel trainerContainer) {
         trainerContainer.removeAll();
         if (selectType.getSelectedIndex() == 0) {
-            LMSIterative trainer = new LMSIterative(lms);
+            trainer = new LMSIterative(lms);
             IterativeControlsPanel iterativeControls =
                 new IterativeControlsPanel(
                     networkPanel, trainer);
@@ -145,5 +148,12 @@ public class LMSEditorDialog extends SupervisedTrainingDialog {
         repaint();
         pack();
         setLocationRelativeTo(null);
+    }
+
+    @Override
+    protected void  stopTrainer() {
+        if (trainer != null) {
+            trainer.setUpdateCompleted(true);
+        }
     }
 }

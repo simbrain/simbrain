@@ -296,8 +296,9 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                     return neuronGroup.getTestData();
                 }
             };
-            inputDataPanel = new TestInputPanel(
-                    networkPanel, neuronGroup.getNeuronList(), matrix);
+            inputDataPanel = TestInputPanel.createTestInputPanel( networkPanel,
+            		neuronGroup.getNeuronList(), matrix);
+
             storedComponents.add(ApplyPanel
                     .createApplyPanel(inputDataPanel));
             tabbedPane.addTab("Input Data", new JPanel()); // Holder
@@ -424,13 +425,12 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 return false;
             }
             return success;
-        }
+        } 
 
         if (specificNeuronGroupPanel != null) {
             success &= ((GroupPropertiesPanel) specificNeuronGroupPanel
                     .getPanel()).commitChanges();
         }
-
         networkPanel.repaint();
         return success;
 

@@ -88,7 +88,7 @@ public class ESNTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Target data", trainingPanel);
 
         // Testing tab
-        validateInputsPanel = new TestInputPanel(np,
+        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
                 network.getInputLayer().getNeuronList(), network.getInputDataMatrix());
         tabbedPane.addTab("Validate Input Data", validateInputsPanel);
 

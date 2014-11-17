@@ -302,8 +302,8 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if (subnetwork instanceof Trainable) {
-                TestInputPanel testInputPanel = new TestInputPanel(
-                        getNetworkPanel(),
+                TestInputPanel testInputPanel =  TestInputPanel
+                		.createTestInputPanel(getNetworkPanel(),
                         ((Trainable) subnetwork).getInputNeurons(),
                         ((Trainable) subnetwork).getTrainingSet()
                                 .getInputDataMatrix());

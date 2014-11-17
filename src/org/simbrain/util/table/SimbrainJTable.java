@@ -21,6 +21,8 @@ package org.simbrain.util.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -35,6 +37,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -93,7 +97,7 @@ public class SimbrainJTable extends JXTable {
     private boolean showNormalizeInPopupMenu = true;
     private boolean showFillInPopupMenu = true;
     private boolean showCSVInPopupMenu = true;
-
+    
     /**
      * Creates a new simbrain gui jtable.
      *
@@ -215,18 +219,19 @@ public class SimbrainJTable extends JXTable {
         });
         hasChangedSinceLastSave = false;
 
-        // Force edits to take effect right away. Has some slightly odd
-        // side effects. Would be nice if the cells behaved more like excel.
-        // See e.g.
-        // http://tips4java.wordpress.com/2008/10/20/table-select-all-editor/
-        this.addKeyListener(new KeyAdapter() {
+        // Force edits to take effect right away.
+        this.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {} //Nothing...
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (SimbrainJTable.this.getCellEditor() != null) {
-                    SimbrainJTable.this.getCellEditor().stopCellEditing();
-                }
-            }
+			@Override
+			public void focusLost(FocusEvent e) {
+				SimbrainJTable.this.getCellEditor().stopCellEditing();
+				SimbrainJTable.this.firePropertyChange("hasChanged",
+						hasChangedSinceLastSave, true);
+				hasChangedSinceLastSave = true;
+			}
+        	
         });
     }
 

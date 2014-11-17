@@ -91,7 +91,7 @@ public class SOMTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        validateInputsPanel = new TestInputPanel(np,
+        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
                 network.getInputNeurons(), network.getTrainingSet()
                         .getInputDataMatrix());
         tabbedPane.addTab("Validate", validateInputsPanel);

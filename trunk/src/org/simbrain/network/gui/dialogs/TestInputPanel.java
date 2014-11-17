@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.dialogs;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -93,9 +95,35 @@ public class TestInputPanel extends DataPanel {
             }
 
         };
-        TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons,
-                dataHolder);
+        final TestInputPanel panel = new TestInputPanel(networkPanel,
+        		inputNeurons, dataHolder);
+        panel.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				panel.commitChanges(); //TODO: More efficient way?
+			}
+        });
         return panel;
+    }
+    
+    /**
+     * 
+     * @param networkPanel
+     * @param inputNeurons
+     * @param dataHolder
+     * @return
+     */
+    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,
+    		List<Neuron> inputNeurons, NumericMatrix dataHolder) {
+    	final TestInputPanel panel = new TestInputPanel(networkPanel,
+    			inputNeurons, dataHolder);
+    	panel.addPropertyChangeListener(new PropertyChangeListener() {
+    		@Override
+    		public void propertyChange(PropertyChangeEvent evt) {
+    			panel.commitChanges(); //TODO: More efficient way?
+    		}
+    	});
+    	return panel;
     }
 
     /**
@@ -106,7 +134,7 @@ public class TestInputPanel extends DataPanel {
      * @param inputNeurons input neurons of the network to be tested
      * @param dataHolder the class whose data should be edited.
      */
-    public TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
+    private TestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons,
             NumericMatrix dataHolder) {
         super(inputNeurons, dataHolder, 5, "Test Inputs");
         if (networkPanel == null) {

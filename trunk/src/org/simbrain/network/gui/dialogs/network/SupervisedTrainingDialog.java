@@ -99,7 +99,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
         addTab("Target data", trainingPanel);
 
         // Testing tab
-        validateInputsPanel = new TestInputPanel(networkPanel,
+        validateInputsPanel =  TestInputPanel.createTestInputPanel(networkPanel,
             trainable.getInputNeurons(), trainable.getTrainingSet()
                 .getInputDataMatrix());
         addTab("Validate Input Data", validateInputsPanel);

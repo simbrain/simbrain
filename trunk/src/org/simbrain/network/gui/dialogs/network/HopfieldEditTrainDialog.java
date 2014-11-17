@@ -92,7 +92,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
         tabbedPane.addTab("Training data", inputPanel);
 
         // Testing tab
-        validateInputsPanel = new TestInputPanel(np,
+        validateInputsPanel =  TestInputPanel.createTestInputPanel(np,
                 hop.getInputNeurons(), hop.getTrainingSet()
                         .getInputDataMatrix());
         tabbedPane.addTab("Validate", validateInputsPanel);

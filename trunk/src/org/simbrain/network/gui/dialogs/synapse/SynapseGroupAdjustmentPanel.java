@@ -148,7 +148,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = HistogramPanel.GRID_WIDTH;
+        gbc.gridwidth = HistogramPanel.GRID_WIDTH - 1;
         gbc.gridheight = 1;
 
         this.add(statPanel, gbc);

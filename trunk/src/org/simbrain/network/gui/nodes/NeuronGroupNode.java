@@ -532,9 +532,9 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
                     return neuronGroup.getTestData();
                 }
             };
-            final TestInputPanel testInputPanel = new TestInputPanel(
-                    networkPanel, neuronGroup.getNeuronList(),
-                    matrix);
+            final TestInputPanel testInputPanel = TestInputPanel
+            		.createTestInputPanel(networkPanel,
+            				neuronGroup.getNeuronList(), matrix);
             networkPanel.displayPanel(testInputPanel,
                     "Inputs for neuron group: " + neuronGroup.getLabel());
         }

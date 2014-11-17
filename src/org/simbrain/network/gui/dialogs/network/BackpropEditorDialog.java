@@ -30,6 +30,9 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
     /** Reference to the backprop network being edited. */
     private BackpropNetwork backprop;
+    
+    /** Reference to backprop trainer. */
+    private BackpropTrainer trainer;
 
     /**
      * Default constructor.
@@ -52,11 +55,18 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        BackpropTrainer trainer = new BackpropTrainer(backprop,
+        trainer = new BackpropTrainer(backprop,
             backprop.getNeuronGroupsAsList());
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
             networkPanel, trainer);
         addTab("Train", iterativeControls);
 
+    }
+
+    @Override
+    protected void stopTrainer() {
+        if (trainer != null) {
+            trainer.setUpdateCompleted(true);
+        }
     }
 }

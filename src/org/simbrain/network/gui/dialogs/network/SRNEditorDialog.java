@@ -38,6 +38,9 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
     /** Reference to the SRN network being edited. */
     private SimpleRecurrentNetwork srn;
 
+    /** The SRN Trainer. */
+    private SRNTrainer trainer;
+
     /**
      * Constructs a labeled item panel dialog for the creation of a simple
      * recurrent network.
@@ -58,7 +61,7 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Simple Recurrent Network");
 
         // Trainer tab
-        SRNTrainer trainer = new SRNTrainer(srn);
+        trainer = new SRNTrainer(srn);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
             networkPanel, trainer);
         addTab("Train", iterativeControls);
@@ -67,6 +70,13 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
         Action helpAction = new ShowHelpAction(
             "Pages/Network/network/srn.html");
         addButton(new JButton(helpAction));
+    }
+
+    @Override
+    protected void stopTrainer() {
+        if (trainer != null) {
+            trainer.setUpdateCompleted(true);
+        }
     }
 
 }

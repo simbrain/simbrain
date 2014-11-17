@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JTabbedPane;
@@ -84,7 +87,7 @@ public class CompetitiveTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Network Properties", competitivePropsPanel);
 
         // Set up training tab
-        CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(
+        final CompetitiveTrainerControlsPanel controlPanel = new CompetitiveTrainerControlsPanel(
                 panel, new CompetitiveTrainer(network), network);
         tabbedPane.addTab("Train Network", controlPanel);
 
@@ -128,6 +131,14 @@ public class CompetitiveTrainingDialog extends StandardDialog {
 
         // Finish configuration
         setContentPane(tabbedPane);
+
+        // Stop trainer from running any time the window is closed
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                controlPanel.getTrainer().setUpdateCompleted(true);
+            }
+        });
 
     }
 

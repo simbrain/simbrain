@@ -279,4 +279,11 @@ public class SOMTrainerControlsPanel extends JPanel {
                     network.getSynapseGroup());
         }
     };
+
+    /**
+     * @return the trainer
+     */
+    public SOMTrainer getTrainer() {
+        return trainer;
+    }
 }

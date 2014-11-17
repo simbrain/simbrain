@@ -20,6 +20,8 @@ package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
  * <b>SupervisedTrainingDialog</b> is the superclass of edit dialogs associated
  * with most supervised learning networks.
  */
-public class SupervisedTrainingDialog extends StandardDialog {
+public abstract class SupervisedTrainingDialog extends StandardDialog {
 
     /** Network panel. */
     protected NetworkPanel networkPanel;
@@ -64,6 +66,7 @@ public class SupervisedTrainingDialog extends StandardDialog {
     /** Reference to validate inputs panel */
     private TestInputPanel validateInputsPanel;
 
+    /** List of tabs in the dialog. */
     private List<Component> tabs = new ArrayList<Component>();
 
     /**
@@ -76,7 +79,18 @@ public class SupervisedTrainingDialog extends StandardDialog {
         final Trainable trainable) {
         networkPanel = np;
         this.trainable = trainable;
+
+        // Stop trainer from running any time the window is closed
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                stopTrainer();
+            }
+        });
     }
+
+    /** Method to stop the trainer from running. */
+    protected abstract void stopTrainer();
 
     /**
      * This method initializes the components on the panel.
@@ -166,9 +180,10 @@ public class SupervisedTrainingDialog extends StandardDialog {
     }
 
     /**
-     * 
-     * @param name
-     * @param tab
+     * Add a tab to the dialog.
+     *
+     * @param name name to be displayed
+     * @param tab the tab itself
      */
     public void addTab(String name, Component tab) {
         if (tabs.size() == 0) {

@@ -21,8 +21,8 @@ package org.simbrain.util.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -31,14 +31,13 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.CellEditor;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -220,16 +219,20 @@ public class SimbrainJTable extends JXTable {
         hasChangedSinceLastSave = false;
 
         // Force edits to take effect right away.
-        this.addFocusListener(new FocusListener() {
-			@Override
-			public void focusGained(FocusEvent e) {} //Nothing...
+        this.addFocusListener(new FocusAdapter() {
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				SimbrainJTable.this.getCellEditor().stopCellEditing();
-				SimbrainJTable.this.firePropertyChange("hasChanged",
-						hasChangedSinceLastSave, true);
-				hasChangedSinceLastSave = true;
+				CellEditor ce = SimbrainJTable.this.getCellEditor();
+				if (ce != null) {
+					// Save the value being edited before focus was lost...
+					SimbrainJTable.this.getCellEditor().stopCellEditing();
+					// Fire an event so that listeners can commit the changes
+					// if need be 
+					SimbrainJTable.this.firePropertyChange("hasChanged",
+							hasChangedSinceLastSave, true);
+					hasChangedSinceLastSave = true;
+				}
 			}
         	
         });

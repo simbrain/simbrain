@@ -274,7 +274,7 @@ public final class ReaderWorld extends TextWorld {
      */
     private void selectCurrentToken() {
         setCurrentItem(currentTextItem);
-        setPosition(currentTextItem.getEndPosition(), false);
+        setPosition(currentTextItem.getEndPosition());
     }
 
     /**

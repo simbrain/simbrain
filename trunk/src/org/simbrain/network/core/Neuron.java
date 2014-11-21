@@ -206,16 +206,8 @@ public class Neuron {
      * parent network has been added.
      */
     public void postUnmarshallingInit() {
-        // TODO: Add checks?
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
-        // Todo: Backwards compatibility for before r3061. Maybe be removable
-        // if all existing workspaces are replaced.
-        if (updateRule instanceof SpikingNeuronUpdateRule) {
-            updateRule.inputType = InputType.SYNAPTIC;
-        } else {
-            updateRule.inputType = InputType.WEIGHTED;
-        }
     }
 
     /**

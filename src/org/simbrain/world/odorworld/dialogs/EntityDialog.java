@@ -51,9 +51,6 @@ public class EntityDialog extends StandardDialog implements ActionListener {
     /** The entity for which this dialog is called. */
     private OdorWorldEntity entityRef;
 
-    /** The visual container for the sub panels. */
-    private LabelledItemPanel mainPanel = new LabelledItemPanel();
-
     /** The text field containing the name of the entity. */
     private JTextField tfEntityName = new JTextField();
 
@@ -110,7 +107,14 @@ public class EntityDialog extends StandardDialog implements ActionListener {
         // Main tab
         // tabbedPane.addTab("Main", mainPanel);
         mainEditor = new ReflectivePropertyEditor();
-        mainEditor.setExcludeList(new String[] { "entityType", "id" });
+        // TODO: For now rotating entities are the only agents. As noted
+        // elsewhere the concept of an agent needs to be made explicit.
+        if (entityRef instanceof RotatingEntity) {
+            mainEditor.setExcludeList(new String[] { "entityType", "id" });
+        } else {
+            mainEditor.setExcludeList(new String[] { "entityType", "id",
+                    "showSensors", "sensorsEnabled", "effectorsEnabled" });
+        }
         mainEditor.setObject(entityRef);
         tabbedPane.addTab("Main", mainEditor);
 
@@ -121,9 +125,11 @@ public class EntityDialog extends StandardDialog implements ActionListener {
             tabbedPane.addTab("Dispersion", smellPanel.getDispersionPanel());
         }
 
-        // Sensor display
-        tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
-        tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
+        // Sensor / effector display
+        if (entityRef instanceof RotatingEntity) {
+            tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
+            tabbedPane.addTab("Effectors", new EffectorPanel(entityRef));
+        }
 
         // [Below not currently used]
         cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,

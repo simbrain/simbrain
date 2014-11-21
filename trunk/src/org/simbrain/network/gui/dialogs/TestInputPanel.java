@@ -105,13 +105,14 @@ public class TestInputPanel extends DataPanel {
         });
         return panel;
     }
-    
+
     /**
-     * 
+     * Create the test input panel.
+     *
      * @param networkPanel
      * @param inputNeurons
      * @param dataHolder
-     * @return
+     * @return the constructed panel.
      */
     public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,
     		List<Neuron> inputNeurons, NumericMatrix dataHolder) {

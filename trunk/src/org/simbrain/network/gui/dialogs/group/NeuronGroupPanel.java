@@ -300,8 +300,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             inputDataPanel = TestInputPanel.createTestInputPanel( networkPanel,
             		neuronGroup.getNeuronList(), matrix);
 
-            storedComponents.add(ApplyPanel
-                    .createApplyPanel(inputDataPanel));
+            storedComponents.add(inputDataPanel);
             tabbedPane.addTab("Input Data", new JPanel()); // Holder
         }
 

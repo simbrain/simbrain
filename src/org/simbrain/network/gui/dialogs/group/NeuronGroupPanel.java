@@ -385,15 +385,10 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
     @Override
     public void fillFieldValues() {
-
         if (specificNeuronGroupPanel != null) {
             ((GroupPropertiesPanel) specificNeuronGroupPanel.getPanel())
                     .fillFieldValues();
         }
-
-        // Don't use the neuron group's default line layout. When making bare
-        // neuron groups grid layout seems to be nicer.
-        layoutPanel.setCurrentLayout(new GridLayout());
     }
 
     @Override

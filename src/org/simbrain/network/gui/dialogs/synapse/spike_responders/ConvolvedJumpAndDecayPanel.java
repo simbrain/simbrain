@@ -193,4 +193,15 @@ public class ConvolvedJumpAndDecayPanel extends AbstractSpikeResponsePanel {
     public ConvolvedJumpAndDecay getPrototypeResponder() {
         return PROTOTYPE_RESPONDER;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+    	tfJumpHeight.setEnabled(enabled);
+    	tfBaseLine.setEnabled(enabled);
+    	tfTimeConstant.setEnabled(enabled);
+    }
 }

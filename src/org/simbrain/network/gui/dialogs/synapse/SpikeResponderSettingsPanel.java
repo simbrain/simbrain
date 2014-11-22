@@ -23,8 +23,8 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class SpikeResponderSettingsPanel extends JPanel {
      * by default, the synapse panel corresponding to the rule in the combo box
      * is visible.
      */
-    private static final boolean DEFAULT_SP_DISPLAY_STATE = true;
+    private static final boolean DEFAULT_SP_DISPLAY_STATE = false;
 
     /** Spike responder type combo box. */
     private final JComboBox<String> cbResponderType = new JComboBox<String>(
@@ -161,37 +161,15 @@ public class SpikeResponderSettingsPanel extends JPanel {
      * Adds the listeners to this dialog.
      */
     private void addListeners() {
-        displaySPTriangle.addMouseListener(new MouseListener() {
-
+        displaySPTriangle.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-
                 spikeResponderPanel.setVisible(displaySPTriangle.isDown());
                 repaint();
                 parent.pack();
-
             }
-
-            @Override
-            public void mouseEntered(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent arg0) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent arg0) {
-            }
-
         });
-
         cbResponderType.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 spikeResponderPanel = AbstractSpikeResponsePanel.RESPONDER_MAP
@@ -211,11 +189,8 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
                 repaintPanel();
                 parent.pack();
-
             }
-
         });
-
     }
 
     /**
@@ -253,6 +228,17 @@ public class SpikeResponderSettingsPanel extends JPanel {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * Also enables/disables all UI sub-components
+     */
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+    	cbResponderType.setEnabled(enabled);
+    	spikeResponderPanel.setEnabled(enabled);
+    	startingPanel.setEnabled(enabled);
+    }
+    
     /**
      * @return the name of the selected synapse update rule
      */

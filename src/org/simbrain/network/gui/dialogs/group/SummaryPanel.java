@@ -129,7 +129,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     private JTextField learningRateField = new JTextField();
 
     private JCheckBox useGlobalSettings = new JCheckBox();
-
+    
     /**
      * Constructs the summary panel based on a neuron group. Names the incoming
      * and outgoing labels appropriately (Incoming/Outgoing).
@@ -387,19 +387,14 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     public boolean commitChanges() {
         group.setLabel(nameField.getText());
 
-        if (group instanceof SynapseGroup) {
-            ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
-                .isSelected());
-        }
+//        if (group instanceof SynapseGroup) {
+//            ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
+//                .isSelected());
+//        }
 
         return true; // Always Successful: the only field it makes sense to
         // commit from here cannot fail as a result of user action.
     }
-
-    /*
-     * CHECKSTYLE:OFF*************************************** Getters and Setters
-     * *****************************************************
-     */
 
     public JLabel getIdField() {
         return idField;
@@ -501,6 +496,10 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         return populationLabel;
     }
 
+    public JCheckBox getUseGlobalSettingsChkBx() {
+    	return useGlobalSettings;
+    }
+    
     @Override
     public void fillFieldValues() {
         if (group instanceof SynapseGroup) {
@@ -509,21 +508,5 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             fillFieldValues((NeuronGroup) group);
         }
     }
-
-    // public static void main(String[] args) {
-    // Network net = new Network();
-    // Neuron n = new Neuron(net, new LinearRule());
-    // NeuronGroup ng = new NeuronGroup(net, Collections.singletonList(n));
-    //
-    // SummaryPanel sumP = new SummaryPanel(ng);
-    //
-    // JFrame frame = new JFrame();
-    //
-    // frame.setContentPane(sumP);
-    //
-    // frame.pack();
-    //
-    // frame.setVisible(true);
-    // }
-
+    
 }

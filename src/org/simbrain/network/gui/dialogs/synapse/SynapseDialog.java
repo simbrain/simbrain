@@ -22,14 +22,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainConstants;
@@ -95,7 +95,7 @@ public final class SynapseDialog extends StandardDialog {
     private SynapseDialog(final Collection<Synapse> synapseList) {
         this.synapseList = (ArrayList<Synapse>) synapseList;
         synapseEditingPanel = SynapsePropertiesPanel
-                .createCombinedSynapseInfoPanel(synapseList, this);
+                .createSynapsePropertiesPanel(synapseList, this);
         initializeLayout();
         updateHelp();
     }
@@ -197,59 +197,26 @@ public final class SynapseDialog extends StandardDialog {
      *            the synapses whose source neurons will be tested.
      * @return whether or not at least one of the synapses has a spike responder
      */
-    public static boolean containsASpikeResponder(Collection<Synapse> synapses) {
+    public static boolean targsUseSynapticInputs(Collection<Synapse> synapses)
+    {
+    	if (synapses.isEmpty()) {return true;}
+    	if (synapses.size() == 1) {
+    		Iterator<Synapse> synIter = synapses.iterator();
+    		if (synIter.next().getTarget() == null) {
+    			// Assumed template synapses (only possible synapses w/ out
+    			// source or target, are assumed to contain a spike responder
+    			return true;
+    		}
+    	}
         for (Synapse s : synapses) {
-            if (s.getSource() == null) {
-                // If "free-floating" synapses are found then treat the list as
-                // not
-                // having spike responders (possibly change later);
-                return false;
-            } else {
-                NeuronUpdateRule nur = s.getSource().getUpdateRule();
-                if (nur instanceof SpikingNeuronUpdateRule) {
-                    return true;
-                }
-            }
+        	if (s.getTarget() != null) {
+        		if (s.getTarget().getUpdateRule().getInputType()
+        				== InputType.SYNAPTIC) {
+        			return true;
+        		}
+        	}
         }
         return false;
     }
-
-    // Old version of test that required all synapses were spike responders
-    // public static boolean spikeResponderTest(List<Synapse> synapses) {
-    // HashSet<SpikingNeuronUpdateRule> snurs = new
-    // HashSet<SpikingNeuronUpdateRule>();
-    // for (Synapse s : synapses) {
-    // NeuronUpdateRule nur = s.getSource().getUpdateRule();
-    // if (!snurs.contains(nur)) {
-    // if (!(nur instanceof SpikingNeuronUpdateRule)) {
-    // return false;
-    // } else {
-    // snurs.add((SpikingNeuronUpdateRule) nur);
-    // }
-    // }
-    // }
-    // return true;
-    // }
-
-    // /**
-    // * Test Main: For fast prototyping.
-    // *
-    // * @param args
-    // */
-    // public static void main(String[] args) {
-    // Network net = new Network();
-    // NetworkPanel np = new NetworkPanel(net);
-    // Neuron n = new Neuron(net, new LinearRule());
-    // NeuronNode nn = new NeuronNode(np, n);
-    //
-    // Synapse s = new Synapse(n, n);
-    // ArrayList<SynapseNode> arr = new ArrayList<SynapseNode>();
-    // arr.add(new SynapseNode(np, nn, nn, s));
-    // SynapseDialog nd = new SynapseDialog(arr);
-    //
-    // nd.pack();
-    // nd.setVisible(true);
-    //
-    // }
 
 }

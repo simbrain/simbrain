@@ -175,4 +175,14 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         return PROTOTYPE_RESPONDER;
     }
 
+    /**
+     * {@inheritDoc}
+     * Also enables/disables all UI sub-components
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+    	tfMaximumResponse.setEnabled(enabled);
+    	tfTimeConstant.setEnabled(enabled);
+    }
 }

@@ -103,6 +103,8 @@ public final class SynapseGroupDialog extends StandardDialog {
      * out. This is what allows the panel to resize when tabs are changed.
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
+    
+    private boolean setUseGroupLevelSettings;
 
     /**
      * Creates a synapse group dialog based on a source and target neuron group.
@@ -235,6 +237,14 @@ public final class SynapseGroupDialog extends StandardDialog {
             sumPanel = new SummaryPanel(synapseGroup);
             tabSummaryInfo = ApplyPanel
                 .createApplyPanel(sumPanel);
+            ((ApplyPanel) tabSummaryInfo).addActionListener(
+            		new ActionListener() {
+            			@Override
+            			public void actionPerformed(ActionEvent e) {
+            				setUseGroupLevelSettings = sumPanel
+            						.getUseGlobalSettingsChkBx().isSelected();
+            			}
+            		});
         }
         JScrollPane summaryScrollWrapper = new JScrollPane(tabSummaryInfo);
         summaryScrollWrapper.setBorder(null);
@@ -411,41 +421,11 @@ public final class SynapseGroupDialog extends StandardDialog {
             // TODO: Spike responders at creation time?
             networkPanel.getNetwork().addGroup(synapseGroup);
             networkPanel.repaint();
+        } else {
+        	// Must be set ONLY after dialog is closed otherwise changes won't
+        	// take effect
+        	synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
         }
-    }
-
-    /**
-     * TODO: Pinpoint changes, this is overkill.
-     */
-    private void refresh(Component caller) {
-        for (int i = 0; i < storedComponents.size(); i++) {
-            if (storedComponents.get(i) == caller) {
-                continue;
-            }
-            if (storedComponents.get(i) == tabSummaryInfo) {
-                ((SummaryPanel) tabSummaryInfo).fillFieldValues();
-                continue;
-            }
-            if (storedComponents.get(i) == tabMatrix) {
-                tabMatrix.removeAll();
-                tabMatrix
-                    .add(WeightMatrixViewer
-                        .getWeightMatrixPanel(new WeightMatrixViewer(
-                            synapseGroup.getSourceNeurons(),
-                            synapseGroup.getTargetNeurons(),
-                            networkPanel)));
-                continue;
-            }
-            if (storedComponents.get(i) == adjustmentPanel) {
-                adjustmentPanel.fullUpdate();
-                continue;
-            }
-            if (storedComponents.get(i) == editSynapsesPanel) {
-
-            }
-
-        }
-
     }
 
     @Override

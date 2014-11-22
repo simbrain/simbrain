@@ -36,6 +36,7 @@ import javax.swing.border.Border;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesPanel;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.widgets.ApplyPanel;
@@ -182,11 +183,30 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         	// Ensures that the template is also edited
         	inhibitorySynapses.add(templateInhibitorySynapse);
         }
-        excitatoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
-        inhibitoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
-        init();
+        if (creationPanel) {
+	        excitatoryInfoPanel = SynapsePropertiesPanel
+	            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
+	        inhibitoryInfoPanel = SynapsePropertiesPanel
+	            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+        } else {
+        	excitatoryInfoPanel = SynapsePropertiesPanel
+        			.createBlankSynapsePropertiesPanel(excitatorySynapses,
+        					parentWindow, false);
+        	inhibitoryInfoPanel = SynapsePropertiesPanel
+        			.createBlankSynapsePropertiesPanel(inhibitorySynapses,
+        					parentWindow, false);
+        	excitatoryInfoPanel.fillFieldValues(synapseGroup,
+        			Polarity.EXCITATORY);
+        	inhibitoryInfoPanel.fillFieldValues(synapseGroup,
+        			Polarity.INHIBITORY);
+        	excitatoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
+        			SynapseDialog.targsUseSynapticInputs(synapseGroup
+        					.getExcitatorySynapses()));
+        	inhibitoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
+        			SynapseDialog.targsUseSynapticInputs(synapseGroup
+        					.getInhibitorySynapses()));
+        }
+	    init();
     }
 
     /**
@@ -214,9 +234,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 getTemplateInhibitorySynapse());
         }
         excitatoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
+            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
+            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 
@@ -242,9 +262,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         inhibitorySynapses = Collections.singleton(
             getTemplateInhibitorySynapse());
         excitatoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(excitatorySynapses, parentWindow);
+            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
-            .createCombinedSynapseInfoPanel(inhibitorySynapses, parentWindow);
+            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 
@@ -316,6 +336,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 if (synapseGroup.isUseGroupLevelSettings()) {
                 	synapseGroup.setAndConformToTemplate(
                 			templateExcitatorySynapse, Polarity.EXCITATORY);
+                	double exStr = excitatoryInfoPanel.getStrength();
+                    if (!Double.isNaN(exStr)) {
+                    	synapseGroup.setStrength(exStr, Polarity.EXCITATORY);
+                    }
                 }
             }
         });
@@ -326,7 +350,12 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
                 if (synapseGroup.isUseGroupLevelSettings()) {
                 	synapseGroup.setAndConformToTemplate(
                 			templateInhibitorySynapse, Polarity.INHIBITORY);
+                    double inStr = inhibitoryInfoPanel.getStrength();
+                    if (!Double.isNaN(inStr)) {
+                    	synapseGroup.setStrength(inStr, Polarity.INHIBITORY);
+                    }
                 }
+
             }
         });
     }

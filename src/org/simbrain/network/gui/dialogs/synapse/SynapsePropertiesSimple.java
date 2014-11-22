@@ -26,8 +26,10 @@ import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -93,8 +95,6 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      */
     private boolean displayIDInfo;
 
-    private boolean ignoreSetStrength;
-
     /**
      * Creates a basic synapse info panel. Here whether or not to display ID
      * info is automatically set based on the state of the synapse list.
@@ -137,10 +137,20 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
         final boolean displayIDInfo) {
         SynapsePropertiesSimple panel = new SynapsePropertiesSimple(synapses,
             parent, displayIDInfo);
+        panel.fillFieldValues();
         panel.addListeners();
         return panel;
     }
 
+    public static SynapsePropertiesSimple createBlankSynapseInfoPanel(
+    		final Collection<Synapse> synapses, final Window parent,
+    		final boolean displayIDInfo) {
+        SynapsePropertiesSimple panel = new SynapsePropertiesSimple(synapses,
+                parent, displayIDInfo);
+        panel.addListeners();
+        return panel;
+    }
+    
     /**
      * Construct the panel.
      *
@@ -160,7 +170,6 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
             "Less", parent);
         extraDataPanel = new SynapsePropertiesExtended(synapseList);
         initializeLayout();
-        fillFieldValues();
     }
 
     /**
@@ -312,21 +321,48 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      * @param polarity
      */
     public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
-        double[] weights = null;
-        synapseEnabled.setSelected(synapseGroup.isEnabled(polarity));
+        
+        Set<Synapse> synSet = null;
         if (Polarity.EXCITATORY == polarity) {
-            weights = synapseGroup.getExcitatoryStrengths();
+            if (synapseGroup.hasExcitatory()) {
+            	synSet = synapseGroup.getExcitatorySynapses();
+            } else {
+            	if (synapseList.isEmpty()) {
+            		synapseList.add(synapseGroup.getExcitatoryPrototype());
+            	}
+            	fillFieldValues();
+            	return;
+            }
         } else if (Polarity.INHIBITORY == polarity) {
-            weights = synapseGroup.getInhibitoryStrengths();
+            if (synapseGroup.hasInhibitory()) {
+            	synSet = synapseGroup.getInhibitorySynapses();
+            } else {
+            	if (synapseList.isEmpty()) {
+            		synapseList.add(synapseGroup.getInhibitoryPrototype());
+            	}
+            	fillFieldValues();
+            	return;
+            }
         } else {
-            weights = synapseGroup.getWeightVector();
+            if (!synapseGroup.isEmpty()) {
+            	synSet = new HashSet<Synapse>();
+            	synSet.addAll(synapseGroup.getExcitatorySynapses());
+            	synSet.addAll(synapseGroup.getInhibitorySynapses());
+            } else {
+            	if (synapseList.isEmpty()) {
+            		synapseList.add(synapseGroup.getExcitatoryPrototype());
+            		synapseList.add(synapseGroup.getInhibitoryPrototype());
+            	}
+            	fillFieldValues();
+            	return;
+            }
         }
-        if (weights.length == 0)
-            return;
-        double first = weights[0];
+        synapseEnabled.setSelected(synapseGroup.isEnabled(polarity));
+        Iterator<Synapse> synIter = synSet.iterator();
+        double first = synIter.next().getStrength();
         boolean consistent = true;
-        for (int i = 1, n = weights.length; i < n; i++) {
-            consistent = first == weights[i];
+        while (synIter.hasNext()) {
+            consistent = first == synIter.next().getStrength();
             if (!consistent) {
                 break;
             }
@@ -341,7 +377,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
 
         // Strength
         double strength = Utils.doubleParsable(tfStrength);
-        if (!Double.isNaN(strength) && !ignoreSetStrength) {
+        if (!Double.isNaN(strength)) {
             for (Synapse s : synapseList) {
                 s.setStrength(strength);
             }
@@ -379,21 +415,6 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      */
     public SynapsePropertiesExtended getExtraDataPanel() {
         return extraDataPanel;
-    }
-
-    /**
-     * @return the ignoreSetStrength
-     */
-    public boolean isIgnoreSetStrength() {
-        return ignoreSetStrength;
-    }
-
-    /**
-     * @param ignoreSetStrength
-     *            the ignoreSetStrength to set
-     */
-    public void setIgnoreSetStrength(boolean ignoreSetStrength) {
-        this.ignoreSetStrength = ignoreSetStrength;
     }
 
     public double getStrength() {

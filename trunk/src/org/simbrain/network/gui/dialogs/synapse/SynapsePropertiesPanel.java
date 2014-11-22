@@ -73,12 +73,12 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param parent
      *            the parent window, made available for easy resizing.
      */
-    public static SynapsePropertiesPanel createCombinedSynapseInfoPanel(
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
         final Collection<Synapse> synapseList, final Window parent) {
-        return createCombinedSynapseInfoPanel(synapseList, parent,
+        return createSynapsePropertiesPanel(synapseList, parent,
             DEFAULT_DISPLAY_PARAMS);
     }
-
+    
     /**
      * Creates a combined synapse info panel, which includes the basic synapse
      * info panel and a synapse update settings panel. The panel is
@@ -95,17 +95,37 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      *            whether or not to display the synapse update rule's details
      *            initially
      */
-    public static SynapsePropertiesPanel createCombinedSynapseInfoPanel(
+    public static SynapsePropertiesPanel createSynapsePropertiesPanel(
         final Collection<Synapse> synapseList, final Window parent,
         final boolean showSpecificRuleParams) {
         SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
             synapseList, parent, showSpecificRuleParams);
+        cnip.synapseInfoPanel = SynapsePropertiesSimple
+        		.createBasicSynapseInfoPanel(synapseList, parent);
         cnip.initializeLayout();
         return cnip;
     }
 
     /**
-     * {@link #createCombinedSynapseInfoPanel(List, Window, boolean)}
+     * 
+     * @param synapseList
+     * @param parent
+     * @param showSpecificRuleParams
+     * @return
+     */
+    public static SynapsePropertiesPanel createBlankSynapsePropertiesPanel(
+    		final Collection<Synapse> synapseList, final Window parent,
+    		boolean showSpecificRuleParams) {
+    	SynapsePropertiesPanel cnip = new SynapsePropertiesPanel(
+    			synapseList, parent, showSpecificRuleParams);
+    	cnip.synapseInfoPanel = SynapsePropertiesSimple
+    			.createBlankSynapseInfoPanel(synapseList, parent, false);
+    	cnip.initializeLayout();
+    	return cnip;
+    }
+    
+    /**
+     * {@link #createSynapsePropertiesPanel(List, Window, boolean)}
      *
      * @param synapseList
      *            the list of synapses either being edited (editing) or being
@@ -118,11 +138,9 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      */
     private SynapsePropertiesPanel(final Collection<Synapse> synapseList,
         final Window parent, final boolean showSpecificRuleParams) {
-        synapseInfoPanel = SynapsePropertiesSimple.createBasicSynapseInfoPanel(
-            synapseList, parent);
         updateInfoPanel = new SpecificSynapseRulePanel(synapseList, parent,
             showSpecificRuleParams);
-        if (SynapseDialog.containsASpikeResponder(synapseList)) {
+        if (SynapseDialog.targsUseSynapticInputs(synapseList)) {
             editSpikeResponders = new SpikeResponderSettingsPanel(synapseList,
                 parent);
         }
@@ -159,7 +177,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         success &= updateInfoPanel.commitChanges();
 
         success &= synapseInfoPanel.commitChanges();
-
+        
         if (editSpikeResponders != null) {
             success &= editSpikeResponders.commitChanges();
         }
@@ -169,7 +187,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
     }
 
     /**
-     * @return a template rule assoc
+     * @return a template rule associated with the synapses in question
      */
     public SynapseUpdateRule getTemplateSelectedRule() {
         return updateInfoPanel.getTemplateRule();
@@ -186,7 +204,6 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
 
     public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
         synapseInfoPanel.fillFieldValues(synapseGroup, polarity);
-
     }
 
     /**
@@ -204,17 +221,15 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
         this.updateInfoPanel = updateInfoPanel;
     }
 
-    /**
-     * Sets whether or not the basic synapse
-     *
-     * @param ignoreSetStrength
-     */
-    public void setIgnoreSetStrength(boolean ignoreSetStrength) {
-        synapseInfoPanel.setIgnoreSetStrength(ignoreSetStrength);
-    }
-
     public double getStrength() {
         return synapseInfoPanel.getStrength();
+    }
+    
+    /**
+     * @return the panel governing the editing of spike responders.
+     */
+    public SpikeResponderSettingsPanel getEditSpikeRespondersPanel() {
+    	return editSpikeResponders;
     }
 
 }

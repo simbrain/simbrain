@@ -90,7 +90,7 @@ public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
      * writing to already existing neuron update rules or replacing them with
      * new rules.
      */
-    private final AbstractNeuronRulePanel startingPanel;
+    private AbstractNeuronRulePanel startingPanel;
 
     /**
      * Create a the panel with the default starting visibility (visible) for the
@@ -236,6 +236,11 @@ public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
      */
     @Override
     public boolean commitChanges() {
+    	// If the panel remains open after changes have been committed,
+    	// i.e. for apply button during editing, then set the original panel
+    	// to the selected one since for all intents and purposes it is now.
+    	// Prevents ClassCastExceptions for switching between panels. 
+    	startingPanel = neuronPanel;
         neuronPanel.commitChanges(neuronList);
         return true; // TODO:Finish implementation of CommittablePanel interface
     }

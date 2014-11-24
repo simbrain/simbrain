@@ -1170,5 +1170,22 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         return strBuilder.toString();
     }
 
+    /**
+     * Returns the label of the most active neuron.
+     *
+     * @return the label of the most active neuron
+     */
+    public String getMostActiveNeuron() {
+        double min = Double.MIN_VALUE;
+        String result = "";
+        for (Neuron neuron : neuronList) {
+            if ((neuron.getActivation() > min)
+                    && (!neuron.getLabel().isEmpty())) {
+                result = neuron.getLabel();
+                min = neuron.getActivation();
+            }
+        }
+        return result + " ";
+    }
 
 }

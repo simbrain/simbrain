@@ -174,8 +174,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         this.parent = parent;
         neuronGroup = ng;
         isCreationPanel = false;
-        layoutPanel = new MainLayoutPanel(ng.getLayout().getDescription(),
-                false, parent);
+        layoutPanel = new MainLayoutPanel(ng.getLayout(), false, parent);
     }
 
     /**
@@ -408,6 +407,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 for (int i = 0; i < numNeurons; i++) {
                     neuronGroup.addNeuron(template.deepCopy());
                 }
+                layoutPanel.commitChanges();
                 neuronGroup.setLayout(layoutPanel.getCurrentLayout());
                 neuronGroup.applyLayout();
             } catch (NumberFormatException nfe) {
@@ -420,7 +420,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 return false;
             }
             return success;
-        } 
+        }
 
         if (specificNeuronGroupPanel != null) {
             success &= ((GroupPropertiesPanel) specificNeuronGroupPanel

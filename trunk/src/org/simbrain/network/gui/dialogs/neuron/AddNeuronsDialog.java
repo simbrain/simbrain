@@ -186,8 +186,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         addNeuronsPanel.add(Box.createVerticalStrut(10));
 
-        selectLayout = new MainLayoutPanel(DEFAULT_LAYOUT.getDescription(),
-                true, this);
+        selectLayout = new MainLayoutPanel(DEFAULT_LAYOUT, true, this);
         selectLayout.setAlignmentX(CENTER_ALIGNMENT);
         addNeuronsPanel.add(selectLayout);
 

@@ -15,19 +15,60 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.*;
 import org.simbrain.workspace.*;
 
-//
-// Recurrent network using radial
-//
+/*
+ * Creates a network of recurrently connected Izhikevich neurons (Regular
+ * Spiking by default). Neurons are placed in a 2D lattice and connections
+ * between neurons are probabilistic based on their relative distance from
+ * one another. Specifically the probability of a connection existing between
+ * Neurons a and b: 
+ *
+ *              P(a, b) = C_xy * e ^ -(D(a,b)/lambda^2)
+ *
+ * Such that x is the polarity (inhibitory or excitatory) of neuron a and
+ * y is the polarity of neuron b, and D(a, b) is the Euclidean distance between
+ * a and b in pixels. C_xy is a regulating constant which controls the overall
+ * proportion of connections between neurons based on their polarity. Thus there
+ * are C_ee, C_ei, C_ie, and C_ii values. This is so that (for instance), one
+ * can make connections from inhibitory neurons to other inhibitory neurons
+ * overall less common than connections from inhibitory to excitatory neurons,
+ * etc. Lambda is another regulating constant which represents the average
+ * distance between connected neurons. Each synapse has a delay which is a 
+ * logarithm of the distance between the neurons it connects. 
+ * Equation and parameter values (except lambda) are taken from Maass 2002.
+ *
+ * Each Izhikevich neuron is connected to exactly one Linear neuron in the
+ * second neuron group. Such that the activation of each neuron in the second
+ * group corresponds to the current post-synaptic potential of the Izhikevich
+ * neuron connected to it. Essentially the neuron group on the right represents
+ * the convolved spike trains of the spiking neurons on the left such that
+ *
+ *              A_n(t + delta_t) = - (delta_t *(A_n(t) / tau)) + S(t)
+ *
+ * Where A_n(t) is the activation of neuron n at time t, delta_t is the
+ * integration time-step, tau is a decay constant and S(t) is whether or not
+ * the (only) pre-synaptic Izhikevich neuron has spiked at time t (1 if so, 0
+ * otherwise). Since each neuron in the second group recieves only one input,
+ * this activity pattern is entirely the result of the spike responder
+ * (ConvolvedJumpAndDecay) which governs n's only incoming synapse, not a
+ * result of any internal dynamics on the part of neuron n. A_n(t) is just the
+ * post synaptic response of the source Izhikevich neuron for a synapse with a
+ * strength of 1, and is thus a simple convolution of its spike train. 
+ *
+ * In summary this code displays a network of randomly connected spiking neurons
+ * with a Lognormal weight distribution and distance-based connectivity and
+ * displays the convolution of their individual spike trains on the right.
+ *
+ */
 {
 
     // Parameters 
-    int NUM_NEURONS = 400;
-    double GRID_SPACE = 50;
+    int NUM_NEURONS = 900;
+    int GRID_SPACE = 25;
     double EE_CONST = 0.3;
     double EI_CONST = 0.2;
     double IE_CONST = 0.4;
     double II_CONST = 0.1;
-    double LAMBDA = 150;
+    double LAMBDA = 100;
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");
@@ -39,9 +80,11 @@ import org.simbrain.workspace.*;
     layout2.setInitialLocation(new Point(400, 10));
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
+    // Random rand = new Random();
     for (int i = 0; i < NUM_NEURONS; i++) {
         Neuron neuron = new Neuron(network, "IzhikevichRule");
         neuron.setUpperBound(100);
+        //neuron.setZ(rand.nextInt(NUM_NEURONS * GRID_SPACE));
         neurons.add(neuron);
         if (Math.random() < 0.25) {
         	neuron.setPolarity(Polarity.INHIBITORY);

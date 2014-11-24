@@ -52,7 +52,7 @@ public class LayoutDialog extends StandardDialog {
      */
     public LayoutDialog(final Layout layout, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        mainPanel = new MainLayoutPanel(layout.getDescription(), false, this);
+        mainPanel = new MainLayoutPanel(layout, false, this);
         setContentPane(mainPanel);
     }
 

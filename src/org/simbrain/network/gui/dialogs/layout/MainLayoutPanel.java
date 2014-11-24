@@ -53,8 +53,7 @@ public class MainLayoutPanel extends JPanel {
     private static final boolean DEFAULT_DP_TRIANGLE_VISIBILITY = true;
 
     /** Default starting layout (Grid Layout). */
-    private static final String DEFAULT_INITIAL_LAYOUT = new GridLayout()
-            .getDescription();
+    private static final Layout DEFAULT_INITIAL_LAYOUT = new GridLayout();
 
     /** A holder for the currently displayed panel. */
     private AbstractLayoutPanel layoutPanel;
@@ -137,14 +136,15 @@ public class MainLayoutPanel extends JPanel {
      *            optional
      * @param parent the parent window, used for resizing
      */
-    public MainLayoutPanel(String initialLayout, boolean revealOption,
+    public MainLayoutPanel(Layout initialLayout, boolean revealOption,
             Window parent) {
         this.revealOption = revealOption;
         this.parent = parent;
         layoutParameterReveal = new DropDownTriangle(UpDirection.LEFT, false,
                 "Settings", "Settings", parent);
-        layoutCb.setSelectedItem(initialLayout);
-        layoutPanel = panelMap.get(initialLayout);
+        layoutCb.setSelectedItem(initialLayout.getDescription());
+        layoutPanel = panelMap.get(initialLayout.getDescription());
+        layoutPanel.setNeuronLayout(initialLayout);
 
         initializeLayout();
         addListeners();

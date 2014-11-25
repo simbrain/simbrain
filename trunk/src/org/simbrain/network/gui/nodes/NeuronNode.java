@@ -290,7 +290,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void updateColor() {
         double activation = neuron.getActivation();
-
+        boolean spiking = neuron.getUpdateRule().isSpikingNeuron();
         // Force to blank if 0 (or close to it)
         if ((activation > -.1) && (activation < .1)) {
             circle.setPaint(Color.white);
@@ -304,8 +304,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
-        if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) neuron.getUpdateRule()).hasSpiked()) {
+        if (spiking) {
+            if (((SpikingNeuronUpdateRule) neuron.getUpdateRule())
+            		.hasSpiked()) {
                 circle.setStrokePaint(spikingColor);
                 circle.setPaint(spikingColor);
             } else {

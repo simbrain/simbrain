@@ -245,5 +245,9 @@ public abstract class NeuronUpdateRule {
     public void setInputType(InputType inputType) {
         this.inputType = inputType;
     }
+    
+    public boolean isSpikingNeuron() {
+    	return false;
+    }
 
 }

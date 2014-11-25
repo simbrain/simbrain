@@ -90,4 +90,8 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
         this.lastSpikeTime = lastSpikeTime;
     }
 
+    public boolean isSpikingNeuron() {
+    	return true;
+    }
+    
 }

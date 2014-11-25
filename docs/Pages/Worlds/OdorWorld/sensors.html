@@ -28,9 +28,9 @@
 <p class="menubold">Contents</p>
 
 
-<p class="menubold">&nbsp;&nbsp;&nbsp; <a href="#tile"><small>Smell<br>
-&nbsp;&nbsp;&nbsp;&nbsp; Hearing<br>
-&nbsp;&nbsp;&nbsp;&nbsp; Tile</small></a><br>
+<p class="menubold">&nbsp;&nbsp;&nbsp; <a href="#smell"><small>Smell</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp; <a href="#hearing">Hearing</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp; <a href="#tile">Tile</small></a><br>
 </p>
 
 <p>
@@ -61,7 +61,7 @@ parameters.<br>
 
 <span class="heading"></span><br>
 
-<p class="heading">Smell<a name="smell"></a></p>
+<p class="heading"><a name="smell"></a>Smell</p>
 <p><span style=""><span style="font-weight: normal;">Objects
 and agents in Odor World can emit smells that smell sensors can detect.
 </span></span><span style=""><span style="font-weight: normal;">See <a href="example.html">Example</a> for an implementation of smells. </span></span><span style=""><span style="font-weight: normal;">Sensor angle and length determine where the position of the smell sensor relative to that of the agent.&nbsp;</span></span></p>
@@ -83,13 +83,13 @@ center of the agent.<br>
   </blockquote>
 
 
-<p class="heading">Hearing<a name="hearing"></a></p>
+<p class="heading"><a name="hearing"></a>Hearing</p>
 
 
 <p><span style="font-weight: normal;">A Hearing sensor listens for a <a href="effectors.html#speech">Speech effector</a>
 of the same utterance. When a hearing sensor is activated by a speech
 effector, a thought bubble containing the associated utterance
-is displayed in Odor World.<br>
+is displayed in Odor World. See the workspace <em>bischof.zip</em> for an implementation of hearing. <br>
 </span></p>
 <p style="text-align: center;" class="heading"><span style="font-weight: normal;"></span><img src="../../../Images/OdorWorld_AddHearingSensor.png" alt="" style="width: 272px; height: 212px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img style="width: 432px; height: 172px;" alt="" src="../../../Images/OdorWorld_Hearing.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
 </p>
@@ -102,7 +102,7 @@ when it senses a speech effectors of the same utterance.<br>
  </p>
     
   </blockquote>
-<p class="heading">Tile<a name="tile"></a></p>
+<p class="heading"><a name="tile"></a>Tile</p>
 
 
 <p>A <a href="http://en.wikipedia.org/wiki/Place_cell" target="_blank">place cell</a>
@@ -110,7 +110,7 @@ is a cell that fires when an organism senses that it is in a particular
 location associated with that cell. An input neuron coupled with a tile
 sensor
 mimics the behavior of a place cell. When an agent
-is located inside a tile, its corresponding tile sensor gets activated.<br>
+is located inside a tile, its corresponding tile sensor gets activated. See the script <em>actor-critic.bsh</em> for an implementation of tile sensors in action. <br>
 </p><br>
 <p style="text-align: center;"><img style="width: 272px; height: 300px;" alt="" src="../../../Images/OdorWorld_AddTileSensor.png"></p>
 <br>

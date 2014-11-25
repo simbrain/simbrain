@@ -19,14 +19,14 @@
   <h1>Agents </h1>
   <p>&nbsp;</p>
   <p><left><em>Agents have all the abilities that <a href="objects.html">objects</a> have, and more.</em></left></p>
-  <p><img src="../../../Images/Mouse.gif" width="32" height="32"> An agent is a creature in  Odor World that can be controlled by a neural network. The neural network can be thought of as the brain of the agent; without a network controlling the agent, it does nothing. For a network to control an agent, it must be <a href="../../Network/couplings.html">coupled</a> to an agent by Output Commands and Input Sensors. Output commands are the motor controls of an agent, like moving forward or backward, and turning left or right.  An agent's input sensors abstractly model reaction to stimuli, though they were created with olfaction in mind. Sensors at three positions relative to the agent detect stimulus values associated with different objects and other agents. Agents can "smell" other agents, but not themselves. 
+  <p><img src="../../../Images/Mouse.gif" width="32" height="32"> An agent is a creature in  Odor World that can be controlled by a neural network. The neural network can be thought of as the brain of the agent; without a network controlling the agent, it does nothing. For a network to control an agent, it must be <a href="../../Workspace/Couplings.html">coupled</a> to an agent by Output Commands and Input Sensors. Output commands are the motor controls of an agent, like moving forward or backward, and turning left or right.  An agent's input sensors abstractly model reaction to stimuli, though they were created with olfaction in mind. Sensors at three positions relative to the agent detect stimulus values associated with different objects and other agents. Agents can "smell" other agents, but not themselves. 
   <p class="heading">Output Commands</p>
   <blockquote>
-  <p> Output Commands are essentially the motor controls of the agent. When coupling a neuron to an agent, one can choose between two styles of movement: relative movement, and absolute movement. Relative movements are motor commands that tell the agent how to move relative to its current orientation: e.g. move <em>forward</em> or to the <em>right</em>. Absolute movements tell the agent to move in directions that are independent of its orientation, such as move to the <em>north</em> or to the <em>south-west</em>.   
+  <p> Output Commands are essentially the motor controls of the agent. When coupling a neuron to an agent, one can choose between two styles of movement: relative movement, and absolute movement. Relative movements are motor commands that tell the agent how to move relative to its current orientation: e.g. move <em>forward</em> or to the <em>right</em>. Absolute movements tell the agent to move in directions that are independent of its orientation, such as move to the <em>north</em> or to the <em>south-west</em>. See <a href="../../Workspace/Couplings.html#Attributes">Attributes</a> to set the visibility of absolute movements.
   <p>All movements are scaled based on the activity of the coupled neuron and a fixed movement factor (one for moving straight, one for turning) set in the <a href="entitydialog.html">entity dialog.</a> The larger the activation, the faster the agent. If a neuron is coupled with an agent and its activation becomes negative, the neuron will command the agent to do the opposite of what it would normally do. This is such that when a neuron that normally turns the agent <em>right</em> becomes negative, it will instead start telling the agent to turn left.
   <p><span class="heading">Coupling of Output Commands</span></p>
-  <p>This section describes how to <a href="../../Network/couplings.html">couple</a> networks to agents. </p>
-  <p>Before selecting an Output Command, one must first select an agent. If there are multiple agents, one must differentiate between agents by their name, which can 	be changed in the dialogue of that particular agent. Otherwise they are given defaulot names &quot;Agent 1,&quot; &quot;Agent 2,&quot; etc. Once an agent as been highlighted, another popup menu will appear with the following output commands:
+  <p>This section describes how to <a href="../../Workspace/Couplings.html">couple</a> networks to agents. </p>
+  <p>Before selecting an Output Command, one must first select an agent. If there are multiple agents, one must differentiate between agents by their name, which can 	be changed in the dialog of that particular agent. Otherwise they are given default names &quot;Agent 1,&quot; &quot;Agent 2,&quot; etc. Once an agent as been highlighted, another popup menu will appear with the following output commands:
     </p>
   <blockquote>
     <p><span class="heading2">North, South, East, West, North-east, North-west, South-east, South-west.</span> These move the creature in absolute directions. </p>
@@ -39,11 +39,11 @@
     <p>The location of the left and right whiskers can be set. The location of the whiskers can be visualized as follows:</p>
     <p>&nbsp;</p>
     <p><center><img src="../../../Images/Agent-Sensors.gif"></center></p>
-  <p>The <em>Center</em> Input Sensor is located at the center of the agent. The left and right whiskers shoot off symmetrically from this center of perspective at an angle determined by the parameter <em>Whisker Angle</em>, denoted above by &theta;, which is in degrees. The length of the whiskers can be set by changing the Whisker Length parameter, in pixels. These parameters are set in the <a href="entitydialog.html#Agent">Entity Dialogue</a>.</p>
-  <p>In the Odor World, there is a variable amount of Stimulus Dimensions, set by default to be 8. All agents and objects broadcast customizable stimulus patterns during each iteration. An agent can pick up on these broadcasted signals, using its nose or whiskers, when a neuron is coupled with the agent to receive that input. A sensor can only receive  one dimension of the stimulus pattern at a time from one input sensor; this is to say, when coupling a neuron to an agent, a whisker/nose must be specified, and a stimulus dimension must be specified. </p>
+  <p>The <em>Center</em> Input Sensor is located at the center of the agent. The left and right whiskers shoot off symmetrically from this center of perspective at an angle determined by the parameter <em>Sensor Angle</em>, denoted above by &theta;, which is in degrees. The length of the whiskers can be set by changing the Sensor Length parameter, in pixels. These parameters are set in the <a href="entitydialog.html#Agent">Entity Dialog</a>.</p>
+  <p>In the Odor World, there is a variable amount of Stimulus Dimensions <!--, set by default to be 8-->. All agents and objects broadcast customizable stimulus patterns during each iteration. An agent can pick up on these broadcasted signals, using its nose or whiskers, when a neuron is coupled with the agent to receive that input. A sensor can only receive  one dimension of the stimulus pattern at a time from one input sensor; this is to say, when coupling a neuron to an agent, a whisker/nose must be specified, and a stimulus dimension must be specified. </p>
   <p><span class="heading">Coupling of Input Sensors</span></p>
     <blockquote>
-      <p>If one were to couple a neuron to an agent as an Input Sensor, one would first right-click on the neuron, highlight <em>Input Sensor</em>, highlight the agent for the neuron to be coupled with, then select either:
+      <p>If one were to couple a neuron to an agent as an Input Sensor, one would first right-click on the neuron, highlight <em>Send Scalar Coupling to</em>, highlight the agent for the neuron to be coupled with, then select either:
       </p>
       <blockquote>
 	  <p><span class="heading2">Left, Right, or Center.</span> Where <em>Left</em> and <em>Right</em> denote the left and right whisker, and <em>Center</em> denotes the central nose. 
@@ -56,12 +56,12 @@
 </blockquote>
   <p class="heading">Moving of Agents</p>
 	<blockquote>
-	  <p>Agents can be either be dragged using the mouse, or controlled using keyboard commands. To control an agent, click on the agent you wish to move. This &quot;selects&quot; the agent, in quotes because there is currently no indication that the agent has been selected in the GUI. The selected agent can now be moved forward, backward, left or right by pressing the arrow keys on the keyboard. Only one command can be entered at a time.</p>
-  </blockquote>
-	<p class="heading">Ability to Bite</p>
+	  <p>Agents can be <!--either be--> moved about using a mouse or trackpad <!--, or controlled using keyboard commands-->. To control an agent, click on the agent you wish to move and drag it around in the window. Only one agent can be dragged at a time.  <!--This &quot;selects&quot; the agent, in quotes because there is currently no indication that the agent has been selected in the GUI. The selected agent can now be moved forward, backward, left or right by pressing the arrow keys on the keyboard. Only one command can be entered at a time.</p>
+  </blockquote> -->
+	<!-- <p class="heading">Ability to Bite</p>
     <blockquote>
       If in any iteration an agent is in movement and it is blocked by an agent or object, it performs a <em>bite</em>. If that agent or object is <em>edible</em>, it will take the number of bites as is parameterized by its <em>Bites to die</em>. Edibility is a capable trait of all <a href="objects.html">objects</a>, and thereby agents.
-    </blockquote>
+    </blockquote> -->
 </div>
 </body>
 </html>

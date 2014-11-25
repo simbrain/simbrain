@@ -15,7 +15,10 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.*;
 import org.simbrain.workspace.*;
 
-/*
+/**
+ * 
+ * @author Zach Tosi
+ *
  * Creates a network of recurrently connected Izhikevich neurons (Regular
  * Spiking by default). Neurons are placed in a 2D lattice and connections
  * between neurons are probabilistic based on their relative distance from
@@ -80,11 +83,12 @@ import org.simbrain.workspace.*;
     layout2.setInitialLocation(new Point(400, 10));
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
+    // Optional code to distribute neurons in 3D space with random z values
     // Random rand = new Random();
     for (int i = 0; i < NUM_NEURONS; i++) {
         Neuron neuron = new Neuron(network, "IzhikevichRule");
         neuron.setUpperBound(100);
-        //neuron.setZ(rand.nextInt(NUM_NEURONS * GRID_SPACE));
+        //neuron.setZ(rand.nextInt((int) (Math.sqrt(NUM_NEURONS) * GRID_SPACE)));
         neurons.add(neuron);
         if (Math.random() < 0.25) {
         	neuron.setPolarity(Polarity.INHIBITORY);

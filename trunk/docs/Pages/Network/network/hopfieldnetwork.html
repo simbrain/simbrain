@@ -1,93 +1,105 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p>
+                <span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Hopfield</p>
+        </div>
+        <p></p>
+        <h1>Hopfield Network</h1>
+        <p>A discrete hopfield network is a collection of <a href="../neuron/binary.html">binary neurons</a> that are fully connected to all neurons but themselves. The Hopfield Network exists as a subnetwork in Simbrain because it updates asynchronously, unlike the synchronized updating method of a <a href="standardnetwork.html">standard network</a>. Hopfield networks must be updated in this way in order to be guaranteed to converge on a stable state.</p>
+        <p>The synapses in a Hopfield networks are trained by the Hebb rule. Note that if you open these synapses, however, you will see that they are clamped; the synapse values are changed by Hopfield subnetwork. To train a Hopfield network set the neurons to some desired level and select "train" from <a href="subnetwork_tab.html">subnetwork tab</a> context menu. You may want to begin by clearing the networks.</p>
+        <p>To create a continuous Hopfield networks see below.</p>
 
 
+        <p class="heading">Initialization</p>
+        <blockquote>
+            <p>Hopfield networks are initialized with some number of units, and are by default laid out as a grid. They are fully interconnected with no self connections. </p>
+        </blockquote>
+        <p class="heading">Parameters</p>
+        <blockquote>
+            <p><span class="heading2">Number of Neurons: </span>Input desired number of neurons in this field.</p>
+            <p><span class="heading2">Update Order: </span>This can be set to random or sequential. If set to random, the neuronns are updated in random order. This is the standard assumption of Hopfield networks. if sequential is used, neurons are updated in the same sequence each time, making it possible to reproduce chains of behavior.
+                <br>
+                <span class="heading2"></span>
+            </p>
+            <p><span class="heading2">By Priority: </span>TODO
+                <br>
+                <span class="heading2"></span>
+            </p>
+            <p><span class="heading2">Shuffle Order: </span>TODO
+                <br>
+            </p>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Hopfield</p>
-  </div>
-  <p></p><h1>Hopfield Network</h1>
-  <p>A discrete hopfield network is a collection of <a href="../neuron/binary.html">binary neurons</a>
-that are fully connected to all neurons but themselves. The Hopfield
-Network exists as a subnetwork in Simbrain because it updates
-asynchronously, unlike the synchronized updating method of a <a href="standardnetwork.html">standard network</a>. Hopfield networks must be updated in this way in order to be guaranteed to converge on a stable state. </p>
-  <p>The
-synapses in a Hopfield networks are trained by the Hebb rule. Note that
-if you open these synapses, however, you will see that they are
-clamped; the synapse values are changed by Hopfield subnetwork. To
-train a Hopfield network set the neurons to some desired level and
-select "train" from <a href="subnetwork_tab.html">subnetwork tab</a> context menu. You may want to begin by clearing the networks. </p>
-  <p>To create a continuous Hopfield networks see below. </p>
-  <p class="heading">Initialization</p>
-  <blockquote>
-    <p>Hopfield
-networks are initialized with some number of units, and are by default
-laid out as a grid. They are fully interconnected with no self
-connections. </p>
-  </blockquote>
-  <p class="heading">Parameters</p>
-  <blockquote>
-    <p><span class="heading2">Number of Neurons: </span>Input desired number of neurons in this field.</p>
-  <p><span class="heading2">Update Order: </span>This can be set to
-random or sequential. If set to random, the neuronns are updated in
-random order. This is the standard assumption of Hopfield networks. if
-sequential is used, neurons are updated in the same sequence each time,
-making it possible to reproduce chains of behavior.<br>
-  <span class="heading2"></span></p>
-  <p><span class="heading2">By Priority: </span>TODO<br>
-  <span class="heading2"></span></p>
-  <p><span class="heading2">Shuffle Order: </span>TODO<br>
-  </p>
-
-  </blockquote>
-  <p class="heading">Right Click Menu<br>
-</p>
-  <blockquote>
-    
-  <blockquote>
-    
-  </blockquote>
-  <p style="margin-left: 40px;" class="heading">Edit/Train Hopfield<br>
-    <p style="margin-left: 80px;" >Open edit and train network dialog. <br>
-  </p>
-  <blockquote>
-
-  </blockquote>
-  <p style="margin-left: 40px;" class="heading">Add Current Pattern To Input Data<br>
-     <p style="margin-left: 80px;" >Set the training data to the current pattern. <br>
-  </p>
-  <blockquote>
-
-  </blockquote>
-  <p style="margin-left: 40px;" class="heading">Randomize Synapses Symmetrically</p>
-   <p style="margin-left: 80px;" >Randomize the synaptic weights symmertrically. <br>
-  <p style="margin-left: 40px;" class="heading">Set Weights To Zero<br>
-     <p style="margin-left: 80px;" >Set all synaptic strength to zero. <br>
-  </p>
-  <blockquote>
-  </blockquote>
-  <blockquote>
+        </blockquote>
+        <p class="heading">Right Click Menu
+            <br>
+        </p>
+        <p>
+            <span class="heading2">Update Order:</span>This can be set to random or sequential. If set to random, the neuronns are updated in random order. This is the standard assumption of Hopfield networks. if sequential is used, neurons are updated in the same sequence each time, making it possible to reproduce chains of behavior.&nbsp; Three cases</p>
+        <p>1) Synchronous does not depend on the order in which nodes are updated but sometimes produces oscillations</p>
+        <p>2) Sequential is more stable.&nbsp; Nodes are updated one at a time and order matters.&nbsp; More stable than synchronous.&nbsp; Can either use the priority [link] of the nodes for update order, or a random order (randomize once at initialization and use this order every time).
+            <p>
+                (3) Random: nodes are updated in random order.&nbsp; This was important in the history of Hopfield networks and is related to Boltzmann machnes.
 
 
-  </blockquote>
-<p> </p>
-  </blockquote>
-  <p class="heading">Train</p>
-  <blockquote>
-    <p>Trains the hopfield network using the Hebb rule to learn the current pattern of activity across its nodes.<br>
-</p>
-  </blockquote>
-<p class="heading"> Continuous Hopfield Networks</p>
-<blockquote>
-<p>To create a continuous Hopfield network use a set of <a href="../neuron/additive.html">Additive neurons</a> in a standard network. These can be connected appropriately and trained by using <a href="../synapse/hebbian.html">Hebbian synapses</a>. The user then clamps all neurons, iterates to train the synapses, then clamps all weights. On clamping, see <a href="../toolbar.html">toolbar</a>. </p>
+                <p style="margin-left: 40px;" class="heading">Add Current Pattern To Input Data
+                    <br>
+                    <p style="margin-left: 80px;">Set the training data to the current pattern.
+                        <br>
+                    </p>
+                    <p style="margin-left: 40px;" class="heading">Randomize Synapses Symmetrically</p>
+                    <p style="margin-left: 80px;">Randomize the synaptic weights symmertrically.
+                        <br>
+                        <p style="margin-left: 40px;" class="heading">Set Weights To Zero
+                            <br>
+                            <p style="margin-left: 80px;">Set all synaptic strength to zero.
+                                <br>
+                            </p>
+                            <p class="heading">Right Click Menu
+                                <br>
+                            </p>
+                            <p style="margin-left: 40px;" class="heading">Edit/Train Hopfield
+                                <br>
+                            </p>
+                            <p style="margin-left: 40px;" class="heading">Add Current Pattern To Input Data
+                                <br>
+                            </p>
+                            <p style="margin-left: 40px;" class="heading">Randomize Synapses Symmetrically</p>
+                            <p style="margin-left: 40px;" class="heading">Set Weights To Zero
+                                <br>
+                            </p>
+                            <p class="heading">Train</p>
+                            <p>Trains the hopfield network using the Hebb rule to learn the current pattern of activity across its nodes.
+                                <br>
+                            </p>
+                            <p class="heading">Continuous Hopfield Networks</p>
+                            <blockquote>
+                                <p>To create a continuous Hopfield network use a set of <a href="../neuron/additive.html">Additive neurons</a> in a standard network. These can be connected appropriately and trained by using <a href="../synapse/hebbian.html">Hebbian synapses</a>. The user then clamps all neurons, iterates to train the synapses, then clamps all weights. On clamping, see <a href="../toolbar.html">toolbar</a>.</p>
 
-</blockquote>
-</div>
-</body></html>
+                            </blockquote>
+
+
+                            <p class="heading">Also see</p>
+                            <blockquote>
+                              See <a href="http://www.scholarpedia.org/article/Hopfield_network">here</a>.Random
+                              update is discused there. Related to Boltzmann machines.
+                            </blockquote>
+    </div>
+</body>
+
+</html>

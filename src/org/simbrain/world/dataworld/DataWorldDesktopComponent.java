@@ -23,6 +23,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -35,6 +36,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
+import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -137,8 +139,15 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         editMenu.add(TableActionManager.getShuffleAction(table.getData()));
         editMenu.addSeparator();
         editMenu.add(iterationMode);
-
         mb.add(editMenu);
+
+        // Help menu
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem helpItem = new JMenuItem("Help");
+        helpItem.setAction(new ShowHelpAction(
+                "Pages/Worlds/DataWorld/DataWorld.html"));
+        helpMenu.add(helpItem);
+        mb.add(helpMenu);
 
         getParentFrame().setJMenuBar(mb);
     }

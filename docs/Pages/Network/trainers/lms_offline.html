@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Trainers</a> &gt; LMS Offline<br>
+</p>
+  </div>
+  <p></p><h1>LMS Offline<br>
+</h1>
+  
+<p>A non-iterative method for computing a weight matrix for associating
+input vectors and target vectors [link to training set] in a training
+set.</p>
+<p>Some practical tips</p>
+<p>Wiener-Hopf <br>
+</p>
+<p>Moore-Penrose.</p>
+<p>Moore-Penrose is stable in some cases when Winer Hopf is not.</p>
+<p>Ridge regression and adding noise help when a matrix that is rank deficient. Prevents over-fitting, makes rank slightly higher.</p>
+<p>You have to make sure the output node range is greater than the range of the target values.&nbsp; <br>
+</p>
+<p>Sometimes it helps to change output nodes to linear.<br>
+</p>
+<p class="heading">
+</p>
+<p class="heading">Parameters</p>
+
+
+  
+<blockquote>
+    
+    <p><span class="heading2">Play:</span> Trains the network until told to stop.</p>
+    <p><span class="heading2">Iterate:</span> Iterates the network once.</p>
+    <p><span class="heading2">Train:</span> Trains the network in batches of the size given by the Batch parameter.</p>
+  </blockquote>
+
+<p class="heading">References</p>
+
+  
+<blockquote>
+    <p>http://www.scholarpedia.org/article/Echo_state_network<br>
+</p></blockquote>
+<br>
+</div>
+</body></html>

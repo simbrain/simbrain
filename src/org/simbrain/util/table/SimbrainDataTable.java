@@ -234,7 +234,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
     public void fill(final T value) {
         for (int i = 0; i < this.getRowCount(); i++) {
             for (int j = 0; j < this.getColumnCount(); j++) {
-                setLogicalValue(i, j, value, false);
+                setValue(i, j, value, false);
             }
         }
         this.fireTableDataChanged();

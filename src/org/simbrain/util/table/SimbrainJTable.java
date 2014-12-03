@@ -503,8 +503,7 @@ public class SimbrainJTable extends JXTable {
     public JMenu getMenuFill() {
         if (getData() instanceof NumericTable) {
             JMenu menu = new JMenu("Fill values");
-            menu.add(new JMenuItem(TableActionManager
-                    .getFillAction((NumericTable) getData())));
+            menu.add(new JMenuItem(TableActionManager.getFillAction(this)));
             menu.add(new JMenuItem(TableActionManager.getZeroFillAction(this)));
             return menu;
         }

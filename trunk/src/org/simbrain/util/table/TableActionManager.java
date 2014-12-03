@@ -348,7 +348,7 @@ public class TableActionManager {
                 rows.setText(Integer.toString(table.getData().getRowCount()));
                 rows.setColumns(3);
                 columns.setText(Integer.toString(table.getData()
-                        .getColumnCount()));
+                        .getLogicalColumnCount()));
                 columns.setColumns(3);
                 pane.add(new JLabel("Rows"));
                 pane.add(rows);
@@ -582,8 +582,8 @@ public class TableActionManager {
             {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Zero fill table");
-                putValue(SHORT_DESCRIPTION, "Zero fill table");
+                putValue(NAME, "Zero fill cells");
+                putValue(SHORT_DESCRIPTION, "Zero fill selected cells");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
                 putValue(ACCELERATOR_KEY, keyStroke);
@@ -605,15 +605,16 @@ public class TableActionManager {
      * @param table table to fill
      * @return the action
      */
-    public static Action getFillAction(final NumericTable table) {
+    public static Action getFillAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Eraser.png"));
-                putValue(NAME, "Fill table...");
-                putValue(SHORT_DESCRIPTION, "Fill table with specified value");
+                putValue(NAME, "Fill table cells...");
+                putValue(SHORT_DESCRIPTION,
+                        "Fill table selected cells with specified value");
             }
 
             /**

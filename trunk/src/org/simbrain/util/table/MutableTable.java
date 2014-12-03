@@ -242,32 +242,35 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
     }
 
     /**
-     * Adds or removes rows and columns. Does not change value of existing
+     * Adds or removes rows (from the bottom) and columns (from the left). Does not change value of existing
      * cells. Sets new cells to a specified value.
      *
-     * @param row Number of rows in table.
-     * @param col Number of columns in table.
+     * @param newNumRows logical number of rows in table.
+     * @param newNumCols logical number of columns in table.
      * @param value to be used for any new columns or rows added to the table.
      */
-    public void modifyRowsColumns(int row, int col, T value) {
-        int currentColNum = getColumnCount();
-        int currentRowNum = getRowCount();
-        if (col > currentColNum) {
-            for (int i = 0; i < col - currentColNum; ++i) {
+    public void modifyRowsColumns(int newNumRows, int newNumCols, T value) {
+
+        // Modify columns
+        int currentNumCols = getLogicalColumnCount();
+        if (newNumCols > currentNumCols) {
+            for (int i = 0; i < newNumCols - currentNumCols; ++i) {
                 addColumn(value, false);
             }
-        } else if (col < currentColNum) {
-            for (int i = 0; i < currentColNum - col; ++i) {
-                removeColumn(getColumnCount() - 1, false);
+        } else if (newNumCols < currentNumCols) {
+            for (int i = 0; i < currentNumCols - newNumCols; ++i) {
+                removeColumn(getLogicalColumnCount() - 1, false);
             }
         }
 
-        if (row > currentRowNum) {
-            for (int i = 0; i < row - currentRowNum; ++i) {
+        // Modify rows
+        int currentNumRows = getRowCount();
+        if (newNumRows > currentNumRows) {
+            for (int i = 0; i < newNumRows - currentNumRows; ++i) {
                 addRow(value, false);
             }
-        } else if (row < currentRowNum) {
-            for (int i = 0; i < currentRowNum - row; ++i) {
+        } else if (newNumRows < currentNumRows) {
+            for (int i = 0; i < currentNumRows - newNumRows; ++i) {
                 removeRow(getRowCount() - 1, false);
             }
         }

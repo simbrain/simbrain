@@ -300,8 +300,7 @@ public class NumericTable extends MutableTable<Double> implements
     }
 
     /**
-     * Fill the table at selected with the indicated value at the indicated
-     * locations.
+     * Fill the table at selected indices with the indicated value.
      *
      * @param cellIndices list of cell indices.
      * @param val the value to fill

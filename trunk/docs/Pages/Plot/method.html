@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+
+<div id="main_docs">
+  <div class="navi">
+
+  	<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Plot.html">Plot</a> &gt; <a href="projection.html">Projection</a> &gt; Methods</p>
+  </div> <p></p>
+  
+  <h1><a name="method">Projection Methods</a></h1>
+
+<p>There are numerous ways to project high dimensional data to lower dimensions. The projection menu in the projection component window allows one to switch projections and thereby compare the way neural network data look under different projections. </p>
+
+<p class="heading"><a name="Coordinate"></a>Coordinate Projection</p>
+
+<blockquote><p>This is perhaps the simplest possible projection technique. If one has a list of datapoints with 40 components each, coordinate projection to two-dimensions simply ignores all but two of these components, which are then used to display the data in two-space.</p>
+
+</blockquote>
+
+<p class="heading"> Principal Component Analysis (PCA)</p>
+
+<blockquote><p>PCA builds on coordinate projection by making use of the "principal axes" of the dataset. The principal axes of an object are the directions in space about which the object is most balanced or evenly spaced. PCA selects the two principal axes along which the dataset is the most spread out and projects the data onto these two axes.</p>
+
+<p><a name="Sammon"></a><span class="heading">Sammon map</span></p>
+
+<blockquote><p>The Sammon map is an iterative technique for making interpoint distances in the low-dimensional projection as close as possible to the interpoint distances in the high-dimensional object. Two points close together in the high-dimensional space should appear close together in the projection, while two points far apart in the high dimensional space should appear far apart in the projection. By minimizing an error function between the high and low dimensional sets of interpoint distances, the Sammon map does its best to preserve these distances in the projection. This iterative procedure can be watched in the projection component window by loading a dataset and pressing the "play" button on the interface.<br>
+
+<span class="heading2">Note</span>: Before Sammon Mapping is used, it is useful to <em>Randomize</em>, <img src="../../Images/Rand.gif">, the data points, as overlapping points cause the algorithm to blow up. One would run the Sammon Mapping process <strong>after</strong> data points have been developed by PCA or Coordinate Projection. </p>
+
+</blockquote>
+<br>
+</blockquote>
+<h1><a name="addingPoints">Adding Points</a></h1>
+
+<p>In some cases it is useful to be able to add new points to an existing dataset without running the projection method on the whole dataset again. Methods exist for quickly adding new data points based on data that have already been projected. These methods work best when a certain amount of data has already been collected and projected using, for example, PCA or the Sammon map. Note that these methods will rarely be applied in most uses of Simbrain.</p>
+
+<p class="heading">Nearest Neighbor Subspace Method</p>
+
+<blockquote><p>(<span class="heading2">1</span>) Takes each new point and determines the three points in the current data set that are closest to it.</p>
+
+<p>(<span class="heading2">2</span>) Finds the projection of the new point into the two-dimensional subspace
+that contains the three nearest neighbors in the high-dimensional space.</p>
+
+<p>(<span class="heading2">3</span>) Uses the three nearest neighbors and their corresponding points in the
+low dimensional dataset to find an affine map that approximates the full projection method (whichever one is currently being used).</p>
+
+<p>(<span class="heading2">4</span>) Applies the affine map to the new datapoint.</p>
+
+</blockquote>
+
+<p class="heading"><a name="Triangulate"></a>Triangulate</p>
+
+<blockquote><p>The Triangulate method takes each new point and determines which two points in the current data set are closest to it. Then, if possible, it will place the projected image of the new point so that its distance from the projected image of its two nearest neighbors is the same as it was in the high dimensional space. When it is not possible to project the point such that its distance to its two nearest neighbors is preserved, then the projected image of the new point will be placed on a line connecting the projected image of its two nearest neighbors. In this case the position of the projected image of the new point on this line is determined by the relative sizes of the distances between the new point and its two nearest neighbors in the current data set. </p></blockquote>
+<!--
+<p class="heading">Refresh</p>
+
+<blockquote><p>Data points are not added using any special algorithm. Rather, when new data points arrive, the current projection algorithm is re-run on the entire updated dataset (if the current projection algorithm is an iterative algorithm like the Sammon map then coordinate projection is used by default). PCA tends to be useful in refresh mode, for it is relatively fast but also takes into consideration the entire dataset. For better results using coordinate projection, <em>Automatically Select Most Variant Dimensions</em> can be used.</p>
+
+</blockquote>-->

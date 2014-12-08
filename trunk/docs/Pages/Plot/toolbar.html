@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+
+<div id="main_docs">
+  <div class="navi">
+
+  	<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Plot.html">Plot</a> &gt; <a href="projection.html">Projection</a> &gt; Toolbar</p>
+  </div> <p></p>
+  
+
+  	<h1><a name="toolbar">Toolbar</a></h1>
+<blockquote>
+<table cellpadding="3" cellspacing="3">
+  <tbody><tr>
+    
+  </tr>
+  <tr>
+    <td><span class="heading2">Projection Selector </span></td>
+    <td>This drop down box allows you to select what <a href="#method">projection method</a> to use on the data. Either PCA, Sammon, or Coordinate.</td>
+  </tr>
+  <tr>
+    <td><img src="../../Images/Play.gif" height="18" width="18"> <span class="heading2">Iterate Indefinitely</span></td>
+    <td>Pressing this button will cause the program to iterate the algorithm an indefinite number of steps until the Stop button, <img src="../../Images/Stop.gif">, is pressed. Only Sammon Mapping uses this function.</td>
+  </tr>
+  <tr>
+    <td><img src="../../Images/Stop.gif" height="18" width="18"> <span class="heading2">Stop Iteration</span></td>
+    <td>Pressing this button will cause the program to stop iterating the algorithm.</td>
+  </tr>
+  <tr>
+    <td>&nbsp; <img src="../../Images/Step.gif" height="18" width="18"><span class="heading2"> Iterate One Step</span></td>
+    <td>Pressing this button will cause the projection algorithm to iterate once.</td>
+  </tr>
+  <tr>
+    <td><img src="../../Images/Eraser.gif" height="18" width="18"><span class="heading2">Erase data</span></td>
+    <td>This button clears both the high dimensional data set and low dimensional data set from the program.</td>
+  </tr>
+  <tr>
+    <td><a name="Perturb"></a><img src="../../Images/Rand.gif" height="18" width="18"><span class="heading2">Randomize data</span></td>
+    <td>This button randomizes the points in the low dimensional set. Useful for bumping the Sammon map out of local minima, and for exploring different possible projections of a given dataset under the Sammon map.</td>
+  </tr>
+</tbody>
+</table>
+</blockquote><br>
+
+  <!--
+<p><span class="heading2">Purturbation Factor:</span> the distance the program will move coincident low dimensional points before running the Sammon mapping algorithm. It must do this because overlapping low-dimensional points will cause the Sammon map to divide by zero (this is observed on-screen as the disappearance of all data or the contraction of data to a small point).</p>
+
+<p><span class="heading2">Add new datapoint using</span>: allows users to choose how new points will be added to the dataset. These methods are described <a href="addpoints.html">here</a>.</p>
+
+<p><span class="heading2">Default Projector:</span> the default projector to be used by each subsequent gauge that is opened.</p>
+-->
+<!-- </blockquote>
+<br> -->
+
+</div>
+</body>
+</html>

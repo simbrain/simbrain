@@ -1,14 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
 
 
 
-    
+
 
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
 
-    <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
         </div>
@@ -18,41 +24,28 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; TextWorld</p>
         </div>
         <h1>Text World</h1>
-        <p>There
-are two kinds of text worlds. Display worlds and Reader worlds.These
-worlds can be used to model language, for example, to make networks
-that respond to sentences or that "talk". With text worlds the way you
-set up couplings (see <a href="../../Workspace/Couplings.html">couplings</a>) is especially important, so a review of that could help.</p>
+        <p>There are two kinds of text worlds, display world and reader world. These worlds can be used to model language, for example, to make networks that respond to sentences or that "talk". With text worlds, the way you set up couplings (see <a href="../../Workspace/Couplings.html">couplings</a>) is especially important, so a review of that could help.</p>
         <p>
             <span class="heading"><a name="ReaderWorld">Reader World</a></span>
             <br>
         </p>
-        <p>These
-convert text to numbers and vectors of numbers. They can be used to
-model reading. The most common use would be to set up a reader world to
-produce inputs to a neural network</p>
-        <p>The basic way reader
-worlds work is that you load some text of interest in to the main
-window (just copy and paste in).&nbsp; Then, at each iteration of the
-workspace, the current token (either a word or a character) is
-highlighted, and is converted in to single number (scalar) or vector of
-numbers and sent to another component via couplings. </p>
+        <p>These convert text to numbers and vectors of numbers. They can be used to model reading. The most common use would be to set up a reader world to produce inputs to a neural network.</p>
+        <p>The basic way reader worlds work is that you load some text of interest in to the main window (just copy and paste in).&nbsp; Then, at each iteration of the workspace, the current token (either a word or a character) is highlighted, and is converted in to single number (scalar) or vector of numbers and sent to another component via couplings. </p>
         <p>
             <span class="heading2">Parse Types, Preferences</span>
             <br>
         </p>
-        <p style="margin-left: 40px;">This is set using the Word / Character radio button at the bottom of the main window (see below).&nbsp;
+        <p style="margin-left: 40px;">This is set using the Word / Character radio button at the bottom of the main window (see figure below).&nbsp;
             <br>
         </p>
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Word-based</span>
-            <span style="text-decoration: underline;">:</span>In this mode the world advances through the text one word at a time, using a
-            <span style="text-decoration: underline;">delimiter</span>(defaulting to white space) that is set in the preference dialog.
+            <span style="text-decoration: underline;">Word-based:</span>
+            <span style="text-decoration: underline;"></span>In this mode, the world advances through the text one word at a time, using a
+            <span style="text-decoration: underline;">delimiter</span> (defaulting to white space) that is set in the preference dialog.
             <br>
         </p>
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Character-based</span>
-            <span style="text-decoration: underline;">:</span>In this mode the world advances through the text one character at a time.
+            <span style="text-decoration: underline;">Character-based:</span> In this mode the world, advances through the text one character at a time.
             <br>
         </p>
         <p>
@@ -62,33 +55,18 @@ numbers and sent to another component via couplings. </p>
                 </span>
             </span>
         </p>
-        <p style="margin-left: 40px;">Attribute types are set in the <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager.</a> &nbsp; &nbsp; Reader world attributes are producers, since text is parsed and then used to produce numerical values.
+        <p style="margin-left: 40px;">Attribute types are set in the <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager.</a> Reader world attributes are producers, since text is parsed and then used to produce numerical values.
             <span style="text-decoration: underline;">
                 <br>
             </span>
         </p>
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Letter-based</span>
-            <span style="text-decoration: underline;">:</span>These
-are scalar couplings where when a given letter is activated, a value of
-1 is sent to the target consumer.&nbsp; The decimeter type should be
-set to <span style="font-style: italic;">character.&nbsp;</span>For
-example in a network you could right click on a node, go to "receive
-scalar coupling from" and then in the context menu choose
-"ReaderWorld1" and then "a" to make that neuron respond to the letter a
-being parsed. </p>
+            <span style="text-decoration: underline;">Letter-based:</span> These are scalar couplings where when a given letter is activated, a value of 1 is sent to the target consumer. The decimeter type should be set to <span style="font-style: italic;">character. </span>For example in a network you could right click on a node, go to "receive scalar coupling from" and then in the context menu choose "ReaderWorld1" and then "a" to make that neuron respond to the letter a being parsed. </p>
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Token-vector</span>
-            <span style="text-decoration: underline;">:</span>These
-are vectors couplings where when a given word or token is activated,
-the vector-dictionary is consulted, and a corresponding vector is sent
-to the target consumer (or a zero-vector if no match is found). &nbsp;
-The target will typically be a <a href="../../Network/groups/NeuronGroup.html">neuron group</a>. &nbsp; The delimiter type should be set to
-            <span style="font-style: italic;">word.&nbsp;
-            </span>The
-vector dictionary can be edited using the vector-dictionary editor,
-which stores a list of tokens and corresponding vectors, which can be
-of variable length. <br>
+            <span style="text-decoration: underline;">Token-vector:</span> These are vectors couplings where when a given word or token is activated, the vector-dictionary is consulted, and a corresponding vector is sent to the target consumer (or a zero-vector if no match is found). The target will typically be a <a href="../../Network/groups/NeuronGroup.html">neuron group</a>. The delimiter type should be set to
+            <span style="font-style: italic;">word.
+            </span>The vector dictionary can be edited using the vector-dictionary editor, which stores a list of tokens and corresponding vectors, which can be of variable length.
+            <br>
         </p>
         <br>
         <center>
@@ -99,72 +77,58 @@ of variable length. <br>
         <p>
             <span class="heading"><a name="DisplayWorld">Display World</a></span>
         </p>
-        <p>These
-components convert numbers to text. The most common use of a display is
-to let a neural network produce "speech". Things could be set up so
-that when a given node is activated, the word "Cheese" is written to
-the display world window.&nbsp; <br>
-</p>
-<p>The basic process of setting up a display world is first, setting up
-a dictionary (see below), and then coupling nodes in a neural network
-to the words in that dictionary, so that when those nodes are
-activated, the corresponding words are produced in the display world.<br>
+        <p>These components convert numbers to text. The most common use of a display is to let a neural network produce "speech". Things could be set up so that when a given node is activated, the word "Cheese" is written to the display world window.&nbsp;
+            <br>
+        </p>
+        <p>The basic process of setting up a display world is first, setting up a dictionary (see below), and then coupling nodes in a neural network to the words in that dictionary, so that when those nodes are activated, the corresponding words are produced in the display world.
+            <br>
         </p>
 
-        
-        
+
+
         <p>
             <span class="heading2">Dictionary</span>
             <br>
         </p>
 
-        <p style="margin-left: 40px;">The
-dictionary is a simple list of words.&nbsp;&nbsp; Each entry in the
-dictionary is one word that can be written to the display world. <br>
+        <p style="margin-left: 40px;">The dictionary is a simple list of words. Each entry in the dictionary is one word that can be written to the display world.
+            <br>
         </p>
-        <p style="margin-left: 40px;"><span style="text-decoration: underline;">Edit / Display dictionary</span>: To edit and display the current dictionary press the grid-icon in the toolbar or select menu item&nbsp;<span class="command">Edit &gt; Edit Dictionary</span>.&nbsp;&nbsp;
-It is just a list of words.&nbsp; Rows can be added or deleted using
-straightforward commands.&nbsp;&nbsp; Dictionaries can also be loaded
-or saved to csv files, which are human-readable and easy to edit.<br>
+        <p style="margin-left: 40px;"><span style="text-decoration: underline;">Edit / Display dictionary</span>: To edit and display the current dictionary, press the grid-icon in the toolbar or select menu item&nbsp;<span class="command">Edit &gt; Edit Dictionary</span>. It is just a list of words. Rows can be added or deleted using straightforward commands. Dictionaries can also be loaded or saved to csv files, which are human-readable and easy to edit.
+            <br>
         </p>
 
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Extract-dictionary</span><span style="text-decoration: underline;">:</span> Use this to select a text file, extract every word in it, and add it to the dictionary.&nbsp; After extracting text try displaying the dictionary to see what you got.<br>
-<span style="text-decoration: underline;"></span></p>
+            <span style="text-decoration: underline;">Extract-dictionary</span><span style="text-decoration: underline;">:</span> Use this to select a text file, extract every word in it, and add it to the dictionary.&nbsp; After extracting text, try displaying the dictionary to see what you got.
+            <br>
+            <span style="text-decoration: underline;"></span>
+        </p>
         <p>
             <span class="heading2">Attribute Types, Preferences</span>
             <br>
         </p>
 
 
-        <p style="margin-left: 40px;">As with reader worlds, attribute types are set in the
-coupling manager. &nbsp; Display world attributes are consumers, since
-text is parsed and then used to produce numerical values.&nbsp;
-         </p>
+        <p style="margin-left: 40px;">As with reader worlds, attribute types are set in the coupling manager. Display world attributes are consumers, since text is parsed and then used to produce numerical values.&nbsp;
+        </p>
 
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">String-reader</span> (disabled by default; enable it using the&nbsp;<span class="command">set attribute visibility</span> command in the  <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager.</a> ): This allows the component to directly receive text produced by a text based producer.&nbsp; It is not currently used much.<br>
-</p>
-<p style="margin-left: 40px;"><span style="text-decoration: underline;">Word-reader</span>: <span style="text-decoration: underline;"></span>In this mode,
-each consumer is associated with a particular word, a particular entry
-in the dictionary.&nbsp; When the consumer consumes&nbsp; a numeric
-value, if that value is above a threshold, then the corresponding word
-is produced in the display world window.<span style="font-style: italic;"> </span>For example in a network you
-could right click on a node, go to "send scalar coupling to" and
-then in the context menu choose "DisplayWorld1" and then "cheese" to make activation of
-that neuron&nbsp; produce the word "cheese" in the display.<span style="text-decoration: underline;">
+            <span style="text-decoration: underline;">String-reader</span> (disabled by default; enable it using the&nbsp;<span class="command">set attribute visibility</span> command in the <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager</a> ): This allows the component to directly receive text produced by a text based producer. It is not currently used much.
+            <br>
+        </p>
+        <p style="margin-left: 40px;"><span style="text-decoration: underline;">Word-reader</span>: <span style="text-decoration: underline;"></span>In this mode, each consumer is associated with a particular word, a particular entry in the dictionary. When the consumer consumes a numeric value, if that value is above a threshold, then the corresponding word is produced in the display world window.<span style="font-style: italic;"> </span>For example in a network you could right click on a node, go to "send scalar coupling to" and then in the context menu choose "DisplayWorld1" and then "cheese" to make activation of that neuron produce the word "cheese" in the display.<span style="text-decoration: underline;">
                 
             </span>
         </p>
 
 
         <p style="margin-left: 40px;">
-            <span style="text-decoration: underline;">Display-Threshold:</span>
-The numeric value that must be exceeded in order for a given word to be
-produced in the window.&nbsp; Used with word-reader attributes. By
-default it is set to .5.<br>
-</p>
+            <span style="text-decoration: underline;">Display-Threshold:</span> The numeric value that must be exceeded in order for a given word to be produced in the window. Used with word-reader attributes. By default it is set to .5.
+            <br>
+        </p>
 
     </div>
 
-</body></html>
+</body>
+
+</html>

@@ -641,7 +641,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferencesGeneral = new JMenuItem(
-                "General Preferences...");
+                "Preferences...");
         preferencesGeneral.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(

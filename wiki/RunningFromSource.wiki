@@ -40,6 +40,21 @@ Download and install subversion [http://subversion.apache.org/packages.html here
 
 Checkout the latest version of Simbrain by following the directions [http://code.google.com/p/simbrain/source/checkout here]
 
+== Note for Mac Users ==
+
+On Mac, it is much easier to install ant and subversion using brew (or apt-get, but that has not been tested).  To install brew, go here, and scroll to the bottom:
+
+[http://brew.sh/ http://brew.sh/]
+
+With your terminal still open, enter the following to install ant and subversion
+
+{{{
+brew install ant
+brew install subversion
+}}}
+
+It's that easy!  Perhaps javac can also be installed this way (let us now if it can).
+
 == Setting environment variables ==
 
 For Windows users, ant and jdk must be added to your path, as follows:

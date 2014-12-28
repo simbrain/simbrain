@@ -31,8 +31,8 @@ import umontreal.iro.lecuyer.randvar.LognormalGen;
 import umontreal.iro.lecuyer.randvar.NormalGen;
 import umontreal.iro.lecuyer.randvar.ParetoGen;
 import umontreal.iro.lecuyer.randvar.UniformGen;
+import umontreal.iro.lecuyer.rng.LFSR113;
 import umontreal.iro.lecuyer.rng.RandomStream;
-import umontreal.iro.lecuyer.rng.WELL1024;
 
 public enum ProbDistribution {
 
@@ -455,7 +455,7 @@ public enum ProbDistribution {
     // }
     // };
 
-    public static final RandomStream DEFAULT_RANDOM_STREAM = new WELL1024();
+    public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR113();
 
     public abstract double nextRand(double var1, double var2);
 

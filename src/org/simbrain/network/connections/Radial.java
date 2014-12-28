@@ -18,12 +18,21 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbDistribution;
 
 /**
  *
@@ -242,18 +251,84 @@ public class Radial extends Sparse {
         this.synapseGroup = synGroup;
         List<Neuron> source = synGroup.getSourceNeurons();
         List<Neuron> target = synGroup.getTargetNeurons();
-        List<Synapse> synapses = connectRadialPolarized(source, target,
-            eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst,
-            lambda, false);
-        for (Synapse s : synapses) {
-            synGroup.addNewSynapse(s);
+        List<Synapse> synapses;
+        if (source.size() < 500) {
+        	synapses = connectRadialPolarized(source, target,
+        			eeDistConst, eiDistConst, ieDistConst, iiDistConst,
+        			distConst, lambda, false);
+            for (Synapse s : synapses) {
+                synGroup.addNewSynapse(s);
+            }
+        } else {
+        	List<Callable<Collection<Synapse>>> workers =
+        			new ArrayList<Callable<Collection<Synapse>>>();
+        	int threads = Runtime.getRuntime().availableProcessors();
+        	int idealShare = (int) Math.floor(source.size() / threads);
+        	int remaining = source.size();
+        	Iterator<Neuron> srcIter = source.iterator();
+        	List<Neuron> srcChunk;
+        	double runningPercentEx = 0;
+        	for (int i = 0; i < threads; i++) {
+        		srcChunk = new ArrayList<Neuron>((int) Math.ceil((idealShare
+        				* 2) / 0.75));
+        		int share;
+        		if (remaining < idealShare * 2) {
+        			share = remaining;
+        		} else {
+        			share = idealShare;
+        		}
+        		int j = 0;
+        		while (j < share) {
+        			Neuron n = srcIter.next();
+        			srcChunk.add(n);
+        			if (n.isPolarized()) {
+        				if (Polarity.EXCITATORY == n.getPolarity()) {
+        					runningPercentEx++;
+        				}
+        			}
+        			j++;
+        		}
+        		remaining -= j;
+        		workers.add(new ConnectorService(srcChunk, target, false));
+        	}
+        	runningPercentEx /= source.size();
+        	synGroup.setExcitatoryRatio(runningPercentEx);
+        	ExecutorService ex = Executors.newFixedThreadPool(threads);
+        	List<Future<Collection<Synapse>>> generatedSyns;
+        	try {
+				generatedSyns = ex.invokeAll(workers);
+				ex.shutdown();
+				ex.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return;
+			}
+        	int numSyns = 0;
+        	for (Future<Collection<Synapse>> future : generatedSyns) {
+        		try {
+					numSyns += future.get().size();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+        	}
+        	synGroup.preAllocateSynapses(numSyns);
+        	for (Future<Collection<Synapse>> future : generatedSyns) {
+        		try {
+					for(Synapse s : future.get()) {
+						synGroup.addNewSynapse(s);
+					}
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+        	}
         }
+
         if (synGroup.isRecurrent()) {
-            connectionDensity = (double) synapses.size() /
+            connectionDensity = (double) synGroup.size() /
                 (synGroup.getSourceNeuronGroup().size()
                 * (synGroup.getSourceNeuronGroup().size() - 1));
         } else {
-            connectionDensity = (double) synapses.size() /
+            connectionDensity = (double) synGroup.size() /
                 (synGroup.getSourceNeuronGroup().size()
                 * synGroup.getTargetNeuronGroup().size());
         }
@@ -351,6 +426,72 @@ public class Radial extends Sparse {
         this.lambda = lambda;
     }
 
+    private class ConnectorService implements Callable<Collection<Synapse>> {
+    	
+    	private final Collection<Neuron> srcColl;
+    	
+    	private final Collection<Neuron> targColl;
+    	
+    	private final boolean loose;
+    	
+    	public ConnectorService(final Collection<Neuron> srcColl,
+    			final Collection<Neuron> targColl, final boolean loose) {
+    		this.srcColl = srcColl;
+    		this.targColl = targColl;
+    		this.loose = loose;
+    	}
+
+		@Override
+		public Collection<Synapse> call() throws Exception {
+			// Attempting to pre-allocate... assumes that connection density
+			// will be less than #src * #tar * 0.2 or 20% connectivity
+			List<Synapse> synapses = new ArrayList<Synapse>(
+					(int) Math.ceil(srcColl.size() * targColl.size() * 0.2
+							* 0.75));
+			for (Neuron src : srcColl) {
+	            for (Neuron tar : targColl) {
+	                double randVal = ProbDistribution.UNIFORM.nextRand(0, 1);
+	                double probability;
+	                if (src.getPolarity() == Polarity.EXCITATORY) {
+	                    if (tar.getPolarity() == Polarity.EXCITATORY) {
+	                        probability = calcConnectProb(src, tar, eeDistConst,
+	                            lambda);
+	                    } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+	                        probability = calcConnectProb(src, tar, eiDistConst,
+	                            lambda);
+	                    } else {
+	                        probability = calcConnectProb(src, tar, distConst,
+	                            lambda);
+	                    }
+	                } else if (src.getPolarity() == Polarity.INHIBITORY) {
+	                    if (tar.getPolarity() == Polarity.EXCITATORY) {
+	                        probability = calcConnectProb(src, tar, ieDistConst,
+	                            lambda);
+	                    } else if (tar.getPolarity() == Polarity.INHIBITORY) {
+	                        probability = calcConnectProb(src, tar, iiDistConst,
+	                            lambda);
+	                    } else {
+	                        probability = calcConnectProb(src, tar, distConst,
+	                            lambda);
+	                    }
+	                } else {
+	                    probability = calcConnectProb(src, tar, distConst,
+	                        lambda);
+	                }
+	                if (randVal < probability) {
+	                    Synapse s = new Synapse(src, tar);
+	                    synapses.add(s);
+	                    if (loose) {
+	                        src.getNetwork().addSynapse(s);
+	                    }
+	                }
+	            }
+	        }
+	        return synapses;
+		}
+    	
+    }
+    
     public class DensityEstimator implements Runnable {
 
         private double estimateDensity;

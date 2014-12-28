@@ -290,16 +290,18 @@ public final class SynapseGroupDialog extends StandardDialog {
                 storedComponents.add(cePanel);
                 tabbedPane.addTab("Sparsity", new JPanel());
             }
-            matrixScrollPane.setBorder(null);
-            storedComponents.add(matrixScrollPane);
-            tabbedPane.addTab("Matrix", new JPanel());
-            // TODO: Sorting necessary? Alternative?
-            tabMatrix
-                .add(WeightMatrixViewer
-                    .getWeightMatrixPanel(new WeightMatrixViewer(
-                        synapseGroup.getSourceNeurons(),
-                        synapseGroup.getTargetNeurons(),
-                        networkPanel)));
+            if (synapseGroup.size() < 100000) {
+	            matrixScrollPane.setBorder(null);
+	            storedComponents.add(matrixScrollPane);
+	            tabbedPane.addTab("Matrix", new JPanel());
+	            // TODO: Sorting necessary? Alternative?
+	            tabMatrix
+	                .add(WeightMatrixViewer
+	                    .getWeightMatrixPanel(new WeightMatrixViewer(
+	                        synapseGroup.getSourceNeurons(),
+	                        synapseGroup.getTargetNeurons(),
+	                        networkPanel)));
+            }
         }
 
         // Tab for editing synapses

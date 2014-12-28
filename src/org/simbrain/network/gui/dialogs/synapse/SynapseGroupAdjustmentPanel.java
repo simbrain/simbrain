@@ -84,7 +84,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      * A histogram plotting the strength of synapses over given intervals (bins)
      * against their frequency.
      */
-    private final HistogramPanel histogramPanel = new HistogramPanel(
+    private HistogramPanel histogramPanel = new HistogramPanel(
         new HistogramModel(2));
 
     /**
@@ -126,6 +126,14 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         this.synapseGroup = synapseGroup;
         this.creationPanel = isCreation;
         synTypeSelector.setVisible(!creationPanel);
+        if (!creationPanel) {
+        	int bins = (int)(Math.log10(synapseGroup.size())
+        			* SimbrainMath.log2(synapseGroup.size()));
+        	if (bins < 10) {
+        		bins = 10;
+        	}
+        	histogramPanel = new HistogramPanel(new HistogramModel(2, bins));
+        }
         histogramPanel.setVisible(!creationPanel);
         revalidateButton.setVisible(!creationPanel);
         statPanel.setVisible(!creationPanel);

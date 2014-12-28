@@ -67,9 +67,14 @@ public class HistogramModel extends ChartModel {
      * @param numdsources
      *            number of datasets to add
      */
-    public HistogramModel(int numdsources) {
-        this.addDataSources(numdsources);
+    public HistogramModel(int numSources) {
+        this.addDataSources(numSources);
         redraw();
+    }
+    
+    public HistogramModel(int numSources, int bins) {
+    	this(numSources);
+    	this.bins = bins;
     }
 
     /**

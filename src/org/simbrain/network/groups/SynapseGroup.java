@@ -14,6 +14,7 @@ package org.simbrain.network.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,7 +38,6 @@ import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 /**
@@ -898,7 +898,8 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     *
+     * For large, sparse synapse groups this will cause a heap overflow. Use
+     * {@link #getRowCompressedMatrixRepresentation()} instead.
      * @return
      */
     public double[][] getWeightMatrix() {
@@ -940,12 +941,47 @@ public class SynapseGroup extends Group {
      * @return
      */
     public long[] getRowCompressedMatrixRepresentation() {
-        return SimbrainMath.getMatrixRowCompression(getWeightMatrix());
+        int j = 0;
+        // Create numbers for neurons... less expensive than constant
+        // indexOf calls to array lists.
+        Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
+        for (Neuron n : getTargetNeurons()) {
+            targetMap.put(n, j++);
+        }
+        int index = 0;
+        int numel = size() + getSourceNeuronGroup().size();
+        long [] compRowRep = new long [numel + size()];
+        numel--;
+        compRowRep[index++] = size();
+        for (Neuron n : getSourceNeurons()) {
+        	Map<Integer, Neuron> reverseMap = new HashMap<Integer, Neuron>(30);
+        	List<Integer> indices = new ArrayList<Integer>();
+        	for (Neuron m : n.getFanOut().keySet()) {
+        		if (targetMap.get(m) != null) {
+        			int ind = targetMap.get(m);
+        			indices.add(ind);
+        			reverseMap.put(ind, m);
+        		}
+        	}
+        	Collections.sort(indices);
+        	for (int k = 0, z = indices.size(); k < z; k++) {
+    			compRowRep[index] = indices.get(k);
+    			compRowRep[index + numel] = Double.doubleToLongBits(n
+    					.getFanOut().get(reverseMap.get(indices.get(k)))
+    					.getStrength());
+    			index++;
+        	}
+        	if (index + numel < compRowRep.length) {
+        		compRowRep[index++] = -1L;
+        		numel--;
+        	}
+        }
+        return compRowRep;
     }
 
     /**
      * Sets the strength of a single synapse in the group specified as a
-     * paremeter. If the synapse does not exist in this group returns false. If
+     * parameter. If the synapse does not exist in this group returns false. If
      * the this makes the synapse change polarity it will be removed from its
      * current set and added to the appropriate set.
      *

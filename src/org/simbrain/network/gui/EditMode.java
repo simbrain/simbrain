@@ -45,16 +45,6 @@ public final class EditMode {
     public static final EditMode SELECTION = new EditMode("selection",
             "Arrow.png");
 
-    /** Pan edit mode. */
-    public static final EditMode PAN = new EditMode("pan", "Pan.png");
-
-    /** Zoom in edit mode. */
-    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
-
-    /** Zoom out edit mode. */
-    public static final EditMode ZOOM_OUT = new EditMode("zoom out",
-            "ZoomOut.png");
-
     /** Text edit mode. */
     public static final EditMode TEXT = new EditMode("text", "Text.png");
 
@@ -120,43 +110,6 @@ public final class EditMode {
         return (this == SELECTION);
     }
 
-    /**
-     * Return true if this edit mode is <code>PAN</code>.
-     *
-     * @return true if this edit mode is <code>PAN</code>
-     */
-    public boolean isPan() {
-        return (this == PAN);
-    }
-
-    /**
-     * Return true if this edit mode is <code>ZOOM_IN</code>.
-     *
-     * @return true if this edit mode is <code>ZOOM_IN</code>
-     */
-    public boolean isZoomIn() {
-        return (this == ZOOM_IN);
-    }
-
-    /**
-     * Return true if this edit mode is <code>ZOOM_OUT</code>.
-     *
-     * @return true if this edit mode is <code>ZOOM_OUT</code>
-     */
-    public boolean isZoomOut() {
-        return (this == ZOOM_OUT);
-    }
-
-    /**
-     * Return true if this edit mode is either <code>ZOOM_IN</code> or
-     * <code>ZOOM_OUT</code>.
-     *
-     * @return true if this edit mode is either <code>ZOOM_IN</code> or
-     *         <code>ZOOM_OUT</code>
-     */
-    public boolean isZoom() {
-        return ((this == ZOOM_IN) || (this == ZOOM_OUT));
-    }
 
     /**
      * Return true if this edit mode is <code>TEXT</code>.

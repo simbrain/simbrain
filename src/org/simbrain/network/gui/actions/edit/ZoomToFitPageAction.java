@@ -18,24 +18,36 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import org.simbrain.network.gui.EditMode;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Pan edit mode action.
+ * Action to re-scale the screen to fit all objects.
  */
-public final class PanEditModeAction extends EditModeAction {
+public final class ZoomToFitPageAction extends AbstractAction {
+
+    /** Network panel. */
+    private final NetworkPanel networkPanel;
 
     /**
-     * Create a new pan edit mode action with the specified network panel.
+     * Create a new zoom to fit page action.
      *
      * @param networkPanel network panel, must not be null
      */
-    public PanEditModeAction(final NetworkPanel networkPanel) {
-        super("Pan", networkPanel, EditMode.PAN);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Pan.png"));
-        putValue(SHORT_DESCRIPTION, "Pan Mode (k)");
+    public ZoomToFitPageAction(final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomFitPage.png"));
+        putValue(SHORT_DESCRIPTION, "Fit all objects on screen");
+        putValue(SHORT_DESCRIPTION, "Zoom to fit all objects on screen");
 
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        networkPanel.zoomToFitPage(true);
     }
 }

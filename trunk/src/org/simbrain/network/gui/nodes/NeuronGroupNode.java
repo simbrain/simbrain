@@ -142,18 +142,16 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 
     }
 
-
-
     /**
      * Override PNode layoutChildren method in order to properly set the
      * positions of children nodes.
      */
     @Override
     public void layoutChildren() {
-
         interactionBox.setOffset(outlinedObjects.getFullBounds().getX()
                 + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2, outlinedObjects
-                .getFullBounds().getY() - interactionBox.getHeight() + 1);
+                .getFullBounds().getY()
+                - interactionBox.getFullBounds().getHeight() + 1);
     }
 
     /**
@@ -924,5 +922,10 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
    private boolean samePoint(Point2D a, Point2D b) {
        return a.getX() == b.getX() && a.getY() == b.getY();
    }
+
+    @Override
+    public List<InteractionBox> getInteractionBoxes() {
+        return Collections.singletonList((InteractionBox) interactionBox);
+    }
 
 }

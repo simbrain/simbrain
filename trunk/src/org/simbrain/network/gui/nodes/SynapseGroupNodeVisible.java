@@ -54,8 +54,7 @@ public class SynapseGroupNodeVisible extends SynapseGroupNode {
         double tarY = synapseGroup.getTargetNeuronGroup().getCenterY();
         double x = (srcX + tarX) / 2;
         double y = (srcY + tarY) / 2;
-        interactionBox.setOffset(x - interactionBox.getWidth() / 2, y
-                - interactionBox.getHeight() / 2);
+        interactionBox.centerFullBoundsOnPoint(x,y);
 
         // Old layout code.  Some maybe useful so not removing it yet.
 //          PBounds bounds = new PBounds();

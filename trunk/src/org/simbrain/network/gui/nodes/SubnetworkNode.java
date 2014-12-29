@@ -21,6 +21,8 @@ package org.simbrain.network.gui.nodes;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,9 +32,7 @@ import javax.swing.JPopupMenu;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
@@ -96,7 +96,7 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
                 outlinedObjects.getFullBounds().getX()
                         + OutlinedObjects.ROUNDING_WIDTH_HEIGHT / 2,
                 outlinedObjects.getFullBounds().getY()
-                        - interactionBox.getHeight() + 1);
+                        - interactionBox.getFullBounds().getHeight() + 1);
     }
 
     /**
@@ -339,4 +339,10 @@ public class SubnetworkNode extends PPath.Float implements GroupNode, PropertyCh
             }
         }
     }
+
+    @Override
+    public List<InteractionBox> getInteractionBoxes() {
+        return Collections.singletonList((InteractionBox) interactionBox);
+    }
+
 }

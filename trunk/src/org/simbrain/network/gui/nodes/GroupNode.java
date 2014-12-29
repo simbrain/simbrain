@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.util.List;
+
 /**
  * Interface for all PNodes representing Simbrain groups.
  */
@@ -25,9 +27,20 @@ public interface GroupNode {
 
     /**
      * Update all pnode constituents of this group node to update their
-     * visible state (in the case of synpase group nodes, only do this
-     * if there are visible synpases).
+     * visible state (in the case of synapse group nodes, only do this
+     * if there are visible synapses).
      */
     void updateConstituentNodes();
+
+    /**
+     * Returns a  list of child interaction boxes, or null if
+     * it does not contain an interaction box.  Note that this is not a
+     * recursive list of all interaction boxes below this one.   Rather,
+     * some group nodes have multiple interaction boxes (currently just
+     * SynapseGroupNodeBidirectional).
+     *
+     * @return the node's interaction box
+     */
+    List<InteractionBox> getInteractionBoxes();
 
 }

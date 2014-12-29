@@ -93,15 +93,17 @@ public class STDPRule extends SynapseUpdateRule {
 
         double delta_t, delta_w;
 
-        boolean sourceSpiking = synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule;
-        boolean targetSpiking = synapse.getTarget().getUpdateRule() instanceof SpikingNeuronUpdateRule;
-
+        boolean sourceSpiking = synapse.getSource().getUpdateRule()
+        		.isSpikingNeuron();
+        boolean targetSpiking = synapse.getTarget().getUpdateRule()
+        		.isSpikingNeuron();
+        
         if (sourceSpiking && targetSpiking) {
             SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse
                     .getSource().getUpdateRule();
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
-            if (tar.hasSpiked()) {
+            if (synapse.getTarget().isSpike()) {
                 delta_t = synapse.getNetwork().getTime()
                         - src.getLastSpikeTime();
                 delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
@@ -110,7 +112,7 @@ public class STDPRule extends SynapseUpdateRule {
                         + delta_w));
 
             }
-            if (src.hasSpiked()) {
+            if (synapse.getSource().isSpike()) {
                 delta_t = tar.getLastSpikeTime()
                         - synapse.getNetwork().getTime();
                 delta_w = -W_minus * Math.exp(delta_t / tau_minus)

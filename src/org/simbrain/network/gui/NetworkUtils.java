@@ -128,4 +128,28 @@ public class NetworkUtils {
 
         return retPanel;
     }
+    
+    /**
+     * 
+     * @param sources
+     * @param getter
+     * @return
+     */
+    public static <T, V> boolean isConsistent(Collection<T> sources,
+    		ParameterGetter<T,V> getter) {
+    	if (sources.size() <= 0) {
+    		throw new IllegalArgumentException("Source list is empty.");
+    	}
+    	Iterator<T> sourceIter = sources.iterator();
+    	T sourceFirst = sourceIter.next();
+    	V val = getter.getParameter(sourceFirst);
+    	while (sourceIter.hasNext()) {
+    		if (!val.equals(getter.getParameter(sourceIter.next()))) {
+    			// Found an inconsistency
+    			return false;
+    		}
+    	}
+    	// No inconsistencies were found
+    	return true;
+    }
 }

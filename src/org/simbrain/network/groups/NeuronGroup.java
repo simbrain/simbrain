@@ -18,11 +18,10 @@
 package org.simbrain.network.groups;
 
 import java.awt.geom.Point2D;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +85,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     /** Data (input vectors) for testing the network. */
     private double[][] testData;
+    
+    private File outputFile;
+    
+    private PrintWriter valueWriter;
+    
+    private boolean recording;
+    
+    private int fileNum = 0;
 
     /**
      * Construct a new neuron group from a list of neurons.
@@ -207,7 +214,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
                 getParentNetwork().removeGroup(getParentGroup());
             }
         }
-//        stopRecording();
+        stopRecording();
         neuronList.clear();
         Runtime.getRuntime().gc();
     }
@@ -215,6 +222,40 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     @Override
     public void update() {
         Network.updateNeurons(neuronList);
+        if (recording) {
+        	writeActsToFile();
+        }
+        
+    }
+    
+    public void startRecording() {
+    	recording = true;
+    	outputFile = new File(this.getLabel() + " " + fileNum++ + ".csv");
+    	try {
+    		if (valueWriter != null) {
+    			valueWriter.close();
+    		}
+    		FileWriter fw = new FileWriter(outputFile);
+    		valueWriter = new PrintWriter(fw);
+    	} catch (IOException e) {
+    		
+    	}
+    }
+    
+    public void stopRecording() {
+    	valueWriter.close();
+    	recording = false;
+    }
+    
+    public void writeActsToFile() {
+    	Iterator<Neuron> neuroIter = neuronList.iterator();
+    	while (neuroIter.hasNext()) {
+    		valueWriter.print(neuroIter.next().getActivation());
+    		if (neuroIter.hasNext()) {
+    			valueWriter.print(", ");
+    		}
+    	}
+    	valueWriter.println();
     }
 
 //    public void startRecording(String filename) {
@@ -892,8 +933,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         int i = 0;
         for (Neuron neuron : toCopy.getNeuronList()) {
             if (i < neuronList.size()) {
-                neuronList.get(i++).setActivation(
+                neuronList.get(i).setActivation(
                     neuron.getInputValue() + neuron.getActivation());
+                neuronList.get(i++).setSpike(neuron.isSpike());
+                
             }
         }
     }
@@ -1188,4 +1231,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         return result + " ";
     }
 
+    public boolean isRecording() {
+    	return recording;
+    }
+    
 }

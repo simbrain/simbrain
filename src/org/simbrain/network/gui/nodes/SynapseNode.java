@@ -28,7 +28,6 @@ import javax.swing.JPopupMenu;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
@@ -201,7 +200,6 @@ public final class SynapseNode extends ScreenElement {
      * Positive values are (for example) red, negative values blue.
      */
     public void updateColor() {
-
         if (synapse.getStrength() < 0) {
             circle.setPaint(inhibitoryColor);
         } else if (synapse.getStrength() == 0) {
@@ -209,16 +207,10 @@ public final class SynapseNode extends ScreenElement {
         } else {
             circle.setPaint(excitatoryColor);
         }
-
-        if (source.getNeuron().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) source.getNeuron().getUpdateRule())
-                    .hasSpiked()) {
-                line.setStrokePaint(NeuronNode.getSpikingColor());
-            } else {
-                line.setStrokePaint(lineColor);
-            }
+        if (source.getNeuron().isSpike()) {
+        	line.setStrokePaint(NeuronNode.getSpikingColor());
         } else {
-            line.setStrokePaint(lineColor);
+        	line.setStrokePaint(lineColor);
         }
     }
 

@@ -29,12 +29,14 @@ import org.simbrain.util.randomizer.Randomizer;
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
  *
+ * @author Zach Tosi
+ *
  * TODO: Add custom tooltip
  */
 public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     NoisyUpdateRule {
 
-    /** Resistance. */
+    /** Resistance (M ohms). */
     private double resistance = 1;
 
     /** Time constant (ms) */
@@ -111,9 +113,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
         memPotential += dVm;
 
         if (memPotential >= threshold) {
+            neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
             memPotential = resetPotential;
         } else {
+            neuron.setSpkBuffer(false);
             setHasSpiked(false, neuron);
         }
 

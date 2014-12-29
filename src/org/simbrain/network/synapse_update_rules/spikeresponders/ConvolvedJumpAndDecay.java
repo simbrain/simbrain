@@ -1,8 +1,12 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 
+/**
+ * 
+ * @author Zach Tosi
+ *
+ */
 public class ConvolvedJumpAndDecay extends SpikeResponder {
 
     /** Jump height value. */
@@ -31,8 +35,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
      */
     public void update(final Synapse s) {
         value = s.getPsr();
-        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked()) {
+        if (s.getSource().isSpike()) {
             value += jumpHeight * s.getStrength();
         } else {
             double timeStep = s.getParentNetwork().getTimeStep();

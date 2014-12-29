@@ -43,9 +43,11 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule {
     public void update(Neuron neuron) {
 
         if (inputType.getInput(neuron) >= threshold) {
+            neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
             neuron.setBuffer(1);
         } else {
+            neuron.setSpkBuffer(false);
             setHasSpiked(false, neuron);
             neuron.setBuffer(0); // Make this a separate variable?
         }

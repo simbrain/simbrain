@@ -39,6 +39,12 @@ public class SimbrainMath {
      */
     public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR258();
 
+    public static final double log10of2 = Math.log10(2);
+    
+    public static double log2(double val) {
+    	return Math.log10(val) / log10of2;
+    }
+    
     /**
      * Calculates the Euclidean distance between two points. Used in World.
      *

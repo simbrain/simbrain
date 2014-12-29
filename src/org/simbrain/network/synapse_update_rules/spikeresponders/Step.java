@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -42,8 +41,7 @@ public class Step extends SpikeResponder {
      * {@inheritDoc}
      */
     public void update(Synapse s) {
-        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked()) {
+        if (s.getSource().isSpike()) {
             timer = responseDuration;
         } else {
             timer -= s.getNetwork().getTimeStep();

@@ -25,6 +25,10 @@ import org.simbrain.network.core.Network.TimeType;
  * integrate and fire) with functions common to spiking neurons. For example a
  * boolean hasSpiked field is used in the gui to indicate that this neuron has
  * spiked.
+ * 
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
+ * 
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
@@ -35,8 +39,8 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     /** Time of last spike. */
     private double lastSpikeTime;
 
-    /** Whether a spike has occurred in the current time. */
-    private boolean hasSpiked;
+//    /** Whether a spike has occurred in the current time. */
+//    private boolean hasSpiked;
 
     @Override
     public void clear(Neuron neuron) {
@@ -61,20 +65,20 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      * @param neuron the neuron which has (or has not) spiked.
      */
     public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
-        if (hasSpiked == true) {
+        if (hasSpiked) {
             lastSpikeTime = neuron.getNetwork().getTime();
         }
-        this.hasSpiked = hasSpiked;
+//        this.hasSpiked = hasSpiked;
     }
 
-    /**
-     * Whether the neuron has spiked in this instant or not.
-     *
-     * @return true if the neuron spiked.
-     */
-    public boolean hasSpiked() {
-        return hasSpiked;
-    }
+//    /**
+//     * Whether the neuron has spiked in this instant or not.
+//     *
+//     * @return true if the neuron spiked.
+//     */
+//    public boolean hasSpiked() {
+//        return hasSpiked;
+//    }
 
     /**
      * @return the lastSpikeTime

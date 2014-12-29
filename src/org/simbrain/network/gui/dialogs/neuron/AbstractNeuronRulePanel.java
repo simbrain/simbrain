@@ -42,6 +42,7 @@ import org.simbrain.network.gui.dialogs.neuron.rule_panels.NakaRushtonRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
+import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
@@ -75,6 +76,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
 
     // Populate the Rule Map
     static {
+    	RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
         RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
         RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
         RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());

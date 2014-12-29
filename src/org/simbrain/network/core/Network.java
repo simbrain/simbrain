@@ -45,6 +45,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.util.SimpleId;
+import org.simbrain.util.math.SimbrainMath;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -230,7 +231,7 @@ public class Network {
 
         for (Neuron neuron : prioritySortedNeuronList) {
             neuron.update();
-            neuron.setActivation(neuron.getBuffer());
+            neuron.setToBufferVals();
         }
     }
 
@@ -246,7 +247,7 @@ public class Network {
 
         // Then update the activations themselves
         for (Neuron n : neuronList) {
-            n.setActivation(n.getBuffer());
+            n.setToBufferVals();
         }
     }
 
@@ -880,7 +881,7 @@ public class Network {
             neuron.update();
         }
         for (Neuron neuron : neuronList) {
-            neuron.setActivation(neuron.getBuffer());
+            neuron.setToBufferVals();
         }
     }
 
@@ -1010,8 +1011,8 @@ public class Network {
         if (timeType == TimeType.DISCRETE) {
             return "" + (int) time + " " + getUnits()[1];
         } else {
-            return "" + BigDecimal.valueOf((long) time, getTimeStepPrecision())
-                + " " + getUnits()[0];
+        	return SimbrainMath.roundDouble(time, getTimeStepPrecision())
+        			+ " " + getUnits()[0];
         }
     }
 

@@ -25,7 +25,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -34,9 +33,9 @@ import javax.swing.JPopupMenu;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+//import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
@@ -51,6 +50,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** The logical neuron this screen element represents. */
     protected Neuron neuron;
 
+    private static final double TEXT_VISIBILITY_THRESHOLD = 0.5;
+    
     /** Diameter of neuron. */
     private static final int DIAMETER = 24;
 
@@ -98,7 +99,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Neuron font very small. */
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial",
             Font.PLAIN, 7);
-
+    
     /** Color of "active" neurons, with positive values. */
     private static float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
 
@@ -107,6 +108,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** Color of "spiking" synapse. */
     private static Color spikingColor = Color.yellow;
+    
+    private boolean currentVisibility;
 
     /**
      * Create a new neuron node.
@@ -122,7 +125,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         this.centerFullBoundsOnPoint(neuron.getX(), neuron.getY());
         init();
     }
-
+    
     /**
      * Initialize the NeuronNode.
      */
@@ -131,22 +134,28 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 DIAMETER, DIAMETER);
 
         addChild(circle);
-
-        setPriorityView(getNetworkPanel().getPrioritiesVisible());
-
+        labelText = new PText("...");
+	    priorityText = new PText("...");
+        
         activationText = new PText(String.valueOf((int) Math.round(neuron
                 .getActivation())));
         activationText.setFont(NEURON_FONT);
         setActivationTextPosition();
-        addChild(activationText);
-
         // TODO: create a white background for the activation text
         labelBackground = new PNode();
         labelBackground.setPaint(this.getNetworkPanel().getBackground());
         labelBackground.setBounds(labelText.getBounds());
         labelBackground.addChild(labelText);
-        addChild(labelBackground);
-
+        
+        double scale = this.getNetworkPanel().getCanvas().getCamera()
+        		.getViewScale();
+        if (scale > TEXT_VISIBILITY_THRESHOLD) {
+        	currentVisibility = true;
+            setDisplayText(true);
+        } else {
+        	currentVisibility = false;
+        }
+        
         resetColors();
         update();
 
@@ -158,7 +167,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         PBounds bounds = circle.getBounds();
         setBounds(bounds);
 
-        updateTextLabel();
 
     }
 
@@ -259,13 +267,31 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     public void update() {
         updateColor();
-        updateText();
+        double scale = this.getNetworkPanel().getCanvas().getCamera()
+        		.getViewScale();
+        if (scale > TEXT_VISIBILITY_THRESHOLD) {
+        	if (!currentVisibility) {
+        		setDisplayText(true);
+            	currentVisibility = true;
+        	}
+        } else {
+        	if (currentVisibility) {
+        		setDisplayText(false);
+        		currentVisibility = false;
+        	}
+        }
+        if (currentVisibility) {
+        	updateText();
+        }
     }
 
     /**
      * Update the text label.
      */
     public void updateTextLabel() {
+    	if (!currentVisibility) {
+    		return;
+    	}
         // Set label text
         if ((!neuron.getLabel().equalsIgnoreCase(""))
                 || (!neuron.getLabel().equalsIgnoreCase(
@@ -290,7 +316,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void updateColor() {
         double activation = neuron.getActivation();
-        boolean spiking = neuron.getUpdateRule().isSpikingNeuron();
         // Force to blank if 0 (or close to it)
         if ((activation > -.1) && (activation < .1)) {
             circle.setPaint(Color.white);
@@ -304,16 +329,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
-        if (spiking) {
-            if (((SpikingNeuronUpdateRule) neuron.getUpdateRule())
-            		.hasSpiked()) {
-                circle.setStrokePaint(spikingColor);
-                circle.setPaint(spikingColor);
-            } else {
-                circle.setStrokePaint(SynapseNode.getLineColor());
-            }
+        if (neuron.isSpike()) {
+        	circle.setStrokePaint(spikingColor);
+        	circle.setPaint(spikingColor);
         } else {
-            circle.setStrokePaint(SynapseNode.getLineColor());
+        	circle.setStrokePaint(SynapseNode.getLineColor());
         }
     }
 
@@ -527,7 +547,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** @see ScreenElement */
     public void resetColors() {
         circle.setStrokePaint(SynapseNode.getLineColor());
-        labelBackground.setPaint(NetworkPanel.getBackgroundColor());
+//        labelBackground.setPaint(NetworkPanel.getBackgroundColor());
         updateColor();
     }
 
@@ -597,5 +617,21 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     public static void setSpikingColor(Color spikingColor) {
         NeuronNode.spikingColor = spikingColor;
     }
+
+	public void setDisplayText(boolean displayText) {
+		if(displayText) {
+	        addChild(activationText);
+	        addChild(labelBackground);
+	        setPriorityView(getNetworkPanel().getPrioritiesVisible());
+	        resetColors();
+	        updateText();
+	        updateTextLabel();
+		} else {
+			removeChild(activationText);
+			removeChild(labelText);
+			removeChild(priorityText);
+			removeChild(labelBackground);
+		}
+	}
 
 }

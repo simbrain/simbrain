@@ -372,6 +372,21 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
         if (producerMenu != null) {
             menu.add(producerMenu);
         }
+        
+        menu.addSeparator();
+        
+        Action recordingAction = new AbstractAction((neuronGroup.isRecording()
+        		? "Stop" : "Start") + " Recording"){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(neuronGroup.isRecording()) {
+					neuronGroup.stopRecording();
+				} else {
+					neuronGroup.startRecording();
+				}
+			}
+        };
+        menu.add(recordingAction);
 
         // Add the menu
         return menu;

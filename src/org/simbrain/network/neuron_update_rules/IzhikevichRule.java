@@ -98,8 +98,10 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         if (val >= threshold) {
             val = c;
             recovery += d;
+            neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
         } else {
+            neuron.setSpkBuffer(false);
             setHasSpiked(false, neuron);
         }
 

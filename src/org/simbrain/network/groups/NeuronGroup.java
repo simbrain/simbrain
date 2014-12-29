@@ -243,8 +243,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     }
     
     public void stopRecording() {
-    	valueWriter.close();
-    	recording = false;
+        if (valueWriter != null) {
+            valueWriter.close();
+            recording = false;
+        }
     }
     
     public void writeActsToFile() {

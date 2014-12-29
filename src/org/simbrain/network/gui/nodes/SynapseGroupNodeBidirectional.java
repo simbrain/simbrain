@@ -22,6 +22,8 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.SwingUtilities;
@@ -321,11 +323,9 @@ public class SynapseGroupNodeBidirectional extends PNode implements
         Point2D middleAr2 = SimbrainMath.cubicBezierMidpoint(ar2StPt, bezAr2,
             bez2Ar2, ar2EndPt);
 
-        synGroup1Box.setOffset(middleAr1.getX() - synGroup1Box.getWidth() / 2,
-            middleAr1.getY() - synGroup1Box.getHeight() / 2);
+        synGroup1Box.centerFullBoundsOnPoint(middleAr1.getX(), middleAr1.getY());
+        synGroup2Box.centerFullBoundsOnPoint(middleAr2.getX(), middleAr2.getY());
 
-        synGroup2Box.setOffset(middleAr2.getX() - synGroup2Box.getWidth() / 2,
-            middleAr2.getY() - synGroup2Box.getHeight() / 2);
 
         synGroup1Box.raiseToTop();
         synGroup2Box.raiseToTop();
@@ -635,6 +635,12 @@ public class SynapseGroupNodeBidirectional extends PNode implements
     @Override
     public void updateConstituentNodes() {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public List<InteractionBox> getInteractionBoxes() {
+        return Arrays.asList((InteractionBox) synGroup1Box,
+                (InteractionBox) synGroup2Box);
     }
 
 }

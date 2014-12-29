@@ -131,9 +131,8 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
             traceArrowHead(endAng - 3.1 * Math.PI / 6.0, recArc
                 .getEndPoint().getX() + 0.9 * strokeWidth, recArc
                 .getEndPoint().getY() - 0.9 * 2 * strokeWidth), false);
-        interactionBox.setOffset(
-            recArc.getCenterX() - interactionBox.getWidth() / 2,
-            recArc.getCenterY() - interactionBox.getHeight() / 2);
+        interactionBox.centerFullBoundsOnPoint(recArc.getCenterX(),
+                recArc.getCenterY());
         interactionBox.raiseToTop();
         arrowHead.lowerToBottom();
         arcCurve.lowerToBottom();

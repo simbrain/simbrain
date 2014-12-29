@@ -141,10 +141,10 @@ import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
 
 /**
- * A piccolo PCanvas that maintains a visual representation of a network object.
- * Creation, deletion, and state update events are received here and piccolo
- * nodes created, deleted, and updated accordingly. Various selection events and
- * and other graphics processing are also handled here.
+ * Contains a piccolo PCanvas that maintains a visual representation of the
+ * network. Creation, deletion, and state update events are received here and
+ * piccolo nodes created, deleted, and updated accordingly. Various selection
+ * events and and other graphics processing are also handled here.
  *
  * Here are some more details on this class. These are not API notes but rather
  * an overview of the class, which, given its size, is useful to have. Here are
@@ -1273,6 +1273,15 @@ public class NetworkPanel extends JPanel {
     private void removeGroup(Group group) {
         PNode node = objectNodeMap.get(group);
         if (node != null) {
+            if (node instanceof GroupNode) {
+                for (InteractionBox box : ((GroupNode) node)
+                        .getInteractionBoxes()) {
+                    // TODO: property listener list is not visible in pnode,
+                    //  so have not tested to make sure this cleanup is working
+                    canvas.getCamera()
+                            .removePropertyChangeListener(box.getZoomListener());
+                }
+            }
             node.removeFromParent();
             objectNodeMap.remove(group);
             // If this node is a child of a parent group, remove it from the
@@ -2132,7 +2141,7 @@ public class NetworkPanel extends JPanel {
     public String toString() {
     	return this.getName();
     }
-    
+
     public String debugString() {
         String ret = "";
         Iterator it = objectNodeMap.entrySet().iterator();
@@ -2898,7 +2907,7 @@ public class NetworkPanel extends JPanel {
     	sgd.setModalityType(Dialog.ModalityType.MODELESS);
     	return sgd;
     }
-    
+
     /**
      * Remove all nodes from panel.
      */

@@ -20,6 +20,8 @@ package org.simbrain.network.gui.nodes;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.List;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.groups.SynapseGroup;
@@ -79,8 +81,11 @@ public class SynapseGroupNode extends PNode implements GroupNode,
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        // This is needed for synapse groups within subnetworks
+        // to be updated properly when neuron groups are moved.
         layoutChildren();
     };
+
 
     /**
      * @return the networkPanel
@@ -113,7 +118,13 @@ public class SynapseGroupNode extends PNode implements GroupNode,
 
     @Override
     public void updateConstituentNodes() {
-        // Do nothing since there are no constituent nodes. Synpases are
+        // Do nothing since there are no constituent nodes. Synapses are
         // invisible.
+    }    
+
+    @Override
+    public List<InteractionBox> getInteractionBoxes() {
+        return Collections.singletonList((InteractionBox) interactionBox);
     }
+
 }

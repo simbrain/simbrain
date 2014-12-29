@@ -187,8 +187,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
         // dbLine.reset();
         // dbLine.append(dbL, false);
 
-        interactionBox.setOffset(middle.getX() - (interactionBox.getWidth())
-                / 2, middle.getY() - (interactionBox.getHeight()) / 2);
+        interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
         interactionBox.raiseToTop();
 
     }

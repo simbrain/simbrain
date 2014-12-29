@@ -20,10 +20,13 @@ package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.network.gui.NetworkPanel;
 
@@ -45,6 +48,16 @@ public class InteractionBox extends ScreenElement {
     private JPopupMenu contextMenu;
 
     /**
+     * This is the largest amount an interaction box's scale can be zoomed when
+     * the scale gets small. Easiest to understand by changing the value and
+     * "zooming  out" of a network containing a neuron group.
+     */
+    private final double largestZoomRescaleFactor = 3;
+
+    /** Reference to property change listener so it can be cleaned up later. */
+    private final PropertyChangeListener zoomListener;
+
+    /**
      * Create a new tab node.
      */
     public InteractionBox(final NetworkPanel net) {
@@ -57,6 +70,29 @@ public class InteractionBox extends ScreenElement {
         setStrokePaint(java.awt.Color.GRAY);
         textLabel = new PText();
         addChild(textLabel);
+
+        // Add listener to camera which causes the interaction box
+        // to re-scale when the canvas is "zoomed out" (view scale below 1)
+        zoomListener = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                double viewScale = net.getCanvas().getCamera().getViewScale();
+                if (viewScale < 1) {
+                    // Rescale based on linear equation so that as view scale
+                    // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
+                    double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale
+                            + largestZoomRescaleFactor;
+                    setScale(rescaleAmount);
+                } else {
+                    setScale(1);
+                }
+            }
+        };
+        net.getCanvas()
+                .getCamera()
+                .addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
+                        zoomListener);
+
     }
 
     /**
@@ -143,17 +179,19 @@ public class InteractionBox extends ScreenElement {
         return true;
     }
 
-    @Override
-    public void setScale(double scale) {
-        super.setScale(scale);
-//        textLabel.setScale(scale);
-    }
-
     /**
      * @param contextMenu the contextMenu to set
      */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
+    }
+
+
+    /**
+     * @return the zoomListener
+     */
+    public PropertyChangeListener getZoomListener() {
+        return zoomListener;
     }
 
 }

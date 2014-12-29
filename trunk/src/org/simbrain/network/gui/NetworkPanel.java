@@ -24,7 +24,6 @@ import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -58,6 +57,7 @@ import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PInputEventListener;
+import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.connections.QuickConnectionManager;
@@ -411,13 +411,12 @@ public class NetworkPanel extends JPanel {
 
         // Event listeners
         removeDefaultEventListeners();
-        canvas.addInputEventListener(new PanEventHandler(this));
-        canvas.addInputEventListener(new ZoomEventHandler(this));
-        canvas.addInputEventListener(new SelectionEventHandler(this));
+        canvas.addInputEventListener(new DragEventHandler(this));
+        canvas.addInputEventListener(new ContextMenuEventHandler(this));
+        canvas.addInputEventListener(new PMouseWheelZoomEventHandler());
         canvas.addInputEventListener(new WandEventHandler(this));
         textHandle = new TextEventHandler(this);
         canvas.addInputEventListener(textHandle);
-        canvas.addInputEventListener(new ContextMenuEventHandler(this));
 
         addNetworkListeners();
 
@@ -793,7 +792,7 @@ public class NetworkPanel extends JPanel {
                     groupNode.removeNeuronNode(node);
                 }
             }
-            centerCamera();
+            zoomToFitPage(false);
         }
     }
 
@@ -1297,7 +1296,7 @@ public class NetworkPanel extends JPanel {
                 }
             }
         }
-        centerCamera();
+        zoomToFitPage(false);
     }
 
     /**
@@ -1483,6 +1482,7 @@ public class NetworkPanel extends JPanel {
         for (Action action : actionManager.getNetworkModeActions()) {
             mainTools.add(action);
         }
+        mainTools.add(actionManager.getZoomToFitPageAction());
 
         return mainTools;
     }
@@ -1571,9 +1571,6 @@ public class NetworkPanel extends JPanel {
         this.editMode = newEditMode;
         if (editMode == EditMode.WAND) {
             editMode.resetWandCursor();
-        } else if ((editMode == EditMode.ZOOM_IN)
-            || (editMode == EditMode.ZOOM_OUT)) {
-            this.setAutoZoomMode(false);
         }
         firePropertyChange("editMode", oldEditMode, this.editMode);
         updateCursor();
@@ -2189,13 +2186,16 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Centers the neural Network in the middle of the PCanvas.
+     * Rescales the camera so that all objects in the canvas can be seen.
+     * Compare "zoom to fit page" in draw programs.
+     * 
+     * @param forceZoom if true force the zoom to happen
      */
-    public void centerCamera() {
+    public void zoomToFitPage(boolean forceZoom) {
         PCamera camera = canvas.getCamera();
 
         // TODO: Add a check to see if network is running
-        if (autoZoomMode && editMode.isSelection()) {
+        if ((autoZoomMode && editMode.isSelection()) || forceZoom) {
             PBounds filtered = new PBounds();
             // Must manually ensure that invisible nodes are not used in
             // computing bounds. Not sure why!?
@@ -2372,9 +2372,8 @@ public class NetworkPanel extends JPanel {
         // updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
         // }
 
-        if ((network != null) && (canvas.getLayer().getChildrenCount() > 0)
-            && (!editMode.isPan())) {
-            centerCamera();
+        if ((network != null) && (canvas.getLayer().getChildrenCount() > 0)) {
+            zoomToFitPage(false);
         }
     }
 

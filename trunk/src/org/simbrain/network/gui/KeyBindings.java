@@ -178,30 +178,15 @@ public class KeyBindings {
         panel.getActionMap().put("selectionMode",
                 panel.getActionManager().getSelectionEditModeAction());
 
-        // Pan Mode
-        inputMap.put(KeyStroke.getKeyStroke("K"), "panMode");
-        panel.getActionMap().put("panMode",
-                panel.getActionManager().getPanEditModeAction());
-
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
         panel.getActionMap().put("textMode",
                 panel.getActionManager().getTextEditModeAction());
 
-        // Zoom mode
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT,
-                KeyEvent.ALT_DOWN_MASK), "altPress");
-        panel.getActionMap().put("altPress", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                if (panel.getEditMode().isZoomIn()) {
-                    panel.setEditMode(EditMode.ZOOM_OUT);
-                } else if (panel.getEditMode().isZoomOut()) {
-                    panel.setEditMode(EditMode.ZOOM_IN);
-                } else {
-                    panel.setEditMode(EditMode.ZOOM_IN);
-                }
-            }
-        });
+        // Wand Mode
+        inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
+        panel.getActionMap().put("wandMode",
+                panel.getActionManager().getWandEditModeAction());
 
         // Number keys
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");

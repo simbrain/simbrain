@@ -49,9 +49,10 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 
 /**
- * Selection event handler. Creates the selection "lasso", handles selection and
- * toggle selection, drags objects as appropriate, updates relevant graphics
- * parameters like "last clicked position".
+ * Handle simbrain drag events, which pan the canvas, create lassos for
+ * selection. handles selection an, toggle selection, drags objects as
+ * appropriate, updates relevant graphics parameters like
+ * "last clicked position".
  *
  * Coding this properly requires tracking picked nodes and their parents fairly
  * closely. To see the scene graph hierarchy for debugging this use ctrl-c while
@@ -60,7 +61,7 @@ import org.simbrain.util.Utils;
  * @author Michael Heuer
  * @author Jeff Yoshimi
  */
-final class SelectionEventHandler extends PDragSequenceEventHandler {
+final class DragEventHandler extends PDragSequenceEventHandler {
 
     /** Selection marquee. */
     private SelectionMarquee marquee;
@@ -85,7 +86,7 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
      *
      * @param networkPanel
      */
-    public SelectionEventHandler(NetworkPanel networkPanel) {
+    public DragEventHandler(NetworkPanel networkPanel) {
         super();
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
@@ -203,6 +204,13 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
     protected void drag(final PInputEvent event) {
 
         super.drag(event);
+
+        // If the meta (ctrl on pc and linux, command on macs) is down,
+        // pan the canvas.
+        if (event.isMetaDown()) {
+            pan(event);
+            return;
+        }
 
         // The case where nothing was clicked on initially. So draw the lasso
         // and select things.
@@ -389,4 +397,24 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
             }
         }
     }
+
+    /**
+     * Pans the camera in response to the pan event provided. (From the source
+     * code for PanEventHandler. Note that "autopan"--from that class--is not
+     * being used. Not sure what is being lost by not using it.)
+     *
+     * @author Jesse Grosjean
+     *
+     * @param event contains details about the drag used to translate the view
+     */
+    protected void pan(final PInputEvent event) {
+        final PCamera c = event.getCamera();
+        final Point2D l = event.getPosition();
+
+        if (c.getViewBounds().contains(l)) {
+            final PDimension d = event.getDelta();
+            c.translateView(d.getWidth(), d.getHeight());
+        }
+    }
+
 }

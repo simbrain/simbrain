@@ -41,11 +41,11 @@ import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.edit.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.edit.AlignVerticalAction;
+import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.EditRandomizerPropertiesAction;
-import org.simbrain.network.gui.actions.edit.PanEditModeAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.edit.RandomizeObjectsAction;
 import org.simbrain.network.gui.actions.edit.SelectionEditModeAction;
@@ -55,7 +55,6 @@ import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.edit.TextEditModeAction;
 import org.simbrain.network.gui.actions.edit.WandEditModeAction;
 import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
-import org.simbrain.network.gui.actions.edit.ZoomEditModeAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.network.IterateNetworkAction;
@@ -107,17 +106,17 @@ import org.simbrain.network.layouts.LineLayout;
  */
 public final class NetworkActionManager {
 
-    /** Pan edit mode action. */
-    private final Action panEditModeAction;
-
-    /** Zoom in edit mode action. */
-    private final Action zoomInEditModeAction;
-
     /** Selection edit mode action. */
     private final Action selectionEditModeAction;
 
     /** Text edit mode action. */
     private final Action textEditModeAction;
+
+    /** Wand edit mode action. */
+    private final Action wandEditModeAction;
+
+    /** Auto-zoom action. */
+    private final Action zoomToFitPageAction;
 
     /** New neuron action. */
     private final Action newNeuronAction;
@@ -275,16 +274,17 @@ public final class NetworkActionManager {
 
         this.networkPanel = networkPanel;
 
-        panEditModeAction = new PanEditModeAction(networkPanel);
-        zoomInEditModeAction = new ZoomEditModeAction(networkPanel);
         selectionEditModeAction = new SelectionEditModeAction(networkPanel);
         textEditModeAction = new TextEditModeAction(networkPanel);
+        wandEditModeAction = new WandEditModeAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
         zeroSelectedObjectsAction = new ZeroSelectedObjectsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
+
+        zoomToFitPageAction = new ZoomToFitPageAction(networkPanel);
 
         deleteAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
@@ -317,6 +317,7 @@ public final class NetworkActionManager {
                 new ShowNetworkHierarchyPanel(networkPanel));
 
         setAutoZoomAction = new JCheckBoxMenuItem(new SetAutoZoomAction(networkPanel));
+        setAutoZoomAction.setSelected(networkPanel.getAutoZoomMode());
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
@@ -374,21 +375,12 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Return the pan edit mode action.
+     * Return the wand edit mode action.
      *
-     * @return the pan edit mode action
+     * @return the wand edit mode action
      */
-    public Action getPanEditModeAction() {
-        return panEditModeAction;
-    }
-
-    /**
-     * Return the zoom in edit mode action.
-     *
-     * @return the zoom in edit mode action
-     */
-    public Action getZoomInEditModeAction() {
-        return zoomInEditModeAction;
+    public Action getWandEditModeAction() {
+        return wandEditModeAction;
     }
 
     /**
@@ -397,9 +389,8 @@ public final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List<Action> getNetworkModeActions() {
-        return Arrays.asList(new Action[] { zoomInEditModeAction,
-                panEditModeAction, selectionEditModeAction, textEditModeAction,
-                new WandEditModeAction(networkPanel) });
+        return Arrays.asList(new Action[] { selectionEditModeAction,
+                textEditModeAction, wandEditModeAction });
     }
 
     /**
@@ -939,5 +930,12 @@ public final class NetworkActionManager {
      */
     public Action getAddSynapseGroupAction() {
         return addSynapseGroupAction;
+    }
+
+    /**
+     * @return the zoomToFitPageAction
+     */
+    public Action getZoomToFitPageAction() {
+        return zoomToFitPageAction;
     }
 }

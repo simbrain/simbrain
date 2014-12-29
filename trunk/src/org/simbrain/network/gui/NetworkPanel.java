@@ -2130,6 +2130,10 @@ public class NetworkPanel extends JPanel {
 
     @Override
     public String toString() {
+    	return this.getName();
+    }
+    
+    public String debugString() {
         String ret = "";
         Iterator it = objectNodeMap.entrySet().iterator();
         while (it.hasNext()) {

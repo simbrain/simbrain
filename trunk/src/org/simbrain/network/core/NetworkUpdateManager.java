@@ -27,6 +27,7 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
@@ -114,6 +115,7 @@ public class NetworkUpdateManager {
         // By default these guys are always available
         availableActionList.add(new BufferedUpdate(network));
         availableActionList.add(new PriorityUpdate(network));
+        availableActionList.add(new ConcurrentBufferedUpdate(network));
 
         // Add update actions for all groups available
         for (Group group : network.getGroupList()) {

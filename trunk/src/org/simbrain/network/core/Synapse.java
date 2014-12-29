@@ -33,6 +33,10 @@ import org.simbrain.util.Utils;
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
  * (grow or weaken) based on various factors, including the activation level of
  * connected neurons.
+ * 
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
+ * 
  */
 public class Synapse {
 
@@ -77,10 +81,10 @@ public class Synapse {
     private double increment = 1;
 
     /** Upper limit of synapse. */
-    private double upperBound = 10;
+    private double upperBound = 100;
 
     /** Lower limit of synapse. */
-    private double lowerBound = -10;
+    private double lowerBound = -100;
 
     /** Time to delay sending activation to target neuron. */
     private int delay;

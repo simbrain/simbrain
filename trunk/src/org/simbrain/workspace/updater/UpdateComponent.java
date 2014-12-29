@@ -47,9 +47,10 @@ public class UpdateComponent implements UpdateAction {
      */
     public void invoke() {
         // TODO: Is the below needed? Would component.update() suffice?
-        LatchCompletionSignal latch = new LatchCompletionSignal(1);
-        updater.updateComponent(component, latch);
-        latch.await();
+//        LatchCompletionSignal latch = new LatchCompletionSignal(1);
+//        updater.updateComponent(component, latch);
+//        latch.await();
+    	component.update();
     }
 
     /**

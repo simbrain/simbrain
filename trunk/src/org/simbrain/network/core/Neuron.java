@@ -39,6 +39,10 @@ import org.simbrain.util.SimbrainConstants.Polarity;
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
  * the neural network occurs here, in the update function. Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
+ * 
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
+ * 
  */
 public class Neuron {
 
@@ -48,6 +52,9 @@ public class Neuron {
      * with default parameters.
      */
     public static final NeuronUpdateRule DEFAULT_UPDATE_RULE = new LinearRule();
+    
+    public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500
+    		/ 0.75);
 
     /**
      * The update method of this neuron, which corresponds to what kind of
@@ -63,9 +70,13 @@ public class Neuron {
 
     /** Activation value of the neuron. The main state variable. */
     private double activation;
+    
+    private boolean spike;
 
     /** Temporary activation value. */
     private double buffer;
+    
+    private boolean spkBuffer;
 
     /**
      * Value of any external inputs to neuron. See description at
@@ -77,10 +88,12 @@ public class Neuron {
     private final Network parent;
 
     /** List of synapses this neuron attaches to. */
-    private Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>();
+    private Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>(
+    		PRE_ALLOCATED_NUM_SYNAPSES);
 
     /** List of synapses attaching to this neuron. */
-    private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
+    private ArrayList<Synapse> fanIn = new ArrayList<Synapse>(
+    		PRE_ALLOCATED_NUM_SYNAPSES);
 
     /** A marker for whether or not the update rule is an input generator. */
     private boolean generator;
@@ -307,6 +320,15 @@ public class Neuron {
         }
     }
 
+    /**
+     * A general purpose method that moves all relevant values from this
+     * neuron's buffer to its main values.
+     */
+    public void setToBufferVals() {
+    	setActivation(getBuffer());
+    	setSpike(getSpkBuffer());
+    }
+    
     /**
      * Sets the activation of the neuron regardless of the state of the neuron.
      * Overrides clamping and any intrinsic dynamics of the neuron, and forces
@@ -1066,5 +1088,21 @@ public class Neuron {
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
     }
+
+	public boolean isSpike() {
+		return spike;
+	}
+
+	public void setSpike(boolean spike) {
+		this.spike = spike;
+	}
+
+	public boolean getSpkBuffer() {
+		return spkBuffer;
+	}
+
+	public void setSpkBuffer(boolean spkBuffer) {
+		this.spkBuffer = spkBuffer;
+	}
 
 }

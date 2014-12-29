@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -52,8 +51,7 @@ public class JumpAndDecay extends SpikeResponder {
      */
     public void update(final Synapse s) {
         value = s.getPsr();
-        if (((SpikingNeuronUpdateRule) s.getSource().getUpdateRule())
-                .hasSpiked()) {
+        if (s.getSource().isSpike()) {
             value = jumpHeight * s.getStrength();
         } else {
             double timeStep = s.getParentNetwork().getTimeStep();

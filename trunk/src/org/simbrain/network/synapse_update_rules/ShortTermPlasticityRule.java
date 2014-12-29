@@ -98,8 +98,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     public void update(Synapse synapse) {
         // Determine whether to activate short term dynamics
         if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
-                    .hasSpiked()) {
+            if (synapse.getSource().isSpike()) {
                 activated = true;
             } else {
                 activated = false;

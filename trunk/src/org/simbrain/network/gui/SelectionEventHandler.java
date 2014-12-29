@@ -30,9 +30,9 @@ import java.util.Iterator;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PLayer;
 import org.piccolo2d.PNode;
-import org.piccolo2d.event.PDragSequenceEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
+import org.piccolo2d.event.PPanEventHandler;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
@@ -60,7 +60,7 @@ import org.simbrain.util.Utils;
  * @author Michael Heuer
  * @author Jeff Yoshimi
  */
-final class SelectionEventHandler extends PDragSequenceEventHandler {
+final class SelectionEventHandler extends PPanEventHandler {
 
     /** Selection marquee. */
     private SelectionMarquee marquee;
@@ -202,12 +202,10 @@ final class SelectionEventHandler extends PDragSequenceEventHandler {
     @Override
     protected void drag(final PInputEvent event) {
 
-        super.drag(event);
-
         // The case where nothing was clicked on initially. So draw the lasso
         // and select things.
         if (noObjectWasClickedOn()) {
-
+        	super.drag(event);
             // Select lassoed nodes
             Point2D position = event.getPosition();
             PBounds rect = new PBounds();

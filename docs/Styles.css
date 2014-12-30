@@ -30,7 +30,7 @@ div.logo
 	margin: 0 auto; 
 	padding: 15px; 
 	width: 500px; 
-	border: dashed 1px #666; 
+	border: dashed 1px #665; 
 }
 
 div.navi
@@ -54,7 +54,7 @@ div.section
 
 #main_docs
 { 
-	color: #666; 
+	color: #665; 
 	font-family: Arial, Helvetica, sans-serif, Verdana; 
 	background: #fff; 
 	margin: 10px 10px 40px; 
@@ -85,7 +85,7 @@ div.intial
 
 h1   
 { 
-	color: #666; 
+	color: #665; 
 	font-size: 16px; 
 	font-family: Verdana, Arial, Helvetica, sans-serif; 
 	font-weight: bolder; 
@@ -141,7 +141,7 @@ h1
 
 .command
 { 
-	color: #666; 
+	color: #665; 
 	font: italic 12px Arial, Helvetica, sans-serif; 
 	text-transform: none; 
 	padding-right: 0; 

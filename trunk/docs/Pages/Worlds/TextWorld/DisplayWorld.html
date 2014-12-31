@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="TextWorld.html">TextWorld</a> &gt; Display World</p>
+        </div>
+
+        <h1>Display World</h1>
+        <p>Display world intuitively models "speaking" by converting numbers to text, though it can also be useful as a diagnostic component. Any time it's useful to see text output in Simbrain, a display world can be used. Numbers and vectors from (mainly) neural networks are converted into text that is displayed in the display world. Display world is used in conjunction with couplings (links between components in Simbrain), via consumers. When the workspace is updated, consumers are activated, and corresponding text is displayed. The display world can be thought of as containing a set of "buttons" (one for each consumer). When a given button is activated by a coupling, the corresponding text is displayed. As with reader world, there are scalar and vector attributes:
+            <ul>
+                <li>Scalar: When the scalar coupling is activated, the associated token (character or word) is produced and displayed. Stored in the "token dictionary"</li>
+                <li>Vector: When the vector coupling is activated, the associated token is produced and displayed. These vectors are specified in the "vector dictionary". When a vector comes in, the closest vector in the dictionary is found, and the corresponding token is displayed.</li>
+            </ul>
+        </p>
+        <p>The basic process of setting up a display world is first, setting up a dictionary (see below), and then coupling nodes in a neural network to the words in that dictionary, so that when those nodes are activated, the corresponding words are produced in the display world. Basically, the dictionary is just a text file. Every word in the file is added to the dictionary. One consumer is created for each word in the dictionary. When a coupling is created between a producer (e.g. a neuron) and a consumer, and the producer takes a value above .5, the corresponding word is displayed.
+        </p>
+
+        <!--       <p>These components convert numbers to text. The most common use of a display is to let a neural network produce "speech". Things could be set up so that when a given node is activated, the word "Cheese" is written to the display world window.&nbsp;
+            <br>
+        </p>
+       -->
+        <p>
+            <span class="heading">Dictionary</span>
+            <br>
+        </p>
+
+        <p>The dictionary is a simple list of words. Each entry in the dictionary is one word that can be written to the display world.
+            <br>
+        </p>
+        <blockquote>
+            <p><span class="heading2">Edit / Display dictionary:</span> To edit and display the current dictionary, press the grid-icon in the toolbar or select menu item&nbsp;<span class="command">Edit &gt; Edit Dictionary</span>. It is just a list of words. Rows can be added or deleted using straightforward commands. Dictionaries can also be loaded or saved to csv files, which are human-readable and easy to edit.
+                <br>
+            </p>
+            <p><span class="heading2">Extract-dictionary:</span> Use this to select a text file, extract every word in it, and add it to the dictionary.&nbsp; After extracting text, try displaying the dictionary to see what you got.</blockquote>
+
+        <p>
+            <span class="heading">Attribute Types, Preferences</span>
+            <br>
+        </p>
+        <p>As with reader worlds, attribute types are set in the coupling manager. Display world attributes are consumers, since text is parsed and then used to produce numerical values.&nbsp;
+        </p>
+        <blockquote>
+            <p> <span class="heading2">String-reader:</span> (disabled by default; enable it using the&nbsp;<span class="command">set attribute visibility</span> command in the <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager</a> ): This allows the component to directly receive text produced by a text based producer. It is not currently used much.
+            </p>
+            <p> <span class="heading2">Word-reader:</span> In this mode, each consumer is associated with a particular word, a particular entry in the dictionary. When the consumer consumes a numeric value, if that value is above a threshold, then the corresponding word is produced in the display world window.<span style="font-style: italic;"> </span>For example in a network you could right click on a node, go to "send scalar coupling to" and then in the context menu choose "DisplayWorld1" and then "cheese" to make activation of that neuron produce the word "cheese" in the display. </p>
+
+            <p>
+                <span class="heading2">Display-Threshold:</span> The numeric value that must be exceeded in order for a given word to be produced in the window. Used with word-reader attributes. By default it is set to .5.
+                <br>
+            </p>
+        </blockquote>
+        <p><span class="heading">Examples</span></p>
+        <p><span class="heading2">Sample project 1:</span> Make a
+            <q>poetry net</q>. Open a display world. Find some text online to use as a dictionary. Load Dictionary, Display dictionary. Note how many words are in the dictionary and try not to go over 400. May need to
+            <q>pre-process</q> your text. Make a network with as many nodes as the dictionary. Couple the network to the display world. To test: Run and activate the network with a wand.</p>
+
+        <p><span class="heading2">Sample project 2.</span> Create a sparse set of connections on the network so that the network
+            <q>speaks</q> when the simulation is run. Aim for a network with sparse activity. When running, only a few nodes should be active, and preferably over a nice variety of distances. (To test this try the space bar in the network, so you don&#39;t activate workspace couplings). Suggest decay with .5 decay fraction. I tried sparsity of .01 and 1 percent excitatory. Also try binary units with a high threshold.</p>
+
+
+
+    </div>
+</body>
+
+</html>

@@ -27,18 +27,24 @@
             <blockquote>
                 <p><span class="heading2">Type (entities, agents)</span>: The image associated with the agent or entity. </p>
                 <p><span class="heading2">Name (agents)</span>: The name used to refer to the entity when creating <a href="../../Workspace/Couplings.html">couplings</a>. </p>
-                <p><span class="heading2">X, Y:</span> Set the current x and y coordinates of the entity&#8217s position (sometimes useful for fine tuning entity position). 0,0 is the top of the screen.  Note that larger y values go <u>down</u>, not up.</p>
+                <p><span class="heading2">X, Y:</span> Set the current x and y coordinates of the entity&#8217s position (sometimes useful for fine tuning entity position). 0,0 is the top of the screen. Note that larger y values go <u>down</u>, not up.</p>
 
-                <p><span class="heading2">Velocity X, Velocity Y:</span> Set a velocity vector for the entity, which will give it linear motion while the workspace is updated.  At each update, the <velocity-x,velocity-y> vector is added to the entities current position to update that position. To get a feel for how this works, try setting both values to 1 for a piece of cheese, and then run the simbrain workspace. You'll see cheese on the move!</p>
-            
+                <p><span class="heading2">Velocity X, Velocity Y:</span> Set a velocity vector for the entity, which will give it linear motion while the workspace is updated. At each update, the
+                    <velocity-x,velocity-y> vector is added to the entities current position to update that position. To get a feel for how this works, try setting both values to 1 for a piece of cheese, and then run the simbrain workspace. You'll see cheese on the move!</p>
+
                 <p><span class="heading2">Show Sensors:</span> If checked, sensors will be visible in odor world. </p>
                 <p><span class="heading2">Sensors Enabled:</span> If checked, sensors are active.</p>
                 <p><span class="heading2">Effectors Enabled:</span> If checked, effectors are active. </p>
             </blockquote>
-            <p class="heading"><a name="smell"></a>Smell</p>
+            <p class="heading">
+                <a name="smell"></a>Smell</p>
             <blockquote>
-                <p>Objects are associated with &quot; stimulus vectors.&quot; Distal stimulus vectors can be thought of as a profile of the effect an object will have on the creature's receptors if it is near it. The distal stimulus vecors of all the objects are transformed on the basis of distance betwen them and the creature and the presence of noise. These transformed stimulus vecors are then combined to create the input vector that will be sent to the neural network.</p>
+                <p>Objects are associated with <a href="objects.html#SmellSource">smell sources</a> / "stimulus vectors"; Distal stimulus vectors can be thought of as a profile of the effect an object will have on the creature's receptors if it is near it. The distal stimulus vectors of all the objects are transformed on the basis of distance between them and the creature and the presence of noise. These transformed stimulus vectors are then combined to create the input vector that will be sent to the neural network.</p>
+
+                <p> The stimulus vector is set using the smell and dispersion tabs of the entity dialog.</p>
+
                 <p><span class="heading2">Stimulus dimensions</span>: number of dimensions of this stimulus, e.g. how many numbers make it up. As you change the number the number of visible fields change. These numbers are then used when setting <a href="../../Workspace/Couplings.html">couplings</a>. &quot;1&quot; will show up in the popup menu as <span class="command">Right 1</span>, <span class="command">Left 1</span>, <span class="command">Center 1</span> etc. The numbers can be thought of as indices of sensory receptors, which say how this object will impact that sensory receptor. </p>
+
                 <p><span class="heading2">Randomize stimulus</span>: creates random numbers for all components of the stimulus vector within the upper and lower limits indicated. </p>
                 <p><span class="heading2">Lower</span>: lower bound for randomization.</p>
                 <p><span class="heading2">Upper</span>: upper bound for randomization.</p>
@@ -60,28 +66,6 @@
             <blockquote> See <a href="sensors.html">Sensors</a>.</blockquote>
             <p class="heading">Effectors</p>
             <blockquote>See <a href="effectors.html">Effectors</a>.</blockquote>
-
-            <!--
-            <p class="heading">
-                <a name="Agent"></a>Agents</p>
-            <blockquote>
-                <p><span class="heading2">Whisker angle</span>: the offset between the whiskers of the agent and the nose of the agent. For example, if 15 is selected then the agent has two whiskers, left and right, each of which is 15 degrees offset from the agent's nose. </p>
-                <p><span class="heading2">Whisker length</span>: how long the whiskers are, in pixels. </p>
-                <p><span class="heading2">Turn increment</span>: represents how many degrees the agent will turn. Note that the strength of the signal sent to a turn command will also influence how many degrees the agent will turn. </p>
-                <p><span class="heading2">Straight movement increment</span>: is how many pixels the agent will move with each movement increment. Note that the strength of the signal sent to a straight command will also influence how far the agent will go. </p>
-            </blockquote>
-          -->
-            <!--<p><span class="heading">Miscellaneous Entities Menus </span></p>
-  <blockquote>
-    <p><span class="heading2">Edible</span>: if this is selected then the objects can be eaten. </p>
-    <p><span class="heading2">Bites to die</span>: how many bites before this object disappears. A &quot;bite&quot; occurs when an agent bumps against this object.</p>
-    <p><span class="heading2">Resurection probability</span>: the likelyhood an edible item will re-appear at a given iteration. If 0 the object will never re-apppear. </p>
-  </blockquote>
- <p><span class="heading">Walls</span></p>
-  <blockquote>
-    <p><span class="heading2">Set Wall Color (All Walls) </span>: sets color of all walls (not just the one selected). </p>
-    <p><span class="heading2">Width / Height </span>: currently used to set the size of a wall. </p>
-  </blockquote> -->
     </div>
 </body>
 

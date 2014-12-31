@@ -3,7 +3,6 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../Styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -23,47 +22,36 @@
             <p class="menubold">Contents</p>
 
             <p>
-                <a href="Projection/toolbar.html">&nbsp;&nbsp;&nbsp;Toolbar</a>
+                <a href="Projection/dataPointColoring.html">&nbsp;&nbsp;&nbsp;Datapoint Coloring</a>
                 <br>
                 <a href="Projection/menu.html">&nbsp;&nbsp;&nbsp;Menus</a>
-                <br>
-                <a href="Projection/dataPointColoring.html">&nbsp;&nbsp;&nbsp;Datapoint Coloring</a>
                 <br>
                 <a href="Projection/method.html">&nbsp;&nbsp;&nbsp;Projection Methods</a>
                 <br>
                 <a href="Projection/preferences.html">&nbsp;&nbsp;&nbsp;Preferences</a>
-            </p>
-
+                <br>
+                <a href="Projection/toolbar.html">&nbsp;&nbsp;&nbsp;Toolbar</a>
+                </p>
         </div>
 
 
         <h1><a name="overview">Projection Overview</a></h1>
 
-        <p>Projection components are instances of a program called <a href="http://hisee.sourceforge.net">HiSee</a>. HiSee is a high dimensional visualizer. As a neural net operates its state travels along a path in its state space, which typically has many dimensions, Hisee can take the collection of states, which are visited by a neural net, projecting them down into two dimensions so that many of their geometric and topological properties are preserved. This gives users of Simbrain a way to visualize the behavior of the network component. More information about HiSee is available at the HiSee website: <a href="http://hisee.sourceforge.net"> http://hisee.sourceforge.net </a>.</p>
+        <p>Projection components are instances of a program called <a href="http://hisee.sourceforge.net">HiSee</a>. HiSee is a high dimensional visualizer, it let's you "see" "hi"-dimensional data (get it!).   It is basically a visual way of performing <a href="http://en.wikipedia.org/wiki/Dimensionality_reduction">dimensionality reduction</a> using a few techniques, primarily <a href="http://en.wikipedia.org/wiki/Principal_component_analysis">pca</a> and <a href="http://en.wikipedia.org/wiki/Sammon_mapping">Sammon Maps</a>.  It can be used to represent any high dimensional data, but in Simbrain it is primarily used to study the dynamics of a neural network.The projection component can take all the states (patterns of activation) that occur for the network, which exist in a high dimensional space, and project them down into two dimensions so that many of their geometric and topological properties are preserved. This gives users of Simbrain a way to visualize the dynamics of the network.<p>
+
+        <p>To get a feel for how projection components work, invoke the script <span class="command">Simbrain Menu > Scripts > recurrentNetWithProjection.bsh</span>.  Run the network, and periodically randomize network activations by clicking in the network window, and pressing "N" and "R".  This will give you a sense of how the projection component works.  Each new state of the network is a separate dot in the component, and the red dot is the current state.</p>
+
+        <p align="left">The projection component shown below represents the states that have occurred in a network with 20 neurons. Each dot corresponds to one of those states, where the red dot is current state, and the blue dots are all previous states (colors can be changed in the <a href="projection/menu.html#coloring">datapoint coloring</a> dialog). Points that are close to each other in the projection component correspond to patterns of activity that are similar. You can linger the mouse arrow over a data point to reveal a tooltip that displays which high-dimensional point that 2-dimensional dot corresponds to.</p>
 
         <p align="center"> <img src="../../Images/Gauges.gif" height="314" width="292">
         </p>
 
-        <p align="left">This projection component represents the states (patterns of activity across the nodes of the network) that have occurred in a network with 40 neurons. Each blue dot corresponds to one of those states. The red dot represents the current state. For the most part, points that are close to each other in the projection component correspond to states that close to each other in the network's 40-dimensional state space. </p>
-
         <p align="left">When Simbrain is running users can add one or more projection component windows, each of which projects some subset of the network's state variables to two dimensions. This allows users to independently study different aspects of the network component. For example, one projection component might represent the activity at the input nodes of a network, another might represent activity at the hidden nodes, another might represent the aggregate activity of the entire network, and another might represent the changing values of the network's weights as it learns.</p>
 
-        <p class="heading">What the Dots Represent </p>
+        <p class="heading">Getting started</p>
         <br>
-        <p>Each "dot" in the projection component represents a state of the network. When a projection component is first opened, there are no dots, since no state information has been sent to the projection component yet. With each update of the network, state information is sent to the projection component, which is then displayed as a red dot. The set of dots that appear in the projection component window represent the states that have been visited by the associated network since the projection component was added. This representation of the history of a network's activity allows for the user to understand and analyze the network's behavior. As the network is updated the user can watch new dots appear as new states arise.</p>
-
-        <p align="left">The projection component below represents the states that have occurred in a network with 20 neurons. Each dot corresponds to one of those states, where the red dot is current state, and the blue dots are all previous states (colors can be changed in the <a href="projection/menu.html#coloring">datapoint coloring</a>). Points that are close to each other in the projection component correspond to patterns of activity that are similar. One can linger over a data point to reveal a tooltip that displays which high-dimensional position they correspond to.</p>
-
-        <p align="center"><img src="../../Images/Gauges.gif" height="250" width="233">
-        </p>
-
-        <p>When a projection component is created by pressing a network's <em>Gauge</em> button, they, by default, represent the activity of <em>all</em> the neurons across the network, though they can be set to represent any subset of the neurons of a neural network. Projection components can also be used to represent weight strengths. </p>
-        <br>
-
-        <p><span class="heading"><a name="panZoom">Pan and Zoom</a></span> </p>
-
-        <p>The projection component display is currently 2-dimensional. It is based on the <a href="https://code.google.com/p/piccolo2d/">Piccolo</a> zoomable user interface (ZUI), which allows users to pan and zoom and graphical data. You can pan the visible data by left-dragging (dragging the mouse while holding the left-mouse button down), and you can zoom in or out on data by right-dragging (dragging the mouse while holding the right button down). </p>
-        <br>
+        <p>When a projection component is first opened, there are no dots, since no state information has been sent to the projection component yet. It must also be <a href="../Workspace/Couplings.html">coupled</a> to another component, usually a network.</p>
+        <p> Once everything is configured, with each update of the workspace, state information is sent to the projection component.  Each new state is displayed as a red dot. The set of dots that appear in the projection component window represent the states that have been visited by the associated network since it was first coupled to the projection component. This is a kind of representation of the history of a network's activity. As the network is updated the user can watch new dots appear as new states arise.  In some cases there are no new states, and the network just repeatedly visits states it has visited before.</p>
 
     </div>
 </body>

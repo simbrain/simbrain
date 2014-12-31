@@ -10,8 +10,6 @@
 <body>
     <a href="../SimbrainDocs.html">
         <div class="logo">
-            <p><span></span>
-            </p>
         </div>
     </a>
     <div id="main_docs">
@@ -25,43 +23,41 @@
                     <br>
                     <a href="Workspace/Couplings.html">Couplings</a>
                     <br>
-                    <a href="Workspace/Examples.html">Examples</a>
-                    <br>
                     <a href="Workspace/Menus.html">Menus</a>
                     <br>
                     <a href="Workspace/Preferences.html">Preferences</a>
                     <br>
                     <a href="Workspace/PropertyTabs.html">Property Tabs</a>
                     <br>
-                    <a href="Scripting.html">Scripts</a>
-                    <br>
                     <a href="Workspace/Toolbar.html">Toolbar</a>
                     <br>
                     <a href="Workspace/Update.html">Update</a>
-                    <br> &nbsp;
+                    <br>
                 </p>
             </blockquote>
         </div>
         <p> </p>
         <h1>Workspace</h1>
-        <p>The Simbrain <span style="font-weight: bold;">workspace</span> is the framework within which a simulation is run. It contains components which are coupled to one another, and tools for managing these interactions.&nbsp;&nbsp; More specifically, the workspace&nbsp; is responsible for:
+        <p>The Simbrain workspace is the framework within which a simulation is run. It contains components which are coupled to one another, and tools for managing these interactions.&nbsp;&nbsp; More specifically, the workspace&nbsp; is responsible for:
             <br>
         </p>
         <p style="margin-left: 40px;">(1) Maintaining a list of
             <a href="Workspace/Components.html">components</a> (neural networks, virtual worlds, data tables, plots, etc.)
             <br> (2) Maintaining a list of <a href="Workspace/Couplings.html">couplings</a>, which are links between components (e.g. from a neural network to a time-series plot of the activation of some nodes in that network).
-            <br> (3) Managing simulation <a href="Workspace/Update.html">updates</a>.&nbsp; All updates are iteration based.&nbsp;&nbsp; The network is updated using the press or play buttons in the <a href="Workspace/Toolbar.html">toolbar</a>, and the current iteration number is also visible in the toolbar. Custom forms of update are also available.
+            <br> (3) Managing simulation <a href="Workspace/Update.html">updates</a>.&nbsp; The network is updated using the play or step buttons in the <a href="Workspace/Toolbar.html">toolbar</a>, and the current iteration number is also visible in the toolbar. Custom forms of update are also available.
             <br>
         </p>
-        <p>The workspace is visible in the GUI as the Simbrain <span style="font-weight: bold;">desktop</span> (see below). The desktop contains menus, a toolbar, and a main space in which all components are shown. &nbsp; There is also a set of tabs at the bottom of the network which allow the user to view couplings, set certain properties of components, and monitor a simulation in other ways.
+        <p>The workspace is visible in the GUI as the Simbrain desktop(see below). The desktop contains menus, a toolbar, and a main space in which all components are shown.  There is also a set of tabs at the bottom of the network (not visible by default; to see them use <span class="command">View > Property Tabs</span>) which allow the user to view couplings, set certain properties of components, and monitor a simulation in other ways.
         </p>
-        <p>Workspaces are stored as .zip files.&nbsp; These files contain .xml representations of all components and couplings in a simulation (and some other information as well)&nbsp; They can be unzipped, and individual saved component and coupling descriptions can be inspected (Note that you cannot currently change the files, rezip, and re-open).
-            <br>
+        <p>Workspaces are stored as .zip files. These files contain .xml representations of all components and couplings in a simulation. They can be unzipped, and individual saved component and couplings can be inspected. (Note that you cannot currently change the files, rezip, and re-open).   Workspace files save couplings and components and custom updates, but sometimes a more sophisticated workspace environment must be created.  In these cases <a href="Scripting.html">scripting</a> can be used.
         </p>
-        <br>
-        <p style="text-align: center;"><img src="../Images/WorkspaceLarge.png" height="370" width="600">
+        <p style="text-align: center;"><img src="../Images/WorkspaceLarge.png" width="500">
         </p>
+        
+        <p><span class="heading">Examples</span></p>
 
+        <p>To see some different workspaces try opening a workspace file by pressing the open button in the <a href="Workspace/Toolbar.html">toolbar</a>. It defaults to a workspace directory with various examples in it.</p>
+        <p>You can also try invoking scripts from the <a href="Workspace/Menus.html">Script menu</a>.  These create workspaces using scripts.</p>
     </div>
 </body>
 

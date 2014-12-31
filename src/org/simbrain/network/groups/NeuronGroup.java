@@ -51,8 +51,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
 
     public static final int DEFAULT_GROUP_SIZE = 10;
 
-    private boolean isSpikingNeuronGroup;
-
     private String updateRule;
 
     /** The neurons in this group. */
@@ -186,7 +184,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
         for (Neuron neuron : toCopy.getNeuronList()) {
             this.addNeuron(new Neuron(network, neuron));
         }
-        this.isSpikingNeuronGroup = toCopy.isSpikingNeuronGroup;
         this.updateRule = toCopy.updateRule;
     }
 
@@ -222,10 +219,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     @Override
     public void update() {
         Network.updateNeurons(neuronList);
-        if (recording) {
-        	writeActsToFile();
-        }
-        
     }
     
     public void startRecording() {
@@ -238,7 +231,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     		FileWriter fw = new FileWriter(outputFile);
     		valueWriter = new PrintWriter(fw);
     	} catch (IOException e) {
-    		
+    		e.printStackTrace();
     	}
     }
     
@@ -250,14 +243,18 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     }
     
     public void writeActsToFile() {
-    	Iterator<Neuron> neuroIter = neuronList.iterator();
-    	while (neuroIter.hasNext()) {
-    		valueWriter.print(neuroIter.next().getActivation());
-    		if (neuroIter.hasNext()) {
-    			valueWriter.print(", ");
+    	try {
+    		Iterator<Neuron> neuroIter = neuronList.iterator();
+    		while (neuroIter.hasNext()) {
+    			valueWriter.print(neuroIter.next().getActivation());
+    			if (neuroIter.hasNext()) {
+    				valueWriter.print(", ");
+    			}
     		}
+    		valueWriter.println();
+    	} catch (NullPointerException e) {
+    		e.printStackTrace();
     	}
-    	valueWriter.println();
     }
 
 //    public void startRecording(String filename) {
@@ -312,7 +309,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     	meta[0] = ByteBuffer.allocate(4).putInt(size()).array();
     	meta[1] = getNeuronType().getBytes();
     	meta[2] = new byte[1];
-    	meta[2][0] = isSpikingNeuronGroup ? (byte) -1 : 0;
     	meta[3] = new byte[4 * size()];
     	meta[4] = new byte[4 * size()];
     	double meanOut = 0.0;
@@ -340,8 +336,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     	return meta;
     }
 
-
-
+    /**
+     * @return the name of the neuron update rule used by all the neurons in
+     * this group (or mixed if more than one update rule governs the neurons).
+     */
     public String getNeuronType() {
     	String nType = "Mixed";
     	if (size() == 0) {
@@ -355,10 +353,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup>{
     				.getUpdateRule().getClass()));
     	}
     	if (conflict) {
-    		isSpikingNeuronGroup = false;
     		return nType;
     	} else {
-    		isSpikingNeuronGroup = nur instanceof SpikingNeuronUpdateRule;
     		return nur.getDescription();
     	}
     }

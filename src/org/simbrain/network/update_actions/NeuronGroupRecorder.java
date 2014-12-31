@@ -16,31 +16,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.update_actions.concurrency_tools;
+package org.simbrain.network.update_actions;
 
-/**
- * A task which does nothing other than say that it is poisonous. The intent
- * is for it to be passed to task queues which consumers take tasks
- *  from and
- * used to cause the consumer threads to permanently halt.
- * @author Zach Tosi
- *
- */
-public class PoisonTask implements Task {
+import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.groups.NeuronGroup;
 
+public class NeuronGroupRecorder implements NetworkUpdateAction {
+
+	private final NeuronGroup group;
+	
+	public NeuronGroupRecorder(final NeuronGroup group) {
+		this.group = group;
+	}
+	
+	
 	@Override
-	public void perform() {
-		return;		
+	public void invoke() {
+		if (group.isRecording()) {
+			group.writeActsToFile();
+		}
 	}
 
 	@Override
-	public boolean isPoison() {
-		return true;
+	public String getDescription() {
+		return "NeuronGroup:" + group.getLabel() 
+				+ " (Record Activations)";
 	}
 
 	@Override
-	public boolean isWaiting() {
-		return false;
+	public String getLongDescription() {
+		return "Write " + group.getLabel() +"'s activities to file";
 	}
 
 }

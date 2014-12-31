@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.update_actions.NeuronGroupRecorder;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
@@ -45,12 +47,14 @@ public class NetworkUpdateManager {
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single "update" in the network.
      */
-    private final List<NetworkUpdateAction> actionList = new CopyOnWriteArrayList<NetworkUpdateAction>();
+    private final List<NetworkUpdateAction> actionList =
+    		new CopyOnWriteArrayList<NetworkUpdateAction>();
 
     /**
      * List of listeners on this update manager.
      */
-    private List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
+    private List<UpdateManagerListener> listeners =
+    		new ArrayList<UpdateManagerListener>();
 
     /** Reference to parent network. */
     private final Network network;
@@ -115,12 +119,17 @@ public class NetworkUpdateManager {
         // By default these guys are always available
         availableActionList.add(new BufferedUpdate(network));
         availableActionList.add(new PriorityUpdate(network));
-        availableActionList.add(new ConcurrentBufferedUpdate(network));
+        availableActionList.add(ConcurrentBufferedUpdate
+        		.createConcurrentBufferedUpdate(network));
 
         // Add update actions for all groups available
         for (Group group : network.getGroupList()) {
             if (group.isTopLevelGroup()) {
                 availableActionList.add(new UpdateGroup(group));
+            }
+            if (group instanceof NeuronGroup) {
+            	availableActionList.add(new NeuronGroupRecorder(
+            			(NeuronGroup) group));
             }
         }
 

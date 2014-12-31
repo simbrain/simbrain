@@ -18,47 +18,18 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-
 /**
+ * A utility class that is a task specifically used as a flag to tell consumer
+ * threads to wait using whatever internal mechanisms allow them to do so.
  * 
  * @author Zach Tosi
- * 
- * A task that updates neurons according to their update rules, then updates
- * all afferent synapses to that neuron. Neuron's activations are not set
- * from their buffers here.
  *
  */
-public class BufferedUpdateTask implements Task {
+public class WaitingTask implements Task {
 
-	/** The host neurons, whose update will constitute this task. */
-	private final Neuron[] hosts;
-
-	/**
-	 * @param hosts
-	 */
-	public BufferedUpdateTask(final Neuron[] hosts) {
-		this.hosts = hosts;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * Updates the neurons (does not send their buffered value to their
-	 * activation) then updates all afferent synapses to the neurons in
-	 * question.
-	 */
 	@Override
 	public void perform() {
-		for (Neuron host : hosts) {
-			if (host == null) {
-				break;
-			}
-			host.update();
-			for (Synapse s : host.getFanIn()) {
-				s.update();
-			}
-		}
+		return;
 	}
 
 	@Override
@@ -68,7 +39,7 @@ public class BufferedUpdateTask implements Task {
 
 	@Override
 	public boolean isWaiting() {
-		return false;
+		return true;
 	}
 
 }

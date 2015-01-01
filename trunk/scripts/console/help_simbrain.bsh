@@ -6,14 +6,11 @@ help_simbrain() {
 
     print("---- SOME SAMPLE COMMANDS ----");
     print("print(workspace);");
-    print("Neuron neuron = new Neuron();");
     print("workspace.iterate(100);");
     print("workspace.run();");
     print("workspace.stop();");
-    print("getNetwork(NAME).randomizeNeurons()");
-    print("addNetwork(\"Network 1\");");
-    print("LinearNeuron neuron = new LinearNeuron();");
-    print("getNetwork(\"Network 1\").addNeuron(neuron);");
-    print("print(getNetwork(\"Network 1\"));");
-    print("showGUI(getComponent(\"Network 1\"));");
+    print("addNetwork(\"MyNet\");");
+    print("getNetwork(\"MyNet\").randomizeNeurons()");
+    print("print(getNetwork(\"MyNet\"));");
+    print("showGUI(getComponent(\"MyNet\"));");
 }

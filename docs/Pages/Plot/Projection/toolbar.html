@@ -20,18 +20,22 @@
 
     <div id="main_docs">
         <div class="navi">
-
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="....//Plot.html">Plot</a> &gt; <a href="../projection.html">Projection</a> &gt; Toolbar</p>
         </div>
-        <p></p>
 
-
-        <h1><a name="toolbar">Toolbar</a></h1>
+        <h1><a name="toolbar">Toolbar and Dialog Elements</a></h1>
         <blockquote>
             <table cellpadding="3" cellspacing="3">
                 <tbody>
                     <tr>
-
+                        <td><aname="dimension"></a><span class="heading2">Add / Remove dimension </span>
+                        </td>
+                        <td>This is the currently the main way to set the dimensionality of the high dimensional data to be accepted by this component.  Changing this will clear all current data.  The current dimensionality is shown in the status bar at the bottom.</td>
+                    </tr>
+                    <tr>
+                        <td><aname="dimension"></a><span class="heading2">Status Bar </span>
+                        </td>
+                        <td>The status bar shows the current dimensionality of the high dimensional data, the current number of data points, and for the <a href="method.html#Sammon">Sammon</a> method, the current error.</td>
                     </tr>
                     <tr>
                         <td><span class="heading2">Projection Selector </span>
@@ -41,7 +45,7 @@
                     <tr>
                         <td><img src="../../../Images/Play.gif" height="18" width="18"> <span class="heading2">Iterate Indefinitely</span>
                         </td>
-                        <td>Pressing this button will cause the program to iterate the algorithm an indefinite number of steps until the Stop button, <img src="../../../Images/Stop.gif">, is pressed. Only Sammon Mapping uses this function.</td>
+                        <td>Pressing this button will cause the program to iterate the algorithm an indefinite number of steps until the Stop button, <img src="../../../Images/Stop.gif">, is pressed. Only <a href="method.html#Sammon">Sammon maps</a> uses this and related buttons.</td>
                     </tr>
                     <tr>
                         <td><img src="../../../Images/Stop.gif" height="18" width="18"> <span class="heading2">Stop Iteration</span>
@@ -74,20 +78,17 @@
                         <td>
                             <span class="heading2">Step Size</span>
                         </td>
-                        <td>This field scales the amount points are moved on each iteration. Note this item is only displayed if Sammon is selected.</td>
+                        <td>This field scales the amount points are moved on each iteration. Note this item is only displayed if the <a href="method.html#Sammon">Sammon map</a> is selected.</td>
                     </tr>
                     <tr>
                         <td>
                             <span class="heading2">First and Second Dimension</span>
                         </td>
-                        <td>This field controls which dimensions of the high-dimensional data are projected to the horizontal and vertical axes of the display. Note this item is only displayed if Coordinate Projection is selected.</td>
+                        <td>This field controls which dimensions of the high-dimensional data are projected to the horizontal and vertical axes of the display. Note this item is only displayed if Coordinate Projection is selected. For more info see the discussion at <a href="preferences.html#CoordinatePrefs">coordinate preferences</a>.</td>
                     </tr>
                 </tbody>
             </table>
         </blockquote>
-        <br>
-
-
     </div>
 </body>
 

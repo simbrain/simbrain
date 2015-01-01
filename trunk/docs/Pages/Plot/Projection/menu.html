@@ -4,127 +4,47 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
             <p><span></span>
             </p>
         </div>
     </a>
-
     <div id="main_docs">
         <div class="navi">
-
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Plot.html">Plot</a> &gt; <a href="../projection.html">Projection</a> &gt; Menus</p>
         </div>
         <p></p>
-
-
         <h1>Menus</h1>
 
-        <p style="margin-left: 20px;"><span class="heading">File</span>
+        <p><span class="heading">File</span>
         </p>
-
         <blockquote>
-            <p><span class="heading2">Open: </span>Opens projection component files with an xml encoding.</p>
+            <p><span class="heading2">Open: </span>Opens plot component files as .xml not only with underlying data, but all associated preferences and information.</p>
 
-            <p><span class="heading2">Save/Save As: </span>Saves projection components using the xml style encoding. The xml files stores projected data as well as preferences and information about what state variables in what network this projection component represents.</p>
+            <p><span class="heading2">Save/Save As: </span>Saves projection components using the xml style encoding. The xml files stores plot data as well as related preferences and information.</p>
 
-            <p><span class="heading2">Import: </span>Imports projection component files from CSV (comma separated values) files.</p>
-
+            <p><span class="heading2">Export / Import:</span>Exports or imports the data as human-readable .csv (comma separated values) files.  High dimensional data can be imported, which is the main way of using the projection component as a free-standing tool to analyze existing data.  The high or low dimensional data can also be exported to .csv for viewing or analysis in other programs, like R or Matlab.</p>
         </blockquote>
 
-
-        <p style="margin-left: 20px;"><span class="heading">Edit</span>
+        <p><span class="heading">Edit</span>
         </p>
-
         <blockquote>
-            <p><span class="heading2">Perferences:</span> Opens general preferences dialog. Click <a href="preferences.html">here</a> for more information.
-                <p><span class="heading2"><a name="coloring">Datapoint Coloring</a>:</span> Adjusts the colors for the data points. See <a href="datapointColoring.html"> datapoint coloring</a> for more information. </p>
+            <p><span class="heading2">Preferences:</span> Opens the <a href="preferences.html">preferences</a> dialog.</p>
 
+            <p><span class="heading2"><a name="coloring">Datapoint Coloring</a>:</span> Adjusts the colors for the data points. See <a href="datapointColoring.html"> datapoint coloring</a> for more information. </p>
         </blockquote>
 
-        <p style="margin-left: 20px;"><span class="heading">Help</span>
-        </p>
-
+        <p class="heading">Right-Click Menu</p>
         <blockquote>
-            <p align="left"> <span class="heading2">Help:</span> Opens this help file. </p>
+            <p>The context menu is a <a href="../jfreechart_menu.html">JFreeChart menu</a>.</p>
         </blockquote>
 
-        <br>
-
-        <h1>Right-Click Menu</h1>
-        <p>Note the content of the popup menu depends on which plot you use. </p>
-
-        <p style="margin-left: 10px;"><span class="heading2">Properties:</span> Opens general properties dialog.</p>
-        <blockquote>
-
-            <p style="margin-left: 1px;"><span class="heading2"><u>Title Tab</u></span>
-            </p>
-            <blockquote>
-                <p style="margin-left: 1px;"><span class="heading2">Show Title:</span> Sets the title visibility.
-                </p>
-                <p style="margin-left: 1px;"><span class="heading2">Text: </span> Insert the title of chart here.
-                </p>
-                <p style="margin-left: 1px;"><span class="heading2">Font:</span> Configures font style, size and attributes (bold, italic) of the title. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Color:</span> Sets color of the title.
-            </blockquote>
-            <p style="margin-left: 1px;"><span class="heading2"><u>Plot Tab</u></span>
-            </p>
-            <blockquote>
-
-                <p style="margin-left: 1px;"><span class="heading2">Label:</span> Sets the title of X (domain) and Y (range) axis. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Font:</span> Configures font style, size and attributes (bold, italic) of the axes. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Paint:</span> Sets color of axes. </p>
-
-                <p style="margin-left: 1px;"><span class="heading2">Show Tick Labels:</span> By checking this option, the incremental values are visible on the chart. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Tick Label Font:</span> Configures the font style, size and attributes (bold, italic) of the tick label.</p>
-                <p style="margin-left: 1px;"><span class="heading2">Show Tick Marks:</span> By checking this option, the tick marks are visible on the plot. </p>
-
-                <p style="margin-left: 1px;"><span class="heading2">Auto-Adjust Range:</span> By checking this option, the range of the plot is automatically adjusted to fit the data points. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Minimum Range Value:</span> Sets the minimum range value of the plot. </p>
-
-                <p style="margin-left: 1px;"><span class="heading2">Maximum Range Value:</span> Sets the maximum range value of the plot.</p>
-
-                <p style="margin-left: 1px;"><span class="heading2">Outline Stroke:</span> Configures the boderline style of choosing. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Outline Paint:</span> Sets the color of the outline stroke. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Background Paint:</span> Configures the backgroung color of choosing. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Orientation:</span> Adjusts the plot's orientation as either vertical (range is shown on the vertical axis and domain is shown horizontally on the plot), or horizontal (range is shown horizontally on the plot and domain is on the vertical axis). </p>
-            </blockquote>
-            <p style="margin-left: 1px;"><span class="heading2"><u>Other Tab</u></span> </p>
-            <blockquote>
-                <p style="margin-left: 1px;"><span class="heading2">Draw Anti-Aliased:</span> By checking this option, the lines of the plot are more defined for better visibility. </p>
-                <p style="margin-left: 1px;"><span class="heading2">Background Paint:</span> Adjusts the color of the window's background. </p>
-            </blockquote>
-
-
-        </blockquote>
-
-        </blockquote>
-
-
-        <p style="margin-left: 10px;"><span class="heading2">Copy:</span> Copies the plot. </p>
-
-        <p style="margin-left: 10px;"><span class="heading2">Save As:</span> Saves the current plot, allowing user to specify a name for the file. </p>
-
-        <p style="margin-left: 10px;"><span class="heading2">Print:</span> Prints out the current plot.</p>
-
-        <p style="margin-left: 10px;"><span class="heading2">Zoom In / Zoom Out:</span> User can zoom in or out just the domain or range axis, or both axes. See <a href="projection.html#panZoom">pan and zoom</a> for more information. </p>
-
-        <p style="margin-left: 10px;"><span class="heading2">Auto Range:</span> Automatically re-adjusts the range of domain or range axis, or both axes. </p>
-        </blockquote>
-
-        <br>
-
-        <!--         <h1><a name="keyboard">Keyboard</a></h1>
-        <p style="margin-left: 20px;"><span class="heading2">H:</span> Dump the high-dimensional dataset to the terminal window. </p>
-        <p style="margin-left: 20px;"><span class="heading2">L: </span>Dump the low-dimensional dataset to the terminal window. </p> -->
     </div>
 </body>
 

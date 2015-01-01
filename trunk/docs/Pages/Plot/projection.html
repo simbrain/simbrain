@@ -31,27 +31,36 @@
                 <a href="Projection/preferences.html">&nbsp;&nbsp;&nbsp;Preferences</a>
                 <br>
                 <a href="Projection/toolbar.html">&nbsp;&nbsp;&nbsp;Toolbar</a>
-                </p>
+            </p>
         </div>
 
+        <h1><a name="overview">High Dimensional Projection Overview</a></h1>
 
-        <h1><a name="overview">Projection Overview</a></h1>
+        <p>The projection component is derived from a program called <a href="http://hisee.sourceforge.net">HiSee</a>. HiSee is a high dimensional visualizer, it let's you "see" "hi"-dimensional data (get it!). It is basically a visual way of performing <a href="http://en.wikipedia.org/wiki/Dimensionality_reduction">dimensionality reduction</a> using a few techniques, primarily <a href="http://en.wikipedia.org/wiki/Principal_component_analysis">pca</a> and <a href="http://en.wikipedia.org/wiki/Sammon_mapping">Sammon Maps</a>. It can be used to represent any high dimensional data, but in Simbrain it is primarily used to study the dynamics of a neural network.The projection component can take all the states (patterns of activation) that occur for the network, which exist in a high dimensional space, and project them down into two dimensions so that many of their geometric and topological properties are preserved. This gives users of Simbrain a way to visualize the dynamics of the network.
+            <p>
 
-        <p>Projection components are instances of a program called <a href="http://hisee.sourceforge.net">HiSee</a>. HiSee is a high dimensional visualizer, it let's you "see" "hi"-dimensional data (get it!).   It is basically a visual way of performing <a href="http://en.wikipedia.org/wiki/Dimensionality_reduction">dimensionality reduction</a> using a few techniques, primarily <a href="http://en.wikipedia.org/wiki/Principal_component_analysis">pca</a> and <a href="http://en.wikipedia.org/wiki/Sammon_mapping">Sammon Maps</a>.  It can be used to represent any high dimensional data, but in Simbrain it is primarily used to study the dynamics of a neural network.The projection component can take all the states (patterns of activation) that occur for the network, which exist in a high dimensional space, and project them down into two dimensions so that many of their geometric and topological properties are preserved. This gives users of Simbrain a way to visualize the dynamics of the network.<p>
+                <p class="heading">Getting started</p>
 
-        <p>To get a feel for how projection components work, invoke the script <span class="command">Simbrain Menu > Scripts > recurrentNetWithProjection.bsh</span>.  Run the network, and periodically randomize network activations by clicking in the network window, and pressing "N" and "R".  This will give you a sense of how the projection component works.  Each new state of the network is a separate dot in the component, and the red dot is the current state.</p>
+                <p>To get a feel for how projection components work, invoke the script <span class="command">Simbrain Menu > Scripts > recurrentNetWithProjection.bsh</span>. Run the network, and periodically randomize network activations by clicking in the network window, and pressing "N" and "R". This will give you a sense of how the projection component works. Each new state of the network is a separate dot in the component, and the red dot is the current state.</p>
 
-        <p align="left">The projection component shown below represents the states that have occurred in a network with 20 neurons. Each dot corresponds to one of those states, where the red dot is current state, and the blue dots are all previous states (colors can be changed in the <a href="projection/menu.html#coloring">datapoint coloring</a> dialog). Points that are close to each other in the projection component correspond to patterns of activity that are similar. You can linger the mouse arrow over a data point to reveal a tooltip that displays which high-dimensional point that 2-dimensional dot corresponds to.</p>
+                <p align="center"> <img src="../../Images/Projection.png" height="314" border="1">
+                </p>
 
-        <p align="center"> <img src="../../Images/Gauges.gif" height="314" width="292">
-        </p>
+                <p align="left">The projection component shown above represents the 141 unique states that have occurred in a network with 25 neurons. Each dot corresponds to one of those states, where the red dot is current state, and the green dots are all previous states (colors can be changed in the <a href="projection/menu.html#coloring">datapoint coloring</a> dialog). Points that are close to each other in the projection component correspond to patterns of activity that are similar. You can linger the mouse arrow over a data point to reveal a tooltip that displays which high-dimensional point that 2-dimensional dot corresponds to.</p>
 
-        <p align="left">When Simbrain is running users can add one or more projection component windows, each of which projects some subset of the network's state variables to two dimensions. This allows users to independently study different aspects of the network component. For example, one projection component might represent the activity at the input nodes of a network, another might represent activity at the hidden nodes, another might represent the aggregate activity of the entire network, and another might represent the changing values of the network's weights as it learns.</p>
+                <p class="heading">Choosing a projection method</p>
 
-        <p class="heading">Getting started</p>
-        <br>
-        <p>When a projection component is first opened, there are no dots, since no state information has been sent to the projection component yet. It must also be <a href="../Workspace/Couplings.html">coupled</a> to another component, usually a network.</p>
-        <p> Once everything is configured, with each update of the workspace, state information is sent to the projection component.  Each new state is displayed as a red dot. The set of dots that appear in the projection component window represent the states that have been visited by the associated network since it was first coupled to the projection component. This is a kind of representation of the history of a network's activity. As the network is updated the user can watch new dots appear as new states arise.  In some cases there are no new states, and the network just repeatedly visits states it has visited before.</p>
+                <p>Dimensionality reduction is a large, complex field. Numerous techniques exist for projecting high dimensional data to lower dimensional spaces that can be visualized. To get a feel for what a high dimensional object looks like, the user can choose different methods of visualizing it. Each will introduce its own distortions (there is no way to look directly at an object in more than 3 dimensions), but by using multiple methods intuition about that object can be gained. </p>
+
+                <p>The projection method is chosen in the main combo box, in the upper right of the component (it is set to PCA in the image above). Projection methods available in Simbrain are documented on the <a href="method.html">projection methods</a> page. Different projection methods are used in different ways. PCA and Coordinate are fairly straightforward; just select those options and the data will immediately be projected. However, Sammon requires that an appropriate step size be set and that it be iterated. Triangulation and NN Subspace require that some points have already been added to the projection component, which are used to determine how subsequent points are plotted. If one of these is chosen and there are not sufficiently many points already in the plot, the warning icon <img src="../../Images/Warning.png" alt="warning icon"> will bes shown.</p>
+
+                <p class="heading">Setting up a new projection</p>
+
+                <p>When a projection component is first opened, and it has not been <a href="../Workspace/Couplings.html">coupled</a> to another component (usually a network), there are no dots, since no states have been sent to the projection component yet. An easy way to start is to set this up is to plot the states of a neuron group. Right click on a neuron group interaction box, and choose <span class="command">Send vector coupling to > Projection > Set Point</span>.</p>
+
+                <p> Now, with each update of the workspace, state information is sent to the projection component. Each new state is displayed as a red dot. The set of dots that appear in the projection component window represent the states that have been visited by the associated network since it was first coupled to the projection component. This is a kind of picture of the history of a network's activity. As the network is updated the user can watch new dots appear as new states arise. In some cases there are no new states, and the network just repeatedly visits states it has visited before.</p>
+
+                <p align="left">When Simbrain is running users can add one or more projection component windows, each of which projects some subset of the network's state variables to two dimensions. This allows users to independently study different aspects of the network component. For example, one projection component might represent the activity at the input nodes of a network, another might represent activity at the hidden nodes, another might represent the aggregate activity of the entire network, and another might represent the changing values of the network's weights as it learns.</p>
 
     </div>
 </body>

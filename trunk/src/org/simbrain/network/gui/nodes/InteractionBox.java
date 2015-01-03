@@ -52,7 +52,7 @@ public class InteractionBox extends ScreenElement {
      * the scale gets small. Easiest to understand by changing the value and
      * "zooming  out" of a network containing a neuron group.
      */
-    private final double largestZoomRescaleFactor = 3;
+    private final double largestZoomRescaleFactor = 4;
 
     /** Reference to property change listener so it can be cleaned up later. */
     private final PropertyChangeListener zoomListener;

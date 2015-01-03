@@ -249,6 +249,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
         // Handle interaction box dragging
         if (pickedNode instanceof InteractionBox) {
+            delta = event.getDeltaRelativeTo(pickedNode.getParent());
             if (pickedNode.getParent() instanceof NeuronGroupNode) {
                 pickedNode.getParent().offset(delta.getWidth(),
                         delta.getHeight());

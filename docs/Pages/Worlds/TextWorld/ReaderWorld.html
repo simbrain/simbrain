@@ -3,9 +3,7 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -14,59 +12,48 @@
         <div class="logo">
         </div>
     </a>
+
     <div id="main_docs">
         <div class="navi">
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="TextWorld.html">TextWorld</a> &gt; Reader World</p>
         </div>
 
         <h1>Reader World</h1>
-        <p>Reader world intuitively models "reading" by converting text to numbers and vectors of numbers. The most common use would be to set up a reader to produce inputs to a neural network. </p>
+        <p>Reader world intuitively models "reading" by parsing text in the main window and converting this text to scalars or vectors that are processed by a neural network. Compare reading or hearing, where we see or hear words, and our eyes and ears convert these words in to patterns of activity in the brain (which are patterns of numbers in Simbrain).</p>
 
-        <p> Text in the main display is parsed by letter or word (where a "word" is the determined by a regular expression that can be customized), and highlighted. This item is converted in to scalar or vector values and sent to consumers (mainly neurons and neuron groups) via couplings. When the reader world is updated, the current character or word is highlighted. A dictionary is consulted, and if a match is found, any correspond couplings produce values:
-            <ul>
-                <li>Scalar: When the character or word is highlighted, send a value of 1 to all associated consumers. Stored in the "token dictionary"</li>
-                <li>Vector: When the character or word is highlighted, send a vector to all associated consumers. These vectors are specified in the "vector dictionary".
-                </li>
-            </ul>
-        </p>
-        <!--      <p>These convert text to numbers and vectors of numbers. They can be used to model reading. The most common use would be to set up a reader world to produce inputs to a neural network.</p>
-        <p>The basic way reader worlds work is that you load some text of interest in to the main window (just copy and paste in).&nbsp; Then, at each iteration of the workspace, the current token (either a word or a character) is highlighted, and is converted in to single number (scalar) or vector of numbers and sent to another component via couplings. </p>
-        <p> -->
-        <p> <span class="heading">Parse Types, Preferences</span>
-        </p>
-        <p>This is set using the Word / Character radio button at the bottom of the main window (see figure below).</p>
-        <p style="margin-left: 40px;"> <span class="heading2">Word-based:</span> In this mode, the world advances through the text one word at a time, using a
-            <span style="text-decoration: underline;">delimiter</span> (defaulting to white space) that is set in the preference dialog.
-            <br>
-        </p>
-        <p style="margin-left: 40px;"><span class="heading2">Character-based:</span> In this mode the world, advances through the text one character at a time.
-            <br>
+        <p>The basic way reader worlds work is that you load some text of interest in to the main window (just copy and paste in). Then, at each iteration of the workspace, the current token (either a word or a character; see "parsing" below) is highlighted, and is converted in to single number (scalar) or vector of numbers and sent to another component via couplings. Here is how this works schematically:</p>
+
+        <p align="center"><img src="../../../Images/ReaderWorldDiagram.png" width="500" border="1">
         </p>
 
-        <p>
-            <span class="heading">Attribute Types, Vector Dictionary
-                    <br>
-                </span>
+        <p>Since reader worlds produce numbers or lists of numbers, they are producers in <a href="../../Workspace/Couplings.html">couplings</a>. There are two kinds of reader world producers:</p>
+        <blockquote>
+            <p><span class="heading2">Scalar producer:</span> When a piece of text is parsed, a single number is passed to a scalar consumer (usually a neuron).</p>
+            <p><span class="heading2">Vector producer:</span> When a piece of text is parsed, a vector of numbers is passed to a vector consumer (usually a neuron group).</p>
+        </blockquote>
+
+        <p> <span class="heading">Scalar and Vector Dictionaries</span>
         </p>
-        <p>Attribute types are set in the <a href="../../Workspace/Couplings.html#CouplingManager">coupling manager.</a> Reader world attributes are producers, since text is parsed and then used to produce numerical values.
+
+        <p> The associations described above rely on scalar and vector dictionaries (see the screenshot below), accessed via the <span class="command">edit dictionary...</span> menu item and button. A drop down box allows you to select which dictionary to view or edit.</p>
+        <blockquote>
+            <p><span class="heading2">Scalar dictionary:</span> a simple list of tokens that can serve as producers in scalar couplings. When a given word is parsed, if a match is found in the scalar dictionary, a value of 1 is sent to any coupled consumers. Stored in the "token dictionary".</p>
+            <p><span class="heading2">Vector dictionary:</span> a map that associates words with specific vectors. When a given word is parsed, if a match is found in the vector dictionary that vector is sent to any coupled consumers. Stored in the "vector dictionary".</p>
+        </blockquote>
+
+        <p align="center"><img src="../../../Images/ReaderWorldDialogs.png" width="700" border="1">
         </p>
-        <p style="margin-left: 40px;">
-            <span class="heading2">Letter-based:</span> These are scalar couplings where when a given letter is activated, a value of 1 is sent to the target consumer. The decimeter type should be set to <span style="font-style: italic;">character. </span>For example in a network you could right click on a node, go to "receive scalar coupling from" and then in the context menu choose "ReaderWorld1" and then "a" to make that neuron respond to the letter a being parsed. </p>
-        <p style="margin-left: 40px;">
-            <span class="heading2">Token-vector:</span> These are vectors couplings where when a given word or token is activated, the vector-dictionary is consulted, and a corresponding vector is sent to the target consumer (or a zero-vector if no match is found). The target will typically be a <a href="../../Network/groups/NeuronGroup.html">neuron group</a>. The delimiter type should be set to
-            <span style="font-style: italic;">word.
-            </span>The vector dictionary can be edited using the vector-dictionary editor, which stores a list of tokens and corresponding vectors, which can be of variable length.
-            <br>
+
+        <p>For example in a network you could right click on a node, go to "receive scalar coupling from" and then in the context menu choose "ReaderWorld1" and then "a" to make that neuron respond to the letter a being parsed.</p>
+
+        <p> <span class="heading">Parse Types</span>
         </p>
-        <br>
-        <center>
-            <img src="../../../Images/ReaderWorld.png" border="1">
-        </center>
-        <br>
-        <p> <span class="heading">Example</span>
-            <p>Load the reader with a selection of text to be parsed and converted into patterns. Just copy and paste in to the central text area. In letter mode, as the world is updated, the cursor advances one character at a time. It goes back to the beginning of the text when it reaches the end.<br>
-                <br>In letter mode, creates a set of producers. One producer for each letter. A coupling can be created between a letter-producer and a consumer (e.g. a neuron). One update each, if the letter-producer corresponding to the current letter sends a value of 1 to the corresponding consumer. In this way a passage of text can be converted in to a series of neural activations. </p>
-            <p><span class="heading2">Sample Project:</span> Couple a reader world in letter mode to a network of 26 neurons. Run and watch how this works. Then connect this activation to other networks.</p>
+        <p>Text can be parsed in several ways. How text is parsed is set using the Word / Character radio button at the bottom of the main window.</p>
+        <blockquote>
+            <p> <span class="heading2">Word-based:</span> In this mode, the world advances through the text one word at a time, using a delimiter(defaulting to white space) that is set in the preference dialog. This delimiter is a java regular expression that is passed in to a java <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">pattern</a> object.</p>
+            <p> <span class="heading2">Character-based:</span> In this mode the world, advances through the text one character at a time.</p>
+        </blockquote>
+
     </div>
 </body>
 

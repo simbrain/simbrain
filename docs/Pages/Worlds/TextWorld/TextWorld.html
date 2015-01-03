@@ -3,9 +3,7 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -20,37 +18,35 @@
         </div>
         <div id="menu">
             <p class="menubold">Contents</p>
-
             <p>
                 <a href="ReaderWorld.html">&nbsp;&nbsp;&nbsp;Reader World</a>
                 <br>
                 <a href="DisplayWorld.html">&nbsp;&nbsp;&nbsp;Display World</a>
                 <br>
             </p>
-
         </div>
-
         <h1>Text World</h1>
-        <!--  <p>There are two kinds of text worlds, display world and reader world. These worlds can be used to model language, for example, to make networks that respond to sentences or that "talk". With text worlds, the way you set up couplings (see <a href="../../Workspace/Couplings.html">couplings</a>) is especially important, so a review of that could help.</p> -->
 
-        <p>A text world translates between text and neural activity. It can be used to model reading, dyslexia, dialogue, etc. There are two kinds of text world, reader world and display world. With text worlds, the way you set up couplings (see <a href="../../Workspace/Couplings.html">couplings</a>) is especially important, so a review of that could help. </p>
+        <p>Text worlds transform text into numbers (<a href="ReaderWorld.html">reader world</a>) or numbers in to text (<a href="DisplayWorld.html">display world</a>). They are primarily used to model language, for example, to make networks that "read" text or produce simulated speech (the general domain here is confectionist models of language processing; a classic example is Seidenberg's <a href="http://www.wlu.ca/documents/39510/Seidenberg.pdf">triangle model</a>). Text worlds can also be used more generally as a way of incorporating text processing in to a simulation, for example to log information or issue commands to a network.</p>
+
+        <p>To see some simulations that use workspaces, try the workspace <span class="command">Scripts</span> menu. Three scripts that use workspaces are <span class="command">ElmanPhonemes.bsh</span>, <span class="command">ElmanSentences.bsh</span>, and <span class="command">tisk2.bsh</span>.</p>
+
+        <p>In these docs "text" and "word" are used generically to encompass any string of text. A word can be a letter, for example, or a string representation of a <a href="http://en.wikipedia.org/wiki/Phoneme">phoneme</a> or <a href="http://en.wikipedia.org/wiki/Grapheme">grapheme</a>. It can also just be abstract text used to log or display information.</p>
+
+        <p> As already noted, there are two kinds of text world: <a href="ReaderWorld.html">Reader Worlds</a> and <a href="DisplayWorld.html">Display Worlds</a> (you are encouraged to go to those pages, since they contain graphics that visually conceptualize them). Here is the basic idea of how they work.</p>
+        <p><b>Reader World.</b>Text is parsed and converted in to numbers. Compare reading or hearing, where we see or hear words, and our eyes and ears convert these words in to patterns of activity in the brain (which are patterns of numbers in Simbrain). Since reader worlds produce numbers or lists of numbers, they are producers in <a href="../../Workspace/Couplings.html">couplings</a>. There are two kinds of reader world producers:</p>
         <blockquote>
-            <p> <span class="heading2">Reader world:</span> Convert text to patterns of activity. Cf. Wernicke&#39;s area, which is involved in understanding speech and writing. Can be used to model reading words, hearing phonemes, etc.</p>
-            <p><span class="heading2">Display world:</span> Convert patterns of activity to text. Cf. Broca&#39;s area, which is involves in producing speech and writing. Can be used to model "speaking."</p>
+            <p><span class="heading2">Scalar producer:</span> When a piece of text is parsed, a single number is passed to a scalar consumer (usually a neuron).</p>
+            <p><span class="heading2">Vector producer:</span> When a piece of text is parsed, a vector of numbers is passed to a vector consumer (usually a neuron group).</p>
         </blockquote>
-
-        <p>Note that actual models of reading or hearing tend to use graphemes or phonemes, and can get pretty complicated, whereas with computers, coding schemes are used. Coding schemes, also called localist vs. disturbed, are ways by mean to help translate computer language to human language. Localist is one neuron goes to one word or letter. Distributed is a pattern of activations goes to a word. In the reverse directions a single letter or word can produce activation in a single neuron, or can produce a distributed pattern of activaiton over a set of neurons.</p>
-
-        <p>Elman's work can be modeled using text worlds. See the scripts in the script menu that have start with
-            <q>elman</q>. </p>
-
-        <p>Seidenberg's work is another example of work that could eventually be modelled with text worlds. From Seidenberg, <em>Computational Models of Reading: Connectionist and Dual-Route Approaches</em>,
-            <q>All the models have been concerned with processes involved in reading words, but they have emphasized different aspects of this skill: acquisition; skilled performance; developmental impairments (dyslexia); impairments following brain injury (acquired dyslexia); computation of pronunciations; computation of meanings; naming, lexical decision, and other tasks; bases of individual differences; and others.</q>
+        <p><b>Display World.</b> Numbers come in, and text is produced in the display world.   Compare speech, where patterns of activity (modeled by patterns of numbers in Simbrain), and spoken or written or signed words are produced by different muscle systems.  Since display world receives numbers from other components, and uses these to produce text, its attributes are consumers.  There are two kinds of display world consumer.</p>
+        <blockquote>
+            <p><span class="heading2">Scalar consumer:</span> If the incoming value above a threshold, display the text.</p>
+            <p><span class="heading2">Vector consumer:</span> If the incoming value is sufficiently near the vector associated with a prototype string in "vector-dictionary", display that text.</p>
+        </blockquote>
         </p>
-        <p><b>Sample Project.</b> Failing (for now) the <a href="http://en.wikipedia.org/wiki/Turing_test">Turing Test</a>. Create a model of dialog. You should be able to enter a line of text in a reader world. Iterate the workspace until the end of the line. Observe a network
-            <q>respond</q> to this line of text via a display world. Try to tune the network to produce reasonable amounts of words in response to a sentence.</p>
 
-    </div>
+        <p>Methods like these, of converting from numbers to text and vice-versa are called "coding schemes". Scalar attributes are based on a "local coding" scheme, where neuron are associated with specific words: a neuron's activation either produces a word or it is activated when that word is "read". Vector attributes are based on "distributed" coding schemes. A pattern of activations is either produced when a given word is read, or "spoken" when a given vector occurs in a neural network.  </p>
 
 </body>
 

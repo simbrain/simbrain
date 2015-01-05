@@ -1,78 +1,80 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
 
 
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
+        </div>
+
+        <p></p>
+        <h1>Backprop Network</h1>
+
+        <p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a> is a standard form of <a href="../supervisedLearning.html">supervised learning</a>. &nbsp; It is perhaps the best known and most popular means of training neural networks. <a href="http://en.wikipedia.org/wiki/Backpropagation"><span style="font-weight: bold;"><br>
+</span></a>
+        </p>
 
 
+        <p>An example which steps through the process of&nbsp; creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a>
+            <br>
+        </p>
+        <p><span class="heading">Creation Dialog</span>
+        </p>
+        <p style="margin-left: 40px;"><span class="heading2">Number of Layers: </span>Sets the number of layers in the network.
+        </p>
+        <p style="margin-left: 40px;"><span class="heading2">Number of Neurons: </span>Sets the number of neurons in the network.
+        </p>
+        <p style="margin-left: 40px;"><span class="heading2">Neuron Type:</span> Set neuron type here. Options below.
+        </p>
+        <p style="margin-left: 80px;"><span class="heading2">Tanh</span>
+        </p>
+        <p style="margin-left: 80px;"><span class="heading2">Logistic</span>
+        </p>
+        <p style="margin-left: 80px;"><span class="heading2">Linear<br>
+</span>
+        </p>
 
+        <p>After selecting&nbsp;
+            <span class="command">Insert &gt; Insert Network &gt; Backrpop</span>, a dialog will appear asking that you specify a topology, which means how many layers, and how many neurons per layer (from bottom to top layer).&nbsp; </p>
+        <p class="heading">Right Click Menu</p>
+        <p> <span style="margin-left: 40px;" class="heading2">Edit/Train Backprop: </span>Opens edit dialog to train backprop network. </p>
+        <p> <span style="margin-left: 40px;" class="heading2">Rename:</span> Renames netowork.</p>
+        <p> <span style="margin-left: 40px;" class="heading2">Remove Network:</span> Deletes network. </p>
+        <p> <span style="margin-left: 40px;" class="heading2">View/Edit Data: </span> View and edit training set data (input data and target data).
+        </p>
 
+        <p class="heading">Training</p>
 
+        <blockquote>
+            <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>.
+                <br>
+            </p>
+        </blockquote>
+        <p class="heading">Parameters</p>
+        <blockquote>
+            <p><span class="heading2">Learning Rate: </span>A standard learning rate. This determines how quickly synapses change. </p>
+            <p><span class="heading2">Momentum: </span> This scales the rate of weight change by the amount a given weight changed on the previous time step. This speeds up learning and prevents oscillations. Momentum should be between 0 and 1; 0.9 is a common value. </p>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
-  </div>
-  <p></p><h1>Backprop Network</h1>
-  
+        </blockquote>
+        <blockquote>
+            <p><span class="heading2"></span>
+            </p>
+        </blockquote>
+    </div>
+</body>
 
-
-  
-<p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a>
-is a standard form of <a href="../supervisedLearning.html">supervised learning</a>. &nbsp; It is perhaps the best known
-and most popular means of training neural networks. <a href="http://en.wikipedia.org/wiki/Backpropagation"><span style="font-weight: bold;"><br>
-</span></a></p>
-
-  
-<p>An example which steps through the process of&nbsp; creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a><br>
-</p>
-<p><span class="heading">Creation Dialog</span></p>
-<p style="margin-left: 40px;"><span class="heading2">Number of Layers</span></p>
-<p style="margin-left: 40px;"><span class="heading2">Number of Neurons</span></p>
-<p style="margin-left: 40px;"><span class="heading2">Neuron Type</span></p>
-<p style="margin-left: 80px;"><span class="heading2">Tanh</span></p>
-<p style="margin-left: 80px;"><span class="heading2">Logistic</span></p>
-<p style="margin-left: 80px;"><span class="heading2">Linear<br>
-</span></p>
-
-<p>After
-selecting&nbsp;<span class="command">Insert &gt; Insert Network &gt; Backrpop</span>, a dialog will appear asking that you
-specify a topology, which means how many layers, and how
-many
-neurons per layer (from bottom to top layer).&nbsp; </p>
-<p class="heading">Right Click Menu</p>
-<p style="margin-left: 40px;" class="heading">Edit/Train Backprop</p>
-<p style="margin-left: 40px;" class="heading">Rename</p>
-<p style="margin-left: 40px;" class="heading">Remove Network</p>
-<p style="margin-left: 40px;" class="heading">View/Edit Data<br>
-</p>
-
-
-
-  
-    <br>
-<p class="heading">Training</p>
-
-
-  <blockquote>
-    <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>. <br>
- </p>
-  </blockquote>
-  <p class="heading">Parameters</p>
-  <blockquote>
-    <p><span class="heading2">Learning Rate: </span>A standard learning rate.  This determines how quickly synapses change. </p>
-    <p><span class="heading2">Momentum: </span>
-This scales the rate of weight change by the amount a given weight
-changed on the previous time step. This speeds up learning and prevents
-oscillations. Momentum should be between 0 and 1; 0.9 is a common
-value. </p>
-    
-  </blockquote><blockquote><p><span class="heading2"></span></p>
-  </blockquote>
-</div>
-</body></html>
+</html>

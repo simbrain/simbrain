@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.updater.ComponentUpdatePart;
 
 /**
@@ -60,7 +61,10 @@ public abstract class WorkspaceComponent {
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
-     * when Simbrain is run as a GUI).
+     * when Simbrain is run as a GUI). TODO: This should really be a property of
+     * the GUI only, since we can imagine the gui is on or off for different
+     * views of the component. This design is kind of hack, based on the fact
+     * that {@link ComponentPanel} has no easy access to {@link GuiComponent}.
      */
     private Boolean guiOn = true;
 
@@ -505,7 +509,7 @@ public abstract class WorkspaceComponent {
     /**
      * @return the guiOn
      */
-    public Boolean getGuiOn() {
+    public Boolean isGuiOn() {
         return guiOn;
     }
 

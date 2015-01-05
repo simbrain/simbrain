@@ -111,7 +111,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                      */
                     public void guiToggled() {
                         GuiComponent.this.getParentFrame().setVisible(
-                                workspaceComponent.getGuiOn());
+                                workspaceComponent.isGuiOn());
                     }
                 });
 

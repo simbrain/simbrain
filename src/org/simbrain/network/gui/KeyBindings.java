@@ -232,17 +232,6 @@ public class KeyBindings {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke("6"), "guiOn");
-        panel.getActionMap().put("guiOn", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                if (panel.isGuiOn()) {
-                    panel.setGuiOn(false);
-                } else {
-                    panel.setGuiOn(true);
-                }
-            }
-        });
-
     }
 
 }

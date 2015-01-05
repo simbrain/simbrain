@@ -173,7 +173,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener,
             case 1:
                 return data.get(row).getSimpleName();
             case 2:
-                return data.get(row).getGuiOn();
+                return data.get(row).isGuiOn();
             case 3:
                 return data.get(row).getUpdateOn();
             default:
@@ -191,6 +191,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener,
             case 1:
                 return;
             case 2:
+                // TODO: Really this should be called on the GuiComponent.
+                //  See comment at {@link WorkspaceComponent#guiOn}.
                 data.get(row).setGuiOn((Boolean) value);
                 return;
             case 3:

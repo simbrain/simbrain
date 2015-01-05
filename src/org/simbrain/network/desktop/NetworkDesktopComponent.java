@@ -31,6 +31,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -81,6 +82,27 @@ public final class NetworkDesktopComponent extends
         // Put it all together
         add("Center", networkPanel);
         createAndAttachMenus();
+
+        // Toggle the network panel's visiblity if the workspace component is
+        // set to "gui off"
+        component
+                .addWorkspaceComponentListener(new WorkspaceComponentListener() {
+
+                    @Override
+                    public void componentUpdated() {
+                    }
+
+                    @Override
+                    public void guiToggled() {
+                        networkPanel
+                                .setGuiOn(getWorkspaceComponent().isGuiOn());
+                    }
+
+                    @Override
+                    public void componentOnOffToggled() {
+                    }
+
+                });
     }
 
     /**
@@ -102,7 +124,7 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Create and return a new File menu for this Network panel.
-     *
+     * 
      * @return a new File menu for this Network panel
      */
     JMenu createFileMenu() {
@@ -141,7 +163,7 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Return the network panel for this network frame.
-     *
+     * 
      * @return the network panel for this network frame
      */
     public NetworkPanel getNetworkPanel() {
@@ -170,7 +192,7 @@ public final class NetworkDesktopComponent extends
     /**
      * If at least one synapse group has a large number of synapses that are not
      * going to be saved using compression, show the user a warning.
-     *
+     * 
      * @return true if the save operation should proceed, false if the save
      *         operation should be cancelled.
      */

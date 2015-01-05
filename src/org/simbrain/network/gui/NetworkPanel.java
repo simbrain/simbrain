@@ -27,6 +27,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -420,6 +422,19 @@ public class NetworkPanel extends JPanel {
 
         addNetworkListeners();
 
+        // Don't show text when the canvas is sufficiently zoomed in
+        PropertyChangeListener zoomListener = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                for (NeuronNode node : getNeuronNodes()) {
+                    node.updateTextVisibility();
+                }
+
+            }
+        };
+        canvas.getCamera().addPropertyChangeListener(
+                PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener);
+
         selectionModel.addSelectionListener(new NetworkSelectionListener() {
             /** @see NetworkSelectionListener */
             public void selectionChanged(final NetworkSelectionEvent e) {
@@ -467,6 +482,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons() {
+                if(!guiOn) {
+                    return;
+                }
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateNeuronNodes();
@@ -476,6 +494,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateNeurons(final Collection<Neuron> neurons) {
+                if(!guiOn) {
+                    return;
+                }
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateNeuronNodes(neurons);
@@ -485,6 +506,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses() {
+                if(!guiOn) {
+                    return;
+                }
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateSynapseNodes();
@@ -494,6 +518,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void updateSynapses(final Collection<Synapse> synapses) {
+                if(!guiOn) {
+                    return;
+                }
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         NetworkPanel.this.updateSynapseNodes(synapses);
@@ -623,6 +650,10 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupParameterChanged(NetworkEvent<Group> event) {
+                if(!guiOn) {
+                    return;
+                }
+
                 if (event.getObject() instanceof NeuronGroup) {
                     NeuronGroupNode node = (NeuronGroupNode) objectNodeMap
                         .get(event.getObject());
@@ -646,6 +677,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
+                if(!guiOn) {
+                    return;
+                }
                 updateGroupNode(group);
             }
 
@@ -2188,7 +2222,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Rescales the camera so that all objects in the canvas can be seen.
      * Compare "zoom to fit page" in draw programs.
-     * 
+     *
      * @param forceZoom if true force the zoom to happen
      */
     public void zoomToFitPage(boolean forceZoom) {
@@ -2770,23 +2804,8 @@ public class NetworkPanel extends JPanel {
      * @param guiOn The guiOn to set.
      */
     public void setGuiOn(final boolean guiOn) {
-        // TODO: Revive from dead?
-        // actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
-            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
-                .hasNext();) {
-                PNode pnode = (PNode) iter.next();
-                pnode.setTransparency(1);
-                pnode.setVisible(true);
-            }
-        } else {
-            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
-                .hasNext();) {
-                PNode pnode = (PNode) iter.next();
-                pnode.setTransparency((float) .6);
-                pnode.setVisible(false);
-            }
-
+            this.updateNeuronNodes();
         }
         this.guiOn = guiOn;
     }

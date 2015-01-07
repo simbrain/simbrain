@@ -1,41 +1,73 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; AdEx Integrate and Fire</p>
-  </div>
+<head>
+    <title>Simbrain Documentation</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; AdEx Integrate and Fire</p>
+        </div>
 
 
-  <p></p><h1>Adaptive Experimental Integrate and Fire</h1>
- <br>
-<p class="heading">Leak Conductance</p>
-<br>
+        <p></p>
+        <h1>Adaptive Experimental Integrate and Fire</h1>
+        <p>TODO</p>
+        <p class="heading">Membrane Voltage</p>
+        <blockquote>
+            <p><span class="heading2">Peak Voltage:</span> The peak voltage after which we say with certainty that an action potential has occurred (mV).</p>
+            <br>
+            <p><span class="heading2">Threhold Voltage (mv):</span> This determines when a neuron will start a divergent change in voltage that will tend toward infinity and is not the voltage at which we consider the neuron to have spiked. External factors can cause an action potential to fail even if v_mem > v-Th.</p>
+            <br>
+            <p><span class="heading2">Reset Voltage (mV):</span> Defaults to 3-spike bursting behavior at .8 nA current.</p>
+            <br>
+            <p><span class="heading2">Capacitance:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Background Current:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Reset: </span> TODO </p><br>
+            <p><span class="heading2">Slope Factor:</span> TODO</p>
+        </blockquote>
+        <p class="heading">Input Currents</p>
+        <blockquote>
+            <p><span class="heading2">Leak Conductance (nS):</span> TODO</p>
+            <br>
+            <p><span class="heading2">Max Inhibitory Conductance:</span> TODO </p>
+            <br>
+            <p><span class="heading2">Leak Reversal:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Excitatory Reversal:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Inbitatory Reversal:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Reset: </span>TODO</p>
+            <br>
+            <p><span class="heading2">Coupling Constant:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Time Constant:</span> TODO</p>
+        </blockquote>
+        <p class="heading">Adaptation</p>
+        <blockquote>
+            <p><span class="heading2">Reset:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Coupling Constant:</span> TODO</p>
+            <br>
+            <p><span class="heading2">Time Constant:</span> Controls the rate at which the neuron attains its resting potential. As one increases this value (ms), things become relatively slower; conversely, as one decreases this value, things become relatively faster.</p>
 
-<p class="heading">Max Excitatory Conductance</p>
-<br>
+        </blockquote>
 
-<p class="heading">Max Inhibitory Conductance</p>
-<br>
+    </div>
+</body>
 
-<p class="heading">Leak Reversal</p>
-<br>
-<p class="heading">Excitatory Reversal</p>
-<br>
-<p class="heading">Inbitatory Reversal</p>
-<br>
-<p class="heading">Reset</p>
-<br>
-<p class="heading">Coupling Constant</p>
-<br>
-<p class="heading">Time Constant</p>
-<br>
-
-</div>
-</body></html>
+</html>

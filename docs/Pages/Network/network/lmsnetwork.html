@@ -1,92 +1,95 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
 
 
-  
-
-  
-  
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-  
-  <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../../SimbrainDocs.html">
-<div class="logo">
-<p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-<div class="navi">
-<p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; LMS</p>
-</div>
-
-<h1>LMS Network</h1>
-<p>The LMS Network is a two layer feed-forward network that implements
-the standard Least Mean Squares rule for learning.&nbsp; </p>
-<p>The
-LMS rule is a form of supervised learning, which means that the user
-must supply desired output values for each of a list of input
-values.&nbsp; </p>
-<p>The LMS
-rule works as follows. The change in a weight is equal to the product
-of a learning rate &#949;, the pre-synaptic source activation, and the
-difference between the post-synaptic activation <em>a<sub>j</sub></em>
-and a desired activation <em>t<sub>j</sub></em>. The error is the
-difference between the desired and actual activation of the target
-neuron.</p>
-<p><img src="../equations/LMSRule.png" height="54" width="203"></p>
-<p>Repeated application of this rule mimizes reduces mean squared error
-on a set of training data. </p>
-<p>This
-rule is also known as the "Widrow-Hoff" rule, and the "Delta Rule."
-Networks that use these rules are sometimes called "adalines" or
-"madalines" (for the multilayer case, which these networks do not
-currently implement). They are descendents of an early form of network
-studied by Rosenblatt called a "perceptron."</p>
-<p class="heading">Initialization</p>
-<blockquote>
-  <p>Since
-these are two layer networks, they are initialized with a set number of
-input and output units. The resulting layer will be two layers of the
-specified number of neurons with feed-forward connections.<br>
-  <span class="heading2"></span></p>
-  <p><span class="heading2">Output / Input Layer:<br>
-</span></p>
-
-  <p style="margin-left: 40px;"><span class="heading2">Number of Neurons:</span> Sets neuron of neurons for the network. </p>
-
-  <p style="margin-left: 40px;"><span class="heading2">Neuron Type: </span> Sets the nueron type. See (insert link). </p>
 
 
-</blockquote>
-
-<p class="heading">Right Click Menu</p>
-<p>
-<p> <span style="margin-left: 40px;" class="heading2">Edit/Train LMS:</span> Opens edit dialog to train LMS network.<br>
-</p>
-
-<p> <span style="margin-left: 40px;" class="heading2">Rename:</span> Renames network</p>
-
-<p> <span style="margin-left: 40px;" class="heading2">Remove Network: </span> Deletes network.</p>
-
-<p> <span style="margin-left: 40px;" class="heading2">View/Edit Data: </span> View and edit training set data (input data and target data). <br>
-</p>
-
-</p>
 
 
-<p class="heading">Training</p>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-<blockquote>
-Training a network involves specifying input data, target data, and
-then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>.
-</blockquote>
-<p class="heading">Parameters</p>
-<blockquote>
-  <p><span class="heading2">Learning Rate: </span>Learning rate is
-denoted by &#949;. This parameter determines how quickly synapses change. </p>
-</blockquote>
-<blockquote>&nbsp;</blockquote>
-</div>
 
-</body></html>
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; LMS</p>
+        </div>
+
+        <h1>LMS Network</h1>
+        <p>The LMS Network is a two layer feed-forward network that implements the standard Least Mean Squares rule for learning.&nbsp; </p>
+        <p>The LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values.&nbsp; </p>
+        <p>The LMS rule works as follows. The change in a weight is equal to the product of a learning rate &#949;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.
+        </p>
+        <p><img src="../equations/LMSRule.png" height="54" width="203">
+        </p>
+        <p>Repeated application of this rule mimizes reduces mean squared error on a set of training data. </p>
+        <p>This rule is also known as the "Widrow-Hoff" rule, and the "Delta Rule." Networks that use these rules are sometimes called "adalines" or "madalines" (for the multilayer case, which these networks do not currently implement). They are descendents of an early form of network studied by Rosenblatt called a "perceptron."</p>
+        <p class="heading">Initialization</p>
+        <blockquote>
+            <p>Since these are two layer networks, they are initialized with a set number of input and output units. The resulting layer will be two layers of the specified number of neurons with feed-forward connections.
+                <br>
+                <span class="heading2"></span>
+            </p>
+            <p><span class="heading2">Output / Input Layer:<br>
+</span>
+            </p>
+
+            <p style="margin-left: 40px;"><span class="heading2">Number of Neurons:</span> Sets number of neurons for the network. </p>
+
+            <p style="margin-left: 40px;"><span class="heading2">Neuron Type: </span> Sets the neuron type. </p>
+            <p style="margin-left: 80px;"><span class="heading2">Tanh: </span>TODO
+            </p>
+            <p style="margin-left: 80px;"><span class="heading2">Logistic:</span> Click <a href="../neuron/Logistic.html">here</a> for description.
+            </p>
+            <p style="margin-left: 80px;"><span class="heading2">Linear: </span>TODO
+            </p>
+
+
+        </blockquote>
+
+        <p class="heading">Right Click Menu</p>
+        <p>
+            <p> <span style="margin-left: 40px;" class="heading2">Edit/Train LMS:</span> Opens edit dialog to train LMS network.
+                <br>
+            </p>
+
+            <p> <span style="margin-left: 40px;" class="heading2">Rename:</span> Renames network</p>
+
+            <p> <span style="margin-left: 40px;" class="heading2">Remove Network: </span> Deletes network.</p>
+
+            <p> <span style="margin-left: 40px;" class="heading2">View/Edit Data: </span> View and edit training set data (input data and target data).
+                <br>
+            </p>
+
+        </p>
+
+        <p class="heading">Training</p>
+
+        <blockquote>
+            Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>.
+        </blockquote>
+        <p class="heading">Parameters</p>
+        <blockquote>
+            <p><span class="heading2">Learning Rate: </span>Learning rate is denoted by &#949;. This parameter determines how quickly synapses change. </p>
+            <p><span class="heading2">Iterations Before Stopping: </span>TODO</p>
+            <p><span class="heading2">Stopping Condition: </span>TODO (threshold error, threshold error in validation set, number of epochs, none (keep going until manual stop)), and error threshold.</p>
+            <p><span class="heading2">Error Threshold: </span>TODO</p>
+        </blockquote>
+
+    </div>
+
+</body>
+
+</html>

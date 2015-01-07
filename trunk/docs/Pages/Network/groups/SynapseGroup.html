@@ -1,12 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
 
 
-
-
-    
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
             <p>
@@ -21,225 +24,265 @@
 
         <h1>Synapse Group</h1>
         <p>TODO</p>
-        <p class="heading">Creation/Edit Dialog<br>
-</p>
+        <p class="heading">Creation/Edit Dialog
+            <br>
+        </p>
         <blockquote>
             <p>
-                <span class="heading2">
+                <span class="heading">
                     Properties&nbsp;</span>
             </p>
-            <p style="margin-left: 40px;">
-                <span class="heading2"></span>
-                <span style="font-weight: bold;">Group ID</span>
-            </p>
-            <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Label</span>
-            </p>
-            
-            <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Population</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Optimize As Group<br>
-  </span>
-            </p>
-<p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Excitatory Type</span>
-            </p>
-            <p style="margin-left: 40px;">
-                <span style="font-weight: bold;">Inhibitory Type</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Parent</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Source Group</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Target Group<br>
-  </span>
-            </p>
+            <blockquote>
+                <p><span class="heading2">Group ID: </span>Unique labelling that identifies the group.
+                </p>
+                <p><span class="heading2">Label: </span>Name of group
+                </p>
 
+                <p><span class="heading2">Population: </span>NUmber of neurons in the group.</p>
+                <p><span class="heading2">Optimize As Group:</span> TODO
+                </p>
+                <p><span class="heading2">Excitatory Type: </span>The type of neuronal excitation for the group. Can be changed in "Update Rule." See <a href="../neuron.html">neuron types</a> for a listing of the various types.
+                </p>
+                <p><span class="heading2">Inhibitory Type: </span>The type of neuronal inhibition for the group. See <a href="../neuron.html">neuron types</a> for a listing of the various types. </p>
+                <p><span class="heading2">Parent: </span>Denotes the parent group, if any.</p>
+                <p><span class="heading2">Source Group: </span>Neuron activation will come from this group. </p>
+                <p><span class="heading2">Target Group: </span>Neuron to which the sunapse is attached to. 
+                </p>
+            </blockquote>
         </blockquote>
         <blockquote>
             <p>
-                <span class="heading2">Connection Type&nbsp;</span>
+                <span class="heading">Connection Type&nbsp;</span>
             </p>
-            <p style="margin-left: 40px;">
-                <span class="heading2"></span>
-                <span style="font-weight: bold;"></span><span style="font-weight: bold;">Connection Manager</span></p>
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Allow Self Connections<br>
-  </span></p>
-
+            <blockquote>
+                <p><span class="heading2">Connection Manager: </span>Manages synaptic delay.
+                </p>
+                <p><span class="heading2">Allow Self Connection: </span>TODO
+                </p>
+            </blockquote>
         </blockquote>
         <blockquote>
-            <p>
-                </p>
-  <p>
-                </p>
-  <p><span class="heading2">Synapse Type&nbsp;</span>
+
+            <p><span class="heading">Synapse Type&nbsp;</span>
             </p>
 
 
-            
-  <p style="margin-left: 40px;">
-                <span class="heading2"></span><span style="font-weight: bold;">Inhibitory/Excitatory</span></p>
+            <p style="margin-left: 40px;">
+                <span class="heading2"></span><span style="font-weight: bold;">Inhibitory/Excitatory</span>
+            </p>
+            <blockquote>
+                <p><span class="heading2">Strength:</span> Strength of synapse. 
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Strength</span></p>
+                <p><span class="heading2">Status</span>
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Status</span></p>
+                <p><span class="heading2">Frozen: </span> Indicates whether or not this synpase's strength can be changed by any means other than direct user intervention. 
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Frozen</span></p>
+                <p><span class="heading2">Upper Bound:</span> This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.</p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Upper Bound</span></p>
+                <p><span class="heading2">Lower Bound: </span>This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Lower Bound</span></p>
+                <p><span class="heading2">Increment: </span>Amount to increment the neurons. 
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Increment</span></p>
+                <p><span class="heading2">Delay: </span>Time to delay sending activation to target neurons. 
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Delay</span></p>
+                <p><span class="heading2">Update Rule: </span> A rule for updating a synapse. A learning rule. 
+                </p>
 
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Update Rule</span></p>
+            </blockquote>
+            <p><span class="heading">Synapse Values</span>
+            </p>
 
-  <p>
-  </p>
-  <p><span class="heading2">Synapse Values</span></p>
+            <p style="margin-left: 40px;"><span style="font-weight: bold;">Histogram</span>
+            </p>
 
 
-  
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Histogram</span></p>
+            <p style="margin-left: 80px;"><span style="font-weight: bold;">Basic Data</span>
+            </p>
 
-  
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Basic Data</span></p>
 
-  
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Display Mode</span></p>
+            <p style="margin-left: 80px;"><span style="font-weight: bold;">Display Mode</span>
+            </p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">All</span></p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Overlay</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">All: </span>
+            </p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Excitatory</span></p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Inhibitory</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Overlay: </span>
+            </p>
 
 
-  
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Inhibitory/Excitatory Ratio</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Excitatory: </span>
+            </p>
 
 
-  
-  <p style="margin-left: 40px;"><span style="font-weight: bold;">Randomizers</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Inhibitory: </span>
+            </p>
 
-  
-  <p style="margin-left: 80px;"><span style="font-weight: bold;">Exponential</span></p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Rate</span></p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Ceiling</span></p>
+            <p style="margin-left: 40px;"><span style="font-weight: bold;">Inhibitory/Excitatory Ratio </span>
+            </p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Floor <br>
-  </span></p>
 
-  
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Clipping</span></p>
 
+            <p style="margin-left: 40px;"><span style="font-weight: bold;">Randomizers</span>
+            </p>
 
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Gamma</span></p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Shape</span></p>
+            <p style="margin-left: 80px;"><span style="font-weight: bold;">Exponential</span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Scale</span></p>
+   
+            <p style="margin-left: 120px;"> <span class="heading2">Rate: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Ceiling <br>
-</span></p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Floor</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Ceiling: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Clipping</span></p>
 
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Log-Normal</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Floor: 
+  </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Mean <br>
-</span></p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Std. Dev.</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Clipping: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Ceiling</span></p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Floor</span></p>
+            <p style="margin-left: 120px;"><span class="heading2">Gamma: </span>
+            </p>
+    
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Clipping</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Shape: </span>
+            </p>
 
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Normal</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Scale: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Mean <br>
-</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Ceiling: 
+</span>
+            </p>
 
+            <p style="margin-left: 160px;"><span class="heading2">Floor: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Std. Dev.</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Clipping: </span>
+            </p>
 
+            <p style="margin-left: 120px;"><span style="font-weight: bold;">Log-Normal</span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Ceiling</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Mean:
+</span>
+            </p>
 
+            <p style="margin-left: 160px;"><span class="heading2">Std. Deviation: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Floor</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Ceiling: </span>
+            </p>
 
+            <p style="margin-left: 160px;"><span class="heading2">Floor: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Clipping</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Clipping: </span>
+            </p>
 
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Pareto</span></p>
+            <p style="margin-left: 120px;"><span style="font-weight: bold;">Normal</span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Slope</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Mean: 
+</span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Minimum</span></p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Ceiling</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Std. Deviation: </span>
+            </p>
 
 
+            <p style="margin-left: 160px;"><span class="heading2">Ceiling: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Floor</span></p>
 
+            <p style="margin-left: 160px;"><span class="heading2">Floor: </span>
+            </p>
 
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Clipping</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Clipping: </span>
+            </p>
 
-  <p style="margin-left: 120px;"><span style="font-weight: bold;">Uniform</span></p>
+            <p style="margin-left: 120px;"><span style="font-weight: bold;">Pareto</span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Ceiling</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Slope: </span>
+            </p>
 
-  <p style="margin-left: 160px;"><span style="font-weight: bold;">Floor<br>
-</span></p>
+            <p style="margin-left: 160px;"><span class="heading2">Minimum: </span>
+            </p>
 
+            <p style="margin-left: 160px;"><span class="heading2">Ceiling: </span>
+            </p>
 
 
-  <p><span class="heading2">Matrix<br>
-  </span></p>
-  </blockquote><blockquote>
-        </blockquote><blockquote><span class="heading2"></span>
-        </blockquote>
+
+            <p style="margin-left: 160px;"><span class="heading2">Floor: </span>
+            </p>
+
+
+
+            <p style="margin-left: 160px;"><span class="heading2">Clipping: </span>
+            </p>
+
+            <p style="margin-left: 120px;"><span style="font-weight: bold;">Uniform: </span>
+            </p>
+
+            <p style="margin-left: 160px;"><span class="heading2">Ceiling: </span>
+            </p>
+
+            <p style="margin-left: 160px;"><span class="heading2">Floor:
+ </span>
+            </p>
+
+
+
+            <p><span class="heading">Matrix<br>
+  </span>
+            </p>
+        
         <p class="heading">Right Click Menu</p>
-        <blockquote class="heading2">
-            <span class="heading2">Edit</span> Synapse Group: -
-            <span class="heading2"></span><br>
-            <span class="heading2">Remove Group</span>: -
-            <br>
-            <span class="heading2">Select Synapses</span>: -
-            <br>
-            <span class="heading2"></span>Select Incoming Neurons: -
-            <br>
-            <span class="heading2"></span>Select Outgoing Neurons: -
-            <br>
-            <span class="heading2">Adjust Synapses: -<br>
-Show Weight Matrix: -<br>
-Freeze Synapses: -<br>
-Unfreeze Synapses: -<br>
-Enable Synapses: -<br>
-Disable Synapses: -<br>
-Toggle Synapse Visibility: -<br>
-</span><br>
-            <span class="heading2"></span>
+        <blockquote>
+            <p><span class="heading2">Edit Synapse Group:</span> </p>
+            <p><span class="heading2">Remove Group: </span>
+            </p>
+            <p> <span class="heading2">Select Synapses:</span>:
+            </p>
+            <p><span class="heading2">Select Incoming Neurons: </span>
+            </p>
+            <p> <span class="heading2">Select Outgoing Neurons: </span>
+            </p>
+            <p> <span class="heading2">Adjust Synapses: </span> </p>
+            <p><span class="heading2">Show Weight Matrix: </span>
+            </p>
+            <p><span class="heading2">Freeze Synapses: </span>
+            </p>
+            <p><span class="heading2">Unfreeze Synapses: </span>
+            </p>
+            <p><span class="heading2">Disable Synapses: </psan></p>
+<p><span class="heading2">Toggle Synapse Visibility: </span>
+            </p>
+
         </blockquote>
-        <blockquote>&nbsp;</blockquote>
+
     </div>
 
-</body></html>
+</body>
+
+</html>

@@ -1,135 +1,98 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
 
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
 
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
 
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Update</p>
+        </div>
 
+        <h1>Workspace Updating</h1>
 
+        <p>When a simulation is run, a sequence of "update actions" occurs at each iteration. These actions can be re-ordered and customized in various ways. To run a simulation use the iterate and play buttons in the main desktop toolbar. The time will begin advancing. On each iteration an update occurs, which by default means all the components and couplings in a <a href="../Workspace.html">workspace</a> are updated.Individual components within a workspace can be run separately from the network. The workspace can also be run in other ways, e.g. from <a href="../Scripting.html">scripts</a> or from the <a href="../Console.html">terminal</a>, using the command workspace.iterate(<i>n</i>), which iterates the workspace <i>n</i> times.</p>
 
+        <p>Some forms of workspace and component update occur using <a href="http://en.wikipedia.org/wiki/Parallel_computing">parallelization</a>.</p>
 
+        <p><span class="heading">Update Controls and Indicators</span>
+        </p>
 
+        <blockquote>
+            <p><span class="heading2">Play / Stop:</span><img alt="play" src="../../Images/Play.png">Continuously run the simulation until the user presses the same button.</p>
+            <p><span class="heading2">Step:</span> <img alt="step" src="../../Images/Step.png"> iteration the simulation one time.</p>
+            <p><span class="heading2">Time:</span>When a simulation is run iterations or "simulation time" are tracked. This time is represented in the toolbar, and can be reset to 0 by double clicking on the text label.</p>
+            <p><span class="heading2">Run indicator:</span>While a simulation is running a small animated icon is displayed to draw attention to the fact that the simulation is running.</p>
+            <p><span class="heading2">Simulation delay:</span>Can be used to slow the simulation down from its max speed for easier observation of some processes. See <a href="Preferences.html">preferences dialog</a>.</p>
+        </blockquote>
 
+        <p><span class="heading"><a label="UpdateSequence"></a>Update Sequence Dialog</span>
+        </p>
 
+        <p>Workspace updates occur according to a default buffered update strategy (see below), but this can be customized in various ways. To edit and customize update from the GUI go to <span class="command">File>Edit Updated Sequence...</span> The following dialog will appear:</p>
 
+        <p style="text-align: center;"><img style="width: 500px;" alt="Update Panel" border="1" src="../../Images/WorkspaceUpdaterPanel.png">
+        </p>
 
+        <p>The main window shows the current list of update actions. By default there is just one action, <i>Buffered update of components and couplings</i>, that will be repeatedly called. On a single iteration of the workspace, the actions in this list will be fired in the order they are listed. The order can be changed by dragging the actions around or using the arrow buttons.</p>
+        <blockquote>
+            <p><span class="heading2">Add action: </span>Adds one of a set of predefined action. These actions are discussed below.</p>
+            <p><span class="heading2">Remove selected actions(s): </span>Remove all highlighted actions in the main window.</p>
+            <p><span class="heading2">Custom action:</span>Creates a custom update action. A script editor opens up, with comments that indicate how to go about creating the custom update action. Users have access to the underlying <i>workspace</i> object and the gui <i>desktop</i>. See <a href="../Scripting.html">scripting</a> for more on how to create these scripts. <b>Note:</b>To edit an existing custom action, double click on it.</p>
+            <p><span class="heading2">Changing update order.</span>To change the order of update actions, drag them around in the update sequence panel or use the arrow buttons.
+            <p><span class="heading2">Move Up In Sequence</span>: Move selected action up one in the sequence.
+            </p>
+            <p><span class="heading2">Move To Top Of Sequence:</span> Move selected action to the very top of the sequence.
+            </p>
+            <p><span class="heading2">Move Down In Sequence</span>: Move the selected action down one in the sequence.
+            </p>
+            <p><span class="heading2">Move To Bottom Of Sequence</span>: Move the selected action to the very bottom of the sequence.     
+                   </p>
+        </blockquote>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Update</p>
-  </div>
-  <p>
-  </p><h1>Workspace Updating</h1><br>
-<p><span class="heading">Running a simulation</span><br>
-<br>
-To run a simulation use the iterate <img style="width: 18px; height: 18px;" alt="step" src="../../Images/Step.png"> and play <img style="width: 18px; height: 18px;" alt="play" src="../../Images/Play.png">&nbsp; buttons in the main desktop toolbar.</p>
-<p>On each iteration an update occurs, which essentially means all the
-components and couplings are updated. &nbsp; The workspace time is
-iterated, the components are all updated, and the couplings are
-updated. &nbsp; There are various
-types of update, and you have some control over how the update happens<br>
-</p>
+        <p><span class="heading">Predefined Update Actions</span>
+        </p>
 
+        <p>When pressing the <span class="command">Add action</span> button a dialog appears showing a series of redefined update actions. Which actions appear depends on the state of the workspace. An action appears for each workspace component, and for each coupling. By removing the default buffered update action, and then combining component and coupling updates in specific orders, sequences of actions can be created that are not asynchronous and do not have a time lag in the way buffered update does.</p>
 
+        <p><b>Note:</b> Any update action can be added multiple times, so that (for example) on each iteration a single component gets updated multiple times, or buffered update happens more than once.</p>
 
-<span class="heading2"></span>
-<p>
-</p>
-<p><span class="heading2">Time:</span>&nbsp;When a simulation is run iterations or "simulation time" are
-tracked.&nbsp;&nbsp; This time is represented in the toolbar, and can
-be reset to 0 by double clicking on the text label.</p>
-<p><span class="heading2">Updating From Terminal</span><br>
+        <p><b>Note:</b>If buffered update is removed, care must be taken since when new components and couplings are added to the workspace, they will not automatically be put in the current update sequence.</p>
 
+        <p>Here is a screenshot of the dialog:</p>
 
+        <p style="text-align: center;"><img style="width: 300px;" alt="Update Panel" border="1" src="../../Images/WorkspaceUpdaterPredefined.png">
+        </p>
 
-An alternative method is to use a&nbsp; terminal component&nbsp; or
-in the terminal tab at the bottom of the desktop.&nbsp; The command
-workspace.iterate(<span style="font-style: italic;">n</span>) can be use to iterate the workspace <span style="font-style: italic;">n</span> times.&nbsp;</p>
-<p><span class="heading"><a name="CustomizeUpdate">Managing and Customizing Workspace Update</a></span><br>
-</p>
+        <p><span class="heading">Update Types</span>
+        </p>
+        <p><span class="heading2">Buffered Update of all components and couplings</span>
+            <p>Update order does not matter. The default sequence of events is:</p>
+            <ol>
+                <li>Update all workspace components</li>
+                <li>Update all couplings (uses a buffer so that update order does not matter.)</li>
+            </ol>
+            <p>In this scheme each component is updated in parallel on each update, then the couplings are updated. Information on how this update occurs is in the <span class="command">Updater tab</span> of the <a href="PropertyTabs.html">property tabs</a> at the bottom of the Simbrain desktop.</p>
+            <p>Note that in this scheme, there is a <u>time lag</u> between updates. What happens in one component is not "felt" in another until after an iteration of the workspace, since a coupling's producer value must first update to a buffer, then the consumer is updated on the next iteration.</p>
 
+            <p><span class="heading2">Update Component:</span>This action updates a single <a href="Component.html">component</a>. The name of the component is shown to make it easy to identify.</p>
 
-<p>Workspace updates occur according to a default buffered update
-strategy, but this can be customized in various ways.&nbsp; Sometimes
-it is important that components and couplings be updated in a very
-specific way over time.</p><p>On
-any update the actions listed in the current update sequence panel will
-be instantiated in the order shown.&nbsp;&nbsp; To customize the way
-update happens, open the workspace dialog and click on the update
-tab.&nbsp; This is what you will see:<br>
-</p>
-<div style="text-align: center;"><img style="width: 607px; height: 302px;" alt="Update Panel" src="../../Images/UpdaterPanel.png"><br>
+            <p><span class="heading2">Update Coupling:</span>This action updates a <a href="Coupling.html">coupling</a>, pulling the producer value and applying it to the consumer. It is dispalyed as <i>source component > target component</i>.</p>
 
-</div>
-<p><br>
-</p>
-<p><br>
-</p>
-<p><span class="heading2">Current Update Sequence</span>: The current
-list of update actions.&nbsp; On a given iteration of the workspace the
-actions in this list will be fired in the order they are
-listed.&nbsp;&nbsp; The order can be changed by dragging the actions
-around in the subpanel.<br>
-</p>
-<p><span class="heading2">Unused update actions</span>:&nbsp; Actions you can add to the update sequence.You
-can move actions between the current and unused panels by selecting
-actions in the unused panel and clicking "add selected actions"</p>
-<p><span class="heading2">Add selected action(s): </span>&nbsp;Adds any selected actions in the unused update actions to the&nbsp; current update sequence.</p>
-<p><span class="heading2">Remove selected actions(s):  </span>For
-selected actions in the current update sequence, move them to unused
-update actions.&nbsp; For actions in the unused update actions, remove
-them altogether.</p>
-<p><span class="heading2">Add Custom action: </span>&nbsp;Create&nbsp; a custom update action.&nbsp;&nbsp; A script editor opens up, with comments that indicate
-how to go about creating the custom updater.&nbsp; Users have access to the underlying <span style="text-decoration: underline;">workspace</span> object and the gui <span style="text-decoration: underline;">desktop</span>.&nbsp; See  <a href="../Scripting.html">scripting</a> for more on how to create these scripts.&nbsp; To edit a custom action just double click on it.<br>
-</p>
+            <p><a label="Custom"></a><span class="heading">Custom Updating</span></p>
 
-<p><span class="heading2">Changing update order. </span>&nbsp;To change the order of update actions, drag them around in the update sequence panel.<br>
-</p>
-<p><span class="heading">Types of Update Action</span><br>
-</p>
+            <p>By pressing the custom update button in the <span class="command">Edit update sequence</span> dialog a window appears that allows you to define a custom update action. In addition to creating custom actions this way, highly customized forms of update, that in some cases bypass all of Simbrain's built in features, are possible. Further discussion of these options is in the <a href="../Scripting.html">scripting</a> docs.</p>
 
+    </div>
+</body>
 
-
-
-<p>There are four kinds of action currently.</p>
-<p><span class="heading2">Buffered Update of all components and couplings</span></p>
-<p>Update order does not matter. The default sequence of events is: <br></p>
-
-<ul>
-  <li>
-&nbsp;&nbsp;&nbsp; Update all workspace components</li>
-  <li>&nbsp;&nbsp;&nbsp; Update all couplings (uses a buffer so that update order does not matter.)</li>
-</ul>
-<p></p>
-<p>In this scheme, the impact of a coupling is "felt" after an
-iteration of the workspace, since coupling's producer value must first
-update to a buffer, then the consumer is updated on the next iteration.</p>
-<p><span class="heading2">Update Component</span></p>
-<p>This action updates a single component.<br>
-</p>
-<p><span class="heading2">Update Coupling</span></p>
-<p>This action updates a coupling, pulling the producer value and
-applying it to the consumer.&nbsp; By combining component and coupling
-updates in specific orders sequences of actions can be created that are
-not asynchronous and do not have a time lag in the way buffered update
-does.&nbsp;&nbsp; But care must be taken since when new componentss and
-couplings are added they will not automatically be put in the current
-update sequence.<br>
-</p>
-<p><span class="heading2">Custom Update Action</span><br>
-</p>
-<p>See add custom update action above.<br>
-</p>
-<p>
-</p>
-<span class="heading2"></span>
-<p><br>
-<span style="text-decoration: underline;"><br>
-</span></p>
-
-</div>
-</body></html>
+</html>

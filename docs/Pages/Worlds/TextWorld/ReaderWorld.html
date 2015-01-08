@@ -46,13 +46,68 @@
 
         <p>For example in a network you could right click on a node, go to "receive scalar coupling from" and then in the context menu choose "ReaderWorld1" and then "a" to make that neuron respond to the letter a being parsed.</p>
 
-        <p> <span class="heading">Parse Types</span></p>
-        
+        <p> <span class="heading"><a name="ParseTypes"></a>Parse Types</span>
+        </p>
+
         <p>Text can be parsed in several ways. How text is parsed is set using the Word / Character radio button at the bottom of the main window.</p>
         <blockquote>
-            <p> <span class="heading2">Word-based:</span> In this mode, the world advances through the text one word at a time, using a delimiter(defaulting to white space) that is set in the preference dialog. This delimiter is a java regular expression that is passed in to a java <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">pattern</a> object.</p>
+            <p> <span class="heading2">Word-based:</span> In this mode, the world advances through the text one word at a time, using a delimiter (defaulting to white space) that is set in the preference dialog. This delimiter is a java regular expression that is passed in to a java <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">pattern</a> object.</p>
             <p> <span class="heading2">Character-based:</span> In this mode the world, advances through the text one character at a time.</p>
         </blockquote>
+
+        <p> <span class="heading">Menu</span>
+        </p>
+
+        <blockquote>
+            <span class="heading">File</span>
+        </blockquote>
+
+        <blockquote>
+            <p> <span class="heading2">Open: </span>Opens a new component.</p>
+            <p> <span class="heading2">Save / Save As: </span>Saves the current component.</p>
+            <p> <span class="heading2">Load Text:</span> Uploads a text file.</p>
+            <p> <span class="heading2">Close: </span>Closes current component.</p>
+        </blockquote>
+
+        <blockquote>
+            <span class="heading">Edit</span>
+        </blockquote>
+
+        <blockquote>
+            <p> <span class="heading2">Edit Dictionary: </span>See <a href="DisplayWorld.html#commands">commands</a>. </p>
+            <p> <span class="heading2">Preferences:</span> Show preferences dialog.</p>
+            <blockquote>
+                <p> <span class="heading2">Parse Style:</span> See <a href="#ParseTypes">parse types</a>. </p>
+                <p> <span class="heading2">Regular Expression: </span>This regular expression is used to determine how tokens are delimited when the reader world is in "word" mode. The regular expression is passed to a jave <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">pattern</a> object. By default it is set to use whitespace as a delimiter.. </p>
+            </blockquote>
+        </blockquote>
+
+        <p> <span class="heading">Toolbar</span>
+        </p>
+
+        <table style="margin-left: 40px;" border="0">
+            <tbody>
+                <tr>
+                    <td><img style="width: 18px; height: 18px;" alt="randomize" src="../../../Images/Open.png">
+                        <br>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;Open new component. </td>
+                </tr>
+                <tr>
+                    <td><img style="width: 18px; height: 18px;" alt="prefs" src="../../../Images/Save.png">
+                        <br>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;Save component.</td>
+                </tr>
+
+                <tr>
+                    <td><img style="width: 18px; height: 18px;" alt="prefs" src="../../../Images/Table.png">
+                        <br>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;Edit dictionary.</td>
+                </tr>
+            </tbody>
+        </table>
 
     </div>
 </body>

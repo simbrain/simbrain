@@ -1,128 +1,68 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-  <title>Simbrain Documentation</title>
+<html>
 
-  
-  
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
 
-  
-  <link href="../../Styles.css" rel="stylesheet" type="text/css">
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
+    <div id="main_docs">
 
-</head><body>
-<a href="../../SimbrainDocs.html">
-<div class="logo">
-<p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-<div class="navi">
-<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
-</div>
-<h1>Network Update</h1>
-<p>Each time the step button is pressed in the network panel--the
-network moves forward in time by one iteration; that is, it takes on a
-new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. On each
-update, the "time" label
-is updated as well.
-</p>
-<p>There are multiple ways to go about updating a a construct as
-complex as an artificial neural network. Artificial neural networks are
-essentially graphs, a collection of
-nodes connected by vertices (the vertices are neurons and the
-connections are synapses). The whole network has three lists: a list of
-nodes, a list
-of connections, and a list of networks ("subnetworks"). The connections
-have references to the source and target nodes they connect. When a
-network is updated the program goes through the list of neurons and
-calls an update function internal to each one, and similarly with the
-list of synapses. Before these values are actually changed they are
-stored as a buffer within each network component. In this way, an
-update method can be thought of as the specific way or order in which
-buffered values are transformed into actual values. <br>
-</p>
-<p>To allow for custom updating includes two built in update types:
-buffered (default) and
-priority-based. For more advanced users Simbrain also includes the
-option of creating custom update method, and a dialog for creating
-custom updates.<br>
-</p>
-<p> At the network level update
-rules can be changed by going to File &gt; Network Preferences (or
-"ctrl + ,"), and selecting the "update" tab. From there the update
-method can be customized.<br>
-</p>
-<div style="text-align: center;"><img style="width: 370px; height: 303px;" alt="Update Network" src="../../Images/UpdateNetwork.png">&nbsp;<br>
-</div>
-<br>
-The general operation of this panel is identical to the <a href="../Workspace/Update.html">workspace updater.</a>&nbsp;&nbsp;
-Refer to that page for more on how to use it.<br>
-<br>
-<span class="heading">Update Types</span><br>
-<br>
-<p><span class="heading2">Buffered Update</span><br>
-</p>
-<p>Buffered update is the default update rule in Simbrain. For every
-component of the network, the new value at time <i>t</i> is calculated
-from the attribute values at <i>t - 1</i> and stored in the buffer. No
-activation values are changed until every buffer as been calculated.
-Then all activations are updated simultaneously based on their buffer
-values.</p>
-<p><span class="heading"><span class="heading2">Priority Update</span></span><br>
-</p>
-<p>When using a priority based update, each node is assigned a priority
-value. The lower this value, the higher the node's priority. Based on
-this value all the network components are sorted into a queue. The
-program addresses the head of this queue first calling the component's
-update method and immediately setting its activation based on its
-buffer value before moving on to the next component in the queue.
-Components with the same priority are ordered arbitrarily in this queue.</p>
-<p><span class="heading"><span class="heading2"><a name="CustomUpdate"></a>Custom
-Update </span></span><br>
-</p>
-<p>Create a custom update action.&nbsp; Users have access to the
-underlying <span style="text-decoration: underline;">network</span>
-object and the gui <span style="text-decoration: underline;">networkpanel.<br>
-</span></p>
-<span class="heading">Update Types</span><br>
-<br>
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
+        </div>
 
-<p><span class="heading2">Add Action</span>: Adds any selected actions in the unused update actions to the  current update sequence.<br>
-</p>
-<p><span class="heading2">Add Custom Action:</span> &nbsp;Create&nbsp; a custom update action.&nbsp;&nbsp; A script editor opens up, with comments that indicate
-how to go about creating the custom updater.&nbsp; Users have access to the underlying <span style="text-decoration: underline;">workspace</span> object and the gui <span style="text-decoration: underline;">desktop</span>.&nbsp; See  <a href="../Scripting.html">scripting</a> for more on how to create these scripts.&nbsp; To edit a custom action just double click on it.<br>
-</p>
+        <h1>Network Update</h1>
 
-<p><span class="heading2">Remove Action(s):</span> Deletes selected action(s).<br>
-</p>
-
-<p><span class="heading2">Move Up In Sequence</span>: Move selected action up one in the sequence. <br>
-</p>
-
-<p><span class="heading2">Move To Top Of Sequence:</span> Move selected action to the very top of the sequence. <br>
-</p>
+        <p>When a network is run, by default all of its neurons, synapses, and groups are updated. This update has a default mode, but is highly customizable. The network update often happens as part of <a href="../Workspace/Update.html">workspace update</a> but can also occur independently of the workspace (e.g. by making the network run toolbar visible). Note that the network has a time indicator that is separate from the workspace level indicator.</p>
 
 
-<p><span class="heading2">Move Down In Sequence</span>: Move the selected action down one in the sequence. <br>
-</p>
+        <p><span class="heading">Update Sequence Dialog</span>
+        </p>
 
+        <p>Network update can be customized by going to <span class="command">File>Edit Update Sequence...</span>. The general operation of this panel is identical to the <a href="../Workspace/Update.html">workspace updater.</a> Refer to that page for details on how to use it. The basic idea is that on a single iteration the actions in the main list will be fired in the order they are listed. The order can be changed by dragging the actions around or using the arrow buttons. <b>Note:</b>This order is especially important with network update, because subnetworks and neuron groups are updated sequentially in the order they were added to the network, which may not be the preferred order.</p>
 
+        <p style="text-align: center;"><img style="width: 500px;" alt="Network Update Dialog" border="1" src="../../Images/NetworkUpdaterPanel.png">
+        </p>
 
-<p><span class="heading2">Move To Bottom Of Sequence</span>: Move the selected action to the very bottom of the sequence. <br>
-</p>
+        <p><span class="heading">Update Types</span>
+        </p>
 
-<p><br>
-</p>
+        <p>By default, all loose neurons and synapses are updated, and then each subnetwork and neuron group is updated. Subnetworks often have their own custom update methods, which is listed in parentheses in the update sequence dialog. These methods are described in the relevant group and subnetwork doc pages. They can be configured within the subnetwork's or group's edit dialog.</p>
 
-<p><br>
-</p>
-<p><br>
-</p>
-<p><br>
-</p>
-<p></p>
+        <p>There are several choices for updating loose neurons. There is also a parallelized high performance method for updating everything in a network.</p>
 
-<p>&nbsp;</p>
-</div>
+        <p>As with workspace update, as new components are added to a network, new update actions become available. For neuron groups and subnetworks these are automatically added to the updated sequence. As noted above, this is important to keep track of, since the resulting order may not be what you want. </p>
 
-</body></html>
+        <p>Here is what the predefined action dialog looks like.
+
+            <p style="text-align: center;"><img style="width: 400px;" alt="Network Update Dialog" border="1" src="../../Images/NetworkUpdaterPredefined.png"> </p>
+
+            <p>As with workspace update, network update actions can be repeated. So you can add these multiple times to the update sequence.</p>
+
+            <p>These are the main update methods available:</p>
+
+            <blockquote>
+
+                <p><span class="heading2">Buffered Update of loose neurons:</span>Buffered update is the default update method for loose neurons. When a network is updated the program goes through the list of loose neurons and calls an update function internal to each one, and similarly with the list of synapses. Before these values are actually changed they are stored as a buffer within each network component. In this way, update occurs asynchronously and is predictable.  However, there is a visible time lag as activation must first be placed in a buffer and then read from that buffer.  So activation can be visibly seen propagating through nodes.</p>
+
+                <p><span class="heading2">Priority Update of Loose Neurons:</span>When using a priority based update, each neuron is assigned a priority value. The lower this value, the higher the neuron's priority. These priority values can be viewed using the <a href="menu.html">view</a> menu.  Neurons with the same priority are updated in any arbitrarily order.</p>
+
+                <p><span class="heading2">Parallel Buffered Update:</span>TODO.</p>
+
+				<p><span class="heading2">Subnetwork-Specific Updates:</span>Subnetworks like <a href="network/hopfieldnetwork.html">Hopfield</a> networks or <a href="network/backpropnetwork.html">backprop</a> networks have their own custom update rules, which can sometimes be further configured in the network or group's edit menu.  This update method is briefly described in the update sequence menu, in parentheses.</p>
+
+            </blockquote>
+
+            <p>By pressing the custom update button in the <span class="command">Edit update sequence</span> dialog a window appears that allows you to define a custom update action.  Custom actions can also be loaded from scripts, and in some of the built in examples are loaded.  See the discussion of <a href="scripting.html">network scripting</a> docs.</p>
+
+    </div>
+</body>
+
+</html>

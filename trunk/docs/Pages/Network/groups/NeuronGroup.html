@@ -42,72 +42,38 @@
                 <a name="summary"></a>Summary
             </p>
             <blockquote>
-                <p><span class="heading2">Group ID:</span> Labelling that identifies the group.</p>
+
+                <p><img src="../../../Images/NeuronGroupSummary.png" alt="Summary Panel" style="float:right;width:175px;height:190px">
+                    <span class="heading2">Group ID:</span> Labelling that identifies the group.</p>
                 <p><span class="heading2">Label:</span> Name of group.</p>
                 <p><span class="heading2">Population:</span> Number of neurons in the group.</p>
-                <p>
-                    <span class="heading2">Excitatory Type:</span> The type of neuronal excitation for the group. Can be changed in "Update Rule." See <a href="../neuron.html">neuron types</a> for a listing of the various types.
-                </p>
-                <p>
-                    <span class="heading2">Inhibitory Type:</span> The type of neuronal inhibition for the group. See <a href="../neuron.html">neuron types</a> for a listing of the various types. </p>
-
-                <p> <span class="heading2">Parent:</span> Denotes the parent group, if any.</p>
-
-                <p><span class="heading2">Incoming:</span> TODO</p>
-                <p><span class="heading2">Outgoing:</span> TODO
-                </p>
+                <p><span class="heading2">Neuron Type:</span> The neuron update rule governing the neurons in the group. If multiple different neuron update rules are being used the value will be displayed as "...".</p>
+                <p> <span class="heading2">Parent:</span> Denotes the parent group (usually a subnetwork), if any.</p>
             </blockquote>
 
         </blockquote>
         <blockquote>
             <p class="heading">Neurons</p>
             <blockquote>
-                <p><span class="heading2">Activation:</span> The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (e.g. firing rate, voltage potential, etc.). This is represented by the neuron's color, and can be seen exactly by lingering over the neuron or observing the value in the neuron's properties.
-                </p>
-                <p><span class="heading2">Label:</span> This field labels ALL of the neurons (within the group) with the same name. </p>
-                <p><span class="heading2">Clamped:</span> Clamping the neurons fix the activation value to the current value.</p>
-                <p><span class="heading2">Clipping:</span> If a neuron uses clipping, then if its activation exceeds its upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength.</p>
-                <p><span class="heading2">Upper Bound:</span> This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.
-                </p>
-                <p><span class="heading2">Lower Bound:</span> This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.</p>
-                <p><span class="heading2">Increment</span>: This field sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
-                <p><span class="heading2">Priority:</span> This field lets user give priority to neurons. The lower the value, the higher the priority.</p>
-                <p><span class="heading2">Input Type:</span> This field sets the input as weighted or synaptic. </p>
-                <p><span class="heading2">Update Rule:</span> This field lets user change the neuron type.</p>
+                <p>See the <a href="../neuron.html">neuron</a> page.</p>
             </blockquote>
-        </blockquote>
-        <blockquote>
-
             <p class="heading">Layout</p>
-
             <blockquote>
-                <p>
-                    <span class="heading2">Grid:</span> Neurons are laid out in a grid, beginning at an initial position and moving downward.</p>
-                <p><span class="heading2">Horizontal Spacing: </span>Distance between the neurons from left to right.</p>
-                <p><span class="heading2">Vertical Spacing:</span> Distance between the neurons up and down.</p>
-                <p><span class="heading2">Manual Columns:</span> If checked, the default behavior is overrideen and you can choose how many columns the grid has, using the number of columns field. Default behavior is a square grid.</p>
-                <p><span class="heading2">Number of Columns:</span> How many columns there will be in the grid (if manully set number of columns is selected).</p>
-
-                <p><span class="heading2">Hex Grid</span>: Neurons are laid out in a hexagonal pattern.
-                </p>
-                <p><span class="heading2">Horizontal Spacing:</span> Distance between the neurons from left to right.</p>
-
-                <p><span class="heading2">Vertical Spacing:</span> Distance between the neurons up and down.</p>
-
-                <p><span class="heading2">Manual Columns:</span> If checked, the default behavior is overrideen and you can choose how many columns the grid has, using the number of columns field. Default behavior is a square grid.</p>
-
-                <p><span class="heading2">Number of Columns:</span> How many columns there will be in the grid (if manully set number of columns is selected).</p>
-                <p><span class="heading2">Line:</span> Neurons are laid out in a line, beginning at an initial position.</p>
-                <p><span class="heading2">Layout Style</span>: Whether the neurons are laid out horizontally or vertically.</p>
-                <p><span class="heading2">Spacing:</span> Distance between the neurons.</p>
+                <p>See the <a href="../layouts.html">layouts</a> page.</p>
             </blockquote>
-            <p class="heading">Input Data
+            <p class="heading">Input Data</p>
+            <br>
+           
+            <img src="../../../Images/InputDataTable.png" alt="Data table example" style="margin-left:120px;width:1000px;height:520px">
+            <br>
+            <br>
                 <p style="margin-left: 60px;">
-                    Input data for neurons. User can upload .csv data files. </p>
+                    Here .csv files can be loaded into this table, and thost values fed into the neurons in the group. The .csv file must have a number of columns equal to the number of neurons in the group. Input values can be edited here as well as viewed. The values in the table can be saved to a .csv file as well. Users can then press "play" to feed all the values in order into the group or step from one row to the next one at a time. For values to show up in the neuron group the neurons in the group must be clamped. This reflects that under most circumstances this should be done only if the group acts purely as an input to some other group.
+                </p>
         </blockquote>
         <p class="heading"><a name="RightClick"></a>Right Click Menu</p>
         <blockquote>
-            <span class="heading2">Edit: </span>Edit group properties.
+            <span class="heading2">Edit: </span>Edit group properties. This opens the group properties panel which includes the above sections. The is the same as double-clicking on the interaction box.
             <br>
             <span class="heading2">Rename Group: </span> Input another name for the group.
             <br>
@@ -115,22 +81,23 @@
             <br>
             <span class="heading2">Select Neurons: </span>Select all neurons in the group.
             <br>
-            <span class="heading2">Select Incoming Synapses:</span>TODO
+            <span class="heading2">Select Incoming Synapses:</span> Selects all incoming synapse groups and/or loose synapses.
             <br>
-            <span class="heading2">Select Outgoing Synapses:</span> TODO
+            <span class="heading2">Select Outgoing Synapses:</span> Selects all outgoing synapse groups and/or loose synapses.
             <br>
             <span class="heading2">Clamp Neurons: </span>Clamp all neurons in the group. See <a href="../neuron.html#clamping">Clamping</a>.
             <br>
             <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
             <br>
-            <span class="heading2">Set Group as Source: </span> Set the group as source group.
+            <span class="heading2">Set Group as Source: </span> Set the group as source group for some future synaptic connections.
             <br>
             <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
             <br>
             <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
             <br>
-            <span class="heading2">Send Vector Coupling To: </span> TODO<br>
-            <span class="heading2">Start/ Stop Recording: </span> TODO
+            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the network and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.<br>
+            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector. It establishes this sort of connection and a new vector will be forwarded at each workspace update.<br>
+            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>. 
         </blockquote>
         <blockquote>&nbsp;</blockquote>
     </div>

@@ -903,7 +903,8 @@ public class SynapseGroup extends Group {
      * @return
      */
     public double[][] getWeightMatrix() {
-        double[][] weightMatrix = new double[getSourceNeurons().size()][getTargetNeurons()
+        double[][] weightMatrix =
+                new double[getSourceNeurons().size()][getTargetNeurons()
                 .size()];
         int i = 0;
         int j = 0;
@@ -985,9 +986,10 @@ public class SynapseGroup extends Group {
      * the this makes the synapse change polarity it will be removed from its
      * current set and added to the appropriate set.
      *
-     * @param synapse
-     * @param newWeight
-     * @return
+     * @param synapse sets the strength of an individual synapse in the group
+     * @param newWeight the new weight to set it to
+     * @return true if this group contained the specified synapse, and false if
+     * it did not and thus failed to set the strength value.
      */
     public boolean setSynapseStrength(Synapse synapse, double newWeight) {
         if (synapse.getStrength() >= 0 && exSynapseSet.contains(synapse)) {

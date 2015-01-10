@@ -20,8 +20,8 @@ package org.simbrain.network.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
@@ -48,13 +48,13 @@ public class NetworkUpdateManager {
      * actions constitutes a single "update" in the network.
      */
     private final List<NetworkUpdateAction> actionList =
-    		new CopyOnWriteArrayList<NetworkUpdateAction>();
+            new ArrayList<NetworkUpdateAction>();
 
     /**
      * List of listeners on this update manager.
      */
     private List<UpdateManagerListener> listeners =
-    		new ArrayList<UpdateManagerListener>();
+            new ArrayList<UpdateManagerListener>();
 
     /** Reference to parent network. */
     private final Network network;
@@ -80,6 +80,19 @@ public class NetworkUpdateManager {
     public void postUnmarshallingInit() {
         listeners = new ArrayList<UpdateManagerListener>();
         addListeners();
+        Iterator<NetworkUpdateAction> actions = actionList.iterator();
+        // TODO: Hack-y solution. Revisit this.
+        while (actions.hasNext()) {
+            NetworkUpdateAction nua = actions.next();
+            if (nua instanceof ConcurrentBufferedUpdate) {
+                actions.remove();
+                ((ConcurrentBufferedUpdate) nua).shutdown();
+                actionList.add(ConcurrentBufferedUpdate
+                        .createConcurrentBufferedUpdate(network));
+                break;
+            }
+        }
+
         for (NetworkUpdateAction action : getActionList()) {
             if (action instanceof CustomUpdate) {
                 ((CustomUpdate) action).init();
@@ -114,13 +127,14 @@ public class NetworkUpdateManager {
      * @return available action list
      */
     public List<NetworkUpdateAction> getAvailableActionList() {
-        final List<NetworkUpdateAction> availableActionList = new ArrayList<NetworkUpdateAction>();
+        final List<NetworkUpdateAction> availableActionList =
+                new ArrayList<NetworkUpdateAction>();
 
         // By default these guys are always available
         availableActionList.add(new BufferedUpdate(network));
         availableActionList.add(new PriorityUpdate(network));
         availableActionList.add(ConcurrentBufferedUpdate
-        		.createConcurrentBufferedUpdate(network));
+                .createConcurrentBufferedUpdate(network));
 
         // Add update actions for all groups available
         for (Group group : network.getGroupList()) {
@@ -128,8 +142,8 @@ public class NetworkUpdateManager {
                 availableActionList.add(new UpdateGroup(group));
             }
             if (group instanceof NeuronGroup) {
-            	availableActionList.add(new NeuronGroupRecorder(
-            			(NeuronGroup) group));
+                availableActionList.add(new NeuronGroupRecorder(
+                        (NeuronGroup) group));
             }
         }
 
@@ -140,6 +154,7 @@ public class NetworkUpdateManager {
      * Remove action (if one exists) associated with the provided group.
      *
      * @param group
+     *            the group being removed
      */
     private void removeGroupAction(Group group) {
         NetworkUpdateAction toDelete = null;
@@ -159,7 +174,8 @@ public class NetworkUpdateManager {
     /**
      * Listen for updates to the update manager.
      *
-     * @param listener the listener to add
+     * @param listener
+     *            the listener to add
      */
     public void addListener(UpdateManagerListener listener) {
         listeners.add(listener);
@@ -168,7 +184,8 @@ public class NetworkUpdateManager {
     /**
      * Remove listener.
      *
-     * @param listener the listener to remove
+     * @param listener
+     *            the listener to remove
      */
     public void removeListener(UpdateManagerListener listener) {
         listeners.remove(listener);
@@ -184,8 +201,10 @@ public class NetworkUpdateManager {
     /**
      * Swap elements at the specified location.
      *
-     * @param index1 index of first element
-     * @param index2 index of second element
+     * @param index1
+     *            index of first element
+     * @param index2
+     *            index of second element
      */
     public void swapElements(final int index1, final int index2) {
         Collections.swap(actionList, index1, index2);
@@ -197,7 +216,8 @@ public class NetworkUpdateManager {
     /**
      * Add an action to the list.
      *
-     * @param action the action to add.
+     * @param action
+     *            the action to add.
      */
     public void addAction(NetworkUpdateAction action) {
         actionList.add(action);
@@ -209,7 +229,8 @@ public class NetworkUpdateManager {
     /**
      * Completely remove an action.
      *
-     * @param action the action to completely remove
+     * @param action
+     *            the action to completely remove
      */
     public void removeAction(NetworkUpdateAction action) {
         actionList.remove(action);
@@ -223,14 +244,24 @@ public class NetworkUpdateManager {
      */
     public interface UpdateManagerListener {
 
-        /** An action was added. */
-        public void actionAdded(NetworkUpdateAction action);
+        /**
+         * An action was added.
+         * 
+         * @param action
+         *            the action to add
+         */
+        void actionAdded(NetworkUpdateAction action);
 
-        /** An action was removed. */
-        public void actionRemoved(NetworkUpdateAction action);
+        /**
+         * An action was removed.
+         * 
+         * @param action
+         *            the action to remove
+         */
+        void actionRemoved(NetworkUpdateAction action);
 
         /** The action order was changed. */
-        public void actionOrderChanged();
+        void actionOrderChanged();
     }
 
     /**

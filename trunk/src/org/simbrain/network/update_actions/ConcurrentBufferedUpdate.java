@@ -58,97 +58,102 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  * 
  * @author Zach Tosi
  *
- * A class which performs a parallelized update of an entire network. Neurons
- * are updated in chunks of ~100, and any given thread which is updating a 
- * neuron is also responsible for updating all the afferent synapses of that 
- * neuron. Update occurs synchronously using the same technique as buffered
- * update, despite being concurrent.
+ *         A class which performs a parallelized update of an entire network.
+ *         Neurons are updated in chunks of ~100, and any given thread which is
+ *         updating a neuron is also responsible for updating all the afferent
+ *         synapses of that neuron. Update occurs synchronously using the same
+ *         technique as buffered update, despite being concurrent.
  * 
- * This class keeps its own separate list of neurons in the network because
- * for networks with groups, it would be expensive to extract neuron groups
- * from a generic groups list every invocation. Instead it implements a
- * group and neuron listener and updates its internal set of neurons when/if
- * neurons or neuron groups are added to or removed from the network. 
+ *         This class keeps its own separate list of neurons in the network
+ *         because for networks with groups, it would be expensive to extract
+ *         neuron groups from a generic groups list every invocation. Instead it
+ *         implements a group and neuron listener and updates its internal set
+ *         of neurons when/if neurons or neuron groups are added to or removed
+ *         from the network.
  * 
- * Parallelization in this class follows a classical consumer/producer
- * framework. One thread: the producer has the job of filling a blocking queue
- * with tasks for the consumers to take. The consumers take tasks from the queue
- * and execute them until the queue is empty. In this way, consumers can take
- * on tasks whenever they are available to do so and there are more tasks to
- * complete, instead of having to wait on some other condition. In order to
- * keep the sort of synchronization necessary for a neural network, a cyclic
- * barrier ensures that all tasks have been completed before more tasks 
- * (amounting to the next network iteration/update) are allowed in the queue. 
- * Furthermore this class implements a synchronous or buffered update. The
- * producer thread does not set the activation of each neuron to their buffer
- * values until all tasks have been completed. 
+ *         Parallelization in this class follows a classical consumer/producer
+ *         framework. One thread: the producer has the job of filling a blocking
+ *         queue with tasks for the consumers to take. The consumers take tasks
+ *         from the queue and execute them until the queue is empty. In this
+ *         way, consumers can take on tasks whenever they are available to do so
+ *         and there are more tasks to complete, instead of having to wait on
+ *         some other condition. In order to keep the sort of synchronization
+ *         necessary for a neural network, a cyclic barrier ensures that all
+ *         tasks have been completed before more tasks (amounting to the next
+ *         network iteration/update) are allowed in the queue. Furthermore this
+ *         class implements a synchronous or buffered update. The producer
+ *         thread does not set the activation of each neuron to their buffer
+ *         values until all tasks have been completed.
  *
  */
 public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
-	NeuronListener, GroupListener {
+		NeuronListener, GroupListener {
 
 	/** Each task will consist of updating no more than CHUNK_SIZE neurons. */
 	private static final int CHUNK_SIZE = 100;
-	
-	/** 
+
+	/**
 	 * The initial capacity of the set containing this class's private neuron
 	 * list, which is synchronized to the underlying network.
 	 */
-	private static final int INITIAL_CAPACITY = (int) Math.ceil(15000/0.75);
-	
-	/** 
-	 * A list of threads being used as our "consumers" of tasks
-	 * (updating neurons).
+	private static final int INITIAL_CAPACITY = (int) Math.ceil(15000 / 0.75);
+
+	/**
+	 * A list of threads being used as our "consumers" of tasks (updating
+	 * neurons).
 	 */
 	private final List<Thread> consumerThreads = new ArrayList<Thread>();
-	
-	/** The blocking queue which contains all tasks relevant to updating the
+
+	/**
+	 * The blocking queue which contains all tasks relevant to updating the
 	 * network (insofar as mechanics are concerned). Update actions like
 	 * NeuronGroupRecorder do not actually alter the network's state and are
 	 * <b>NOT</b> bundled in with this class's update algorithm. They must be
 	 * added as independent actions.
 	 */
 	private final BlockingQueue<Task> tasksQueue;
-	
+
 	/**
 	 * The current number of available processors to the JVM, should that value
 	 * change. Any changes to this value will be reflected in the number of
 	 * consumer threads upon subsequent invocation.
 	 */
 	private volatile int currentAvailableProcessors;
-	
-	/** The barrier which prevents producer/consumer threads from moving on
-	 *  until the entire network has been brought into the next time step.
+
+	/**
+	 * The barrier which prevents producer/consumer threads from moving on until
+	 * the entire network has been brought into the next time step.
 	 */
 	private volatile CyclicBarrier synchronizingBarrier;
-	
+
 	/**
 	 * This class's private set of neurons in the network, used for updating.
 	 */
-	private final Set<Neuron> neurons = Collections.synchronizedSet(
-			new HashSet<Neuron>(INITIAL_CAPACITY));
+	private final Set<Neuron> neurons = Collections
+			.synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
 
 	/** A count of the number of network changes which have taken place. */
 	private AtomicInteger pendingOperations = new AtomicInteger(0);
-	
+
 	/** A copy of the network. */
 	private final Network network;
-	
+
 	/** A reference to the current thread which is acting as a producer. */
 	private volatile Thread producer;
-	
-	/** 
-	 * Indicating whether or not this class and consumer threads are dead
-	 * and can no longer process network updates.
+
+	/**
+	 * Indicating whether or not this class and consumer threads are dead and
+	 * can no longer process network updates.
 	 */
 	private volatile boolean dead = false;
-	
+
 	/** A signal to shut down this class and its consumer threads. */
 	private final AtomicBoolean shutdownSignal = new AtomicBoolean(false);
-	
+
 	/**
 	 * A static factory method that creates a concurrent buffered update class
 	 * for a network. See {@link #ConcurrentBufferedUpdate(Network)}.
+	 * 
 	 * @param network
 	 * @return
 	 */
@@ -159,15 +164,16 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 		network.addNeuronListener(cbu);
 		return cbu;
 	}
-	
+
 	/**
 	 * Creates the consumer threads, in a quantity equal to the number of
 	 * available processors, since the producer's job is small enough that
 	 * having more threads than processors will not be problematic (they are
-	 * also not active at the same time at least half the time). Also
-	 * populates this classes copy of the neurons in the network.
+	 * also not active at the same time at least half the time). Also populates
+	 * this classes copy of the neurons in the network.
 	 * 
-	 * @param network the network being updated by this updater.
+	 * @param network
+	 *            the network being updated by this updater.
 	 */
 	private ConcurrentBufferedUpdate(final Network network) {
 		this.network = network;
@@ -175,8 +181,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 		tasksQueue = new LinkedBlockingQueue<Task>();
 		// +1 because Producer thread doesn't get its own processor, its job is
 		// too small
-		synchronizingBarrier = new CyclicBarrier(currentAvailableProcessors
-				+ 1); 
+		synchronizingBarrier = new CyclicBarrier(currentAvailableProcessors + 1);
 		for (int i = 0; i < currentAvailableProcessors; i++) {
 			consumerThreads.add(new Thread(new Consumer(synchronizingBarrier,
 					tasksQueue, i)));
@@ -189,22 +194,25 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 			neurons.addAll(ng.getNeuronList());
 		}
 	}
-	
+
 	@Override
 	public void invoke() {
 		if (dead) {
-			throw new IllegalStateException("ConcurrentBufferedUpdate cannot be"
-					+ " invoked once it has been shutdown");
+			throw new IllegalStateException(
+					"ConcurrentBufferedUpdate cannot be"
+							+ " invoked once it has been shutdown");
 		}
 		producer = Thread.currentThread();
+		network.setUpdateCompleted(false);
 		try {
 			if (currentAvailableProcessors
-					!= getAvailableConsumerProcessors()) {
+			        != getAvailableConsumerProcessors()) 
+			{
 				availableProcessorChange();
 			}
-			synchronized(neurons) {
+			synchronized (neurons) {
 				int i = 0;
-				Neuron [] block = new Neuron[CHUNK_SIZE];
+				Neuron[] block = new Neuron[CHUNK_SIZE];
 				for (Neuron n : neurons) {
 					if (i >= CHUNK_SIZE) {
 						i = 0;
@@ -235,13 +243,14 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 				}
 			}
 			synchronizingBarrier.await();
+			network.setUpdateCompleted(true);
 			while (pendingOperations.get() > 0) {
-				synchronized(this) {
+				synchronized (producer) {
 					wait();
 				}
 			}
-			synchronized(neurons) {
-				for(Neuron n : neurons) {
+			synchronized (neurons) {
+				for (Neuron n : neurons) {
 					n.setToBufferVals();
 				}
 			}
@@ -249,11 +258,11 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
-	 * Re-checks the number of processors available to the JVM and adjusts the 
+	 * Re-checks the number of processors available to the JVM and adjusts the
 	 * number of consumer threads accordingly.
 	 */
 	private void availableProcessorChange() {
@@ -274,10 +283,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 			currentAvailableProcessors++;
 		}
 	}
-	
+
 	/**
-	 * Permanently shuts down the consumer threads and thus the functionality
-	 * of this class.
+	 * Permanently shuts down the consumer threads and thus the functionality of
+	 * this class.
 	 */
 	public void shutdown() {
 		shutdownSignal.set(true);
@@ -297,40 +306,40 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 	public void groupAdded(NetworkEvent<Group> e) {
 		if (e.getObject() instanceof NeuronGroup) {
 			pendingOperations.incrementAndGet();
-			synchronized(neurons) {
-				for (Neuron n : ((NeuronGroup)e.getObject()).getNeuronList()) {
+			synchronized (neurons) {
+				for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
 					neurons.add(n);
 				}
 			}
 			decrementPendingOperations();
 		} else if (e.getObject() instanceof Subnetwork) {
-			 List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-					 .getNeuronGroupList();
-			 for (NeuronGroup ng : neuronGroups) {
-				 groupAdded(new NetworkEvent<Group>(network, null, ng));
-			 }
+			List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
+					.getNeuronGroupList();
+			for (NeuronGroup ng : neuronGroups) {
+				groupAdded(new NetworkEvent<Group>(network, null, ng));
+			}
 		} else {
 			return;
 		}
-		
+
 	}
 
 	@Override
 	public void groupRemoved(NetworkEvent<Group> e) {
 		if (e.getObject() instanceof NeuronGroup) {
 			pendingOperations.incrementAndGet();
-			synchronized(neurons) {
-				for (Neuron n : ((NeuronGroup)e.getObject()).getNeuronList()) {
+			synchronized (neurons) {
+				for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
 					neurons.remove(n);
 				}
 			}
 			decrementPendingOperations();
 		} else if (e.getObject() instanceof Subnetwork) {
-			 List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-					 .getNeuronGroupList();
-			 for (NeuronGroup ng : neuronGroups) {
-				 groupRemoved(new NetworkEvent<Group>(network, null, ng));
-			 }
+			List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
+					.getNeuronGroupList();
+			for (NeuronGroup ng : neuronGroups) {
+				groupRemoved(new NetworkEvent<Group>(network, null, ng));
+			}
 		} else {
 			return;
 		}
@@ -385,21 +394,22 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 		neurons.remove(networkEvent.getObject());
 		decrementPendingOperations();
 	}
-	
+
 	public int getAvailableConsumerProcessors() {
 		return Runtime.getRuntime().availableProcessors();
 	}
-	
+
 	private int decrementPendingOperations() {
-		synchronized(this) {
+		synchronized (producer) {
 			producer.notify();
 		}
 		return pendingOperations.decrementAndGet();
 	}
-	
+
 	/**
 	 * Test main to demonstrate performance improvements over serial updates
-	 * without a GUI. 
+	 * without a GUI.
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -426,44 +436,43 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 		exRand.setParam1(3.5);
 		inRand.setParam1(2.5);
 		System.out.println("Begin Synapse Group Construction");
-		SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng,
-				new Sparse(0.01, false, false), 0.75, exRand, inRand);
+		SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(
+				0.01, false, false), 0.75, exRand, inRand);
 		net.addGroup(ng);
 		net.addGroup(sg);
 		System.out.println("End network construction");
 		final int TEST_ITERATIONS = 500;
-		
+
 		for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
 			System.out.println(nua.getDescription());
 		}
-		
+
 		// Quick tune up...
 		for (int i = 0; i < 100; i++) {
 			net.update();
 		}
 		System.out.println("End tune-up");
-		
+
 		// SerialExecution
 		long start = System.nanoTime();
 		for (int i = 0; i < TEST_ITERATIONS; i++) {
 			net.update();
 		}
 		long end = System.nanoTime();
-		System.out.println("Serial: " + SimbrainMath.roundDouble((end - start)
-				/ Math.pow(10, 9), 6));
-		
+		System.out.println("Serial: "
+				+ SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+
 		net.getUpdateManager().clear();
 		net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
-		
+
 		start = System.nanoTime();
 		for (int i = 0; i < TEST_ITERATIONS; i++) {
 			net.update();
 		}
 		end = System.nanoTime();
-		System.out.println("Parallel: " + SimbrainMath.roundDouble((end - start)
-				/ Math.pow(10, 9), 6));
-		
+		System.out.println("Parallel: "
+				+ SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+
 	}
-	
-	
+
 }

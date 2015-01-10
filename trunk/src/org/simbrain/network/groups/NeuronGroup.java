@@ -57,23 +57,26 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 	 * @deprecated
 	 * Does nothing, exists only for backwards compatibility.
 	 */
+	@Deprecated
 	private boolean isSpikingNeuronGroup = false;
-	
+
 	/** The neurons in this group. */
 	private List<Neuron> neuronList = new ArrayList<Neuron>(500);
 
 	/** Default layout for neuron groups. */
 	public static final Layout DEFAULT_LAYOUT = new LineLayout(50,
-			LineOrientation.HORIZONTAL);
+					LineOrientation.HORIZONTAL);
 
 	/** The layout for the neurons in this group. */
 	private Layout layout = DEFAULT_LAYOUT;
 
 	/** Set of incoming synapse groups. */
-	private final HashSet<SynapseGroup> incomingSgs = new HashSet<SynapseGroup>();
+	private final HashSet<SynapseGroup> incomingSgs =
+					new HashSet<SynapseGroup>();
 
 	/** Set of outgoing synapse groups. */
-	private final HashSet<SynapseGroup> outgoingSgs = new HashSet<SynapseGroup>();
+	private final HashSet<SynapseGroup> outgoingSgs =
+					new HashSet<SynapseGroup>();
 
 	/**
 	 * In method setLayoutBasedOnSize, this is used as the threshold number of

@@ -25,79 +25,84 @@ import java.util.concurrent.CyclicBarrier;
 /**
  * The underlying runnable consumer assigned to a thread, which consumes network
  * update tasks i.e. executes them.
- * 
+ *
  * @author Zach Tosi
  *
  */
 public class Consumer implements Runnable {
 
-	/** 
-	 * The synchronizing barrier which causes this consumer to wait for other
-	 * other entities to finish their tasks before this consumer attempts to
-	 * take on more tasks.
-	 */
-	private volatile CyclicBarrier barrier;
+    /**
+     * The synchronizing barrier which causes this consumer to wait for other
+     * other entities to finish their tasks before this consumer attempts to
+     * take on more tasks.
+     */
+    private volatile CyclicBarrier barrier;
 
-	/** 
-	 * The blocking queue containing tasks this consumer will attempt to
-	 * execute.
-	 */
-	private final BlockingQueue<Task> taskQueue;
-	
-	/** 
-	 * An optional int identifier number used to label this consumer should
-	 * such a thing be desired.
-	 */
-	private final int id_No;
-	
-	/** 
-	 * A tag indicating if this consumer is live and can/will continue to
-	 * request and execute successfully requested tasks.
-	 */
-	private volatile boolean live = true;
-	
-	/**
-	 * 
-	 * @param barrier
-	 * @param taskQueue
-	 * @param no
-	 */
-	public Consumer(CyclicBarrier barrier, BlockingQueue<Task> taskQueue,
-			int no) {
-		this.barrier = barrier;
-		this.taskQueue = taskQueue;
-		this.id_No = no;
-	}
+    /**
+     * The blocking queue containing tasks this consumer will attempt to
+     * execute.
+     */
+    private final BlockingQueue<Task> taskQueue;
 
-	/**
-	 * Executes tasks or waits on a cyclic barrier until a poison task is
-	 * consumed which kills this consumer (sets {@link #live} to false).
-	 */
-	@Override
-	public void run() {
-		while(live) {
-			try {
-				Task t = taskQueue.take();
-				if (t.isPoison()) {
-					live = false;
-					barrier.await();
-				} else if (t.isWaiting()) {
-					barrier.await();
-				} else {
-					t.perform();
-				}
-			} catch (InterruptedException | BrokenBarrierException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    /**
+     * An optional int identifier number used to label this consumer should such
+     * a thing be desired.
+     */
+    private final int idNo;
 
-	public void setBarrier(CyclicBarrier barrier) {
-		this.barrier = barrier;
-	}
+    /**
+     * A tag indicating if this consumer is live and can/will continue to
+     * request and execute successfully requested tasks.
+     */
+    private volatile boolean live = true;
 
-	public int getId_no() {
-		return id_No;
-	}
-	
+    /**
+     *
+     * @param barrier
+     *            the cyclic barrier this consumer will wait at
+     * @param taskQueue
+     *            the blocking queue this consumer will take tasks from
+     * @param no
+     *            an optional ID number parameter for the consumer, used mainly
+     *            for debugging, but can be used to call out an individual
+     *            consumer elsewhere.
+     */
+    public Consumer(CyclicBarrier barrier, BlockingQueue<Task> taskQueue,
+            int no) {
+        this.barrier = barrier;
+        this.taskQueue = taskQueue;
+        this.idNo = no;
+    }
+
+    /**
+     * Executes tasks or waits on a cyclic barrier until a poison task is
+     * consumed which kills this consumer (sets {@link #live} to false).
+     */
+    @Override
+    public void run() {
+        while (live) {
+            try {
+                Task t = taskQueue.take();
+                if (t.isPoison()) {
+                    live = false;
+                    barrier.await();
+                } else if (t.isWaiting()) {
+                    barrier.await();
+                } else {
+                    t.perform();
+                }
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setBarrier(CyclicBarrier barrier) {
+        this.barrier = barrier;
+    }
+
+    public int getId_no() {
+        return idNo;
+    }
+
 }

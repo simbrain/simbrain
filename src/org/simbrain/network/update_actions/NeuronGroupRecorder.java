@@ -24,12 +24,12 @@ import org.simbrain.network.groups.NeuronGroup;
 public class NeuronGroupRecorder implements NetworkUpdateAction {
 
 	private final NeuronGroup group;
-	
+
 	public NeuronGroupRecorder(final NeuronGroup group) {
 		this.group = group;
 	}
-	
-	
+
+
 	@Override
 	public void invoke() {
 		if (group.isRecording()) {

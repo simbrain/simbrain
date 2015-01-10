@@ -87,392 +87,396 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
  *
  */
 public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
-		NeuronListener, GroupListener {
+        NeuronListener, GroupListener {
 
-	/** Each task will consist of updating no more than CHUNK_SIZE neurons. */
-	private static final int CHUNK_SIZE = 100;
+    /** Each task will consist of updating no more than CHUNK_SIZE neurons. */
+    private static final int CHUNK_SIZE = 100;
 
-	/**
-	 * The initial capacity of the set containing this class's private neuron
-	 * list, which is synchronized to the underlying network.
-	 */
-	private static final int INITIAL_CAPACITY = (int) Math.ceil(15000 / 0.75);
+    /**
+     * The initial capacity of the set containing this class's private neuron
+     * list, which is synchronized to the underlying network.
+     */
+    private static final int INITIAL_CAPACITY = (int) Math.ceil(15000 / 0.75);
 
-	/**
-	 * A list of threads being used as our "consumers" of tasks (updating
-	 * neurons).
-	 */
-	private final List<Thread> consumerThreads = new ArrayList<Thread>();
+    /**
+     * A list of threads being used as our "consumers" of tasks (updating
+     * neurons).
+     */
+    private final List<Thread> consumerThreads = new ArrayList<Thread>();
 
-	/**
-	 * The blocking queue which contains all tasks relevant to updating the
-	 * network (insofar as mechanics are concerned). Update actions like
-	 * NeuronGroupRecorder do not actually alter the network's state and are
-	 * <b>NOT</b> bundled in with this class's update algorithm. They must be
-	 * added as independent actions.
-	 */
-	private final BlockingQueue<Task> tasksQueue;
+    /**
+     * The blocking queue which contains all tasks relevant to updating the
+     * network (insofar as mechanics are concerned). Update actions like
+     * NeuronGroupRecorder do not actually alter the network's state and are
+     * <b>NOT</b> bundled in with this class's update algorithm. They must be
+     * added as independent actions.
+     */
+    private final BlockingQueue<Task> tasksQueue;
 
-	/**
-	 * The current number of available processors to the JVM, should that value
-	 * change. Any changes to this value will be reflected in the number of
-	 * consumer threads upon subsequent invocation.
-	 */
-	private volatile int currentAvailableProcessors;
+    /**
+     * The current number of available processors to the JVM, should that value
+     * change. Any changes to this value will be reflected in the number of
+     * consumer threads upon subsequent invocation.
+     */
+    private volatile int currentAvailableProcessors;
 
-	/**
-	 * The barrier which prevents producer/consumer threads from moving on until
-	 * the entire network has been brought into the next time step.
-	 */
-	private volatile CyclicBarrier synchronizingBarrier;
+    /**
+     * The barrier which prevents producer/consumer threads from moving on until
+     * the entire network has been brought into the next time step.
+     */
+    private volatile CyclicBarrier synchronizingBarrier;
 
-	/**
-	 * This class's private set of neurons in the network, used for updating.
-	 */
-	private final Set<Neuron> neurons = Collections
-			.synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
+    /**
+     * This class's private set of neurons in the network, used for updating.
+     */
+    private final Set<Neuron> neurons = Collections
+            .synchronizedSet(new HashSet<Neuron>(INITIAL_CAPACITY));
 
-	/** A count of the number of network changes which have taken place. */
-	private AtomicInteger pendingOperations = new AtomicInteger(0);
+    /** A count of the number of network changes which have taken place. */
+    private AtomicInteger pendingOperations = new AtomicInteger(0);
 
-	/** A copy of the network. */
-	private final Network network;
+    /** A copy of the network. */
+    private final Network network;
 
-	/** A reference to the current thread which is acting as a producer. */
-	private volatile Thread producer;
+    /** A reference to the current thread which is acting as a producer. */
+    private volatile Thread producer;
 
-	/**
-	 * Indicating whether or not this class and consumer threads are dead and
-	 * can no longer process network updates.
-	 */
-	private volatile boolean dead = false;
+    /**
+     * Indicating whether or not this class and consumer threads are dead and
+     * can no longer process network updates.
+     */
+    private volatile boolean dead = false;
 
-	/** A signal to shut down this class and its consumer threads. */
-	private final AtomicBoolean shutdownSignal = new AtomicBoolean(false);
+    /** A signal to shut down this class and its consumer threads. */
+    private final AtomicBoolean shutdownSignal = new AtomicBoolean(false);
 
-	/**
-	 * A static factory method that creates a concurrent buffered update class
-	 * for a network. See {@link #ConcurrentBufferedUpdate(Network)}.
-	 * 
-	 * @param network
-	 * @return
-	 */
-	public static ConcurrentBufferedUpdate createConcurrentBufferedUpdate(
-			final Network network) {
-		ConcurrentBufferedUpdate cbu = new ConcurrentBufferedUpdate(network);
-		network.addGroupListener(cbu);
-		network.addNeuronListener(cbu);
-		return cbu;
-	}
+    /**
+     * A static factory method that creates a concurrent buffered update class
+     * for a network. See {@link #ConcurrentBufferedUpdate(Network)}.
+     * 
+     * @param network
+     * @return
+     */
+    public static ConcurrentBufferedUpdate createConcurrentBufferedUpdate(
+            final Network network) {
+        ConcurrentBufferedUpdate cbu = new ConcurrentBufferedUpdate(network);
+        network.addGroupListener(cbu);
+        network.addNeuronListener(cbu);
+        return cbu;
+    }
 
-	/**
-	 * Creates the consumer threads, in a quantity equal to the number of
-	 * available processors, since the producer's job is small enough that
-	 * having more threads than processors will not be problematic (they are
-	 * also not active at the same time at least half the time). Also populates
-	 * this classes copy of the neurons in the network.
-	 * 
-	 * @param network
-	 *            the network being updated by this updater.
-	 */
-	private ConcurrentBufferedUpdate(final Network network) {
-		this.network = network;
-		currentAvailableProcessors = getAvailableConsumerProcessors();
-		tasksQueue = new LinkedBlockingQueue<Task>();
-		// +1 because Producer thread doesn't get its own processor, its job is
-		// too small
-		synchronizingBarrier = new CyclicBarrier(currentAvailableProcessors + 1);
-		for (int i = 0; i < currentAvailableProcessors; i++) {
-			consumerThreads.add(new Thread(new Consumer(synchronizingBarrier,
-					tasksQueue, i)));
-			consumerThreads.get(i).start();
-		}
-		for (Neuron n : network.getFlatNeuronList()) {
-			neurons.add(n);
-		}
-		for (NeuronGroup ng : network.getFlatNeuronGroupList()) {
-			neurons.addAll(ng.getNeuronList());
-		}
-	}
+    /**
+     * Creates the consumer threads, in a quantity equal to the number of
+     * available processors, since the producer's job is small enough that
+     * having more threads than processors will not be problematic (they are
+     * also not active at the same time at least half the time). Also populates
+     * this classes copy of the neurons in the network.
+     * 
+     * @param network
+     *            the network being updated by this updater.
+     */
+    private ConcurrentBufferedUpdate(final Network network) {
+        this.network = network;
+        currentAvailableProcessors = getAvailableConsumerProcessors();
+        tasksQueue = new LinkedBlockingQueue<Task>();
+        // +1 because Producer thread doesn't get its own processor, its job is
+        // too small
+        synchronizingBarrier = new CyclicBarrier(currentAvailableProcessors + 1);
+        for (int i = 0; i < currentAvailableProcessors; i++) {
+            consumerThreads.add(new Thread(new Consumer(synchronizingBarrier,
+                    tasksQueue, i)));
+            consumerThreads.get(i).start();
+        }
+        for (Neuron n : network.getFlatNeuronList()) {
+            neurons.add(n);
+        }
+        for (NeuronGroup ng : network.getFlatNeuronGroupList()) {
+            neurons.addAll(ng.getNeuronList());
+        }
+    }
 
-	@Override
-	public void invoke() {
-		if (dead) {
-			throw new IllegalStateException(
-					"ConcurrentBufferedUpdate cannot be"
-							+ " invoked once it has been shutdown");
-		}
-		producer = Thread.currentThread();
-		network.setUpdateCompleted(false);
-		try {
-			if (currentAvailableProcessors
-			        != getAvailableConsumerProcessors()) 
-			{
-				availableProcessorChange();
-			}
-			synchronized (neurons) {
-				int i = 0;
-				Neuron[] block = new Neuron[CHUNK_SIZE];
-				for (Neuron n : neurons) {
-					if (i >= CHUNK_SIZE) {
-						i = 0;
-						tasksQueue.put(new BufferedUpdateTask(block));
-						block = new Neuron[CHUNK_SIZE];
-					}
-					block[i] = n;
-					i++;
-				}
-				if (i > 1) {
-					tasksQueue.put(new BufferedUpdateTask(block));
-				}
-			}
-			synchronized (shutdownSignal) {
-				if (!shutdownSignal.get()) {
-					for (int i = 0; i < currentAvailableProcessors; i++) {
-						tasksQueue.put(new WaitingTask());
-					}
-				} else {
-					for (int i = 0; i < currentAvailableProcessors; i++) {
-						tasksQueue.put(new PoisonTask());
-					}
-					dead = true;
-					synchronizingBarrier.await();
-					consumerThreads.clear();
-					tasksQueue.clear();
-					return;
-				}
-			}
-			synchronizingBarrier.await();
-			network.setUpdateCompleted(true);
-			while (pendingOperations.get() > 0) {
-				synchronized (producer) {
-					wait();
-				}
-			}
-			synchronized (neurons) {
-				for (Neuron n : neurons) {
-					n.setToBufferVals();
-				}
-			}
-		} catch (InterruptedException | BrokenBarrierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    @Override
+    public void invoke() {
+        if (dead) {
+            throw new IllegalStateException(
+                    "ConcurrentBufferedUpdate cannot be"
+                            + " invoked once it has been shutdown");
+        }
+        producer = Thread.currentThread();
+        network.setUpdateCompleted(false);
+        try {
+            if (currentAvailableProcessors
+                != getAvailableConsumerProcessors())
+            {
+                availableProcessorChange();
+            }
+            synchronized (neurons) {
+                int i = 0;
+                Neuron[] block = new Neuron[CHUNK_SIZE];
+                for (Neuron n : neurons) {
+                    if (i >= CHUNK_SIZE) {
+                        i = 0;
+                        tasksQueue.put(new BufferedUpdateTask(block));
+                        block = new Neuron[CHUNK_SIZE];
+                    }
+                    block[i] = n;
+                    i++;
+                }
+                if (i > 1) {
+                    tasksQueue.put(new BufferedUpdateTask(block));
+                }
+            }
+            synchronized (shutdownSignal) {
+                if (!shutdownSignal.get()) {
+                    synchronized (tasksQueue) {
+                        for (int i = 0; i < currentAvailableProcessors; i++) {
+                            tasksQueue.put(new WaitingTask());
+                        }
+                    }
+                } else {
+                    synchronized (tasksQueue) {
+                        for (int i = 0; i < currentAvailableProcessors; i++) {
+                            tasksQueue.put(new PoisonTask());
+                        }
+                    }
+                    dead = true;
+                    synchronizingBarrier.await();
+                    consumerThreads.clear();
+                    tasksQueue.clear();
+                    return;
+                }
+            }
+            synchronizingBarrier.await();
+            network.setUpdateCompleted(true);
+            while (pendingOperations.get() > 0) {
+                synchronized (producer) {
+                    wait();
+                }
+            }
+            synchronized (neurons) {
+                for (Neuron n : neurons) {
+                    n.setToBufferVals();
+                }
+            }
+        } catch (InterruptedException | BrokenBarrierException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	/**
-	 * Re-checks the number of processors available to the JVM and adjusts the
-	 * number of consumer threads accordingly.
-	 */
-	private void availableProcessorChange() {
-		int newAvailableProcessors = getAvailableConsumerProcessors();
-		if (newAvailableProcessors <= 0) {
-			return;
-		}
-		synchronizingBarrier = new CyclicBarrier(newAvailableProcessors);
-		while (newAvailableProcessors < currentAvailableProcessors) {
-			consumerThreads.remove(consumerThreads.size() - 1);
-			currentAvailableProcessors--;
-		}
-		while (newAvailableProcessors > currentAvailableProcessors) {
-			Thread consumer = new Thread(new Consumer(synchronizingBarrier,
-					tasksQueue, currentAvailableProcessors));
-			consumerThreads.add(consumer);
-			consumer.start();
-			currentAvailableProcessors++;
-		}
-	}
+    /**
+     * Re-checks the number of processors available to the JVM and adjusts the
+     * number of consumer threads accordingly.
+     */
+    private void availableProcessorChange() {
+        int newAvailableProcessors = getAvailableConsumerProcessors();
+        if (newAvailableProcessors <= 0) {
+            return;
+        }
+        synchronizingBarrier = new CyclicBarrier(newAvailableProcessors);
+        while (newAvailableProcessors < currentAvailableProcessors) {
+            consumerThreads.remove(consumerThreads.size() - 1);
+            currentAvailableProcessors--;
+        }
+        while (newAvailableProcessors > currentAvailableProcessors) {
+            Thread consumer = new Thread(new Consumer(synchronizingBarrier,
+                    tasksQueue, currentAvailableProcessors));
+            consumerThreads.add(consumer);
+            consumer.start();
+            currentAvailableProcessors++;
+        }
+    }
 
-	/**
-	 * Permanently shuts down the consumer threads and thus the functionality of
-	 * this class.
-	 */
-	public void shutdown() {
-		shutdownSignal.set(true);
-	}
+    /**
+     * Permanently shuts down the consumer threads and thus the functionality of
+     * this class.
+     */
+    public void shutdown() {
+        shutdownSignal.set(true);
+    }
 
-	@Override
-	public String getDescription() {
-		return "Parallel Buffered Update";
-	}
+    @Override
+    public String getDescription() {
+        return "Parallel Buffered Update";
+    }
 
-	@Override
-	public String getLongDescription() {
-		return "Parallel Buffered Update (All Neurons)";
-	}
+    @Override
+    public String getLongDescription() {
+        return "Parallel Buffered Update (All Neurons)";
+    }
 
-	@Override
-	public void groupAdded(NetworkEvent<Group> e) {
-		if (e.getObject() instanceof NeuronGroup) {
-			pendingOperations.incrementAndGet();
-			synchronized (neurons) {
-				for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
-					neurons.add(n);
-				}
-			}
-			decrementPendingOperations();
-		} else if (e.getObject() instanceof Subnetwork) {
-			List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-					.getNeuronGroupList();
-			for (NeuronGroup ng : neuronGroups) {
-				groupAdded(new NetworkEvent<Group>(network, null, ng));
-			}
-		} else {
-			return;
-		}
+    @Override
+    public void groupAdded(NetworkEvent<Group> e) {
+        if (e.getObject() instanceof NeuronGroup) {
+            pendingOperations.incrementAndGet();
+            synchronized (neurons) {
+                for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
+                    neurons.add(n);
+                }
+            }
+            decrementPendingOperations();
+        } else if (e.getObject() instanceof Subnetwork) {
+            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
+                    .getNeuronGroupList();
+            for (NeuronGroup ng : neuronGroups) {
+                groupAdded(new NetworkEvent<Group>(network, null, ng));
+            }
+        } else {
+            return;
+        }
 
-	}
+    }
 
-	@Override
-	public void groupRemoved(NetworkEvent<Group> e) {
-		if (e.getObject() instanceof NeuronGroup) {
-			pendingOperations.incrementAndGet();
-			synchronized (neurons) {
-				for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
-					neurons.remove(n);
-				}
-			}
-			decrementPendingOperations();
-		} else if (e.getObject() instanceof Subnetwork) {
-			List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
-					.getNeuronGroupList();
-			for (NeuronGroup ng : neuronGroups) {
-				groupRemoved(new NetworkEvent<Group>(network, null, ng));
-			}
-		} else {
-			return;
-		}
-	}
+    @Override
+    public void groupRemoved(NetworkEvent<Group> e) {
+        if (e.getObject() instanceof NeuronGroup) {
+            pendingOperations.incrementAndGet();
+            synchronized (neurons) {
+                for (Neuron n : ((NeuronGroup) e.getObject()).getNeuronList()) {
+                    neurons.remove(n);
+                }
+            }
+            decrementPendingOperations();
+        } else if (e.getObject() instanceof Subnetwork) {
+            List<NeuronGroup> neuronGroups = ((Subnetwork) e.getObject())
+                    .getNeuronGroupList();
+            for (NeuronGroup ng : neuronGroups) {
+                groupRemoved(new NetworkEvent<Group>(network, null, ng));
+            }
+        } else {
+            return;
+        }
+    }
 
-	@Override
-	public void groupChanged(NetworkEvent<Group> networkEvent,
-			String changeDescription) {
-		return;
-	}
+    @Override
+    public void groupChanged(NetworkEvent<Group> networkEvent,
+            String changeDescription) {
+        return;
+    }
 
-	@Override
-	public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
-		return;
-	}
+    @Override
+    public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
+        return;
+    }
 
-	@Override
-	public void groupUpdated(Group group) {
-		return;
-	}
+    @Override
+    public void groupUpdated(Group group) {
+        return;
+    }
 
-	@Override
-	public void neuronChanged(NetworkEvent<Neuron> networkEvent) {
-		return;
-	}
+    @Override
+    public void neuronChanged(NetworkEvent<Neuron> networkEvent) {
+        return;
+    }
 
-	@Override
-	public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> networkEvent) {
-		return;
-	}
+    @Override
+    public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> networkEvent) {
+        return;
+    }
 
-	@Override
-	public void labelChanged(NetworkEvent<Neuron> networkEvent) {
-		return;
-	}
+    @Override
+    public void labelChanged(NetworkEvent<Neuron> networkEvent) {
+        return;
+    }
 
-	@Override
-	public void neuronAdded(NetworkEvent<Neuron> networkEvent) {
-		pendingOperations.incrementAndGet();
-		neurons.add(networkEvent.getObject());
-		decrementPendingOperations();
-	}
+    @Override
+    public void neuronAdded(NetworkEvent<Neuron> networkEvent) {
+        pendingOperations.incrementAndGet();
+        neurons.add(networkEvent.getObject());
+        decrementPendingOperations();
+    }
 
-	@Override
-	public void neuronMoved(NetworkEvent<Neuron> networkEvent) {
-		return;
-	}
+    @Override
+    public void neuronMoved(NetworkEvent<Neuron> networkEvent) {
+        return;
+    }
 
-	@Override
-	public void neuronRemoved(NetworkEvent<Neuron> networkEvent) {
-		pendingOperations.incrementAndGet();
-		neurons.remove(networkEvent.getObject());
-		decrementPendingOperations();
-	}
+    @Override
+    public void neuronRemoved(NetworkEvent<Neuron> networkEvent) {
+        pendingOperations.incrementAndGet();
+        neurons.remove(networkEvent.getObject());
+        decrementPendingOperations();
+    }
 
-	public int getAvailableConsumerProcessors() {
-		return Runtime.getRuntime().availableProcessors();
-	}
+    public int getAvailableConsumerProcessors() {
+        return Runtime.getRuntime().availableProcessors();
+    }
 
-	private int decrementPendingOperations() {
-		synchronized (producer) {
-			producer.notify();
-		}
-		return pendingOperations.decrementAndGet();
-	}
+    private int decrementPendingOperations() {
+        synchronized (producer) {
+            producer.notify();
+        }
+        return pendingOperations.decrementAndGet();
+    }
 
-	/**
-	 * Test main to demonstrate performance improvements over serial updates
-	 * without a GUI.
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Scanner keyboard = new Scanner(System.in);
-		System.out.println("Press any key");
-		String beginToken = keyboard.next();
-		keyboard.close();
-		Network net = new Network();
-		net.setTimeStep(0.5);
-		NeuronGroup ng = new NeuronGroup(net, 10000);
-		ng.setLabel(beginToken);
-		ng.setNeuronType(new IzhikevichRule());
-		for (Neuron n : ng.getNeuronList()) {
-			if (Math.random() < 0.25) {
-				n.setPolarity(Polarity.INHIBITORY);
-			} else {
-				n.setPolarity(Polarity.EXCITATORY);
-			}
-		}
-		PolarizedRandomizer exRand = new PolarizedRandomizer(
-				Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-		PolarizedRandomizer inRand = new PolarizedRandomizer(
-				Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-		exRand.setParam1(3.5);
-		inRand.setParam1(2.5);
-		System.out.println("Begin Synapse Group Construction");
-		SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(
-				0.01, false, false), 0.75, exRand, inRand);
-		net.addGroup(ng);
-		net.addGroup(sg);
-		System.out.println("End network construction");
-		final int TEST_ITERATIONS = 500;
+    /**
+     * Test main to demonstrate performance improvements over serial updates
+     * without a GUI.
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Press any key");
+        String beginToken = keyboard.next();
+        keyboard.close();
+        Network net = new Network();
+        net.setTimeStep(0.5);
+        NeuronGroup ng = new NeuronGroup(net, 10000);
+        ng.setLabel(beginToken);
+        ng.setNeuronType(new IzhikevichRule());
+        for (Neuron n : ng.getNeuronList()) {
+            if (Math.random() < 0.25) {
+                n.setPolarity(Polarity.INHIBITORY);
+            } else {
+                n.setPolarity(Polarity.EXCITATORY);
+            }
+        }
+        PolarizedRandomizer exRand = new PolarizedRandomizer(
+                Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        PolarizedRandomizer inRand = new PolarizedRandomizer(
+                Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
+        exRand.setParam1(3.5);
+        inRand.setParam1(2.5);
+        System.out.println("Begin Synapse Group Construction");
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(
+                0.01, false, false), 0.75, exRand, inRand);
+        net.addGroup(ng);
+        net.addGroup(sg);
+        System.out.println("End network construction");
+        final int TEST_ITERATIONS = 500;
 
-		for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
-			System.out.println(nua.getDescription());
-		}
+        for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
+            System.out.println(nua.getDescription());
+        }
 
-		// Quick tune up...
-		for (int i = 0; i < 100; i++) {
-			net.update();
-		}
-		System.out.println("End tune-up");
+        // Quick tune up...
+        for (int i = 0; i < 100; i++) {
+            net.update();
+        }
+        System.out.println("End tune-up");
 
-		// SerialExecution
-		long start = System.nanoTime();
-		for (int i = 0; i < TEST_ITERATIONS; i++) {
-			net.update();
-		}
-		long end = System.nanoTime();
-		System.out.println("Serial: "
-				+ SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        // SerialExecution
+        long start = System.nanoTime();
+        for (int i = 0; i < TEST_ITERATIONS; i++) {
+            net.update();
+        }
+        long end = System.nanoTime();
+        System.out.println("Serial: "
+                + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
 
-		net.getUpdateManager().clear();
-		net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
 
-		start = System.nanoTime();
-		for (int i = 0; i < TEST_ITERATIONS; i++) {
-			net.update();
-		}
-		end = System.nanoTime();
-		System.out.println("Parallel: "
-				+ SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        start = System.nanoTime();
+        for (int i = 0; i < TEST_ITERATIONS; i++) {
+            net.update();
+        }
+        end = System.nanoTime();
+        System.out.println("Parallel: "
+                + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
 
-	}
+    }
 
 }

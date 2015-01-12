@@ -258,7 +258,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
         } else {
             if (parent instanceof StandardDialog) {
                 ((StandardDialog) parent).setTitle("Edit "
-                        + neuronGroup.getTypeDescription());
+                        + neuronGroup.getLabel());
             }
             editWrapComponents();
         }

@@ -319,11 +319,12 @@ public class SummaryPanel extends JPanel implements EditablePanel {
         } else {
             nameField.setText(sg.getLabel());
         }
-        populationField.setText(Integer.toString(sg.size()));
+
 
         useGlobalSettings.setSelected(sg.isUseGroupLevelSettings());
 
         if (sg.size() > 0) {
+            populationField.setText(Integer.toString(sg.size()));
             Iterator<Synapse> synIter;
             Synapse protoSyn;
             boolean discrepancy;
@@ -370,6 +371,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 inhibitoryTypeField.setText("None");
             }
         } else {
+            populationLabel.setText("0");
             // Handles if an empty synapse group is selected
             excitatoryTypeField.setText("None");
             inhibitoryTypeField.setText("None");

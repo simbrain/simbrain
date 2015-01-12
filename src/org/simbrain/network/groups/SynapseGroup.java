@@ -77,6 +77,10 @@ public class SynapseGroup extends Group {
 
     /** A set containing all the inhibitory (wt < 0) synapses in the group. */
     private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
+    
+    private Set<Synapse> exTemp;
+    
+    private Set<Synapse> inTemp;
 
     /** Reference to source neuron group. */
     private final NeuronGroup sourceNeuronGroup;
@@ -1615,7 +1619,7 @@ public class SynapseGroup extends Group {
      * Perform operations required before saving a synapse group.
      */
     public void preSaveInit() {
-        if (this.isUseGroupLevelSettings()) {
+        if (isUseGroupLevelSettings()) {
             long[] rowCompression = getRowCompressedMatrixRepresentation();
             //long start = System.nanoTime();
             //System.out.println("Begin Serialization... ");
@@ -1627,10 +1631,25 @@ public class SynapseGroup extends Group {
             //                4) + " secs.");
 
             // Don't explicitly save the synapses.
+            inTemp = inSynapseSet;
+            exTemp = exSynapseSet;
             inSynapseSet = null;
             exSynapseSet = null;
+
         } else {
             compressedMatrixRep = null;
+        }
+    }
+
+    /**
+     * 
+     */
+    public void postSaveReInit() {
+        if (isUseGroupLevelSettings()) {
+            inSynapseSet = inTemp;
+            exSynapseSet = exTemp;
+            inTemp = null;
+            exTemp = null;
         }
     }
 

@@ -44,6 +44,7 @@ import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
+import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 import org.simbrain.network.update_actions.concurrency_tools.Consumer;
 import org.simbrain.network.update_actions.concurrency_tools.PoisonTask;
@@ -442,8 +443,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         System.out.println("Begin Synapse Group Construction");
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(
                 0.01, false, false), 0.75, exRand, inRand);
+        sg.setLearningRule(new STDPRule(), Polarity.BOTH);
         net.addGroup(ng);
         net.addGroup(sg);
+        ng.startRecording();
         System.out.println("End network construction");
         final int TEST_ITERATIONS = 500;
 
@@ -452,27 +455,31 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
 
         // Quick tune up...
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 500; i++) {
             net.update();
         }
         System.out.println("End tune-up");
 
         // SerialExecution
         long start = System.nanoTime();
+        net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
         for (int i = 0; i < TEST_ITERATIONS; i++) {
             net.update();
         }
+        ng.stopRecording();
         long end = System.nanoTime();
         System.out.println("Serial: "
                 + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
 
         net.getUpdateManager().clear();
         net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
-
+        net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
+        ng.startRecording();
         start = System.nanoTime();
         for (int i = 0; i < TEST_ITERATIONS; i++) {
             net.update();
         }
+        ng.stopRecording();
         end = System.nanoTime();
         System.out.println("Parallel: "
                 + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));

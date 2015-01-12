@@ -218,7 +218,7 @@ public final class SynapseGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             setTitle("Create Synapse Group");
         } else {
-            setTitle("Edit Synapse Group");
+            setTitle("Edit " + synapseGroup.getLabel());
         }
 
         setMinimumSize(new Dimension(500, 300));

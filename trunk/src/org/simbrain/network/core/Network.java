@@ -923,15 +923,17 @@ public class Network {
         xstream.omitField(ConcurrentBufferedUpdate.class, "consumerThreads");
         xstream.omitField(ConcurrentBufferedUpdate.class, "neurons");
         xstream.omitField(ConcurrentBufferedUpdate.class, "tasksQueue");
-        xstream.omitField(ConcurrentBufferedUpdate.class,
-                "synchronizingBarrier");
         xstream.omitField(ConcurrentBufferedUpdate.class, "network");
         xstream.omitField(ConcurrentBufferedUpdate.class, "producer");
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 
+        xstream.omitField(SynapseGroup.class, "exTemp");
+        xstream.omitField(SynapseGroup.class, "inTemp");
+
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
+
         // TODO: Backwards compatible
         xstream.omitField(Synapse.class, "sendWeightedInput");
 
@@ -982,6 +984,15 @@ public class Network {
     public void preSaveInit() {
         for (SynapseGroup group : this.getSynapseGroups()) {
             group.preSaveInit();
+        }
+    }
+
+    /**
+     * 
+     */
+    public void postSaveReInit() {
+        for (SynapseGroup group : this.getSynapseGroups()) {
+            group.postSaveReInit();
         }
     }
 

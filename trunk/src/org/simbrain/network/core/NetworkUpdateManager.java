@@ -269,8 +269,11 @@ public class NetworkUpdateManager {
      */
     public void clear() {
         for (NetworkUpdateAction action : actionList) {
-            removeAction(action);
+            for (UpdateManagerListener l : listeners) {
+                l.actionRemoved(action);
+            }
         }
+        actionList.clear();
     }
 
 }

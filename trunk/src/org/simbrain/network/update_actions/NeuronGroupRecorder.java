@@ -23,29 +23,28 @@ import org.simbrain.network.groups.NeuronGroup;
 
 public class NeuronGroupRecorder implements NetworkUpdateAction {
 
-	private final NeuronGroup group;
+    private final NeuronGroup group;
 
-	public NeuronGroupRecorder(final NeuronGroup group) {
-		this.group = group;
-	}
+    public NeuronGroupRecorder(final NeuronGroup group) {
+        this.group = group;
+    }
 
+    @Override
+    public void invoke() {
+        if (group.isRecording()) {
+            group.writeActsToFile();
+        }
+    }
 
-	@Override
-	public void invoke() {
-		if (group.isRecording()) {
-			group.writeActsToFile();
-		}
-	}
+    @Override
+    public String getDescription() {
+        return "NeuronGroup:" + group.getLabel()
+                + " (Record Activations)";
+    }
 
-	@Override
-	public String getDescription() {
-		return "NeuronGroup:" + group.getLabel() 
-				+ " (Record Activations)";
-	}
-
-	@Override
-	public String getLongDescription() {
-		return "Write " + group.getLabel() +"'s activities to file";
-	}
+    @Override
+    public String getLongDescription() {
+        return "Write " + group.getLabel() + "'s activities to file";
+    }
 
 }

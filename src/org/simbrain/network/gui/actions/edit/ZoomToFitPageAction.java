@@ -21,6 +21,8 @@ package org.simbrain.network.gui.actions.edit;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -41,9 +43,11 @@ public final class ZoomToFitPageAction extends AbstractAction {
     public ZoomToFitPageAction(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomFitPage.png"));
-        putValue(SHORT_DESCRIPTION, "Fit all objects on screen");
-        putValue(SHORT_DESCRIPTION, "Zoom to fit all objects on screen");
-
+        putValue(SHORT_DESCRIPTION, "Fit all objects on screen (f)");
+        putValue(SHORT_DESCRIPTION, "Zoom to fit all objects on screen (f)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('f'), this);
+        networkPanel.getActionMap().put(this, this);
     }
 
     @Override

@@ -35,8 +35,10 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.util.table.MutableTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.TableActionManager;
 
 /**
  * Panel for sending inputs from a table to a network. The action that calls
@@ -157,6 +159,7 @@ public class TestInputPanel extends DataPanel {
         JButton testTable = new JButton(testTableAction);
         JCheckBox iterationCheckBox = new JCheckBox(iterationModeAction);
         iterationCheckBox.setSelected(iterationMode);
+        toolbars.add(table.getToolbarEditRows());
         JToolBar testToolBar = new JToolBar();
         testToolBar.add(test);
         testToolBar.add(advance);

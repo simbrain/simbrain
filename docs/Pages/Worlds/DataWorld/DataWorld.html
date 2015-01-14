@@ -1,56 +1,74 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
 
-  
+<head>
+    <title>Simbrain Documentation</title>
 
-  
-  
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-  
-  <link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../../SimbrainDocs.html">
-<div class="logo">
-<p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-<div class="navi">
-<p><a href="../../../SimbrainDocs.html">Simbrain</a>
-&gt; <a href="../../World.html">World</a>
-&gt; DataWorld</p>
-</div>
-<div id="menu">
-<p class="menubold">Contents</p>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-<p>
-	<a href="menus.html">&nbsp;&nbsp;&nbsp;Menus</a><br>
-	<a href="Toolbars.html">&nbsp;&nbsp;&nbsp;Toolbars</a><br>
-</p>
 
-</div>
-<p> </p>
-<h1>DataWorld</h1>
-<p>Data Worlds are essentially spreadsheets that can be used to store
-data. They are essentially tables. The component provides
-some limited spreadsheet and numerical capacities (e.g. an ability to
-randomize or normalize data).</p>
-<p>Data World data can be imported from and exported to *.csv files
-(which can be read by most spreadsheet programs, e.g. Excel).</p>
-<p>Columns in a data world table can be producers or consumers (see <a href="couplings.html">couplings</a>). When columns produce data, 
-during each workspace upate the values in the current row and that
-column are sent to a consumer (e.g. a neuron). When columns
-consume data,during each workspace upate the values coming from a producer (e.g. a neuron) is written to that column, in the current row. </p>
-<p>A standard use of data worlds is to provide inputs to a neural network.&nbsp; In that case, each row in a Data World
-corresponds to an input or output vector, and each column corresponds to an input node in a neural network.</p>
-<p><br>
-</p>
-<br>
-<p><br>
- </p>
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
 
-<br>
-<p>&nbsp;</p>
-</div>
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p><span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; DataWorld</p>
+        </div>
 
-</body></html>
+        <h1>DataWorld</h1>
+        <p>Data Worlds are essentially spreadsheets that can be used to store data. They are essentially tables. The component provides some limited spreadsheet and numerical capacities (e.g. an ability to randomize or normalize data).</p>
+        <p>Data World data can be imported from and exported to *.csv files (which can be read by most spreadsheet programs, e.g. Excel).</p>
+        <p>Columns in a data world table can be producers or consumers (see <a href="couplings.html">couplings</a>). When columns produce data, during each workspace upate the values in the current row and that column are sent to a consumer (e.g. a neuron). When columns consume data,during each workspace upate the values coming from a producer (e.g. a neuron) is written to that column, in the current row. </p>
+        <p>A standard use of data worlds is to provide inputs to a neural network.&nbsp; In that case, each row in a Data World corresponds to an input or output vector, and each column corresponds to an input node in a neural network.</p>
+
+        <p class="heading">File</p>
+        <blockquote>
+            <p><span class="heading2">Open / Save</span>: Open and save a world as a .xml file. When saving this way (from DataWorld window), the format is less human readable but all associated informatin about the DataWorld is saved, e.g. if iteration mode is turned on, it will be saved. </p>
+            <p><span class="heading2">Save-As</span>: Saves a world as a&nbsp;.xml file with a name specified by the user.<span class="heading2"></span>
+            </p>
+            <p><span class="heading2">Import/Export .csv &gt; Import (.csv) </span>: Import data from a .csv file (comma separated values).<span class="heading2"></span>
+            </p>
+            <p><span class="heading2">Import/Export .csv &gt; Export (.csv) </span>: Export data to a .csv file (comma separated values).</p>
+            <p><span class="heading2">Close</span>: Closes the current DataWorld. </p>
+        </blockquote>
+        <p class="heading">Edit</p>
+        <blockquote>
+            <p> See <a href="../../Utils/Tables/Tables.html">Tables</a>.</p>
+
+            <!--  <p> <span class="heading2">Remove a row</span>: Remove a row frm DataWorld</p>
+      <p><span class="heading2">Remove a Column</span>: Remove a column from DataWorld. </p> -->
+
+        </blockquote>
+
+        <p class="heading">Pop-up Menu</p>
+
+        <!-- <p class="heading">Right-click over Data Sheet</p> -->
+        <blockquote>
+            <p> See <a href="../../Utils/Tables/Tables.html">Tables</a>.</p>
+
+            <!--
+                    </blockquote>
+                    <p class="heading">Right-click over Send Buttons</p>
+                    <blockquote>
+                        <p><span class="heading2">Insert Row</span>: Insert a row into Data World above the highlighted row.</p>
+                        <p><span class="heading2">Delete Row</span>: Delete the highlighted row from Data World.</p>
+                    </blockquote> -->
+        </blockquote>
+        <p class="heading">Toolbar</p>
+        <blockquote>
+            <p> See <a href="../../Utils/Tables/Toolbars.html">Toolbars</a> of tables. </p>
+        </blockquote>
+
+    </div>
+
+</body>
+
+</html>

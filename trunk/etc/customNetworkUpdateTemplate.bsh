@@ -1,5 +1,6 @@
 import java.util.*;
 import org.simbrain.network.*;
+import org.simbrain.network.groups.*;
 import org.simbrain.network.core.*;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.synapse_update_rules.*;

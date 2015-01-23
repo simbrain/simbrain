@@ -50,7 +50,7 @@ void buildNetwork() {
     Network network = new Network();
     NetworkComponent networkComponent = new NetworkComponent("Cerebellum", network);
     workspace.addWorkspaceComponent(networkComponent);
-    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(400, 10, 550, 600);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(332,10,550,600);
     
 	DecayRule generalRule = new DecayRule();
 	generalRule.setDecayFraction(.25);
@@ -194,7 +194,7 @@ void buildNetwork() {
 
     // DA
     Neuron dopamine = new Neuron(network);
-    dopamine.setLabel("Dopamine");
+    dopamine.setLabel("Basal Ganglia (GPi)");
     dopamine.setLocation(150, 50);
     // dopamine.setLowerBound(0);
     network.addNeuron(dopamine);
@@ -207,7 +207,7 @@ void buildNetwork() {
     target.setLabel("Target");
 	target.setClamped(true);
     // target.setUpdateRule(targetRule);
-    target.setLocation(200, 50);
+    target.setLocation(240, 50);
     // target.setLowerBound(0);
     network.addNeuron(target);
 	
@@ -231,7 +231,7 @@ void loadCustomUpdater() {
 
     // References
     Network network = ((NetworkComponent) workspace.getComponent("Cerebellum")).getNetwork();
-    Neuron dopamine = network.getNeuronByLabel("Dopamine");
+    Neuron dopamine = network.getNeuronByLabel("Basal Ganglia (GPi)");
     Neuron output = network.getNeuronByLabel("Output");
     Neuron target = network.getNeuronByLabel("Target");
     Neuron purkinje = network.getNeuronByLabel("Purkinje");
@@ -276,7 +276,7 @@ void loadCustomUpdater() {
 				
 				// Update Alpha (stable IO firing rate)
 				alpha = (1 - alphaTimeConstant) * i_olive.getActivation() + alpha * alphaTimeConstant;
-				//System.out.println("IO: " + i_olive.getActivation() + " | alpha:" + alpha);
+				System.out.println("IO: " + i_olive.getActivation() + " | alpha:" + alpha);
 				//System.out.println("Target: " + target.getActivation() + " | Damped Target:" + dampedTarget + " | Damped Damped DA:" + dopamine.getActivation());   
 			}			
         }
@@ -308,7 +308,7 @@ void makeButtons() {
     Network network = ((NetworkComponent) workspace.getComponent("Cerebellum")).getNetwork();
     NeuronGroup inputs  = network.getGroupByLabel("From Spinal Cord");
     Neuron target  = network.getNeuronByLabel("Target");
-    Neuron dopamine  = network.getNeuronByLabel("Dopamine");
+    Neuron dopamine  = network.getNeuronByLabel("Basal Ganglia (GPi)");
 
 	// Just give the input of each to the model, without giving it a target (and hence no Dopamine)
     JButton btnReaction = new JButton("No Dopamine");
@@ -450,7 +450,7 @@ void makeButtons() {
 	
     // Set up Frame
     JInternalFrame internalFrame = new JInternalFrame("Train / Test", true, true);
-    internalFrame.setLocation(10,10);
+    internalFrame.setLocation(7,350);
     internalFrame.getContentPane().add(panel);
     internalFrame.setVisible(true);
     internalFrame.pack();
@@ -470,13 +470,13 @@ void addTimeSeries() {
     chart.getModel().setRangeUpperBound(1);
     chart.getModel().setRangeLowerBound(-1);
     workspace.addWorkspaceComponent(chart);
-    desktop.getDesktopComponent(chart).getParentFrame().setBounds(10, 300, 380, 300);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(880,8,380,300);
 	
 	// Couple network to time series
-    PotentialProducer neuronProducer1 = NetworkComponent.getNeuronProducer(networkComponent, network.getNeuronByLabel("Output"));
+    PotentialProducer neuronProducer1 = NetworkComponent.getNeuronProducer(networkComponent, network.getNeuronByLabel("Output"), "getActivation");
     PotentialConsumer timeSeriesConsumer1 = chart.getPotentialConsumers().get(0);
     workspace.getCouplingManager().addCoupling(new Coupling(neuronProducer1, timeSeriesConsumer1));
-    PotentialProducer neuronProducer2 =  NetworkComponent.getNeuronProducer(networkComponent, network.getNeuronByLabel("Dopamine"));
+    PotentialProducer neuronProducer2 =  NetworkComponent.getNeuronProducer(networkComponent, network.getNeuronByLabel("Basal Ganglia (GPi)"), "getActivation");
     PotentialConsumer timeSeriesConsumer2 = chart.getPotentialConsumers().get(1);
     workspace.getCouplingManager().addCoupling(new Coupling(neuronProducer2, timeSeriesConsumer2));
 
@@ -488,14 +488,14 @@ void addTimeSeries() {
 //
 void addDocViewer() {
 	DocViewerComponent docViewer = new DocViewerComponent("Information");
-	docViewer.setText("<h3>Cerbellum Model</h3>" +
+	docViewer.setText("<h1>Cerbellum Model</h1>" +
         "A model developed by Charles C. Peck, Tyler Streeter, and James Kozloski. Simbrain implementation by Jeff Rodny and Jeff Yoshimi." +
         "<br><br>" +
         "The model illustrates how novelty is initially processed by the basal ganglia and then transferred to the cerebellum." +
         "<br><br>" +
         "The model learns a spinal-cord > spinal-cord mapping, from the input on the lower-right to the output on the lower-left. It will be trained to associate a 'Go' signal with an output of 1 and 'No Go' signal with output of 0." +
         "<br><br>" +
-        "Initially both signals have no learned output; they both give an output of 0. We can see this by pressing the 'Test: No Dopamine' button. In this mode the 'Dopamine' neuron is clamped to 0 and so it exerts no influence on the network.  In this mode, prior to training, notice that the same output is produced for activation of 'Go' and 'No Go' neurons; both produce zero output. " +
+        "Initially both signals have no learned output; they both give an output of 0. We can see this by pressing the 'Test: No Dopamine' button. In this mode the 'Basal Ganglia (GPi)' neuron is clamped to 0 and so it exerts no influence on the network.  In this mode, prior to training, notice that the same output is produced for activation of 'Go' and 'No Go' neurons; both produce zero output. " +
         "<br><br>" +
         "We can then train the model to produce the desired mapping from 'Go' to 1 and 'No Go' to 0, initially using the dopamine system.  On a trial of length 200 ('trial length' is number of iterations), the network is exposed to both patterns for 100 iterations.   For each of the two patterns an appropriate target value is set in the 'Target' neuron.  The 'Dopamine' neuron then registers the difference between the target value and the output value, i.e. the error.  This error then influences and 'corrects' the output via left Thalamus-Cortex-Spinal Cord connections.  Dopamine activity is visible in the blue time-series, and output activity in the red time series." +
         "<br><br>" +
@@ -511,10 +511,12 @@ void addDocViewer() {
         "<li>Upon first opening the simulation, press the 'Test: No Dopamine' button to see the initial behavior of the cerebellum without targets or Dopamine intervention.  Notice in the time series that Dopamine (blue) stays flat, since it is not operating.  Notice that both inputs give the same output.</li>" +
         "<li>Now press the 'Train: 10 Trials' button. This will use the Dopamine system to train the model on the correct input-output pattern 10 times.</li>" +
         "<li>Press the 'Test: No Dopamine' button again. Now the correct input output patterns are produced without Dopmaine.  The cerebellum has learned the mapping.  Notice the correct oscillation of output (red) in the time series. </li>" +
-        "</ol>");
+        "</ol><br><br>" + 
+        "Note: The Go and No Go nodes represent sparsified outputs of the granule cells hypothetically produced by more complex afferent projections. There are other simplifications and some misleading features of this simulation.   We hope to update it in a future release."
+        );
     // TODO: Explain what time series is doing
     workspace.addWorkspaceComponent(docViewer);
-    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(960, 10, 400, 600);
+    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(3,11,339,336);
 		
 }
 	

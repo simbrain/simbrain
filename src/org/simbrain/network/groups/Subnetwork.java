@@ -201,10 +201,10 @@ public abstract class Subnetwork extends Group {
         final SynapseGroup sg, final String sourceLabel,
         final String targetLabel) {
         if (!source.equals(target)) {
-            sg.setLabel("Weights: " + sourceLabel + " "
+            sg.setLabel(sourceLabel + " "
                 + new Character('\u2192') + " " + targetLabel);
         } else {
-            sg.setLabel("Weights: " + sourceLabel + " "
+            sg.setLabel(sourceLabel + " "
                 + new Character('\u21BA'));
         }
 

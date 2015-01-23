@@ -483,7 +483,7 @@ void makeButtons() {
 
 
     // Set up Frame
-    internalFrame.setLocation(20,38);
+    internalFrame.setLocation(26,380);
     internalFrame.getContentPane().add(panel);
     internalFrame.setVisible(true);
     internalFrame.pack();
@@ -527,7 +527,7 @@ void addDocViewer() {
         "<h3>Actor Critic Model</h3>" +
         "Based on Sutton and Barto, grid world model. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey." +
         "<br><br>" +
-        "A model which learns the location of rewarding stimuli.   Do a few runs through 5 trials with default values and the rat should figure out how to get the cheese.<br><br>" +
+        "A model which learns the location of rewarding stimuli.   Do a few runs through 5 trials using the run button on the panel below.  Using default values, the rat should figure out how to get the cheese.<br><br>" +
         "<b>Discount Factor</b>:  Range is 0-1.  If 0, predict next value only. If .5, predict future values." +
         "As it increases toward one, values of y in the more distant future become more significant." +
         "<br>" +
@@ -542,7 +542,7 @@ void addDocViewer() {
         "<br>"
         );
     workspace.addWorkspaceComponent(docViewer);
-    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(20, 320, 250, 350);
+    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(24,32,250,350);
 }
 
 //

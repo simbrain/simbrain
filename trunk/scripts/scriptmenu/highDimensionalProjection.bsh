@@ -26,10 +26,8 @@ import org.simbrain.workspace.*;
     GridLayout layout = new GridLayout(50.0, 50.0, 5);
     layout.setInitialLocation(new Point(10, 10));
     for (int i = 0; i < numNeurons; i++) {
-        Neuron neuron = new Neuron(network, "DecayRule");
-        ((DecayRule)neuron.getUpdateRule()).setRelAbs(DecayRule.ABSOLUTE);
-        ((DecayRule)neuron.getUpdateRule()).setDecayAmount(.1);
-        neuron.setUpperBound(20);
+        Neuron neuron = new Neuron(network, "NakaRushtonRule");
+        neuron.setUpperBound(100);
         network.addNeuron(neuron);
     }
     layout.layoutNeurons(network.getNeuronList());

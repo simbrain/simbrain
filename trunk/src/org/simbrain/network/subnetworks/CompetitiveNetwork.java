@@ -94,7 +94,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive,
-                Direction.NORTH, 150);
+                Direction.NORTH, 200);
     }
 
     @Override

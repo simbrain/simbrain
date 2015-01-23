@@ -39,7 +39,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 public class FeedForward extends Subnetwork {
 
     /** Space to put between layers. */
-    private int betweenLayerInterval = 150;
+    private int betweenLayerInterval = 200;
 
     /**
      * Construct a feed-forward network.

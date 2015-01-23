@@ -66,7 +66,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
     private final NeuronGroup outputLayer;
 
     /** space between layers */
-    private int betweenLayerInterval = 150;
+    private int betweenLayerInterval = 300;
 
     /**
      * Training set.
@@ -138,7 +138,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
 
         // Hidden Layer
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
-        hiddenLayer.setLabel("Hidden layer (x(t))");
+        //hiddenLayer.setLabel("Hidden layer (x(t))");
+        hiddenLayer.setLabel("Hidden layer");
         addNeuronGroup(hiddenLayer);
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
@@ -149,7 +150,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991). TODO
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
-        contextLayer.setLabel("Context Layer (x(t - \u0394t))");
+        //contextLayer.setLabel("Context Layer (x(t - \u0394t))");
+        contextLayer.setLabel("Context Layer");
         addNeuronGroup(contextLayer);
         contextLayer.setLayoutBasedOnSize();
         NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,

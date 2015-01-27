@@ -175,6 +175,9 @@ public class HistogramModel extends ChartModel {
      * Re-add the data.
      */
     public void redraw() {
+        // First time draws data as is
+        dataSet.resetData(dataNames, data, bins);
+        // Second time redraws based on maximum range amoung sets.
         dataSet.resetData(dataNames, data, bins);
     }
 

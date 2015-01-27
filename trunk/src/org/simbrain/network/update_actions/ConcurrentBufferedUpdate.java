@@ -19,6 +19,7 @@
 package org.simbrain.network.update_actions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.connections.Radial;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
@@ -40,11 +41,12 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
-import org.simbrain.network.synapse_update_rules.STDPRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 import org.simbrain.network.update_actions.concurrency_tools.Consumer;
 import org.simbrain.network.update_actions.concurrency_tools.PoisonTask;
@@ -204,21 +206,21 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
                             + " invoked once it has been shutdown");
         }
         producer = Thread.currentThread();
-        network.setUpdateCompleted(false);
         try {
             if (currentAvailableProcessors
                 != getAvailableConsumerProcessors())
             {
                 availableProcessorChange();
             }
+            int chunkSize = neurons.size() / 100;
             synchronized (neurons) {
                 int i = 0;
-                Neuron[] block = new Neuron[CHUNK_SIZE];
+                Neuron[] block = new Neuron[chunkSize];
                 for (Neuron n : neurons) {
-                    if (i >= CHUNK_SIZE) {
+                    if (i >= chunkSize) {
                         i = 0;
                         tasksQueue.put(new BufferedUpdateTask(block));
-                        block = new Neuron[CHUNK_SIZE];
+                        block = new Neuron[chunkSize];
                     }
                     block[i] = n;
                     i++;
@@ -399,14 +401,28 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         neurons.remove(networkEvent.getObject());
         decrementPendingOperations();
     }
+    
+    public void excludeNeurons(Collection<Neuron> exclude) {
+        for (Neuron n : exclude) {
+            neurons.remove(n);
+        }
+    }
+    
+    public void includeNeurons(Collection<Neuron> include) {
+        for (Neuron n : include) {
+            neurons.add(n);
+        }
+    }
 
     public int getAvailableConsumerProcessors() {
         return Runtime.getRuntime().availableProcessors();
     }
 
     private int decrementPendingOperations() {
-        synchronized (producer) {
-            producer.notify();
+        if (producer != null) {
+            synchronized (producer) {
+                producer.notify();
+            }
         }
         return pendingOperations.decrementAndGet();
     }
@@ -418,15 +434,22 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * @param args
      */
     public static void main(String[] args) {
+        final int numNeurons = 10000;
+        final int lambda = 575;
+        
+        System.out.println(System.getProperty("java.vm.name"));
         Scanner keyboard = new Scanner(System.in);
-        System.out.println("Press any key");
+        System.out.println("Press any key, then ENTER.");
         String beginToken = keyboard.next();
-        keyboard.close();
+        long start = System.nanoTime();
         Network net = new Network();
         net.setTimeStep(0.5);
-        NeuronGroup ng = new NeuronGroup(net, 10000);
+        NeuronGroup ng = new NeuronGroup(net, numNeurons);
+        ng.setRecordAsSpikes(true);
         ng.setLabel(beginToken);
-        ng.setNeuronType(new IzhikevichRule());
+        IzhikevichRule upRule = new IzhikevichRule();
+        upRule.setiBg(13);
+        ng.setNeuronType(upRule);
         for (Neuron n : ng.getNeuronList()) {
             if (Math.random() < 0.25) {
                 n.setPolarity(Polarity.INHIBITORY);
@@ -434,40 +457,68 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
                 n.setPolarity(Polarity.EXCITATORY);
             }
         }
+        GridLayout gl = new GridLayout();
+        gl.layoutNeurons(ng.getNeuronList());
         PolarizedRandomizer exRand = new PolarizedRandomizer(
                 Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
                 Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(3.5);
-        inRand.setParam1(2.5);
-        System.out.println("Begin Synapse Group Construction");
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng, new Sparse(
-                0.01, false, false), 0.75, exRand, inRand);
-        sg.setLearningRule(new STDPRule(), Polarity.BOTH);
+        exRand.setParam1(0.01);
+        exRand.setParam2(0.01);
+        inRand.setParam1(0.035);
+        inRand.setParam2(0.02);
+        System.out.println("Begin Network Construction...");
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng,
+                new Radial(lambda),
+                0.75, exRand, inRand);
+//        STDPRule stdp = new STDPRule();
+//        stdp.setLearningRate(0.01);
+//        sg.setLearningRule(stdp, Polarity.BOTH);
+        sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
+        //sg.setUseGroupLevelSettings(false);
+        ConvolvedJumpAndDecay inhibSR = new ConvolvedJumpAndDecay();
+        inhibSR.setTimeConstant(6.0);
+        sg.setSpikeResponder(inhibSR, Polarity.INHIBITORY);
         net.addGroup(ng);
         net.addGroup(sg);
-        ng.startRecording();
-        System.out.println("End network construction");
-        final int TEST_ITERATIONS = 500;
-
-        for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
-            System.out.println(nua.getDescription());
+        long end = System.nanoTime();
+        System.out.println("End Network construction");
+        System.out.println("Time: "
+                + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
+        System.out.println(ng.size() + " neurons.");
+        System.out.println(sg.size() + " synapses.");
+        System.out.println("Begin Test? (Y/N)");
+        String cont = keyboard.next();
+        keyboard.close();
+        if (!(cont.matches("Y") || cont.matches("y"))) {
+            return;
         }
-
+        final int TEST_ITERATIONS = 500;
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(new ConcurrentBufferedUpdate(net));
         // Quick tune up...
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 1000; i++) {
             net.update();
         }
         System.out.println("End tune-up");
+        for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
+            if (nua instanceof ConcurrentBufferedUpdate) {
+                ((ConcurrentBufferedUpdate) nua).shutdown();
+            }
+        }
 
         // SerialExecution
-        long start = System.nanoTime();
+        ng.startRecording();
+        start = System.nanoTime();
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(new UpdateGroup(sg));
+        net.getUpdateManager().addAction(new UpdateGroup(ng));
         net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
         for (int i = 0; i < TEST_ITERATIONS; i++) {
             net.update();
         }
         ng.stopRecording();
-        long end = System.nanoTime();
+        end = System.nanoTime();
         System.out.println("Serial: "
                 + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
 
@@ -483,7 +534,12 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         end = System.nanoTime();
         System.out.println("Parallel: "
                 + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));
-
+        for (NetworkUpdateAction nua : net.getUpdateManager().getActionList()) {
+            if (nua instanceof ConcurrentBufferedUpdate) {
+                ((ConcurrentBufferedUpdate) nua).shutdown();
+            }
+        }
+        return;
     }
 
 }

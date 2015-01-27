@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -46,7 +47,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
     /** D. */
     private double d = 6;
-    
+
     /** Constant background current. */
     private double iBg = 14;
 
@@ -58,6 +59,12 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
     /** Add noise to the neuron. */
     private boolean addNoise;
+
+    /**
+     * An optional absolute refractory period. In many simulations this
+     * promotes network stability.
+     */
+    private double refractoryPeriod = 1.0; //ms
 
     /**
      * {@inheritDoc}
@@ -78,16 +85,19 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public void update(Neuron neuron) {
-        double timeStep = neuron.getNetwork().getTimeStep();
-        double inputs = inputType.getInput(neuron);
-        double activation = neuron.getActivation();
-
-        if (addNoise) {
-            inputs += noiseGenerator.getRandom();
+    public void update(final Neuron neuron) {
+        final double timeStep = neuron.getNetwork().getTimeStep();
+        final boolean refractory = getLastSpikeTime() + refractoryPeriod
+                >= neuron.getNetwork().getTime();
+        final double activation = neuron.getActivation();
+        double inputs = 0;
+        if (!refractory) {
+            inputs = inputType.getInput(neuron);
+            if (addNoise) {
+                inputs += noiseGenerator.getRandom();
+            }
+            inputs += iBg + getAppliedInput();
         }
-        inputs += iBg;
-
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
         double val = activation
@@ -98,8 +108,13 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         if (val >= threshold) {
             val = c;
             recovery += d;
-            neuron.setSpkBuffer(true);
-            setHasSpiked(true, neuron);
+            if (!refractory) {
+                neuron.setSpkBuffer(true);
+                setHasSpiked(true, neuron);
+            } else {
+                neuron.setSpkBuffer(false);
+                setHasSpiked(false, neuron);
+            }
         } else {
             neuron.setSpkBuffer(false);
             setHasSpiked(false, neuron);
@@ -213,6 +228,22 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     @Override
     public String getDescription() {
         return "Izhikevich";
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    public double getRefractoryPeriod() {
+        return refractoryPeriod;
+    }
+
+    public void setRefractoryPeriod(double refractoryPeriod) {
+        this.refractoryPeriod = refractoryPeriod;
     }
 
 }

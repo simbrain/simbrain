@@ -23,12 +23,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -202,6 +205,25 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                 .createApplyPanel(NeuronPropertiesPanel
                         .createCombinedNeuronInfoPanel(
                                 neuronGroup.getNeuronList(), parent));
+        ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean spiking = true;
+                                for (Neuron n : neuronGroup.getNeuronList()) {
+                                    if (!n.getUpdateRule().isSpikingNeuron()) {
+                                        spiking = false;
+                                        break;
+                                    }
+                                }
+                                neuronGroup.setSpikingNeuronGroup(spiking);
+                            }
+                        });
+                    }
+                });
 
         layoutPanelWrapper = ApplyPanel.createApplyPanel(new EditablePanel() {
             @Override

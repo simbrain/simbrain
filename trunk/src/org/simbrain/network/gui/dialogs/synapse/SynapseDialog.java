@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.synapse;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -73,6 +74,15 @@ public final class SynapseDialog extends StandardDialog {
         SynapseDialog sd = createSynapseDialog(getSynapses(selectedSynapses));
         return sd;
     }
+    
+    public static SynapseDialog createSynapseDialog(
+            final Collection<SynapseNode> selectedSynapses,
+            final Frame parent) {
+        SynapseDialog sd = new SynapseDialog(getSynapses(selectedSynapses),
+                parent);
+        sd.addListeners();
+        return sd;
+    }
 
     /**
      * Creates synapse dialog from a collection of synapses.
@@ -100,6 +110,16 @@ public final class SynapseDialog extends StandardDialog {
         updateHelp();
     }
 
+    private SynapseDialog(final Collection<Synapse> synapseList,
+            final Frame parent) {
+        super(parent, "Synapse Dialog");
+        this.synapseList = (ArrayList<Synapse>) synapseList;
+        synapseEditingPanel = SynapsePropertiesPanel
+                .createSynapsePropertiesPanel(synapseList, this);
+        initializeLayout();
+        updateHelp();
+    }
+    
     /**
      * Gets the logical synapses from a list of gui Synapse Nodes
      *

@@ -65,11 +65,11 @@ public class SynapseAdjustmentPanel extends JPanel {
 
     /** Random source for randomizing inhibitory synapses. */
     private PolarizedRandomizer inhibitoryRandomizer = new PolarizedRandomizer(
-        Polarity.INHIBITORY);
+            Polarity.INHIBITORY);
 
     /** Random source for randomizing excitatory synapses. */
     private PolarizedRandomizer excitatoryRandomizer = new PolarizedRandomizer(
-        Polarity.EXCITATORY);
+            Polarity.EXCITATORY);
 
     /** Random source for randomizing all synapses. */
     private Randomizer allRandomizer = new Randomizer();
@@ -148,8 +148,8 @@ public class SynapseAdjustmentPanel extends JPanel {
      * displayed and/or what kind of display.
      */
     private JComboBox<SynapseView> synTypeSelector =
-        new JComboBox<SynapseView>(
-            SynapseView.values());
+            new JComboBox<SynapseView>(
+                    SynapseView.values());
 
     /**
      * Calculates some basic statistics about the private final StatisticsBlock
@@ -161,7 +161,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      * against their frequency.
      */
     private final HistogramPanel histogramPanel = new HistogramPanel(
-        new HistogramModel(2));
+            new HistogramModel(2));
 
     /**
      * The histogram axis names.
@@ -213,9 +213,9 @@ public class SynapseAdjustmentPanel extends JPanel {
     private final List<Synapse> synapses;
 
     public static SynapseAdjustmentPanel createSynapseAdjustmentPanel(
-        final NetworkPanel networkPanel, final List<Synapse> synapses) {
+            final NetworkPanel networkPanel, final List<Synapse> synapses) {
         SynapseAdjustmentPanel sap = new SynapseAdjustmentPanel(networkPanel,
-            synapses);
+                synapses);
 
         // Update the stats in the stats panel.
         sap.updateStats();
@@ -240,7 +240,7 @@ public class SynapseAdjustmentPanel extends JPanel {
      *            synapses to represent in this panel
      */
     private SynapseAdjustmentPanel(final NetworkPanel networkPanel,
-        final List<Synapse> synapses) {
+            final List<Synapse> synapses) {
 
         // Establish the parent panel.
         this.networkPanel = networkPanel;
@@ -269,7 +269,7 @@ public class SynapseAdjustmentPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         JPanel synTypePanel = new JPanel();
         synTypePanel.setBorder(BorderFactory.createTitledBorder("Synapse"
-            + " Stats"));
+                + " Stats"));
         synTypePanel.setLayout(new GridLayout(3, 2));
         synTypePanel.add(numSynsLabel);
         synTypePanel.add(meanLabel);
@@ -364,11 +364,11 @@ public class SynapseAdjustmentPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 randomPanel.commitRandom(perturber);
                 SynapseView view = (SynapseView) synTypeSelector
-                    .getSelectedItem();
+                        .getSelectedItem();
                 for (Synapse synapse : synapses) {
                     if (view.synapseIsAdjustable(synapse)) {
                         synapse.forceSetStrength(synapse.getStrength()
-                            + perturber.getRandom());
+                                + perturber.getRandom());
                     }
                 }
                 fullUpdate();
@@ -380,7 +380,7 @@ public class SynapseAdjustmentPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SynapseView view = (SynapseView) synTypeSelector
-                    .getSelectedItem();
+                        .getSelectedItem();
                 // Commit appropriate randomizer to panel
                 switch (view) {
                     case ALL:
@@ -404,30 +404,30 @@ public class SynapseAdjustmentPanel extends JPanel {
                         switch (view) {
                             case ALL:
                                 synapse.forceSetStrength(allRandomizer
-                                    .getRandom());
+                                        .getRandom());
                                 break;
                             case OVERLAY:
                                 if (SynapseView.INHIBITORY
-                                    .synapseIsAdjustable(synapse)) {
+                                        .synapseIsAdjustable(synapse)) {
                                     synapse
-                                        .forceSetStrength(inhibitoryRandomizer
-                                            .getRandom());
+                                            .forceSetStrength(inhibitoryRandomizer
+                                                    .getRandom());
                                 }
                                 if (SynapseView.EXCITATORY
-                                    .synapseIsAdjustable(synapse)) {
+                                        .synapseIsAdjustable(synapse)) {
                                     synapse
-                                        .forceSetStrength(excitatoryRandomizer
-                                            .getRandom());
+                                            .forceSetStrength(excitatoryRandomizer
+                                                    .getRandom());
 
                                 }
                                 break;
                             case EXCITATORY:
                                 synapse.forceSetStrength(excitatoryRandomizer
-                                    .getRandom());
+                                        .getRandom());
                                 break;
                             case INHIBITORY:
                                 synapse.forceSetStrength(inhibitoryRandomizer
-                                    .getRandom());
+                                        .getRandom());
                         }
                     }
                 }
@@ -446,7 +446,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 getParent().revalidate();
                 getParent().repaint();
                 SynapseView view = (SynapseView) synTypeSelector
-                    .getSelectedItem();
+                        .getSelectedItem();
                 switch (view) {
                     case ALL:
                         randomPanel.fillFieldValues(allRandomizer);
@@ -533,8 +533,8 @@ public class SynapseAdjustmentPanel extends JPanel {
 
         switch ((SynapseView) synTypeSelector.getSelectedItem()) {
 
-        // The absolute value of all the weights are combined into a
-        // single row.
+            // The absolute value of all the weights are combined into a
+            // single row.
             case ALL: {
                 // Send the histogram the excitatory and absolute inhibitory
                 // synapse values as separate data series.
@@ -545,9 +545,8 @@ public class SynapseAdjustmentPanel extends JPanel {
                 names.add(SynapseView.INHIBITORY.toString());
                 data.add(hist1);
                 data.add(hist2);
-            }
-                ;
-                break;
+            };
+            break;
 
             // The weights as they are stored is appropriate except that the
             // inhibitory values must be converted into non-negative values
@@ -564,9 +563,8 @@ public class SynapseAdjustmentPanel extends JPanel {
                 names.add(SynapseView.INHIBITORY.toString());
                 data.add(hist1);
                 data.add(hist2);
-            }
-                ;
-                break;
+            };
+            break;
 
             // Data is a single row copy of first row of weights
             case EXCITATORY: {
@@ -575,9 +573,8 @@ public class SynapseAdjustmentPanel extends JPanel {
                 // Name the series
                 names.add(SynapseView.EXCITATORY.toString());
                 data.add(hist);
-            }
-                ;
-                break;
+            };
+            break;
 
             // Data is a single row copy of second row of weights, negative
             // values are allowed here.
@@ -587,26 +584,25 @@ public class SynapseAdjustmentPanel extends JPanel {
                 // Name the series
                 names.add(SynapseView.INHIBITORY.toString());
                 data.add(hist);
-            }
-                ;
-                break;
+            };
+            break;
 
             default: {
                 throw new IllegalArgumentException("Invalid Synapse"
-                    + " Selection.");
+                        + " Selection.");
             }
         }
 
         // Send the histogram the new data and re-draw it.
         histogramPanel.getModel().resetData(data, names);
         histogramPanel.getModel().setSeriesColor(SynapseView.ALL.toString(),
-            HistogramPanel.getDefault_Pallet()[0]);
+                HistogramPanel.getDefault_Pallet()[0]);
         histogramPanel.getModel().setSeriesColor(
-            SynapseView.EXCITATORY.toString(),
-            HistogramPanel.getDefault_Pallet()[0]);
+                SynapseView.EXCITATORY.toString(),
+                HistogramPanel.getDefault_Pallet()[0]);
         histogramPanel.getModel().setSeriesColor(
-            SynapseView.INHIBITORY.toString(),
-            HistogramPanel.getDefault_Pallet()[1]);
+                SynapseView.INHIBITORY.toString(),
+                HistogramPanel.getDefault_Pallet()[1]);
         histogramPanel.reRender();
 
     }
@@ -621,18 +617,18 @@ public class SynapseAdjustmentPanel extends JPanel {
         statCalculator.calcStats();
 
         meanLabel.setText("Mean: "
-            + SimbrainMath.roundDouble(statCalculator.getMean(), 5));
+                + SimbrainMath.roundDouble(statCalculator.getMean(), 5));
         medianLabel.setText("Median: "
-            + SimbrainMath.roundDouble(statCalculator.getMedian(), 5));
+                + SimbrainMath.roundDouble(statCalculator.getMedian(), 5));
         sdLabel.setText("Std. Dev: "
-            + SimbrainMath.roundDouble(statCalculator.getStdDev(), 5));
+                + SimbrainMath.roundDouble(statCalculator.getStdDev(), 5));
 
         int tot = weights[0].length + weights[1].length;
         numSynsLabel.setText("Synapses: " + Integer.toString(tot));
         numExSynsLabel.setText("Excitatory : "
-            + Integer.toString(weights[0].length));
+                + Integer.toString(weights[0].length));
         numInSynsLabel.setText("Inhibitory: "
-            + Integer.toString(weights[1].length));
+                + Integer.toString(weights[1].length));
 
         statsPanel.revalidate();
         statsPanel.repaint();
@@ -696,7 +692,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                     }
                 }
             } else if (type.equals(SynapseView.EXCITATORY)
-                && weights[0].length != 0) {
+                    && weights[0].length != 0) {
                 tot = weights[0].length;
                 data = new double[tot];
                 for (int j = 0; j < tot; j++) {
@@ -706,7 +702,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                 }
 
             } else if (type.equals(SynapseView.INHIBITORY)
-                && weights[1].length != 0) {
+                    && weights[1].length != 0) {
                 tot = weights[1].length;
                 data = new double[tot];
                 for (int j = 0; j < tot; j++) {
@@ -775,13 +771,13 @@ public class SynapseAdjustmentPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     double amount = Double.parseDouble(tfIncreaseDecrease
-                        .getText());
+                            .getText());
                     SynapseView view = (SynapseView) synTypeSelector
-                        .getSelectedItem();
+                            .getSelectedItem();
                     for (Synapse synapse : synapses) {
                         if (view.synapseIsAdjustable(synapse)) {
                             synapse.forceSetStrength(synapse.getStrength()
-                                + synapse.getStrength() * amount);
+                                    + synapse.getStrength() * amount);
                         }
                     }
                     fullUpdate();
@@ -795,13 +791,13 @@ public class SynapseAdjustmentPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     double amount = Double.parseDouble(tfIncreaseDecrease
-                        .getText());
+                            .getText());
                     SynapseView view = (SynapseView) synTypeSelector
-                        .getSelectedItem();
+                            .getSelectedItem();
                     for (final Synapse synapse : synapses) {
                         if (view.synapseIsAdjustable(synapse)) {
                             synapse.forceSetStrength(synapse.getStrength()
-                                - synapse.getStrength() * amount);
+                                    - synapse.getStrength() * amount);
                         }
                     }
                     fullUpdate();
@@ -838,14 +834,14 @@ public class SynapseAdjustmentPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     double threshold =
-                        Double.parseDouble(tfThreshold.getText());
+                            Double.parseDouble(tfThreshold.getText());
                     SynapseView view = (SynapseView) synTypeSelector
-                        .getSelectedItem();
+                            .getSelectedItem();
                     for (Synapse synapse : synapses) {
                         if (view.synapseIsAdjustable(synapse)) {
                             if (Math.abs(synapse.getStrength()) < threshold) {
                                 networkPanel.getNetwork()
-                                    .removeSynapse(synapse);
+                                        .removeSynapse(synapse);
                             }
                         }
                     }

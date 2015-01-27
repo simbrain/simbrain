@@ -52,10 +52,15 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     /**
      * A mapping from the names of data series to the data themselves.
      */
-    private LinkedHashMap<String, ColoredDataSeries> dataMap = new LinkedHashMap<String, ColoredDataSeries>();
+    private LinkedHashMap<String, ColoredDataSeries> dataMap =
+            new LinkedHashMap<String, ColoredDataSeries>();
 
     /** The histogram type. */
     private HistogramType type;
+
+    /** A value representing the largest value range among datasets. */
+    private double maxRangeValue =
+            Double.MIN_VALUE;
 
     /**
      * Creates a new (empty) dataset with a default type of
@@ -95,8 +100,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param key the series key (<code>null</code> not permitted).
      * @param values the raw observations.
      * @param bins the number of bins (must be at least 1).
-     * @param minimum the lower bound of the bin range.
-     * @param maximum the upper bound of the bin range.
      */
     public void overwriteSeries(String key, double[] values, int bins) {
         addSeries(key, values, bins);
@@ -113,8 +116,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
      * @param key the series key (<code>null</code> not permitted).
      * @param values the raw observations.
      * @param bins the number of bins (must be at least 1).
-     * @param minimum the lower bound of the bin range.
-     * @param maximum the upper bound of the bin range.
      */
     public void addSeries(String key, double[] values, int bins) {
         if (key == null) {
@@ -127,23 +128,35 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
                     "The 'bins' value must be at least 1.");
         }
 
-        if (values.equals(dataMap.get(key))) {
-            if (dataMap.get(key).data.length == bins) {
-                // The series hasn't changed and the number
-                // of bins hasn't changed nothing to do here.
-                return;
+        if (dataMap.get(key) != null) {
+            HistogramBin [] original = dataMap.get(key).data;
+            double range = getRange(original);
+            if (range >= maxRangeValue - maxRangeValue / 10
+                    && range <= maxRangeValue + maxRangeValue / 10)
+            {
+                double newMax = Double.MIN_VALUE;
+                for (ColoredDataSeries data : dataMap.values()) {
+                    if (data.equals(dataMap.get(key))) {
+                        continue;
+                    }
+                    range = getRange(data.data);
+                    if (range > newMax) {
+                        newMax = range;
+                    }
+                }
+                maxRangeValue = newMax;
             }
         }
-
+        Arrays.sort(values);
+        double range = Math.abs(values[values.length - 1] - values[0]);
+        if (range > maxRangeValue) {
+            maxRangeValue = range;
+        }
         HistogramBin[] histBins = new HistogramBin[0];
         double binWidth = 0;
         if (values.length != 0) {
-            Arrays.sort(values);
-
-            binWidth = (values[values.length - 1] - values[0]) / bins;
-
+            binWidth = (maxRangeValue) / bins;
             histBins = new HistogramBin[bins];
-
             int index = 0;
             HistogramBin bin;
             double endVal = 0;
@@ -153,7 +166,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
                     endVal = startVal + binWidth;
                     bin = new HistogramBin(startVal, endVal);
                     while (index < values.length
-                            && values[index] <= endVal) {
+                            && values[index] <= endVal)
+                    {
                         bin.incrementCount();
                         index++;
                     }
@@ -172,6 +186,30 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
     }
 
     /**
+     * Contingent on the histogram bins being sorted.
+     * @param histSet
+     * @return
+     */
+    private double getRange(HistogramBin [] histSet) {
+        int cap1 = -1;
+        int cap2 = -1;
+        for (int i = 0; i < histSet.length; i++) {
+            if (histSet[i].getCount() > 0) {
+                cap1 = i;
+                break;
+            }
+        }
+        for (int i = histSet.length - 1; i >= 0; i--) {
+            if (histSet[i].getCount() > 0) {
+                cap2 = i;
+                break;
+            }
+        }
+        return Math.abs(histSet[cap2]
+                .getEndBoundary() - histSet[cap1].getStartBoundary());
+    }
+
+    /**
      * Reset the data in the data map field.
      *
      * @param names List of data series names
@@ -184,11 +222,11 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
                     "Number of names for series does not"
                             + "equal the number of data series.");
         }
-        dataMap.keySet().retainAll(names);
         Iterator<double[]> dataIterator = data.iterator();
         for (String str : names) {
             addSeries(str, dataIterator.next(), bins);
         }
+        dataMap.keySet().retainAll(names);
     }
 
     /**

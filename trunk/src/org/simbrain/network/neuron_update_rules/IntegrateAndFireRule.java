@@ -61,6 +61,12 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     private boolean addNoise;
 
     /**
+     * @deprecated here for backwards compatibility.
+     */
+    @Deprecated
+    private boolean hasSpiked;
+
+    /**
      * {@inheritDoc}
      */
     public IntegrateAndFireRule deepCopy() {
@@ -107,7 +113,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
         double dVm =
             timeStep
                 * (-(memPotential - restingPotential) + resistance
-                    * (iSyn + backgroundCurrent))
+                    * (iSyn + backgroundCurrent + getAppliedInput()))
                 / timeConstant;
 
         memPotential += dVm;

@@ -270,6 +270,10 @@ public class AddNeuronsDialog extends StandardDialog {
         helpButton.setAction(helpAction);
     }
 
+    public void tickGroupifyOption(boolean gropify) {
+        groupPanel.addToGroup.setSelected(gropify);
+    }
+
     /**
      * A sub-panel which allows a user to put newly created neurons into a
      * neuron group. Options include a new neuron group, already existing neuron

@@ -31,14 +31,13 @@ import javax.swing.JToolBar;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.table.MutableTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.TableActionManager;
 
 /**
  * Panel for sending inputs from a table to a network. The action that calls
@@ -70,7 +69,17 @@ public class TestInputPanel extends DataPanel {
      * simply creates temporary data.
      */
     private double[][] tempDataMatrix = new double[5][inputNeurons.size()];
+    
+    private NeuronGroup neuronGroup;
 
+    public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,
+            NeuronGroup neuronGroup) {
+        TestInputPanel tip = TestInputPanel.createTestInputPanel(networkPanel,
+                neuronGroup.getNeuronList());
+        tip.neuronGroup = neuronGroup;
+        return tip;
+    }
+    
     /**
      * Create panel using a network panel and a list of selected neurons for
      * case where no data holder is provided (currently, applying test inputs to
@@ -306,6 +315,9 @@ public class TestInputPanel extends DataPanel {
     public void setData(double[][] data) {
         if (data != null) {
             ((NumericTable) table.getData()).setData(data);
+        }
+        if (neuronGroup != null) {
+            neuronGroup.setTestData(data);
         }
     }
 

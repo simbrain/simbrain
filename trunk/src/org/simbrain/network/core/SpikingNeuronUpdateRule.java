@@ -25,10 +25,10 @@ import org.simbrain.network.core.Network.TimeType;
  * integrate and fire) with functions common to spiking neurons. For example a
  * boolean hasSpiked field is used in the gui to indicate that this neuron has
  * spiked.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
- * 
+ *
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
@@ -39,8 +39,11 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     /** Time of last spike. */
     private double lastSpikeTime;
 
-//    /** Whether a spike has occurred in the current time. */
-//    private boolean hasSpiked;
+    /**
+     * An aux value for applied inputs to the neuron (eg injected current)
+     * usable across all spiking neuron update rules.
+     */
+    private double appliedInput = 0.0;
 
     @Override
     public void clear(Neuron neuron) {
@@ -61,24 +64,16 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     public abstract void update(Neuron neuron);
 
     /**
-     * @param hasSpiked the hasSpiked to set
-     * @param neuron the neuron which has (or has not) spiked.
+     * @param hasSpiked
+     *            the hasSpiked to set
+     * @param neuron
+     *            the neuron which has (or has not) spiked.
      */
     public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
         if (hasSpiked) {
             lastSpikeTime = neuron.getNetwork().getTime();
         }
-//        this.hasSpiked = hasSpiked;
     }
-
-//    /**
-//     * Whether the neuron has spiked in this instant or not.
-//     *
-//     * @return true if the neuron spiked.
-//     */
-//    public boolean hasSpiked() {
-//        return hasSpiked;
-//    }
 
     /**
      * @return the lastSpikeTime
@@ -88,14 +83,46 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     }
 
     /**
-     * @param lastSpikeTime the lastSpikeTime to set
+     * @param lastSpikeTime
+     *            the lastSpikeTime to set
      */
     public void setLastSpikeTime(double lastSpikeTime) {
         this.lastSpikeTime = lastSpikeTime;
     }
 
-    public boolean isSpikingNeuron() {
-    	return true;
+    /**
+     * A helper method which identifies this and all subclasses as variations of
+     * spiking neurons. While instanceof is often bad practice this is a faster
+     * way of determining if a neuron is spiking without using instanceof.
+     * While normally this would still be bad practice, this is often used by
+     * GUI components which are separate from the logical code.
+     *
+     * @return TRUE: Any subclass of SpikingNeuronUpdate rule, must by
+     *         definition be a spiking neuron.
+     */
+    @Override
+    public final boolean isSpikingNeuron() {
+        return true;
     }
-    
+
+    /**
+     * @return the input being injected into this neuron update rule, if any.
+     */
+    public double getAppliedInput() {
+        return appliedInput;
+    }
+
+    /**
+     * Allows external objects to set the background applied input to this
+     * neuron. This allows inputs to be passed through the rule's update without
+     * directly setting the activation. It is much more practical for spiking
+     * neurons for which it makes much more sense to inject current as input
+     * since the update rule is in charge of whether or not the neuron spikes.
+     * @param appliedInput the background stimulation being applied or
+     *  "injected" into this neuron.
+     */
+    public void setAppliedInput(double appliedInput) {
+        this.appliedInput = appliedInput;
+    }
+
 }

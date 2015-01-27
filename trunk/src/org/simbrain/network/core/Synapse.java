@@ -18,8 +18,10 @@
  */
 package org.simbrain.network.core;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +46,8 @@ public class Synapse {
 
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
 
+    private static final double MIN_PSR = 1E-05;
+    
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
      * and their parents can occur at different levels of the network hierarchy.
@@ -105,8 +109,10 @@ public class Synapse {
     private boolean frozen;
 
     /** Manages synaptic delay */
-    private LinkedList<Double> delayManager;
+    private double [] delayManager;
 
+    private int dlyPtr = 0;
+    
     /**
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent
@@ -266,8 +272,13 @@ public class Synapse {
             if (delay == 0) {
                 return psr;
             } else {
-                enqueu(psr);
-                return dequeu();
+                double retVal = dequeu();
+                if (psr > MIN_PSR) {
+                    enqueu(psr);
+                } else {
+                    enqueu(0);
+                }
+                return retVal;
             }
         }
     }
@@ -285,8 +296,9 @@ public class Synapse {
         } else {
             psr = source.getActivation() * strength;
             if (delay != 0) {
+                double retVal = dequeu();
                 enqueu(psr);
-                return dequeu();
+                return retVal;
             } else {
                 return psr;
             }
@@ -564,9 +576,6 @@ public class Synapse {
      */
     public void setSpikeResponder(final SpikeResponder sr) {
         this.spikeResponder = sr;
-        if (sr == null) {
-            return;
-        }
     }
 
     /**
@@ -575,21 +584,48 @@ public class Synapse {
      * @param dly Amount of delay
      */
     public void setDelay(final int dly) {
+        if (dly < 0 && source != null) {
+            return;
+        }
         delay = dly;
 
-        if (delay == 0) {
+        if (delay <= 0) {
             delayManager = null;
 
             return;
         }
 
-        delayManager = new LinkedList<Double>();
-        delayManager.clear();
+        delayManager = new double[delay];
 
         for (int i = 0; i < delay; i++) {
-            delayManager.add(new Double(0));
+            delayManager[i] = 0;
         }
+        dlyPtr = 0;
     }
+//
+//    /**
+//     *
+//     * @param dly
+//     */
+//    public void setDelayTimeDialate(final int dly) {
+//        if (dly < 0) {
+//            delay = 0;
+//        }
+//        int delayDiff = dly - delay;
+//        delay = dly;
+//        if (delay == 0) {
+//            delayManager = null;
+//
+//            return;
+//        }
+//        if (delayDiff > 0) {
+//            for (int i = 0; i < delayDiff; i++) {
+//                delayManager.addFirst(0.0);
+//            }
+//        } else {
+//            Iterator<Double> delayIter = delayManager.iterator();
+//        }
+//    }
 
     /**
      * @return Current amount of delay.
@@ -602,7 +638,15 @@ public class Synapse {
      * @return the deque.
      */
     private double dequeu() {
-        return delayManager.removeFirst().doubleValue();
+//        double retVal = delayManager[dlyPtr++];
+//        for (int i = 1; i < delay; i++) {
+//            delayManager[i - 1] = delayManager[i];
+//        }
+//        delayManager[delay - 1] = 0;
+        if(dlyPtr == delay) {
+            dlyPtr = 0;
+        }
+        return delayManager[dlyPtr++];
     }
 
     /**
@@ -611,8 +655,15 @@ public class Synapse {
      * @param val Value to enqueu
      */
     private void enqueu(final double val) {
-        delayManager.add(new Double(val));
+//        delayManager[delay - 1] = val;
+        if (dlyPtr == 0) {
+            delayManager[delay - 1] = val;
+        } else {
+            delayManager[dlyPtr - 1] = val;
+        }
     }
+    
+    
 
     @Override
     public String toString() {
@@ -835,6 +886,50 @@ public class Synapse {
      */
     public void setPsr(double psr) {
         this.psr = psr;
+    }
+
+    public byte [] getNumericValuesAsByteArray() {
+        // 4 for delay, 8 for strength, 8 for psr.
+        // One byte to store enabled and frozen
+        // Eight bytes to store two integers, the indexes of the source and
+        // target neurons (optionally set as it only pertains to neuron groups).
+        int numBytes = 4 + 8 + 8 + 1 + 8 + 4;
+        if (delay > 0) {
+            numBytes += 8 * delay;
+        }
+        // [numDoubleValues<byte>, fieldValues <double>, delayValues<double>,
+        // enabled&frozen]
+        ByteBuffer bBuf = ByteBuffer.allocate(numBytes);
+        bBuf.putInt(delay);
+        bBuf.putDouble(strength);
+        bBuf.putDouble(psr);
+        if (delay > 0) {
+            for (double d : delayManager) {
+                bBuf.putDouble(d);
+            }
+        }
+        bBuf.putInt(dlyPtr);
+        byte enFr = 0x0;
+        byte en = (byte) (enabled ? 2 : 0);
+        byte fr = (byte) (frozen ? 1 : 0);
+        enFr = (byte) (en | fr);
+        bBuf.put(enFr);
+        return bBuf.array();
+    }
+
+    public void decodeNumericByteArray(ByteBuffer byteValues) {
+        setDelay(byteValues.getInt());
+        setStrength(byteValues.getDouble());
+        setPsr(byteValues.getDouble());
+        if (delay > 0) {
+            for (int i = 0; i < delay; i++) {
+                delayManager[i] = byteValues.getDouble();
+            }
+        }
+        dlyPtr = byteValues.getInt();
+        byte enFr = byteValues.get();
+        setEnabled(enFr >= 2);
+        setFrozen(enFr == 1 || enFr == 3);
     }
 
     /**

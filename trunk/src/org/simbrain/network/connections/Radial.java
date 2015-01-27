@@ -217,6 +217,15 @@ public class Radial extends Sparse {
      * @param distConst
      * @param lambda
      */
+    public Radial(double lambda) {
+        this();
+        this.lambda = lambda;
+    }
+
+    /**
+     * @param distConst
+     * @param lambda
+     */
     public Radial(double distConst, double lambda) {
     	this();
         this.distConst = distConst;

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -130,6 +131,11 @@ public class SummaryPanel extends JPanel implements EditablePanel {
 
     private JCheckBox useGlobalSettings = new JCheckBox();
     
+    private JCheckBox inputMode = new JCheckBox();
+    {
+        inputMode.setSelected(false);
+    }
+    
     /**
      * Constructs the summary panel based on a neuron group. Names the incoming
      * and outgoing labels appropriately (Incoming/Outgoing).
@@ -187,7 +193,11 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             this.add(new JLabel("Optimize as Group:"));
             this.add(useGlobalSettings);
         }
-       
+        if (group instanceof NeuronGroup && !editable) {
+            this.add(new JLabel("Input Mode:"));
+            this.add(inputMode);
+        }
+
         this.add(excitatoryTypeLabel);
         this.add(excitatoryTypeField);
         if (group instanceof SynapseGroup || inhibitoryTypeLabel.isVisible()) {
@@ -228,9 +238,8 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     	inhibitoryTypeField.setVisible(false);
         excitatoryTypeLabel.setText("Neuron Type");
         removeAll();
-        initializeLayout();
     	// End Temporary fixes.
-    	
+    	inputMode.setSelected(ng.isInputMode());
         if (ng.getId() == null || ng.getId().isEmpty()) {
             idField.setText(ng.getParentNetwork().getGroupIdGenerator()
                 .getHypotheticalId()); // ng hasn't been added to the
@@ -389,10 +398,24 @@ public class SummaryPanel extends JPanel implements EditablePanel {
     public boolean commitChanges() {
         group.setLabel(nameField.getText());
 
-//        if (group instanceof SynapseGroup) {
-//            ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
-//                .isSelected());
-//        }
+        if (group instanceof SynapseGroup) {
+            ((SynapseGroup) group).setUseGroupLevelSettings(useGlobalSettings
+                .isSelected());
+        }
+
+        if (group instanceof NeuronGroup) {
+            try {
+                ((NeuronGroup) group).setInputMode(inputMode.isSelected());
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(null, "Changes not saved!"
+                        + "\nIssue: Input data is missing."
+                        + "\nInput data can be set under the"
+                        + " \"Input Data\" tab of this dialog.",
+                        "Missing Input Data",
+                        JOptionPane.WARNING_MESSAGE);
+                inputMode.setSelected(false);
+            }
+        }
 
         return true; // Always Successful: the only field it makes sense to
         // commit from here cannot fail as a result of user action.

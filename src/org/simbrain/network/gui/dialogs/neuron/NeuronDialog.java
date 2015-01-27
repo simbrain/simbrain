@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -61,6 +63,17 @@ public final class NeuronDialog extends StandardDialog {
     /** The neurons being modified. */
     private final ArrayList<Neuron> neuronList;
 
+    public static NeuronDialog createNeuronDialog(
+            final Collection<NeuronNode> selectedNeurons, final Frame parent) {
+        NeuronDialog nd = new NeuronDialog(selectedNeurons, parent);
+        nd.neuronDataPanel = NeuronPropertiesPanel
+                .createCombinedNeuronInfoPanel(nd.neuronList, nd);
+        nd.init();
+        nd.addListeners();
+        nd.updateHelp();
+        return nd;
+    }
+
     /**
      * Creates a neuron dialog from a collection of NeuronNodes.
      *
@@ -83,6 +96,12 @@ public final class NeuronDialog extends StandardDialog {
      *            the pnode_neurons being adjusted
      */
     private NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
+        neuronList = getNeuronList(selectedNeurons);
+    }
+    
+    private NeuronDialog(final Collection<NeuronNode> selectedNeurons,
+            final Frame parent) {
+        super(parent, "Neuron Dialog");
         neuronList = getNeuronList(selectedNeurons);
     }
 

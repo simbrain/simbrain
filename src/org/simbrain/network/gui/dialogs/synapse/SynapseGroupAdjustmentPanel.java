@@ -34,13 +34,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel.SynapseView;
@@ -63,8 +67,8 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      * displayed and/or what kind of display.
      */
     private JComboBox<SynapseView> synTypeSelector =
-        new JComboBox<SynapseView>(
-            SynapseView.values());
+            new JComboBox<SynapseView>(
+                    SynapseView.values());
 
     /** The synapses being viewed in the histogram. */
     private SynapseView synapseView = SynapseView.values()[0];
@@ -72,20 +76,24 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     /** A panel displaying basic statistics about the synapses. */
     private Stats statPanel = new Stats();
 
-    private JButton revalidateButton = new JButton("Revalidate"); 
-    
+    private JButton revalidateButton = new JButton("Revalidate");
+
+    private JButton pruneButton = new JButton("Prune");
+
     {
-    	revalidateButton.setToolTipText("Places synapses into their"
-    			+ " appropriate (Excitatory/Inhibitory) sets if changes"
-    			+ " have been made.");
+        revalidateButton.setToolTipText("Places synapses into their"
+                + " appropriate (Excitatory/Inhibitory) sets if changes"
+                + " have been made.");
+        pruneButton.setToolTipText("Deletes all synapses with a weight of 0"
+                + " from this network.");
     }
-    
+
     /**
      * A histogram plotting the strength of synapses over given intervals (bins)
      * against their frequency.
      */
     private HistogramPanel histogramPanel = new HistogramPanel(
-        new HistogramModel(2));
+            new HistogramModel(2));
 
     /**
      * The panel governing the percent excitatory connections and the randomizer
@@ -102,15 +110,17 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     /**
      * Create the synapse group adjustment panel.
      *
-     * @param parent the parent window
-     * @param synapseGroup the group to adjust
+     * @param parent
+     *            the parent window
+     * @param synapseGroup
+     *            the group to adjust
      * @return the constructed panel
      */
     public static SynapseGroupAdjustmentPanel
-        createSynapseGroupAdjustmentPanel(
-            Window parent, SynapseGroup synapseGroup, boolean isCreation) {
+            createSynapseGroupAdjustmentPanel(
+                    Window parent, SynapseGroup synapseGroup, boolean isCreation) {
         SynapseGroupAdjustmentPanel sgap = new SynapseGroupAdjustmentPanel(
-            parent, synapseGroup, isCreation);
+                parent, synapseGroup, isCreation);
         sgap.addListeners();
         return sgap;
     }
@@ -118,28 +128,31 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     /**
      * Private constructor used by factory method.
      *
-     * @param parent parent window
-     * @param synapseGroup group to adjust
+     * @param parent
+     *            parent window
+     * @param synapseGroup
+     *            group to adjust
      */
     private SynapseGroupAdjustmentPanel(Window parent,
-        SynapseGroup synapseGroup, boolean isCreation) {
+            SynapseGroup synapseGroup, boolean isCreation) {
         this.synapseGroup = synapseGroup;
         this.creationPanel = isCreation;
         synTypeSelector.setVisible(!creationPanel);
         if (!creationPanel) {
-        	int bins = (int)(Math.log10(synapseGroup.size())
-        			* SimbrainMath.log2(synapseGroup.size()));
-        	if (bins < 10) {
-        		bins = 10;
-        	}
-        	histogramPanel = new HistogramPanel(new HistogramModel(2, bins));
+            int bins = (int) (Math.log10(synapseGroup.size())
+                    * SimbrainMath.log2(synapseGroup.size()));
+            if (bins < 10) {
+                bins = 10;
+            }
+            histogramPanel = new HistogramPanel(new HistogramModel(2, bins));
         }
         histogramPanel.setVisible(!creationPanel);
         revalidateButton.setVisible(!creationPanel);
+        pruneButton.setVisible(!creationPanel);
         statPanel.setVisible(!creationPanel);
         statPanel.update();
         excitatoryPercentPanel = SynapsePolarityAndRandomizerPanel
-            .createPolarityRatioPanel(parent, synapseGroup);
+                .createPolarityRatioPanel(parent, synapseGroup);
         init();
     }
 
@@ -156,18 +169,17 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = HistogramPanel.GRID_WIDTH - 1;
+        gbc.gridwidth = HistogramPanel.GRID_WIDTH - 2;
         gbc.gridheight = 1;
 
         this.add(statPanel, gbc);
 
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx = HistogramPanel.GRID_WIDTH - 1;
+        gbc.gridx = HistogramPanel.GRID_WIDTH - 2;
 
         this.add(synTypeSelector, gbc);
 
-        gbc.weighty = 1;
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridwidth = HistogramPanel.GRID_WIDTH;
@@ -177,25 +189,34 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
 
         // Set initial size of histogram panel based on screen size
         int height =
-            (int) (.33 * Toolkit.getDefaultToolkit().getScreenSize().height);
+                (int) (.33 * Toolkit.getDefaultToolkit().getScreenSize()
+                .height);
         int width = this.getPreferredSize().width;
         histogramPanel.setPreferredSize(new Dimension(width, height));
 
         this.add(histogramPanel, gbc);
 
-        gbc.gridwidth = HistogramPanel.GRID_WIDTH;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weighty = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy += HistogramPanel.GRID_HEIGHT;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-        this.add(revalidateButton, gbc);
-        
+        Box buttonBox = Box.createHorizontalBox();
+        buttonBox.add(Box.createHorizontalGlue());
+        buttonBox.add(revalidateButton);
+        buttonBox.add(pruneButton);
+        buttonBox.add(Box.createHorizontalGlue());
+
+        this.add(buttonBox, gbc);
+
+        gbc.weightx = 0;
+        gbc.gridx = 0;
         gbc.gridy += 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        
+
         this.add(excitatoryPercentPanel, gbc);
         fullUpdate();
     }
@@ -212,58 +233,66 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     synapseView = (SynapseView) synTypeSelector
-                        .getSelectedItem();
+                            .getSelectedItem();
                     fullUpdate();
                 }
             }
         });
-        
+
         revalidateButton.addActionListener(new ActionListener() {
-        	@Override
-        	public void actionPerformed(ActionEvent e) {
-        		synapseGroup.revalidateSynapseSets();
-        		fullUpdate();
-        	}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synapseGroup.revalidateSynapseSets();
+                fullUpdate();
+            }
+        });
+
+        pruneButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synapseGroup.prune();
+                fullUpdate();
+            }
         });
 
         excitatoryPercentPanel
-            .addSliderApplyActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            fullUpdate();
-                        }
-                    });
-                }
-            });
+                .addSliderApplyActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                fullUpdate();
+                            }
+                        });
+                    }
+                });
 
         excitatoryPercentPanel.getExcitatoryRandomizerPanel()
-            .addApplyActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            fullUpdate();
-                        }
-                    });
-                }
-            });
+                .addApplyActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                fullUpdate();
+                            }
+                        });
+                    }
+                });
 
         excitatoryPercentPanel.getInhibitoryRandomizerPanel()
-            .addApplyActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            fullUpdate();
-                        }
-                    });
-                }
-            });
+                .addApplyActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                fullUpdate();
+                            }
+                        });
+                    }
+                });
     }
 
     /**
@@ -290,7 +319,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
 
         List<double[]> data = new ArrayList<double[]>();
         List<String> names = new ArrayList<String>();
-
         switch ((SynapseView) synTypeSelector.getSelectedItem()) {
 
         // The absolute value of all the weights are combined into a
@@ -353,20 +381,20 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
 
             default: {
                 throw new IllegalArgumentException("Invalid Synapse"
-                    + " Selection.");
+                        + " Selection.");
             }
         }
 
         // Send the histogram the new data and re-draw it.
         histogramPanel.getModel().resetData(data, names);
         histogramPanel.getModel().setSeriesColor(SynapseView.ALL.toString(),
-            HistogramPanel.getDefault_Pallet()[0]);
+                HistogramPanel.getDefault_Pallet()[0]);
         histogramPanel.getModel().setSeriesColor(
-            SynapseView.EXCITATORY.toString(),
-            HistogramPanel.getDefault_Pallet()[0]);
+                SynapseView.EXCITATORY.toString(),
+                HistogramPanel.getDefault_Pallet()[0]);
         histogramPanel.getModel().setSeriesColor(
-            SynapseView.INHIBITORY.toString(),
-            HistogramPanel.getDefault_Pallet()[1]);
+                SynapseView.INHIBITORY.toString(),
+                HistogramPanel.getDefault_Pallet()[1]);
         histogramPanel.reRender();
 
     }
@@ -439,15 +467,15 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             calcStats();
             numSynapses.setText(Integer.toString(synapseGroup.size()));
             exSynapses.setText(Integer.toString(synapseGroup
-                .getExcitatorySynapses().size()));
+                    .getExcitatorySynapses().size()));
             inSynapses.setText(Integer.toString(synapseGroup
-                .getInhibitorySynapses().size()));
+                    .getInhibitorySynapses().size()));
             meanLabel
-                .setText(Double.toString(SimbrainMath.roundDouble(mean, 4)));
+                    .setText(Double.toString(SimbrainMath.roundDouble(mean, 4)));
             medianLabel.setText(Double.toString(SimbrainMath.roundDouble(
-                median, 4)));
+                    median, 4)));
             stdDevLabel.setText(Double.toString(SimbrainMath.roundDouble(
-                stdDev, 4)));
+                    stdDev, 4)));
             revalidate();
             repaint();
         }
@@ -545,7 +573,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             if (SynapseView.OVERLAY.equals(synapseView)) {
                 for (Synapse s : synapses) {
                     tot += (mean - Math.abs(s.getStrength()))
-                        * (mean - Math.abs(s.getStrength()));
+                            * (mean - Math.abs(s.getStrength()));
                 }
             } else {
                 for (Synapse s : synapses) {
@@ -556,4 +584,19 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         }
 
     }
+
+    public static void main(String[] args) {
+        Network net = new Network();
+        NeuronGroup ng = new NeuronGroup(net, 25);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng);
+        JFrame disp = new JFrame();
+        SynapseGroupAdjustmentPanel sgap = SynapseGroupAdjustmentPanel
+                .createSynapseGroupAdjustmentPanel(disp, sg, false);
+        disp.setContentPane(sgap);
+        disp.pack();
+        disp.setLocationRelativeTo(null);
+        disp.setVisible(true);
+
+    }
+
 }

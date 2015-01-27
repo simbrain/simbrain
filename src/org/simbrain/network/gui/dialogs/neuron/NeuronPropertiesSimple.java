@@ -43,8 +43,8 @@ import org.simbrain.util.widgets.EditablePanel;
 /**
  * Panel showing activation and label properties of a neuron.
  *
- * @author ztosi
- * @author jyoshimi
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  *
  */
 @SuppressWarnings("serial")
@@ -61,7 +61,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("useNativeFileChooser")) {
             DEFAULT_INIT_EXTENDED_DISPLAY = Boolean.parseBoolean(properties
-                .getProperty("initializeNeuronDialogToExpandedState"));
+                    .getProperty("initializeNeuronDialogToExpandedState"));
         }
 
     }
@@ -106,15 +106,17 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * Creates a basic neuron info panel. Here whether or not to display ID info
      * is automatically set based on the state of the neuron list.
      *
-     * @param neuronList the neurons whose information is being displayed/made
+     * @param neuronList
+     *            the neurons whose information is being displayed/made
      *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing.
+     * @param parent
+     *            the parent window for dynamic resizing.
      * @return A basic neuron info panel with the specified parameters
      */
     public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
-        final List<Neuron> neuronList, final Window parent) {
+            final List<Neuron> neuronList, final Window parent) {
         return createBasicNeuronInfoPanel(neuronList, parent,
-            !(neuronList == null || neuronList.size() != 1));
+                !(neuronList == null || neuronList.size() != 1));
     }
 
     /**
@@ -124,17 +126,20 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * In fact this is probably the only reason to use this factory method over
      * {@link #createBasicNeuronInfoPanel(List, Window)}.
      *
-     * @param neuronList the neurons whose information is being displayed/made
+     * @param neuronList
+     *            the neurons whose information is being displayed/made
      *            available to edit on this panel
-     * @param parent the parent window for dynamic resizing
-     * @param displayIDInfo whether or not to display ID info
+     * @param parent
+     *            the parent window for dynamic resizing
+     * @param displayIDInfo
+     *            whether or not to display ID info
      * @return A basic neuron info panel with the specified parameters
      */
     public static NeuronPropertiesSimple createBasicNeuronInfoPanel(
-        final List<Neuron> neuronList, final Window parent,
-        final boolean displayIDInfo) {
+            final List<Neuron> neuronList, final Window parent,
+            final boolean displayIDInfo) {
         NeuronPropertiesSimple bnip = new NeuronPropertiesSimple(neuronList,
-            parent, displayIDInfo);
+                parent, displayIDInfo);
         bnip.addListeners();
         return bnip;
     }
@@ -146,12 +151,12 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
      * @param displayIDInfo
      */
     private NeuronPropertiesSimple(final List<Neuron> neuronList,
-        final Window parent, final boolean displayIDInfo) {
+            final Window parent, final boolean displayIDInfo) {
         this.neuronList = neuronList;
         this.parent = parent;
         this.displayIDInfo = displayIDInfo;
         detailTriangle = new DropDownTriangle(UpDirection.LEFT,
-            DEFAULT_INIT_EXTENDED_DISPLAY, "More", "Less", parent);
+                DEFAULT_INIT_EXTENDED_DISPLAY, "More", "Less", parent);
         extraDataPanel = new NeuronPropertiesExtended(this.neuronList, parent);
         initializeLayout();
         fillFieldValues();
@@ -194,7 +199,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
 
         this.add(extraDataPanel, BorderLayout.SOUTH);
 
-        TitledBorder tb = BorderFactory.createTitledBorder("Basic Data");
+        TitledBorder tb = BorderFactory.createTitledBorder("Neuron Properties");
         this.setBorder(tb);
 
     }
@@ -257,7 +262,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
 
         // Handle Activation
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
-            "getActivation")) {
+                "getActivation")) {
             tfActivation.setText(NULL_STRING);
         } else {
             tfActivation.setText(Double.toString(neuronRef.getActivation()));
@@ -282,7 +287,7 @@ public class NeuronPropertiesSimple extends JPanel implements EditablePanel {
         if (!Double.isNaN(act)) {
             for (int i = 0; i < neuronList.size(); i++) {
                 neuronList.get(i).forceSetActivation(
-                    Double.parseDouble(tfActivation.getText()));
+                        Double.parseDouble(tfActivation.getText()));
             }
         } else {
             // Only successful if the field can't be parsed because

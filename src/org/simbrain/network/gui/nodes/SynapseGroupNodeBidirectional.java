@@ -643,4 +643,14 @@ public class SynapseGroupNodeBidirectional extends PNode implements
                 (InteractionBox) synGroup2Box);
     }
 
+    /**
+     * Updates the text in the interaction boxes of the group.
+     */
+    public void updateText() {
+        synGroup1Box.setText(synGroup1.getLabel());
+        synGroup2Box.setText(synGroup2.getLabel());
+        synGroup1Box.updateText();
+        synGroup2Box.updateText();
+    }
+
 }

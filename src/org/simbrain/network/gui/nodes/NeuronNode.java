@@ -423,8 +423,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (neurons == null || neurons.isEmpty()) {
             return null;
         }
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(this
-                .getNetworkPanel().getSelectedNeurons());
+        NeuronDialog dialog = (NeuronDialog) getNetworkPanel()
+                .getNeuronDialog(neurons);
         return dialog;
     }
 

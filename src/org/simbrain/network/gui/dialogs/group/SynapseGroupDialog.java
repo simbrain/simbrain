@@ -103,7 +103,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * out. This is what allows the panel to resize when tabs are changed.
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
-    
+
     private boolean setUseGroupLevelSettings;
 
     /**
@@ -121,7 +121,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      *         source and target neuron groups.
      */
     public static SynapseGroupDialog createSynapseGroupDialog(
-        final NetworkPanel np, NeuronGroup src, NeuronGroup tar) {
+            final NetworkPanel np, NeuronGroup src, NeuronGroup tar) {
         SynapseGroupDialog sgd = new SynapseGroupDialog(np, src, tar);
         sgd.addListeners();
         sgd.tabbedPane.setSelectedIndex(0);
@@ -140,13 +140,13 @@ public final class SynapseGroupDialog extends StandardDialog {
      * @return a synapse group dialog which can edit the specified synapse group
      */
     public static SynapseGroupDialog createSynapseGroupDialog(
-        final NetworkPanel np, final SynapseGroup sg) {
+            final NetworkPanel np, final SynapseGroup sg) {
         SynapseGroupDialog sgd = new SynapseGroupDialog(np, sg);
         sgd.addListeners();
         sgd.tabbedPane.setSelectedIndex(0);
         return sgd;
     }
-    
+
     /**
      * 
      * @param parent
@@ -155,11 +155,11 @@ public final class SynapseGroupDialog extends StandardDialog {
      * @return
      */
     public static SynapseGroupDialog createSynapseGroupDialog(
-    		final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
-    	SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
-    	 sgd.addListeners();
-         sgd.tabbedPane.setSelectedIndex(0);
-         return sgd;
+            final Frame parent, final NetworkPanel np, final SynapseGroup sg) {
+        SynapseGroupDialog sgd = new SynapseGroupDialog(parent, np, sg);
+        sgd.addListeners();
+        sgd.tabbedPane.setSelectedIndex(0);
+        return sgd;
     }
 
     /**
@@ -173,14 +173,14 @@ public final class SynapseGroupDialog extends StandardDialog {
      *            parent panel
      */
     private SynapseGroupDialog(final NetworkPanel np, NeuronGroup src,
-        NeuronGroup tar) {
+            NeuronGroup tar) {
         networkPanel = np;
         this.sourceNeuronGroup = src;
         this.targetNeuronGroup = tar;
         isCreationDialog = true;
         init();
     }
-    
+
     /**
      * 
      * @param parent
@@ -188,9 +188,9 @@ public final class SynapseGroupDialog extends StandardDialog {
      * @param src
      * @param tar
      */
-    private SynapseGroupDialog (final Frame parent, final NetworkPanel np,
-    		final SynapseGroup sg) {
-    	super(parent, "Synapse Group Dialog");
+    private SynapseGroupDialog(final Frame parent, final NetworkPanel np,
+            final SynapseGroup sg) {
+        super(parent, "Synapse Group Dialog");
         networkPanel = np;
         synapseGroup = sg;
         init();
@@ -230,21 +230,21 @@ public final class SynapseGroupDialog extends StandardDialog {
         final SummaryPanel sumPanel;
         if (isCreationDialog) {
             synapseGroup = new SynapseGroup(sourceNeuronGroup,
-                targetNeuronGroup);
+                    targetNeuronGroup);
             sumPanel = new SummaryPanel(synapseGroup);
             tabSummaryInfo = sumPanel;
         } else {
             sumPanel = new SummaryPanel(synapseGroup);
             tabSummaryInfo = ApplyPanel
-                .createApplyPanel(sumPanel);
+                    .createApplyPanel(sumPanel);
             ((ApplyPanel) tabSummaryInfo).addActionListener(
-            		new ActionListener() {
-            			@Override
-            			public void actionPerformed(ActionEvent e) {
-            				setUseGroupLevelSettings = sumPanel
-            						.getUseGlobalSettingsChkBx().isSelected();
-            			}
-            		});
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            setUseGroupLevelSettings = sumPanel
+                                    .getUseGlobalSettingsChkBx().isSelected();
+                        }
+                    });
         }
         JScrollPane summaryScrollWrapper = new JScrollPane(tabSummaryInfo);
         summaryScrollWrapper.setBorder(null);
@@ -257,9 +257,9 @@ public final class SynapseGroupDialog extends StandardDialog {
         // Connectivity panel for creation
         if (isCreationDialog) {
             connectionPanel = ConnectionPanel.createConnectionPanel(this,
-                networkPanel);
+                    networkPanel);
             JScrollPane connectWrapper = new JScrollPane(
-                connectionPanel.getMainPanel());
+                    connectionPanel.getMainPanel());
             connectWrapper.setBorder(null);
             storedComponents.add(connectWrapper);
             tabbedPane.addTab("Connection Type", new JPanel());
@@ -267,9 +267,9 @@ public final class SynapseGroupDialog extends StandardDialog {
             // to editing.
             // Weight Matrix Editor Tabs
             if (synapseGroup.getConnectionManager() instanceof Sparse) {
-            	Sparse sparseCM = (Sparse) synapseGroup.getConnectionManager();
+                Sparse sparseCM = (Sparse) synapseGroup.getConnectionManager();
                 SparseConnectionPanel sparsePanel = SparseConnectionPanel
-                    .createSparsityAdjustmentPanel(sparseCM, networkPanel);
+                        .createSparsityAdjustmentPanel(sparseCM, networkPanel);
                 sparsePanel.setEnabled(sparseCM.isPermitDensityEditing());
                 ApplyPanel cePanel = ApplyPanel.createApplyPanel(sparsePanel);
                 cePanel.addActionListener(new ActionListener() {
@@ -290,23 +290,23 @@ public final class SynapseGroupDialog extends StandardDialog {
                 storedComponents.add(cePanel);
                 tabbedPane.addTab("Sparsity", new JPanel());
             }
-            if (synapseGroup.size() < 100000) {
-	            matrixScrollPane.setBorder(null);
-	            storedComponents.add(matrixScrollPane);
-	            tabbedPane.addTab("Matrix", new JPanel());
-	            // TODO: Sorting necessary? Alternative?
-	            tabMatrix
-	                .add(WeightMatrixViewer
-	                    .getWeightMatrixPanel(new WeightMatrixViewer(
-	                        synapseGroup.getSourceNeurons(),
-	                        synapseGroup.getTargetNeurons(),
-	                        networkPanel)));
+            if (synapseGroup.size() < 10000) {
+                matrixScrollPane.setBorder(null);
+                storedComponents.add(matrixScrollPane);
+                tabbedPane.addTab("Matrix", new JPanel());
+                // TODO: Sorting necessary? Alternative?
+                tabMatrix
+                        .add(WeightMatrixViewer
+                                .getWeightMatrixPanel(new WeightMatrixViewer(
+                                        synapseGroup.getSourceNeurons(),
+                                        synapseGroup.getTargetNeurons(),
+                                        networkPanel)));
             }
         }
 
         // Tab for editing synapses
         editSynapsesPanel = ConnectionSynapsePropertiesPanel
-            .createSynapsePropertiesPanel(this, synapseGroup);
+                .createSynapsePropertiesPanel(this, synapseGroup);
         if (!isCreationDialog) {
             ActionListener al = new ActionListener() {
                 @Override
@@ -326,7 +326,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             editSynapsesPanel.addApplyListenerIn(al);
         }
         JScrollPane editSynapseScrollPane = new JScrollPane(
-            ((EditablePanel) editSynapsesPanel).getPanel());
+                ((EditablePanel) editSynapsesPanel).getPanel());
         editSynapseScrollPane.setBorder(null);
         storedComponents.add(editSynapseScrollPane);
         tabbedPane.addTab("Synapse Type", new JPanel());
@@ -337,8 +337,8 @@ public final class SynapseGroupDialog extends StandardDialog {
         storedComponents.add(adjustSynScrollPane);
         tabAdjust.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         adjustmentPanel = SynapseGroupAdjustmentPanel
-            .createSynapseGroupAdjustmentPanel(this, synapseGroup,
-                isCreationDialog);
+                .createSynapseGroupAdjustmentPanel(this, synapseGroup,
+                        isCreationDialog);
         tabAdjust.add(adjustmentPanel);
         tabbedPane.addTab("Synapse Values", new JPanel());
 
@@ -362,7 +362,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int selectedTab = ((JTabbedPane) e.getSource())
-                    .getSelectedIndex();
+                        .getSelectedIndex();
                 Component current = storedComponents.get(selectedTab);
                 int numTabs = storedComponents.size();
                 for (int i = 0; i < numTabs; i++) {
@@ -381,10 +381,10 @@ public final class SynapseGroupDialog extends StandardDialog {
                         int minPx = tabbedPane.getTabCount() * 120;
                         if (current.getPreferredSize().width < minPx) {
                             tmpPanel.setPreferredSize(new Dimension(minPx,
-                                current.getPreferredSize().height));
+                                    current.getPreferredSize().height));
                         } else {
                             tmpPanel.setPreferredSize(current
-                                .getPreferredSize());
+                                    .getPreferredSize());
                         }
                         tabbedPane.setComponentAt(i, tmpPanel);
                     }
@@ -424,9 +424,9 @@ public final class SynapseGroupDialog extends StandardDialog {
             networkPanel.getNetwork().addGroup(synapseGroup);
             networkPanel.repaint();
         } else {
-        	// Must be set ONLY after dialog is closed otherwise changes won't
-        	// take effect
-        	synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
+            // Must be set ONLY after dialog is closed otherwise changes won't
+            // take effect
+            synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
         }
     }
 

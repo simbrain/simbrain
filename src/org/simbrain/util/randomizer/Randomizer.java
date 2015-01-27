@@ -67,6 +67,10 @@ public class Randomizer {
 
     }
 
+    public Randomizer(ProbDistribution pdf) {
+        this.pdf = pdf;
+    }
+    
     /**
      * Copy constructor.
      *

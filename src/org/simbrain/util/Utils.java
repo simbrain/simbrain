@@ -404,6 +404,9 @@ public class Utils {
      * @return string representation of rounded decimal
      */
     public static String round(final double num, final int precision) {
+        if (Double.isInfinite(num) || Double.isNaN(num)) {
+            return Double.toString(num);
+        }
         BigDecimal bd = new BigDecimal(num);
         return bd.setScale(precision, BigDecimal.ROUND_HALF_UP).toString();
     }

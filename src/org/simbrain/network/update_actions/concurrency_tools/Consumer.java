@@ -104,5 +104,9 @@ public class Consumer implements Runnable {
     public int getId_no() {
         return idNo;
     }
+    
+    public void shutdown() {
+        live = false;
+    }
 
 }

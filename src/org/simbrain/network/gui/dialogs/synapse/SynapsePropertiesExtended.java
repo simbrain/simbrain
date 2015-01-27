@@ -102,35 +102,37 @@ public class SynapsePropertiesExtended extends JPanel {
         Synapse synapseRef = synapseCollection.iterator().next();
         // Handle Upper Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-            "getUpperBound")) {
+                "getUpperBound")) {
             tfUpBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         }
         // Handle Lower Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-            "getLowerBound")) {
+                "getLowerBound")) {
             tfLowBound.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         }
         // Handle Increment
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-            "getIncrement")) {
+                "getIncrement")) {
             tfIncrement.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         }
         // Handle Delay
-        if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-            "getDelay")) {
+        if (synapseRef.getDelay() < 0
+                || !NetworkUtils.isConsistent(synapseCollection, Synapse.class,
+                        "getDelay"))
+        {
             tfDelay.setText(SimbrainConstants.NULL_STRING);
         } else {
             tfDelay.setText(Integer.toString(synapseRef.getDelay()));
         }
         // Handle Frozen
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
-            "isFrozen")) {
+                "isFrozen")) {
             frozenDD.setNull();
         } else {
             frozenDD.setSelectedIndex(synapseRef.isFrozen() ? 0 : 1);
@@ -164,7 +166,7 @@ public class SynapsePropertiesExtended extends JPanel {
             tfLowBound.setText(SimbrainConstants.NULL_STRING);
         }
         Integer delay = synapseGroup.getDelay(polarity);
-        if (delay != null) {
+        if (delay != null && delay != -1) {
             tfDelay.setText(delay.toString());
         } else {
             tfDelay.setText(SimbrainConstants.NULL_STRING);
@@ -207,7 +209,7 @@ public class SynapsePropertiesExtended extends JPanel {
         }
         // Frozen ?
         boolean frozen = frozenDD.getSelectedIndex() == TristateDropDown
-            .getTRUE();
+                .getTRUE();
         if (frozenDD.getSelectedIndex() != TristateDropDown.getNULL()) {
             for (Synapse s : synapses) {
                 s.setFrozen(frozen);

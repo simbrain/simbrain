@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.core.NeuronUpdateRule.InputType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
@@ -39,10 +38,10 @@ import org.simbrain.util.SimbrainConstants.Polarity;
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
  * the neural network occurs here, in the update function. Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
- * 
+ *
  */
 public class Neuron {
 
@@ -52,9 +51,13 @@ public class Neuron {
      * with default parameters.
      */
     public static final NeuronUpdateRule DEFAULT_UPDATE_RULE = new LinearRule();
-    
+
+    /**
+     * Pre-allocates the number of bins in this neuron's fanIn/Out for
+     * efficiency.
+     */
     public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500
-    		/ 0.75);
+            / 0.75);
 
     /**
      * The update method of this neuron, which corresponds to what kind of
@@ -70,12 +73,22 @@ public class Neuron {
 
     /** Activation value of the neuron. The main state variable. */
     private double activation;
-    
+
+    /**
+     * Whether or not this neuron has spiked. Specifically if the result of
+     * integration of a spiking neuron update rule at time t, produced an action
+     * potential at time t+1. True on t+1 in that case. Always false for
+     * non-spiking neuron update rules.
+     */
     private boolean spike;
 
     /** Temporary activation value. */
     private double buffer;
-    
+
+    /**
+     * A temporary spike value, set so that neuron's spiking behavior can be
+     * synchronously updated.
+     */
     private boolean spkBuffer;
 
     /**
@@ -89,11 +102,11 @@ public class Neuron {
 
     /** List of synapses this neuron attaches to. */
     private Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>(
-    		PRE_ALLOCATED_NUM_SYNAPSES);
+            PRE_ALLOCATED_NUM_SYNAPSES);
 
     /** List of synapses attaching to this neuron. */
     private ArrayList<Synapse> fanIn = new ArrayList<Synapse>(
-    		PRE_ALLOCATED_NUM_SYNAPSES);
+            PRE_ALLOCATED_NUM_SYNAPSES);
 
     /** A marker for whether or not the update rule is an input generator. */
     private boolean generator;
@@ -141,8 +154,8 @@ public class Neuron {
 
     /**
      * Construct a neuron with all default values in the specified network.
-     * Sometimes used as the basis for a template neuron which will be
-     * edited and then copied.  Also used in scripts.
+     * Sometimes used as the basis for a template neuron which will be edited
+     * and then copied. Also used in scripts.
      *
      * @param parent
      *            The parent network of this neuron.
@@ -261,14 +274,14 @@ public class Neuron {
     public void setUpdateRule(String name) {
         try {
             NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName(
-                "org.simbrain.network.neuron_update_rules." + name)
-                .newInstance();
+                    "org.simbrain.network.neuron_update_rules." + name)
+                    .newInstance();
             setUpdateRule(newRule);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
-                "The provided neuron rule name, \"" + name
-                    + "\", does not correspond to a known neuron type."
-                    + "\n Could not find " + e.getMessage());
+                    "The provided neuron rule name, \"" + name
+                            + "\", does not correspond to a known neuron type."
+                            + "\n Could not find " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -322,13 +335,15 @@ public class Neuron {
 
     /**
      * A general purpose method that moves all relevant values from this
-     * neuron's buffer to its main values.
+     * neuron's buffer to its main values. Must be used to ensure that spikes
+     * update synchronously in the same way activations do for buffered
+     * updates.
      */
     public void setToBufferVals() {
-    	setActivation(getBuffer());
-    	setSpike(getSpkBuffer());
+        setActivation(getBuffer());
+        setSpike(getSpkBuffer());
     }
-    
+
     /**
      * Sets the activation of the neuron regardless of the state of the neuron.
      * Overrides clamping and any intrinsic dynamics of the neuron, and forces
@@ -387,20 +402,20 @@ public class Neuron {
      * original synapse connecting this neuron to a target neuron will be
      * removed and replaced by <i>Synapse s</i>.
      *
-     * @param s
+     * @param synapse the synapse for which this neuron is a source to add.
      */
     public void addEfferent(final Synapse synapse) {
         if (fanOut != null) {
-        	Synapse dup = fanOut.get(synapse.getTarget());
-        	if (dup == null) { // There is no duplicate
+            Synapse dup = fanOut.get(synapse.getTarget());
+            if (dup == null) { // There is no duplicate
                 fanOut.put(synapse.getTarget(), synapse);
-        	} else { // There is a duplicate connecting src and target
-        		// Check that we're not trying to add the exact same synapse...
-        		if (!dup.equals(synapse)) {
-        			getNetwork().removeSynapse(fanOut.get(synapse.getTarget()));
-        			fanOut.put(synapse.getTarget(), synapse);
-        		} // Do nothing if we are.
-        	}
+            } else { // There is a duplicate connecting src and target
+                // Check that we're not trying to add the exact same synapse...
+                if (!dup.equals(synapse)) {
+                    getNetwork().removeSynapse(fanOut.get(synapse.getTarget()));
+                    fanOut.put(synapse.getTarget(), synapse);
+                } // Do nothing if we are.
+            }
         }
     }
 
@@ -421,7 +436,8 @@ public class Neuron {
      * {@link #fanIn}. Does <b>NOT</b> add this synapse to the network or any
      * intermediate bodies.
      *
-     * @param s
+     * @param source adds source as a synapse for which this neuron is the
+     * target.
      */
     public void addAfferent(final Synapse source) {
         if (fanIn != null) {
@@ -445,7 +461,7 @@ public class Neuron {
      * Sums the weighted signals that are sent to this node. This sums all the
      * weighted inputs to a neuron in a connectionist sense. No spike responders
      * are called and thus this is <b>not</b> appropriate for most biological
-     *  models.
+     * models.
      *
      * @return weighted input to this node
      */
@@ -461,7 +477,10 @@ public class Neuron {
      * Sums the weighted <b>synaptic</b> inputs to a given neuron based on that
      * synapse's spike responder. This is usually only appropriate for
      * biological model neurons.
-     * @return
+     *
+     * @return the sum of the post-synaptic responses (synapse values in
+     * response to spikes and mediated by spike responders) impinging on this
+     * neuron.
      */
     public double getSynapticInput() {
         double wtdSum = inputValue;
@@ -733,7 +752,7 @@ public class Neuron {
     public List<Synapse> getFanInList() {
         // Pre-allocating for speed
         List<Synapse> syns =
-            new ArrayList<Synapse>((int) (fanIn.size() / 0.75));
+                new ArrayList<Synapse>((int) (fanIn.size() / 0.75));
         for (Synapse s : fanIn) {
             syns.add(s);
         }
@@ -751,7 +770,7 @@ public class Neuron {
     public List<Synapse> getFanOutList() {
         // Pre-allocating for speed
         List<Synapse> syns = new ArrayList<Synapse>(
-            (int) (fanOut.size() / 0.75));
+                (int) (fanOut.size() / 0.75));
         for (Synapse s : fanOut.values()) {
             syns.add(s);
         }
@@ -785,8 +804,8 @@ public class Neuron {
     @Override
     public String toString() {
         return "Neuron [" + getId() + "] " + getType() + "  Activation = "
-            + this.getActivation() + "  Location = (" + this.x + ","
-            + this.y + ")";
+                + this.getActivation() + "  Location = (" + this.x + ","
+                + this.y + ")";
     }
 
     /**
@@ -908,7 +927,7 @@ public class Neuron {
     public void randomizeBias(double lower, double upper) {
         if (this.getUpdateRule() instanceof BiasedUpdateRule) {
             ((BiasedUpdateRule) this.getUpdateRule()).setBias((upper - lower)
-                * Math.random() + lower);
+                    * Math.random() + lower);
         }
     }
 
@@ -1089,20 +1108,20 @@ public class Neuron {
         this.polarity = polarity;
     }
 
-	public boolean isSpike() {
-		return spike;
-	}
+    public boolean isSpike() {
+        return spike;
+    }
 
-	public void setSpike(boolean spike) {
-		this.spike = spike;
-	}
+    public void setSpike(boolean spike) {
+        this.spike = spike;
+    }
 
-	public boolean getSpkBuffer() {
-		return spkBuffer;
-	}
+    public boolean getSpkBuffer() {
+        return spkBuffer;
+    }
 
-	public void setSpkBuffer(boolean spkBuffer) {
-		this.spkBuffer = spkBuffer;
-	}
+    public void setSpkBuffer(boolean spkBuffer) {
+        this.spkBuffer = spkBuffer;
+    }
 
 }

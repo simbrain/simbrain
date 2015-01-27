@@ -321,7 +321,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      * @param polarity
      */
     public void fillFieldValues(SynapseGroup synapseGroup, Polarity polarity) {
-        
+
         Set<Synapse> synSet = null;
         if (Polarity.EXCITATORY == polarity) {
             if (synapseGroup.hasExcitatory()) {

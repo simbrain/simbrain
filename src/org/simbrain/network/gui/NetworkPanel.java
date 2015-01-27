@@ -141,6 +141,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the
@@ -650,10 +651,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupParameterChanged(NetworkEvent<Group> event) {
-                if(!guiOn) {
+                if (!guiOn) {
                     return;
                 }
-
                 if (event.getObject() instanceof NeuronGroup) {
                     NeuronGroupNode node = (NeuronGroupNode) objectNodeMap
                         .get(event.getObject());
@@ -661,10 +661,14 @@ public class NetworkPanel extends JPanel {
                         node.updateText();
                     }
                 } else if (event.getObject() instanceof SynapseGroup) {
-                    SynapseGroupNode node = (SynapseGroupNode) objectNodeMap
-                        .get(event.getObject());
+                    // TODO: Address the whole snyapse group arrow situation
+                    Object node =  objectNodeMap.get(event.getObject());
                     if (node != null) {
-                        node.updateText();
+                        if (node instanceof SynapseGroupNode) {
+                            ((SynapseGroupNode) node).updateText();
+                        } else {
+                            ((SynapseGroupNodeBidirectional) node).updateText();
+                        }
                     }
                 } else if (event.getObject() instanceof Subnetwork) {
                     SubnetworkNode node = (SubnetworkNode) objectNodeMap
@@ -677,7 +681,7 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void groupUpdated(Group group) {
-                if(!guiOn) {
+                if (!guiOn) {
                     return;
                 }
                 updateGroupNode(group);
@@ -1798,6 +1802,7 @@ public class NetworkPanel extends JPanel {
     public void showSelectedNeuronProperties() {
         NeuronDialog dialog = NeuronDialog
             .createNeuronDialog(getSelectedNeurons());
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -1810,6 +1815,7 @@ public class NetworkPanel extends JPanel {
     public void showSelectedSynapseProperties() {
         SynapseDialog dialog = SynapseDialog.createSynapseDialog(this
             .getSelectedModelSynapses());
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -2926,6 +2932,18 @@ public class NetworkPanel extends JPanel {
     	return sgd;
     }
 
+    public StandardDialog getNeuronDialog(Collection<NeuronNode> nns) {
+        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns);
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
+    }
+
+    public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(sns);
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
+    }
+    
     /**
      * Remove all nodes from panel.
      */

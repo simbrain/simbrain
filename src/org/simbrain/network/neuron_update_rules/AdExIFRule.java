@@ -1,14 +1,48 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
+/**
+ *
+ * An implementation of adaptive exponential integrate and fire. This version
+ * of integrate and fire includes an exponential term as a part of the
+ * differential equation as well as an adaptation term which lowers the
+ * membrane potential in response to successive spikes.
+ * See Toboul & Brette 2005.
+ *
+ * @author Zach Tosi
+ *
+ */
 public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		NoisyUpdateRule {
 
+    /**
+     * A converter from pA to nA, since most other sims in Simbrain use
+     * nano Amps.
+     */
 	public static final double CURRENT_CONVERTER = 1000;
 
 	/**
@@ -16,7 +50,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 	 * current. See Touboul & Brette 2005 -48.5: 2 spike burst -47.2: 4 spike
 	 * burst -48: chaotic spike response
 	 */
-	private double v_Reset = -47.7; //
+	private double v_Reset = -47.7;
 
 	/**
 	 * Threshold voltage (mV). This determines when a neuron will start a
@@ -74,15 +108,28 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 	/** Background current being directly injected into the neuron (nA). */
 	private double i_bg = 0;
 
+	/** An option to add noise. */
 	private boolean addNoise = false;
 
+	/** The noise generator randomizer. */
 	private Randomizer noiseGenerator = new Randomizer();
+
+	/**
+	 * An absolute refractory period. Not normally a part of AdEx, but can
+	 * optionally be used to promote network stability.
+	 */
+	private double refractoryPeriod = 1.0;
 
 	@Override
 	public void update(Neuron neuron) {
+	    // Retrieve integration time constant in case it has changed...
+        final double dt = neuron.getNetwork().getTimeStep();
+//        final double ref = neuron.getNetwork().getTimeType()
+//                == TimeType.DISCRETE ? refractoryPeriod / dt
+//                        : refractoryPeriod;
+        final boolean refractory = getLastSpikeTime() + refractoryPeriod
+                >= neuron.getNetwork().getTime();
 
-		// Retrieve integration time constant in case it has changed...
-		double dt = neuron.getNetwork().getTimeStep();
 
 		// Retrieve membrane potential from host neuron's activation
 		// in case some outside entity has explicitly changed the membrane
@@ -99,12 +146,12 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		// Calculate voltage changes due to leak
 		double i_leak = g_L * (leakReversal - v_mem);
 
-		// Calc dV/dt for membrane potential
-		double dVdt = (g_L * slopeFactor * Math.exp((v_mem - v_Th)
-				/ slopeFactor))
-				+ i_leak + iSyn_ex + iSyn_in + i_bg - w;
+        // Calc dV/dt for membrane potential
+        double dVdt = (g_L * slopeFactor * Math.exp((v_mem - v_Th)
+                / slopeFactor))
+                + i_leak + iSyn_ex + iSyn_in + i_bg - w + getAppliedInput();
 
-		// Add noise if there is any to be added
+        // Add noise if there is any to be added
 		if (addNoise) {
 			dVdt += noiseGenerator.getRandom();
 		}
@@ -124,8 +171,13 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		if (v_mem >= v_Peak) {
 			v_mem = v_Reset;
 			w = w + (b * CURRENT_CONVERTER);
-			neuron.setSpkBuffer(true);
-			setHasSpiked(true, neuron);
+			if (!refractory) {
+			    neuron.setSpkBuffer(true);
+			    setHasSpiked(true, neuron);
+			} else {
+			    neuron.setSpkBuffer(false);
+	            setHasSpiked(false, neuron);
+			}
 		} else {
 			neuron.setSpkBuffer(false);
 			setHasSpiked(false, neuron);
@@ -333,5 +385,13 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 	public void setInReversal(double inReversal) {
 		this.inReversal = inReversal;
 	}
+
+    public double getRefractoryPeriod() {
+        return refractoryPeriod;
+    }
+
+    public void setRefractoryPeriod(double refractoryPeriod) {
+        this.refractoryPeriod = refractoryPeriod;
+    }
 
 }

@@ -20,6 +20,7 @@ package org.simbrain.network.desktop;
 
 import java.awt.Color;
 import java.awt.Dialog;
+import java.util.Collection;
 
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -36,6 +37,8 @@ import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
+import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
@@ -78,7 +81,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      *            the neural network model
      */
     public NetworkPanelDesktop(final NetworkDesktopComponent component,
-        final Network Network) {
+            final Network Network) {
         super(Network);
         this.component = component;
 
@@ -100,29 +103,29 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public void applyUserPrefsToNetwork() {
         try {
             NetworkPanel.setBackgroundColor(new Color(SimbrainPreferences
-                .getInt("networkBackgroundColor")));
+                    .getInt("networkBackgroundColor")));
             EditMode.setWandRadius(SimbrainPreferences
-                .getInt("networkWandRadius"));
+                    .getInt("networkWandRadius"));
             NetworkPanel.setNudgeAmount(SimbrainPreferences
-                .getDouble("networkNudgeAmount"));
+                    .getDouble("networkNudgeAmount"));
             Network.setSynapseVisibilityThreshold(SimbrainPreferences
-                .getInt("networkSynapseVisibilityThreshold"));
+                    .getInt("networkSynapseVisibilityThreshold"));
             NeuronNode.setHotColor(SimbrainPreferences
-                .getFloat("networkHotNodeColor"));
+                    .getFloat("networkHotNodeColor"));
             NeuronNode.setCoolColor(SimbrainPreferences
-                .getFloat("networkCoolNodeColor"));
+                    .getFloat("networkCoolNodeColor"));
             NeuronNode.setSpikingColor(new Color(SimbrainPreferences
-                .getInt("networkSpikingColor")));
+                    .getInt("networkSpikingColor")));
             SynapseNode.setExcitatoryColor(new Color(SimbrainPreferences
-                .getInt("networkExcitatorySynapseColor")));
+                    .getInt("networkExcitatorySynapseColor")));
             SynapseNode.setInhibitoryColor(new Color(SimbrainPreferences
-                .getInt("networkInhibitorySynapseColor")));
+                    .getInt("networkInhibitorySynapseColor")));
             SynapseNode.setZeroWeightColor(new Color(SimbrainPreferences
-                .getInt("networkZeroWeightColor")));
+                    .getInt("networkZeroWeightColor")));
             SynapseNode.setMaxDiameter(SimbrainPreferences
-                .getInt("networkSynapseMaxSize"));
+                    .getInt("networkSynapseMaxSize"));
             SynapseNode.setMinDiameter(SimbrainPreferences
-                .getInt("networkSynapseMinSize"));
+                    .getInt("networkSynapseMinSize"));
             resetColors();
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();
@@ -289,77 +292,120 @@ public class NetworkPanelDesktop extends NetworkPanel {
             PotentialConsumer consumer = NetworkComponent.getNeuronConsumer(
                     component.getWorkspaceComponent(), neuron, "setInputValue");
             JMenu producerMenu = new CouplingMenuProducer(
-                "Send Scalar Coupling to", workspace, producer);
+                    "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);
             JMenu consumerMenu = new CouplingMenuConsumer(
-                "Receive Scalar Coupling from", workspace, consumer);
+                    "Receive Scalar Coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;
     }
 
     /**
-     * Creates a modeless version of the neuron group dialog relative to
-     * the SimbrainDesktop.
+     * Creates a modeless version of the neuron group dialog relative to the
+     * SimbrainDesktop.
      */
     @Override
     public StandardDialog getNeuronGroupDialog(final NeuronGroupNode node) {
-    	// TODO: Why is there this map in SimbrainDesktop? Shouldn't there
-    	// only ever be one Simbrain Desktop?
-    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-    			.iterator().next();
-    	@SuppressWarnings("serial")
-		StandardDialog dialog = new StandardDialog(current.getFrame(),
-    			"Neuron Group Dialog") {
-    		private final NeuronGroupPanel panel;
-    		{
-    			panel = NeuronGroupPanel.createNeuronGroupPanel(
-    					node.getNetworkPanel(), node.getNeuronGroup(), this);
-    			setContentPane(panel);
-    		}
+        // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
+        // only ever be one Simbrain Desktop?
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+                .iterator().next();
+        @SuppressWarnings("serial")
+        StandardDialog dialog = new StandardDialog(current.getFrame(),
+                "Neuron Group Dialog") {
+            private final NeuronGroupPanel panel;
+            {
+                panel = NeuronGroupPanel.createNeuronGroupPanel(
+                        node.getNetworkPanel(), node.getNeuronGroup(), this);
+                setContentPane(panel);
+            }
 
-    		@Override
-    		protected void closeDialogOk() {
-    			super.closeDialogOk();
-    			panel.commitChanges();
-    		}
-    	};
-    	dialog.setAsDoneDialog();
-    	dialog.setModalityType(Dialog.ModalityType.MODELESS);
-    	return dialog;
+            @Override
+            protected void closeDialogOk() {
+                super.closeDialogOk();
+                panel.commitChanges();
+            }
+        };
+        dialog.setAsDoneDialog();
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
     }
 
     /**
-     * Creates a modeless version of the synapse group dialog relative to
-     * the SimbrainDesktop.
+     * Creates a modeless version of the synapse group dialog relative to the
+     * SimbrainDesktop.
      */
     @Override
     public StandardDialog getSynapseGroupDialog(
-    		SynapseGroupInteractionBox sgib) {
-    	// TODO: Why is there this map in SimbrainDesktop? Shouldn't there
-    	// only ever be one Simbrain Desktop?
-    	SimbrainDesktop current = SimbrainDesktop.getInstances().values()
-    			.iterator().next();
-    	SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(
-    			current.getFrame(), this, sgib.getSynapseGroup());
-    	sgd.setModalityType(Dialog.ModalityType.MODELESS);
-    	return sgd;
+            SynapseGroupInteractionBox sgib) {
+        // TODO: Why is there this map in SimbrainDesktop? Shouldn't there
+        // only ever be one Simbrain Desktop?
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+                .iterator().next();
+        SynapseGroupDialog sgd = SynapseGroupDialog.createSynapseGroupDialog(
+                current.getFrame(), this, sgib.getSynapseGroup());
+        sgd.setModalityType(Dialog.ModalityType.MODELESS);
+        return sgd;
     }
-    
+
+    @Override
+    public StandardDialog getNeuronDialog(Collection<NeuronNode> nns) {
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+                .iterator().next();
+        NeuronDialog dialog = NeuronDialog.createNeuronDialog(nns,
+                current.getFrame());
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
+    }
+
+    @Override
+    public StandardDialog getSynapseDialog(Collection<SynapseNode> sns) {
+        SimbrainDesktop current = SimbrainDesktop.getInstances().values()
+                .iterator().next();
+        SynapseDialog dialog = SynapseDialog.createSynapseDialog(sns,
+                current.getFrame());
+        dialog.setModalityType(Dialog.ModalityType.MODELESS);
+        return dialog;
+    }
+
+    /**
+     * Creates and displays the neuron properties dialog.
+     */
+    @Override
+    public void showSelectedNeuronProperties() {
+        StandardDialog dialog = getNeuronDialog(getSelectedNeurons());
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Creates and displays the synapse properties dialog.
+     */
+    @Override
+    public void showSelectedSynapseProperties() {
+        StandardDialog dialog = getSynapseDialog(getSelectedSynapses());
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+    }
+
     @Override
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
 
         if (component.getWorkspaceComponent() != null) {
             PotentialProducer producer = component
-                .getWorkspaceComponent()
-                .getAttributeManager()
-                .createPotentialProducer(neuronGroup, "getActivations",
-                    double[].class);
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(neuronGroup, "getActivations",
+                            double[].class);
             producer.setCustomDescription("Neuron Group: "
-                + neuronGroup.getLabel());
+                    + neuronGroup.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                "Send Vector Coupling to", component
-                    .getWorkspaceComponent().getWorkspace(), producer);
+                    "Send Vector Coupling to", component
+                            .getWorkspaceComponent().getWorkspace(), producer);
             return producerMenu;
         }
         return null;
@@ -369,15 +415,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public JMenu getNeuronGroupConsumerMenu(NeuronGroup neuronGroup) {
         if (component.getWorkspaceComponent() != null) {
             PotentialConsumer consumer = component
-                .getWorkspaceComponent()
-                .getAttributeManager()
-                .createPotentialConsumer(neuronGroup, "setInputValues",
-                    double[].class);
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialConsumer(neuronGroup, "setInputValues",
+                            double[].class);
             consumer.setCustomDescription("Neuron Group: "
-                + neuronGroup.getLabel());
+                    + neuronGroup.getLabel());
             JMenu menu = new CouplingMenuConsumer(
-                "Receive Vector Coupling from", component
-                    .getWorkspaceComponent().getWorkspace(), consumer);
+                    "Receive Vector Coupling from", component
+                            .getWorkspaceComponent().getWorkspace(), consumer);
             return menu;
         }
         return null;
@@ -387,14 +433,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public JMenu getSynapseGroupProducerMenu(SynapseGroup sg) {
         if (component.getWorkspaceComponent() != null) {
             PotentialProducer producer = component
-                .getWorkspaceComponent()
-                .getAttributeManager()
-                .createPotentialProducer(sg, "getWeightVector",
-                    double[].class);
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(sg, "getWeightVector",
+                            double[].class);
             producer.setCustomDescription("Synapse Group: " + sg.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                "Send Vector Coupling to", component
-                    .getWorkspaceComponent().getWorkspace(), producer);
+                    "Send Vector Coupling to", component
+                            .getWorkspaceComponent().getWorkspace(), producer);
             return producerMenu;
         }
         return null;

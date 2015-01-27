@@ -52,7 +52,7 @@ import org.simbrain.util.widgets.EditablePanel;
  */
 @SuppressWarnings("serial")
 public class ConnectionSynapsePropertiesPanel extends JPanel implements
-    EditablePanel {
+        EditablePanel {
 
     /**
      * A synapse info panel containing basic synapse properties and synapse
@@ -66,15 +66,15 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      */
     private SynapsePropertiesPanel inhibitoryInfoPanel;
 
-    /** 
+    /**
      * The apply panel associated with using {@link #excitatoryInfoPanel} for
-     * editing. 
+     * editing.
      */
     private ApplyPanel exApplyPanel;
 
-    /** 
+    /**
      * The apply panel associated with using {@link #inhibitoryInfoPanel} for
-     * editing. 
+     * editing.
      */
     private ApplyPanel inApplyPanel;
 
@@ -106,11 +106,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * @return
      */
     public static ConnectionSynapsePropertiesPanel
-        createSynapsePropertiesPanel(
-            final Window parent, final SynapseGroup synapseGroup) {
+            createSynapsePropertiesPanel(
+                    final Window parent, final SynapseGroup synapseGroup) {
         ConnectionSynapsePropertiesPanel spp =
-            new ConnectionSynapsePropertiesPanel(parent,
-                synapseGroup);
+                new ConnectionSynapsePropertiesPanel(parent,
+                        synapseGroup);
         if (!spp.creationPanel) {
             spp.initApplyListeners();
         }
@@ -124,11 +124,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * @return
      */
     public static ConnectionSynapsePropertiesPanel
-        createSynapsePropertiesPanel(
-            final Window parent, final Collection<Synapse> synapses) {
+            createSynapsePropertiesPanel(
+                    final Window parent, final Collection<Synapse> synapses) {
         ConnectionSynapsePropertiesPanel spp =
-            new ConnectionSynapsePropertiesPanel(parent,
-                synapses);
+                new ConnectionSynapsePropertiesPanel(parent,
+                        synapses);
         if (!spp.creationPanel) {
             spp.initApplyListeners();
         }
@@ -142,10 +142,10 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * @return
      */
     public static ConnectionSynapsePropertiesPanel
-        createSynapsePropertiesPanel(
-            final Window parent) {
+            createSynapsePropertiesPanel(
+                    final Window parent) {
         ConnectionSynapsePropertiesPanel spp =
-            new ConnectionSynapsePropertiesPanel(parent);
+                new ConnectionSynapsePropertiesPanel(parent);
         if (!spp.creationPanel) {
             spp.initApplyListeners();
         }
@@ -158,7 +158,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * @param synapseGroup
      */
     private ConnectionSynapsePropertiesPanel(final Window parentWindow,
-        final SynapseGroup synapseGroup) {
+            final SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
         creationPanel = synapseGroup.isEmpty();
         templateExcitatorySynapse = synapseGroup.getExcitatoryPrototype();
@@ -166,47 +166,63 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         Set<Synapse> excitatorySynapses;
         Set<Synapse> inhibitorySynapses;
         if (!synapseGroup.hasExcitatory()
-        		|| synapseGroup.isUseGroupLevelSettings()) {
-        	excitatorySynapses = Collections
-        			.singleton(templateExcitatorySynapse);
+                || synapseGroup.isUseGroupLevelSettings()) {
+            excitatorySynapses = Collections
+                    .singleton(templateExcitatorySynapse);
+            double exDelay = templateExcitatorySynapse.getDelay();
+            for (Synapse s : synapseGroup.getExcitatorySynapses()) {
+                if (s.getDelay() != exDelay) {
+                    templateExcitatorySynapse.setDelay(-1);
+                    break;
+                }
+            }
         } else {
-        	excitatorySynapses = synapseGroup.getExcitatorySynapses();
-        	// Ensures that the template is also edited
-        	excitatorySynapses.add(templateExcitatorySynapse);
+            excitatorySynapses = synapseGroup.getExcitatorySynapses();
+            // Ensures that the template is also edited
+            excitatorySynapses.add(templateExcitatorySynapse);
         }
         if (!synapseGroup.hasInhibitory()
-        		|| synapseGroup.isUseGroupLevelSettings()) {
-        	inhibitorySynapses = Collections
-        			.singleton(templateInhibitorySynapse);
+                || synapseGroup.isUseGroupLevelSettings()) {
+            inhibitorySynapses = Collections
+                    .singleton(templateInhibitorySynapse);
+            double inDelay = templateInhibitorySynapse.getDelay();
+            for (Synapse s : synapseGroup.getInhibitorySynapses()) {
+                if (s.getDelay() != inDelay) {
+                    templateInhibitorySynapse.setDelay(-1);
+                    break;
+                }
+            }
         } else {
-        	inhibitorySynapses = synapseGroup.getInhibitorySynapses();
-        	// Ensures that the template is also edited
-        	inhibitorySynapses.add(templateInhibitorySynapse);
+            inhibitorySynapses = synapseGroup.getInhibitorySynapses();
+            // Ensures that the template is also edited
+            inhibitorySynapses.add(templateInhibitorySynapse);
         }
         if (creationPanel) {
-	        excitatoryInfoPanel = SynapsePropertiesPanel
-	            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
-	        inhibitoryInfoPanel = SynapsePropertiesPanel
-	            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+            excitatoryInfoPanel = SynapsePropertiesPanel
+                    .createSynapsePropertiesPanel(excitatorySynapses,
+                            parentWindow);
+            inhibitoryInfoPanel = SynapsePropertiesPanel
+                    .createSynapsePropertiesPanel(inhibitorySynapses,
+                            parentWindow);
         } else {
-        	excitatoryInfoPanel = SynapsePropertiesPanel
-        			.createBlankSynapsePropertiesPanel(excitatorySynapses,
-        					parentWindow, false);
-        	inhibitoryInfoPanel = SynapsePropertiesPanel
-        			.createBlankSynapsePropertiesPanel(inhibitorySynapses,
-        					parentWindow, false);
-        	excitatoryInfoPanel.fillFieldValues(synapseGroup,
-        			Polarity.EXCITATORY);
-        	inhibitoryInfoPanel.fillFieldValues(synapseGroup,
-        			Polarity.INHIBITORY);
-        	excitatoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
-        			SynapseDialog.targsUseSynapticInputs(synapseGroup
-        					.getExcitatorySynapses()));
-        	inhibitoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
-        			SynapseDialog.targsUseSynapticInputs(synapseGroup
-        					.getInhibitorySynapses()));
+            excitatoryInfoPanel = SynapsePropertiesPanel
+                    .createBlankSynapsePropertiesPanel(excitatorySynapses,
+                            parentWindow, false);
+            inhibitoryInfoPanel = SynapsePropertiesPanel
+                    .createBlankSynapsePropertiesPanel(inhibitorySynapses,
+                            parentWindow, false);
+//            excitatoryInfoPanel.fillFieldValues(synapseGroup,
+//                    Polarity.EXCITATORY);
+//            inhibitoryInfoPanel.fillFieldValues(synapseGroup,
+//                    Polarity.INHIBITORY);
+            excitatoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
+                    SynapseDialog.targsUseSynapticInputs(synapseGroup
+                            .getExcitatorySynapses()));
+            inhibitoryInfoPanel.getEditSpikeRespondersPanel().setEnabled(
+                    SynapseDialog.targsUseSynapticInputs(synapseGroup
+                            .getInhibitorySynapses()));
         }
-	    init();
+        init();
     }
 
     /**
@@ -215,7 +231,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
      * @param synapses
      */
     private ConnectionSynapsePropertiesPanel(final Window parentWindow,
-        final Collection<Synapse> synapses) {
+            final Collection<Synapse> synapses) {
         synapseGroup = null;
         templateExcitatorySynapse = Synapse.getTemplateSynapse();
         templateInhibitorySynapse = Synapse.getTemplateSynapse();
@@ -224,19 +240,19 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         Collection<Synapse> inhibitorySynapses;
         if (!creationPanel) {
             excitatorySynapses = ConnectionUtilities
-                .getExcitatorySynapses(synapses);
+                    .getExcitatorySynapses(synapses);
             inhibitorySynapses = ConnectionUtilities
-                .getInhibitorySynapses(synapses);
+                    .getInhibitorySynapses(synapses);
         } else {
             excitatorySynapses = Collections.singleton(
-                getTemplateExcitatorySynapse());
+                    getTemplateExcitatorySynapse());
             inhibitorySynapses = Collections.singleton(
-                getTemplateInhibitorySynapse());
+                    getTemplateInhibitorySynapse());
         }
         excitatoryInfoPanel = SynapsePropertiesPanel
-            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
+                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
-            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 
@@ -252,19 +268,19 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         templateExcitatorySynapse = Synapse.getTemplateSynapse();
         templateInhibitorySynapse = Synapse.getTemplateSynapse();
         templateExcitatorySynapse.setStrength(
-            ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
+                ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
         templateInhibitorySynapse.setStrength(
-            ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
+                ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
         Collection<Synapse> excitatorySynapses;
         Collection<Synapse> inhibitorySynapses;
         excitatorySynapses = Collections.singleton(
-            getTemplateExcitatorySynapse());
+                getTemplateExcitatorySynapse());
         inhibitorySynapses = Collections.singleton(
-            getTemplateInhibitorySynapse());
+                getTemplateInhibitorySynapse());
         excitatoryInfoPanel = SynapsePropertiesPanel
-            .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
+                .createSynapsePropertiesPanel(excitatorySynapses, parentWindow);
         inhibitoryInfoPanel = SynapsePropertiesPanel
-            .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
+                .createSynapsePropertiesPanel(inhibitorySynapses, parentWindow);
         init();
     }
 
@@ -274,15 +290,15 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
     private void init() {
         // Excitatory Border
         Border redBorder =
-            BorderFactory.createLineBorder(Color.RED);
+                BorderFactory.createLineBorder(Color.RED);
         Border exBorder = BorderFactory.createTitledBorder(redBorder,
-            "Excitatory");
+                "Excitatory");
 
         // Inhibitory Border
         Border blueBorder =
-            BorderFactory.createLineBorder(Color.BLUE);
+                BorderFactory.createLineBorder(Color.BLUE);
         Border inBorder = BorderFactory.createTitledBorder(blueBorder,
-            "Inhibitory");
+                "Inhibitory");
 
         // Layout panels
         BoxLayout bxLayout = new BoxLayout(mainPanel, BoxLayout.X_AXIS);
@@ -334,11 +350,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             public void actionPerformed(ActionEvent arg0) {
                 excitatoryInfoPanel.commitChanges();
                 if (synapseGroup.isUseGroupLevelSettings()) {
-                	synapseGroup.setAndConformToTemplate(
-                			templateExcitatorySynapse, Polarity.EXCITATORY);
-                	double exStr = excitatoryInfoPanel.getStrength();
+                    synapseGroup.setAndConformToTemplate(
+                            templateExcitatorySynapse, Polarity.EXCITATORY);
+                    double exStr = excitatoryInfoPanel.getStrength();
                     if (!Double.isNaN(exStr)) {
-                    	synapseGroup.setStrength(exStr, Polarity.EXCITATORY);
+                        synapseGroup.setStrength(exStr, Polarity.EXCITATORY);
                     }
                 }
             }
@@ -348,11 +364,11 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
             public void actionPerformed(ActionEvent e) {
                 inhibitoryInfoPanel.commitChanges();
                 if (synapseGroup.isUseGroupLevelSettings()) {
-                	synapseGroup.setAndConformToTemplate(
-                			templateInhibitorySynapse, Polarity.INHIBITORY);
+                    synapseGroup.setAndConformToTemplate(
+                            templateInhibitorySynapse, Polarity.INHIBITORY);
                     double inStr = inhibitoryInfoPanel.getStrength();
                     if (!Double.isNaN(inStr)) {
-                    	synapseGroup.setStrength(inStr, Polarity.INHIBITORY);
+                        synapseGroup.setStrength(inStr, Polarity.INHIBITORY);
                     }
                 }
 
@@ -361,8 +377,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
     }
 
     /**
-     * Add a special action to the "apply" action for editing excitatory 
+     * Add a special action to the "apply" action for editing excitatory
      * synapses.
+     * 
      * @param l
      */
     public void addApplyListenerEx(ActionListener l) {
@@ -372,6 +389,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
     /**
      * Add a special action to the "apply" action for editing inhibitory
      * synapses
+     * 
      * @param l
      */
     public void addApplyListenerIn(ActionListener l) {
@@ -387,15 +405,15 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
         success &= inhibitoryInfoPanel.commitChanges();
         if (synapseGroup != null) {
             synapseGroup.setAndConformToTemplate(templateExcitatorySynapse,
-                Polarity.EXCITATORY);
+                    Polarity.EXCITATORY);
             synapseGroup.setAndConformToTemplate(templateInhibitorySynapse,
-                Polarity.INHIBITORY);
+                    Polarity.INHIBITORY);
         }
         // Ensure that strengths have been set within appropriate boundaries...
         templateExcitatorySynapse.setStrength( // Always positive
-            Math.abs(templateExcitatorySynapse.getStrength()));
+                Math.abs(templateExcitatorySynapse.getStrength()));
         templateInhibitorySynapse.setStrength( // Always negative
-            -Math.abs(templateInhibitorySynapse.getStrength()));
+                -Math.abs(templateInhibitorySynapse.getStrength()));
         return success;
     }
 

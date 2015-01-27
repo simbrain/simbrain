@@ -63,14 +63,14 @@ div.section
 	border: solid 1px #628596; 
 }
 	
-div.intial
+div.initial
 { 
 	background: #f2f2e4; 
 	margin: 40px 20px 60px; 
 	padding: 12px; 
 	width: auto; 
 	height: auto; 
-	float: right; 
+	/*float: right; */
 	border: solid 1px #628596; 
 }
 
@@ -200,12 +200,6 @@ P.bold
 	font-weight: bolder;
 }
 
-a:link
-{ 
-	color: #679; 
-	text-decoration: underline;
-}
-
 #menu a:link
 {
  	color: #628596; 
@@ -216,6 +210,12 @@ a:link
 {
  	color: #628596; 
 	text-decoration: none;
+}
+
+a:link
+{ 
+	color: #679; 
+	text-decoration: underline;
 }
 
 a:visited

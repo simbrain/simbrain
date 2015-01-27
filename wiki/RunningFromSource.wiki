@@ -36,7 +36,7 @@ See: http://ant.apache.org/manual/install.html
 
 == Subversion ==
 
-Download and install subversion [http://subversion.apache.org/packages.html here]. Windows users click on "windows binaries", Mac users click on "Mac OS X binaries", etc.   SlikSVN appears to work well for Windows.  For Mac use brew (see "Note to Mac Users") below)
+Download and install subversion [http://subversion.apache.org/packages.html here]. Windows users click on "windows binaries", Mac users click on "Mac OS X binaries", etc.   SlikSVN appears to work well for Windows.  For Mac use brew (see "Note to Mac Users" below)
 
 == Getting the Code ===
 

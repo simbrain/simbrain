@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <a href="../SimbrainDocs.html">
+    <a href="../../../SimbrainDocs.html">
         <div class="logo">
             <p><span></span>
             </p>
@@ -40,11 +40,10 @@
                 <p><span class="heading2"><a name="randomize"></a>Randomize:</span> Randomizes selected cell(s) in the table by sampling from an uniform distribution. </p>
                 <p><span class="heading2">Randomization Bounds: </span>Adjusts the upper and lower limit for randomization of the data in the table.</p>
             </blockquote>
-            <p> <span class="heading2">Normalize Column(s): </span>Adjusts the values in a column to an uniform distribution. </p>
-            <p> <span class="heading2">Shuffle Rows:</span> Reorganizes the rows of the table. </p>
+            <p> <span class="heading2">Normalize Column(s): </span><a href="http://en.wikipedia.org/wiki/Feature_scaling">Rescales</a> the values in a column using maximum and minimum values so that they all lie in the range [0,1].</p>
+            <p> <span class="heading2">Shuffle Rows:</span> Randomly permute the rows of the table.</p>
             <p> <span class="heading2">Iteration Mode</span>: When a table is in iteration mode, every time a network it is coupled to is iterated, the selected row moves forward. Running a coupled network thereby has the effect of iterating through the entire set of columns. This feature allows one to create a specific sequence of inputs to a network and repeatedly deliver it. </p>
-            <!--  <p><span class="heading2">Use Last Column (only used in iteration mode) </span>: If selected, then when the dataworld is in iteration mode, the last column indicates how many times the network uses that row before iterating to the next row.</p>-->
-
+ 
             </blockquote>
 
             <p class="heading"><a name="popup"></a>Pop-up Menu</p>

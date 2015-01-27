@@ -40,7 +40,7 @@ Download and install subversion [http://subversion.apache.org/packages.html here
 
 == Getting the Code ===
 
-Once subversion is installed, check out the latest version of Simbrain by following the directions  here: [http://code.google.com/p/simbrain/source/checkout here]
+Once subversion is installed, check out the latest version of Simbrain by following the directions [http://code.google.com/p/simbrain/source/checkout here]
 
 == Note for Mac Users ==
 

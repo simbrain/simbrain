@@ -1,4 +1,4 @@
 import numpy
-numVals = 26;
-ones = numpy.diag(numpy.ones(26))
-numpy.savetxt("orthongoal_" + str(numVals) + ".csv", ones ,fmt='%i', delimiter=",")
+numVals = int(raw_input("Number of dimensions: "))
+ones = numpy.diag(numpy.ones(numVals))
+numpy.savetxt("orthogonal_" + str(numVals) + ".csv", ones ,fmt='%i', delimiter=",")

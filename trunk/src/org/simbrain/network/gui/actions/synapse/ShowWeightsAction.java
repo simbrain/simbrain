@@ -48,7 +48,7 @@ public final class ShowWeightsAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION, "Show weights in GUI");
+        putValue(SHORT_DESCRIPTION, "Show weights in GUI (Use 5 to toggle)");
     }
 
     /** @see AbstractAction */

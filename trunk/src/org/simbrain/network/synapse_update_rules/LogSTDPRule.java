@@ -33,8 +33,13 @@ public class LogSTDPRule extends STDPRule {
         double delta_t, delta_w;
         final double timeStep = synapse.getNetwork().getTimeStep();
         final double delay = synapse.getDelay() * timeStep;
-        delta_t = (src.getLastSpikeTime() + delay)
-                - tar.getLastSpikeTime();
+        if (synapse.getStrength() >= 0) {
+            delta_t = (src.getLastSpikeTime() + delay)
+                    - tar.getLastSpikeTime();
+        } else {
+            delta_t = tar.getLastSpikeTime()
+                    - (src.getLastSpikeTime() + delay);
+        }
         double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
         if (delta_t < 0) {
             calcW_plusTerm(synapse);
@@ -63,8 +68,15 @@ public class LogSTDPRule extends STDPRule {
             if (s.getStrength() >= s.getUpperBound()) {
                 W_plus = 0;
             } else {
-                W_plus *= Math.exp(-s.getStrength()
-                        / (s.getUpperBound() - s.getStrength()));
+                W_plus *= Math.exp(-2 *Math.pow(s.getStrength()
+                        / (s.getUpperBound() - s.getStrength()), 2));
+            }
+        } else {
+            if (s.getStrength() <= s.getLowerBound()) {
+                W_plus = 0;
+            } else {
+                W_plus *= Math.exp(-2 *Math.pow(s.getStrength()
+                        / (s.getLowerBound() - s.getStrength()), 2));
             }
         }
         return W_plus;
@@ -81,11 +93,20 @@ public class LogSTDPRule extends STDPRule {
             W_minus = w_minus * (1 + (numerator / logSaturation));
         }
         if (s.getStrength() < 0) {
+            if (s.getStrength() >= s.getUpperBound()) {
+                W_minus = 0;
+            } else {
+                W_minus *= Math.exp(-2 * Math.pow((s.getLowerBound()
+                        - s.getStrength()) / (s.getUpperBound()
+                                - s.getStrength()), 2));
+            }
+        } else {
             if (s.getStrength() <= s.getLowerBound()) {
                 W_minus = 0;
             } else {
-                W_minus *= Math.exp(s.getStrength()
-                        / (s.getLowerBound() - s.getStrength()));
+                W_minus *= Math.exp(-2 * Math.pow((s.getUpperBound()
+                        - s.getStrength()) / (s.getLowerBound()
+                                - s.getStrength()), 2));
             }
         }
         return W_minus;

@@ -54,4 +54,12 @@ public interface NetworkListener {
      */
     void updateSynapses(Collection<Synapse> synapses);
 
+    /**
+     * A way to tell listeners that their update is incomplete signaling that
+     * they should update. Ideally this goes at the beginning of a network
+     * update call.
+     * @param b
+     */
+    void setUpdateComplete(boolean b);
+
 }

@@ -127,6 +127,9 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
             throw new IllegalArgumentException(
                     "The 'bins' value must be at least 1.");
         }
+        if (values.length == 0) {
+            return;
+        }
 
         if (dataMap.get(key) != null) {
             HistogramBin [] original = dataMap.get(key).data;

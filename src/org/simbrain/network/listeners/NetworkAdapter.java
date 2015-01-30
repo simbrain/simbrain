@@ -47,4 +47,8 @@ public class NetworkAdapter implements NetworkListener {
     public void updateSynapses(Collection<Synapse> synapses) {
     }
 
+    @Override
+    public void setUpdateComplete(boolean b) {
+    }
+
 }

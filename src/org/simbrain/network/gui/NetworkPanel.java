@@ -711,11 +711,14 @@ public class NetworkPanel extends JPanel {
             }
 
             @Override
-            public void groupsUpdated(Collection<Group> groups) {
+            public void groupUpdated(Group group) {
                 if (!guiOn) {
                     return;
                 }
-                updateGroupNodes(groups);
+                PNode groupNode = objectNodeMap.get(group);
+                if (groupNode != null) {
+                    ((GroupNode) groupNode).updateConstituentNodes();
+                }
             }
 
         });

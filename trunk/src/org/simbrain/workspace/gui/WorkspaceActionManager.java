@@ -188,7 +188,12 @@ public class WorkspaceActionManager {
 
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
-
+    
+    private static final String EXTERNAL_SOURCE_DIRECTORY =
+            "scripts/customSourceFiles";
+    
+    private static final int NUM_CUSTOM_SOURCE_FILES = 5;
+    
     /**
      * Create a new workspace action manager for the specified workspace.
      *
@@ -348,6 +353,16 @@ public class WorkspaceActionManager {
         public void actionPerformed(final ActionEvent event) {
 
             Interpreter interpreter = new Interpreter();
+            try {
+                for (int i = 0; i < NUM_CUSTOM_SOURCE_FILES; i++) {
+
+                    interpreter.source(EXTERNAL_SOURCE_DIRECTORY + "/source" + i
+                            + ".bsh");
+
+                }
+            } catch (IOException | EvalError e) {
+                e.printStackTrace();
+            }
 
             try {
                 interpreter.set("workspace", workspace);

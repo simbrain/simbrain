@@ -185,7 +185,9 @@ public class Network {
         // Fire update events for GUI update. Loose items, then groups.
         fireSynapsesUpdated(synapseList); // Loose synapses
         fireNeuronsUpdated(neuronList); // Loose neurons
-        fireGroupsUpdated(groupList); // Groups
+        for (Group g : getFlatGroupList()) {
+            fireGroupUpdated(g); // Groups
+        }
 
         // Clear input nodes
         clearInputs();
@@ -1486,12 +1488,12 @@ public class Network {
      * @param group
      *            reference to group that has been updated.
      */
-    public void fireGroupsUpdated(final Collection<Group> groups) {
+    public void fireGroupUpdated(final Group groups) {
         for (GroupListener listener : groupListeners) {
-            listener.groupsUpdated(groups);
+            listener.groupUpdated(groups);
         }
     }
-
+    
     @Override
     public String toString() {
 

@@ -533,8 +533,8 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         return;
     }
 
-	@Override
-	public void groupsUpdated(Collection<Group> group) {
-	}
+    @Override
+    public void groupUpdated(Group group) {
+    }
 
 }

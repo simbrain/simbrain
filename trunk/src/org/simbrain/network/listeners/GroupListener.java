@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.listeners;
 
+import java.util.Collection;
+
 import org.simbrain.network.groups.Group;
 
 /**

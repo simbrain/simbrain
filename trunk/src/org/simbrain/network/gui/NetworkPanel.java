@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
@@ -141,7 +143,6 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the
@@ -326,7 +327,7 @@ public class NetworkPanel extends JPanel {
     private ViewGroupNode vgn;
 
     /** Local thread flag for manually starting and stopping the network. */
-    private volatile boolean isRunning;
+    private AtomicBoolean isRunning = new AtomicBoolean();
 
     /** Toolbar panel. */
     private JPanel toolbars;
@@ -356,6 +357,13 @@ public class NetworkPanel extends JPanel {
     // "initial position". Cries out for some more encapsulated solution.
     private Point2D.Double whereToAdd = new Point2D.Double(0, 0);
 
+    
+    /** 
+     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update
+     * is complete.
+     */
+    private AtomicInteger updateComplete = new AtomicInteger(0);
+    
     /**
      * Create a new Network panel.
      */
@@ -528,6 +536,12 @@ public class NetworkPanel extends JPanel {
                     }
                 });
             }
+
+			@Override
+			public void setUpdateComplete(boolean updateComplete) {
+				NetworkPanel.this.setUpdateComplete(updateComplete);
+				
+			}
         });
 
         // Handle Neuron Events
@@ -635,6 +649,14 @@ public class NetworkPanel extends JPanel {
             public void groupChanged(final NetworkEvent<Group> e,
                 final String description) {
                 Group group = e.getObject();
+                PNode groupNode = objectNodeMap.get(group);
+                if (groupNode != null) {
+                	updateComplete.incrementAndGet();
+                	NetworkPanel.this.setRunning(true);
+                	((GroupNode) groupNode).updateConstituentNodes();
+                	NetworkPanel.this.setRunning(false);
+                	updateComplete.decrementAndGet();
+                }
                 if (description
                     .equals(SynapseGroupNode.SYNAPSE_VISIBILITY_CHANGED)) {
                     if (group instanceof SynapseGroup) {
@@ -654,13 +676,22 @@ public class NetworkPanel extends JPanel {
                 if (!guiOn) {
                     return;
                 }
-                if (event.getObject() instanceof NeuronGroup) {
+                Group group = event.getObject();
+                PNode groupNode = objectNodeMap.get(group);
+                if (groupNode != null) {
+                	updateComplete.incrementAndGet();
+                	NetworkPanel.this.setRunning(true);
+                	((GroupNode) groupNode).updateConstituentNodes();
+                	NetworkPanel.this.setRunning(false);
+                	updateComplete.decrementAndGet();
+                }
+                if (group instanceof NeuronGroup) {
                     NeuronGroupNode node = (NeuronGroupNode) objectNodeMap
                         .get(event.getObject());
                     if (node != null) {
                         node.updateText();
                     }
-                } else if (event.getObject() instanceof SynapseGroup) {
+                } else if (group instanceof SynapseGroup) {
                     // TODO: Address the whole snyapse group arrow situation
                     Object node =  objectNodeMap.get(event.getObject());
                     if (node != null) {
@@ -670,9 +701,9 @@ public class NetworkPanel extends JPanel {
                             ((SynapseGroupNodeBidirectional) node).updateText();
                         }
                     }
-                } else if (event.getObject() instanceof Subnetwork) {
+                } else if (group instanceof Subnetwork) {
                     SubnetworkNode node = (SubnetworkNode) objectNodeMap
-                        .get(event.getObject());
+                        .get(group);
                     if (node != null) {
                         node.updateText();
                     }
@@ -680,11 +711,11 @@ public class NetworkPanel extends JPanel {
             }
 
             @Override
-            public void groupUpdated(Group group) {
+            public void groupsUpdated(Collection<Group> groups) {
                 if (!guiOn) {
                     return;
                 }
-                updateGroupNode(group);
+                updateGroupNodes(groups);
             }
 
         });
@@ -703,8 +734,7 @@ public class NetworkPanel extends JPanel {
             node.update();
         }
         timeLabel.update();
-        network.setUpdateCompleted(true);
-
+        updateComplete.decrementAndGet();
     }
 
     /**
@@ -722,7 +752,7 @@ public class NetworkPanel extends JPanel {
             }
         }
         timeLabel.update();
-        network.setUpdateCompleted(true);
+        updateComplete.decrementAndGet();
     }
 
     /**
@@ -730,14 +760,17 @@ public class NetworkPanel extends JPanel {
      *
      * @param group the group to update
      */
-    private void updateGroupNode(Group group) {
+    private void updateGroupNodes(Collection<Group> groups) {
         // System.out.println("In update group node.  Updating group " + group);
-        PNode groupNode = objectNodeMap.get(group);
-        if (groupNode != null) {
-            ((GroupNode) groupNode).updateConstituentNodes();
-        }
+    	for (Group group : groups) {
+    		PNode groupNode = objectNodeMap.get(group);
+    		if (groupNode != null) {
+    			((GroupNode) groupNode).updateConstituentNodes();
+    		}
+    	}
+    	updateComplete.decrementAndGet();
     }
-
+    
     /**
      * Update visible state of all synapse nodes. This is not used much
      * internally, because it is preferred to updated the specific nodes that
@@ -753,7 +786,7 @@ public class NetworkPanel extends JPanel {
             }
         }
         timeLabel.update();
-        network.setUpdateCompleted(true);
+        updateComplete.decrementAndGet();
     }
 
     /**
@@ -773,7 +806,7 @@ public class NetworkPanel extends JPanel {
             }
         }
         timeLabel.update();
-        network.setUpdateCompleted(true);
+        updateComplete.decrementAndGet();
     }
 
     /**
@@ -2811,7 +2844,12 @@ public class NetworkPanel extends JPanel {
      */
     public void setGuiOn(final boolean guiOn) {
         if (guiOn) {
+        	this.setUpdateComplete(false);
             this.updateNeuronNodes();
+            this.updateSynapseNodes();
+            updateComplete.decrementAndGet();
+        } else {
+        	
         }
         this.guiOn = guiOn;
     }
@@ -2964,14 +3002,14 @@ public class NetworkPanel extends JPanel {
      * @return the isRunning
      */
     public boolean isRunning() {
-        return isRunning;
+        return isRunning.get();
     }
 
     /**
      * @param isRunning the isRunning to set
      */
     public void setRunning(boolean isRunning) {
-        this.isRunning = isRunning;
+    	this.isRunning.set(isRunning);
     }
 
     /**
@@ -3206,5 +3244,14 @@ public class NetworkPanel extends JPanel {
     public QuickConnectionManager getQuickConnector() {
         return quickConnector;
     }
+
+	public boolean getUpdateComplete() {
+		return updateComplete.get() == 0;
+	}
+
+	public void setUpdateComplete(boolean updateComplete) {
+		if (!updateComplete && this.updateComplete.get() != 0) { return; }
+		this.updateComplete.set(updateComplete ? 0 : 3);
+	}
 
 }

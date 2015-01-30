@@ -93,6 +93,9 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
 
     @Override
     public synchronized void layoutChildren() {
+    	if (networkPanel.isRunning()) {
+    		return;
+    	}
         if (halt.get())
             return;
         NeuronGroup ng = getSynapseGroup().getSourceNeuronGroup();

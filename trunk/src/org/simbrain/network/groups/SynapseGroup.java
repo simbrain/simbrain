@@ -1128,7 +1128,6 @@ public class SynapseGroup extends Group {
      * out of memory error for being to large.
      */
     public void saveToFileAsMatrix(String filename) throws OutOfMemoryError {
-        filename = System.getProperty("user.dir/").concat(filename);
         try (FileWriter fw = new FileWriter(filename);
                 PrintWriter pw = new PrintWriter(fw);)
         {
@@ -1153,7 +1152,6 @@ public class SynapseGroup extends Group {
      * indexes of the weights.
      */
     public void saveToFileAsIndexes(String filename) {
-        filename = System.getProperty("user.dir").concat(filename);
         try (FileWriter fw = new FileWriter(filename);
                 PrintWriter pw = new PrintWriter(fw);)
         {

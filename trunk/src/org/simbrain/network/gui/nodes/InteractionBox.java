@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
@@ -117,11 +118,16 @@ public class InteractionBox extends ScreenElement {
      * Update the text label bounds.
      */
     public void updateText() {
-        // Reset box bounds
-        textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(),
-                getBounds().getCenter2D().getY());
-        setBounds(textLabel.getBounds());
-        getNetworkPanel().repaint();
+    	SwingUtilities.invokeLater(new Runnable() {
+    		@Override
+    		public void run() {
+    			// Reset box bounds
+    			textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(),
+    					getBounds().getCenter2D().getY());
+    			setBounds(textLabel.getBounds());
+    			getNetworkPanel().repaint();
+    		}
+    	});
     }
 
     @Override
@@ -161,7 +167,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     public boolean isDraggable() {
-        return true;
+        return !getNetworkPanel().isRunning();
     }
 
     @Override

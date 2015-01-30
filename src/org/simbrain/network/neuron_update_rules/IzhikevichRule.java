@@ -46,7 +46,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     private double c = -65;
 
     /** D. */
-    private double d = 6;
+    private double d = 8;
 
     /** Constant background current. */
     private double iBg = 14;
@@ -64,7 +64,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
      * An optional absolute refractory period. In many simulations this
      * promotes network stability.
      */
-    private double refractoryPeriod = 1.0; //ms
+    private double refractoryPeriod = 0.0; //ms
 
     /**
      * {@inheritDoc}

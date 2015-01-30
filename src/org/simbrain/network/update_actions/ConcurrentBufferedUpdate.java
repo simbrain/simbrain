@@ -92,9 +92,6 @@ import org.simbrain.util.randomizer.PolarizedRandomizer;
 public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         NeuronListener, GroupListener {
 
-    /** Each task will consist of updating no more than CHUNK_SIZE neurons. */
-    private static final int CHUNK_SIZE = 100;
-
     /**
      * The initial capacity of the set containing this class's private neuron
      * list, which is synchronized to the underlying network.
@@ -250,7 +247,6 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
                 }
             }
             synchronizingBarrier.await();
-            network.setUpdateCompleted(true);
             while (pendingOperations.get() > 0) {
                 synchronized (producer) {
                     wait();
@@ -360,11 +356,6 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 
     @Override
     public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
-        return;
-    }
-
-    @Override
-    public void groupUpdated(Group group) {
         return;
     }
 
@@ -541,5 +532,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
         return;
     }
+
+	@Override
+	public void groupsUpdated(Collection<Group> group) {
+	}
 
 }

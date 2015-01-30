@@ -126,6 +126,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      */
     @Override
     public void layoutChildren() {
+    	if (getNetworkPanel().isRunning()) {
+    		return;
+    	}
         if (halt.get()) {
             return;
         }
@@ -150,6 +153,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      * @param pt2
      */
     public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
+    	if (getNetworkPanel().isRunning()) {
+    		return;
+    	}
         halt.getAndSet(true);
         if (pt1 == null) {
             if (this.startPt == null) {
@@ -176,7 +182,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      * @param tar
      */
     public void layout(Point2D src, Point2D tar) {
-
+		if (networkPanel.isRunning()) {
+			return;
+		}
         arrow.layoutChildren(src, startPort, tar, endPort);
 
         Point2D.Float bez = arrow.getTemplate().getBez1(src, tar, startPort);
@@ -228,7 +236,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
      *
      */
     public void determineProperEndPoints() {
-
+		if (networkPanel.isRunning()) {
+			return;
+		}
         float centerXSrc = (float) source.getCenterX();
         float centerYSrc = (float) source.getCenterY();
         float centerXTar = (float) target.getCenterX();

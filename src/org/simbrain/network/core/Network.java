@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.groups.Group;
@@ -124,7 +125,7 @@ public class Network {
     private List<TextListener> textListeners = new ArrayList<TextListener>();
 
     /** Whether network has been updated yet; used by thread. */
-    private boolean updateCompleted;
+    private AtomicBoolean updateCompleted = new AtomicBoolean(false);
 
     /**
      * List of neurons sorted by their update priority. Used in priority based
@@ -173,10 +174,9 @@ public class Network {
      * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
-
-        // Update Time
-        updateTime();
-
+    	for (NetworkListener nl : networkListeners) {
+    		nl.setUpdateComplete(false);
+    	}
         // Perform update
         for (NetworkUpdateAction action : updateManager.getActionList()) {
             action.invoke();
@@ -185,12 +185,15 @@ public class Network {
         // Fire update events for GUI update. Loose items, then groups.
         fireSynapsesUpdated(synapseList); // Loose synapses
         fireNeuronsUpdated(neuronList); // Loose neurons
-        for (Group group : groupList) { // Groups
-            fireGroupUpdated(group);
-        }
+        fireGroupsUpdated(groupList); // Groups
 
         // Clear input nodes
         clearInputs();
+
+        // Update Time
+        updateTime();
+        setUpdateCompleted(true);
+
     }
 
     /**
@@ -1001,7 +1004,7 @@ public class Network {
         for (Synapse synapse : this.getSynapseList()) {
             synapse.postUnmarshallingInit();
         }
-
+        updateCompleted = new AtomicBoolean(false);
         return this;
     }
 
@@ -1058,6 +1061,13 @@ public class Network {
      *            the current time
      */
     public void setTime(final double i) {
+        for (Neuron n : this.getFlatNeuronList()) {
+        	NeuronUpdateRule nur = n.getUpdateRule();
+        	if (nur.isSpikingNeuron()) {
+        		SpikingNeuronUpdateRule snur = (SpikingNeuronUpdateRule) nur;
+        		snur.setLastSpikeTime(snur.getLastSpikeTime() - time);
+        	}
+        }
         time = i;
     }
 
@@ -1368,7 +1378,7 @@ public class Network {
      * @return whether the network has been updated or not
      */
     public boolean isUpdateCompleted() {
-        return updateCompleted;
+        return updateCompleted.get();
     }
 
     /**
@@ -1379,7 +1389,7 @@ public class Network {
      *            whether the network has been updated or not.
      */
     public void setUpdateCompleted(final boolean b) {
-        updateCompleted = b;
+        updateCompleted.set(b);
     }
 
     /**
@@ -1445,6 +1455,19 @@ public class Network {
     }
 
     /**
+     * 
+     * @param group
+     * @param changeDescription
+     */
+    public void fireGroupChanged(final Group group,
+    		final String changeDescription) {
+        for (GroupListener listener : groupListeners) {
+            listener.groupChanged(new NetworkEvent<Group>(this, group),
+            		changeDescription);
+        }
+    }
+
+    /**
      * Fire a group parameters changed event.
      *
      * @param group
@@ -1463,9 +1486,9 @@ public class Network {
      * @param group
      *            reference to group that has been updated.
      */
-    public void fireGroupUpdated(final Group group) {
+    public void fireGroupsUpdated(final Collection<Group> groups) {
         for (GroupListener listener : groupListeners) {
-            listener.groupUpdated(group);
+            listener.groupsUpdated(groups);
         }
     }
 

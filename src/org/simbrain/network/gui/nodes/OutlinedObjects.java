@@ -139,7 +139,17 @@ public class OutlinedObjects extends PPath.Float {
      */
     @Override
     public boolean validateFullBounds() {
-        comparisonBounds = getUnionOfChildrenBounds(comparisonBounds);
+    	try {
+    		if (comparisonBounds == null) {
+    			System.out.println("Im null before.");
+    		}
+    		comparisonBounds = getUnionOfChildrenBounds(comparisonBounds);
+    		if (comparisonBounds == null) {
+    			System.out.println("Im null after.");
+    		}
+    	} catch (NullPointerException npe) {
+    		npe.printStackTrace();
+    	}
 
         if (!cachedChildBounds.equals(comparisonBounds)) {
             setPaintInvalid(true);

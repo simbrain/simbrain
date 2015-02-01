@@ -9,7 +9,9 @@ import org.simbrain.network.layouts.*;
 import org.simbrain.network.networks.*;
 import org.simbrain.network.neurons.*;
 import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.synapse_update_rules.spikeresponders.*;
+import org.simbrain.network.update_actions.*;
 import org.simbrain.util.randomizer.*;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.*;
@@ -63,38 +65,57 @@ import org.simbrain.workspace.*;
  *
  */
 {
-
     // Parameters 
-    int NUM_NEURONS = 900;
+    int NUM_NEURONS = 4096;
     int GRID_SPACE = 25;
     double EE_CONST = 0.3;
     double EI_CONST = 0.2;
     double IE_CONST = 0.4;
     double II_CONST = 0.1;
-    double LAMBDA = 100;
+    double LAMBDA = 200;
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");
     workspace.addWorkspaceComponent(networkComponent);
     Network network = networkComponent.getNetwork();
+    network.setTimeStep(0.1);
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     layout.setInitialLocation(new Point(10, 10));
     GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-    layout2.setInitialLocation(new Point(400, 10));
+    layout2.setInitialLocation(new Point(NUM_NEURONS * 100, 10));
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
     // Optional code to distribute neurons in 3D space with random z values
     // Random rand = new Random();
+    Randomizer rand = new Randomizer();
+    rand.setPdf(ProbDistribution.NORMAL);
+    rand.setParam2(4);
     for (int i = 0; i < NUM_NEURONS; i++) {
-        Neuron neuron = new Neuron(network, "IzhikevichRule");
-        neuron.setUpperBound(100);
-        //neuron.setZ(rand.nextInt((int) (Math.sqrt(NUM_NEURONS) * GRID_SPACE)));
+    	Neuron neuron = new Neuron(network);
         neurons.add(neuron);
-        if (Math.random() < 0.25) {
-        	neuron.setPolarity(Polarity.INHIBITORY);
+        IzhikevichRule iz = new IzhikevichRule();
+        if (Math.random() < 0.2) {
+            neuron.setPolarity(Polarity.INHIBITORY);
+            iz.setRefractoryPeriod(1.0);
+            double rVal = Math.random();
+            iz.setA(0.02 + (0.08 * rVal));
+            iz.setB(0.25 - (0.05 * rVal));
+            iz.setC(-65);
+            iz.setD(2);
         } else {
-        	neuron.setPolarity(Polarity.EXCITATORY);
+            neuron.setPolarity(Polarity.EXCITATORY);
+            iz.setRefractoryPeriod(2.0);
+            iz.setA(0.02);
+            iz.setB(0.2);
+            double rVal = Math.random();
+            rVal *= rVal;
+            iz.setC(-65.0 + (15.0 * rVal));
+            iz.setD(8.0 - (6 * rVal));
         }
+        iz.setiBg(9.0);
+        iz.setAddNoise(true);
+        iz.setNoiseGenerator(rand);
+        neuron.setUpdateRule(iz);
         Neuron outNeuron = new Neuron(network);
         outNeuron.getUpdateRule().setInputType(InputType.SYNAPTIC);
         ((LinearRule) outNeuron.getUpdateRule()).setClipped(false);
@@ -103,24 +124,29 @@ import org.simbrain.workspace.*;
     NeuronGroup ng1 = new NeuronGroup(network, neurons);
     ng1.setLabel("Izhikevich Network");
     NeuronGroup outs = new NeuronGroup(network, outNeurons);
-    outs.setLabel("Exponential Convolution");
-    network.addGroup(ng1);
-    network.addGroup(outs);
+    outs.setLabel("Spike Visualizer");
     ng1.setLayout(layout);
     ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
     outs.setLayout(layout2);
     outs.applyLayout(new Point2D.Double(1000.0, 0.0));
-
+    network.addGroup(ng1);
+    network.addGroup(outs);
+    
 	PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY,
 		ProbDistribution.LOGNORMAL);
 	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
 		ProbDistribution.LOGNORMAL);
-	exRand.setParam1(2.5);
-	inRand.setParam1(3.5);	
+	exRand.setParam1(0.5);
+	//exRand.setParam2(0.5);
+	inRand.setParam1(1.5);	
+	//inRand.setParam2(1.0);
 
 	Radial rCon = new Radial(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
 	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
-	sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.BOTH);
+	sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
+	ConvolvedJumpAndDecay inhibSR = new ConvolvedJumpAndDecay();
+	inhibSR.setTimeConstant(6.0);
+	sg.setSpikeResponder(inhibSR, Polarity.INHIBITORY);
 	sg.setLabel("Recurrent Synapses");
 	for (Synapse s : sg.getAllSynapses()) {
 		double dist = Network.getEuclideanDist(s.getSource(), s.getTarget());
@@ -129,14 +155,31 @@ import org.simbrain.workspace.*;
 	network.addGroup(sg);
 
 	SynapseGroup outCon = SynapseGroup.createSynapseGroup(ng1, outs, new OneToOne());
-	outCon.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.BOTH);
+	Step step = new Step();
+	step.setResponseDuration(100000000);
+	outCon.setSpikeResponder(step, Polarity.BOTH);
+	//ConvolvedJumpAndDecay outSR = new ConvolvedJumpAndDecay();
+	//outSR.setTimeConstant(3);
+	//outCon.setSpikeResponder(step, Polarity.BOTH);
 	outCon.setLabel("One to One Connections");
 	network.addGroup(outCon);
+	for (Neuron n : outs.getNeuronList()) {
+		n.setUpperBound(2);
+        	if (n.getFanIn().get(0).getStrength() < 0) {
+    			((LinearRule) n.getUpdateRule()).setSlope(-1);
+    		}
+     }
+
 
     print(sg.size());
+    
     sg.setUpperBound(70, Polarity.EXCITATORY);
+    sg.setLowerBound(0, Polarity.EXCITATORY);
     sg.setLowerBound(-70, Polarity.INHIBITORY);
+    sg.setUpperBound(0, Polarity.INHIBITORY);
     network.randomizeNeurons();
     network.fireSynapsesUpdated();
-
+    network.getUpdateManager().clear();
+    network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+    network.updateTimeType();
 }

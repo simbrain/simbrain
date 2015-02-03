@@ -295,7 +295,8 @@ public class HistogramPanel extends JPanel {
         XYPlot plot = (XYPlot) mainChart.getPlot();
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
         Iterator<ColoredDataSeries> series = model.getSeriesData().iterator();
-        for (int i = 0; i < model.getData().size(); i++) {
+        int i = 0; 
+        while (series.hasNext()) {
             if (i < colorPallet.length) {
                 ColoredDataSeries s = series.next();
                 Color c = s.color;
@@ -305,6 +306,7 @@ public class HistogramPanel extends JPanel {
                 }
                 renderer.setSeriesPaint(i, c, true);
             }
+            i++;
         }
     }
 

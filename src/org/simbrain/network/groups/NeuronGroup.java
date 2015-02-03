@@ -361,13 +361,16 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                 writeCounter = 0;
             }
             Iterator<Neuron> neuroIter = neuronList.iterator();
+            int index = 0;
+            valueWriter.print(this.getParentNetwork().getTime() + ":\t");
             while (neuroIter.hasNext()) {
                 Neuron n = neuroIter.next();
                 if (n.getUpdateRule().isSpikingNeuron() && recordAsSpikes) {
                     if (n.isSpike()) {
-                        valueWriter.print(n.getId());
-                        valueWriter.print(" ");
-                        valueWriter.println(getParentNetwork().getTime());
+                        valueWriter.print(index + ", ");
+                    }
+                    if (!neuroIter.hasNext()) {
+                    	valueWriter.println();
                     }
                 } else {
                     valueWriter.print(n.getActivation());
@@ -377,6 +380,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                         valueWriter.println();
                     }
                 }
+                index++;
             }
             writeCounter++;
         } catch (NullPointerException e) {

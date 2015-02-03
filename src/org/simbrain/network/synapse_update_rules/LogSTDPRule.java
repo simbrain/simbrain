@@ -1,23 +1,83 @@
+/*
+ * Copyright (C) 2005,2007 The Authors. See http://www.simbrain.net/credits This
+ * program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
 package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.math.ProbDistribution;
 
+/**
+ *
+ * An implementation of Log-STDP as introduced in:
+ *
+ * Gilson M, Fukai T (2011) Stability versus Neuronal Specialization for STDP:
+ * Long-Tail Weight Distributions Solve the Dilemma. PLoS ONE 6(10): e25339
+ * doi:10.1371/journal.pone.0025339
+ *
+ * Log-STDP pushes weight values toward a log normal distribution. This can
+ * help with weight divergence, which is common to Add and Mlt STDP. It also
+ * allows for specialization of synapses, and fits very well with experimental
+ * data concerning synaptic efficacy.
+ *
+ * @author Zach Tosi
+ *
+ */
 public class LogSTDPRule extends STDPRule {
 
-    private double smallWtThreshold = 1.0;
+    /**
+     * The value that for a given synapse, if the absolute value of the synapses
+     * weight is below this threshold it is governed by a different LTD rule
+     * than if it were being subjected to LTD, but had a weight greater than
+     * this value. LTD for weights below this value linearly approach 0 as the
+     * weight approaches 0. LTD for weights above this value are related
+     * logarithmically to the synapse strength.
+     *
+     * J_0 in the cited paper.
+     */
+    private double smallWtThreshold = 5;
 
+    /** A constant for LTP. c_+ in the cited paper. */
     private double w_plus = 0.8;
 
+    /** A constant for LTD. c_- in the cited paper. */
     private double w_minus = 0.6;
 
-    private double logSaturation = 5;
+    /**
+     * The degree to which the distribution is pushed logarithmically. Has an
+     * effect on how strongly LTD pushes larger weights toward the small weight
+     * threshold.
+     *
+     * alpha in the cited paper.
+     */
+    private double logSaturation = 1;
 
+    /**
+     * A moderating constant for LTP, causing LTP to behave noticeably
+     * differently for weights greater than ltpMod * smallWtThreshold.
+     *
+     * beta in the cited paper.
+     */
     private double ltpMod = 5;
 
+    /**
+     * The variance of the noise applied to weight changes.
+     */
     private double noiseVar = 0.6;
 
+    /**
+     * Updates the synapse's strength using Log-STDP.
+     */
+    @Override
     public void update(Synapse synapse) {
         boolean sourceSpiking = synapse.getSource().getUpdateRule()
                 .isSpikingNeuron();
@@ -33,22 +93,22 @@ public class LogSTDPRule extends STDPRule {
         double delta_t, delta_w;
         final double timeStep = synapse.getNetwork().getTimeStep();
         final double delay = synapse.getDelay() * timeStep;
-        if (synapse.getStrength() >= 0) {
-            delta_t = (src.getLastSpikeTime() + delay)
-                    - tar.getLastSpikeTime();
-        } else {
-            delta_t = tar.getLastSpikeTime()
-                    - (src.getLastSpikeTime() + delay);
-        }
+        // if (synapse.getStrength() >= 0) {
+        delta_t = (src.getLastSpikeTime() + delay)
+                - tar.getLastSpikeTime();
+        // } else {
+        // delta_t = tar.getLastSpikeTime()
+        // - (src.getLastSpikeTime() + delay);
+        // }
         double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
         if (delta_t < 0) {
             calcW_plusTerm(synapse);
             delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
-                    / tau_plus)) * noise;
+                    / tau_plus)) * (1 + noise);
         } else if (delta_t > 0) {
             calcW_minusTerm(synapse);
             delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t
-                    / tau_minus)) * noise;
+                    / tau_minus)) * (1 + noise);
         } else {
             delta_w = 0;
         }
@@ -64,24 +124,29 @@ public class LogSTDPRule extends STDPRule {
         W_plus = w_plus
                 * Math.exp(-Math.abs(s.getStrength()) / (smallWtThreshold
                         * ltpMod));
-        if (s.getStrength() > 0) {
-            if (s.getStrength() >= s.getUpperBound()) {
-                W_plus = 0;
-            } else {
-                W_plus *= Math.exp(-2 *Math.pow(s.getStrength()
-                        / (s.getUpperBound() - s.getStrength()), 2));
-            }
-        } else {
-            if (s.getStrength() <= s.getLowerBound()) {
-                W_plus = 0;
-            } else {
-                W_plus *= Math.exp(-2 *Math.pow(s.getStrength()
-                        / (s.getLowerBound() - s.getStrength()), 2));
-            }
-        }
+        // if (s.getStrength() > 0) {
+        // if (s.getStrength() >= s.getUpperBound()) {
+        // W_plus = 0;
+        // } else {
+        // W_plus *= Math.exp(-20 * Math.pow(s.getStrength()
+        // / (s.getUpperBound() - s.getStrength()), 2));
+        // }
+        // } else {
+        // if (s.getStrength() <= s.getLowerBound()) {
+        // W_plus = 0;
+        // } else {
+        // W_plus *= Math.exp(-20 * Math.pow(s.getStrength()
+        // / (s.getLowerBound() - s.getStrength()), 2));
+        // }
+        // }
         return W_plus;
     }
 
+    /**
+     * 
+     * @param s
+     * @return
+     */
     private double calcW_minusTerm(Synapse s) {
         double wt = Math.abs(s.getStrength());
         if (wt <= smallWtThreshold) {
@@ -92,23 +157,23 @@ public class LogSTDPRule extends STDPRule {
                     * ((wt / smallWtThreshold) - 1)));
             W_minus = w_minus * (1 + (numerator / logSaturation));
         }
-        if (s.getStrength() < 0) {
-            if (s.getStrength() >= s.getUpperBound()) {
-                W_minus = 0;
-            } else {
-                W_minus *= Math.exp(-2 * Math.pow((s.getLowerBound()
-                        - s.getStrength()) / (s.getUpperBound()
-                                - s.getStrength()), 2));
-            }
-        } else {
-            if (s.getStrength() <= s.getLowerBound()) {
-                W_minus = 0;
-            } else {
-                W_minus *= Math.exp(-2 * Math.pow((s.getUpperBound()
-                        - s.getStrength()) / (s.getLowerBound()
-                                - s.getStrength()), 2));
-            }
-        }
+        // if (s.getStrength() < 0) {
+        // if (s.getStrength() >= s.getUpperBound()) {
+        // W_minus = 0;
+        // } else {
+        // W_minus *= Math.exp(-0.25 * Math.pow((s.getLowerBound()
+        // - s.getStrength()) / (s.getUpperBound()
+        // - s.getStrength()), 2));
+        // }
+        // } else {
+        // if (s.getStrength() <= s.getLowerBound()) {
+        // W_minus = 0;
+        // } else {
+        // W_minus *= Math.exp(-0.25 * Math.pow((s.getUpperBound()
+        // - s.getStrength()) / (s.getLowerBound()
+        // - s.getStrength()), 2));
+        // }
+        // }
         return W_minus;
     }
 

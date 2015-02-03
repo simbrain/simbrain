@@ -1063,13 +1063,17 @@ public class Network {
      *            the current time
      */
     public void setTime(final double i) {
-        for (Neuron n : this.getFlatNeuronList()) {
-        	NeuronUpdateRule nur = n.getUpdateRule();
-        	if (nur.isSpikingNeuron()) {
-        		SpikingNeuronUpdateRule snur = (SpikingNeuronUpdateRule) nur;
-        		snur.setLastSpikeTime(snur.getLastSpikeTime() - time);
-        	}
-        }
+    	if (i < time) {
+    		for (Neuron n : this.getFlatNeuronList()) {
+    			NeuronUpdateRule nur = n.getUpdateRule();
+    			if (nur.isSpikingNeuron()) {
+    				SpikingNeuronUpdateRule snur =
+    						(SpikingNeuronUpdateRule) nur;
+    				double diff = i - (time - snur.getLastSpikeTime());
+    				snur.setLastSpikeTime(diff < 0 ? 0 : diff);
+    			}
+    		}
+    	}
         time = i;
     }
 
@@ -1098,13 +1102,12 @@ public class Network {
      */
     public void updateTimeType() {
         timeType = TimeType.DISCRETE;
-
         for (Neuron n : getFlatNeuronList()) {
             if (n.getTimeType() == TimeType.CONTINUOUS) {
                 timeType = TimeType.CONTINUOUS;
             }
         }
-        time = 0;
+        setTime(0);
     }
 
     /**
@@ -1112,12 +1115,7 @@ public class Network {
      * this is a continuous or discrete. network.
      */
     public void updateTime() {
-        time += getTimeStep();
-        // if (timeType == TimeType.CONTINUOUS) {
-        // time += this.getTimeStep();
-        // } else {
-        // time += 1;
-        // }
+        setTime(time + timeStep);
     }
 
     /**

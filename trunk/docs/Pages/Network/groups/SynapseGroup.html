@@ -17,6 +17,9 @@
         div.overflowPrevent {
             overflow: auto;
         }
+        div.navi {
+            text-align: right;
+        }
     </style>
 </head>
 
@@ -111,7 +114,7 @@
         <h4>Synapse Adjustment Panel (Histogram)</h4>
         <img src="../../../Images/SynapseGroupHistogram.png" height="400" width="400" align="left" hspace="20px" vspace="10px">
                 
-            <p>The first is the synapse adjustment panel, which represents the weights that comprise the group in the form of a histogram. The synapse adjustment panel can be found as a part of the general editing/creation dialog for synapse groups or by right-clicking the group and selecting <i><b>"Adjust Synapses"</i></b> from the menu.From here it is possible to assign different <a href="../../Utils/Randomizers/Randomizers.html">probability distributions</a> to the excitatory and/or inhibitory weights in the group. It is also possible to change the ratio of excitatory and inhibitory synapses in the group from here*. The histogram can be made to display weight values for synapses of both or only one polarity, and optionally can overlay the two for a direct comparison.</p>
+            <p>The first is the synapse adjustment panel, which represents the weights that comprise the group in the form of a histogram. The synapse adjustment panel can be found as a part of the general editing/creation dialog for synapse groups or by right-clicking the group and selecting <i><b>"Adjust Synapses"</i></b> from the menu. From here it is possible to assign different <a href="../../Utils/Randomizers/Randomizers.html">probability distributions</a> to the excitatory and/or inhibitory weights in the group. It is also possible to change the ratio of excitatory and inhibitory synapses in the group from here*. The histogram can be made to display weight values for synapses of both or only one polarity, and optionally can overlay the two for a direct comparison.</p>
                 
             <p>The <a href="../../Plot/histogram.html">histogram</a> panel also displays some basic information about the weights and synapses in the group. Pictured left, one can see that the histogram panel displays the total population as well as the population of synapses of each type. It also displays the mean, median, and standard deviation of the synapse values, which are calculated using the selected polarity(ies). For instance if "Both" is selected these values are calculated using both polarities, assigning negative values to inhibitory weights. If "Overlay" is selected, it will display these values for all synapses in the group, using the absolute value of all inhibitory weight values. Finally if a single polarity is selected it will display those statistics only for the synapses of that polarity, again using absolute values for inhibitory synaptic weights. </p>
 

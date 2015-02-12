@@ -23,7 +23,7 @@
                 <p>
                     <a href="groups/NeuronGroup.html">Neuron Groups</a>
                     <br>
-                    <a href="groups/SynapseGroup.html">Synapse Group</a>
+                    <a href="groups/SynapseGroup.html">Synapse Groups</a>
                     <br>
                     <a href="subnetwork.html">Subnetworks</a>
                 </p>
@@ -31,14 +31,16 @@
         </div>
 
         <h1>Groups</h1>
-        <p>These are logical groupings of neurons and / or synapses, and of other groups. There are many reasons to collect neurons and synpases together into more organized sets. For example, it can be useful to move specific groups of neurons around as a unit, or to randomize or otherwise permute them. It is also useful to be able to associate some groups of elements with special operations and data structures. Perhaps the most important groups are <a href="subnetwork.html">subnetworks</a>, which are discussed separately.
+        <p>These are logical groupings of neurons and / or synapses, and of other groups. Groups provide an organized means of displaying and manipulating variables and parameters of an aggregated collection of simpler units like <a href="neuron.html">Neurons</a> and <a href="synapse.html">Synapses</a>. Essentially, groups can gather and manipulate the statistics and properties of their constituents. Groups can also be used to perform actions which depend on the aggregated behavior of and/or exert top-down control over their consituents. This is often the case for Subnetworks, and in particular cases where Subnetworks are used to implement a training algorithm.
+        </p><p>When networks grow beyond a certain size, it becomes pragmatic (above and beyond simple organization) to deal with many neurons or synapses at once. Groups can be associated with specific operations and data structures which wouldn't make sense for <i>loose</i> neurons or synapses. 
+        </p>
+        <p>It is important to note that groups can include other groups as members of their constituency. These groups are known as <a href="subnetwork.html">Subnetworks</a>, and are usually associated with some specialized process for manipulating multimple neuron groups and synapse groups. 
             <br>
         </p>
-        <p>Here is an example of a group, a backprop network, which is itself comprised of 5 subgroups: 3 neuron groups and 2 weight groups. You can click on any of the interaction tabs and the associated elements will be selected. This can be useful for randomizing, moving, and deleting elements.
-            <br>
-        </p>
-
-        <p>
+            <img src="../../Images/GroupsExample.png" width="476" height="400" align="right">
+        <p><b>Pictured right</b> is an example of a group (subnetwork), a backprop network, which is itself comprised of 5 subgroups: 3 neuron groups and 2 weight groups. You can click on any of the interaction tabs and the associated elements will be selected. This can be useful for randomizing, moving, and deleting elements. Double-cliking or right-clicking on the interaction tabs is the primary means by which users can interact with groups.
+        <br>
+        <br>
             <span class="heading">Interaction Box</span>
             <br>
         </p>
@@ -49,8 +51,8 @@
             <p>
                 <span class="heading2">Single Click:</span> Single clicking on the interaction box of a group highlights all of that groups nodes and / or weights. They can be dragged around as a unit,which is often very convenient. They can also be modified by any comand that only modifies selected elements. For example they can be randomized, incremented, decremented (using the up and down arrows) or "cleared" (set to 0).</p>
             <p>
-                <span class="heading2">Right click / Group Actions:</span> By right-clicking on a group's interaction box various actions arise. Many of these are customized to a particular group type.</p>
-            <p><span class="heading2">Double Click:</span> If you double-click on the subnetwork tab it calls up that network's properties dialog, if a property dialog is defined for that group.</p>
+                <span class="heading2">Right click / Group Actions:</span> By right-clicking on a group's interaction box various actions arise. Many of these are customized to a particular group type. However most of the time (especially for neuron and synapse groups), this menu will include options to clamp/freeze neurons/synapses in the group, couple the group to some other entity in the workspace, edit the group, or delete the group.</p>
+            <p><span class="heading2">Double Click:</span> If you double-click on the subnetwork tab it calls up that network's properties dialog, if a property dialog is defined for that group. The propery dialogs allow the user to manipulate the many variables comprising the consituent entities of the group as well as any group level properties.</p>
         </blockquote>
         <p>
             <span class="heading">Default Group Actions</span>
@@ -71,8 +73,8 @@
         <p>Neuron Groups and synpase groups can be created from existing collections of neurons or synapses.&nbsp;&nbsp; This can be useful for organizing a complex network.</p>
         <blockquote>
             <p><span class="heading2">Neuron Group:</span> To create a neuron group <a href="buildingnets.html#SelectNodes">select</a> the neurons you want to add to the group and in the network or popup menu select Edit &gt; Group &gt; Neuron Group.</p>
-            <p>
-                <span class="heading2">Synapse Group:</span> To create a synpase group select the syanpses you want to add to the group and in the network or popup menu select Edit &gt; Group &gt; Synapse Group.</p>
+            <p><span class="heading2">Synapse Group:</span> To create a synpase group select the syanpses you want to add to the group and in the network or popup menu select Edit &gt; Group &gt; Synapse Group.</p>
+            <p><span class="heading2">Subnetworks:</span> At this time Subnetworks cannot be created from consituent groups. Though there are future plans to allow this, for the time being custom subnetworks can only be created through scripting.</p>
         </blockquote>
     </div>
 </body>

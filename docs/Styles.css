@@ -170,8 +170,8 @@ Opera streches it half way. */
 	line-height: 14px; 
 	background: #f2f2e4; 
 	margin: 0 10px 10px; 
-	padding: 3px; 
-	width: 230px; 
+	padding: 5px; 
+	width: 250px; 
 	float: right; 
 	border: solid 1px #628596; 
 }
@@ -198,6 +198,7 @@ P.bold
 	font-size: 14px; 
 	font-family: Verdana, Arial, Helvetica, sans-serif; 
 	font-weight: bolder;
+	padding-left: 20px; 
 }
 
 #menu a:link

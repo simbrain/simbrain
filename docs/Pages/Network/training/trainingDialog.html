@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
+
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../training.html">Training</a> &gt; Backprop
+            </p>
+        </div>
+
+        <h1>Training Dialog</h1>
+
+        <p>Some version of a trainig dialog is used in many places, including: <a href="../network/backpropnetwork.html">backprop</a>, <a href="../network/lmsnetwork.html">least mean squares</a>, <a href="../network/srn.html">simple recurrent nets</a>, <a href="../network/echostatenetwork.html">echo state nets</a>, <a href="../network/hopfieldnetwork.html">hopfield nets</a>, <a href="../network/competitivenetwork.html">competitive nets</a>, and <a href="../network/som.html">self-organizing maps</a>.  This page describes the main elements that occur in these pages. For items specific to a particular network type see those pages.</p>
+
+        <p><img style="float:right;" width="450" src="../../../Images/TrainingDialog.png">
+        </p>
+
+        <p>Generally there is a main training tab, either one or two input data tabs, and a validation tab.</p>
+
+        <p>An example which steps through the process of&nbsp; creating and training a network using supervised learning (backprop) is in the <a href="../../Examples.html">examples page.</a>
+        </p>
+
+        <p><span class="heading">Training Tab</span>
+        </p>
+
+        <p>This tab is used to train a network, after a training set has been specified. You use this to manage a supervised algorithm, and track error, which should decrease. You can also randomize a network from this dialog to try to find better initial conditions for the algorithm and hopefully better results.</p>
+
+        <blockquote>
+            <p><span class="heading2">Play</span>: Repeatedly iterate the algorithm until stop is pressed.</p>
+            <p><span class="heading2">Iterate</span>: Iterate the algorithm once.</p>
+            <p><span class="heading2">Show Updates</span>: If this is selected then you will see the weights change in Simbrain while the algorithm is run. This slows things down but is pedagogically useful.</p>
+            <p><span class="heading2">Preferences</span>:Show preferences dialog for the current training method.</p>
+            <p><span class="heading2">Randomize</span>:Randomize the weights of the network being trained.  Usually this randomizes the weights and biases, but the details of randomizaation depend on the network type. Useful to "restart" training, for example, if you suspect you are stuck in a local minimum in weight space.</p>
+        </blockquote>
+       
+        <p><span class="heading">Input Data / Target Data</span>
+        </p>
+
+        <p>Training a network generally involves specifying one or more datasets. These datasets appear as tables, and have functions that are described in the <a href="../../Utils/Tables/Tables.html">table documentation</a>.</p>
+
+        <p><a href="http://en.wikipedia.org/wiki/Unsupervised_learning">Unsupervised learning</a> uses one data table (som, competitive, hopfield), while  <a href="http://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> (backprop, lms, simple recurrent, echo state) uses two tables.</p>
+
+        <p>For input data tables, columns correspond to input neurons. Columns of the training data table correspond to output neurons.</p>
+
+        <p>For networks that use supervised learning, each row of the input data table is an input vector, and the corresponding row of the target data table is the  desired vector that should be produced for that input, if training is successful.  The input and target data tables show have the same number of rows.
+        </p>
+
+        <p>For example, suppose we want to train a network to compute these associations:</p>
+        <blockquote>
+            <blockquote>
+                <p>(0,0) &gt; (0)
+                    <br> (1,0) &gt; (1)
+                    <br> (0,1) &gt; (1)
+                    <br> (1,1) &gt; (0)</p>
+            </blockquote>
+        </blockquote>
+
+        <p>To do this we need to set the input and training datasets as follows:</p>
+        <blockquote>
+            <table>
+                <tr class="row">
+                    <td class="col">
+                        <u>Input Dataset</u>
+                        <br>0,0
+                        <br>1,0
+                        <br>0,1
+                        <br>1,1
+                    </td>
+                    <td class="col">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td class="col"><u>Target Dataset</u>
+                        <br>0
+                        <br>1
+                        <br>1
+                        <br>0
+                    </td>
+                </tr>
+            </table>
+        </blockquote>
+
+        <!-- This is described elsewhere.  Make a common place for it. -->
+        <p><span class="heading">Validation Tab</span>
+        </p>
+
+        <p>This is a table of data that is not used in training, but rather in testing and validating a network after it has been trained.  In addition to the standard <a href="../../Utils/Tables/Tables.html">table</a> functions, this panel has tools for iterating through the rows of the table and sending each row's values to the network. </p>
+
+
+    </div>
+</body>
+
+</html>

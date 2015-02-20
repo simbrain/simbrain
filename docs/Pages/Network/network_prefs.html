@@ -1,69 +1,66 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html>
 
+<head>
+    <title>Simbrain Documentation</title>
 
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
 
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Preferences</p>
-  </div>
-  <p></p><h1> Network Preferences </h1>
-<div style="text-align: left;"><img style="width: 300px; height: 240px;" src="../../Images/NetworkDialog.png"><br>
-</div>
-<div style="text-align: left;"><br>
-The Network Preferences dialog can be opened by going to File &gt;
-Network Preferences within a network window. The dialog offers ways to
-alter the graphical, logical, and other miscellaneous properties of the
-network window and/or the network within that window.&nbsp;
-&nbsp;
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Preferences</p>
+        </div>
 
-  </div>
-<p class="heading">Main<br>
-</p>
-    <blockquote>
-      <p><span class="heading2">Color:</span>
-allows the user to change the color of the various components within
-the network frame. The colors that can be changed are: Background,
-Line, Hot node, Cool node, Excitatory weight, Inhibitory weight, Lasso,
-Selection and Spiking. The current color selection is indicated by the
-color box located between the combo box and the "Set" button. </p>
-      <blockquote>
-        <p><span class="heading2">Background color</span>: is the color of the network background.</p>
-        <p><span class="heading2">Cool node color:</span> is the color of a neuron that has an activation level less than zero.</p>
-        <p><span class="heading2">Excitatory weight color:</span> is the color of the synapse that has a strength  greater than zero.</p>
-        <p><span class="heading2">Hot node color:</span> is the color of a neuron that has an activation level greater than zero.</p>
-        <p><span class="heading2">Inhibitory weight color:</span> is the color of the synapse that has a strength  less than zero.</p>
-        <p><span class="heading2">Lasso color:</span> is the color of the line that appears when dragging the mouse to select neurons and weights. </p>
-        <p><span class="heading2">Line color:</span> is the color of the lines that connect neurons.</p>
-        <p><span class="heading2">Selection color:</span> is the color of the box that surrounds items that have been selected. </p>
-        <p><span class="heading2">Spiking color:</span> is the color of a neuron's outline (and outgoing synapse lines) when it spikes.</p>
-      </blockquote>
-      <p><span class="heading2">Weight size max/min:</span>
-sets the maximum and minimum size a weight can be. This option only
-changes the graphical size of the weight and has no bering on how the
-weight behaves.</p>
-	<p><span class="heading2">Network Time Step:</span> TODO<br>
- </p>
-	<p><span class="heading2">Synapse Visibility Threshold: </span>TODO<br>
-</p>
-  <p><span class="heading2">Nudge Amount:</span> is the amount of indent to be used when indenting network files. This option is only valid when "Indent network files" is selected.<br>
- </p>
+        <h1> Network Preferences </h1>
 
-	 
-  <p><span class="heading2">Wand Radius: </span> adjusts and sets wand visibility. 
-  </p>
+        <p><img style="float:right;" width="450" src="../../Images/NetworkDialog.png">
+        </p>
 
-    </blockquote>
-    <p class="heading">Connections<br>
-</p>
-    <blockquote>
-      <p><span class="heading2">See <a href="connections.html">Connections</a>.<br>
-</span></p><br>
-</blockquote></div>
-</body></html>
+        <p>The Network Preferences dialog can be opened by going to <span class="command">File > Network Preferences...</span> in a network window. The dialog provides ways to alter the graphical, logical, and other properties of a neural network that are not specific to any particular network element. </p>
+
+        <p class="heading">Main</p>
+
+        <blockquote>
+            <p><span class="heading2">Color:</span> allows the user to change the color of the various components within the network frame. The colors that can be changed are: Background, Line, Hot node, Cool node, Excitatory weight, Inhibitory weight, Lasso, Selection and Spiking. The current color selection is indicated by the color box located between the combo box and the "Set" button. </p>
+            <blockquote>
+                <p><span class="heading2">Background color</span>: is the color of the network background.</p>
+                <p><span class="heading2">Cool node color:</span> is the color of a neuron that has an activation level less than zero.</p>
+                <p><span class="heading2">Excitatory weight color:</span> is the color of the synapse that has a strength greater than zero.</p>
+                <p><span class="heading2">Hot node color:</span> is the color of a neuron that has an activation level greater than zero.</p>
+                <p><span class="heading2">Inhibitory weight color:</span> is the color of the synapse that has a strength less than zero.</p>
+                <p><span class="heading2">Lasso color:</span> is the color of the line that appears when dragging the mouse to select neurons and weights. </p>
+                <p><span class="heading2">Line color:</span> is the color of the lines that connect neurons.</p>
+                <p><span class="heading2">Selection color:</span> is the color of the box that surrounds items that have been selected. </p>
+                <p><span class="heading2">Spiking color:</span> is the color of a neuron's outline (and outgoing synapse lines) when it spikes.</p>
+            </blockquote>
+            <p><span class="heading2">Weight size max/min:</span> sets the maximum and minimum size a weight can be. This option only changes the graphical size of the weight and has no bering on how the weight behaves.</p>
+            <p><span class="heading2">Network Time Step:</span> A parameter governing the temporal granularity of the current network simulation.  For example, neurons that numerically integrate a differential equqation use this as their integration time step.  Intuitively, if the time step is larger the simulation runs faster: when the network is in continuous mode each iteration will advance by this value at each iteration.  For more information see <a href="timing.html">timing</a>.
+            </p>
+            <p><span class="heading2">Synapse Visibility Threshold:</span> A number to determine whether <a href="groups/SynapseGroup.html">Synapse Groups</a> should initially have their synapses visible when created. If a new synapse group has more than this number of synapses, individual synapses will be invisible. For example, if set to 0 synapse groups are always in "invisible synapse" mode. If set to 2000 only synapse groups with more than 200 synapses are invisible.
+            </p>
+            <p><span class="heading2">Nudge Amount:</span> is the amount of indent to be used when indenting network files. This option is only valid when "Indent network files" is selected.
+            </p>
+            <p><span class="heading2">Wand Radius: </span> set the width in pixels of the <a href="wand.html">wand tool</a>.
+            </p>
+            <p><span class="heading2">Restore defaults:</span> Restore settings in the main tab to their default values.
+            </p>
+
+        </blockquote>
+        <p class="heading">Connections</p>
+        <blockquote>
+            <p><span class="heading2">See <a href="connections.html">Connections</a>.</span>
+            </p>
+        </blockquote>
+
+    </div>
+</body>
+
+</html>

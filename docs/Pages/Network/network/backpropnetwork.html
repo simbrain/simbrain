@@ -12,8 +12,7 @@
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-            <p><span></span>
-            </p>
+
         </div>
     </a>
     <div id="main_docs">
@@ -24,10 +23,8 @@
         <p></p>
         <h1>Backprop Network</h1>
 
-        <p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a> is a standard form of <a href="../supervisedLearning.html">supervised learning</a>. It is perhaps the best known and most popular means of training neural networks. <a href="http://en.wikipedia.org/wiki/Backpropagation"><span style="font-weight: bold;"><br>
-</span></a>
+        <p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a> is a standard form of <a href="../training.html">supervised learning</a>. It is perhaps the best known and most popular means of training neural networks.
         </p>
-
 
         <p>An example which steps through the process of creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a>
             <br>
@@ -61,23 +58,11 @@
         <p class="heading">Training</p>
 
         <blockquote>
-            <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../supervisedLearning.html">here</a>.
-                <br>
+            <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../training.html">here</a>.
             </p>
-        </blockquote>
-        <p class="heading">Parameters</p>
-        <blockquote>
-            <p><span class="heading2">Learning Rate: </span>A standard learning rate. This determines how quickly synapses change. </p>
-            <p><span class="heading2">Momentum: </span> This scales the rate of weight change by the amount a given weight changed on the previous time step. This speeds up learning and prevents oscillations. Momentum should be between 0 and 1; 0.9 is a common value. </p>
-              <p><span class="heading2">Iterations Before Stopping: </span>TODO</p>
-               <p><span class="heading2">Stopping Condition: </span>TODO (threshold error, threshold error in validation set, number of epochs, none (keep going until manual stop)), and error threshold.</p>
-                 <p><span class="heading2">Error Threshold: </span>TODO</p>
 
-        </blockquote>
-        <blockquote>
-            <p><span class="heading2"></span>
-            </p>
-        </blockquote>
+            <p>Details on the backprop algorithm and parameters that can be set are <a href="../training/backprop.html">here</a>.</p>
+        </blockquote>        
     </div>
 </body>
 

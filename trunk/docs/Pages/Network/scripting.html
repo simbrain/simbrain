@@ -18,34 +18,15 @@
         <div class="navi">
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Scripting</p>
         </div>
-        <p></p>
-        <h1>Scripting</h1>
-        <blockquote>
-            <br>Simbrain neural networks can be customized using scripts.&nbsp; Some useful scripts come pre-loaded and are described below. To invoke a script use the <span class="command">scripts</span> menu in network window.
-            <br>
-            <br>These are beanshell <a href="../Scripting.html">scripts</a> specifically for a network. They can be edited in {Simbrain}/scripts/network.&nbsp; After adding a new script in that direcory it shows up in network windows.
-            <br>
-            <br> One specific use of Simbrain scripts is to create a <a href="../Workspace/Update.html#CustomizeWorkspaceUpdate">custom update</a> method.
-            <br>
-            <br>
-            <span class="heading">Accessible Variables</span>
-            <br>
-            <br> The two Simbrain variables provided to you by a network script are <span style="text-decoration: underline;">networkPanel</span> and <span style="text-decoration: underline;">network</span>.
-            <br>
-            <span class="heading">Pre-loaded Scripts</span>
-            <br>
-            <br> Some useful scripts include:
-            <br>
-            <blockquote>
-                <p><span class="heading2"><a name="addLayered"></a>addLayeredNetwork</span>: to add a standard feed-forward network.&nbsp; You specify how many layers and how many neurons per layer in the dialog.
-                    <br>
-                </p>
-                <p><span class="heading2">prunSynapses:</span> to remove all synapses whose absolute value is below a threshold (by default&nbsp; .5) that can be edited in the script.
-                    <br>
-                </p>
-                <p>&nbsp;</p>
-            </blockquote>
-        </blockquote>
+
+        <h1>Network Scripting</h1>
+
+        <p>Network scripting is a special case of Simbrain's scripting capability, which is documented <a href="../Scripting.html">here</a>.  Workspace level scripts can be used to create and modifying existing neural networks in many ways.</p>
+
+        <p>At the network level, scripts can be invoked from the <span class="command">script</span> menu.  The menu is pre-populated with a few scripts with self-explanatory functions.  As with the workspace level script menu, this menu is auto-populated based on the contents of the <span class="command">{Simbrain_Dir}/network/scripts</span>.  You are encouraged to go that directory and view the script files to get a feel for how they work.</p>
+
+        <p>Network menu scripts are standard <a href="http://www.beanshell.org/">beanshell</a> scripts with two pre-loaded objects: <u>network</u>, which refers to the underlying network object (<span class="command">src.org.simbrain.network.core.Network.java</span>) and <u>networkPanel</u>, which refers to its GUI representation in the desktop (<span class="command">src.org.simbrain.network.gui.NetworkPanel.java</span>).</p>
+
     </div>
 </body>
 

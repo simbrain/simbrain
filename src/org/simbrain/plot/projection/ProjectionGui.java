@@ -325,30 +325,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         JButton helpButton = new JButton();
         helpButton.setAction(helpAction);
 
-        // Add/Remove dimension buttons
-        JButton addButton = new JButton("Add Dimension");
-        addButton.setActionCommand("Add");
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getWorkspaceComponent().getProjectionModel().addSource();
-            }
-        });
-        JButton deleteButton = new JButton("Remove Dimension");
-        deleteButton.setActionCommand("Delete");
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getWorkspaceComponent().getProjectionModel().removeSource();
-            }
-        });
-
-        // Button Panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(helpButton);
-        buttonPanel.add(addButton);
-        buttonPanel.add(deleteButton);
-
         // Setup Menu Bar
         createAttachMenuBar();
 
@@ -358,7 +334,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         errorBar.add(errorLabel);
 
         // Bottom panel
-        bottomPanel.add("North", buttonPanel);
         JPanel southPanel = new JPanel();
         southPanel.add(errorBar);
         southPanel.add(statusBar);
@@ -655,6 +630,21 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         });
         editMenu.add(preferencesGeneral);
 
+        final JMenuItem setDimensions = new JMenuItem(
+                "Set Dimensions...");
+        setDimensions.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String dimsString = JOptionPane.showInputDialog("Dimensions:",
+                        getWorkspaceComponent().getProjectionModel()
+                        .getProjector().getDimensions());
+                int dims = Integer.parseInt(dimsString); //todo; Catch exception
+                getWorkspaceComponent().getProjectionModel().init(dims);
+                getWorkspaceComponent().initializeConsumers();
+            }
+
+        });
+        editMenu.add(setDimensions);
+
         final JMenuItem colorPrefs = new JMenuItem("Datapoint Coloring...");
         colorPrefs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -718,6 +708,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
                     + ((IterableProjectionMethod) getWorkspaceComponent()
                             .getProjector().getProjectionMethod()).getError());
         }
+        repaint();
     }
 
     /**

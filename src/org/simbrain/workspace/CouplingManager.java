@@ -328,6 +328,8 @@ public class CouplingManager {
         // connecting particular workspace components together)
         WorkspaceComponent source = coupling.getProducer().getParentComponent();
         WorkspaceComponent target = coupling.getConsumer().getParentComponent();
+        source.couplingAdded(coupling);
+        target.couplingAdded(coupling);
         SourceTarget sourceTarget = new SourceTarget(source, target);
         sourceTargetCouplings.put(
                 sourceTarget,

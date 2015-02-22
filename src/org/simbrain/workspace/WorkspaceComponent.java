@@ -438,14 +438,23 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Called when a coupling that this workspace owns the target or source of
-     * is removed from the workspace. This method will only be called once if
-     * the workspace owns both the source and the target.
+     * Called when a coupling attached to this component is removed. This method
+     * will only be called once if this component has both the source and the
+     * target.
      *
      * @param coupling The coupling that has been removed.
      */
-    protected void couplingRemoved(final Coupling<?> coupling) {
-        /* no default implementation */
+    public void couplingRemoved(final Coupling<?> coupling) {
+        // No implementation.
+    }
+
+    /**
+     * Called when a coupling is attached to this component.
+     *
+     * @param coupling The coupling that is being added
+     */
+    public void couplingAdded(Coupling<?> coupling) {
+        // Override is this function is needed in a component type
     }
 
     /**

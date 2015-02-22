@@ -3,8 +3,6 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -12,7 +10,6 @@
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
@@ -20,49 +17,33 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
         </div>
 
-        <p></p>
+        <!-- TODO: Warning about clamped... -->
+
         <h1>Backprop Network</h1>
 
-        <p><a href="http://en.wikipedia.org/wiki/Backpropagation">Backprop</a> is a standard form of <a href="../training.html">supervised learning</a>. It is perhaps the best known and most popular means of training neural networks.
-        </p>
+        <div><img style="float:right; padding-left: 30px; padding-right: 30px;" width="400" src="../../../Images/Backprop.png">
+        </div>
+
+        <p>A backprop network is a <a href="feedforward.html">feed forward</a> network that can be trained using the <a href="http://en.wikipedia.org/wiki/Backpropagation">backpropagation</a> learning algorithm, which is perhaps the best known and most popular means of training neural networks.</p>
+
+        <p>To use backprop networks, they must be created using <span class="command">Insert network > backprop</span>, trained, and then used.</p>
+
+        <p>Note that backprop can also be used separately from a backprop network, in <a href="../../Scripting.html">scripts</a> to custom train a set of weights.</p>
 
         <p>An example which steps through the process of creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a>
-            <br>
         </p>
+
         <p><span class="heading">Creation Dialog</span>
         </p>
-        <p style="margin-left: 40px;"><span class="heading2">Number of Layers: </span>Sets the number of layers in the network.
-        </p>
-        <p style="margin-left: 40px;"><span class="heading2">Number of Neurons: </span>Sets the number of neurons in the network.
-        </p>
-        <p style="margin-left: 40px;"><span class="heading2">Neuron Type:</span> Set neuron type here. Options below.
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Tanh:</span> TODO
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Logistic:</span> Click <a href="../neuron/Logistic.html">here</a> for description.
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Linear:
-</span> TODO
+
+        <p>The backprop creation dialog allows you to specify the network topology and neuron types.  This dialog is documented in <a href="feedforward.html">feed forward</a> docs.</p>
+
+        <p><span class="heading">Training</span>
         </p>
 
-        <p>After selecting&nbsp;
-            <span class="command">Insert &gt; Insert Network &gt; Backrpop</span>, a dialog will appear asking that you specify a topology, which means how many layers, and how many neurons per layer (from bottom to top layer).&nbsp; </p>
-        <p class="heading">Right Click Menu</p>
-        <p>
-            <p> <span style="margin-left: 40px;" class="heading2">Edit/Train Backprop: </span>Opens edit dialog to train backprop network. </p>
-            <p> <span style="margin-left: 40px;" class="heading2">Rename:</span> Renames netowork.</p>
-            <p> <span style="margin-left: 40px;" class="heading2">Remove Network:</span> Deletes network. </p>
-            <p> <span style="margin-left: 40px;" class="heading2">View/Edit Data: </span> View and edit training set data (input data and target data).
-            </p>
-        </p>
-        <p class="heading">Training</p>
+        <p>Training a network involves specifying input data, target data, and then running the algorithm. This process is covered <a href="../training.html">here</a>.</p>
 
-        <blockquote>
-            <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../training.html">here</a>.
-            </p>
-
-            <p>Details on the backprop algorithm and parameters that can be set are <a href="../training/backprop.html">here</a>.</p>
-        </blockquote>        
+        <p>Once the network is trained to perform a particular input-output mapping, it can be linked to other networks or neurons in Simbrain, or simply used on its own, primarily with the validation tab.</p>
     </div>
 </body>
 

@@ -28,6 +28,7 @@ import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -45,8 +46,17 @@ public class ProjectionComponent extends WorkspaceComponent {
     /** Projection vector consumer. */
     private AttributeType projectionVectorConsumer;
 
-    /** Objects which can be used to add data to time series plot. */
+    // TODO: This whole construct helps link loose neurons to projection plots
+    // but could become unwieldy as we move towards later networks. Consider
+    // removing. JKY 2/15.
+    /** Objects which can be used to link scalar couplings to projection plot. */
     private List<Dimension> dimensionList = new ArrayList<Dimension>();
+
+    /**
+     * When this flag is set, initialize the dimension of the projector when the
+     * next point is added.
+     */
+    private boolean initializeDimensions = false;
 
     /**
      * Create new Projection Component.
@@ -105,7 +115,7 @@ public class ProjectionComponent extends WorkspaceComponent {
                 "setValue", double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
-            addDimension(i);
+            addScalarDimension(i);
         }
         projectionVectorConsumer = new AttributeType(this, "Vector values",
                 double[].class, true);
@@ -141,7 +151,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      *
      * @param i index of dimension object
      */
-    protected void addDimension(int i) {
+    protected void addScalarDimension(int i) {
         for (Dimension dimension : dimensionList) {
             if (dimension.getDimension() == i) {
                 return;
@@ -161,7 +171,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         }
         dimensionList.clear();
         for (int i = 0; i < numDims; i++) {
-            addDimension(i);
+            addScalarDimension(i);
         }
     }
 
@@ -184,7 +194,6 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Add chart listener to model.
      */
     private void addListener() {
-
         projectionModel.addListener(new ChartListener() {
 
             /**
@@ -192,7 +201,7 @@ public class ProjectionComponent extends WorkspaceComponent {
              */
             public void dataSourceAdded(final int dimension) {
                 if (getDimension(dimension) == null) {
-                    addDimension(dimension);
+                    addScalarDimension(dimension);
                     ProjectionComponent.this.firePotentialAttributesChanged();
                 }
             }
@@ -289,6 +298,11 @@ public class ProjectionComponent extends WorkspaceComponent {
      * @param newPoint the new point
      */
     public void addPoint(double[] newPoint) {
+        if (initializeDimensions) {
+            projectionModel.init(newPoint.length);
+            initializeConsumers();
+            initializeDimensions = false;
+        }
         for (int i = 0; i < newPoint.length; i++) {
             if (i >= dimensionList.size()) {
                 break;
@@ -406,4 +420,16 @@ public class ProjectionComponent extends WorkspaceComponent {
         }
 
     }
+
+    @Override
+    public void couplingAdded(Coupling coupling) {
+        // When a vector coupling is added reinitialize dimension of the
+        // projector. This method does not have knowledge of the size of
+        // these vectors though,so the actual re-init happens after the first
+        // datapoint is sent in.
+        if (coupling.getProducer().getDataType() == double[].class) {
+            initializeDimensions = true;
+        }
+    }
+
 }

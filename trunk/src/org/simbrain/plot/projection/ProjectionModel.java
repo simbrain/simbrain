@@ -73,7 +73,7 @@ public class ProjectionModel extends ChartModel {
      *
      * @param numDataSources number of sources to initialize model with.
      */
-    private void init(int numDataSources) {
+    public void init(int numDataSources) {
         if (dataset == null) {
             dataset = new XYSeriesCollection();
             dataset.addSeries(new XYSeries("Data", false, true));
@@ -123,30 +123,6 @@ public class ProjectionModel extends ChartModel {
 
         });
 
-    }
-
-    /**
-     * Adds a consuming attribute. Increases the dimensionality of the projected
-     * data by one.
-     */
-    public void addSource() {
-        int index = projector.getDimensions() + 1;
-        projector.init(index);
-        fireDataSourceAdded(index);
-        resetData();
-    }
-
-    /**
-     * Removes a source from the dataset.
-     */
-    public void removeSource() {
-        int currentSize = projector.getDimensions() - 1;
-
-        if (currentSize > 0) {
-            projector.init(currentSize);
-            fireDataSourceRemoved(currentSize);
-            resetData();
-        }
     }
 
     /**

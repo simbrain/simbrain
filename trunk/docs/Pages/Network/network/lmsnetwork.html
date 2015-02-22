@@ -19,8 +19,13 @@
         </div>
 
         <h1>LMS Network</h1>
-        <p>The LMS Network is a two layer feed-forward network that implements the standard Least Mean Squares rule for learning.&nbsp; </p>
-        <p>The LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values.&nbsp; </p>
+        <p>The LMS Network is a two layer feed-forward network that implements the  Least Mean Squares or <a href="http://en.wikipedia.org/wiki/Delta_rule">Delta rule</a> for learning.</p>
+
+        <div><img style="float:right; padding-left: 30px; padding-right: 30px" width="350" src="../../../Images/lms.png">
+        </div>
+
+        <p>The LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values.</p>
+
         <p>The LMS rule works as follows. The change in a weight is equal to the product of a learning rate &#949;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.
         </p>
         <p><img src="../equations/LMSRule.png" height="54" width="203">

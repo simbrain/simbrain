@@ -23,31 +23,24 @@
         <p></p>
         <h1>Feedfoward Network</h1>
 
-        <p>
-        	TODO
-        </p>
+        <div><img style="float:right; padding-left: 20px; padding-right: 50px;" width="225" src="../../../Images/feedforward.png">
+        </div>
+
+        <p>A feed-forward network, comprising a sequence of <a href="../groups/BareNeuronGroup.html">bare neuron groups</a> connected by all-to-all <a href="../groups/SynapseGroup.html">synapse groups</a>. Activation in the bottom layer will propagate up the network. </p>
 
         <p><span class="heading">Creation Dialog</span>
         </p>
-        <p style="margin-left: 40px;"><span class="heading2">Number of Layers:</span> Sets the number of layers in the betwork.
-        </p>
-        <p style="margin-left: 40px;"><span class="heading2">Number of Neurons:</span> Sets the number of nuerons in the network.
-        </p>
-        <p style="margin-left: 40px;"><span class="heading2">Neuron Type:</span> Set neuron type here. 
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Tanh: </span>TODO
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Logistic:</span> Click <a href="../neuron/Logistic.html">here</a> for description.
-        </p>
-        <p style="margin-left: 80px;"><span class="heading2">Linear: </span>TODO
-        </p>
 
-        <p class="heading">Right Click Menu</p>
-   		<p>
-        <p> <span style="margin-left: 40px;" class="heading2">Rename:</span> Renames network.</p> 
-        <p> <span style="margin-left: 40px;" class="heading2">Remove Network:</span> Deletes network. </p>
-
-    </p>
+        <p>The network's topology is specified in a creation dialog:</p>
+        <blockquote>
+            <p><span class="heading2">Number of Layers:</span> Sets the number of layers in the betwork.  Enter a value in the text field and press <b>change</b>.  When you do, the dialog changes, allowing you to specify number of neurons and neuron type separately from each layer.  Layer 1 is the input layer.
+            </p>
+            <p><span class="heading2">Number of Neurons:</span> Sets the number of neurons for a given layer.
+            </p>
+            <p><span class="heading2">Neuron Type:</span> Sets the neuron type for a given layer.  By default these are variants of a <a href="../neuron/SigmoidalDiscrete.html">discrete sigmoidal</a> neuron.</p>
+        </blockquote>
+        <p><img width="375" src="../../../Images/ff_creation.png">
+        </p>
     </div>
 </body>
 

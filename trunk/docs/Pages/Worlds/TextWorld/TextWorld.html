@@ -29,31 +29,31 @@
 
         <p>Text worlds transform text into numbers (<a href="ReaderWorld.html">reader world</a>) or numbers in to text (<a href="DisplayWorld.html">display world</a>). They are primarily used to model language, for example, to make networks that "read" text or produce simulated speech. They are primarily meant to help develop connectionist models of language processing (A classic example in this domain is Seidenberg's <a href="http://www.wlu.ca/documents/39510/Seidenberg.pdf">triangle model</a>). However, text worlds can also be used more generally as a way of incorporating text processing in to a simulation, for example to log information or issue commands to a network.</p>
 
+        <div style="float:left; padding: 20px;"><img src="../../../Images/TextWorld.gif" width="300" border="1">
+        </div>
+
         <p>To see some simulations that use workspaces, try the workspace <span class="command">Scripts</span> menu. Three scripts that use workspaces are <span class="command">ElmanPhonemes.bsh</span>, <span class="command">ElmanSentences.bsh</span>, and <span class="command">tisk2.bsh</span>.</p>
 
         <p>(Note that in these docs we'll use "text" and "word" to refer to any string of text. Thus, a "word" can be a letter, or a string representation of a <a href="http://en.wikipedia.org/wiki/Phoneme">phoneme</a> or <a href="http://en.wikipedia.org/wiki/Grapheme">grapheme</a>, or abstract text used to log or display information.)</p>
-
 
         <p class="heading">The basic idea</p>
 
         <p>There are two kinds of text world: <a href="ReaderWorld.html">Reader Worlds</a> and <a href="DisplayWorld.html">Display Worlds</a>. Here is the basic idea of how they work (see the sub-pages for more details).</p>
 
-        <p>
-            <center>
-                <table>
-                    <tr class="row">
-                        <td class="col"><img src="../../../Images/ReaderWorldDiagram.png" width="300" border="1">
-                            <br>Reader World
-                        </td>
-                        <td class="col">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                        </td>
-                        <td class="col"><img src="../../../Images/DisplayWorld.png" width="300" border="1">
-                            <br>Display World
-                        </td>
-                    </tr>
-                </table>
-            </center>
-        </p>
+        <div style="float:right; padding-left: 40px;">
+            <table>
+                <tr class="row">
+                    <td class="col"><img src="../../../Images/ReaderWorldDiagram.png" width="300" border="1">
+                        <br>Reader World
+                    </td>
+                    <td class="col">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </td>
+                    <td class="col"><img src="../../../Images/DisplayWorld.png" width="300" border="1">
+                        <br>Display World
+                    </td>
+                </tr>
+            </table>
+        </div>
 
         <p>Reader worlds produce scalars or vectors, while display world consume scalars and vectors (recall that producers and consumers are parts of <a href="../../Workspace/Couplings.html">couplings</a>). It may help to think of the consumers and producers as relating the body to the brain. Reader world <em>produces</em> neural activity: it takes what we see or hear and converts these in to neural activations which it sends to the brain. Display world <em>consumes</em> neural activity: it takes activations from the brain, and converts them in to writing and speech.)</p>
 

@@ -63,6 +63,7 @@ import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewHistogramAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
 import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;
+import org.simbrain.workspace.actions.chart.NewRasterPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
 import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
@@ -113,6 +114,9 @@ public class WorkspaceActionManager {
 
     /** New histogram chart action. */
     private final Action newHistogramAction;
+    
+    /** New raster chart action. */
+    private final Action newRasterPlotAction; 
 
     /** New pie chart action. */
     private final Action newPieChartAction;
@@ -223,6 +227,7 @@ public class WorkspaceActionManager {
         newProjectionPlotAction = new NewProjectionPlotAction(workspace);
         newScatterPlotAction = new NewScatterPlotAction(workspace);
         newTimeSeriesAction = new NewTimeSeriesAction(workspace);
+        newRasterPlotAction = new NewRasterPlotAction(workspace);
 
         newDataWorldAction = new NewDataWorldAction(workspace);
         newMidiWorldAction = new NewMidiWorldAction(workspace);
@@ -293,7 +298,8 @@ public class WorkspaceActionManager {
     public List<Action> getPlotActions() {
         return Arrays.asList(new Action[] { newBarChartAction,
                 newHistogramAction, newPieChartAction, newProjectionPlotAction,
-                newScatterPlotAction, newTimeSeriesAction });
+                newScatterPlotAction, newTimeSeriesAction,
+                newRasterPlotAction });
     }
 
     /**

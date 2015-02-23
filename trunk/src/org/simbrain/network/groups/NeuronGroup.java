@@ -696,6 +696,23 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         return retArray;
     }
+    
+    public double[] getSpikeIndexes() {
+        List<Double> inds = new ArrayList<Double>(size());
+        int i = 0;
+        for (Neuron n : neuronList) {
+            if (n.isSpike()) {
+                inds.add((double) i);
+            }
+            i++;
+        }
+        double [] vals = new double[inds.size()];
+        int j = 0;
+        for (Double d : inds) {
+            vals[j++] = d.doubleValue();
+        }
+        return vals;
+    }
 
     // public byte [] getSpikes() {
     // if (!isSpikingNeuronGroup) {

@@ -81,6 +81,8 @@ public final class NetworkComponent extends WorkspaceComponent {
                 double.class, false));
         addProducerType(new AttributeType(this, "NeuronGroup",
                 "getActivations", double[].class, true));
+        addProducerType(new AttributeType(this, "NeuronGroup",
+                "getSpikeIndices", double[].class, true));
         addProducerType(new AttributeType(this, "SynapseGroup",
                 "getWeightVector", double[].class, true));
 
@@ -279,6 +281,12 @@ public final class NetworkComponent extends WorkspaceComponent {
                         producer.setCustomDescription("Neuron Group: "
                                 + group.getLabel());
                         returnList.add(producer);
+                        PotentialProducer producer2 = getAttributeManager()
+                                .createPotentialProducer(group,
+                                        "getSpikeIndexes", double[].class);
+                        producer2.setCustomDescription("Spike Trains: "
+                                + group.getLabel());
+                        returnList.add(producer2);
 
                     }
                 }

@@ -82,6 +82,8 @@ import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartGui;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionGui;
+import org.simbrain.plot.rasterchart.RasterPlotComponent;
+import org.simbrain.plot.rasterchart.RasterPlotGui;
 import org.simbrain.plot.scatterplot.ScatterPlotComponent;
 import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
@@ -399,6 +401,7 @@ public class SimbrainDesktop {
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
         registerComponent(TimeSeriesPlotComponent.class,
                 TimeSeriesPlotGui.class);
+        registerComponent(RasterPlotComponent.class, RasterPlotGui.class);
         registerComponent(VisionWorldComponent.class,
                 VisionWorldDesktopComponent.class);
         registerComponent(GameComponent.class, GameDesktopComponent.class);
@@ -725,13 +728,18 @@ public class SimbrainDesktop {
      * This nasty declaration creates a map of the workspace guiComponents to
      * their associated wrapper class.
      */
-    private static final Map<Class<? extends WorkspaceComponent>, Class<? extends GuiComponent<?>>> wrappers = new HashMap<Class<? extends WorkspaceComponent>, Class<? extends GuiComponent<?>>>();
+    private static final Map<Class<? extends WorkspaceComponent>,
+            Class<? extends GuiComponent<?>>> wrappers =
+            new HashMap<Class<? extends WorkspaceComponent>,
+            Class<? extends GuiComponent<?>>>();
 
     /**
      * Registers a gui wrapper class association with a component class.
      *
-     * @param component The component class.
-     * @param gui The gui class.
+     * @param component
+     *            The component class.
+     * @param gui
+     *            The gui class.
      */
     private static void registerComponent(
             final Class<? extends WorkspaceComponent> component,

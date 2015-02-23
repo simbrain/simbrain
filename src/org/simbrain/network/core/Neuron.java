@@ -131,7 +131,7 @@ public class Neuron {
      * The polarity of this neuron (excitatory, inhibitory, or none, which is
      * null).
      */
-    private Polarity polarity = null;
+    private Polarity polarity = Polarity.BOTH;
 
     /** Target value. */
     private double targetValue;
@@ -409,6 +409,7 @@ public class Neuron {
             Synapse dup = fanOut.get(synapse.getTarget());
             if (dup == null) { // There is no duplicate
                 fanOut.put(synapse.getTarget(), synapse);
+                synapse.setStrength(polarity.value(synapse.getStrength()));
             } else { // There is a duplicate connecting src and target
                 // Check that we're not trying to add the exact same synapse...
                 if (!dup.equals(synapse)) {

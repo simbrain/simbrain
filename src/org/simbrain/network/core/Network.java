@@ -1107,7 +1107,6 @@ public class Network {
                 timeType = TimeType.CONTINUOUS;
             }
         }
-        setTime(0);
     }
 
     /**

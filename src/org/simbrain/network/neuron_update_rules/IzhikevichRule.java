@@ -91,13 +91,11 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
                 >= neuron.getNetwork().getTime();
         final double activation = neuron.getActivation();
         double inputs = 0;
-        if (!refractory) {
-            inputs = inputType.getInput(neuron);
-            if (addNoise) {
-                inputs += noiseGenerator.getRandom();
-            }
-            inputs += iBg + getAppliedInput();
+        inputs = inputType.getInput(neuron);
+        if (addNoise) {
+            inputs += noiseGenerator.getRandom();
         }
+        inputs += iBg + getAppliedInput();
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
         double val = activation

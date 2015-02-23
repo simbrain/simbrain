@@ -16,10 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.rasterchart;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -29,6 +33,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
@@ -39,7 +45,7 @@ import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
  * TODO: Make a version that extends this, like network panel case. Then
  * document in UML
  */
-public class TimeSeriesPlotPanel extends JPanel {
+public class RasterPlotPanel extends JPanel {
 
     /** Chart un-initialized instance. */
     private JFreeChart chart;
@@ -51,7 +57,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     private ChartPanel chartPanel = new ChartPanel(null);
 
     /** Data model. */
-    private TimeSeriesModel model;
+    private RasterModel model;
 
     /** Button panel. */
     private JPanel buttonPanel = new JPanel();
@@ -61,7 +67,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      *
      * @param RasterModel model underlying model
      */
-    public TimeSeriesPlotPanel(final TimeSeriesModel timeSeriesModel) {
+    public RasterPlotPanel(final RasterModel timeSeriesModel) {
 
         model = timeSeriesModel;
         setPreferredSize(PREFERRED_SIZE);
@@ -83,7 +89,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void init() {
 
         // Generate the graph
-        chart = ChartFactory.createXYLineChart("Time series", // Title
+        chart = ChartFactory.createScatterPlot("Time series", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
                 model.getDataset(), // Dataset
@@ -92,6 +98,16 @@ public class TimeSeriesPlotPanel extends JPanel {
                 true, // Use tooltips
                 false // Configure chart to generate URLs?
                 );
+        XYItemRenderer renderer = ((XYPlot) chart.getPlot()).getRenderer();
+        renderer.setSeriesPaint(0, Color.BLACK);
+        double size = 2.0;
+        double delta = size / 2.0;
+        Shape shape1 = new Rectangle2D.Double(-delta, -delta, size, size);
+        Shape shape2 = new Ellipse2D.Double(-delta, -delta, size, size);
+        renderer.setSeriesShape(0, shape1);
+        renderer.setSeriesShape(1, shape2);
+        renderer.setSeriesShape(2, shape1);
+        renderer.setSeriesShape(3, shape2);
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
@@ -145,10 +161,10 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void addAddDeleteButtons() {
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(TimeSeriesPlotActions
+        deleteButton.setAction(RasterPlotActions
                 .getRemoveSourceAction(this));
         JButton addButton = new JButton("Add");
-        addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
+        addButton.setAction(RasterPlotActions.getAddSourceAction(this));
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
 
@@ -159,7 +175,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void addClearGraphDataButton() {
         JButton clearButton = new JButton("Clear");
-        clearButton.setAction(TimeSeriesPlotActions.getClearGraphAction(this));
+        clearButton.setAction(RasterPlotActions.getClearGraphAction(this));
         buttonPanel.add(clearButton);
     }
 
@@ -169,7 +185,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void addPreferencesButton() {
         JButton prefsButton = new JButton("Prefs");
         prefsButton.setHideActionText(true);
-        prefsButton.setAction(TimeSeriesPlotActions
+        prefsButton.setAction(RasterPlotActions
                 .getPropertiesDialogAction(this));
         buttonPanel.add(prefsButton);
     }
@@ -196,7 +212,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     /**
      * @return the model
      */
-    public TimeSeriesModel getTimeSeriesModel() {
+    public RasterModel getTimeSeriesModel() {
         return model;
     }
 }

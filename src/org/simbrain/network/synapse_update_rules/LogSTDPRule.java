@@ -100,23 +100,43 @@ public class LogSTDPRule extends STDPRule {
         // delta_t = tar.getLastSpikeTime()
         // - (src.getLastSpikeTime() + delay);
         // }
-        double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
-        if (delta_t < 0) {
-            calcW_plusTerm(synapse);
-            delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
-                    / tau_plus)) * (1 + noise);
-        } else if (delta_t > 0) {
-            calcW_minusTerm(synapse);
-            delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t
-                    / tau_minus)) * (1 + noise);
-        } else {
-            delta_w = 0;
+        double noise = (1 + ProbDistribution.NORMAL.nextRand(0,
+                Math.sqrt(noiseVar)));
+        if (synapse.getStrength() >= 0) {
+            if (delta_t < 0) {
+                calcW_plusTerm(synapse);
+                delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
+                        / tau_plus)) * (1 + noise);
+            } else if (delta_t > 0) {
+                calcW_minusTerm(synapse);
+                delta_w = timeStep * learningRate * (-W_minus
+                        * Math.exp(-delta_t / tau_minus)) * (1 + noise);
+            } else {
+                delta_w = 0;
+            }
+            synapse.setStrength(synapse.clip(synapse.getStrength() + delta_w));
+            if (synapse.getTarget().isSpike()) {
+                synapse.setStrength(synapse.clip(synapse.getStrength()
+                        - learningRate * 0.01));
+            }
         }
-        synapse.setStrength(synapse.clip(synapse.getStrength() + delta_w));
+        if (synapse.getStrength() <= 0) {
+            if (delta_t > 0) {
+                delta_w = learningRate * 1.5 * Math.exp(-delta_t / tau_plus);
+            } else if (delta_t < 0) {
+                delta_w = learningRate * -1 * Math.exp(delta_t / tau_minus);
+            } else {
+                delta_w = 0;
+            }
+            synapse.setStrength(synapse.clip(synapse.getStrength() - delta_w));
+            if (synapse.getSource().isSpike()) {
+                synapse.setStrength(synapse.clip(synapse.getStrength()
+                        + learningRate * 0.2));
+            }
+        }
     }
 
     /**
-     * 
      * @param s
      * @return
      */

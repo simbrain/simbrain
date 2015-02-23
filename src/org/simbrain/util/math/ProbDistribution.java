@@ -189,12 +189,12 @@ public enum ProbDistribution {
 
         @Override
         public String getParam1Name() {
-            return "Mean (\u03BC)";
+            return "Location (\u03BC)";
         }
 
         @Override
         public String getParam2Name() {
-            return "Std. Dev. (\u03C3)";
+            return "Scale (\u03C3)";
         }
 
         @Override

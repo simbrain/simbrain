@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.rasterchart;
 
 import java.awt.event.ActionEvent;
 
@@ -32,7 +32,7 @@ import org.simbrain.resource.ResourceManager;
  *
  * @author jyoshimi
  */
-public class TimeSeriesPlotActions {
+public class RasterPlotActions {
 
     /**
      * Shows a properties dialog for the trainer.
@@ -41,7 +41,7 @@ public class TimeSeriesPlotActions {
      * @return the action
      */
     public static Action getPropertiesDialogAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -67,7 +67,7 @@ public class TimeSeriesPlotActions {
      * @return the action
      */
     public static Action getClearGraphAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -93,7 +93,7 @@ public class TimeSeriesPlotActions {
      * @return the action
      */
     public static Action getAddSourceAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -121,7 +121,7 @@ public class TimeSeriesPlotActions {
      * @return the action
      */
     public static Action getRemoveSourceAction(
-            final TimeSeriesPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel timeSeriesPanel) {
         return new AbstractAction() {
 
             // Initialize

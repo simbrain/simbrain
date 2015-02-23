@@ -86,9 +86,9 @@ public class UDF extends JumpAndDecay {
             init(s);
             firstTime = false;
         }
-        final double ISI = lastSpikeTime - s.getNetwork().getTime();
         final double A;
         if (s.getSource().isSpike()) {
+            final double ISI = lastSpikeTime - s.getNetwork().getTime();
             u = U + (u * (1 - U) * Math.exp(ISI / F));
             R = 1 + ((R - (u * R) - 1) * Math.exp(ISI / D));
             A = R * s.getStrength() * u;
@@ -197,7 +197,7 @@ public class UDF extends JumpAndDecay {
             F = rand.getRandom();
             spikeDecay.setTimeConstant(3);
         }
-
+        u = U;
     }
 
 }

@@ -55,8 +55,10 @@ public class BufferedUpdateTask implements Task {
 				break;
 			}
 			host.update();
-			for (Synapse s : host.getFanIn()) {
-				s.update();
+			if (!host.getUpdateRule().isSkipsSynapticUpdates()) {
+    			for (Synapse s : host.getFanIn()) {
+    				s.update();
+    			}
 			}
 		}
 	}

@@ -409,7 +409,6 @@ public class Neuron {
             Synapse dup = fanOut.get(synapse.getTarget());
             if (dup == null) { // There is no duplicate
                 fanOut.put(synapse.getTarget(), synapse);
-                synapse.setStrength(polarity.value(synapse.getStrength()));
             } else { // There is a duplicate connecting src and target
                 // Check that we're not trying to add the exact same synapse...
                 if (!dup.equals(synapse)) {

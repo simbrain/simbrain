@@ -1092,7 +1092,7 @@ public class Neuron {
      * @return whether this neuron is polarized.
      */
     public boolean isPolarized() {
-        return polarity != null;
+        return polarity != null && polarity != Polarity.BOTH;
     }
 
     /**

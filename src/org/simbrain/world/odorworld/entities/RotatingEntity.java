@@ -101,6 +101,8 @@ public class RotatingEntity extends OdorWorldEntity {
             imageMap = RotatingEntityManager.getRotatingTileset("lion", 15);
         } else if (entityType.equalsIgnoreCase("Susi")) {
             imageMap = RotatingEntityManager.getRotatingTileset("susi", 20);
+        } else if (entityType.equalsIgnoreCase("Jake")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("jake", 20);
         } else if (entityType.equalsIgnoreCase("Steve")) {
             imageMap = RotatingEntityManager.getRotatingTileset("steve", 20);
         }
@@ -238,7 +240,7 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Amy", "Arnold", "Boy", "Circle", "Cow", "Girl",
+                return new Object[] { "Amy", "Arnold", "Boy", "Circle", "Cow",  "Girl", "Jake",
                         "Lion", "Mouse", "Susi", "Steve" };
             }
         };

@@ -61,6 +61,7 @@ div.section
 	padding: 20px 20px 38px; 
 	min-width: 700px; 
 	border: solid 1px #628596; 
+	overflow: auto;
 }
 	
 div.initial

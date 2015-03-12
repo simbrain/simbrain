@@ -151,7 +151,7 @@ public class Neuron {
      * values can be useful in scripts.
      */
     private double auxValue;
-
+    
     /**
      * Construct a neuron with all default values in the specified network.
      * Sometimes used as the basis for a template neuron which will be edited
@@ -467,8 +467,8 @@ public class Neuron {
      */
     public double getWeightedInputs() {
         double wtdSum = inputValue;
-        for (Synapse w : fanIn) {
-            wtdSum += w.calcWeightedSum();
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+        	wtdSum += fanIn.get(i).calcWeightedSum();
         }
         return wtdSum;
     }
@@ -484,10 +484,16 @@ public class Neuron {
      */
     public double getSynapticInput() {
         double wtdSum = inputValue;
-        for (Synapse s : fanIn) {
-            wtdSum += s.calcPSR();
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+        	wtdSum += fanIn.get(i).calcPSR();
         }
         return wtdSum;
+    }
+    
+    public void updateFanIn() {
+    	for (int i = 0, n = fanIn.size(); i < n; i++) {
+        	fanIn.get(i).update();
+        }
     }
 
     /**
@@ -949,7 +955,7 @@ public class Neuron {
             synapse.randomize();
         }
     }
-
+    
     /**
      * A method that returns a list of all the neuron update rules associated
      * with a list of neurons.

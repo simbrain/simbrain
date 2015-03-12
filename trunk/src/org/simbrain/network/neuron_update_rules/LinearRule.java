@@ -91,8 +91,8 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = inputType.getInput(neuron) + bias;
-        double val = slope * wtdInput;
+        double wtdInput = inputType.getInput(neuron);
+        double val = (slope * wtdInput) + bias;
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

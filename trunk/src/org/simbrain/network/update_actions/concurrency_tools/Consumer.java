@@ -18,9 +18,10 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+
+import org.simbrain.network.update_actions.ConcurrentBufferedUpdate.CyclicTaskQueue;
 
 /**
  * The underlying runnable consumer assigned to a thread, which consumes network
@@ -42,7 +43,7 @@ public class Consumer implements Runnable {
      * The blocking queue containing tasks this consumer will attempt to
      * execute.
      */
-    private final BlockingQueue<Task> taskQueue;
+    private final CyclicTaskQueue taskQueue;
 
     /**
      * An optional int identifier number used to label this consumer should such
@@ -67,14 +68,14 @@ public class Consumer implements Runnable {
      *            for debugging, but can be used to call out an individual
      *            consumer elsewhere.
      */
-    public Consumer(CyclicBarrier barrier, BlockingQueue<Task> taskQueue,
+    public Consumer(CyclicBarrier barrier, CyclicTaskQueue taskQueue,
             int no) {
         this.barrier = barrier;
         this.taskQueue = taskQueue;
         this.idNo = no;
     }
 
-    /**
+	/**
      * Executes tasks or waits on a cyclic barrier until a poison task is
      * consumed which kills this consumer (sets {@link #live} to false).
      */
@@ -82,15 +83,7 @@ public class Consumer implements Runnable {
     public void run() {
         while (live) {
             try {
-                Task t = taskQueue.take();
-                if (t.isPoison()) {
-                    live = false;
-                    barrier.await();
-                } else if (t.isWaiting()) {
-                    barrier.await();
-                } else {
-                    t.perform();
-                }
+                taskQueue.take().perform();
             } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }

@@ -72,13 +72,13 @@ import org.simbrain.workspace.*;
     double EI_CONST = 0.2;
     double IE_CONST = 0.4;
     double II_CONST = 0.1;
-    double LAMBDA = 200;
+    double LAMBDA = 150;
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");
     workspace.addWorkspaceComponent(networkComponent);
     Network network = networkComponent.getNetwork();
-    network.setTimeStep(0.1);
+    network.setTimeStep(0.5);
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     layout.setInitialLocation(new Point(10, 10));
     GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
@@ -89,7 +89,6 @@ import org.simbrain.workspace.*;
     // Random rand = new Random();
     Randomizer rand = new Randomizer();
     rand.setPdf(ProbDistribution.NORMAL);
-    rand.setParam2(4);
     for (int i = 0; i < NUM_NEURONS; i++) {
     	Neuron neuron = new Neuron(network);
         neurons.add(neuron);
@@ -102,6 +101,7 @@ import org.simbrain.workspace.*;
             iz.setB(0.25 - (0.05 * rVal));
             iz.setC(-65);
             iz.setD(2);
+            rand.setParam2(0.5);
         } else {
             neuron.setPolarity(Polarity.EXCITATORY);
             iz.setRefractoryPeriod(2.0);
@@ -111,8 +111,9 @@ import org.simbrain.workspace.*;
             rVal *= rVal;
             iz.setC(-65.0 + (15.0 * rVal));
             iz.setD(8.0 - (6 * rVal));
+            rand.setParam2(1.2);
         }
-        iz.setiBg(9.0);
+        iz.setiBg(3.5);
         iz.setAddNoise(true);
         iz.setNoiseGenerator(rand);
         neuron.setUpdateRule(iz);
@@ -136,10 +137,10 @@ import org.simbrain.workspace.*;
 		ProbDistribution.LOGNORMAL);
 	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
 		ProbDistribution.LOGNORMAL);
-	exRand.setParam1(0.5);
-	//exRand.setParam2(0.5);
+	exRand.setParam1(0.8);
+	exRand.setParam2(1.0);
 	inRand.setParam1(1.5);	
-	//inRand.setParam2(1.0);
+	inRand.setParam2(1.0);
 
 	Radial rCon = new Radial(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
 	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
@@ -155,18 +156,19 @@ import org.simbrain.workspace.*;
 	network.addGroup(sg);
 
 	SynapseGroup outCon = SynapseGroup.createSynapseGroup(ng1, outs, new OneToOne());
-	Step step = new Step();
-	step.setResponseDuration(100000000);
-	outCon.setSpikeResponder(step, Polarity.BOTH);
-	//ConvolvedJumpAndDecay outSR = new ConvolvedJumpAndDecay();
-	//outSR.setTimeConstant(3);
-	//outCon.setSpikeResponder(step, Polarity.BOTH);
+	ConvolvedJumpAndDecay outSR = new ConvolvedJumpAndDecay();
+	outSR.setTimeConstant(10);
+	outCon.setSpikeResponder(outSR, Polarity.BOTH);
 	outCon.setLabel("One to One Connections");
 	network.addGroup(outCon);
 	for (Neuron n : outs.getNeuronList()) {
 		n.setUpperBound(2);
+		n.setLowerBound(-4);
         	if (n.getFanIn().get(0).getStrength() < 0) {
     			((LinearRule) n.getUpdateRule()).setSlope(-1);
+    			((LinearRule) n.getUpdateRule()).setBias(1);
+    		} else {
+    			((LinearRule) n.getUpdateRule()).setBias(-1);
     		}
      }
 

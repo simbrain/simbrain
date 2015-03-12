@@ -150,6 +150,12 @@ public class Network {
      * the initial synapse visibility flag is set false.
      */
     private static int synapseVisibilityThreshold = 200;
+    
+    /** 
+     * A variable telling the network not to fire events to any listeners
+     * during update. 
+     */
+    private volatile boolean fireUpdates = true;
 
     /** Static initializer */
     {
@@ -174,28 +180,29 @@ public class Network {
      * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
-    	for (NetworkListener nl : networkListeners) {
-    		nl.setUpdateComplete(false);
+    	for (int i = 0, n = networkListeners.size(); i < n; i++) {
+    		networkListeners.get(i).setUpdateComplete(false);
     	}
         // Perform update
-        for (NetworkUpdateAction action : updateManager.getActionList()) {
-            action.invoke();
-        }
+    	for (int i = 0, n = updateManager.getActionList().size(); i < n;
+    			i++) {
+    		updateManager.getActionList().get(i).invoke();
+    	}
 
-        // Fire update events for GUI update. Loose items, then groups.
-        fireSynapsesUpdated(synapseList); // Loose synapses
-        fireNeuronsUpdated(neuronList); // Loose neurons
-        for (Group g : getFlatGroupList()) {
-            fireGroupUpdated(g); // Groups
-        }
+    	if (fireUpdates) {
+    	    // Fire update events for GUI update. Loose items, then groups.
+    	    fireSynapsesUpdated(synapseList); // Loose synapses
+    	    fireNeuronsUpdated(neuronList); // Loose neurons
+    	    for (int i = 0, n = groupList.size(); i < n; i++) {
+    	        fireGroupUpdated(groupList.get(i)); // Groups
+    	    }
+    	}
 
         // Clear input nodes
         clearInputs();
-
         // Update Time
         updateTime();
         setUpdateCompleted(true);
-
     }
 
     /**
@@ -955,9 +962,12 @@ public class Network {
         xstream.omitField(NetworkUpdateManager.class, "listeners");
         xstream.omitField(ConcurrentBufferedUpdate.class, "consumerThreads");
         xstream.omitField(ConcurrentBufferedUpdate.class, "neurons");
-        xstream.omitField(ConcurrentBufferedUpdate.class, "tasksQueue");
+        xstream.omitField(ConcurrentBufferedUpdate.class, "taskSet");
         xstream.omitField(ConcurrentBufferedUpdate.class, "network");
         xstream.omitField(ConcurrentBufferedUpdate.class, "producer");
+        xstream.omitField(ConcurrentBufferedUpdate.class, "collectorThread");
+        xstream.omitField(ConcurrentBufferedUpdate.class,
+                "synchronizingBarrier");
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 
@@ -982,6 +992,8 @@ public class Network {
      */
     private Object readResolve() {
 
+    	fireUpdates = true;
+    	
         // Initialize listener lists
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();
@@ -1187,9 +1199,9 @@ public class Network {
      *            the neurons whose state has changed
      */
     public void fireNeuronsUpdated(Collection<Neuron> neurons) {
-        for (NetworkListener listener : networkListeners) {
-            listener.updateNeurons(neurons);
-        }
+    	for (int i = 0, n = networkListeners.size(); i < n; i++) {
+    		networkListeners.get(i).updateNeurons(neurons);
+    	}
     }
 
     /**
@@ -1211,9 +1223,9 @@ public class Network {
      *            the synapses whose state has changed
      */
     public void fireSynapsesUpdated(Collection<Synapse> synapses) {
-        for (NetworkListener listener : networkListeners) {
-            listener.updateSynapses(synapses);
-        }
+    	for (int i = 0, n = networkListeners.size(); i < n; i++) {
+    		networkListeners.get(i).updateSynapses(synapses);
+    	}
     }
 
     /**
@@ -1486,8 +1498,8 @@ public class Network {
      *            reference to group that has been updated.
      */
     public void fireGroupUpdated(final Group groups) {
-        for (GroupListener listener : groupListeners) {
-            listener.groupUpdated(groups);
+        for (int i = 0, n = groupListeners.size(); i < n; i++) {
+            groupListeners.get(i).groupUpdated(groups);
         }
     }
     
@@ -1831,6 +1843,14 @@ public class Network {
      */
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
+    }
+
+    public boolean isFireUpdates() {
+        return fireUpdates;
+    }
+
+    public void setFireUpdates(boolean fireUpdates) {
+        this.fireUpdates = fireUpdates;
     }
 
 }

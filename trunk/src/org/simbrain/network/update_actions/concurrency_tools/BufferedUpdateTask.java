@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
+import java.util.Random;
+
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
@@ -35,11 +37,14 @@ public class BufferedUpdateTask implements Task {
 	/** The host neurons, whose update will constitute this task. */
 	private final Neuron[] hosts;
 
+	private final int hostSize;
+	
 	/**
 	 * @param hosts
 	 */
 	public BufferedUpdateTask(final Neuron[] hosts) {
 		this.hosts = hosts;
+		this.hostSize = hosts.length;
 	}
 
 	/**
@@ -50,15 +55,13 @@ public class BufferedUpdateTask implements Task {
 	 */
 	@Override
 	public void perform() {
-		for (Neuron host : hosts) {
-			if (host == null) {
+		for (int i = 0; i < hostSize; i++) {
+			if (hosts[i] == null) {
 				break;
 			}
-			host.update();
-			if (!host.getUpdateRule().isSkipsSynapticUpdates()) {
-    			for (Synapse s : host.getFanIn()) {
-    				s.update();
-    			}
+			hosts[i].update();
+			if (!hosts[i].getUpdateRule().isSkipsSynapticUpdates()) {
+				hosts[i].updateFanIn();
 			}
 		}
 	}
@@ -71,6 +74,10 @@ public class BufferedUpdateTask implements Task {
 	@Override
 	public boolean isWaiting() {
 		return false;
+	}
+	
+	public Neuron[] getHosts() {
+		return hosts;
 	}
 
 }

@@ -21,8 +21,6 @@ package org.simbrain.network.core;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.simbrain.network.groups.SynapseGroup;
@@ -112,6 +110,8 @@ public class Synapse {
     private double [] delayManager;
 
     private int dlyPtr = 0;
+    
+    private double dlyVal = 0;
     
     /**
      * Construct a synapse using a source and target neuron, defaulting to
@@ -264,21 +264,21 @@ public class Synapse {
         if (!enabled) {
             return 0;
         } else {
-            if (spikeResponder != null) {
-                spikeResponder.update(this);
-            } else {
-                psr = source.getActivation() * strength;
-            }
+        	if (spikeResponder != null) {
+        		spikeResponder.update(this);
+        	} else {
+        		return calcWeightedSum();
+        	}
             if (delay == 0) {
                 return psr;
             } else {
-                double retVal = dequeu();
+                dlyVal = dequeu();
                 if (psr > MIN_PSR) {
                     enqueu(psr);
                 } else {
                     enqueu(0);
                 }
-                return retVal;
+                return dlyVal;
             }
         }
     }
@@ -296,9 +296,9 @@ public class Synapse {
         } else {
             psr = source.getActivation() * strength;
             if (delay != 0) {
-                double retVal = dequeu();
+                dlyVal = dequeu();
                 enqueu(psr);
-                return retVal;
+                return dlyVal;
             } else {
                 return psr;
             }
@@ -554,7 +554,10 @@ public class Synapse {
      * @return Returns the id.
      */
     public String getId() {
-        return id;
+        if (id != null)
+            return id;
+        else
+            return "";
     }
 
     /**
@@ -638,11 +641,6 @@ public class Synapse {
      * @return the deque.
      */
     private double dequeu() {
-//        double retVal = delayManager[dlyPtr++];
-//        for (int i = 1; i < delay; i++) {
-//            delayManager[i - 1] = delayManager[i];
-//        }
-//        delayManager[delay - 1] = 0;
         if(dlyPtr == delay) {
             dlyPtr = 0;
         }
@@ -655,15 +653,12 @@ public class Synapse {
      * @param val Value to enqueu
      */
     private void enqueu(final double val) {
-//        delayManager[delay - 1] = val;
         if (dlyPtr == 0) {
             delayManager[delay - 1] = val;
         } else {
             delayManager[dlyPtr - 1] = val;
         }
     }
-    
-    
 
     @Override
     public String toString() {
@@ -719,29 +714,29 @@ public class Synapse {
         return learningRule;
     }
 
-    /**
-     * Sets the update rule using a String description. The provided description
-     * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-     *
-     * @param name the "simple name" of the class associated with the neuron
-     *            rule to set.
-     */
-    public void setLearningRule(String name) {
-        try {
-            SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
-                    "org.simbrain.network.synapse_update_rules." + name)
-                    .newInstance();
-            setLearningRule(newRule);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(
-                    "The provided learning rule name, \""
-                            + name
-                            + "\", does not correspond to a known synapse type."
-                            + "\n Could not find " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * Sets the update rule using a String description. The provided description
+//     * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
+//     *
+//     * @param name the "simple name" of the class associated with the neuron
+//     *            rule to set.
+//     */
+//    public void setLearningRule(String name) {
+//        try {
+//            SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
+//                    "org.simbrain.network.synapse_update_rules." + name)
+//                    .newInstance();
+//            setLearningRule(newRule);
+//        } catch (ClassNotFoundException e) {
+//            throw new IllegalArgumentException(
+//                    "The provided learning rule name, \""
+//                            + name
+//                            + "\", does not correspond to a known synapse type."
+//                            + "\n Could not find " + e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * Change this synapse's learning rule.
@@ -782,18 +777,18 @@ public class Synapse {
         return synapse;
     }
 
-    /**
-     * Returns a template synapse with a (string) specified learning rule.
-     *
-     * @param rule the learning rule.
-     * @return the template synapse
-     * @see instantiateTemplateSynapse
-     */
-    public static Synapse getTemplateSynapse(String rule) {
-        Synapse synapse = getTemplateSynapse();
-        synapse.setLearningRule(rule);
-        return synapse;
-    }
+//    /**
+//     * Returns a template synapse with a (string) specified learning rule.
+//     *
+//     * @param rule the learning rule.
+//     * @return the template synapse
+//     * @see instantiateTemplateSynapse
+//     */
+//    public static Synapse getTemplateSynapse(String rule) {
+//        Synapse synapse = getTemplateSynapse();
+//        synapse.setLearningRule(rule);
+//        return synapse;
+//    }
 
     /**
      * A method which takes in a collection of synapses and returns a list of

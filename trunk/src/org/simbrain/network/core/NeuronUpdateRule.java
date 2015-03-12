@@ -351,7 +351,7 @@ public abstract class NeuronUpdateRule {
     }
 
     public boolean isSkipsSynapticUpdates() {
-        return false;
+    	return false;
     }
     
 }

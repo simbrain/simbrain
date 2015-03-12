@@ -258,7 +258,7 @@ public class Sparse implements ConnectNeurons {
             new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup
             .getTargetNeurons().toArray(new Neuron[numTar]);
-        generateSparseOrdering(recurrent);
+        //generateSparseOrdering(recurrent);
         if (equalizeEfferents) {
             connectEqualized(synapseGroup);
         } else {
@@ -327,8 +327,11 @@ public class Sparse implements ConnectNeurons {
                 connectionDensity);
             Neuron src = sourceNeurons[i];
             Neuron tar;
+            int tarLen = targetNeurons.length - 1;
+            int [] o = SimbrainMath.randPermuteWithExclusion(0,
+                    tarLen + 1, i);
             for (int j = 0; j < currentOrderingIndices[i]; j++) {
-                tar = targetNeurons[sparseOrdering[i][j]];
+                tar = targetNeurons[o[j]];
                 Synapse s = new Synapse(src, tar);
                 synapseGroup.addNewSynapse(s);
             }

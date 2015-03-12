@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.math;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.ExponentialDist;
 import umontreal.iro.lecuyer.probdist.GammaDist;
@@ -228,7 +230,7 @@ public enum ProbDistribution {
          */
         @Override
         public double nextRand(double mean, double std) {
-            return NormalGen.nextDouble(DEFAULT_RANDOM_STREAM, mean, std);
+            return (ThreadLocalRandom.current().nextGaussian() + mean) * std;
         }
 
         /**
@@ -356,7 +358,7 @@ public enum ProbDistribution {
          */
         @Override
         public double nextRand(double floor, double ceil) {
-            return UniformGen.nextDouble(DEFAULT_RANDOM_STREAM, floor, ceil);
+            return ThreadLocalRandom.current().nextDouble(floor, ceil);
         }
 
         /**

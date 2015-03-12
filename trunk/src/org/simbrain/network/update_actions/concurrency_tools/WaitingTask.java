@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * A utility class that is a task specifically used as a flag to tell consumer
  * threads to wait using whatever internal mechanisms allow them to do so.
@@ -27,10 +30,16 @@ package org.simbrain.network.update_actions.concurrency_tools;
  */
 public class WaitingTask implements Task {
 
-	@Override
-	public void perform() {
-		return;
-	}
+    private final CyclicBarrier waitBarrier;
+    
+    public WaitingTask(CyclicBarrier waitBarrier) {
+        this.waitBarrier = waitBarrier;
+    }
+    
+    @Override
+    public void perform() throws InterruptedException, BrokenBarrierException {
+        waitBarrier.await();
+    }
 
 	@Override
 	public boolean isPoison() {

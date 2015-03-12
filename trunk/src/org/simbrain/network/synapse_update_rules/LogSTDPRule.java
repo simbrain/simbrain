@@ -44,13 +44,13 @@ public class LogSTDPRule extends STDPRule {
      *
      * J_0 in the cited paper.
      */
-    private double smallWtThreshold = 5;
+    private double smallWtThreshold = 1;
 
     /** A constant for LTP. c_+ in the cited paper. */
-    private double w_plus = 0.8;
+    private double w_plus = 2;
 
     /** A constant for LTD. c_- in the cited paper. */
-    private double w_minus = 0.6;
+    private double w_minus = 1;
 
     /**
      * The degree to which the distribution is pushed logarithmically. Has an
@@ -59,7 +59,7 @@ public class LogSTDPRule extends STDPRule {
      *
      * alpha in the cited paper.
      */
-    private double logSaturation = 1;
+    private double logSaturation = 5;
 
     /**
      * A moderating constant for LTP, causing LTP to behave noticeably
@@ -67,7 +67,7 @@ public class LogSTDPRule extends STDPRule {
      *
      * beta in the cited paper.
      */
-    private double ltpMod = 5;
+    private double ltpMod = 10;
 
     /**
      * The variance of the noise applied to weight changes.
@@ -92,33 +92,41 @@ public class LogSTDPRule extends STDPRule {
                 .getTarget().getUpdateRule();
         double delta_t, delta_w;
         final double timeStep = synapse.getNetwork().getTimeStep();
-        final double delay = synapse.getDelay() * timeStep;
-        // if (synapse.getStrength() >= 0) {
-        delta_t = (src.getLastSpikeTime() + delay)
-                - tar.getLastSpikeTime();
-        // } else {
-        // delta_t = tar.getLastSpikeTime()
-        // - (src.getLastSpikeTime() + delay);
-        // }
-        double noise = (1 + ProbDistribution.NORMAL.nextRand(0,
-                Math.sqrt(noiseVar)));
+//        final double delay = synapse.getDelay() * timeStep;
+//        if (synapse.getStrength() >= 0) {
+        delta_t = (src.getLastSpikeTime())
+        		- tar.getLastSpikeTime();
+//        } else {
+//        	delta_t = tar.getLastSpikeTime()
+//        			- (src.getLastSpikeTime());
+//        }
         if (synapse.getStrength() >= 0) {
-            if (delta_t < 0) {
-                calcW_plusTerm(synapse);
-                delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
-                        / tau_plus)) * (1 + noise);
-            } else if (delta_t > 0) {
-                calcW_minusTerm(synapse);
-                delta_w = timeStep * learningRate * (-W_minus
-                        * Math.exp(-delta_t / tau_minus)) * (1 + noise);
-            } else {
-                delta_w = 0;
-            }
-            synapse.setStrength(synapse.clip(synapse.getStrength() + delta_w));
-            if (synapse.getTarget().isSpike()) {
-                synapse.setStrength(synapse.clip(synapse.getStrength()
-                        - learningRate * 0.01));
-            }
+	        double noise = (1 + ProbDistribution.NORMAL.nextRand(0, noiseVar));
+	        if (delta_t < 0) {
+	            calcW_plusTerm(synapse);
+	            delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t
+	                    / tau_plus)) * (1 + noise);
+	        } else if (delta_t > 0) {
+	            calcW_minusTerm(synapse);
+	            delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t
+	                    / tau_minus)) * (1 + noise);
+	        } else {
+	            delta_w = 0;
+	        }
+	        if (synapse.getTarget().isSpike()) {
+        		synapse.setStrength(synapse.clip(synapse.getStrength() - (learningRate * 0.05)));
+        	}
+        } else {
+        	if (delta_t > 0) {
+        		delta_w  = timeStep * learningRate * -1.0 * Math.exp(-delta_t / tau_plus);
+        	} else if (delta_t < 0) {
+        		delta_w  = timeStep * learningRate * 1.5 * Math.exp(delta_t / tau_plus);
+        	} else {
+        		delta_w = 0;
+        	}
+        	if (synapse.getSource().isSpike()) {
+        		synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * 0.05)));
+        	}
         }
         if (synapse.getStrength() <= 0) {
             if (delta_t > 0) {

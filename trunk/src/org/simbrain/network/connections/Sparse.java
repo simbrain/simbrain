@@ -258,7 +258,7 @@ public class Sparse implements ConnectNeurons {
             new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup
             .getTargetNeurons().toArray(new Neuron[numTar]);
-        //generateSparseOrdering(recurrent);
+        generateSparseOrdering(recurrent);
         if (equalizeEfferents) {
             connectEqualized(synapseGroup);
         } else {

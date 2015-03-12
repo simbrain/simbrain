@@ -43,7 +43,7 @@ public class Step extends SpikeResponder {
     public void update(Synapse s) {
         if (s.getSource().isSpike()) {
             timer = responseDuration;
-            value += responseHeight * s.getStrength();
+            value = responseHeight * s.getStrength();
         } else {
             timer -= s.getNetwork().getTimeStep();
             if (timer < 0) {

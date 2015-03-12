@@ -20,7 +20,6 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
@@ -80,15 +79,17 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
         return in;
     }
-
+    private double timeStep;
+    private double inputs = 0;
+    private double val;
     /**
      * {@inheritDoc}
      */
     @Override
     public void update(final Neuron neuron) {
-        final double timeStep = neuron.getNetwork().getTimeStep();
-        final boolean refractory = getLastSpikeTime() + refractoryPeriod
-                >= neuron.getNetwork().getTime();
+        timeStep = neuron.getNetwork().getTimeStep();
+//        final boolean refractory = getLastSpikeTime() + refractoryPeriod
+//                >= neuron.getNetwork().getTime();
         final double activation = neuron.getActivation();
         double inputs = 0;
         inputs = inputType.getInput(neuron);
@@ -98,7 +99,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         inputs += iBg + getAppliedInput();
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
-        double val = activation
+        val = activation
             + (timeStep * (((.04 * (activation * activation))
                 + (5 * activation) + 140)
                 - recovery + inputs));
@@ -106,13 +107,8 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         if (val >= threshold) {
             val = c;
             recovery += d;
-            if (!refractory) {
-                neuron.setSpkBuffer(true);
-                setHasSpiked(true, neuron);
-            } else {
-                neuron.setSpkBuffer(false);
-                setHasSpiked(false, neuron);
-            }
+            neuron.setSpkBuffer(true);
+            setHasSpiked(true, neuron);
         } else {
             neuron.setSpkBuffer(false);
             setHasSpiked(false, neuron);

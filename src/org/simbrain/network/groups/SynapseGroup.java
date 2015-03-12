@@ -35,7 +35,6 @@ import org.simbrain.network.connections.ConnectionUtilities.
     SynapseParameterGetter;
 import org.simbrain.network.connections.ConnectionUtilities.
     SynapseParameterSetter;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;

@@ -20,6 +20,7 @@ package org.simbrain.network.gui.actions.network;
 
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.AbstractAction;
 
@@ -33,6 +34,8 @@ public final class RunNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
+    
+//    private final ReentrantLock lock = new ReentrantLock();
 
     /**
      * Create a new run network action with the specified network panel.
@@ -41,12 +44,12 @@ public final class RunNetworkAction extends AbstractAction {
      */
     public RunNetworkAction(final NetworkPanel networkPanel) {
         super();
-
+        
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-
         this.networkPanel = networkPanel;
+//        networkPanel.getNetwork().setUpdateLock(lock);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
@@ -56,18 +59,16 @@ public final class RunNetworkAction extends AbstractAction {
         networkPanel.setRunning(true);
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
+                //networkPanel.getNetwork().setFireUpdates(false);
+//                lock.lock();
                 while (networkPanel.isRunning()) {
+//                    lock.unlock();
                     networkPanel.getNetwork().setUpdateCompleted(false);
                     networkPanel.getNetwork().update();
-                    while (networkPanel.getNetwork().isUpdateCompleted() == false) {
-                        // Block until update is competed
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+//                    lock.lock();
                 }
+//                lock.unlock();
+                //networkPanel.getNetwork().setFireUpdates(true);
             }
         });
     }

@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.core.Network;
@@ -360,29 +361,34 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                 valueWriter.flush();
                 writeCounter = 0;
             }
-            Iterator<Neuron> neuroIter = neuronList.iterator();
-            int index = 0;
-            valueWriter.print(this.getParentNetwork().getTime() + ":\t");
-            while (neuroIter.hasNext()) {
-                Neuron n = neuroIter.next();
-                if (n.getUpdateRule().isSpikingNeuron() && recordAsSpikes) {
-                    if (n.isSpike()) {
-                        valueWriter.print(index + ", ");
-                    }
-                    if (!neuroIter.hasNext()) {
-                    	valueWriter.println();
-                    }
-                } else {
-                    valueWriter.print(n.getActivation());
-                    if (neuroIter.hasNext()) {
-                        valueWriter.print(", ");
-                    } else {
-                        valueWriter.println();
+            boolean write = false;
+            if (recordAsSpikes) {
+                int start = 0;
+                for (int i = 0, n = size(); i < n; i++) {
+                    if (neuronList.get(i).isSpike()) {
+                        write = true;
+                        start = i;
+                        break;
                     }
                 }
-                index++;
+                if (write) {
+                    valueWriter.print(this.getParentNetwork().getTime());
+                    valueWriter.print(" ");
+                    for (int i = start, n = size(); i < n; i++) {
+                        if (neuronList.get(i).isSpike()) {
+                            valueWriter.print(i);
+                            valueWriter.print(" ");
+                        }
+                    }
+                    valueWriter.println();
+                    writeCounter++;
+                }
+            } else {
+                for (int i = 0, n = size(); i < n; i++) {
+                    valueWriter.print(neuronList.get(i).getActivation());
+                }
+                writeCounter++;
             }
-            writeCounter++;
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -766,9 +772,31 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         return neuronList.size();
     }
 
+    /**
+     * Returns all the neurons in this group within a certain radius of the
+     * given neuron. This method will never return the given neuron as part
+     * of the list of neurons within the given radius, nor will it return
+     * neurons with the exact same position as the given neuron as a part 
+     * of the returned list.
+     * 
+     * @param n
+     * @param radius
+     * @return
+     */
+    public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
+        ArrayList<Neuron> ret = new ArrayList<Neuron>((int)(size()/0.75f));
+        for (Neuron potN : neuronList) {
+            double dist = Network.getEuclideanDist(n, potN); 
+            if (dist <= radius && dist != 0) {
+                ret.add(potN);
+            }
+         }
+        return ret;
+    }
+    
     // TODO: Below don't take account of the actual width of neurons themselves.
     // Treats them as points.
-
+    
     /**
      * Get the central x coordinate of this group, based on the positions of the
      * neurons that comprise it.
@@ -1086,6 +1114,42 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         return new Point2D.Double(getMinX(), getMinY());
     }
 
+    public void setXYZCoordinatesFromFile(String filename) {
+        try(Scanner rowSc = new Scanner(new File(filename));) {
+            Scanner colSc = null;
+            int i = 0;
+            int j;
+            try {
+                while (rowSc.hasNextLine()) {
+                    colSc = new Scanner(rowSc.nextLine());
+                    colSc.useDelimiter(", *");
+                    j = 0;
+                    while (colSc.hasNext()) {
+                        double coordinate = colSc.nextDouble();
+                        if (i == 0) {
+                            neuronList.get(j++).setX(coordinate);
+                        } else if (i == 1) {
+                            neuronList.get(j++).setY(coordinate);
+                        } else if (i == 2) {
+                            neuronList.get(j++).setZ(coordinate);
+                        } else {
+                            return;
+                        }
+                    }
+                    i++;
+                    colSc.close();
+                }
+            } finally {
+                if (colSc != null) {
+                    colSc.close();
+                }
+            }
+        } catch (IOException ie) {
+            ie.printStackTrace();
+            return;
+        }
+    }
+    
     /**
      * Apply this group's layout to its neurons.
      */

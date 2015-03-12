@@ -2851,8 +2851,9 @@ public class NetworkPanel extends JPanel {
             this.updateNeuronNodes();
             this.updateSynapseNodes();
             updateComplete.decrementAndGet();
+            network.setFireUpdates(true);
         } else {
-        	
+        	network.setFireUpdates(false);
         }
         this.guiOn = guiOn;
     }

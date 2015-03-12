@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
+import java.util.concurrent.BrokenBarrierException;
+
 /**
  * An interface used to perform a task and which is tagged with information
  * for flagging the tasks with whether or not it is used to make consumers
@@ -28,7 +30,7 @@ package org.simbrain.network.update_actions.concurrency_tools;
  */
 public interface Task {
 
-	void perform();
+	void perform() throws InterruptedException, BrokenBarrierException;
 	
 	boolean isPoison();
 	

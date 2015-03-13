@@ -1,0 +1,3 @@
+All scripts in this directory are available for use in the Simbrain console. To use them, open a terminal window in Simbrain, and simply enter the filename (without the .bsh) with a "();" at the end. Example: "tips();".
+Some of these commands take arguments.   The tips(); command shows some example usages.   The files
+themselves also contain information that can help you use them (e.g. sample usage in comments).

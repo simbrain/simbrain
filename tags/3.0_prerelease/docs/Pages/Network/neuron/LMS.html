@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; LMS </p>
+  </div>
+  <p>
+  <h1>LMS</h1>
+  </p>
+  <p>The least mean square (LMS) neuron allows users to implement simple least mean square type networks outside of a subnetwork. This can also be done within a subnetwork--see <a href="../network/lmsnetwork.html">LMS Network.</a> More information on this rule and its history are available at the <a href="../network/lmsnetwork.html">LMS Network</a> page. </p>
+  <p>When an LMS neuron is updated, all of the synapses which attach to it are updated using the LMS rule. The LMS rule works as follows. The change in a weight is equal to the product of a learning rate &epsilon;, the pre-synaptic neuron activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. </p>
+  <p><img src="../equations/LMSRule.png" width="203" height="54"></p>
+  <p>The error is the difference between the desired and actual activation of the target neuron. Repeated application of this rule mimizes reduces the error. </p>
+  <p>Desired activation <em>t<sub>j</sub></em> is supplied by a neuron connected to a given LMS neuron by a <a href="../synapse/signal.html">signal synapse.</a> This neuron can be thought of as a &quot;teacher&quot; neuron. Since these synapses are colored differently, it should be obvious which neuron is the teacher. If there is no such neuron, then incoming weights are not updated. If there is more than one teacher, one will be chosen arbitrarily.</p>
+  <p>An LMS neuron or collection of neurons can be used instead of an LMS Network when the user wants to have greater control over the training signal. </p>
+  <p>&nbsp;</p>
+  <blockquote>
+  <p> <span class="heading2">Learning Rate: </span>Learning rate is denoted by &epsilon; in the equation above. This parameter determines how quickly synapses change. </p>
+</blockquote>
+<blockquote>&nbsp;</blockquote>
+</div>
+</body>
+</html>

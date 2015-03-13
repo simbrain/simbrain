@@ -1,0 +1,252 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.util.*;
+import org.simbrain.util.environment.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.docviewer.*;
+import javax.swing.*;
+import org.simbrain.util.math.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+//
+// Rescorla-Wagner Simulation.  
+//
+// Note that code where the main rule is applied is at around line 190.
+//
+// TODOS: Demo
+// Overshadowing
+// Blocking
+// Extinction
+// Spontaneous Recovery
+// Rapid Reacquisition
+// Renewal
+// Reinstatement
+
+//
+// Initial parameter values  
+//
+double alpha = .6; // Salience of CS (Candle)
+double beta = .6; // Salience of US (Swiss / Poison)
+double hitRadius = 75; // If mouse is within this many pixels of candle, stop running simulation
+double lambda = 1; // Maximum value the associative strength can take
+
+//
+// Set up the simulation
+//
+void main() {
+	workspace.clearWorkspace();
+	String FS = System.getProperty("file.separator");
+	// This script is based on a saved workspace file
+	workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "rescorla_wagner.zip"));
+    buildButtonPanel();
+}
+
+//
+// Create button panel
+//
+void buildButtonPanel() {
+
+	// Get references to main objects
+	OdorWorldComponent worldComponent = (OdorWorldComponent) workspace.getComponent("CandleWorld.xml");
+	OdorWorld world =  worldComponent.getWorld();
+	RotatingEntity mouse = (RotatingEntity) world.getEntity("Agent_1");
+	SmellSensor sensor = mouse.getSensors().get(0);    
+	NetworkComponent networkComponent = (NetworkComponent) workspace.getComponent("RescorlaWagner.xml");
+	Network network = networkComponent.getNetwork();
+	Neuron valueNeuron = network.getNeuronByLabel("CR");
+	Neuron rewardNeuron = network.getNeuronByLabel("CS");
+	Neuron forwardNeuron = network.getNeuronByLabel("Forward");
+	Synapse synapseLeftLeft = network.getSynapse("Synapse_4");
+	Synapse synapseLeftRight = network.getSynapse("Synapse_3");
+	Synapse synapseRightLeft = network.getSynapse("Synapse_2");
+	Synapse synapseRightRight = network.getSynapse("Synapse_1");
+	Synapse associationSynapse = network.getSynapse("Synapse_6");
+
+	// Initialize Synapses and neurons
+	synapseLeftLeft.setStrength(lambda);
+	synapseLeftRight.setStrength(0);
+	synapseRightLeft.setStrength(0);
+	synapseRightRight.setStrength(lambda);
+	associationSynapse.setStrength(0);
+	forwardNeuron.setClamped(true);
+
+	// Entitites
+	BasicEntity candle = world.getEntity("Candle");
+
+	// Set up button panel
+	JInternalFrame internalFrame = new JInternalFrame("Simulation", true, true);
+	LabelledItemPanel panel = new LabelledItemPanel();    
+
+	// Parameter Fields
+	JTextField alphaField = new JTextField();
+	alphaField.setText("" + alpha);
+	panel.addItem("Salience of CS (alpha)", alphaField);
+	JTextField betaField = new JTextField();
+	betaField.setText("" + beta);
+	panel.addItem("Salience of UCS (beta)", betaField);
+	JTextField slowDownField = new JTextField();
+	slowDownField.setText("" + workspace.getUpdateDelay());
+	panel.addItem("Delay per iteration (msec)", slowDownField);
+
+	// Variables
+	double unconditioned = 0;
+	double deltaV = 0;
+	double V = 0;
+	boolean goalAchieved = false;
+
+	// Run Button
+	JButton runButton = new JButton("Run");
+	runButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+
+			Executors.newSingleThreadExecutor().execute(new Runnable() {
+				public void run() {
+
+					workspace.setUpdateDelay(Integer.parseInt(slowDownField.getText()));
+					alpha = Double.parseDouble(alphaField.getText());
+					beta = Double.parseDouble(betaField.getText());
+					double heading;
+
+					// Randomize position of mouse on a circle, pointing
+					//      towards main objects
+					//heading = 360 * Math.random();
+					//mouse.setHeading(180 + heading + ((Math.random() * 45)-6));
+					//heading = Math.toRadians(heading);
+					//mouse.setLocation((int)(xpos + (200 * Math.cos(heading))), 
+					//		((int)(ypos + (-200 * Math.sin(heading)))));
+					mouse.setLocation(32,160);
+					mouse.setHeading(60);
+
+					goalAchieved = false;
+					int distance = Integer.MAX_VALUE; 
+
+					while(!goalAchieved) {
+						if(world.containsEntity(candle)) {
+							distance = (int) SimbrainMath.distance(
+									mouse.getCenterLocation(), 
+									candle.getCenterLocation()); 
+						}
+						if (distance < hitRadius) {
+							goalAchieved = true;
+						}
+						CountDownLatch latch = new CountDownLatch(1);
+						workspace.iterate(latch);
+						try {
+							latch.await();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+
+		}});
+	panel.addItem("Start simulation", runButton);
+
+	// Stop Button
+	JButton stopButton = new JButton("Stop");
+	panel.addItem("Stop simulation", stopButton);
+	stopButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			goalAchieved = true;
+			rp = false;
+		}
+	});
+
+	// Reward-Punish Button
+	JButton rpButton = new JButton("Reward/Punish...");
+	panel.addItem("", rpButton);
+	rpButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			goalAchieved = true;
+			// Reward / Punish dialog
+			Object[] options = {"Reward", "Punish"};
+			int clickedPunish = JOptionPane.showOptionDialog(null,
+					"Reward or punish the creature?",
+					"Reward/Punish",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.PLAIN_MESSAGE, //For some reason QUESTION_MESSAGE DOES NOT WORK
+					null,
+					options,
+					null);
+
+			V = Math.abs(associationSynapse.getStrength());
+
+			// Apply Rescorla-Wagner rule 
+			deltaV = alpha * beta * (lambda - V);
+
+			// Update association synapse based on results of apply the rule
+			if (clickedPunish == 0) {
+				associationSynapse.setStrength(associationSynapse.getStrength() + deltaV);
+			} else {
+				associationSynapse.setStrength(associationSynapse.getStrength() - deltaV);
+			}
+
+			// Diagonostics
+			//System.out.println(V + "  " + unconditioned);
+			//System.out.println("-->" + deltaV);
+
+			// Set vehicle to approach or repulse based on current associative strength V
+			double turnWeight = 10 + 100 * V;
+			if (associationSynapse.getStrength() > 0) {
+				// Pursue object
+				synapseLeftLeft.setStrength(turnWeight);
+				synapseLeftRight.setStrength(0);
+				synapseRightLeft.setStrength(0);
+				synapseRightRight.setStrength(turnWeight);
+			} else {
+				// Avoid object
+				synapseLeftLeft.setStrength(0);
+				synapseLeftRight.setStrength(turnWeight);
+				synapseRightLeft.setStrength(turnWeight);
+				synapseRightRight.setStrength(0);
+			}
+
+			// Make speed proportional to current conditioned response
+			forwardNeuron.forceSetActivation(1 + 4*V);
+
+			// Update the CR neurons immediately on pressing the reward / punish buttons
+			// so that the current value of V is visible.
+			rewardNeuron.setActivation(1); // Hack so that V is visible in value neuron
+			valueNeuron.update();
+			valueNeuron.setActivation(valueNeuron.getBuffer());
+			network.fireNeuronsUpdated();
+			network.fireSynapsesUpdated();
+		}
+	});
+
+	// Set up Frame
+	internalFrame.setLocation(11,344);
+	internalFrame.getContentPane().add(panel);
+	internalFrame.setVisible(true);
+	internalFrame.pack();
+	desktop.addInternalFrame(internalFrame);
+
+}
+
+//
+// Make doc viewer
+//
+void addDocViewer() {
+	DocViewerComponent docViewer = new DocViewerComponent("Information");
+	docViewer.setText("<h1>Rescorla Wagner Model</h1>" +
+        "A model of the Rescorla Wagner learning rule....");
+	//TODO: Explain the parameters, say what to do, link to a paper, credit the people
+    workspace.addWorkspaceComponent(docViewer);
+    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(9,311,368,339);
+}
+
+// Run the simulation.
+main();

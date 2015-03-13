@@ -1,0 +1,7 @@
+import org.simbrain.network.*;
+
+addNetwork(String name) {
+
+	workspace.addWorkspaceComponent(new NetworkComponent( name));
+}
+

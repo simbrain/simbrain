@@ -1,0 +1,61 @@
+<html>
+  <body>
+    <p>Filter editors.</p>
+
+<h4>Creating a new filter editor</h4>
+
+<p>
+To create a new filter editor, perform the following steps:
+  <ol>
+    <li>Implement the <a href="FilterEditor.html">FilterEditor</a> interface.  It is helpful
+but not necessary to extend JPanel, e.g.</li>
+<pre>
+public class MyFilterEditor
+  extends JPanel
+  implements FilterEditor {
+
+  public MyFilterEditor() {
+    super();
+    // add UI components to panel
+  }
+
+
+  public Component getEditorComponent() {
+    // reset UI components and return this
+    return this;
+  }
+
+  public Filter createFilter() throws FilterEditorException {
+    try {
+      // create instance of MyFilter from values in UI components
+      return new MyFilter(...);
+    }
+    catch (IllegalArgumentException e) {
+      // rethrow instantiation exceptions as FilterEditorExceptions
+      throw new FilterEditorException(e);
+    }
+  }
+
+  //...
+}
+</pre>
+    <li>Return a reasonable display name for <code>String toString()</code>.
+<pre>
+public String toString() {
+  return "My filter";
+}
+</pre>
+    <li>Add a public static instance of the filter editor to <a href="FilterEditors.html">FilterEditors</a>.</li>
+<pre>
+/** My filter editor. */
+public static final FilterEditor MY_FILTER_EDITOR = new MyFilterEditor();
+</pre>
+    <li>Add a reference to that public static instance to the private values array in <a href="FilterEditors.html">FilterEditors</a>.</li>
+<pre>
+/** Private array of filter editors. */
+private static final FilterEditor[] values = new FilterEditor[] { RANDOM, UNIFORM, MY_FILTER_EDITOR };
+</pre>
+  </ol>
+</p>
+  </body>
+</html>

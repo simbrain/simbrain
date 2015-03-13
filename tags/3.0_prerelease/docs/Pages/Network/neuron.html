@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+
+    <link href="../../Styles.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+    <a href="../../SimbrainDocs.html">
+    </a>
+    <div class="logo">
+        <a href="../../SimbrainDocs.html"> </a>
+        <p><span />
+        </p>
+    </div>
+
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
+        </div>
+        
+        <h1>Neurons</h1>
+        <img src="../../Images/Spk&NonSpk.gif" align="right" hspace="20px" vspace="10px"><br>
+        <p align="justify">
+            Neurons or "nodes" are represented by circles. The numbers inside the neurons corresponds to their "activation level." (What this level represents varies with neuron type: in many cases it can be thought of as representing the rate of a firing of a neuron.) Visibly, these numbers are rounded; functionally, however, the double precision floating point values are used. This precision value can be seen by lingering over a neuron or double clicking on it.
+        </p>
+        <p align="justify">
+             The color of a neuron represents the overall state of the neuron depending upon its update rule. Loosely neuron models can be broken up into two classes: spiking and non-spiking, and this distinction accounts for bulk of any differences in the meaning of colors. In general, blue corresponds to a quiescent or inhibitory state, white corresponds to a 0 or neutral state, and red corresponds to an active or excitatory state. For neuron models which have explicit action potentials (spiking neurons), red indicates the neuron is near its threshold, a yellow flash indicates an action potential. A comparison of the two can be seen <b>pictured right</b>.
+        </p>
+         <p>These color conventions can be customized, as described in the <a href="network_prefs.html">preference dialog</a>. The closeness of the neuron's activiation level to the neuron's upper or lower bound is visualized by the intensity of the color. </p>
+        <p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters that can be set. This page addresses properties common to all of the different neuron types. Details on particular neuron types can be found on their respective pages. </p>
+        <p class="heading">Neuron Update Rules (a.k.a. "Types") 
+        <div id="menu"  style="margin-left: 30px;">
+            <p class="menubold">Neuron Types</p>
+            <blockquote>
+                <p><a href="neuron/AdExIF.html">AdEx Integrate & Fire (s, &delta;t)</a> 
+                    <br />
+                    <a href="neuron/Binary.html">Binary</a>
+                    <br />
+                    <a href="neuron/SigmoidalContinuous.html">Continuous Sigmoidal (&delta;t)</a>
+                    <br />
+                    <a href="neuron/Decay.html">Decay</a>
+                    <br />
+                    <a href="neuron/SigmoidalDiscrete.html">Discrete Sigmoidal</a>
+                    <br />
+                    <a href="neuron/IAC.html">IAC</a>
+                    <br />
+                    <a href="neuron/Integrate%20and%20Fire.html">Integrate & Fire (s, &delta;t)</a> 
+                    <br />
+                    <a href="neuron/Izhikevich.html">Izhikevich (s, &delta;t)</a> 
+                    <br />
+                    <a href="neuron/Linear.html">Linear</a>
+                    <br />
+                    <a href="neuron/Naka-Rushton.html">Naka-Rushton (&delta;t)</a>
+                    <br />
+                    <a href="neuron/SpikingThreshold.html">Spiking Threshold (s)</a>
+                    <br />
+                    <a href="neuron/Three Value.html">Three value<br /></a>
+                </p>
+                <p><b>s</b> indicates a <a href="spikingneurons.html">Spiking neuron</a>.<br>
+                    <b>&delta;t</b> indicates a <a href="timing.html">continuous time</a> neuron.
+                </p>
+            </blockquote>
+        </div>
+        </p>
+        <blockquote>
+            <p align="justify">
+             The neuron object itself is not what determine's the neuron's behavior. Neurons contain a generic set of parameters and utilities common to virtually any model neuron (activation, boundaries, lists of incoming/outgoing synapses, methods to sum synapse strengths, etc.), but themselves have no "type" beyond what is delegated to an <i>update rule</i>. When we speak of a neuron of a given type we are really referring to a neuron which posesses an update rule of that type, since the update rule is what ultimately determines the behavior of the neuron. To the right is a menu of all the different neuron models (neuron update rules), which Simbrain currently posesses out of the box. Editing a neuron allows the user to also edit the properties of its update rule or change the update rule entirely (thereby changing the neuron model).
+            </p>
+        </blockquote>
+        <p class="heading">Setting Neuron Properties </p>
+        <p>Neuron parameters can be adjusted as follows:</p>
+        <blockquote>
+            <p><span class="heading2">Setting single neurons: </span>Double click on a neuron or right click on it and select set properties.</p>
+            <p><span class="heading2">Setting multiple neurons:</span> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons. </p>
+        </blockquote>
+        <p class="heading"><a name="NeuronProperties"></a>Common Neuron Properties</p>
+        <blockquote>
+            <p><span class="heading2">Activation:</span> The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (e.g. firing rate, voltage potential, etc.). This is represented by the neuron's color, and can be seen exactly by lingering over the neuron or observing the value in the neuron's properties. </p>
+            <p><span class="heading2">Label:</span> Label neuron with a name.
+                <br>
+                <br>
+                <span class="heading2">Clamped:</span> See <a href="#clamping">below</a>.</p>
+            <p><span class="heading2"><a name="clipping"></a>Clipping:</span> If a neuron uses clipping, then if its activation exceeds its upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength.</p>
+            <p><span class="heading2"><a id="UpBound">Upper bound</a>:</span> This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.</p>
+            <p><span class="heading2"><a name="LowBound"></a>Lower bound:</span> This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.</p>
+            <p><span class="heading2">Increment:</span> This sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
+            <p><span class="heading2">Priority:</span> This field sets the neuron with a desired priority. The lower the value, the higher the priority.</p>
+            <p><span class="heading2">Input Type:</span> This field sets the input as <a href="#wtdinput">weighted</a> or synaptic.</p>
+        </blockquote>
+
+        <p class="heading">
+            <a name="clamping"></a>Clamping
+        </p>
+        <p>In general, a clamped synapse or node will not change over time; it is "clamped" to its current value. There are two ways to clamp neurons and synapses in Simbrain.
+            <br />
+        </p>
+        <blockquote>
+            <p>(1) Set the type of a synapse to <a href="synapse/Clamped%20%28no%20learning%29.html">clamped
+synapse</a> or the type of a neuron to clamped neuron. This allows specific subsets of synapses or neurons to be permanently clamped.
+                <br />
+            </p>
+            <p>(2) In the <a href="menu.html#MenuEdit">Edit menu</a>, use the "Clamp weights" <img style="width: 18px; height: 18px;" alt="Clamp Weight" src="../../Images/Clamp_W.png" /> or "Clamp neurons" <img style="width: 18px; height: 18px;" alt="Clamp Neuron" src="../../Images/Clamp_N.png" /> buttons. &nbsp; These cause <em>all</em> weights or synapses in a simulation to be clamped. This is useful as a temporary override and can be used to train certain types of networks (e.g. recurrent auto-associators using hebbian synapses). </p>
+        </blockquote>
+        <p>Note that some <a href="subnetwork.html">subnetworks</a> override clamping, in particular when they manually train their weights. Also note that the activation of a clamped neuron can be changed by using the up and down keys, and similarly with clamped weights.</p>
+        
+        <p class="heading">Input Type</p>
+        <p>A major component of a neuron's behavior is how it goes about interpreting its inputs. In Simbrain there are two different ways a neuron can sum up its inputs: a <i>Weighted Sum</i> or a <i>Synaptic Sum</i>. Loosely these correspond to non-spiking and spiking neurons respectively, but there are some cases where it is useful for a non-spiking neuron to interpret its inputs as synaptic input and vice versa with spiking neurons.</p>
+        <p class="heading2">Weighted</p>
+        <p>
+            <blockquote>
+         This is the simplest and most common way of determining input for most ANNs. As its name suggests it is a weighted sum over the neuron's incoming synapses. The influence of a pre-synaptic neuron on a post synaptic neuron is then dependent on two values: 1) the activation value of the pre-synaptic neuron and 2) the weight or "strength" of the synapse connecting the pre-synaptic neuron to the post-synaptic neuron. The total influence of a given pre-synaptic neuron is represented by the product of its activation and the strength of the connecting synapse.
+         <br>
+          <br>We represent the weight of the <em>j</em><sub>th</sub> input where <em>j</em>&nbsp;&#x2208;&nbsp;{1,&nbsp;2,&nbsp;...&nbsp;,&nbsp;N} for N inputs to neuron <em>i</em> by <em>w</em><sub>ij</sub> and the steady activation level from the <em>j</em><sub>th</sub> node by <em>a</em><sub>j</sub>. The weighted input is then:
+            </blockquote>
+        </p>
+        <div style="text-align: center;">
+            $$ net_{i} \;=\; \sum\limits_{j = 1}^N w_{ij}a_j$$
+            $$ a_i \;=\; f(net_{i})$$
+        </div>
+        <blockquote>Where $f$ represents the function neuron <em>i</em>'s update rule applies to its inputs, and <i>net<sub>i</sub></i> is the weighted or "net" input to neuron <em>i</em>. Often times the connectionist literature refers to the weighted input to a neuron as its net input. </blockquote>
+            <blockquote><a name="wtdinput" id="wtdinput"> </a> Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="../Workspace/Couplings.html">sensory coupling</a> attached to it.
+            <br><br>
+            <i><b>Tip</b>:   To make a neuron whose acitvation value equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. Linear neurons are great for quickly displaying unfiltered values.</i>  
+        </blockquote>
+
+        <p class="heading2">Synaptic</p>
+        <p>
+        <blockquote>
+         Synaptic inputs are a bit more complicated than weighted inputs as they attempt to capture some of the dynamics of real synapses in the brain. This type of input is meant specifically for translating action potentials (spikes) created when spiking neurons fire into a continuous value which can be interpreted by other neurons. Thus it should be noted that this input type is non-sensical if the pre-synaptic neuron does not produce action potentials. Essentially, the synaptic input type performs a weighted sum over the <i>post-synaptic responses</i> of the incoming synapses, which are themselves goverend by <a href="./synapse/spikeResponder.html">spike responders</a>. More details can be found in the <a href="./synapse/spikeResponder.html">spike responder</a> and <a href="spikingneurons.html">spiking neuron</a>) documentation pages, but the quick version is that spikes are modeled as being instantaneous in time and spike responders generate a continuous value from this instantaneous one. 
+         </blockquote>
+        </p>
+    </div>
+
+</body>
+
+</html>

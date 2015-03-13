@@ -1,0 +1,47 @@
+source0() {
+		public class SORNNeuron extends Neuron {
+
+		private boolean firstTime = true;
+
+		private ArrayList<Synapse> exSyns = new ArrayList<Synapse>();
+
+		private ArrayList<Synapse> inSyns = new ArrayList<Synapse>();
+
+		public SORNNeuron(Network net) {
+			super(net);
+		}
+
+		public void update() {
+			super.update();
+			if (firstTime) {
+				double sum = 0;
+				for (Synapse s : getFanIn()) {
+					double str = s.getStrength();
+					if (str > 0) {
+						exSyns.add(s);
+					} else {
+						inSyns.add(s);
+					}
+				}
+				firstTime = false;
+			} else {
+				double exSum = 0;
+				double inSum = 0;
+				for (Synapse s : exSyns) {
+					exSum += s.getStrength();
+				}
+				for (Synapse s : inSyns) {
+					inSum -= s.getStrength();
+				}
+				for (Synapse s : exSyns) {
+					s.setStrength(s.getStrength() / exSum);
+				}
+				for (Synapse s : inSyns) {
+					s.setStrength(s.getStrength() / inSum);
+				}
+			}
+
+		}
+
+	}
+}

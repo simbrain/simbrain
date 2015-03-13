@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+            <p>
+                <span></span>
+            </p>
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../groups.html">Groups</a> &gt; Neuron Group</p>
+        </div>
+        <div id="menu">
+            <p class="menubold">Neuron Group Types</p>
+            <blockquote>
+                <p><a href="BareNeuronGroup.html">Bare (Neuron Group)</a>
+                    <br>
+                    <a href="Competitive.html">Competitive</a>
+                    <br>
+                    <a href="../network/som.html">SOM</a>
+                    <br>
+                    <a href="../network/winnerTakeAll.html">WTA</a>
+                </p>
+            </blockquote>
+        </div>
+        <h1>Neuron Group</h1>
+        <p>A neuron group is a group consisting of a neuron(s) in which is represented by an enclosure of the neuron(s). The label at the top of the enclosure is the group's name (defaulted to the type of neuron group). There are various types of neuron group (listed to the right) in Simbrain, each of which has numerous parameters that can be set. This page covers properties common to all of the different neuron group types. Details of each type can be found on their respective page. </p>
+
+        <p class="heading"><a name="EditDialog"></a>Creation/Edit Dialog</p>
+        <blockquote>
+            <p class="heading">
+                <a name="summary"></a>Summary
+            </p>
+            <blockquote>
+
+                <p><img src="../../../Images/NeuronGroupSummary.png" alt="Summary Panel" style="float:right;width:175px;height:190px">
+                    <span class="heading2">Group ID:</span> Labelling that identifies the group.</p>
+                <p><span class="heading2">Label:</span> Name of group.</p>
+                <p><span class="heading2">Population:</span> Number of neurons in the group.</p>
+                <p><span class="heading2">Neuron Type:</span> The neuron update rule governing the neurons in the group. If multiple different neuron update rules are being used the value will be displayed as "...".</p>
+                <p> <span class="heading2">Parent:</span> Denotes the parent group (usually a subnetwork), if any.</p>
+            </blockquote>
+
+        </blockquote>
+        <blockquote>
+            <p class="heading">Neurons</p>
+            <blockquote>
+                <p>See the <a href="../neuron.html">neuron</a> page.</p>
+            </blockquote>
+            <p class="heading">Layout</p>
+            <blockquote>
+                <p>See the <a href="../layouts.html">layouts</a> page.</p>
+            </blockquote>
+            <p class="heading">Input Data</p>
+            <p class="heading"><a name="inputData"></a>Input Data</p>
+            <br>
+           
+            <img src="../../../Images/InputDataTable.png" alt="Data table example" style="margin-left:80px;width:800px;height:420px">
+            <br>
+            <br>
+                <p style="margin-left: 60px;">
+                    Here .csv files can be loaded into this table, and thost values fed into the neurons in the group. The .csv file must have a number of columns equal to the number of neurons in the group. Input values can be edited here as well as viewed. The values in the table can be saved to a .csv file as well. Users can then press "play" to feed all the values in order into the group or step from one row to the next one at a time. For values to show up in the neuron group the neurons in the group must be clamped. This reflects that under most circumstances this should be done only if the group acts purely as an input to some other group. For details on how tables work click <a href="../../Utils/Tables/Tables.html">here</a>.
+                </p>
+        </blockquote>
+        <p class="heading"><a name="RightClick"></a>Right Click Menu</p>
+        <blockquote>
+            <span class="heading2">Edit: </span>Edit group properties. This opens the group properties panel which includes the above sections. The is the same as double-clicking on the interaction box.
+            <br>
+            <span class="heading2">Rename Group: </span> Input another name for the group.
+            <br>
+            <span class="heading2">Remove Group: </span> Delete the group.
+            <br>
+            <span class="heading2">Select Neurons: </span>Select all neurons in the group.
+            <br>
+            <span class="heading2">Select Incoming Synapses:</span> Selects all incoming synapse groups and/or loose synapses.
+            <br>
+            <span class="heading2">Select Outgoing Synapses:</span> Selects all outgoing synapse groups and/or loose synapses.
+            <br>
+            <span class="heading2">Clamp Neurons: </span>Clamp all neurons in the group. See <a href="../neuron.html#clamping">Clamping</a>.
+            <br>
+            <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
+            <br>
+            <span class="heading2">Set Group as Source: </span> Set the group as source group for some future synaptic connections.
+            <br>
+            <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
+            <br>
+            <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
+            <br>
+            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the network and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.<br>
+            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector. It establishes this sort of connection and a new vector will be forwarded at each workspace update.<br>
+            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>. 
+        </blockquote>
+        <blockquote>&nbsp;</blockquote>
+    </div>
+
+</body>
+
+</html>

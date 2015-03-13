@@ -1,0 +1,28 @@
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.subnetworks.*;
+
+/**
+ * Print the activations of a given neuron group, in this case a hidden layer.
+ *
+ * Not very interesting but illustrates some basic scripting methods.
+ */
+{
+	BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+	if (backpropNet == null) {
+		print("Network not found");
+		return;		
+	}
+
+	NeuronGroup hiddenLayer = backpropNet.getNeuronGroupByLabel("Layer 3");
+	if (hiddenLayer == null) {
+		print("Layer not found");
+		return;		
+	}
+
+    for (Neuron neuron: hiddenLayer.getNeuronList()) {
+        System.out.print(neuron.getActivation() + " ");
+    }
+    System.out.println();
+}

@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <meta name="generator" content="HTML Tidy for Mac OS X (vers 31 October 2006 - Apple Inc. build 15.6), see www.w3.org">
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo"></div>
+    </a>
+
+    <div id="main_docs">
+
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Scripting.html">Scripting</a> &gt; Scripting Examples</p>
+        </div>
+
+        <h1>Scripting Examples</h1>
+
+
+        <p> <span class="heading">Bar Chart <br> </span> </p>
+
+        <p>To get a very basic feel for scripting, go to
+            <span class="command">Scripts &gt; Edit/Run Script</span>and, load BarChartDemo.bsh, and try modifying the parameters at the top, before running the simulation.&nbsp; Try this a few times to see how the parameters affect the simulation.
+            <br>
+        </p>
+
+
+        <p><span class="heading">Creating a simple network from scratch</span>
+        </p>
+
+        <p>Here is an example of a simple script to create a few neurons connected by a synapse.&nbsp;&nbsp; You can use this example to get a feel for creating a script from scratch.
+            <br>
+        </p>
+        <p>To start, open a text file, copy and paste the text below, and save it as a .bsh file (for example, "SimpleNet.bsh"). Then execute the script, either using
+            <span class="command">Scripts &gt; Edit/Run Script...
+            </span>or by placing it in the {SimbrainHome}/scripts/scriptmenu directory and re-running Simbrain.
+        </p>
+
+
+        <p style="margin-left: 40px;" class="command">import org.simbrain.network.*;
+            <br>import org.simbrain.network.core.*;
+            <br>import org.simbrain.network.networks.*;
+            <br>import org.simbrain.network.neuron_update_rules.*;
+            <br>import org.simbrain.workspace.*;
+            <br>
+            <br>{
+            <br>&nbsp;&nbsp;&nbsp; NetworkComponent networkComponent = new NetworkComponent("Test Network");
+            <br>&nbsp;&nbsp;&nbsp; workspace.addWorkspaceComponent(networkComponent);
+            <br>&nbsp;&nbsp;&nbsp; Network network = networkComponent.getNetwork();
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; Neuron neuron1 = new Neuron(network, "LinearRule");
+            <br>&nbsp;&nbsp;&nbsp; neuron1.setLocation(2,2);
+            <br>&nbsp;&nbsp;&nbsp; network.addNeuron(neuron1);
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; Neuron neuron2 = new Neuron(network, "LinearRule");
+            <br>&nbsp;&nbsp;&nbsp; neuron2.setLocation(50,2);
+            <br>&nbsp;&nbsp;&nbsp; network.addNeuron(neuron2);
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; network.addSynapse(new Synapse(neuron1, neuron2));
+            <br>
+            <br>}
+        </p>
+        <p>
+            <span class="heading">Logging hidden unit activations
+                <br>
+            </span>
+        </p>
+        <p>To do this, you must create a custom update action.&nbsp;&nbsp; First create a network and add a Backprop subnetwork to it.&nbsp; Then go to&nbsp;
+            <span class="command">File &gt; Edit&nbsp; Update Sequence...</span>.&nbsp; Then click the "add custom action" button.&nbsp; Then&nbsp; copy and paste the code below in to the editor:
+            <br>
+        </p>
+        <p class="command" style="margin-left: 40px;">
+            <br>import org.simbrain.network.core.*;
+            <br>import org.simbrain.network.subnetworks.*;
+            <br>import org.simbrain.network.groups.*;
+            <br>import org.simbrain.network.update_actions.*;
+            <br>
+            <br>/**
+            <br>&nbsp;* Log data from hidden units.
+            <br>&nbsp;*/
+            <br>{
+            <br>&nbsp;&nbsp;&nbsp; // Object used for standard update.
+            <br>&nbsp;&nbsp;&nbsp; BufferedUpdate bufferedUpdate = new BufferedUpdate(network);
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; // Customize this
+            <br>&nbsp;&nbsp;&nbsp; this.action = new NetworkUpdateAction() {
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public void invoke() {
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Log hidden unit activations
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; NeuronGroup hiddenLayer = backpropNet.getNeuronGroupByLabel("Layer 2");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; for (Neuron neuron: hiddenLayer.getNeuronList()) {
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.print(neuron.getActivation() + " ");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; }
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; System.out.println();
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // This is how the action appears in the update manager dialog
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public String getDescription() {
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return "Print hidden unit activations";
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // This is a longer description for the tooltip
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public String getLongDescription() {
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return "Print hidden unit activations";
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+            <br>
+            <br>&nbsp;&nbsp;&nbsp; };
+            <br>}
+            <br>
+            <br>
+        </p>
+        <p>After this, when you run the network it will print out the activations of the hidden units.</p>
+        <p>
+            <span class="heading">Custom update of a neuron
+                <br>
+            </span>
+        </p>
+        <p>This is another example of using a custom update script, this time to do something custom to the neural activations in a network.&nbsp; Use the same script as above, but change the block under "Log Hidden Unit Activations" to this:</p>
+
+
+
+        <p style="margin-left: 40px;" class="command">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; // Randomize hidden unit activations
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; NeuronGroup inputLayer = backpropNet.getNeuronGroupByLabel("Layer 1");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; for (Neuron neuron: inputLayer.getNeuronList()) {
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; neuron.forceSetActivation(Math.random());
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; }
+            <br>
+        </p>
+
+
+        <p>You should also change the getDescription() and getLongDescription() methods.
+        </p>
+        <p>This will result in the activations of the input neurons being randomized at every iteration.&nbsp; Changes like this can be used to customize network update in various ways.
+            <br>
+        </p>
+    </div>
+</body>
+
+</html>

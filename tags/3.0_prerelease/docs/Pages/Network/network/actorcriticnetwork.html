@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Actor Critic</p>
+  </div>
+  <p><h1>Actor Critic Network</h1></p>
+  <p>Actor critic network implements the temporal difference learning algorithm. This network consistes of 3 layers. The first layer is the state (input) layer. This feeds input into the other two layers: the actor layer and the adaptive critic layer. The weights between the state and actor layers intuitively map perceptions to actions, and can thus control an agent's behavior in an environment.   The network learns to modify the weights in this layer so that a controlled agent maximizes reward to itself.  We will look at the working of these layers, one by one</p>
+
+  <p><span class="heading2">Adaptive Critic</span><br>
+  This layer consists of a single neuron that gets inputs from the state layer. This neurons learns to predict the discounted future associated with the input state. Hence, this layer's working is exactly the same as that of a <a href="../synapse/tdsynapse.html">TDSynapse</a>.
+  The adaptive critic's activation value is equal to the weighted sum of the state input. This activation value represents the critic's estimate of the discounted future reward. This value is used to compute the error in the reward estimate (delta) as follows:
+  <p span><img src="../equations/td_delta.png" width="350" height="50">
+  <p span>In the above equation, delta (error in reward expectation) is being computed for the <em>t<sup>th</sup></em> iteration. V stands for the target neuron's activation value and r stands for the reward value. Gamma is the reward discount factor. This delta value is used to update the connection strength between state and critic as follows:
+  <p span><img src="../equations/del_w_crit.png" width="270" height="45">
+  </p>
+  <p>eta_c is the critic learning rate and x(t) is the sending neuron activation value.</p>
+
+  <p><span class="heading2">Actor</span><br>
+  The number of neurons in this layer is the same as the number of possible actions in the agent that the network is modeling, with each neuron representing an action. Each action neuron computes the weighted sum of inputs and the one with the highest activation value is selected as the action to execute in the current state.  As the critic learns to predict the reward expectations, the actor learns to select the action that is likely to lead the network towards rewarding states. It is interesting to note that he network is never explicitly instructed which action to take. Hence, the biggest strength of the actor-critic framework is that actions are learned based purely on the reward values of the states. The delta value computed for the adaptive critic is used for training the actor, as follows:
+  </p>
+  <p span><img src="../equations/del_w_act.png" width="300" height="45">
+  </p>
+  <p>eta_a is the critic learning rate, x(t) is the sending neuron activation value and a(t) is the receiving neuron activation value.</p>
+
+
+  <p><span class="heading2">Exploration Policy</span><br>
+  Exploration is a very important concept in the training of an actor critic network. To prevent the network from being stuck in local minima and to give the network a chance to reach previously unexplored states in the state-space, some degree of randomization should be added to the network's action selection during the training process.
+  </p>
+
+  <p><span class="heading2">Using actor-critic subnetwork</span><br>
+  In the simbrain main menu, select Insert > New Network to create a new network. In the network's menu, select Insert > New Network > Actor Critic Network to create the actor critic network. A dialog will open for you to specify the number of state and actor neurons in the actor-critic network. Enter the desired numbers and press ok. This will create the actor critic network.
+
+  <br>Double click on the actor critic network to open its properties dialog. This dialog lets you select the actor learning rate (eta1), the critic learning rate (eta2) and the reward discount factor (gamma). The dialog also has a check box named "Train the network". If you uncheck  this box, the network's weights will not be updated when you step through it. This box should be checked with you want to train the network and unchecked when you want to test the network. The final element of this dialog is the "Exploration Policy". When training the network, it should be set to random (random exploration policy selects the highest activation action with a probability of 0.8 and one of the other actions with a probability of 0.2) and when testing the network, this should be set to None.<br>
+
+  <br>Explore the <a href="../../Samples/ActorCriticMazeNavigation.html">Maze navigation model</a> to test the working of the actor critic network.
+  </p>
+</div>
+</body>
+</html>

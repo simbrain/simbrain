@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Feedforward</p>
+        </div>
+
+        <p></p>
+        <h1>Feedfoward Network</h1>
+
+        <div><img style="float:right; padding-left: 20px; padding-right: 50px;" width="225" src="../../../Images/feedforward.png">
+        </div>
+
+        <p>A feed-forward network, comprising a sequence of <a href="../groups/BareNeuronGroup.html">bare neuron groups</a> connected by all-to-all <a href="../groups/SynapseGroup.html">synapse groups</a>. Activation in the bottom layer will propagate up the network. </p>
+
+        <p><span class="heading">Creation Dialog</span>
+        </p>
+
+        <p>The network's topology is specified in a creation dialog:</p>
+        <blockquote>
+            <p><span class="heading2">Number of Layers:</span> Sets the number of layers in the betwork.  Enter a value in the text field and press <b>change</b>.  When you do, the dialog changes, allowing you to specify number of neurons and neuron type separately from each layer.  Layer 1 is the input layer.
+            </p>
+            <p><span class="heading2">Number of Neurons:</span> Sets the number of neurons for a given layer.
+            </p>
+            <p><span class="heading2">Neuron Type:</span> Sets the neuron type for a given layer.  By default these are variants of a <a href="../neuron/SigmoidalDiscrete.html">discrete sigmoidal</a> neuron.</p>
+        </blockquote>
+        <p><img width="375" src="../../../Images/ff_creation.png">
+        </p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+import org.simbrain.world.dataworld.*;
+
+addDataWorld(String name) {
+
+	workspace.addWorkspaceComponent(new DataWorldComponent(name));
+}
+

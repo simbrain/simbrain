@@ -1,0 +1,8 @@
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import  org.simbrain.world.odorworld.*;
+
+OdorWorld getOdorWorld(String in) {
+	return ((OdorWorldComponent) workspace.getComponent(in)).getWorld();
+}
+

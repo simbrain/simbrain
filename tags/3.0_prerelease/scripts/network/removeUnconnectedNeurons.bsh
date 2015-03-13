@@ -1,0 +1,13 @@
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+
+/**
+ * Remove any neurons that are not connected to other neurons.
+ */
+{
+    for (Neuron neuron: network.getFlatNeuronList()) {
+        if ((neuron.getFanIn().size() + neuron.getFanOut().size()) == 0) {
+            network.removeNeuron(neuron);
+        }
+    }
+}

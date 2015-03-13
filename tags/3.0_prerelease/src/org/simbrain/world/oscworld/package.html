@@ -1,0 +1,188 @@
+<html>
+  <body>
+OpenSound Control (OSC) world.
+
+<h3>Summary</h3>
+<p>
+The OpenSound Control (OSC) world adds OSC in and OSC out support to Simbrain.  OpenSound Control is a communication protocol which allows musical instruments (especially electronic musical instruments such as synthesizers), computers, and other multimedia devices to share music performance data in realtime over a network. [<a href="#1">1</a>]
+</p>
+
+<h3>Simbrain to OSC out</h3>
+<p>
+The OSC world can be coupled to a network in order to send OSC messages with a single float argument to external applications.  More than one OSC message sender can be configured to produce messages with different OSC Address Patterns [<a href="#2">2</a>].
+</p>
+
+<h4>Example</h4>
+<ol>
+  <li>Create a network with at least one neuron</li>
+
+<p>
+Insert --&gt; New Network<br/>
+Right click --&gt; New Neuron
+</p>
+
+  <li>Open an OSC world</li>
+
+<p>
+Insert --&gt; New World --&gt; OSC World
+</p>
+
+  <li>Create a new OSC out message</li>
+
+<p>
+File --&gt; Create OSC out message<br/>
+Type "/melody" and hit OK.
+</p>
+
+  <li>Couple the neuron's activation to the OSC message's /melody, f attribute</li>
+
+<p>
+Right click on the /melody, f OSC message --&gt; Set input source --&gt; Network --&gt; Neuron_1 --&gt; Activation<br/>
+&nbsp;or<br/>
+Right click on the neuron --&gt; Set output target --&gt; OSC World --&gt; OSC Message --&gt; /melody, f
+</p>
+
+  <li>Set up an external OSC application to generate sound from the /melody OSC messages</li>
+
+<p>
+For example, run the following script in ChucK [<a href="#3">3</a>]:
+</p>
+
+<p>
+melody.ck:
+<pre>
+SinOSC melody =&gt; dac;
+0.5 =&gt; melody.gain;
+
+OscRecv recv;
+9999 =&gt; recv.port;
+recv.listen();
+
+recv.event("/melody, f") @=&gt; OscEvent @ melodyEvent;
+
+spork ~ pollMelodyEvent(melodyEvent);
+
+me.yield();
+
+while (true)
+{
+    1::second =&gt; now;
+}
+
+fun void pollMelodyEvent(OscEvent event)
+{
+    while (true)
+    {
+        event =&gt; now;
+        while (event.nextMsg())
+        {
+            1760.0 + (800.0 * event.getFloat()) =&gt; melody.freq;
+        }
+    }
+}
+</pre>
+</p>
+
+<p>
+From the command-line:
+<pre>
+$ chuck melody.ck
+</pre>
+</p>
+
+  <li>Activation changes in the neuron result in changes to the sound frequency</li>
+
+<p>
+Double-click on the neuron<br/>
+Set Neuron type to Random<br/>
+Click OK<br/>
+<br/>
+Click Global iterate network update algorithm button
+</p>
+</ol>
+
+<h3>OSC in to Simbrain</h3>
+<p>
+The OSC world can be coupled to a network in order to receive OSC messages with a single float argument from external applications.  More than one OSC message receiver can be configured to handle messages with different OSC Address Patterns [<a href="#2">2</a>].
+</p>
+
+<h4>Example</h4>
+<ol>
+  <li>Create a network with at least one neuron</li>
+
+<p>
+Insert --&gt; New Network<br/>
+Right click --&gt; New Neuron
+</p>
+
+  <li>Open an OSC world</li>
+
+<p>
+Insert --&gt; New World --&gt; OSC World
+</p>
+
+  <li>Create a new OSC in message</li>
+
+<p>
+File --&gt; Create OSC in message<br/>
+Type "/pulse" and hit OK.
+</p>
+
+  <li>Couple the neuron's activation to the OSC message's /pulse, f attribute</li>
+
+<p>
+Right click on the /pulse, f OSC message --&gt; Set output target --&gt; Network --&gt; Neuron_1 --&gt; Activation<br/>
+&nbsp;or<br/>
+Right click on the neuron --&gt; Set input source --&gt; OSC World --&gt; OSC Message --&gt; /pulse, f
+</p>
+
+  <li>Set up an external OSC application to send /pulse OSC messages</li>
+
+<p>
+For example, run the following script in ChucK [<a href="#3">3</a>]:
+</p>
+
+<p>
+pulse.ck:
+<pre>
+OscSend send;
+send.setHost("localhost", 9998);
+
+while (true)
+{
+    send.startMsg("/pulse", "f");
+    Std.rand2f(0.1, 0.9) =&gt; send.addFloat;
+
+    1::second =&gt; now;
+}
+</pre>
+</p>
+
+<p>
+From the command-line:
+<pre>
+$ chuck pulse.ck
+</pre>
+</p>
+
+  <li>OSC pulse messages change the neuron's activation</li>
+
+<p>
+Click Global iterate network update algorithm button
+</p>
+</ol>
+
+<h3>Acknowledgements</h3>
+<p>
+The OSC world is based on the JavaOSC library [<a href="#4">4</a>].
+</p>
+
+<h3>References</h3>
+<ul>
+  <li><a id="1"/>OpenSound Control (OSC) Wikipedia entry<br/><a href="http://en.wikipedia.org/wiki/OpenSound_Control">http://en.wikipedia.org/wiki/OpenSound_Control</a></li>
+  <li><a id="2"/>The OpenSound Control 1.0 Specification<br/><a href="hhttp://opensoundcontrol.org/spec-1_0">http://opensoundcontrol.org/spec-1_0</a></li>
+  <li><a id="3"/>ChucK : Strongly-timed, Concurrent, and On-the-fly Audio Programming Language<br/><a href="http://chuck.cs.princeton.edu">http://chuck.cs.princeton.edu</a></li>
+  <li><a id="4"/>JavaOSC library<br/><a href="http://www.illposed.com/software/javaosc.html">http://www.illposed.com/software/javaosc.html</a></li>
+</ul>
+  </body>
+</html>

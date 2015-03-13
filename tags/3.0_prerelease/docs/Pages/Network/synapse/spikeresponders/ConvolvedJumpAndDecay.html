@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+     <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <a href="../../../../SimbrainDocs.html">
+        <div class="logo">
+
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+
+            <p><a href="../../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../../Network.html">Network</a> &gt; <a href="../../synapse.html">Synapses</a> &gt; <a href="../spikeResponder.html">Spike Responder</a> &gt; Convolved Jump and Decay </p>
+        </div>
+        <p>
+            <h1>Convolved Jump and Decay</h1>
+             <img src="../../../../Images/convolvedJumpAndDecay.gif" align="right" vspace="10px" hspace="20px">
+        </p>
+        <br>
+        <p align="justify">The convolved jump and decay spike responder produces a post-synaptic response (PSR) by convolving instantaneous trains of spikes (Dirac delta functions) with a simple exponential kernel. This yeilds the following equation for determining a post synaptic response based on the absolute efficacy of the synapse (strength/weight), the time since the last spike, and the current state (spiking or quiescent) of the pre-synaptic cell. 
+            <blockquote>
+                $$  q_{ij}(t + 1) \,\,=\,\, q_{ij}(t)e^{-\left( \frac{\Delta_{t}}{\tau} \right)} \,+\,\, Jw_{ij}\delta(t)_j$$   
+                <br>  
+                $$ PSR(t)_{ij}  = q(t)_{ij} + b $$
+            </blockquote>
+            <br>
+            <blockquote>
+                $$ \delta(t)_j \,\, = \,\,
+                \left\{\begin{matrix}
+                   1 & \quad if \,\, j \,\, spikes \,\, at \,\, time \,\, t\\ 
+                   0 & \quad otherwise
+                \end{matrix}\right.
+                $$
+        </blockquote>
+        </p>
+        <br>
+        <p align="justify">
+            Where $q(t)_{ij}$ is an intermediate value determining the shape of the post synaptic response impinging on neuron $i$ via the synapse connecting neuron $j$ to neuron $i$, $\Delta_t$ is the difference between the current time and the time of the last action potential at neuron $j$, $J$ is the jump height, $w_{ij}$ is the absolute synaptic efficacy of the synapse connecting neuron $j$ to neuron $i$, and $b$ is the baseline of the curve, which determines the value of $PSR(t)_{ij}$ as $q(t)_{ij} \rightarrow 0$.
+        </p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+
+        </div>
+    </a>
+
+    <div id="main_docs">
+        <div class="navi">
+
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt;
+                <a href="../Plot.html">Plot</a> &gt; histogram </p>
+        </div>
+        <p>
+        </p>
+
+        <h1>Histogram</h1>
+
+        <p>The histogram plot can be used to represent arrays of data. Currently it can be used to represent patterns of activity in the neurons in a neuron group or synaptic strengths in a synapse group. It partitions the data in to "bins", where each bin shows how many values in the total array are in that range. For example, in a set of 20 synapses, if 10 synapses have a strength between 0 and 1 and another 10 have a strength between -1 and 0, then we would have two bins of the same height. The same panel is also embedded in the Synapse Adjustment panel, where the strengths of a selected group of synapses are displayed and adjusted. As with other plots, several simultaneous datasets (histograms) can be displayed. Unlike other plots, the number of datasets that can be displayed can be dynamically changed. All histogram plot components are restricted to representing 4 histograms. To represented more data open another histogram plot.
+
+            <p class="heading">Component Panel</p>
+
+            <p style="margin-left: 40px;"><span class="heading2">Clear:</span> Clear the current data. Note that empty data appears as a thin vertical cline at 0. </p>
+            <p style="margin-left: 40px;"><span class="heading2">Set Bins:</span> Sets the number of bins used to represent the data. Try modifying the number and pressing the button to get a feel for this.</p>
+
+            <p class="heading">Menus</p>
+
+            <p style="margin-left: 20px;" class="heading">File</p>
+
+            <p style="margin-left: 40px;"><span class="heading2">Open:</span> Opens a histogram from a stored .xml file.</p>
+            <p style="margin-left: 40px;"><span class="heading2">Save:</span> Saves the current histogram.</p>
+            <p style="margin-left: 40px;"><span class="heading2">Save As:</span> Saves the current histogram and allows you to specify a name for the file.</p>
+            <p style="margin-left: 40px;"><span class="heading2">Close:</span> Closes the current histogram.</p>
+
+            <p class="heading">Right-Click Menu</p>
+            <blockquote>
+                <p>The context menu is a <a href="jfreechart_menu.html">JFreeChart menu</a>.</p>
+            </blockquote>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
+import javax.swing.*;
+
+//
+// Prints component bounds to terminal.  Useful when writing scripts.  You can lay out components as you like them,
+// then use this command to determine those bounds, and then use the bounds in your script.
+//
+void componentBounds() {
+	SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+    for(JInternalFrame frame : desktop.getDesktop().getAllFrames()) {
+    	print(frame.getTitle() + " (" + frame.getX() + "," + frame.getY() + "," + frame.getWidth() 
+    		+ "," + frame.getHeight() + ")");
+    }
+
+}

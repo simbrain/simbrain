@@ -1,0 +1,41 @@
+import java.util.*;
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.util.*;
+
+private NetworkUpdateAction action;
+
+/**
+ * Print activations of input neurons
+ */
+{
+  NeuronGroup sensoryNet  = network.getGroupByLabel("Sensory");
+  NeuronGroup actionNet  = network.getGroupByLabel("Actions");
+  NeuronGroup predictionNet  = network.getGroupByLabel("Predicted");
+
+  this.action = new NetworkUpdateAction() {
+    public void invoke() {
+        System.out.print("Action:"  + Utils.getVectorString(actionNet.getActivations(), ","));  
+        System.out.print(" Sensory:" + Utils.getVectorString(sensoryNet.getActivations(), ",")); 
+        System.out.print(" Prediction:" +  Utils.getVectorString(predictionNet.getActivations(), ",")); 
+        System.out.println();
+    }
+    
+    // This is how the action appears in the update manager dialog
+    public String getDescription() {
+      return "Print activations";
+    }
+    
+    // This is a longer description for the tooltip
+    public String getLongDescription() {
+      return "Print activations for diagnostic purposes";
+    }
+
+  };
+}

@@ -1,0 +1,27 @@
+source1() {
+	public class HPSpkThresh extends SpikingThresholdRule {
+
+		private double hIP = 0.1;
+
+		private double nIP = 0.01;
+
+		public HPSpkThresh() {
+			super();
+			super.setInputType(InputType.WEIGHTED);
+		}
+
+		public HPSpkThresh deepCopy() {
+			HPSpkThresh cpy = new HPSpkThresh();
+			cpy.setThreshold(getThreshold());
+			return cpy;
+		}
+
+		public void update(Neuron n) {
+			super.update(n);
+			double newThreshold = getThreshold()
+				+ nIP * (n.isSpike() ? 1 : 0 - hIP);
+			setThreshold(newThreshold);
+		}
+
+	}
+}

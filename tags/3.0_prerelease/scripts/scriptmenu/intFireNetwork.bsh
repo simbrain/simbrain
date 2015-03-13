@@ -1,0 +1,52 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.workspace.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.randomizer.*;
+import org.simbrain.util.math.*;
+
+{
+
+	// Parameters 
+	int NUM_NEURONS = 49;
+	double GRID_SPACE = 50;
+	double SPARSITY = .05; // Percent of possible connections to make
+	double excitatoryRatio = .05;
+
+	// Build Network
+	NetworkComponent networkComponent = new NetworkComponent("Integrate and Fire Network");
+	workspace.addWorkspaceComponent(networkComponent);
+	Network network = networkComponent.getNetwork();
+	GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+	//layout.setInitialLocation(new Point(10, 10));
+	for (int i = 0; i < NUM_NEURONS; i++) {
+	    Neuron neuron = new Neuron(network, "IntegrateAndFireRule");
+	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setTimeConstant(5);
+	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setResetPotential(2);
+	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setThreshold(11);
+	    network.addNeuron(neuron);
+	}
+	layout.layoutNeurons(network.getNeuronList());
+    Sparse.connectSparse(network.getFlatNeuronList(),
+            network.getFlatNeuronList(), SPARSITY, false, false, true);
+     //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
+    PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
+    exciteRand.setPdf(ProbDistribution.NORMAL);
+    exciteRand.setParam1(1); // Mean
+    exciteRand.setParam2(.1); // STD
+    PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
+    inhibRand.setPdf(ProbDistribution.NORMAL);
+    inhibRand.setParam1(5); 
+    inhibRand.setParam2(.1);
+
+    ConnectionUtilities.randomizeAndPolarizeSynapses(network.getFlatSynapseList(), 
+        exciteRand, inhibRand, excitatoryRatio);
+    network.randomizeNeurons();
+    network.fireNeuronsUpdated();
+
+}

@@ -1,0 +1,226 @@
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.plot.projection.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.util.*;
+import javax.swing.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+//
+// Simulation for "Narrowing the Explanatory Gap Using Bridge Metaphors"
+//
+// Illustrates how states of an agent's network state space can be plotted and its
+// predictions about future states used to color the points in the plot.
+// For more informaiton see:
+// https://mindmodeling.org/cogsci2014/papers/542/paper542.pdf
+//
+// Jeff Yoshimi
+//
+void main() {
+
+  // Parameters
+  double tolerance = .02; // How far away (Euclidean distance) from an existing point new points must be to be plotted in the Projection
+
+  // Clear workspace
+  workspace.clearWorkspace();
+
+  // Open workspace
+  String FS = System.getProperty("file.separator");
+  File workspaceFile = new File("scripts" + FS + "scriptmenu" + FS + "agentTrails" + FS  + "agentTrails.zip");
+  workspace.openWorkspace(workspaceFile);
+
+  // Component references
+  Network network = ((NetworkComponent) workspace.getComponent("predicter.xml")).getNetwork();
+  OdorWorldComponent worldComponent = (OdorWorldComponent) workspace.getComponent("choicePoint.xml");
+  ProjectionComponent projectionComponent = (ProjectionComponent) workspace.getComponent("Projection1");
+
+  // Load custom network update script, for training 
+  File trainSynapsesFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "trainSynapses.bsh");
+  network.addUpdateAction(new CustomUpdate(network, trainSynapsesFile));
+
+  // Uncomment as needed below to print relevant data terminal 
+
+  // Script to print outputs to terminal (Must run from terminal to see this)
+  //File printActivationsFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "printActivations.bsh");
+  //network.addUpdateAction(new CustomUpdate(network, printActivationsFile));
+
+  // Script to print coherent qualia to terminal 
+  // File printQualiaFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "printQualia.bsh");
+  // network.addUpdateAction(new CustomUpdate(network, printQualiaFile));
+
+  // Script to print chaotic qualia to terminal
+  //File printChaoticQualiaFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "printChaoticQualia.bsh");
+  //network.addUpdateAction(new CustomUpdate(network, printChaoticQualiaFile));
+
+  // Object references
+  Neuron rightTurnNeuron = network.getNeuronByLabel("Right");
+  Neuron straightNeuron = network.getNeuronByLabel("Straight");
+  Neuron leftTurnNeuron = network.getNeuronByLabel("Left");
+
+  // Load custom network update script, for training 
+  File colorPlots = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "colorPlot.bsh");
+  workspace.addUpdateAction(new UpdateActionCustom(workspace, colorPlots));
+
+  // Set projection tolerance
+  projectionComponent.getProjector().setTolerance(tolerance);
+
+  // Set up internal frame
+  JInternalFrame internalFrame = new JInternalFrame("Train / Test", true, true);
+  LabelledItemPanel panel = new LabelledItemPanel();
+  Random generator = new Random(); 
+
+  // Set up odor world
+  OdorWorld world =  worldComponent.getWorld();
+  RotatingEntity mouse = (RotatingEntity) world.getEntity("Agent_1");
+  OdorWorldEntity fish = (OdorWorldEntity) world.getEntity("Fish");
+  OdorWorldEntity cheese = (OdorWorldEntity) world.getEntity("Cheese");
+  OdorWorldEntity flower = (OdorWorldEntity) world.getEntity("Flower");
+  int dispersion = 65;
+  int fishX = 50;
+  int fishY = 100;
+  fish.setX(fishX);
+  fish.setY(fishY);
+  fish.getSmellSource().setDispersion(dispersion);
+  int flowerX = 200;
+  int flowerY = 100;
+  flower.setX(flowerX);
+  flower.setY(flowerY);
+  flower.getSmellSource().setDispersion(dispersion);
+  int cheeseX = 120;
+  int cheeseY = 180;
+  cheese.setX(cheeseX);
+  cheese.setY(cheeseY);
+  cheese.getSmellSource().setDispersion(dispersion);
+  mouse.setLocation(cheeseX, cheeseY+dispersion);
+
+  // Move past cheese
+  JButton button1 = new JButton("Cheese");
+  button1.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent arg0) {
+     Executors.newSingleThreadExecutor().execute(new Runnable() {
+       public void run() {
+            network.clearActivations();
+            mouse.setLocation(cheeseX, cheeseY+dispersion);
+            mouse.setHeading(90);
+            straightNeuron.forceSetActivation(1);
+            iterate(180);
+       }
+     });
+   }});
+  panel.addItem("", button1);
+
+  // Move past Fish
+  JButton button2 = new JButton("Fish");
+  button2.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent arg0) {
+     Executors.newSingleThreadExecutor().execute(new Runnable() {
+       public void run() {
+            network.clearActivations();
+            mouse.setLocation(fishX, fishY+dispersion);
+            mouse.setHeading(90);
+            straightNeuron.forceSetActivation(1);
+            iterate(180);
+       }
+     });
+   }});
+  panel.addItem("", button2);
+
+  // Move past flower
+  JButton button3 = new JButton("Flower");
+  button3.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent arg0) {
+     Executors.newSingleThreadExecutor().execute(new Runnable() {
+       public void run() {
+            network.clearActivations();
+            mouse.setLocation(flowerX, flowerY+dispersion);
+            mouse.setHeading(90);
+            straightNeuron.forceSetActivation(1);
+            iterate(180);
+
+       }
+     });
+   }});
+  panel.addItem("", button3);
+
+  // Cheese > Fish
+  JButton button4 = new JButton("Cheese > Flower");
+  button4.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent arg0) {
+     Executors.newSingleThreadExecutor().execute(new Runnable() {
+       public void run() {
+            network.clearActivations();
+            mouse.setLocation(cheeseX, cheeseY+dispersion);
+            mouse.setHeading(90);
+            straightNeuron.forceSetActivation(1);
+            iterate(50);
+            rightTurnNeuron.forceSetActivation(1.5);
+            iterate(25);
+            rightTurnNeuron.forceSetActivation(0);
+            iterate(220);
+       }
+     });
+   }});
+  panel.addItem("", button4);
+
+  // Cheese > Flower
+  JButton button5 = new JButton("Cheese > Fish");
+  button5.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent arg0) {
+     Executors.newSingleThreadExecutor().execute(new Runnable() {
+       public void run() {
+            network.clearActivations();
+            mouse.setLocation(cheeseX, cheeseY+dispersion);
+            mouse.setHeading(90);
+            straightNeuron.forceSetActivation(1);
+            iterate(50);
+            leftTurnNeuron.forceSetActivation(1.5);
+            iterate(25);
+            leftTurnNeuron.forceSetActivation(0);
+            iterate(220);
+       }
+     });
+   }});
+  panel.addItem("", button5);
+
+  // Set up Frame
+  internalFrame.setLocation(5,10);
+  internalFrame.getContentPane().add(panel);
+  internalFrame.setVisible(true);
+  internalFrame.pack();
+  desktop.addInternalFrame(internalFrame);
+
+}
+
+//
+// Iterate the simulation a specific number of times and don't move forward in the
+// script until done.
+//
+void iterate(int iterations) {
+ CountDownLatch iterationLatch = new CountDownLatch(1);
+ workspace.iterate(iterationLatch, iterations);
+ try {
+   iterationLatch.await();
+ } catch (InterruptedException e) {
+   e.printStackTrace();
+ }
+}
+
+
+// Run the simulation.
+main();

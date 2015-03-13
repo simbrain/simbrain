@@ -1,0 +1,551 @@
+import org.simbrain.network.interfaces.*;
+import java.util.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.util.*;
+import org.simbrain.util.*;
+import org.simbrain.util.math.*;
+import org.simbrain.util.environment.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.docviewer.*;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.plot.timeseries.*;
+import javax.swing.*;
+import java.swing.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+/**
+ * Actor critic simulation
+ * 
+ * Based on earlier work by Ashish Gupta.
+ */
+
+// Simulation parameters
+int numTrials = 5;
+double alpha = .25; // Learning rate
+double gamma = 1; // Discount factor .  0-1.  0 predict next value only.   .5 predict future values.
+                // As it increases toward one, values of y in the more distant future become more significant.}
+double lambda = 0; // 0 for no trace; 1 for permanent trace.  .9 default.  Must set in script.
+double epsilon = .1; // Prob. of taking a random action
+double rewardDispersionFactor = 2; // Number of tiles for reward to disperse
+double movementFactor = 1; // Number of tiles to move
+
+// World Parameters
+int worldWidth = 250; 
+int worldHeight = 250; // just one var?
+int numTiles = 5; // Number of rows / cols in each tileset
+int tileSets = 1; // Number of tilesets
+boolean worldWrap = false; // Currently hard to get good performance if set to true
+
+// Other variables
+double previousValue = 0;
+Random generator = new Random();
+double stdev = .01 * worldHeight;
+int tileSize = worldHeight / numTiles;
+double tileIncrement = (worldHeight / numTiles) / tileSets;
+double hitRadius = rewardDispersionFactor * (tileSize/2);
+boolean stop  = false;
+boolean goalAchieved = false;
+int location = (tileSize*numTiles) - tileSize/2;
+
+Network network;
+NetworkComponent networkComponent;
+NeuronWithMemory tdErrorNeuron;
+NeuronWithMemory valueNeuron;
+NeuronWithMemory rewardNeuron;
+OdorWorld world;
+OdorWorldComponent worldComponent;
+RotatingEntity mouse;
+BasicEntity cheese;
+BasicEntity entity;
+List effectorCouplings;
+List sensorCouplings;
+List tileNeurons;
+
+// TODOS:
+// Ability to step through sim
+// Set distribution of good and bad entities.
+// Button to reset weights
+
+
+//
+// Main method
+//
+void main() {
+    buildMainSimulation();
+    makeTimeSeries();
+    makeButtons();
+    addDocViewer();
+}
+
+//
+// Build network, world, and time series and couple them
+//
+void buildMainSimulation() {
+
+    // Init workspace
+    workspace.clearWorkspace();
+
+    // Create network
+    networkComponent = new NetworkComponent("TD Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(270, 38, 446, 500);
+    network = networkComponent.getNetwork();
+
+    // Create world
+    worldComponent = new OdorWorldComponent("Odor World");
+    world = worldComponent.getWorld();
+    world.setWrapAround(worldWrap);
+    world.setObjectsBlockMovement(false);
+    workspace.addWorkspaceComponent(worldComponent);
+    desktop.getDesktopComponent(worldComponent).getParentFrame().setBounds(710, 38, worldWidth, worldHeight);
+    mouse = new RotatingEntity(world);
+    mouse.setCenterLocation(location,location);
+    world.addAgent(mouse);
+    cheese = new BasicEntity("Swiss.gif", world);
+    double dispersion = rewardDispersionFactor * (tileSize/2);
+    cheese.setCenterLocation(tileSize/2, tileSize/2);
+    cheese.setSmellSource(
+            new SmellSource(new double[]{1,0},
+                    SmellSource.DecayFunction.STEP, 
+                    dispersion,
+                    cheese.getCenterLocation()));
+    world.addEntity(cheese);
+
+    // Distribution of good and bad entities
+    //      (Set number above)
+    entity = new BasicEntity("Poison.gif", world);
+    int gridx = 3;
+    int gridy = 3;
+    entity.setCenterLocation(gridx * tileSize - (tileSize/2), gridy * tileSize - (tileSize/2));
+    entity.setSmellSource(
+            new SmellSource(new double[]{-1,0},
+                    SmellSource.DecayFunction.STEP, 
+                    tileSize/2,
+                    entity.getCenterLocation()));
+    //world.addEntity(entity);
+
+    // Neuron position variables
+    double initTilesX = 100;
+    double initTilesY = 100;
+    double topX = initTilesX + (((numTiles-1) * tileSize) / 2) - (150/2); // Half tile neuron width - half action neurons with
+    double topY = initTilesY - 75;
+    double topRightX = initTilesX + (numTiles * tileSize) + 30;
+
+    // TD, Value, Reward neurons
+    tdErrorNeuron = new NeuronWithMemory(network, "LinearRule");
+    tdErrorNeuron.setLabel("TD");
+    tdErrorNeuron.setLocation(topRightX,topY); // TODO: Set location using location of tiles...
+    network.addNeuron(tdErrorNeuron);
+    valueNeuron = new NeuronWithMemory(network, "LinearRule");
+    valueNeuron.setLabel("Value");
+    valueNeuron.setLocation(topRightX + 50,topY);
+    network.addNeuron(valueNeuron);
+    rewardNeuron = new NeuronWithMemory(network, "LinearRule");
+    rewardNeuron.setLabel("Reward");
+    rewardNeuron.setLocation(topRightX + 100,topY);
+    //rewardNeuron.getUpdateRule().setBias(-1);
+    network.addNeuron(rewardNeuron);
+    
+    // Action Neurons
+    NeuronWithMemory northNeuron = new NeuronWithMemory(network, "LinearRule");
+    northNeuron.setLabel("North");
+    northNeuron.setLocation(topX,topY);
+    network.addNeuron(northNeuron);
+    NeuronWithMemory southNeuron = new NeuronWithMemory(network, "LinearRule");
+    southNeuron.setLabel("South");
+    southNeuron.setLocation(topX + 50,topY);
+    network.addNeuron(southNeuron);
+    NeuronWithMemory westNeuron = new NeuronWithMemory(network, "LinearRule");
+    westNeuron.setLabel("West");
+    westNeuron.setLocation(topX + 100,topY);
+    network.addNeuron(westNeuron);
+    NeuronWithMemory eastNeuron = new NeuronWithMemory(network, "LinearRule");
+    eastNeuron.setLabel("East");
+    eastNeuron.setLocation(topX + 150,topY);
+    network.addNeuron(eastNeuron);
+    List actionNeurons = new ArrayList();
+    actionNeurons.add(northNeuron);
+    actionNeurons.add(southNeuron);
+    actionNeurons.add(eastNeuron);
+    actionNeurons.add(westNeuron);
+    
+    // CustomUpdateRule
+	NetworkUpdateAction networkUpdateAction = new NetworkUpdateAction() {
+        public String getDescription() {
+        	return "Custom TD Rule";
+        }
+
+	    public String getLongDescription() {
+        	return "Custom TD Rule";
+    	}
+
+        public void invoke() {
+
+            // Update all neurons (Just state neurons?)
+            network.updateNeurons(tileNeurons);
+            network.updateNeurons(Collections.singletonList(valueNeuron));
+            network.updateNeurons(Collections.singletonList(rewardNeuron));
+
+            // Determine winning neuron and update action neurons
+            //  TODO: Break ties randomly
+            //  TOOD: Use WTA subnetwork?
+            NeuronWithMemory winningNeuron;
+            double maxVal; 
+            if (Math.random() > epsilon) {
+                maxVal = Double.NEGATIVE_INFINITY;
+                for(NeuronWithMemory neuron : actionNeurons) {
+                    if (neuron.getWeightedInputs() > maxVal) {
+                        maxVal = neuron.getWeightedInputs();
+                        winningNeuron = neuron;
+                    }
+                }      
+                // Break ties randomly
+                if (maxVal == 0) {
+                    int winner = generator.nextInt(actionNeurons.size());
+                    winningNeuron = actionNeurons.get(winner);                    
+                }
+            } else {                
+                // Choose winner randomly
+                int winner = generator.nextInt(actionNeurons.size());
+                winningNeuron = actionNeurons.get(winner);
+            }            
+            for(NeuronWithMemory neuron : actionNeurons) {
+                if (neuron == winningNeuron) {
+                    neuron.setActivation(tileSize * movementFactor);
+                    neuron.update();
+                } else {
+                    neuron.setActivation(0);
+                }
+            }
+
+            // Set main variables
+            //valueNeuron.setActivation(maxVal);
+            tdErrorNeuron.setActivation((rewardNeuron.getActivation() + gamma * valueNeuron.getActivation()) - valueNeuron.getLastActivation());
+            //System.out.println("td error:" + valueNeuron.getActivation() + " + " + rewardNeuron.getActivation() + " - " + valueNeuron.lastActivation);
+
+
+            // Update all value synapses 
+            for (Synapse synapse : valueNeuron.getFanIn()) {
+                NeuronWithMemory sourceNeuron = synapse.getSource(); 
+                double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
+                //synapse.setStrength(synapse.clip(newStrength)); 
+                synapse.setStrength(newStrength); 
+                //System.out.println("Value Neuron / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
+            }
+            // Update all actor neurons
+            for (NeuronWithMemory neuron : actionNeurons) {
+                // Just update the last winner
+                if (neuron.getLastActivation() > 0) {
+                    for (Synapse synapse : neuron.getFanIn()) {
+                        Neuron sourceNeuron = synapse.getSource(); 
+                        double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
+                        synapse.setStrength(synapse.clip(newStrength)); 
+                        //synapse.setStrength(newStrength); 
+                        //System.out.println("Neuron (" + neuron.getLabel() + ") / Tile //neuron (" + sourceNeuron.getId() + "):" + newStrength);
+                    }
+                    
+                }
+            } 
+
+        }
+
+	};
+    network.getUpdateManager().clear();
+	network.addUpdateAction(networkUpdateAction);
+
+    // Initialize world and tile neurons
+    world.setWidth(worldWidth);
+    world.setHeight(worldHeight);
+    tileNeurons = new ArrayList();
+    sensorCouplings = new ArrayList();
+    for(int i = 0; i < tileSets; i++) {
+        for (int j = 0; j < numTiles; j++) {
+            for(int k = 0; k < numTiles; k++) {
+                int x = (j * tileSize) -i * tileIncrement;
+                int y = (k * tileSize) -i * tileIncrement;
+                TileSensor sensor = new TileSensor(mouse,x,y, tileSize, tileSize);
+                mouse.addSensor(sensor);
+                NeuronWithMemory tileNeuron;
+                if (lambda == 0) {
+                    tileNeuron = new NeuronWithMemory(network, "LinearRule");                    
+                } else {
+                    tileNeuron = new NeuronWithMemory(network, "DecayRule");
+                }
+                tileNeurons.add(tileNeuron);
+                tileNeuron.setX(initTilesX + (double)x);
+                tileNeuron.setY(initTilesY + (double)y);
+                network.addNeuron(tileNeuron);
+                PotentialProducer tileProducer = worldComponent.getAttributeManager().createPotentialProducer(sensor, "getValue", double.class);
+                tileProducer.setCustomDescription(sensor.getLabel());
+                PotentialConsumer neuronConsumer = networkComponent.getAttributeManager().createPotentialConsumer(tileNeuron, "setInputValue", double.class);
+                neuronConsumer.setCustomDescription(tileNeuron.getId());
+                Coupling tileCoupling = new Coupling(tileProducer, neuronConsumer);
+                sensorCouplings.add(tileCoupling);
+                workspace.getCouplingManager().addCoupling(tileCoupling);
+                // Sensor neurons to action neurons
+                for (Neuron actionNeuron : actionNeurons) {
+                    Synapse synapse = new Synapse(tileNeuron, actionNeuron, new StaticSynapseRule());
+                    network.addSynapse(synapse);
+                    synapse.setStrength(0);
+                }
+                // Sensor neurons to value neuron
+                Synapse synapse = new Synapse(tileNeuron, valueNeuron, new StaticSynapseRule());
+                synapse.setStrength(.01);
+                network.addSynapse(synapse);
+            }
+        }
+    }
+    
+    // Add one smell coupling
+    PotentialProducer smell = worldComponent.getAttributeManager().createPotentialProducer(world.getSensor(mouse.getId(),"Sensor_2"), "getCurrentValue", double.class, new Class[]{int.class}, new Object[]{0}); 
+    smell.setCustomDescription("Reward");
+    PotentialConsumer reward = networkComponent.getAttributeManager().createPotentialConsumer(rewardNeuron, "setInputValue", double.class); 
+    reward.setCustomDescription("Reward neuron");
+    Coupling rewardCoupling = new Coupling(smell, reward);
+    sensorCouplings.add(rewardCoupling);
+    workspace.getCouplingManager().addCoupling(rewardCoupling);
+
+    // Absolute movement couplings
+    effectorCouplings = new ArrayList();
+    PotentialProducer northProducer = networkComponent.getAttributeManager().createPotentialProducer(northNeuron, "getActivation", double.class); 
+    PotentialConsumer northMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveNorth", double.class); 
+    northMovement.setCustomDescription("North");
+    Coupling northCoupling = new Coupling(northProducer, northMovement);
+    effectorCouplings.add(northCoupling);
+    workspace.getCouplingManager().addCoupling(northCoupling);
+    
+    PotentialProducer southProducer = networkComponent.getAttributeManager().createPotentialProducer(southNeuron, "getActivation", double.class); 
+    PotentialConsumer southMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveSouth", double.class); 
+    southMovement.setCustomDescription("South");
+    Coupling southCoupling = new Coupling(southProducer, southMovement);
+    effectorCouplings.add(southCoupling);
+    workspace.getCouplingManager().addCoupling(southCoupling);
+    
+    PotentialProducer eastProducer = networkComponent.getAttributeManager().createPotentialProducer(eastNeuron, "getActivation", double.class); 
+    PotentialConsumer eastMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveEast", double.class); 
+    eastMovement.setCustomDescription("East");
+    Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
+    effectorCouplings.add(eastCoupling);
+    workspace.getCouplingManager().addCoupling(eastCoupling);
+    
+    PotentialProducer westProducer = networkComponent.getAttributeManager().createPotentialProducer(westNeuron, "getActivation", double.class); 
+    PotentialConsumer westMovement = worldComponent.getAttributeManager().createPotentialConsumer(mouse, "moveWest", double.class); 
+    westMovement.setCustomDescription("West");
+    Coupling westCoupling = new Coupling(westProducer, westMovement);
+    effectorCouplings.add(westCoupling);
+    workspace.getCouplingManager().addCoupling(westCoupling);
+
+    network.fireNeuronsUpdated();
+    network.fireSynapsesUpdated();
+
+    // Initialize decay using lambda
+    for (Neuron neuron : network.getFlatNeuronList()) {
+        if (lambda != 0) {
+            if (neuron.getUpdateRule() instanceof DecayRule) {
+                ((DecayRule)neuron.getUpdateRule()).setDecayFraction(1-lambda);
+            }            
+        }
+    }
+}
+    
+void makeTimeSeries() {
+    // Make time series chart
+    TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("TD, Value, Reward", 2);
+    chart.getModel().setAutoRange(false);
+    chart.getModel().setRangeUpperBound(1);
+    chart.getModel().setRangeLowerBound(-1);
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(710, 340, 300, 300);
+
+
+    // Couple network to chart
+    PotentialProducer valueProducer = networkComponent.getAttributeManager().createPotentialProducer(valueNeuron, "getActivation", double.class); 
+    PotentialConsumer timeSeriesConsumer1 = chart.getPotentialConsumers().get(0);
+    Coupling valueCoupling = new Coupling(valueProducer, timeSeriesConsumer1);
+    workspace.getCouplingManager().addCoupling(valueCoupling);
+    sensorCouplings.add(valueCoupling);
+    PotentialProducer tdProducer = networkComponent.getAttributeManager().createPotentialProducer(tdErrorNeuron, "getActivation", double.class); 
+    PotentialConsumer timeSeriesConsumer2 = chart.getPotentialConsumers().get(1);
+    Coupling tdCoupling = new Coupling(tdProducer, timeSeriesConsumer2);
+    workspace.getCouplingManager().addCoupling(tdCoupling);
+    sensorCouplings.add(tdCoupling);
+}
+
+
+//
+// Make Buttons
+//
+void makeButtons() {
+
+    // Set up button panel
+    JInternalFrame internalFrame = new JInternalFrame("Simulation", true, true);
+    LabelledItemPanel panel = new LabelledItemPanel();    
+
+    // Parameter Fields
+    JTextField trialField = new JTextField();
+    trialField.setText("" + numTrials);
+    panel.addItem("Trials", trialField);
+    JTextField discountField = new JTextField();
+    discountField.setText("" + gamma);
+    panel.addItem("Discount rate", discountField);
+    JTextField lambdaField = new JTextField();
+    lambdaField.setText("" + lambda);
+    //panel.addItem("Lambda", lambdaField);  // Don't show because it can only be set in script
+    JTextField epsilonField = new JTextField();
+    epsilonField.setText("" + epsilon);
+    panel.addItem("Epsilon", epsilonField);
+    JTextField movementField = new JTextField();
+    movementField.setText("" + movementFactor);
+    movementField.setToolTipText("Percentage of a tile, by which to move on each iteration.");
+    panel.addItem("Movement Factor", movementField);
+
+    // Run Button
+    JButton runButton = new JButton("Run");
+    runButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                public void run() {
+
+                    numTrials = Integer.parseInt(trialField.getText());
+                    gamma = Double.parseDouble(discountField.getText());
+                    lambda = Double.parseDouble(lambdaField.getText());
+                    epsilon = Double.parseDouble(epsilonField.getText());                    
+                    movementFactor = Double.parseDouble(movementField.getText());
+                    
+                    stop = false;
+                    for (int i = 1; i < numTrials+1; i++) {
+
+                        if (stop) {
+                            return;
+                        }
+                        
+                        // Set up the trial
+                        trialField.setText("" + ((numTrials + 1)- i));
+                        goalAchieved = false;
+
+                        // Clear network activations between trials
+                        network.clearActivations();
+
+                        // Randomize position of the mouse
+                        mouse.setCenterLocation(location,location);
+                        //mouse.setX(30);
+                        //mouse.setY(30);
+                        //mouse.setX((int)300 * Math.random());
+                        //mouse.setY((int)300 * Math.random());
+
+                        // Move mouse up to object by iterating n times
+                        while(!goalAchieved) {
+                            int distance = SimbrainMath.distance(
+                                    mouse.getCenterLocation(), 
+                                    cheese.getCenterLocation()); 
+                            if (distance < hitRadius) {
+                                goalAchieved = true;
+                            }
+                            CountDownLatch latch = new CountDownLatch(1);
+                            workspace.iterate(latch);
+                            try {
+                                latch.await();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }                                
+
+                    }
+                    trialField.setText("" + numTrials);
+                }
+            });
+
+        }});
+    panel.addItem("Simulation", runButton);
+
+    // Stop Button
+    JButton stopButton = new JButton("Stop");
+    panel.addItem("Stop simulation", stopButton);
+    stopButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            goalAchieved = true;
+            stop = true;
+        }
+    });
+
+
+    // Set up Frame
+    internalFrame.setLocation(26,380);
+    internalFrame.getContentPane().add(panel);
+    internalFrame.setVisible(true);
+    internalFrame.pack();
+    desktop.addInternalFrame(internalFrame);
+    
+    // Custom workspace update rule
+    UpdateAction workspaceUpdateAction = new UpdateAction() {
+        public String getDescription() {
+            return "Actor Critic";
+        }
+
+        public String getLongDescription() {
+            return "Actor Critic";
+        }
+
+        public void invoke() {
+            // First: update world effectors
+            workspace.getCouplingManager().updateCouplings(effectorCouplings);
+
+            // Second: update world
+            worldComponent.update();
+
+            // Third: update tile sensors
+            workspace.getCouplingManager().updateCouplings(sensorCouplings);
+            
+            // Fourth: update network
+            networkComponent.update();     
+        }
+
+    };
+    workspace.getUpdater().getUpdateManager().clear();
+    workspace.addUpdateAction(workspaceUpdateAction);
+
+}
+//
+// Make doc viewer
+//
+void addDocViewer() {
+    DocViewerComponent docViewer = new DocViewerComponent("Information");
+    docViewer.setText(
+        "<h3>Actor Critic Model</h3>" +
+        "Based on Sutton and Barto, grid world model. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey." +
+        "<br><br>" +
+        "A model which learns the location of rewarding stimuli.   Do a few runs through 5 trials using the run button on the panel below.  Using default values, the rat should figure out how to get the cheese.<br><br>" +
+        "<b>Discount Factor</b>:  Range is 0-1.  If 0, predict next value only. If .5, predict future values." +
+        "As it increases toward one, values of y in the more distant future become more significant." +
+        "<br>" +
+        "<b>Epsilon</b>: Probability of taking a random action.  0 for no random actions; 1 for all random actions." +
+        "<br>" +
+        "<b>Movement Factor</b>: Number of tiles to move in a given update." +
+        "<br>" +
+        "<b>Other params</b>: A fair number of other parameters can be set in the script itself.<br>" +
+        "<br>" +
+        "<b>Time series</b> The red time series shows the activation of the value neuron.  This means a tile either has reward or (together with correct actions) leads to reward." +
+        "The blue time series shows the activation of the td error neuron. When something unexpected happens this goes up and the network learns." +
+        "<br>"
+        );
+    workspace.addWorkspaceComponent(docViewer);
+    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(24,32,250,350);
+}
+
+//
+// Run the simulation
+//
+main();

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Trace</p>
+  </div>
+  <p><h1>Trace Neuron</h1></p>
+  <p>The Trace neuron is a special type of neuron designed primarily to interact with the <a href="../synapse/trace.html">trace synapse</a>. It is based on Sutton and Barto's 1981, &quot;Towards a Modern Theory of Adaptive Networks: Expectation and Prediction,&quot; which prefigures a broad body of contemporary research into reinforcement learning, and is, to some extent, superceded by &quot;temporal difference&quot; models.</p>
+  <p>The neuron involves two variables, the standard activation variable and what is called a trace, or eligibility trace, computed in a manner similar to the <a href="../neuron/runningaverage.html">running average</a> neuron. The synapses connected to a Trace neuron are only updated when the trace neurons they are connected to have a positive non-zero trace, which described as being &quot;eligible.&quot; The trace rises and decays with stimulus activity, and with this behavior in mind, the trace can be described as a moving window of opportunity for synaptic change.</p>
+  <p>The neuron's activation is its <a href="../common.html#wtdinput">weighted input</a> <em>W</em> .</p>
+  <p>The trace <em>y </em>is updated as follows:</p>
+  <p><img src="../equations/traceNeuron.png" width="136" height="43">  </p>
+  <p>It is assumed that <em>c<sub>1</sub></em> and <em>c<sub>2</sub></em> are between 0 and 1, and that <em>c<sub>2</sub></em> = 1 - <em>c<sub>1</sub></em>. (Note that these parameters allow one to implement Sutton and Barto's Equations (4) as well as (3), in the latter case by setting <em>c<sub>2</sub></em> to 0.)</p>
+  <p>The trace of a neuron can be observed in a trace neuron's tooltip, and can also be observed by attaching a trace neuron to a linear neuron via a <a href="../synapse/signal.html">signal synapse</a>, and placing &quot;get trace&quot; in its label field.</p>
+  <p>The trace neuron also contains special methods to get the difference between the neuron's trace and its activation, which functions as a kind of measure of surprise--how different is the neuron's current value from the running trace of its past values? Two methods gauge this: getDifference and getDifferenceHistory, which can also be plugged in to the label field of a signal synapse. The trace synapse uses getDifferenceHistory.</p>
+  <p>See Ralph Sutton and Andrew Barto (1981), &quot;Towards a Modern Theory of Adaptive Networks: Expectation and Prediction,&quot; <em>Psychological Review</em>.  </p>
+  <p class="heading"><em>c<sub>1</sub></em></p>
+  <blockquote>
+    <p>Parameter scaling trace value.</p>
+  </blockquote>
+  <p class="heading"><em>c<sub>2</sub></em></p>
+  <blockquote>
+  <p>Parameter scaling addition of past activation to the trace. </p>
+</blockquote>
+<p class="heading">&nbsp;</p>
+</div>
+</body>
+</html>

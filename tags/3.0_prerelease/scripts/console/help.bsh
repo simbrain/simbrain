@@ -1,0 +1,9 @@
+help() {
+    print("");
+    print("All lines must end in semicolons, \";\"");
+    print("Use java syntax.");
+    print("");
+    print("help_simbrain(); for simbrain specific help");
+    print("help_beanshell(); for general beanshell commands.");
+    print("");
+}

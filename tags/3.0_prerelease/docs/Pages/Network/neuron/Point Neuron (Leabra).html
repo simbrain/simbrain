@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Binary</p>
+  </div>
+  <p><h1>Point Neuron</h1></p>
+  <p>The point neuron is a neuron that provides an efficient approximation of the neural dynamics of integrating over inputs of different types, i.e. Sigmoidal Activation Function. The point neuron activation function requires an explicit separation between excitatory and inhibitory inputs, which is done by only directly simulating excitatory neurons.</p>
+
+  <p>The key factor of the point neuron is the averaging of the electrical signals as they pass from the dendrites to the cell bodies, which provides us with an approximation of the membrane potential.  The membrane potential is found by using Ohm's Law to compute the current for each ion channel, and then add these currents together.</p>
+
+  <p>The three basic channels that do most of the work are the excitatory synaptic input channel, the inhibitory synaptic input channel, and the leak channel which is always open.</p>
+
+  <p>For each ion channel we need to know: </p>
+<ul>
+<li>the equilibrium potential</li>
+<li>the fraction of the total number of channels open</li>
+<li>the maximum conductance that would result if all the channels were open</li>
+</ul>
+
+  <p>The overall excitatory conductance is an average of the projection-level conductance together with the bias weight, with a time-averaging time constant greater than zero but less than 1.</p>
+
+
+</div>
+</body>
+</html>

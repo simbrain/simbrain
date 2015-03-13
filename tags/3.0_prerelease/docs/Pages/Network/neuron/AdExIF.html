@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; AdEx Integrate and Fire</p>
+        </div>
+
+
+        <p></p>
+        <h1>Adaptive Exponential Integrate and Fire</h1>
+        <p>The <b>Adaptive Exponential Integrate and Fire</b> or <b>AdEx</b> model is a spiking neuron model governed by two coupled differential equations. The first equation defines the behavior of the neuron's membrane potential over time, while the second equation defines the behavior of an adaptation parameter which broadly speaking acts to hyperpolarize the membrane potential in response to successive spikes. The <b>AdEx</b> model is capable of simulating many different kinds of observed spiking behavior including (but not limited to) bursting, fast-spiking, regular spiking, delayed spiking, and chaotic spiking. For more information see the <a href="http://www.scholarpedia.org/article/Adaptive_exponential_integrate-and-fire_model">Scholarpedia article on the AdEx model</a>. 
+        </p>
+        <p class="heading">Equations</p>
+        <blockquote>
+            <br>
+            <p>$$ C{{dV} \over {dt}} \; = \; {\overline{g}_L \,\Delta_{T} \, e^{({{V - V_T}\over{\Delta_T}})} \, - \, w \, + \, I} $$ 
+            <br>
+            $$ \tau_w{{dw} \over {dt}} \; = \; {a(V - E_L) \, - \, w} $$
+            <br>
+            Where:
+            <br>
+            $$ V \leftarrow V_{Reset} $$
+            <br>
+            $$ w \leftarrow w + b $$
+            <br>
+            when an action potential is fired, which is defined by $V > V_{peak}$. And where:
+            <br>
+            <br>
+            $$ I \; = \; {\overline{g}_L(E_L - V) \, + \, g_e\overline{g}_e(E_e - V) \, + \, g_i\overline{g}_i(E_i - V)} + I_{bg}$$
+            <br>
+            and
+            <br>
+            $$ {g_x} = {\frac{1}{n} \sum\limits_{i = 1}^n q_{xi}} $$
+            <br>
+            where $x$ is denotes excitatory or inhibitory (which are summed separatedly), $n$ is the number of afferent synapses of type $x$ impinging on the neuron, and $q_{xi}$ is the post synaptic response of synapse $i$ of polarity $x$.
+            <br>
+        </p>
+        </blockquote>
+        <p class="heading">Membrane Voltage</p>
+        <blockquote>
+            <p><span class="heading2">$V$: Membrane potential (mV):</span> The current electrical potential across the membrane. This value is used to determine the overall behavior of the neuron.</p>
+            <br>
+            <p><span class="heading2">$V_{peak}$: Peak Voltage (mV):</span> The peak voltage after which we say with certainty that an action potential has occurred (mV). In most models this is usually referred to as the threshold as it is the (somewhat) arbitrarily chosen voltage above which we officially count the neuron to have fired an action potential.</p>
+            <br>
+            <p><span class="heading2">$V_T$: Threhold Voltage (mV):</span> This determines when a neuron will start a divergent change in voltage that will tend toward infinity and is <b>not</b> the voltage at which we consider the neuron to have spiked. External factors can cause an action potential to fail even if its membrane potential surpasses this threshold value.</p>
+            <br>
+            <p><span class="heading2">$V_{Reset}$: Reset Voltage (mV):</span> This represents the voltage to which the membrane potential will be reset after an action potential has fired. This reset value strongly determines the overall behavior of the neuron. At a constant 0.8 nA of input current the reset voltage will determine whether or not the neuron fires in singletons <b>($<$ -49 mV)</b>, bursts of 2 <b>(-48.5 mV)</b> or 4 spikes <b>(-47.2 mV)</b>, or chaotically <b>(-48 mV)</b>. Other behaviors are possible, feel free to experiment with these parameters!</p>
+            <br>
+            <p><span class="heading2">$\Delta_T$: Slope Factor:</span> A value which regulates the overall effect of the exponential term on the membrane potential equation. Usually this is set to 1, but it can be set to other values to enhance or mitigate the effect of the exponential effect of the difference between $V$ and $V_T$.</p>
+            <br>
+            <p><span class="heading2">$C$: Capacitance (&mu;F):</span> A paramter designating the overall ability of the neuron's membrane to retain a charge. Includes the membrane time constant since the Farad in SI units is $s^4 \times A^2 \times m^{-2} \times kg^{-1}$</p>
+        </blockquote>
+        <p class="heading">Input Currents</p>
+        <blockquote>
+            <p><span class="heading2">$\overline{g}_L$: Leak Conductance (nS):</span> The inverse of the resistance of the channels through which current leaks from the neuron. </p>
+            <br>
+            <p><span class="heading2">$\overline{g}_e$: Max Excitatory Conductance (nS):</span> The excitatory conductance if all excitatory channels are open. Essentially this scales the effect of excitatory afferents.</p>
+            <br>
+            <p><span class="heading2">$\overline{g}_i$: Max Inhibitory Conductance (nS):</span> The inhibitory conductance if all inhibitory channels are open. Essentially this scales the effect of inhibitory afferents.</p>
+            <br>
+            <p><span class="heading2">$g_e$ and $g_i$: Excitatory/Inhibitory Conductance (nS):</span> Represents the ratio of open excitatory and inhibitory channels. Excitatory/Inhibitory inputs act to open some ratio of these channels.</p>
+            <br>
+            <p><span class="heading2">$E_L$: Leak Reversal (mV):</span> The membrane potential at which leak currents would no longer have any effect on the neuron's membrane potential. This is the voltage toward which leak pulls the membrane potential. This can also be thought of as the leak's equilibrium point.</p>
+            <br>
+            <p><span class="heading2">$E_e$: Excitatory Reversal:</span> The membrane potential at which impinging excitatory (depolarizing) inputs reach equilibrium. That is to say, the voltage excitatory inputs pull the membrane potential toward.</p>
+            <br>
+            <p><span class="heading2">$E_i$: Inbitatory Reversal:</span> The membrane potential at which impinging inhibitory (hyperpolarizing) inputs reach equilibrium. That is to say, the voltage inhibitory inputs pull the membrane potential toward.</p>
+            <br>
+            <p><span class="heading2">$I_{bg}$: Background Current (nA):</span> A tunable parameter in some ways similar to a bias parameter for non-spiking neurons. The idea here is to subject the neuron to a small constant input to represent the high-conductance state found in real neural tissue, which is the result of contant noisy bombardment from other brain regions. However the background current parameter can also be used to inject a coherent current that is, as an entry point for any non-synaptic inputs to the neuron.</p>
+        </blockquote>
+        <p class="heading">Adaptation</p>
+        <blockquote>
+            <p><span class="heading2">$w$: Main Parameter (nA): </span> The adaptation value which regulates membrane potential in response to successive spikes. </p>
+            <br>
+            <p><span class="heading2">$b$: Increment (nA): </span> The value by which the adaptation parameter is incremented each time an action potential is fired. </p>
+            <br>
+            <p><span class="heading2">$a$: Coupling Constant:</span> This value regulates how quickly the adaptation term exponentiall decays and its value relative to the membrane potential. </p>
+            <br>
+            <p><span class="heading2">$\tau_w$: Time Constant:</span> Controls the rate at which the neuron attains its resting potential. As one increases this value (ms), things become relatively slower; conversely, as one decreases this value, things become relatively faster.</p>
+
+        </blockquote>
+
+    </div>
+</body>
+
+</html>

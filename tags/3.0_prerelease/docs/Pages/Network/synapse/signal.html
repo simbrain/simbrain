@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Signal</p>
+  </div>
+  <p><h1>Signal</h1></p>
+  <p>The signal synapse does not function like a typical &quot;synapse,&quot;  but rather carries other information. It signals something about its source neuron to the target neuron, but what it signals varies from case to case. To show that these &quot;synapses&quot; are non-standard, they are colored green, though this color can be adjusted in network preferences. Currently <a href="../neuron/LMS.html">LMS neurons</a> make particular use of signal synapses.
+  <p>The Signal Synapse can be used to draw out information from a pre-synaptic neuron that otherwise would not be evident, such as a threshold or parameter. Which information the Signal Synapse passes to the post-synaptic neuron is dependent on the <em>Label</em> field. What to place into this Label field is dependent on what type of neuron the pre-synaptic neuron is, and to see what you can place in the label field you must look at the source code (or consult the table below).</p>
+  <p>In general, the Signal Synapse is used for debugging or when one wants some visual representation of some otherwise hidden data. It can also be used to react to some hidden variable, such as a <em>sliding threshold</em>.
+<p class="heading">Find a Label</p>
+<blockquote>
+<p>What is put into the <em>Label</em> field is dependent on the neuron the Signal Synapse is attempting to draw information from. The Label works by actually calling the &quot;getter&quot; function on the source neuron  to retrieve that information. This means that the entry into the Label field must be entered exactly as it appears in the code. Only public methods whicih return double variables--i.e. that begin with &quot;public double&quot;--can be retrieved.</p>
+<p>To find what Label you need, first find out what neuron-type the source neuron is. Once this is known, look at the <a href="http://www.simbrain.net/trac/browser/trunk/src/org/simnet/neurons">source code</a> for that neuron-type. Once in the source, find a <em>public double</em> function that calls for the variable that you wish to retrieve. Enter this function name, case sensitively, without parenthesis or arguments, into the <em>Label</em> field. </p>
+<p>Note: By making the target neuron a <em>Linear</em> neuron-type with a <em>slope</em> of 1, and a <em>bias</em> of 0, the linear neuron's activation will be the exact value that the Signal Synapse retrieves.</p>
+</blockquote>
+<p class="heading">Labels</p>
+<blockquote>
+ <p> For convenience, a table of all possible Labels for Simbrain 2.0 is given here. Labels are case-sensitive. If the neuron-type or variable one wishes to retrieve is not obviously listed here, one should consult the source code as is described in the <em>Find a Label</em> section above.</p>
+ <center>
+<TABLE border="0">
+<TR VALIGN=top>
+<TD align="left" VALIGN=top>
+  <table border="0" cellpadding=5>
+    <tr>
+      <td><span class="heading">Neuron Type</span></td>
+      <td><span class="heading">Labels</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Additive</span></td>
+      <td>getLambda<br>getResistance</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Binary</span></td>
+      <td>getThreshold<br>getBias</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Clamped</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Decay</span></td>
+      <td>getDecayAmount<br>getDecayFraction<br>getBaseLine</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">IAC</span></td>
+      <td>getDecay<br>getRest</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Integrate and Fire</span></td>
+      <td>getRestingPotential<br>getResistance<br>getResetPotential<br>getThreshold<br>getTimeConstant</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Izhikevich</span></td>
+      <td>getA<br>getB<br>getC<br>getD</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Linear</span></td>
+      <td>getBias<br>getSlope</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">LMS</span></td>
+      <td>getWeightedInputs<br>getLearningRate</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">Logistic</span></td>
+      <td>getGrowthRate</td>
+    </tr>
+    <tr>
+      <td><span class="heading2">NakaRushton</span></td>
+      <td>getSemiSaturationConstant<br>getSteepness<br>getTimeConstant<br>getAdaptationTimeConstant<br>getAdaptationParameter</td>
+    </tr>
+   </table>
+</TD>
+<TD ALIGN="left" VALIGN="top">
+<table border="0" cellpadding="5">
+  <tr>
+    <td><span class="heading">Neuron Type</td>
+    <td><span class="heading">Labels</td>
+  <tr>
+    <td><span class="heading2">Random</span></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Running Average</span></td>
+    <td>getRateConstant</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Sigmoidal</span></td>
+    <td>getBias<br>getSlope</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Sinusoidal</span></td>
+    <td>getPhase<br>getFrequency</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Stochastic</span></td>
+    <td>getFiringProbability</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Temporal Difference</span></td>
+    <td>getAlpha<br>getBeta</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Three Valued</span></td>
+    <td>getBias<br>getLowerThreshold<br>getLowerValue<br>getMiddleValue<br>getUpperThreshold<br>getUpperValue</td>
+  </tr>
+  <tr>
+    <td><span class="heading2">Trace</span></td>
+    <td>getDifference<br>getDifferenceHistory<br>getTrace<br>getTraceHistory<br>getC1<br>getC2</td>
+  </tr>
+</table>
+</TD>
+</TR>
+</TABLE>
+</center>
+</blockquote>
+</div>
+</body>
+</html>

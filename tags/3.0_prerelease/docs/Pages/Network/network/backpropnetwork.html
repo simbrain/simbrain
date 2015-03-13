@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
+        </div>
+
+        <!-- TODO: Warning about clamped... -->
+
+        <h1>Backprop Network</h1>
+
+        <div><img style="float:right; padding-left: 30px; padding-right: 30px;" width="400" src="../../../Images/Backprop.png">
+        </div>
+
+        <p>A backprop network is a <a href="feedforward.html">feed forward</a> network that can be trained using the <a href="http://en.wikipedia.org/wiki/Backpropagation">backpropagation</a> learning algorithm, which is perhaps the best known and most popular means of training neural networks.</p>
+
+        <p>To use backprop networks, they must be created using <span class="command">Insert network > backprop</span>, trained, and then used.</p>
+
+        <p>Note that backprop can also be used separately from a backprop network, in <a href="../../Scripting.html">scripts</a> to custom train a set of weights.</p>
+
+        <p>An example which steps through the process of creating and trainining a backprop network is in the <a href="../../Examples.html">examples page.</a>
+        </p>
+
+        <p><span class="heading">Creation Dialog</span>
+        </p>
+
+        <p>The backprop creation dialog allows you to specify the network topology and neuron types.  This dialog is documented in <a href="feedforward.html">feed forward</a> docs.</p>
+
+        <p><span class="heading">Training</span>
+        </p>
+
+        <p>Training a network involves specifying input data, target data, and then running the algorithm. This process is covered <a href="../training.html">here</a>.</p>
+
+        <p>Once the network is trained to perform a particular input-output mapping, it can be linked to other networks or neurons in Simbrain, or simply used on its own, primarily with the validation tab.</p>
+    </div>
+</body>
+
+</html>

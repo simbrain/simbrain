@@ -1,0 +1,18 @@
+import org.simbrain.network.*;
+
+//
+// Example 1: setNodeLabels("Network1", "Layer 3", new String[] {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"});
+// Example 2: setNodeLabels("lmsABC.xml", "Layer 2", new String[] {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"});
+//
+//
+setNodeLabels(String networkComponentName, String groupLabel, String[] labels) {
+	Network network = getNetwork(networkComponentName);
+	NeuronGroup neuronGroup = network.getGroupByLabel(groupLabel);
+	int i = 0;
+	for(Neuron neuron : neuronGroup.getNeuronList()) {
+		if (i < labels.length) {
+			neuron.setLabel(labels[i++]);
+		}
+	}
+}
+

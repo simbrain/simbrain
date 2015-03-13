@@ -1,0 +1,187 @@
+import java.awt.geom.Point2D;
+import java.util.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.core.NeuronUpdateRule.InputType;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.synapse_update_rules.spikeresponders.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.util.randomizer.*;
+import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.*;
+import org.simbrain.workspace.*;
+
+/**
+ * 
+ * @author Zach Tosi
+ *
+ * Creates a network of recurrently connected Izhikevich neurons (Regular
+ * Spiking by default). Neurons are placed in a 2D lattice and connections
+ * between neurons are probabilistic based on their relative distance from
+ * one another. Specifically the probability of a connection existing between
+ * Neurons a and b: 
+ *
+ *              P(a, b) = C_xy * e ^ -(D(a,b)/lambda^2)
+ *
+ * Such that x is the polarity (inhibitory or excitatory) of neuron a and
+ * y is the polarity of neuron b, and D(a, b) is the Euclidean distance between
+ * a and b in pixels. C_xy is a regulating constant which controls the overall
+ * proportion of connections between neurons based on their polarity. Thus there
+ * are C_ee, C_ei, C_ie, and C_ii values. This is so that (for instance), one
+ * can make connections from inhibitory neurons to other inhibitory neurons
+ * overall less common than connections from inhibitory to excitatory neurons,
+ * etc. Lambda is another regulating constant which represents the average
+ * distance between connected neurons. Each synapse has a delay which is a 
+ * logarithm of the distance between the neurons it connects. 
+ * Equation and parameter values (except lambda) are taken from Maass 2002.
+ *
+ * Each Izhikevich neuron is connected to exactly one Linear neuron in the
+ * second neuron group. Such that the activation of each neuron in the second
+ * group corresponds to the current post-synaptic potential of the Izhikevich
+ * neuron connected to it. Essentially the neuron group on the right represents
+ * the convolved spike trains of the spiking neurons on the left such that
+ *
+ *              A_n(t + delta_t) = - (delta_t *(A_n(t) / tau)) + S(t)
+ *
+ * Where A_n(t) is the activation of neuron n at time t, delta_t is the
+ * integration time-step, tau is a decay constant and S(t) is whether or not
+ * the (only) pre-synaptic Izhikevich neuron has spiked at time t (1 if so, 0
+ * otherwise). Since each neuron in the second group recieves only one input,
+ * this activity pattern is entirely the result of the spike responder
+ * (ConvolvedJumpAndDecay) which governs n's only incoming synapse, not a
+ * result of any internal dynamics on the part of neuron n. A_n(t) is just the
+ * post synaptic response of the source Izhikevich neuron for a synapse with a
+ * strength of 1, and is thus a simple convolution of its spike train. 
+ *
+ * In summary this code displays a network of randomly connected spiking neurons
+ * with a Lognormal weight distribution and distance-based connectivity and
+ * displays the convolution of their individual spike trains on the right.
+ *
+ */
+{
+    // Parameters 
+    int NUM_NEURONS = 4096;
+    int GRID_SPACE = 25;
+    double EE_CONST = 0.3;
+    double EI_CONST = 0.2;
+    double IE_CONST = 0.4;
+    double II_CONST = 0.1;
+    double LAMBDA = 150;
+
+    // Build Network
+    NetworkComponent networkComponent = new NetworkComponent("Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    Network network = networkComponent.getNetwork();
+    network.setTimeStep(0.5);
+    GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+    layout.setInitialLocation(new Point(10, 10));
+    GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+    layout2.setInitialLocation(new Point(NUM_NEURONS * 100, 10));
+    List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
+    List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
+    // Optional code to distribute neurons in 3D space with random z values
+    // Random rand = new Random();
+    Randomizer rand = new Randomizer();
+    rand.setPdf(ProbDistribution.NORMAL);
+    for (int i = 0; i < NUM_NEURONS; i++) {
+    	Neuron neuron = new Neuron(network);
+        neurons.add(neuron);
+        IzhikevichRule iz = new IzhikevichRule();
+        if (Math.random() < 0.2) {
+            neuron.setPolarity(Polarity.INHIBITORY);
+            iz.setRefractoryPeriod(1.0);
+            double rVal = Math.random();
+            iz.setA(0.02 + (0.08 * rVal));
+            iz.setB(0.25 - (0.05 * rVal));
+            iz.setC(-65);
+            iz.setD(2);
+            rand.setParam2(0.5);
+        } else {
+            neuron.setPolarity(Polarity.EXCITATORY);
+            iz.setRefractoryPeriod(2.0);
+            iz.setA(0.02);
+            iz.setB(0.2);
+            double rVal = Math.random();
+            rVal *= rVal;
+            iz.setC(-65.0 + (15.0 * rVal));
+            iz.setD(8.0 - (6 * rVal));
+            rand.setParam2(1.2);
+        }
+        iz.setiBg(3.5);
+        iz.setAddNoise(true);
+        iz.setNoiseGenerator(rand);
+        neuron.setUpdateRule(iz);
+        Neuron outNeuron = new Neuron(network);
+        outNeuron.getUpdateRule().setInputType(InputType.SYNAPTIC);
+        ((LinearRule) outNeuron.getUpdateRule()).setClipped(false);
+        outNeurons.add(outNeuron);
+    }
+    NeuronGroup ng1 = new NeuronGroup(network, neurons);
+    ng1.setLabel("Izhikevich Network");
+    NeuronGroup outs = new NeuronGroup(network, outNeurons);
+    outs.setLabel("Spike Visualizer");
+    ng1.setLayout(layout);
+    ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
+    outs.setLayout(layout2);
+    outs.applyLayout(new Point2D.Double(1000.0, 0.0));
+    network.addGroup(ng1);
+    network.addGroup(outs);
+    
+	PolarizedRandomizer exRand = new PolarizedRandomizer(Polarity.EXCITATORY,
+		ProbDistribution.LOGNORMAL);
+	PolarizedRandomizer inRand = new PolarizedRandomizer(Polarity.INHIBITORY,
+		ProbDistribution.LOGNORMAL);
+	exRand.setParam1(0.8);
+	exRand.setParam2(1.0);
+	inRand.setParam1(1.5);	
+	inRand.setParam2(1.0);
+
+	Radial rCon = new Radial(EE_CONST, EI_CONST, IE_CONST, II_CONST, LAMBDA);
+	SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, rCon, 0.5, exRand, inRand);
+	sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
+	ConvolvedJumpAndDecay inhibSR = new ConvolvedJumpAndDecay();
+	inhibSR.setTimeConstant(6.0);
+	sg.setSpikeResponder(inhibSR, Polarity.INHIBITORY);
+	sg.setLabel("Recurrent Synapses");
+	for (Synapse s : sg.getAllSynapses()) {
+		double dist = Network.getEuclideanDist(s.getSource(), s.getTarget());
+		s.setDelay((int) (Math.log(dist * dist) / Math.log(2)));
+	}
+	network.addGroup(sg);
+
+	SynapseGroup outCon = SynapseGroup.createSynapseGroup(ng1, outs, new OneToOne());
+	ConvolvedJumpAndDecay outSR = new ConvolvedJumpAndDecay();
+	outSR.setTimeConstant(10);
+	outCon.setSpikeResponder(outSR, Polarity.BOTH);
+	outCon.setLabel("One to One Connections");
+	network.addGroup(outCon);
+	for (Neuron n : outs.getNeuronList()) {
+		n.setUpperBound(2);
+		n.setLowerBound(-4);
+        	if (n.getFanIn().get(0).getStrength() < 0) {
+    			((LinearRule) n.getUpdateRule()).setSlope(-1);
+    			((LinearRule) n.getUpdateRule()).setBias(1);
+    		} else {
+    			((LinearRule) n.getUpdateRule()).setBias(-1);
+    		}
+     }
+
+
+    print(sg.size());
+    
+    sg.setUpperBound(70, Polarity.EXCITATORY);
+    sg.setLowerBound(0, Polarity.EXCITATORY);
+    sg.setLowerBound(-70, Polarity.INHIBITORY);
+    sg.setUpperBound(0, Polarity.INHIBITORY);
+    network.randomizeNeurons();
+    network.fireSynapsesUpdated();
+    network.getUpdateManager().clear();
+    network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+    network.updateTimeType();
+}

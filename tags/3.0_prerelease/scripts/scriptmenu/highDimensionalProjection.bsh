@@ -1,0 +1,56 @@
+package org.simbrain;
+
+import java.awt.Point;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.*;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.plot.projection.*;
+import org.simbrain.workspace.*;
+
+{
+
+	// PARAMETERS
+    int numNeurons = 25;
+    double sparsity = .2;
+    double excitatoryRatio = .6;
+
+    workspace.clearWorkspace();
+
+    // Make Network
+    NetworkComponent networkComponent = new NetworkComponent("Attractor Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    Network network = networkComponent.getNetwork();
+    GridLayout layout = new GridLayout(50.0, 50.0, 5);
+    layout.setInitialLocation(new Point(10, 10));
+    for (int i = 0; i < numNeurons; i++) {
+        Neuron neuron = new Neuron(network, "NakaRushtonRule");
+        neuron.setUpperBound(100);
+        network.addNeuron(neuron);
+    }
+    layout.layoutNeurons(network.getNeuronList());
+    Sparse.connectSparse(network.getFlatNeuronList(),
+            network.getFlatNeuronList(), sparsity, false, false, true);            
+    network.randomizeNeurons();
+    network.randomizeWeights();
+    network.fireNeuronsUpdated();
+    network.fireSynapsesUpdated();
+
+    //Make a projection component
+    ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network", numNeurons);
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
+
+    // Make Couplings
+    for (int i = 1; i <= numNeurons; i++) {
+        PotentialProducer neuronAttribute = 
+        		networkComponent.getAttributeManager().createPotentialProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class);
+        neuronAttribute.setCustomDescription("Neuron_" + i);
+        PotentialConsumer chartAttribute = chart.getAttributeManager().createPotentialConsumer(chart.getDimension(i-1), "setValue", double.class);
+        chartAttribute.setCustomDescription("Dimension " + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+    }
+
+}

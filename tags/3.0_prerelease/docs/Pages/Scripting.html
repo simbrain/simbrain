@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <meta name="generator" content="HTML Tidy for Mac OS X (vers 31 October 2006 - Apple Inc. build 15.6), see www.w3.org">
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+    <link href="../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../SimbrainDocs.html">
+        <div class="logo"></div>
+    </a>
+
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Scripting</p>
+        </div>
+        <div id="menu">
+            <p class="menubold">Contents</p>
+            <blockquote>
+                <p>
+                    <a href="Scripting/Beanshell.html">Beanshell Scripting</a>
+                    <br>
+                    <a href="Scripting/ScriptingExamples.html">Examples</a>
+                    <br>
+                </p>
+            </blockquote>
+        </div>
+        <p> </p>
+
+        <h1>Scripting</h1>
+        <br>
+        <p>To produce custom simulations or behaviors not possible using the Simbrain GUI, you can create custom scripts.</p>
+
+        <p> <span class="heading">Basics</span>
+        </p>
+
+        <p>All scripts are currently <a href="http://www.beanshell.org/docs.html">beanshell</a> scripts (there is nothing to prevent other scripting languages, but none have been implemented yet).&nbsp;&nbsp; These are basically small java programs that interact with the Simbrain workspace.&nbsp;&nbsp; Any java library can be used, as can the whole Simbrain API.&nbsp; This allows for a great deal of flexibility.</p>
+
+        <p align="center"><img src="../Images/ScriptExample.png" width="700" border="1">
+        </p>
+
+        <p> <span class="heading">Uses of Scripts</span>
+        </p>
+
+        <p>Some examples of things you can do using scripts are:</p>
+        <ul>
+            <li>Building a highly customized simulation.
+            </li>
+            <li>Create a custom button panel that allows users to produce special behaviors.
+            </li>
+            <li>Modifying an existing component, e.g. a network, in some special way.
+            </li>
+            <li>Logging data.</li>
+            <li>Loading a neuron with a custom update function.</li>
+            <li>Using an external library. The script called "GeneticAlgorithmScriptingDemo.bsh" gives an example of this.
+            </li>
+        </ul>
+        <p>The best way to get a feel for scripting is to have a look at a few scripts.&nbsp;&nbsp; Try opening a few in the scriptmenu directory, and running them. &nbsp; Try modifying them in simple ways (e.g. modifying the paramters at the top) and re-running them.&nbsp;
+        </p>
+        <p>Also note that there are many basic things you'll need to do in a script that have most likely already been done in some script or another. So you can treat the script directory as a kind of repository of basic actions that you can combine together to get started with the behavior you want.</p>
+        <p>Scripting is closely related to custom updating in Simbrain. Custom update methods for the workspace or for components introduce custom update actions that are written using this same Beanshell scripting framework.&nbsp; See <a href="./Workspace/Update.html">workspace update</a> and <a href="./Network/update.html">network update</a>.
+        </p>
+
+
+        <p><span class="heading">Ways to Invoke a Script</span>
+        </p>
+
+        <p>To get started, create a new text file with a text editor, save it as a .bsh file, and then run the script from Simbrain.&nbsp; There are a few ways to do this:
+            <br>
+        </p>
+        <div style="margin-left: 40px;">
+            <span class="heading2">Scriptmenu</span>: .bsh files in the {SimbrainHome}/scripts/scriptmenu directory automatically appear in the&nbsp;
+            <span class="command">Scripts</span>menu of the Simbrain workspace (if you just added the file, you must re-run simbrain).&nbsp;&nbsp; You can also use the the&nbsp;
+            <span class="command">Scripts &gt; Edit/Run Script...</span>command to open, edit, then run a script. e.g. one in a location other than the scripts directory.
+            <br>
+            <br>
+            <span class="heading2">Network</span>: .bsh files in {SimbrainHome}/scripts/network&nbsp; automatically appear in the
+            <span class="command">Scripts</span>menu of Simbrain network components&nbsp;&nbsp; Use this directory to create custom actions that can be applied to a current network (e.g., methods of adding neurons, modifying neurons or synapses, etc.)&nbsp; The two objects available here are "
+            <span style="text-decoration: underline;">network</span>" and "
+            <span style="text-decoration: underline;">networkPanel</span>."&nbsp; These give access to the current Network and its gui representation.
+            <br>
+            <br>
+            <span class="heading2">Console</span>: .bsh files in {SimbrainHome}/scripts/console are available from the Simbrain console or terminal components. The console can be useful to quickly test or debug Simbrain. For a sense of some things you can do in the console enter "help(); or "tips();". The console is similar to a UNIX or DOS terminal window.&nbsp; You can navigate around the file system using commands like "cd();&nbsp; To run a script from the console, using the source command, e.g.&nbsp;
+            <span class="command">source("sparseNetwork.bsh");&nbsp;</span>
+        </div>
+        <br>
+    </div>
+</body>
+
+</html>

@@ -26,11 +26,8 @@ import javax.swing.Action;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Contains actions for use in Time Series Component.
+ * Contains actions for use in raster plot
  *
- * TODO: Possibly abstract these actions and move to top level of plot package.
- *
- * @author jyoshimi
  */
 public class RasterPlotActions {
 
@@ -48,7 +45,7 @@ public class RasterPlotActions {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
                 putValue(NAME, "Preferences...");
-                putValue(SHORT_DESCRIPTION, "Show time series graph properties");
+                putValue(SHORT_DESCRIPTION, "Show raster chart properties");
             }
 
             /**
@@ -80,7 +77,7 @@ public class RasterPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().clearData();
+                timeSeriesPanel.getRasterModel().clearData();
             }
 
         };
@@ -108,7 +105,7 @@ public class RasterPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().addDataSource();
+                timeSeriesPanel.getRasterModel().addDataSource();
             }
 
         };
@@ -121,7 +118,7 @@ public class RasterPlotActions {
      * @return the action
      */
     public static Action getRemoveSourceAction(
-            final RasterPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel rasterPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -136,7 +133,7 @@ public class RasterPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().removeDataSource();
+                rasterPanel.getRasterModel().removeDataSource();
             }
 
         };

@@ -114,9 +114,9 @@ public class WorkspaceActionManager {
 
     /** New histogram chart action. */
     private final Action newHistogramAction;
-    
+
     /** New raster chart action. */
-    private final Action newRasterPlotAction; 
+    private final Action newRasterPlotAction;
 
     /** New pie chart action. */
     private final Action newPieChartAction;
@@ -192,12 +192,11 @@ public class WorkspaceActionManager {
 
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
-    
-    private static final String EXTERNAL_SOURCE_DIRECTORY =
-            "scripts/customSourceFiles";
-    
+
+    private static final String EXTERNAL_SOURCE_DIRECTORY = "scripts/customSourceFiles";
+
     private static final int NUM_CUSTOM_SOURCE_FILES = 5;
-    
+
     /**
      * Create a new workspace action manager for the specified workspace.
      *
@@ -298,8 +297,7 @@ public class WorkspaceActionManager {
     public List<Action> getPlotActions() {
         return Arrays.asList(new Action[] { newBarChartAction,
                 newHistogramAction, newPieChartAction, newProjectionPlotAction,
-                newScatterPlotAction, newTimeSeriesAction,
-                newRasterPlotAction });
+                newRasterPlotAction, newTimeSeriesAction });
     }
 
     /**
@@ -362,8 +360,8 @@ public class WorkspaceActionManager {
             try {
                 for (int i = 0; i < NUM_CUSTOM_SOURCE_FILES; i++) {
 
-                    interpreter.source(EXTERNAL_SOURCE_DIRECTORY + "/source" + i
-                            + ".bsh");
+                    interpreter.source(EXTERNAL_SOURCE_DIRECTORY + "/source"
+                            + i + ".bsh");
 
                 }
             } catch (IOException | EvalError e) {

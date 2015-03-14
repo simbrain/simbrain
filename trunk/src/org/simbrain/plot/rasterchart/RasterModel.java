@@ -25,11 +25,11 @@ import org.simbrain.plot.ChartModel;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * Data model for a time series plot.
+ * Data model for a raster plot.
  */
 public class RasterModel extends ChartModel {
 
-    /** Time Series Data. */
+    /** Raster Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
     /** Default number of data sources for plot initialization. */
@@ -51,7 +51,7 @@ public class RasterModel extends ChartModel {
     private boolean fixedWidth = true;
 
     /**
-     * Time series model constructor.
+     * Raster series model constructor.
      *
      * @param parent component
      */
@@ -238,29 +238,6 @@ public class RasterModel extends ChartModel {
      * "fixed width" mode.
      */
     public void update() {
-
-        // Trim appropriately if fixed width
-
-        // TODO: This does not work well in trainer.gui. Concurrency issues. So
-        // disabling for now.
-        // if (isFixedWidth()) {
-        // System.out.println("Dataset Size: " +
-        // dataset.getSeries(0).getItemCount());
-        // for (Iterator iterator = getDataset().getSeries().iterator();
-        // iterator
-        // .hasNext();) {
-        // XYSeries series = (XYSeries) iterator.next();
-        // if (series.getItemCount() > getWindowSize()) {
-        // int diff = Math
-        // .abs(series.getItemCount() - getWindowSize());
-        // System.out.println("diff:" + diff);
-        // for (int i = 0; i < diff; i++) {
-        // series.remove(i);
-        // }
-        // }
-        // }
-        // }
-
     }
 
 }

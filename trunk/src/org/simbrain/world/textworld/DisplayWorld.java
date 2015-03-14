@@ -19,6 +19,7 @@
 package org.simbrain.world.textworld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.util.Utils;
@@ -222,6 +223,7 @@ public class DisplayWorld extends TextWorld {
      * @param vec the vector
      */
     public void addVectorTokenPair(String token, double[] vec) {
+        //System.out.println(token + "-->" + Arrays.toString(vec));
         StringDataPoint point = new StringDataPoint(vec, token);
         vectorToTokenDict.add(point);
     }

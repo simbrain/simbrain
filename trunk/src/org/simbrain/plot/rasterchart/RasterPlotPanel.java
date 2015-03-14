@@ -39,7 +39,7 @@ import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 /**
- * Display a TimeSeriesPlot. This component can be used independently of the
+ * Display a raster plot. This component can be used independently of the
  * time series workspace component.
  *
  * TODO: Make a version that extends this, like network panel case. Then
@@ -63,13 +63,13 @@ public class RasterPlotPanel extends JPanel {
     private JPanel buttonPanel = new JPanel();
 
     /**
-     * Construct a time series panel.
+     * Construct a raster panel.
      *
      * @param RasterModel model underlying model
      */
-    public RasterPlotPanel(final RasterModel timeSeriesModel) {
+    public RasterPlotPanel(final RasterModel rasterModel) {
 
-        model = timeSeriesModel;
+        model = rasterModel;
         setPreferredSize(PREFERRED_SIZE);
         setLayout(new BorderLayout());
 
@@ -89,7 +89,7 @@ public class RasterPlotPanel extends JPanel {
     public void init() {
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("Time series", // Title
+        chart = ChartFactory.createScatterPlot("Raster values", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
                 model.getDataset(), // Dataset
@@ -212,7 +212,7 @@ public class RasterPlotPanel extends JPanel {
     /**
      * @return the model
      */
-    public RasterModel getTimeSeriesModel() {
+    public RasterModel getRasterModel() {
         return model;
     }
 }

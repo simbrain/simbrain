@@ -29,7 +29,7 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Represents time series data.
+ * Represents raster data.
  */
 public class RasterPlotComponent extends WorkspaceComponent {
 

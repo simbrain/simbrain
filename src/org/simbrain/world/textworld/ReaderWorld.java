@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.textworld;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -146,6 +148,7 @@ public final class ReaderWorld extends TextWorld {
      */
     public double[] getMatchingVector(String token) {
         double[] vector = tokenToVectorDictionary.get(token);
+        //System.out.println(token + "-->" + Arrays.toString(vector));
         if (vector == null) {
             // Return zero vector if no matching string is found in the token
             // map.
@@ -163,8 +166,6 @@ public final class ReaderWorld extends TextWorld {
      * @return the vector corresponding to the currently parsed token.
      */
     public double[] getCurrentVector() {
-        // System.out.println(Arrays.toString(this.getVector(this.getCurrentItem()
-        // .getText())));
         if (getCurrentItem() == null) {
             return new double[vectorLength];
         } else {

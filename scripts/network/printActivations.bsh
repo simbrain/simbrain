@@ -2,27 +2,40 @@ import org.simbrain.network.*;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.subnetworks.*;
+import org.simbrain.util.*;
 
 /**
- * Print the activations of a given neuron group, in this case a hidden layer.
+ * Print the activations of loose neurons to system.out.  Commented-out code below
+ * shows how a specific neuron groups' activations can be printed out
  *
- * Not very interesting but illustrates some basic scripting methods.
+ * Not very interesting but illustrates some basic scripting methods
  */
 {
-	BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
-	if (backpropNet == null) {
-		print("Network not found");
-		return;		
-	}
 
-	NeuronGroup hiddenLayer = backpropNet.getNeuronGroupByLabel("Layer 3");
-	if (hiddenLayer == null) {
-		print("Layer not found");
-		return;		
+	//
+	// Print activations of loose neurons
+	//
+	for (Neuron neuron: network.getNeuronList()) {
+	    System.out.print(Utils.round(neuron.getActivation(),2) + " ");
 	}
+	System.out.println();
 
-    for (Neuron neuron: hiddenLayer.getNeuronList()) {
-        System.out.print(neuron.getActivation() + " ");
-    }
-    System.out.println();
+	//
+	// Print activations of layer 3 of a backprop network 
+	//
+	// BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+	// if (backpropNet == null) {
+	// 	print("Network not found");
+	// 	return;		
+	// }
+	// NeuronGroup hiddenLayer = backpropNet.getNeuronGroupByLabel("Layer 3");
+	// if (hiddenLayer == null) {
+	// 	print("Layer not found");
+	// 	return;		
+	// }
+	// for (Neuron neuron: hiddenLayer.getNeuronList()) {
+	//     System.out.print(neuron.getActivation() + " ");
+	// }
+	// System.out.println();
+
 }

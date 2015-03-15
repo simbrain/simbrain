@@ -474,7 +474,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
 
         public synchronized void repopulateQueue(Collection<Neuron> tasks) {
-            int chunkSize = Math.floorDiv(tasks.size(), taskPartition);
+            int chunkSize = (int) Math.floor(tasks.size() / taskPartition);
             int remainingTasks = tasks.size() % taskPartition;
             Iterator<Neuron> taskIter = tasks.iterator();
             if (remainingTasks != 0) {

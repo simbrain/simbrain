@@ -3,10 +3,7 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <link href="../Styles.css" rel="stylesheet" type="text/css">
-
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 
@@ -36,12 +33,18 @@
                 <b>Main Components</b>
                 <br>
                 <p>
-                    <a href="Network/neuron.html">Neurons</a><br>
-                    <a href="Network/synapse.html">Synapses</a><br>
-                     <a href="Network/groups.html">Groups</a><br>
-                    <a href="Network/groups/NeuronGroup.html">Neuron Groups</a><br>
-                    <a href="Network/groups/SynapseGroup.html">Synapse Group</a><br>
-                    <a href="Network/subnetwork.html">Subnetworks</a><br>
+                    <a href="Network/neuron.html">Neurons</a>
+                    <br>
+                    <a href="Network/synapse.html">Synapses</a>
+                    <br>
+                    <a href="Network/groups.html">Groups</a>
+                    <br>
+                    <a href="Network/groups/NeuronGroup.html">Neuron Groups</a>
+                    <br>
+                    <a href="Network/groups/SynapseGroup.html">Synapse Group</a>
+                    <br>
+                    <a href="Network/subnetwork.html">Subnetworks</a>
+                    <br>
                 </p>
                 <b>General</b>&nbsp;
                 <br>
@@ -51,12 +54,11 @@
                     <br>
                     <a href="Network/toolbar.html">Toolbar</a>
                     <br>
-                    <a href="Network/visualConventions.html">Visual Conventions</a> 
+                    <a href="Network/visualConventions.html">Visual Conventions</a>
                     <br>
                 </p><b>Other Topics</b>
                 <br>
-
-                <p> 
+                <p>
                     <a href="Network/scripting.html">Scripting</a>
                     <br>
                     <a href="Network/spikingnetworks.html">Spiking Networks</a>
@@ -70,10 +72,9 @@
                     <a href="Network/wand.html">Wand Tool</a>
                     <br>
                 </p>
-
                 <b>Reference</b>
                 <br>
-                <p> <a href="Network/quickref.html"> Quick reference</a> 
+                <p> <a href="Network/quickref.html"> Quick reference</a>
                     <br>
                 </p>
             </blockquote>
@@ -81,26 +82,31 @@
         <p></p>
         <h1>Network</h1>
         <p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the "play" or "step" button (see the <a href="Network/quickref.html">quick reference</a>). For a sense of what the colors, circles, etc. signify see the discussion of <a href="Network/visualConventions.html">visual conventions</a>.
-            <br>
         </p>
-        <p>There are a variety of different <a href="Network/neuron.html">neurons</a>
-            and <a href="Network/synapse.html">synapses</a>, each with their own rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called "<a href="Network/subnetwork.html">subnetworks</a>" which can be added to a simulation. Different subnetworks can be linked together, leading to even more complex and powerful simulations.</p>
-        <p>There are also connection objects, layout objects, model groups and other functions which can be used to build neural networks.
-            <br>
+        <p>There are a variety of different <a href="Network/neuron.html">neurons</a> and <a href="Network/synapse.html">synapses</a>, each with their own rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called "<a href="Network/subnetwork.html">subnetworks</a>" which can be added to a simulation. Different subnetworks can be linked together, leading to even more complex and powerful simulations. There are also connection objects, layout objects, model groups and other functions which can be used to build neural networks. Follow the links on the right to learn more about these features.
         </p>
-        <p>Shown below is a simple neural network. The colored circles with numbers in the middle represent simplified neurons or "nodes." The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections.</p>
-        <p align="left">
-            <img src="../Images/simple_net.gif" height="175" width="259">
+        
+        <p>Two neural network components are shown below; a complex network on the left, and a simpler one on the right. The colored circles represent neurons or "nodes." The lines between nodes on the right represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections.  The network on the left has so many synapses that it would be unwieldy to represent them.   In that case you can interact with a whole <a href="./network/groups/SynapseGroup.html">synapse group</a>.</p>
+        <p>
+            <table align="center">
+                <tr>
+                    <td>
+                        <img src="../Images/corticalBranching.gif" height="300" border="1">
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td>
+                        <img src="../Images/simple_net.gif" height="175" border="1">
+                    </td>
+                </tr>
+            </table>
         </p>
         <p align="left">&nbsp;</p>
         <p align="left">
-            <a name="RunningNet"></a>When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user "runs" the network it comes to life--an <a href="Network/update.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the play button
+            <a name="RunningNet"></a><u>Running a network:</u> When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user "runs" the network it comes to life--an <a href="Network/update.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the play button
             <img src="../Images/Play.gif" height="18" width="18">in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a "stop" button
             <img src="../Images/Stop.gif" height="18" width="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. You can also press the step button
             <img src="../Images/Step.gif" height="18" width="18">(or press "space") to iterate the network a single time. Sometimes repeatedly hitting the space bar is useful way to test a network.</p>
-  
     </div>
-
 </body>
 
 </html>

@@ -329,7 +329,7 @@ public abstract class OdorWorldEntity {
     /**
      * Set the entity's name.
      *
-     * @param string name for entity.
+     * @param name string name for entity.
      */
     public void setName(final String name) {
         this.name = name;

@@ -160,8 +160,9 @@ public class SynapseGroupNodeBidirectional extends PNode implements
      *
      * @param networkPanel
      *            parent panel
-     * @param group
+     * @param synGroup1
      *            the synapse group
+     * @param synGroup2
      */
     public static SynapseGroupNodeBidirectional createBidirectionalSynapseGN(
         final NetworkPanel networkPanel, final SynapseGroup synGroup1,

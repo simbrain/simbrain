@@ -35,7 +35,7 @@ public final class GlobalRunAction extends WorkspaceAction {
     /**
      * Create a new run network action with the specified network panel.
      *
-     * @param networkPanel network panel, must not be null
+     * @param workspace network panel, must not be null
      */
     public GlobalRunAction(Workspace workspace) {
         super("Global run", workspace);

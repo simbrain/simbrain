@@ -2244,7 +2244,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Set Root network.
      *
-     * @param Network The Network to set.
+     * @param network The Network to set.
      */
     public void setNetwork(final Network network) {
         this.network = network;

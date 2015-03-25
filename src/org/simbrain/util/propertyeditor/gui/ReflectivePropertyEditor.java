@@ -113,7 +113,7 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Returns an action for showing a property dialog for the provided objects.
      *
-     * @param Object object the object whose properties should be displayed
+     * @param object object the object whose properties should be displayed
      * @return the action
      */
     public static AbstractAction getPropertiesDialogAction(final Object object) {

@@ -36,7 +36,7 @@ public class ViewGroupNode extends ScreenElement implements
      * Construct text object at specified location.
      *
      * @param netPanel reference to networkPanel
-     * @param ptext the styled text
+     * @param elements the styled text
      */
     public ViewGroupNode(final NetworkPanel netPanel,
             final ArrayList<ScreenElement> elements) {

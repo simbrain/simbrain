@@ -136,7 +136,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
     /**
      * Create and populate the stimulus panel.
      *
-     * @param we reference to the world entity whose smell signature is being
+     * @param source we reference to the world entity whose smell signature is being
      *            adjusted.
      */
     public SmellSourcePanel(final SmellSource source) {

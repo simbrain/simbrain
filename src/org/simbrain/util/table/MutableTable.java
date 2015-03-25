@@ -176,7 +176,7 @@ public abstract class MutableTable<T> extends SimbrainDataTable<T> {
      * Adds a specified number of columns to the right of the table.
      *
      * @param colsToAdd number of columns to add.
-     * @param defaultValue value for cells of new columns
+     * @param value  value for cells of new columns
      */
     public void addColumns(int colsToAdd, T value) {
         modifyRowsColumns(0, colsToAdd, value);

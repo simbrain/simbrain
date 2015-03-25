@@ -62,7 +62,7 @@ public class RasterModel extends ChartModel {
     /**
      * Initialize model to specified number of data sources.
      *
-     * @param parent component
+     * @param numDataSources number of data sources to initialize
      */
     public RasterModel(int numDataSources) {
         addDataSources(numDataSources);
@@ -199,7 +199,7 @@ public class RasterModel extends ChartModel {
     }
 
     /**
-     * @param upperRangeBoundary the upperRangeBoundary to set
+     * @param upperBound the upperBound to set
      */
     public void setRangeUpperBound(final double upperBound) {
         this.rangeUpperBound = upperBound;

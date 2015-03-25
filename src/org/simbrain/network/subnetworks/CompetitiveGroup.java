@@ -117,7 +117,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Copy constructor.
      *
-     * @param newParent new root network
+     * @param newRoot new root network
      * @param oldNet old network.
      */
     public CompetitiveGroup(Network newRoot, CompetitiveGroup oldNet) {

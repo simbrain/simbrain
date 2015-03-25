@@ -36,7 +36,7 @@ public final class AddTileSensorsAction extends AbstractAction {
     /**
      * Construct the action.
      *
-     * @param component GUI component, must not be null.
+     * @param entity GUI component, must not be null.
      */
     public AddTileSensorsAction(OdorWorldEntity entity) {
         super("Add Tile Sensors");

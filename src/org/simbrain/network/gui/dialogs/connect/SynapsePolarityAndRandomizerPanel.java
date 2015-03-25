@@ -523,7 +523,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
      * Fills the field values for this sub-panel based on the values of an
      * already existing connection object.
      *
-     * @param connection
+     * @param synGrp
      *            the connection being used to determine the field values
      */
     public void fillFieldValues(SynapseGroup synGrp) {

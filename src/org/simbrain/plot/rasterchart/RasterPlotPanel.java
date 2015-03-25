@@ -65,7 +65,7 @@ public class RasterPlotPanel extends JPanel {
     /**
      * Construct a raster panel.
      *
-     * @param RasterModel model underlying model
+     * @param rasterModel model underlying model
      */
     public RasterPlotPanel(final RasterModel rasterModel) {
 

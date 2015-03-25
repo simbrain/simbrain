@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  * consisting of a <code>Producer</code> and a <code>Consumer</code>, where the
  * producer passes a value of type E to the consumer:
  * <p>
- * Producer --> E --> Consumer
+ * Producer -->  E -->  Consumer
  * <p>
  * Producers and Consumers are types of <code>Attribute</code>. They are usually
  * not created directly but are created from a <code>PotentialAttribute</code>.

@@ -35,7 +35,7 @@ public final class SelectAllAction extends AbstractAction {
     /**
      * Create a new create pixel matrix action.
      *
-     * @param visionWorld vision world, must not be null
+     * @param world vision world, must not be null
      */
     public SelectAllAction(final VisionWorld world) {
         super("Select All");

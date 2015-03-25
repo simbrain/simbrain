@@ -61,8 +61,6 @@ public class RgbFilter implements Filter {
      * @param red The red threshold.
      * @param green The green threshold.
      * @param blue The blue threshold.
-     * @param lower The lower bound of the results.
-     * @param upper The upper bound of the results.
      */
     public RgbFilter(final int red, final int green, final int blue) {
         this(red, green, blue, 0, 1);

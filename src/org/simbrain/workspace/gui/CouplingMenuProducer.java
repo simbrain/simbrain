@@ -44,7 +44,7 @@ public class CouplingMenuProducer extends JMenu {
      *
      * @param menuName the name of the menu
      * @param workspace the workspace
-     * @param sourceComponent the target consuming attribute.
+     * @param producer the target consuming attribute.
      */
     public CouplingMenuProducer(final String menuName,
             final Workspace workspace, final PotentialProducer producer) {

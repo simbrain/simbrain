@@ -30,7 +30,7 @@ package org.simbrain.workspace;
  * @param <E> the type of data returned by the getter.
  *
  * @see Attribute
- * @see AttributeManaager
+ * @see AttributeManager
  */
 public interface Producer<E> extends Attribute {
 

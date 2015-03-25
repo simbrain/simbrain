@@ -139,7 +139,7 @@ public final class EditMode {
     /**
      * Set the new wand radius.
      *
-     * @param wandRadius the wandRadius to set
+     * @param newWandRadius the wandRadius to set
      */
     public static void setWandRadius(int newWandRadius) {
         if (newWandRadius < MINIMUM_WAND_RADIUS) {

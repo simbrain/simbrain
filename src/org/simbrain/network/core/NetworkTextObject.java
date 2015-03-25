@@ -79,7 +79,7 @@ public class NetworkTextObject {
     /**
      * Copy constructor.
      *
-     * @param newParent parent network for this text object
+     * @param parent parent network for this text object
      * @param text text object to copy
      */
     public NetworkTextObject(Network parent, NetworkTextObject text) {

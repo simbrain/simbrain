@@ -92,7 +92,6 @@ public class WorkspaceUpdater {
      * threads.
      *
      * @param workspace The parent workspace.
-     * @param controller The update controller.
      * @param threads The number of threads for component updates.
      */
     public WorkspaceUpdater(final Workspace workspace, final int threads) {

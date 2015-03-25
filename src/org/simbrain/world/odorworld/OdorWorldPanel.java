@@ -92,7 +92,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /**
      * Construct a world, set its background color.
      *
-     * @param wf the frame in which this world is rendered
+     * @param world the frame in which this world is rendered
      */
     public OdorWorldPanel(final OdorWorld world) {
 

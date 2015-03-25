@@ -59,7 +59,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     /**
      * Construct a time series panel.
      *
-     * @param RasterModel model underlying model
+     * @param timeSeriesModel model underlying model
      */
     public TimeSeriesPlotPanel(final TimeSeriesModel timeSeriesModel) {
 

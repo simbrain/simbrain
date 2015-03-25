@@ -210,7 +210,7 @@ public abstract class TextWorld {
     }
 
     /**
-     * @param position the position to set
+     * @param newPosition the position to set
      */
     public void setPosition(int newPosition) {
         setPosition(newPosition, true);

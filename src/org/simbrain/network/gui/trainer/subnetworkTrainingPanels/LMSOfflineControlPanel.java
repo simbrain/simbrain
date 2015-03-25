@@ -108,7 +108,7 @@ public class LMSOfflineControlPanel extends JPanel {
      * it has been created. This is used by ESN for example where states must
      * first be harvested and only then is the trainer built.
      *
-     * @param networkPanel the parent network panel
+     * @param frame the parent network panel
      */
     public LMSOfflineControlPanel(Window frame) {
         this.frame = frame;
@@ -121,7 +121,7 @@ public class LMSOfflineControlPanel extends JPanel {
     /**
      * Build the panel.
      *
-     * @param networkPanel the parent network panel
+     * @param frame the parent network panel
      * @param trainer the LMSOffline trainer to represent
      */
     public LMSOfflineControlPanel(final LMSOffline trainer, Window frame) {

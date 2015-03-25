@@ -66,7 +66,7 @@ public class TileSensor extends Sensor {
     /**
      * Construct a tile sensor.
      *
-     * @param entity parent entity
+     * @param parent parent entity
      * @param x upper left
      * @param y upper right
      * @param width width in pixels

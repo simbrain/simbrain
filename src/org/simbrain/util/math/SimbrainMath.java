@@ -556,7 +556,7 @@ public class SimbrainMath {
     /**
      * Create a random vector with i components.
      *
-     * @param i number of components in this vector.
+     * @param length i number of components in this vector.
      * @return the random vector.
      */
     public static double[] randomVector(int length) {

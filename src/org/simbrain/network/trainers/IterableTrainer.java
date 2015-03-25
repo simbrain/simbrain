@@ -305,7 +305,7 @@ public abstract class IterableTrainer extends Trainer {
     /**
      * Set the current stopping condition. Used by preference dialog.
      *
-     * @param ComboBoxWrapper the current solution set up for combo box.
+     * @param stoppingConditionWrapper the current solution set up for combo box.
      */
     public void setStoppingCond(ComboBoxWrapper stoppingConditionWrapper) {
         setStoppingCondition((StoppingCondition) stoppingConditionWrapper

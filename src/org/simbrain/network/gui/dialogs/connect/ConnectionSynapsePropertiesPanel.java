@@ -138,7 +138,7 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
     /**
      *
      * @param parent
-     * @param synapses
+     * @param spp
      * @return
      */
     public static ConnectionSynapsePropertiesPanel

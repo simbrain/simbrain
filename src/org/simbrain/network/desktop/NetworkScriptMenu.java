@@ -48,7 +48,7 @@ public class NetworkScriptMenu {
     /**
      * Create script menu.
      *
-     * @param network root network references
+     * @param panel root network references
      * @return script JMenu
      */
     public static JMenu getNetworkScriptMenu(NetworkPanel panel) {

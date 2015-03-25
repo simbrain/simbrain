@@ -214,7 +214,6 @@ public class Radial extends Sparse {
     }
 
     /**
-     * @param distConst
      * @param lambda
      */
     public Radial(double lambda) {

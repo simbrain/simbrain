@@ -216,8 +216,9 @@ public class IterativeControlsPanel extends JPanel {
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
             // putValue(NAME, "Open (.csv)");
+            // TODO: Later change to "until stopping condition met".
             putValue(SHORT_DESCRIPTION,
-                    "Iterate training until stopping condition met");
+                    "Iterate training until stop button pressed.");
         }
 
         /**
@@ -354,7 +355,10 @@ public class IterativeControlsPanel extends JPanel {
                 return;
             }
             ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-            editor.setExcludeList(new String[] { "iteration", "updateCompleted" });
+            // TODO: un-exclude once those features are implemented!
+            editor.setExcludeList(new String[] { "iteration",
+                    "updateCompleted", "stoppingCond", "stoppingCondition",
+                    "iterationsBeforeStopping", "errorThreshold" });
             editor.setObject(trainer);
             JDialog dialog = editor.getDialog();
             dialog.setModal(true);

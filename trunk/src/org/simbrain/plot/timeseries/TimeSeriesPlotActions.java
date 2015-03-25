@@ -37,7 +37,7 @@ public class TimeSeriesPlotActions {
     /**
      * Shows a properties dialog for the trainer.
      *
-     * @param RasterPlotPanel reference to time series plot panel
+     * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
     public static Action getPropertiesDialogAction(
@@ -63,7 +63,7 @@ public class TimeSeriesPlotActions {
     /**
      * Clear the graph.
      *
-     * @param RasterPlotPanel reference to time series plot panel
+     * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
     public static Action getClearGraphAction(
@@ -89,7 +89,7 @@ public class TimeSeriesPlotActions {
     /**
      * Add a data source.
      *
-     * @param RasterPlotPanel reference to time series plot panel
+     * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
     public static Action getAddSourceAction(
@@ -117,7 +117,7 @@ public class TimeSeriesPlotActions {
     /**
      * Add a data source.
      *
-     * @param RasterPlotPanel reference to time series plot panel
+     * @param timeSeriesPanel reference to time series plot panel
      * @return the action
      */
     public static Action getRemoveSourceAction(

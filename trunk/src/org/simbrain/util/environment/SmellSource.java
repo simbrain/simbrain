@@ -461,7 +461,7 @@ public class SmellSource {
     }
 
     /**
-     * @param imageBox the imageBox to set
+     * @param decayFunctionBox
      */
     public void setTheDecayFunction(ComboBoxWrapper decayFunctionBox) {
         setDecayFunction((DecayFunction) decayFunctionBox.getCurrentObject());

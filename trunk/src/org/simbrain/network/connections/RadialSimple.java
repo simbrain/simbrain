@@ -79,7 +79,7 @@ public class RadialSimple implements ConnectNeurons {
 
     /**
      * @param network
-     * @param sourceNeurons
+     * @param sourceNeurons 
      */
     public RadialSimple(Network network, List<Neuron> sourceNeurons) {
         super();

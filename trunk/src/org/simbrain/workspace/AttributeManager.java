@@ -51,7 +51,7 @@ public class AttributeManager {
     private WorkspaceComponent parentComponent;
 
     /**
-     * @param parentWorkspace
+     * @param parentComponent
      */
     public AttributeManager(WorkspaceComponent parentComponent) {
         this.parentComponent = parentComponent;

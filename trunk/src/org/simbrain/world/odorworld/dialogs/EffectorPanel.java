@@ -253,7 +253,7 @@ public class EffectorPanel extends JPanel {
         /**
          * Add a row
          *
-         * @param Effector
+         * @param effector
          */
         public void addRow(Effector effector) {
             data.add(effector);

@@ -356,7 +356,7 @@ public class RandomizerPanel extends JPanel {
 
     /**
     *
-    * @param pc
+    * @param fl
     */
     public void addFocusListenerToFields(FocusListener fl) {
         for (ProbDistPanel pdp : cardMap.values()) {

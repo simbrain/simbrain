@@ -442,8 +442,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	/**
 	 * Set a custom interaction box.
 	 *
-	 * @param interactionBox
-	 *            the interactionBox to set.
+	 * @param newBox
+	 *            the newBox to set.
 	 */
 	protected void setInteractionBox(NeuronGroupInteractionBox newBox) {
 		this.removeChild(interactionBox);
@@ -816,8 +816,8 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 
 	 /**
 	  *
-	  * @param origins
-	  * @param synGroups
+	  * @param map
+	  * @param terminaMap
 	  */
 	 public LinkedHashMap<Point2D, Point2D> untangle(
 			 LinkedHashMap<Point2D, Point2D> map,

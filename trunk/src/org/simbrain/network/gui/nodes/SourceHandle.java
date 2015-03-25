@@ -174,7 +174,7 @@ public final class SourceHandle extends PHandle {
     }
 
     /**
-     * @param sourceColor The sourceColor to set.
+     * @param selectionColor The sourceColor to set.
      */
     public static void setSourceColor(final Color selectionColor) {
         SourceHandle.sourceColor = selectionColor;

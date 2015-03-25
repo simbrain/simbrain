@@ -197,8 +197,8 @@ public class Workspace {
      * Couple each source attribute to one target attribute, as long as there
      * are target attributes to couple to.
      *
-     * @param sourceAttributes source producing attributes
-     * @param targetAttributes target consuming attributes
+     * @param producerKeys source producing attributes
+     * @param consumerKeys target consuming attributes
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(final List<PotentialProducer> producerKeys,
@@ -735,7 +735,7 @@ public class Workspace {
     /**
      * Open a workspace from a file.
      *
-     * @param file the file to try to open
+     * @param theFile the file to try to open
      */
     public void openWorkspace(final File theFile) {
         WorkspaceSerializer serializer = new WorkspaceSerializer(this);

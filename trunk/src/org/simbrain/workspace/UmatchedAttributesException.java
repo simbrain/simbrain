@@ -27,7 +27,7 @@ package org.simbrain.workspace;
 public class UmatchedAttributesException extends Exception {
 
     /**
-     * @param arg0
+     * @param message
      */
     public UmatchedAttributesException(final String message) {
         super(message);

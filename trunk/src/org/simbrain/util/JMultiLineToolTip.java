@@ -89,7 +89,7 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         super();
     }
 
-    /** @param component */
+    /** @param c */
     public void installUI(JComponent c) {
         super.installUI(c);
         tip = (JToolTip) c;

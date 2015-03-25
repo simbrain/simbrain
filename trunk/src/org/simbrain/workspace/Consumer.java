@@ -29,7 +29,7 @@ package org.simbrain.workspace;
  * @param <E> the type of data taken by the setter.
  *
  * @see Attribute
- * @see AttributeManaager
+ * @see AttributeManager
  * @see PotentialConsumer
  */
 public interface Consumer<E> extends Attribute {

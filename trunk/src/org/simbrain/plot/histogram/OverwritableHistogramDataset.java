@@ -488,7 +488,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset
         /**
          * Create the data series.
          *
-         * @param data the data
+         * @param bins the data
          */
         public ColoredDataSeries(final HistogramBin[] bins) {
             this.data = bins;

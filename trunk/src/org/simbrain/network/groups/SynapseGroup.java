@@ -1735,7 +1735,7 @@ public class SynapseGroup extends Group {
      * specified by the passed function.
      *
      * @param check
-     * @param synapses
+     * @param polarity
      * @param prototype
      * @return
      */

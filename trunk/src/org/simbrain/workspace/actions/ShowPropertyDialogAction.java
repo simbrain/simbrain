@@ -39,7 +39,7 @@ public final class ShowPropertyDialogAction extends AbstractAction {
     /**
      * Create a workspace component list of the specified workspace.
      *
-     * @param desktop reference to simbrain desktop.
+     * @param workspace reference to simbrain desktop.
      */
     public ShowPropertyDialogAction(final Workspace workspace) {
         super("Workspace Properties...");

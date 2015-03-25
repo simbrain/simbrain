@@ -143,7 +143,7 @@ public class LabelledItemPanel extends JPanel {
      * Adds a labeled item to the panel on the current myNextItemRow, at the
      * specified column.
      *
-     * @param labelText The label text for the item.
+     * @param name The label text for the item.
      * @param item The item to be added.
      * @param col desired grid bag layor column
      */

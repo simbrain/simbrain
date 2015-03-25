@@ -64,8 +64,8 @@ public interface SynapseGroupArrow {
 
     /**
      * Returns the midpoint for for
-     * @param pt1 the first point
-     * @param pt2 the second point
+     * @param src the first point
+     * @param tar the second point
      * @return the midpoint between pt1 and pt2
      */
     Point2D midpoint(Point2D src, Point2D tar);

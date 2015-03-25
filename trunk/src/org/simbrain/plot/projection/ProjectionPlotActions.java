@@ -37,7 +37,7 @@ public class ProjectionPlotActions {
     /**
      * Export high dimensional data to .csv.
      *
-     * @param ProjectionModel
+     * @param model
      * @return the action
      */
     public static Action getExportDataHi(final ProjectionModel model) {
@@ -68,7 +68,7 @@ public class ProjectionPlotActions {
     /**
      * Export low dimensional data to .csv.
      *
-     * @param ProjectionModel
+     * @param model
      * @return the action
      */
     public static Action getExportDataLow(final ProjectionModel model) {

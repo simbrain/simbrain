@@ -1467,7 +1467,7 @@ public class Network {
 
     /**
      * 
-     * @param group
+     * @param group 
      * @param changeDescription
      */
     public void fireGroupChanged(final Group group,
@@ -1494,7 +1494,7 @@ public class Network {
     /**
      * Fire a group update event event.
      *
-     * @param group
+     * @param groups
      *            reference to group that has been updated.
      */
     public void fireGroupUpdated(final Group groups) {
@@ -1838,7 +1838,7 @@ public class Network {
     }
 
     /**
-     * @param synapseVisibilityThreshold
+     * @param svt
      *            the synapseVisibilityThreshold to set
      */
     public static void setSynapseVisibilityThreshold(int svt) {

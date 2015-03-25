@@ -48,7 +48,6 @@ public class WorkspaceComponentSerializer {
      * Serializes a component and returns the id for that component.
      *
      * @param component The component to serialize.
-     * @param DEFAULT_RANDOM_STREAM The stream to write to.
      * @return The id for the component that was serialized.
      */
     int serializeComponent(final WorkspaceComponent component) {

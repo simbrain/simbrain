@@ -36,7 +36,7 @@ public final class SaveVisionWorldAction extends AbstractAction {
     /**
      * Create a new create pixel matrix action.
      *
-     * @param visionWorld vision world, must not be null
+     * @param desktopComponent vision world, must not be null
      */
     public SaveVisionWorldAction(
             final VisionWorldDesktopComponent desktopComponent) {

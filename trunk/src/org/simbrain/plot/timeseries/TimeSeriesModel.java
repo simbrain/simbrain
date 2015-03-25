@@ -62,7 +62,7 @@ public class TimeSeriesModel extends ChartModel {
     /**
      * Initialize model to specified number of data sources.
      *
-     * @param parent component
+     * @param numDataSources
      */
     public TimeSeriesModel(int numDataSources) {
         addDataSources(numDataSources);
@@ -199,7 +199,7 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * @param upperRangeBoundary the upperRangeBoundary to set
+     * @param upperBound the upperRangeBoundary to set
      */
     public void setRangeUpperBound(final double upperBound) {
         this.rangeUpperBound = upperBound;

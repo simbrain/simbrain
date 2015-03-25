@@ -37,7 +37,7 @@ public final class ShowEntityDialogAction extends AbstractAction {
     /**
      * Construct a show entity action.
      *
-     * @param component GUI component, must not be null.
+     * @param entity GUI component, must not be null.
      */
     public ShowEntityDialogAction(OdorWorldEntity entity) {
         super("Edit entity");

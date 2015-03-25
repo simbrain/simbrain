@@ -217,7 +217,7 @@ public class Utils {
     }
 
     /**
-     * Like {@link #doubleParsable(tField)} but checks for the formatting of a
+     * Like {@link #doubleParsable(JTextField)} but checks for the formatting of a
      * string rather than a text field.
      *
      * @param text the text to check

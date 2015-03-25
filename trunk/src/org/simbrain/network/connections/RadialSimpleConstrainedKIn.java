@@ -28,8 +28,12 @@ public class RadialSimpleConstrainedKIn extends Sparse {
     private int defactoRadius = 90;
     
     /**
-     * @param network
-     * @param sourceNeurons
+     * @param excitatoryKIN
+     * @param inhbititoryKIN
+     * @param defactoKIN
+     * @param excitatoryRadius
+     * @param inhibitoryRadius
+     * @param defactoRadius
      */
     public RadialSimpleConstrainedKIn(final int excitatoryKIN,
     		final int inhibitoryKIN, final int defactoKIN,
@@ -45,8 +49,8 @@ public class RadialSimpleConstrainedKIn extends Sparse {
     }
 
     /**
-     * @param network
-     * @param sourceNeurons
+     * @param defactoKIN
+     * @param defactoRadius
      */
     public RadialSimpleConstrainedKIn(final int defactoKIN,
     	final int defactoRadius) {

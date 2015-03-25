@@ -303,7 +303,7 @@ public class WorkspaceActionManager {
     /**
      * Make a list of script actions by iterating through script menu directory.
      *
-     * @param workspace reference
+     * @param desktop workspace reference
      * @return script action
      */
     public List<Action> getScriptActions(final SimbrainDesktop desktop) {

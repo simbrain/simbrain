@@ -103,7 +103,7 @@ public class TestObject {
     /**
      * Sets the enumeration based on a boxable object.
      *
-     * @param boxable the boxable to set
+     * @param object the boxable to set
      */
     public void setEnumeration(ComboBoxWrapper object) {
         theEnum = (TestEnum) object.getCurrentObject();

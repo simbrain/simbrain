@@ -64,7 +64,7 @@ public class HistogramModel extends ChartModel {
     /**
      * Creates a histogram with no data and a specified number of datsets.
      *
-     * @param numdsources
+     * @param numSources
      *            number of datasets to add
      */
     public HistogramModel(int numSources) {

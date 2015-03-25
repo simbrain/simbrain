@@ -762,7 +762,7 @@ public class SimbrainDesktop {
      * Returns the desktop component corresponding to a named workspace
      * component.
      *
-     * @param component name of desktop component to return
+     * @param componentName name of desktop component to return
      * @return component desktop component, or null if none found
      */
     public GuiComponent<?> getDesktopComponent(final String componentName) {
@@ -908,7 +908,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Add a new <c>SimbrainComponent</c>.
+     * Add a new SimbrainComponent.
      *
      * @param workspaceComponent Workspace Component
      */

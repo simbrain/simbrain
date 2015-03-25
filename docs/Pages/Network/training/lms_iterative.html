@@ -19,15 +19,18 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../training.html">Training</a> &gt; LMS Iterative
             </p>
         </div>
-
         <h1>Least Mean Squares Iterative</h1>
-
-        <p>The <a href="http://en.wikipedia.org/wiki/Delta_rule">Least Mean Squares</a> or LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values.  It is a classic algorithm which is also called the delta rule and is related to adalines and perceptrons.  The change in a weight when the algorithm is run is equal to the product of a learning rate &#949;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.
-        <blockquote>
-            <p><span class="heading2">Learning Rate: </span>A standard learning rate. This determines how quickly synapses change. </p>
-            <p><span class="heading2">Momentum: </span> This scales the rate of weight change by the amount a given weight changed on the previous time step. This speeds up learning and prevents oscillations. Momentum should be between 0 and 1; 0.9 is a common value. </p>
-        </blockquote>
-
+        <p>The <a href="http://en.wikipedia.org/wiki/Delta_rule">Least Mean Squares</a> or LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values. It is a classic algorithm which is also called the delta rule and is related to adalines and perceptrons. The change in a weight when the algorithm is run is equal to the product of a learning rate &#949;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.
+            <blockquote>
+                <p><span class="heading2">Learning Rate: </span>A standard learning rate. This determines how quickly synapses change. </p>
+                <p><span class="heading2">Momentum: </span> This scales the rate of weight change by the amount a given weight changed on the previous time step. This speeds up learning and prevents oscillations. Momentum should be between 0 and 1; 0.9 is a common value. </p>
+            </blockquote>
+            <p>The LMS rule works as follows. The change in a weight is equal to the product of a learning rate &#949;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.
+            </p>
+            <p><img src="../equations/LMSRule.png" height="54" width="203">
+            </p>
+            <p>Repeated application of this rule minimizes reduces mean squared error on a set of training data. </p>
+            <p>This rule is also known as the "Widrow-Hoff" rule, and the "Delta Rule." Networks that use these rules are sometimes called "adalines" or "madalines" (for the multilayer case, which these networks do not currently implement). They are descendants of an early form of network studied by Rosenblatt called a "perceptron."</p>
     </div>
 </body>
 

@@ -8,23 +8,18 @@
 </head>
 
 <body>
-
     <a href="../../SimbrainDocs.html">
         <div class="logo">
         </div>
     </a>
-
     <div id="main_docs">
-
         <div class="navi">
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Subnetwork</p>
         </div>
-
         <div id="menu">
             <p class="menubold">Contents
                 <br>
             </p>
-
             <blockquote>
                 <p><a href="network/backpropnetwork.html">Backprop</a>
                     <br>
@@ -42,21 +37,13 @@
                     <br> </p>
             </blockquote>
         </div>
-
         <h1>Subnetworks</h1>
-
         <div style="float:left; padding-left: 20px; padding-right: 70px;"><img width="300px" src="../../Images/Backprop.png">
         </div>
-
-        <p>Subnetworks are a special kind of <a href="groups.html">group</a> that encompass multple neuron and synapse groups, often with special update rules. </p>
-
+        <p>Subnetworks are a special kind of <a href="groups.html">group</a> that encompass multiple neuron and synapse groups, often with special update rules. </p>
         <p>For more information on specific types of subnetwork click on the items in the menu on the right.</p>
-        <!-- 
-        <p><img width="325" src="../../Images/Backprop.png" border = "0">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <img width="225" src="../../Images/Hopfield.png" border = "0">
-        </p> -->
-
+        <a href="#clamp_warning"></a>
+        <p><img src="../../Images/Warning.png" alt="warning icon"> Note! The input nodes of many subnetworks are, by default, <a href="neuron.html#clamping">clamped</a>. This is to make it easier to manually set and test their values. However, if you want to connect other neurons to the input nodes of a subnetwork you should unclamp the input neurons. </p>
     </div>
 </body>
 

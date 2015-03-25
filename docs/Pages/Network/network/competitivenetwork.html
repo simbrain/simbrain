@@ -3,8 +3,6 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -12,28 +10,23 @@
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
         <div class="navi">
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Competitive</p>
         </div>
-
         <h1>Competitive Network</h1>
-
-        <p>A competitive network is a collection of neurons that compete with each other to represent clusters of inputs. Each unit in a competitive network should come to represent a particular cluster of inputs.</p>
-
-        <p>The competitive network combines elements of <a href="winnerTakeAll.html">winner take all networks</a> and hebbian learning. They are also related to self-organizing networks, which will be included in future releases. </p>
-
+        <p>A competitive network is a collection of neurons that compete with each other to represent clusters of inputs. With training, the nodes of a competitive network should come to represent a particular cluster of inputs.</p>
+        <p>The competitive network combines elements of <a href="winnerTakeAll.html">winner take all networks</a> and hebbian learning. The <a href="som.html">self-organizing-map</a> is a generalization of this algorithm.</p>
         <div style="float:right; padding-left: 50px; padding-right: 70px;"><img src="../../../Images/Competitive.png">
         </div>
-
-        <p>After creating a competitive network, some neurons must be attached to its units. The resulting weights will then be trained using the competitive learning algorithm, which updates weights according to the following steps:
-        </p>
+        <p>A competitive network may either be created as a group or a network. As a network, it has a self-contained layer of input nodes and it can be trained using a table of inputs. As a group, it is up to the user to connect it to other neurons, and the inputs these produce will determine its weights to it over time.</p>
+        <p class="heading">Algorithm</p>
+        <p>The basic algorithm described here is the original PDP version due to Rumelhart and Zipser. An alternative, due to Alvarez and Squire, is also available.(see references below)</p>
         <blockquote>
             <p>1) Compute the weighted input to every unit.
-                <br> 2) Determine the winner, which is the unit with the greatest <a href="../common.html#wtdinput">weighted input</a>. In the case of a tie this is done arbitrarily.
+                <br> 2) Determine the winner, which is the unit with the greatest weighted input. In the case of a tie this is done arbitrarily.
                 <br> 3) Update the weights attaching to the winning neuron only. These weights are changed by the following quantity: learning rate times the source activation divided by the total activation of the source layer minus the current strength of the weight:</p>
             <p><img src="../equations/Competitive.png" height="60" width="253">
             </p>
@@ -41,8 +34,6 @@
             </p>
         </blockquote>
         <p>The division by the sum of inputs maintains the normalization of the weight vectors. Thus, if more strength is added to one weight, it is taken away from another.</p>
-        <p>For more on competitive learning see <a href="http://www.gc.ssr.upm.es/inves/neural/ann1/unsupmod/CompetLe/CompetLe.htm">this site</a>. Also see the PDP volumes, volume 1, chapter 5. </p>
-
         <p class="heading">Initialization</p>
         <blockquote>
             <p>Competitive networks are initialized with some number of units, and are by default laid out as a line. There are no connections. Connections must be made leading in to the network, and they should be constrained to only take values between 0 and 1. </p>
@@ -57,12 +48,9 @@
                 </p>
                 <p><span class="heading2">Number of Input Neurons: </span>Sets number of input neurons.
                 </p>
-                <p><span class="heading2">Update Method: </span> TODO
-                    <br>
+                <p><span class="heading2">Update Method: Rummelhart-Zipser:</span> The Rummelhart-Zipser method described above.
                 </p>
-                <p style="margin-left: 40px;"><span class="heading2">Rummelhart-Zipser:</span> TODO
-                </p>
-                <p style="margin-left: 40px;"><span class="heading2">Alvarez-Squire:</span> TODO
+                <p><span class="heading2">Update Method: Alvarez-Squire:</span> The Alvarez-Squire method described in the link below in references.
                 </p>
                 <p><span class="heading2">Epsilon: </span>A standard learning rate, which determines how quickly synapses change. </p>
                 <p><span class="heading2">Winner Value: </span>The value for the winning neuron.</p>
@@ -71,47 +59,33 @@
                 <p><span class="heading2">Leaky epsilon </span>: The learning rate for losing neurons, when leaky learning is used. </p>
                 <p><span class="heading2">Normalize Inputs</span>: if selected, inputs are normalized prior to being used in setting weights.
                 </p>
-                <p><span class="heading2">Synapse Decay Percent: </span>TODO
+                <p><span class="heading2">Synapse Decay Percent: </span>Amount to decay incoming synapses at every iteration. Cf. the Alvarez-Squire paper.
                 </p>
             </blockquote>
-
-
             <p><span class="heading">Layout&nbsp;</span>
             </p>
-            <blockquote>
-                <p><span class="heading2">Neuron Layout: </span> This field lets the user choose perferred <a href="../layouts.html">neuron layout</a>. </p>
-
-                <p><span class="heading2">Layout Style: </span> This field lets the user choose perferred layout style of the neurons. See <a href="../layouts.html">neuron layout</a> for details. </p>
-
-                <p><span class="heading2">Spacing: </span> This field sets the distance between the neurons. </p>
-            </blockquote>
+            <p>See the <a href="../layouts.html">layouts</a> page.</p>
         </blockquote>
         <p class="heading">Right Click Menu
-            <br>
         </p>
-
         <blockquote>
-
+            <p>Generic right-click items are described on the <a href="../groups/NeuronGroup.html#rightclick">neuron group</a> page.</p>
             <p> <span class="heading2">Edit/Train Competitive: </span> Opens edit dialog to edit and train the competitive network.
-            </p>
-            <p> <span class="heading2">Rename: </span> Rename the network.
-            </p>
-            <p> <span class="heading2">Remove Network: </span> Deletes the network.
-            </p>
-            <p> <span class="heading2">Add Current Pattern To Input Data: </span> TODO
-            </p>
-            <p><span class="heading2">Train On Current Pattern: </span>TODO</p>
-            <p><span class="heading2">Randomize Synapses: </span> TODO
-
-            </p>
-
+                <p> <span class="heading2">Add Current Pattern To Input Data: </span> Adds the current pattern in the input nodes of the network to the network's input table (viewable in the <a href="../training/trainingDialog.html">training dialog</a>). Useful for creating a training set for a competitive network using GUI activations or activations from a larger simulation.
+                </p>
+                <p><span class="heading2">Train On Current Pattern: </span>Iterate the training algorithm once using the current inputs.</p>
+                <p><span class="heading2">Randomize Synapses: </span> Randomize synapses connected the competitive group, which are the ones trained using the algorithm.
+                </p>
         </blockquote>
-
         <p class="heading">Training</p>
-
         <blockquote>
-            <p>Training a network involves specifying input data, target data, and then running the algorithm.&nbsp; This process is covered <a href="../training.html">here</a>.
+            <p>Training a network involves specifying input data and then running the algorithm.&nbsp; This process is covered <a href="../training.html">here</a>.
             </p>
+        </blockquote>
+        <p class="heading">References</p>
+        <blockquote>
+            <p>The Rummelhart and Zipser update rules is described <a href="http://www.gc.ssr.upm.es/inves/neural/ann1/unsupmod/CompetLe/CompetLe.htm">here</a>. Also see the PDP volumes, volume 1, chapter 5. </p>
+            <p>The Alvarez and Squire version of the algorithm is describe in <a href="http://www.pnas.org/content/91/15/7041.full.pdf">this PNAS</a> paper.</p>
         </blockquote>
     </div>
 </body>

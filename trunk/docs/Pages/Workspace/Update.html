@@ -22,9 +22,9 @@
 
         <p>When a simulation is run, a sequence of "update actions" occurs at each iteration. These actions can be re-ordered and customized in various ways. To run a simulation use the iterate and play buttons in the main desktop toolbar. The time will begin advancing. On each iteration an update occurs, which by default means all the components and couplings in a <a href="../Workspace.html">workspace</a> are updated.Individual components within a workspace can be run separately from the network. The workspace can also be run in other ways, e.g. from <a href="../Scripting.html">scripts</a> or from the <a href="../Console.html">terminal</a>, using the command workspace.iterate(<i>n</i>), which iterates the workspace <i>n</i> times.</p>
 
-    <p>Note that workspace update is similar to <a href="../Network/update.html">network update</a>.</p>
+        <p>Note that workspace update is similar to <a href="../Network/update.html">network update</a>.</p>
 
-        <p>Some forms of workspace and component update occur using <a href="http://en.wikipedia.org/wiki/Parallel_computing">parallelization</a>.</p>
+        <p>Some forms of workspace and component update occur using <a href="http://en.wikipedia.org/wiki/Parallel_computing">parallelization</a>, in particular <a href="../Network/update.html#pbu">parallel buffered update</a> of network components.</p>
 
         <p><span class="heading">Update Controls and Indicators</span>
         </p>

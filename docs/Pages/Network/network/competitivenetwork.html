@@ -17,7 +17,7 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Competitive</p>
         </div>
         <h1>Competitive Network</h1>
-        <p>A competitive network is a collection of neurons that compete with each other to represent clusters of inputs. With training, the nodes of a competitive network should come to represent a particular cluster of inputs.</p>
+        <p>A <a href="http://en.wikipedia.org/wiki/Competitive_learning">competitive</a> network is a collection of neurons that compete with each other to represent clusters of inputs. With training, the nodes of a competitive network should come to represent a particular cluster of inputs.</p>
         <p>The competitive network combines elements of <a href="winnerTakeAll.html">winner take all networks</a> and hebbian learning. The <a href="som.html">self-organizing-map</a> is a generalization of this algorithm.</p>
         <div style="float:right; padding-left: 50px; padding-right: 70px;"><img src="../../../Images/Competitive.png">
         </div>
@@ -39,32 +39,27 @@
             <p>Competitive networks are initialized with some number of units, and are by default laid out as a line. There are no connections. Connections must be made leading in to the network, and they should be constrained to only take values between 0 and 1. </p>
             <p>A variant of the competitive learning algorithm called "leaky learning" requires all weights to learn on each time step, rather than just the winning weight. The algorithm for the weight change on the losing units is the same as above, but a new learning rate parameter is used, which will typically be smaller than the winning unit learning rate, so that weights attaching to losing neurons learn more slowly.</p>
         </blockquote>
-        <p class="heading">Creation Dialog</p>
+        <p class="heading">Creation / Editing</p>
         <blockquote>
-            <p> <span class="heading">Logic</span>
+            <p><span class="heading2">Number of Competitive Neurons:</span> Sets the number of neurons for the group.
             </p>
-            <blockquote>
-                <p><span class="heading2">Number of Competitive Neurons:</span> Sets the number of neurons for the group.
-                </p>
-                <p><span class="heading2">Number of Input Neurons: </span>Sets number of input neurons.
-                </p>
-                <p><span class="heading2">Update Method: Rummelhart-Zipser:</span> The Rummelhart-Zipser method described above.
-                </p>
-                <p><span class="heading2">Update Method: Alvarez-Squire:</span> The Alvarez-Squire method described in the link below in references.
-                </p>
-                <p><span class="heading2">Epsilon: </span>A standard learning rate, which determines how quickly synapses change. </p>
-                <p><span class="heading2">Winner Value: </span>The value for the winning neuron.</p>
-                <p><span class="heading2">Loser Value</span>: The value for all losing neurons. </p>
-                <p><span class="heading2">Use Leaky Learning</span>: whether to use the leaky learning rule. Leaky learning requires all weights to learn, not just the weights attaching to the winning unit. </p>
-                <p><span class="heading2">Leaky epsilon </span>: The learning rate for losing neurons, when leaky learning is used. </p>
-                <p><span class="heading2">Normalize Inputs</span>: if selected, inputs are normalized prior to being used in setting weights.
-                </p>
-                <p><span class="heading2">Synapse Decay Percent: </span>Amount to decay incoming synapses at every iteration. Cf. the Alvarez-Squire paper.
-                </p>
-            </blockquote>
-            <p><span class="heading">Layout&nbsp;</span>
+            <p><span class="heading2">Number of Input Neurons: </span>Sets number of input neurons.
             </p>
-            <p>See the <a href="../layouts.html">layouts</a> page.</p>
+            <p><span class="heading2">Update Method: Rummelhart-Zipser:</span> The Rummelhart-Zipser method described above.
+            </p>
+            <p><span class="heading2">Update Method: Alvarez-Squire:</span> The Alvarez-Squire method described in the link below in references.
+            </p>
+            <p><span class="heading2">Epsilon: </span>A standard learning rate, which determines how quickly synapses change. </p>
+            <p><span class="heading2">Winner Value: </span>The value for the winning neuron.</p>
+            <p><span class="heading2">Loser Value</span>: The value for all losing neurons. </p>
+            <p><span class="heading2">Use Leaky Learning</span>: whether to use the leaky learning rule. Leaky learning requires all weights to learn, not just the weights attaching to the winning unit. </p>
+            <p><span class="heading2">Leaky epsilon </span>: The learning rate for losing neurons, when leaky learning is used. </p>
+            <p><span class="heading2">Normalize Inputs</span>: if selected, inputs are normalized prior to being used in setting weights.
+            </p>
+            <p><span class="heading2">Synapse Decay Percent: </span>Amount to decay incoming synapses at every iteration. Cf. the Alvarez-Squire paper.
+            </p>
+            <p><span class="heading2">Layout: </span>See the <a href="../layouts.html">layouts</a> page.</p>
+            </p>
         </blockquote>
         <p class="heading">Right Click Menu
         </p>

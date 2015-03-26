@@ -85,27 +85,33 @@
         </p>
         <p>There are a variety of different <a href="Network/neuron.html">neurons</a> and <a href="Network/synapse.html">synapses</a>, each with their own rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called "<a href="Network/subnetwork.html">subnetworks</a>" which can be added to a simulation. Different subnetworks can be linked together, leading to even more complex and powerful simulations. There are also connection objects, layout objects, model groups and other functions which can be used to build neural networks. Follow the links on the right to learn more about these features.
         </p>
-        
-        <p>Two neural network components are shown below; a complex network on the left, and a simpler one on the right. The colored circles represent neurons or "nodes." The lines between nodes on the right represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections.  The network on the left has so many synapses that it would be unwieldy to represent them.   In that case you can interact with a whole <a href="./network/groups/SynapseGroup.html">synapse group</a>.</p>
-        <p>
-            <table align="center">
-                <tr>
-                    <td>
-                        <img src="../Images/corticalBranching.gif" height="300" border="1">
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                    <td>
-                        <img src="../Images/simple_net.gif" height="175" border="1">
-                    </td>
-                </tr>
-            </table>
+
+        <p>There are two main types of network in Simbrain, that involve slightly different default graphical behavior: (1) loose neurons and synapses, and (2) group-based operations.  The two can be combined in one simulation.</p>
+
+        <a id="loose"></a><p class="heading">Loose neurons and synapses</p>
+
+        <p>This is the classic way individual neurons and synapses are shown in Simbrain.</p>
+
+        <p style="float:left; padding: 30px;"> <img src="../Images/simple_net.gif" height="175" border="1">
         </p>
-        <p align="left">&nbsp;</p>
-        <p align="left">
+        
+        <p>The colored circles represent neurons or "nodes." The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. For more see <a href="Network/visualConventions.html">visual conventions</a>. Each node and synapse can be individually adjusted by selecting it, pressing the up and down errors, or double clicking to reveal a dialog. </p>
+    
+        <a id="group"></a><p class="heading">Group based operations</p>
+
+        <p>Large groups of neurons and (even more importantly) synapses are too unwieldy to represent and process, and so they are aggregated in to <a href="Network/groups.html">groups</a>, <a href="Network/groups/NeuronGroup.html">neuron groups</a> and <a href="Network/groups/SynapseGroup.html"> synapse groups</a>.  In these cases the neurons and synapse are not typically individually adjusted, but are rather adjusted <i>as a group</i>, typically by double clicking or right-clicking on a yellow interaction box. Shown here is a cortical bursting network, which is a single neuron group and recurrent synapse group.</p>
+
+        <p style="float:right; padding: 30px;"><img src="../Images/corticalBranching.gif" height="300" border="1"></p>
+
+        <p class="heading">Running a network</p>
+
+        <blockquote>
             <a name="RunningNet"></a><u>Running a network:</u> When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user "runs" the network it comes to life--an <a href="Network/update.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the play button
             <img src="../Images/Play.gif" height="18" width="18">in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a "stop" button
             <img src="../Images/Stop.gif" height="18" width="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. You can also press the step button
             <img src="../Images/Step.gif" height="18" width="18">(or press "space") to iterate the network a single time. Sometimes repeatedly hitting the space bar is useful way to test a network.</p>
+        </blockquote>
+
     </div>
 </body>
 

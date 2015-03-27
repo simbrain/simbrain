@@ -134,8 +134,8 @@ public class StopLight extends JPanel implements ActionListener {
     /**
      * Set the current state of the stoplight.
      *
-     * @param greenlight the desired state of the stop light: green -> true
-     *            false -> red
+     * @param greenlight the desired state of the stop light: green -&#62; true
+     *            false -&#62; red
      */
     public void setState(boolean greenlight) {
         this.greenlight = greenlight;

@@ -208,6 +208,7 @@ public abstract class NeuronUpdateRule {
 
     /**
      * Increment a neuron by increment.
+     * @param n neuron
      */
     public final void incrementActivation(Neuron n) {
         n.forceSetActivation(n.getActivation() + increment);
@@ -216,6 +217,7 @@ public abstract class NeuronUpdateRule {
 
     /**
      * Decrement a neuron by increment.
+     * @param n neuron
      */
     public final void decrementActivation(Neuron n) {
         n.forceSetActivation(n.getActivation() - increment);
@@ -225,6 +227,7 @@ public abstract class NeuronUpdateRule {
     /**
      * Increment a neuron by increment, respecting neuron specific constraints.
      * Intended to be overriden.
+     * @param n neuron to be incremented 
      */
     public void contextualIncrement(Neuron n) {
         incrementActivation(n);
@@ -233,6 +236,7 @@ public abstract class NeuronUpdateRule {
     /**
      * Decrement a neuron by increment, respecting neuron specific constraints.
      * Intended to be overriden.
+     * @param n neuron
      */
     public void contextualDecrement(Neuron n) {
         decrementActivation(n);

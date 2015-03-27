@@ -84,7 +84,7 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
      * A flag used to indicate whether this panel will be replacing synapse
      * update rules or simply writing to them. In cases where the panel
      * represents the same rule as the rule of each of the synapses (i.e.
-     * Hebbian panel & Hebbian synapses) the synapses' update rules are edited,
+     * Hebbian panel &#38; Hebbian synapses) the synapses' update rules are edited,
      * not replaced. However, if the panel does not correspond to the synapse
      * update rule of the synapses being edited, then new SynapseUpdateRule
      * objects are created, and replace the old rule. This optimization prevents

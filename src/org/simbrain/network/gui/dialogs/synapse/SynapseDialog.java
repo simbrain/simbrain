@@ -46,7 +46,7 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * Main panel for editing synapses.
      *
-     * @see org.simbrain.network.gui.dialogs.synapse.SynapsePropertiesSimple.java
+     * @see SynapsePropertiesSimple
      */
     private SynapsePropertiesPanel synapseEditingPanel;
 

@@ -48,6 +48,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     /**
      * Create a new network component.
+     * @param name name
      */
     public NetworkComponent(final String name) {
         super(name);
@@ -56,6 +57,8 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     /**
      * Create a new network component.
+     * @param name name of network
+     * @param network the network being created
      */
     public NetworkComponent(final String name, final Network network) {
         super(name);

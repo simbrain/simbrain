@@ -319,8 +319,8 @@ public class Network {
      * Gets the Euclidean distance between two neurons' positions in coordinate
      * space.
      *
-     * @param n1
-     * @param n2
+     * @param n1 Neuron one
+     * @param n2 Neuron two
      * @return
      */
     public static double getEuclideanDist(Neuron n1, Neuron n2) {
@@ -1473,8 +1473,8 @@ public class Network {
 
     /**
      * 
-     * @param group 
-     * @param changeDescription
+     * @param group reference to the group whose parameters are being changed
+     * @param changeDescription A change of description for the group
      */
     public void fireGroupChanged(final Group group,
     		final String changeDescription) {

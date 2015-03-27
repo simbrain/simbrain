@@ -122,7 +122,7 @@ public class ViewGroupNode extends ScreenElement implements
     public void resetColors() {
     }
 
-    /** @See PNode. */
+    /** @see PNode. */
     public void propertyChange(PropertyChangeEvent arg0) {
         xOffset = oldPosition.getX() - this.getOffset().getX();
         yOffset = oldPosition.getY() - this.getOffset().getY();

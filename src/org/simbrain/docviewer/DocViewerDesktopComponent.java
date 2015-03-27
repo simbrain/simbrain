@@ -85,6 +85,8 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
     /**
      * Constructor the gui component.
+     * @param frame frame of doc viewer
+     * @param component workspace component
      */
     public DocViewerDesktopComponent(GenericFrame frame,
             DocViewerComponent component) {

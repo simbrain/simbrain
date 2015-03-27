@@ -120,7 +120,7 @@ public class DisplayWorld extends TextWorld {
     /**
      * Add the provided text, if the provided value is above threshold. Called
      * by consumers reading data from (e.g) neural networks. If node activation
-     * > threshold then display a particular word.
+     * &#62; threshold then display a particular word.
      *
      * @param value value to check against threshold
      * @param string text to add

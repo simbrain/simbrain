@@ -393,7 +393,6 @@ public class Sparse implements ConnectNeurons {
     /**
      *
      * @param newSparsity
-     * @param returnRemoved
      * @return
      */
     public void removeToSparsity(double newSparsity) {
@@ -602,7 +601,7 @@ public class Sparse implements ConnectNeurons {
      * Set whether or not self connections (connections where the source and
      * target neuron are the same neuron) are allowed.
      *
-     * @param selfConnectionAllowed
+     * @param selfConnectionAllowed Connections are allowed to connect to themselves.
      */
     public void setSelfConnectionAllowed(boolean selfConnectionAllowed) {
         if (this.selfConnectionAllowed != selfConnectionAllowed) {

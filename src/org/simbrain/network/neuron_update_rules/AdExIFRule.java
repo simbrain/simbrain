@@ -31,7 +31,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * of integrate and fire includes an exponential term as a part of the
  * differential equation as well as an adaptation term which lowers the
  * membrane potential in response to successive spikes.
- * See Toboul & Brette 2005.
+ * See Toboul &#38; Brette 2005.
  *
  * @author Zach Tosi
  *

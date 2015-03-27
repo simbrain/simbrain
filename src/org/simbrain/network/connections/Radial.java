@@ -117,6 +117,7 @@ public class Radial extends Sparse {
      * @param eiDistConst
      * @param ieDistConst
      * @param iiDistConst
+     * @param distConst
      * @param lambda
      * @param loose
      * @return

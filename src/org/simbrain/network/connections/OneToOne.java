@@ -46,8 +46,8 @@ public class OneToOne implements ConnectNeurons {
     /**
      * Use this connection object to make connections.
      *
-     * @param sourceNeurons
-     * @param targetNeurons
+     * @param sourceNeurons the starting neurons
+     * @param targetNeurons the targeted neurons
      * @return the new synapses
      */
     public List<Synapse> connectOneToOne(List<Neuron> sourceNeurons,
@@ -92,10 +92,10 @@ public class OneToOne implements ConnectNeurons {
 
     /**
      *
-     * @param sourceNeurons
-     * @param targetNeurons
-     * @param useBidirectionalConnections
-     * @param looseSynapses
+     * @param sourceNeurons the starting neurons
+     * @param targetNeurons the targeted neurons
+     * @param useBidirectionalConnections the useBidirectionalConnections to set
+     * @param looseSynapses 
      * @return
      */
     public static List<Synapse> connectOneToOne(

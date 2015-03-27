@@ -245,6 +245,7 @@ public class StandardDialog extends GenericJDialog {
      * "Escape" key is pressed. In other words, if the User has caused the
      * dialog to close by any method other than by pressing the "Ok" button,
      * this method will return <code>true</code>.
+     * @return
      */
     public boolean hasUserCancelled() {
         return myIsDialogCancelled;

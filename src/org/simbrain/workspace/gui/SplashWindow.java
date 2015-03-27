@@ -47,7 +47,7 @@ import java.awt.event.MouseEvent;
  * and disposes the splash window afterwards. Please note that we want to keep
  * the Splasher class and the SplashWindow class as small as possible. The less
  * code and the less classes must be loaded into the JVM to open the splash
- * screen, the faster it will appear.
+ * screen, the faster it will appear. </p>
  *
  * <pre>
  * class Splasher {
@@ -59,7 +59,7 @@ import java.awt.event.MouseEvent;
  * }
  * </pre>
  *
- * </p>
+ * 
  *
  * @author Werner Randelshofer
  * @version 2.1 2005-04-03 Revised.

@@ -29,7 +29,7 @@ public class RadialSimpleConstrainedKIn extends Sparse {
     
     /**
      * @param excitatoryKIN
-     * @param inhbititoryKIN
+     * @param inhibitoryKIN
      * @param defactoKIN
      * @param excitatoryRadius
      * @param inhibitoryRadius

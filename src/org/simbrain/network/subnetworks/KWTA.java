@@ -60,7 +60,6 @@ public class KWTA extends NeuronGroup {
     /**
      * Default constructor.
      *
-     * @param layout for layout of Neurons.
      * @param k for the number of Neurons in the Kwta Network.
      * @param root reference to Network.
      */

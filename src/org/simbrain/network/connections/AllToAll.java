@@ -171,7 +171,7 @@ public class AllToAll implements ConnectNeurons {
     /**
      * Set whether or not self connections are allowed.
      *
-     * @param allowSelfConnect
+     * @param allowSelfConnect Neurons are allowed to connect to themselves.
      */
     public void setSelfConnectionAllowed(boolean allowSelfConnect) {
         this.selfConnectionAllowed = allowSelfConnect;

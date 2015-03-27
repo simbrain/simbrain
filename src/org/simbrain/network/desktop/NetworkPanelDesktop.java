@@ -247,7 +247,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     /**
      * This version of network dialog allows user to set User Preferences.
      *
-     * @param networkPanel
+     * @param networkPanel network panel
      *
      * @return superclass version of network dialog, with User Preferences
      */

@@ -334,28 +334,29 @@ public final class SynapseNode extends ScreenElement {
     /** @see ScreenElement */
     protected JPopupMenu getContextMenu() {
 
-        JPopupMenu contextMenu = new JPopupMenu();
-
-        contextMenu.add(new CutAction(getNetworkPanel()));
-        contextMenu.add(new CopyAction(getNetworkPanel()));
-        contextMenu.add(new PasteAction(getNetworkPanel()));
-        contextMenu.addSeparator();
-
-        contextMenu.add(new DeleteAction(getNetworkPanel()));
-        contextMenu.addSeparator();
-
-        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
-        contextMenu.addSeparator();
-
-        // Workspace workspace = getNetworkPanel().getWorkspace();
-        // if (workspace.getGaugeList().size() > 0) {
-        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-        // contextMenu.addSeparator();
-        // }
-
-        contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
-
-        return contextMenu;
+//        JPopupMenu contextMenu = new JPopupMenu();
+//
+//        contextMenu.add(new CutAction(getNetworkPanel()));
+//        contextMenu.add(new CopyAction(getNetworkPanel()));
+//        contextMenu.add(new PasteAction(getNetworkPanel()));
+//        contextMenu.addSeparator();
+//
+//        contextMenu.add(new DeleteAction(getNetworkPanel()));
+//        contextMenu.addSeparator();
+//
+//        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
+//        contextMenu.addSeparator();
+//
+//        // Workspace workspace = getNetworkPanel().getWorkspace();
+//        // if (workspace.getGaugeList().size() > 0) {
+//        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+//        // contextMenu.addSeparator();
+//        // }
+//
+//        contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
+//
+//        return contextMenu;
+        return this.getNetworkPanel().getSynapseContextMenu(synapse);
     }
 
     /** @see ScreenElement */

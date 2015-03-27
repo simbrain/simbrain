@@ -29,11 +29,17 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.edit.CopyAction;
+import org.simbrain.network.gui.actions.edit.CutAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
+import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
@@ -291,6 +297,46 @@ public class NetworkPanelDesktop extends NetworkPanel {
                     component.getWorkspaceComponent(), neuron, "getActivation");
             PotentialConsumer consumer = NetworkComponent.getNeuronConsumer(
                     component.getWorkspaceComponent(), neuron, "setInputValue");
+            JMenu producerMenu = new CouplingMenuProducer(
+                    "Send Scalar Coupling to", workspace, producer);
+            contextMenu.add(producerMenu);
+            JMenu consumerMenu = new CouplingMenuConsumer(
+                    "Receive Scalar Coupling from", workspace, consumer);
+            contextMenu.add(consumerMenu);
+        }
+        return contextMenu;
+    }
+
+    @Override
+    public JPopupMenu getSynapseContextMenu(Synapse synapse) {
+        JPopupMenu contextMenu = new JPopupMenu();
+
+        contextMenu.add(new CutAction(this));
+        contextMenu.add(new CopyAction(this));
+        contextMenu.add(new PasteAction(this));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new DeleteAction(this));
+        contextMenu.addSeparator();
+
+        contextMenu.add(this.getActionManager().getGroupMenu());
+        contextMenu.addSeparator();
+
+        // Workspace workspace = getNetworkPanel().getWorkspace();
+        // if (workspace.getGaugeList().size() > 0) {
+        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+        // contextMenu.addSeparator();
+        // }
+
+        contextMenu.add(new SetSynapsePropertiesAction(this));
+        // Add coupling menus
+        Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+        if (getSelectedSynapses().size() == 1) {
+            contextMenu.addSeparator();
+            PotentialProducer producer = NetworkComponent.getSynapseProducer(
+                    component.getWorkspaceComponent(), synapse, "getStrength");
+            PotentialConsumer consumer = NetworkComponent.getSynapseConsumer(
+                    component.getWorkspaceComponent(), synapse, "setStrength");
             JMenu producerMenu = new CouplingMenuProducer(
                     "Send Scalar Coupling to", workspace, producer);
             contextMenu.add(producerMenu);

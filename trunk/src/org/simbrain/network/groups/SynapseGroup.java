@@ -31,10 +31,9 @@ import java.util.Set;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.ConnectionUtilities.
-    SynapseParameterGetter;
-import org.simbrain.network.connections.ConnectionUtilities.
-    SynapseParameterSetter;
+import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterGetter;
+import org.simbrain.network.connections.ConnectionUtilities.SynapseParameterSetter;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -1966,6 +1965,9 @@ public class SynapseGroup extends Group {
             for (Synapse synapse : this.getAllSynapses()) {
                 synapse.postUnmarshallingInit();
             }
+        }
+        if (connectionManager instanceof Sparse) {
+            ((Sparse) connectionManager).setPermitDensityEditing(false);
         }
     }
 }

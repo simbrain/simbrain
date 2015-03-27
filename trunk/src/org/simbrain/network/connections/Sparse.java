@@ -203,8 +203,9 @@ public class Sparse implements ConnectNeurons {
                 if (!selfConnectionAllowed && recurrent) {
                     tListCopy = new ArrayList<Integer>();
                     for (int k = 0; k < targetList.size(); k++) {
-                        if (k == i) // Exclude oneself as a possible target
+                        if (k == i) { // Exclude oneself as a possible target
                             continue;
+                        }
                         tListCopy.add(targetList.get(k));
                     }
                     randShuffleK(tListCopy, synsPerSource, rand);
@@ -247,22 +248,32 @@ public class Sparse implements ConnectNeurons {
     }
 
     /**
-     *
+     * @param synapseGroup The synapse group that the connections this class
+     * will generate will be added to.
      */
     public void connectNeurons(SynapseGroup synapseGroup) {
         this.synapseGroup = synapseGroup;
         boolean recurrent = synapseGroup.isRecurrent();
         int numSrc = synapseGroup.getSourceNeurons().size();
         int numTar = synapseGroup.getTargetNeurons().size();
+        setPermitDensityEditing(numSrc * numTar < 10E8);
         sourceNeurons = synapseGroup.getSourceNeurons().toArray(
             new Neuron[numSrc]);
         targetNeurons = recurrent ? sourceNeurons : synapseGroup
             .getTargetNeurons().toArray(new Neuron[numTar]);
-        generateSparseOrdering(recurrent);
-        if (equalizeEfferents) {
-            connectEqualized(synapseGroup);
+        if (isPermitDensityEditing()) {
+            generateSparseOrdering(recurrent);
+            if (equalizeEfferents) {
+                connectEqualized(synapseGroup);
+            } else {
+                connectRandom(synapseGroup);
+            }
         } else {
-            connectRandom(synapseGroup);
+            List<Synapse> syns = this.connectSparse(synapseGroup
+                    .getSourceNeurons(), synapseGroup.getTargetNeurons());
+            for (Synapse s : syns) {
+                synapseGroup.addNewSynapse(s);
+            }
         }
 
     }

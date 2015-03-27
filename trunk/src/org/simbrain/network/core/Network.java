@@ -27,8 +27,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -150,10 +152,10 @@ public class Network {
      * the initial synapse visibility flag is set false.
      */
     private static int synapseVisibilityThreshold = 200;
-    
-    /** 
-     * A variable telling the network not to fire events to any listeners
-     * during update. 
+
+    /**
+     * A variable telling the network not to fire events to any listeners during
+     * update.
      */
     private volatile boolean fireUpdates = true;
 
@@ -973,6 +975,10 @@ public class Network {
 
         xstream.omitField(SynapseGroup.class, "exTemp");
         xstream.omitField(SynapseGroup.class, "inTemp");
+        xstream.omitField(Sparse.class, "sparseOrdering");
+        xstream.omitField(Sparse.class, "currentOrderingIndices");
+        xstream.omitField(Sparse.class, "sourceNeurons");
+        xstream.omitField(Sparse.class, "targetNeurons");
 
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");

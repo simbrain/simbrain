@@ -234,6 +234,9 @@ public class Neuron {
     public void postUnmarshallingInit() {
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
+        if (polarity == null) {
+            polarity = Polarity.BOTH;
+        }
     }
 
     /**
@@ -489,13 +492,87 @@ public class Neuron {
         }
         return wtdSum;
     }
-    
+
+    /**
+     * A helper method which iterates over each afferent synapse to this neuron
+     * and calls their update functions.
+     */
     public void updateFanIn() {
     	for (int i = 0, n = fanIn.size(); i < n; i++) {
         	fanIn.get(i).update();
         }
     }
 
+    /**
+     * Normalizes the excitatory synaptic strengths impinging on this neuron,
+     * that is finds the sum of the exctiatory weights and divides each weight
+     * value by that sum;
+     */
+    public void normalizeExcitatoryFanIn() {
+        double sum = 0;
+        double str = 0;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            str = fanIn.get(i).getStrength();
+            if (str > 0) {
+                sum += str;
+            }
+        }
+        Synapse s = null;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            s = fanIn.get(i);
+            str = s.getStrength();
+            if (str > 0) {
+                s.setStrength(s.getStrength() / sum);
+            }
+        }
+    }
+    
+    public void normalizeInhibitoryFanIn() {
+        double sum = 0;
+        double str = 0;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            str = fanIn.get(i).getStrength();
+            if (str < 0) {
+                sum -= str;
+            }
+        }
+        Synapse s = null;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            s = fanIn.get(i);
+            str = s.getStrength();
+            if (str < 0) {
+                s.setStrength(s.getStrength() / sum);
+            }
+        }
+    }
+
+    public void normalizeFanIn() {
+        double eSum = 0;
+        double iSum = 0;
+        double str;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            str = fanIn.get(i).getStrength();
+            if (str > 0) {
+                eSum += str;
+            } else {
+                // subtract negative wts so that iSum stays +. Otherwise a
+                // sign change will occur when the weights are divided by this
+                // value.
+                iSum -= str;
+            }
+        }
+        Synapse s = null;
+        for (int i = 0, n = fanIn.size(); i < n; i++) {
+            s = fanIn.get(i);
+            str = s.getStrength();
+            if (str > 0) {
+                s.setStrength(s.getStrength() / eSum);
+            } else {
+                s.setStrength(s.getStrength() / iSum);
+            }
+        }
+    }
+    
     /**
      * Randomize this neuron to a value between upperBound and lowerBound.
      */

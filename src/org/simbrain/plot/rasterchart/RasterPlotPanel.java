@@ -100,7 +100,7 @@ public class RasterPlotPanel extends JPanel {
                 );
         XYItemRenderer renderer = ((XYPlot) chart.getPlot()).getRenderer();
         renderer.setSeriesPaint(0, Color.BLACK);
-        double size = 2.0;
+        double size = 1.0;
         double delta = size / 2.0;
         Shape shape1 = new Rectangle2D.Double(-delta, -delta, size, size);
         Shape shape2 = new Ellipse2D.Double(-delta, -delta, size, size);

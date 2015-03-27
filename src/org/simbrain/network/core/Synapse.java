@@ -27,25 +27,28 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
  * (grow or weaken) based on various factors, including the activation level of
  * connected neurons.
- * 
+ *
  * @author Jeff Yoshimi
  * @author Zach Tosi
- * 
+ *
  */
 public class Synapse {
 
-    private static final SynapseUpdateRule DEFAULT_LEARNING_RULE = new StaticSynapseRule();
+    /** A default update rule for the synapse. */
+    private static final SynapseUpdateRule DEFAULT_LEARNING_RULE =
+            new StaticSynapseRule();
 
-    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
+    /** A default spike responder. */
+    private static final SpikeResponder DEFAULT_SPIKE_RESPONDER =
+            new JumpAndDecay();
 
-    private static final double MIN_PSR = 1E-05;
-    
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
      * and their parents can occur at different levels of the network hierarchy.
@@ -107,19 +110,26 @@ public class Synapse {
     private boolean frozen;
 
     /** Manages synaptic delay */
-    private double [] delayManager;
+    private double[] delayManager;
 
+    /**
+     * Points to the location in the delay manager that corresponds to the
+     * current time.
+     */
     private int dlyPtr = 0;
-    
+
+    /** The value {@link #dlyPtr} points to in the delay manager. */
     private double dlyVal = 0;
-    
+
     /**
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent
      * of this synapse.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
      */
     public Synapse(Neuron source, Neuron target) {
         setSourceAndTarget(source, target);
@@ -132,9 +142,12 @@ public class Synapse {
     /**
      * Construct a synapse with a specified initial strength.
      *
-     * @param source source neuron
-     * @param target target neuron
-     * @param initialStrength initial strength for synapse
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param initialStrength
+     *            initial strength for synapse
      */
     public Synapse(Neuron source, Neuron target, double initialStrength) {
         this(source, target);
@@ -146,11 +159,15 @@ public class Synapse {
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
      *
-     * @param source source neuron
-     * @param target target neuron
-     * @param learningRule update rule for this synapse
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param learningRule
+     *            update rule for this synapse
      */
-    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule) {
+    public Synapse(Neuron source, Neuron target,
+            SynapseUpdateRule learningRule) {
         setSourceAndTarget(source, target);
         initSpikeResponder();
         setLearningRule(learningRule);
@@ -164,10 +181,14 @@ public class Synapse {
      * learning rule. Assumes the parent network is the same as the parent
      * network of the provided source neuron.
      *
-     * @param source source neuron
-     * @param target target neuron
-     * @param learningRule update rule for this synapse
-     * @param templateSynapse synapse with parameters to copy
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param learningRule
+     *            update rule for this synapse
+     * @param templateSynapse
+     *            synapse with parameters to copy
      */
     public Synapse(Neuron source, Neuron target,
             SynapseUpdateRule learningRule, Synapse templateSynapse) {
@@ -184,10 +205,14 @@ public class Synapse {
      * Construct a synapse using a source and target neuron, and a specified
      * learning rule.
      *
-     * @param source source neuron
-     * @param target target neuron
-     * @param learningRule update rule for this synapse
-     * @param parent parent network for this synapse.
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param learningRule
+     *            update rule for this synapse
+     * @param parent
+     *            parent network for this synapse.
      */
     public Synapse(Neuron source, Neuron target,
             SynapseUpdateRule learningRule, Network parent) {
@@ -200,7 +225,8 @@ public class Synapse {
     /**
      * Copy constructor.
      *
-     * @param s Synapse to used as a template for constructing a new synapse.
+     * @param s
+     *            Synapse to used as a template for constructing a new synapse.
      */
     private Synapse(final Synapse s) {
         setLearningRule(s.getLearningRule().deepCopy());
@@ -218,8 +244,8 @@ public class Synapse {
     /**
      * Makes a deep copy of a template synapse (one with no source or target).
      *
-     * @param s
-     * @return
+     * @param s the synapse to copy
+     * @return a new synapse with all the same variable valueas as the original
      */
     public static Synapse copyTemplateSynapse(Synapse s) {
         if (s.getSource() != null || s.getTarget() != null) {
@@ -236,8 +262,9 @@ public class Synapse {
     public void initSpikeResponder() {
         if (source != null) {
             if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-                if (getSpikeResponder() == null)
+                if (getSpikeResponder() == null) {
                     setSpikeResponder(new JumpAndDecay());
+                }
             } else {
                 setSpikeResponder(null);
             }
@@ -264,20 +291,16 @@ public class Synapse {
         if (!enabled) {
             return 0;
         } else {
-        	if (spikeResponder != null) {
-        		spikeResponder.update(this);
-        	} else {
-        		return calcWeightedSum();
-        	}
+            if (spikeResponder != null) {
+                spikeResponder.update(this);
+            } else {
+                return calcWeightedSum();
+            }
             if (delay == 0) {
                 return psr;
             } else {
                 dlyVal = dequeu();
-                if (psr > MIN_PSR) {
-                    enqueu(psr);
-                } else {
-                    enqueu(0);
-                }
+                enqueu(psr);
                 return dlyVal;
             }
         }
@@ -288,7 +311,7 @@ public class Synapse {
      * the pre-synaptic (source) neuron multiplied by the strength of this
      * synapse.
      *
-     * @return
+     * @return the post synaptic response calculated as a simple weighted sum
      */
     public double calcWeightedSum() {
         if (!enabled) {
@@ -317,13 +340,6 @@ public class Synapse {
     }
 
     /**
-     * @return Strength of synapse.
-     */
-    public final double getStrength() {
-        return strength;
-    }
-
-    /**
      * @return Source neuron to which the synapse is attached.
      */
     public Neuron getSource() {
@@ -331,24 +347,28 @@ public class Synapse {
     }
 
     /**
-     * Sets the source and target neurons simultaneously.
+     * Sets the source and target neurons simultaneously, used only in
+     * constructors. Synapses without source or target neurons are ill formed
+     * and generally speaking not allowed. The only exception to this are
+     * template synapses used for instance in SynapseGroup which exist to store
+     * synapse variables for other synapses or exist as a template.
      *
-     * @param new_source
-     * @param new_target
+     * @param newSource the source neuron to the synapse
+     * @param newTarget the target neuron to the synapse
      */
-    private void setSourceAndTarget(final Neuron new_source,
-    		final Neuron new_target) {
+    private void setSourceAndTarget(final Neuron newSource,
+            final Neuron newTarget) {
         if (this.source != null) {
             this.source.removeEfferent(this);
         }
         if (this.target != null) {
             this.target.removeAfferent(this);
         }
-        if (new_source != null && new_target != null) {
-            this.source = new_source;
-            this.target = new_target;
-            new_source.addEfferent(this);
-            new_target.addAfferent(this);
+        if (newSource != null && newTarget != null) {
+            this.source = newSource;
+            this.target = newTarget;
+            newSource.addEfferent(this);
+            newTarget.addAfferent(this);
         }
     }
 
@@ -360,19 +380,28 @@ public class Synapse {
     }
 
     /**
+     * @return Strength of synapse.
+     */
+    public final double getStrength() {
+        return strength;
+    }
+
+    /**
      * Sets the strength of the synapse.
      *
-     * @param wt Strength value
+     * @param wt
+     *            Strength value
      */
     public void setStrength(final double wt) {
         if (!isFrozen()) {
-            strength = wt;
+            strength = clip(source.getPolarity().clip(wt));
         }
     }
 
     /**
      *
-     * @param wt the value to set the strength of the synapse to
+     * @param wt
+     *            the value to set the strength of the synapse to
      */
     public void forceSetStrength(final double wt) {
         strength = wt;
@@ -388,7 +417,8 @@ public class Synapse {
     /**
      * Sets the upper synapse bound.
      *
-     * @param d bound
+     * @param d
+     *            bound
      */
     public void setUpperBound(final double d) {
         upperBound = d;
@@ -404,7 +434,8 @@ public class Synapse {
     /**
      * Sets the lower synapse bound.
      *
-     * @param d bound
+     * @param d
+     *            bound
      */
     public void setLowerBound(final double d) {
         lowerBound = d;
@@ -420,7 +451,8 @@ public class Synapse {
     /**
      * Sets the amount to increment neuron.
      *
-     * @param d Increment amount
+     * @param d
+     *            Increment amount
      */
     public void setIncrement(final double d) {
         increment = d;
@@ -534,19 +566,19 @@ public class Synapse {
      * Utility function for use in learning rules. If value is above or below
      * the bounds of this synapse set it to those bounds.
      *
-     * @param value Value to be checked
+     * @param value
+     *            Value to be checked
      * @return Evaluated value
      */
     public double clip(final double value) {
         double val = value;
         if (val > upperBound) {
             val = upperBound;
+        } else {
+            if (val < lowerBound) {
+                val = lowerBound;
+            }
         }
-
-        if (val < lowerBound) {
-            val = lowerBound;
-        }
-
         return val;
     }
 
@@ -554,14 +586,16 @@ public class Synapse {
      * @return Returns the id.
      */
     public String getId() {
-        if (id != null)
+        if (id != null) {
             return id;
-        else
+        } else {
             return "";
+        }
     }
 
     /**
-     * @param id The id to set.
+     * @param id
+     *            The id to set.
      */
     public void setId(final String id) {
         this.id = id;
@@ -575,7 +609,8 @@ public class Synapse {
     }
 
     /**
-     * @param sr The spikeResponder to set.
+     * @param sr
+     *            The spikeResponder to set.
      */
     public void setSpikeResponder(final SpikeResponder sr) {
         this.spikeResponder = sr;
@@ -584,7 +619,8 @@ public class Synapse {
     /**
      * Delay manager.
      *
-     * @param dly Amount of delay
+     * @param dly
+     *            Amount of delay
      */
     public void setDelay(final int dly) {
         if (dly < 0 && source != null) {
@@ -605,30 +641,31 @@ public class Synapse {
         }
         dlyPtr = 0;
     }
-//
-//    /**
-//     *
-//     * @param dly
-//     */
-//    public void setDelayTimeDialate(final int dly) {
-//        if (dly < 0) {
-//            delay = 0;
-//        }
-//        int delayDiff = dly - delay;
-//        delay = dly;
-//        if (delay == 0) {
-//            delayManager = null;
-//
-//            return;
-//        }
-//        if (delayDiff > 0) {
-//            for (int i = 0; i < delayDiff; i++) {
-//                delayManager.addFirst(0.0);
-//            }
-//        } else {
-//            Iterator<Double> delayIter = delayManager.iterator();
-//        }
-//    }
+
+    //
+    // /**
+    // *
+    // * @param dly
+    // */
+    // public void setDelayTimeDialate(final int dly) {
+    // if (dly < 0) {
+    // delay = 0;
+    // }
+    // int delayDiff = dly - delay;
+    // delay = dly;
+    // if (delay == 0) {
+    // delayManager = null;
+    //
+    // return;
+    // }
+    // if (delayDiff > 0) {
+    // for (int i = 0; i < delayDiff; i++) {
+    // delayManager.addFirst(0.0);
+    // }
+    // } else {
+    // Iterator<Double> delayIter = delayManager.iterator();
+    // }
+    // }
 
     /**
      * @return Current amount of delay.
@@ -641,7 +678,7 @@ public class Synapse {
      * @return the deque.
      */
     private double dequeu() {
-        if(dlyPtr == delay) {
+        if (dlyPtr == delay) {
             dlyPtr = 0;
         }
         return delayManager[dlyPtr++];
@@ -650,7 +687,8 @@ public class Synapse {
     /**
      * Enqueeu.
      *
-     * @param val Value to enqueu
+     * @param val
+     *            Value to enqueu
      */
     private void enqueu(final double val) {
         if (dlyPtr == 0) {
@@ -667,7 +705,8 @@ public class Synapse {
         ret += ("  Connects neuron "
                 + (getSource() == null ? "[null]" : getSource().getId())
                 + " to neuron "
-                + (getTarget() == null ? "[null]" : getTarget().getId()) + "\n");
+                + (getTarget() == null ? "[null]" : getTarget().getId())
+                + "\n");
         return ret;
     }
 
@@ -683,7 +722,8 @@ public class Synapse {
      * setSendWeightedInput for now. Possibly change name for 3.0. have not done
      * so yet so as note to break a bunch of simulations.
      *
-     * @param enabled true if enabled, false otherwise.
+     * @param enabled
+     *            true if enabled, false otherwise.
      */
     public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
@@ -714,34 +754,36 @@ public class Synapse {
         return learningRule;
     }
 
-//    /**
-//     * Sets the update rule using a String description. The provided description
-//     * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-//     *
-//     * @param name the "simple name" of the class associated with the neuron
-//     *            rule to set.
-//     */
-//    public void setLearningRule(String name) {
-//        try {
-//            SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
-//                    "org.simbrain.network.synapse_update_rules." + name)
-//                    .newInstance();
-//            setLearningRule(newRule);
-//        } catch (ClassNotFoundException e) {
-//            throw new IllegalArgumentException(
-//                    "The provided learning rule name, \""
-//                            + name
-//                            + "\", does not correspond to a known synapse type."
-//                            + "\n Could not find " + e.getMessage());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    // /**
+    // * Sets the update rule using a String description. The provided
+    // description
+    // * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
+    // *
+    // * @param name the "simple name" of the class associated with the neuron
+    // * rule to set.
+    // */
+    // public void setLearningRule(String name) {
+    // try {
+    // SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
+    // "org.simbrain.network.synapse_update_rules." + name)
+    // .newInstance();
+    // setLearningRule(newRule);
+    // } catch (ClassNotFoundException e) {
+    // throw new IllegalArgumentException(
+    // "The provided learning rule name, \""
+    // + name
+    // + "\", does not correspond to a known synapse type."
+    // + "\n Could not find " + e.getMessage());
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+    // }
 
     /**
      * Change this synapse's learning rule.
      *
-     * @param newLearningRule the learningRule to set
+     * @param newLearningRule
+     *            the learningRule to set
      */
     public void setLearningRule(SynapseUpdateRule newLearningRule) {
         SynapseUpdateRule oldRule = learningRule;
@@ -767,7 +809,8 @@ public class Synapse {
     /**
      * Returns a template synapse with a specified learning rule.
      *
-     * @param rule the learning rule.
+     * @param rule
+     *            the learning rule.
      * @return the template synapse
      * @see instantiateTemplateSynapse
      */
@@ -777,33 +820,34 @@ public class Synapse {
         return synapse;
     }
 
-//    /**
-//     * Returns a template synapse with a (string) specified learning rule.
-//     *
-//     * @param rule the learning rule.
-//     * @return the template synapse
-//     * @see instantiateTemplateSynapse
-//     */
-//    public static Synapse getTemplateSynapse(String rule) {
-//        Synapse synapse = getTemplateSynapse();
-//        synapse.setLearningRule(rule);
-//        return synapse;
-//    }
+    // /**
+    // * Returns a template synapse with a (string) specified learning rule.
+    // *
+    // * @param rule the learning rule.
+    // * @return the template synapse
+    // * @see instantiateTemplateSynapse
+    // */
+    // public static Synapse getTemplateSynapse(String rule) {
+    // Synapse synapse = getTemplateSynapse();
+    // synapse.setLearningRule(rule);
+    // return synapse;
+    // }
 
     /**
      * A method which takes in a collection of synapses and returns a list of
      * their update rules in the order in which they appear in the original
      * collection, if that collection supports a consistent order.
      *
-     * @param synapseCollection The collection of synapses whose update rules we
-     *            want to query.
+     * @param synapseCollection
+     *            The collection of synapses whose update rules we want to
+     *            query.
      * @return Returns a list of synapse update rules associated with the group
      *         of synapses
      */
     public static List<SynapseUpdateRule> getRuleList(
             Collection<Synapse> synapseCollection) {
-        ArrayList<SynapseUpdateRule> ruleList = new ArrayList<SynapseUpdateRule>(
-                synapseCollection.size());
+        ArrayList<SynapseUpdateRule> ruleList =
+                new ArrayList<SynapseUpdateRule>(synapseCollection.size());
         for (Synapse s : synapseCollection) {
             ruleList.add(s.getLearningRule());
 
@@ -816,9 +860,12 @@ public class Synapse {
      * used for setting properties. When the user is ready to instantiate it,
      * they call this method to give the proper references.
      *
-     * @param source source neuron
-     * @param target target neuron
-     * @param parent parent network
+     * @param source
+     *            source neuron
+     * @param target
+     *            target neuron
+     * @param parent
+     *            parent network
      * @return a new synapse with these references and the base synapse's
      *         properties
      */
@@ -838,7 +885,8 @@ public class Synapse {
     }
 
     /**
-     * @param parentGroup the parentGroup to set
+     * @param parentGroup
+     *            the parentGroup to set
      */
     public void setParentGroup(SynapseGroup parentGroup) {
         this.parentGroup = parentGroup;
@@ -848,7 +896,8 @@ public class Synapse {
      * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength
      * in half.
      *
-     * @param decayPercent decay percent
+     * @param decayPercent
+     *            decay percent
      */
     public void decay(final double decayPercent) {
         double decayAmount = decayPercent * getStrength();
@@ -863,7 +912,8 @@ public class Synapse {
     }
 
     /**
-     * @param frozen sets whether or not this synapses strength will be frozen
+     * @param frozen
+     *            sets whether or not this synapses strength will be frozen
      */
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
@@ -877,13 +927,14 @@ public class Synapse {
     }
 
     /**
-     * @param psr set the post-synaptic response
+     * @param psr
+     *            set the post-synaptic response
      */
     public void setPsr(double psr) {
         this.psr = psr;
     }
 
-    public byte [] getNumericValuesAsByteArray() {
+    public byte[] getNumericValuesAsByteArray() {
         // 4 for delay, 8 for strength, 8 for psr.
         // One byte to store enabled and frozen
         // Eight bytes to store two integers, the indexes of the source and

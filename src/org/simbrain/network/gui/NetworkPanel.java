@@ -64,6 +64,7 @@ import org.piccolo2d.event.PInputEventListener;
 import org.piccolo2d.event.PMouseWheelZoomEventHandler;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.QuickConnectionManager;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
@@ -82,6 +83,7 @@ import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupPanel;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
@@ -143,6 +145,11 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ToggleButton;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the
@@ -740,6 +747,10 @@ public class NetworkPanel extends JPanel {
         updateComplete.decrementAndGet();
     }
 
+    public void updateTime() {
+        timeLabel.update();
+    }
+    
     /**
      * Update visible state of nodes corresponding to specified neurons.
      *
@@ -3176,6 +3187,30 @@ public class NetworkPanel extends JPanel {
         contextMenu.addSeparator();
         contextMenu.add(actionManager.getTestInputAction());
         contextMenu.add(actionManager.getShowWeightMatrixAction());
+        return contextMenu;
+    }
+    
+    public JPopupMenu getSynapseContextMenu(Synapse synapse) {
+        JPopupMenu contextMenu = new JPopupMenu();
+
+        contextMenu.add(new CutAction(this));
+        contextMenu.add(new CopyAction(this));
+        contextMenu.add(new PasteAction(this));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new DeleteAction(this));
+        contextMenu.addSeparator();
+
+        contextMenu.add(this.getActionManager().getGroupMenu());
+        contextMenu.addSeparator();
+
+        // Workspace workspace = getNetworkPanel().getWorkspace();
+        // if (workspace.getGaugeList().size() > 0) {
+        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+        // contextMenu.addSeparator();
+        // }
+
+        contextMenu.add(new SetSynapsePropertiesAction(this));
         return contextMenu;
     }
 

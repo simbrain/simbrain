@@ -189,6 +189,14 @@ public final class NetworkComponent extends WorkspaceComponent {
         return consumer;
     }
 
+    public static PotentialConsumer getSynapseConsumer(
+            NetworkComponent component, Synapse synapse, String methodName) {
+        PotentialConsumer consumer = component.getAttributeManager()
+                .createPotentialConsumer(synapse, methodName, double.class);
+        consumer.setCustomDescription(synapse.getId() + ":" + methodName);
+        return consumer;
+    }
+    
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
@@ -251,6 +259,14 @@ public final class NetworkComponent extends WorkspaceComponent {
         PotentialProducer producer = component.getAttributeManager()
                 .createPotentialProducer(neuron, methodName, double.class);
         producer.setCustomDescription(neuron.getId() + ":" + methodName);
+        return producer;
+    }
+    
+    public static PotentialProducer getSynapseProducer(
+            NetworkComponent component, Synapse synapse, String methodName) {
+        PotentialProducer producer = component.getAttributeManager()
+                .createPotentialProducer(synapse, methodName, double.class);
+        producer.setCustomDescription(synapse.getId() + ":" + methodName);
         return producer;
     }
 
@@ -375,5 +391,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     public String getXML() {
         return Network.getXStream().toXML(network);
     }
+
+
 
 }

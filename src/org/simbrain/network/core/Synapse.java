@@ -121,6 +121,8 @@ public class Synapse {
     /** The value {@link #dlyPtr} points to in the delay manager. */
     private double dlyVal = 0;
 
+    private final boolean isTemplate;
+    
     /**
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent
@@ -137,6 +139,7 @@ public class Synapse {
         if (source != null) {
             parentNetwork = source.getNetwork();
         }
+        isTemplate = source == null;
     }
 
     /**
@@ -174,6 +177,7 @@ public class Synapse {
         if (source != null) {
             parentNetwork = source.getNetwork();
         }
+        isTemplate = source == null;
     }
 
     /**
@@ -220,6 +224,7 @@ public class Synapse {
         setLearningRule(learningRule);
         initSpikeResponder();
         parentNetwork = parent;
+        isTemplate = source == null;
     }
 
     /**
@@ -239,6 +244,7 @@ public class Synapse {
         setDelay(s.getDelay());
         setFrozen(s.isFrozen());
         s.initSpikeResponder();
+        isTemplate = s.isTemplate;
     }
 
     /**
@@ -393,6 +399,10 @@ public class Synapse {
      *            Strength value
      */
     public void setStrength(final double wt) {
+        if (isTemplate) {
+            forceSetStrength(wt);
+            return;
+        }
         if (!isFrozen()) {
             strength = clip(source.getPolarity().clip(wt));
         }

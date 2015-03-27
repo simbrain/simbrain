@@ -121,8 +121,17 @@ public class Synapse {
     /** The value {@link #dlyPtr} points to in the delay manager. */
     private double dlyVal = 0;
 
+    /**
+     * This special tag denotes that the synapse is a template to other
+     *  synapses. That is, it exists solely to store parameter values for a
+     *  large group of synapses. Normally synapses must have a source and
+     *  target neuron. Template synapses are the only case where having a
+     *  null source and target is acceptable. This tag exists to prevent
+     *  NullPointerExceptions since some methods in synapse consult the source
+     *  or target neuron before allowing certain changes.
+     */
     private final boolean isTemplate;
-    
+
     /**
      * Construct a synapse using a source and target neuron, defaulting to
      * ClampedSynapse and assuming the parent of the source neuron is the parent

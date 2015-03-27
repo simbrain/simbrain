@@ -1494,6 +1494,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Create a new context menu for this Network panel.
+     * @return the newly constructed context menu 
      */
     public JPopupMenu createNetworkContextMenu() {
 
@@ -2320,7 +2321,10 @@ public class NetworkPanel extends JPanel {
     // click, but condition not fulfilled....
     // public boolean resetPasteTrail = false;
 
-    /** @see NetworkListener */
+    /** @see NetworkListener 
+    * @param e 
+    */
+
     public void modelCleared(final NetworkEvent e) {
         // empty
     }

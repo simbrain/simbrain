@@ -30,6 +30,7 @@ public interface ConnectNeurons {
 
     /**
      * Apply connection to a synapse group using specified parameters.
+     * @param synGroup synapse group
      */
     public abstract void connectNeurons(final SynapseGroup synGroup);
 

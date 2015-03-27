@@ -65,6 +65,8 @@ public final class NetworkDesktopComponent extends
 
     /**
      * Create a new network frame.
+     * @param frame frame of network
+     * @param component network component
      */
     public NetworkDesktopComponent(final GenericFrame frame,
             final NetworkComponent component) {

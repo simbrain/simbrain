@@ -71,7 +71,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * A flag used to indicate whether this panel will be replacing spike
      * responders or simply writing to them. In cases where the panel represents
      * the same responder as the responder of each of the synapses (i.e. Step
-     * panel & Step spike responder) the synapses' update rules are edited, not
+     * panel &#38; Step spike responder) the synapses' update rules are edited, not
      * replaced. However, if the panel does not correspond to the spike
      * responder of the synapses being edited, then new SpikeResponder objects
      * are created, and replace the old rule. This optimization prevents

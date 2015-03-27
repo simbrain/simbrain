@@ -23,7 +23,7 @@ package org.simbrain.network;
  * NetworkGuiSettings, this will be a base preference storing class, which can
  * then be used either on its own, or with user preferences.
  *
- * @see org.simbrain.network.gui.NetworkGuiSettings. NOTE: We have obviously not
+ * @see NetworkGuiSettings NOTE: We have obviously not
  *      added this functionality yet.
  */
 public class NetworkSettings {

@@ -62,10 +62,10 @@ public class ConnectionUtilities {
      * assigned default strengths based on their polarity depending on which
      * randomizers are null.
      *
-     * @param exciteRand
-     * @param inhibRand
-     * @param excitatoryRatio
-     * @param synapses
+     * @param exciteRand 
+     * @param inhibRand 
+     * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
+     * @param synapses the synapses to modify
      * @throws IllegalArgumentException
      */
     public static void randomizeAndPolarizeSynapses(
@@ -130,8 +130,8 @@ public class ConnectionUtilities {
 
     /**
      *
-     * @param synapses
-     * @param exciteRand
+     * @param synapses the synapses to modify
+     * @param exciteRand 
      * @param inhibRand
      */
     public static void randomizeSynapses(Collection<Synapse> synapses,
@@ -162,7 +162,7 @@ public class ConnectionUtilities {
      * Randomizes the excitatory synapses in the given list of synapses using
      * the given excitatory randomizer.
      *
-     * @param synapses
+     * @param synapses the synapses to modify
      * @param exciteRand
      */
     public static void randomizeExcitatorySynapses(
@@ -183,7 +183,7 @@ public class ConnectionUtilities {
      * source neurons are not inhibitory. Used for speed when the polarity of
      * the synapses in the list is known ahead of time.
      *
-     * @param synapses
+     * @param synapses the synapses to modify
      * @param exciteRand
      */
     public static void randomizeExcitatorySynapsesUnsafe(
@@ -199,7 +199,7 @@ public class ConnectionUtilities {
      * Randomizes the inhibitory synapses in the given list of synapses using
      * the given inhibitory randomizer.
      *
-     * @param synapses
+     * @param synapses the synapses to modify
      * @param inhibRand
      */
     public static void randomizeInhibitorySynapses(
@@ -220,7 +220,7 @@ public class ConnectionUtilities {
      * source neurons are not excitatory. Used for speed when the polarity of
      * the synapses in the list is known ahead of time.
      *
-     * @param synapses
+     * @param synapses the synapses to modify
      * @param inhibRand
      */
     public static void randomizeInhibitorySynapsesUnsafe(
@@ -234,7 +234,7 @@ public class ConnectionUtilities {
 
     /**
      *
-     * @param synapses
+     * @param synapses the synapses to modify
      * @return
      */
     public static ArrayList<Synapse> getExcitatorySynapses(
@@ -427,6 +427,9 @@ public class ConnectionUtilities {
      * Tests whether or not these connections are recurrent, that is, whether or
      * not the neurons in the source list are the same as those in the target
      * list.
+     *
+     * @param sourceNeurons the starting neurons
+     * @param targetNeurons the targeted neurons
      *
      * @return true or false: whether or not these connections are recurrent.
      */

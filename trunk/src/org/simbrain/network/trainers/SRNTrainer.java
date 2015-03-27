@@ -24,7 +24,7 @@ import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
  * Trainer for SRN Networks. Extends backprop trainer but instead of using a
  * list of layers uses the built in srn layers
  *
- * Example: 5_binary_orth.csv > 5_binary_orth_offset.csv. Manually set inputs to
+ * Example: 5_binary_orth.csv &#62; 5_binary_orth_offset.csv. Manually set inputs to
  * test. 0 error is possible with defaults.
  *
  * @author jyoshimi

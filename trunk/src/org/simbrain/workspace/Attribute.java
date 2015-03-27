@@ -26,7 +26,7 @@ package org.simbrain.workspace;
  * data of type E (see the <code>Coupling</code> documentation). From this
  * standpoint, a coupling is a pair consisting of a getter and a setter:
  * <p>
- * Producer (getX) -- E ---> Consumer (setX).
+ * Producer (getX) --&#62; E ---&#62; Consumer (setX).
  * <p>
  * Usually (1)-(3) below are all that are needed to create an attribute. (4) Can
  * be customized as needed. (5) and (6) are only used in special cases where

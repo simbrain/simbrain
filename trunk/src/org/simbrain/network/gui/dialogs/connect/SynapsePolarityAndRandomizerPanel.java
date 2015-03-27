@@ -106,7 +106,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * A switchable listener
      *
-     * @see org.simbrain.util.SwitchablePropertyChangeListener.java listenting
+     * @see SwitchablePropertyChangeListener listenting
      *      to changes to the excitatory ratio text field.
      */
     private SwitchablePropertyChangeListener exTfListener;
@@ -114,7 +114,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * A switchable listener
      *
-     * @see org.simbrain.util.SwitchablePropertyChangeListener.java listenting
+     * @see SwitchablePropertyChangeListener listenting
      *      to changes to the inhibitory ratio text field.
      */
     private SwitchablePropertyChangeListener inTfListener;
@@ -122,7 +122,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     /**
      * A switchable listener
      *
-     * @see org.simbrain.util.SwitchableChangeListener.java listenting to
+     * @see SwitchableChangeListener listenting to
      *      changes to the excitatory/inhibitory ratio slider.
      */
     private SwitchableChangeListener sliderListener;
@@ -652,8 +652,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
     public class EditableRandomizerPanel extends JPanel {
 
     	/** 
-    	 * The Polarity Associated with the panel (inhibitory -> only
-    	 * negative values allowed; exciatory -> only positive values
+    	 * The Polarity Associated with the panel (inhibitory -&#62; only
+    	 * negative values allowed; exciatory -&#62; only positive values
     	 * allowed).
     	 */
         private final Polarity polarity;

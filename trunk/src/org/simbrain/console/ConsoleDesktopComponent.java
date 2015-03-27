@@ -36,6 +36,8 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
 
     /**
      * Constructor.
+     * @param frame frame of interpreter
+     * @param component workspace component
      */
     public ConsoleDesktopComponent(GenericFrame frame,
             ConsoleComponent component) {

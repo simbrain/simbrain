@@ -119,7 +119,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     /**
      * A flag used to indicate whether this panel will be replacing neuron
      * update rules or simply writing to them. In cases where the panel
-     * represents the same rule as the rule (i.e. Linear panel & linear neurons)
+     * represents the same rule as the rule (i.e. Linear panel &#38; linear neurons)
      * the neurons' update rules are edited, not replaced. However, if the panel
      * does not correspond to the currently used neuron update rule, new
      * NeuronUpdateRule objects are created, and replace the old rule. This

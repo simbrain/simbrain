@@ -136,7 +136,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     }
 
     /**
-     * @see ActionListener.
+     * @see ActionListener
      * @param event to listen.
      */
     public void actionPerformed(final ActionEvent event) {

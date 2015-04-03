@@ -18,11 +18,11 @@
     </a>
     <div id="main_docs">
         <div class="navi">
-            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Spiking Networks </p>
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Spiking Neurons </p>
         </div>
         <p>
         </p>
-        <h1>Spiking Networks</h1>
+        <h1>Spiking Neurons</h1>
         <p>Several neuron types produce discrete "spikes," that is, instantaneous firing events. When they do, the neuron and the lines leading out from it (the "axon") turn a different color (by default yellow). This framework is used to create more biologically realistic simulations. In these neurons, the activation--the number in the neuron--is interpreted as a voltage potential, and when that number passes a threshold the neuron "fires," and typically the activation then drops to a lower value. </p>
         <p>Currently two neurons are spiking neurons:</p>
         <blockquote>
@@ -38,8 +38,6 @@
         </p>
         <p>Simbrain allows interaction between connectionist type units and more biologically realistic model elements.&nbsp;&nbsp;"Weights" mean different things in the two contexts. For incoming neurons, it's not too hard.&nbsp; It's just weighted input (incoming activation x weight value). It's stranger in the "outgoing" direction. To deal with the situation, we associate weights attaching to a spiking neuron with a "
             <a href="synapse/spikeResponder.html">Spike responder</a>" that converts weighted input (incoming activation x weight value) into an input current.
-            <br>
-            <br>
             <br>
         </p>
     </div>

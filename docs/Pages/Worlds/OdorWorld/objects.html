@@ -37,8 +37,9 @@
 
         <p>We can think of a <a href="sensors.html#smell">smell sensor</a> as having, at any time, a "sensory vector" that is the result of scaling all the stimulus vectors in its vicinity based on how far away they are.  An agent's smell sensor is updated by taking each object around it, scaling its stimulus vector by a decay function, and then adding all these decayed stimulus vectors together. The basic process is illustrated below, where two objects with two stimulus vectors are sensed by the agent's left smell sensor. </p>
 
-        <p style="text-align: center"><img src="../../../Images/OdorWorldDiagram.png" style="width: 500px" alt="Odor World Diagram">
-        </p>
+        <!-- <p style="text-align: center"><img src="../../../Images/OdorWorldDiagram.png" style="width: 500px" alt="Odor World Diagram">
+        </p> -->
+        <div style="float:left; padding: 20px;"><img src="../../../Images/OdorWorldVectors.png" width="500" border ="1"></div>
 
         <p>In the example shown, we can suppose that the first stimulus vector decays from (1,.1,.8) to (.1,.01,.08) when it reaches the sensor, and the second decays from (1,0,.9) to (.1,0,.09). These decayed stimulus vectors are added so that the value of the sensor vector will be (.2,.01,.17). Note that the left sensor will receive larger values because it is closer to the two cheese objects.</p>
 

@@ -23,9 +23,9 @@
             <p class="menubold">Contents</p>
             <blockquote><b>Building / Editing</b>
                 <br>
-                <p><a href="Network/buildingnets.html"> Building a Network</a>
+                <p><a href="Network/buildingnets.html"> Building Basics</a>
                     <br>
-                    <a href="Network/connections.html">Connections</a>
+                    <a href="Network/connections.html">Making Connections</a>
                     <br>
                     <a href="Network/layouts.html">Layouts</a>
                     <br>
@@ -54,8 +54,6 @@
                     <br>
                     <a href="Network/toolbar.html">Toolbar</a>
                     <br>
-                    <a href="Network/visualConventions.html">Visual Conventions</a>
-                    <br>
                 </p><b>Other Topics</b>
                 <br>
                 <p>
@@ -68,11 +66,6 @@
                     <a href="Network/update.html">Updating</a>
                     <br>
                     <a href="Network/wand.html">Wand Tool</a>
-                    <br>
-                </p>
-                <b>Reference</b>
-                <br>
-                <p> <a href="Network/quickref.html"> Quick reference</a>
                     <br>
                 </p>
             </blockquote>
@@ -93,7 +86,7 @@
         <p style="float:left; padding: 30px;"> <img src="../Images/simple_net.gif" height="175" border="1">
         </p>
         
-        <p>The colored circles represent neurons or "nodes." The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. For more see <a href="Network/visualConventions.html">visual conventions</a>. Each node and synapse can be individually adjusted by selecting it, pressing the up and down errors, or double clicking to reveal a dialog. </p>
+        <p>The colored circles represent neurons or "nodes." The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. Each node and synapse can be individually adjusted by selecting it, pressing the up and down errors, or double clicking to reveal a dialog. </p>
     
         <a id="group"></a><p class="heading">Groups</p>
 
@@ -105,7 +98,18 @@
 
         <p>Simbrain has two kinds of neurons: activation-based neurons, and <a href="Network/spikingneurons.html">spiking neurons</a>, and also allows the two to co-exist.  Activation-based neurons are used in more traditional, connectionst types of application, which abstract from biological details, while spiking neurons are used in more biologically realistic simulations. Since spikes are discrete events without a numerical value, some way of converting them into numbers is required (e.g. when a spike arrives at a synapse).   This is handled using <a href="Network/synapse/spikeResponder.html">spike responders</a>. </p>
 
-        <p class="heading">Running a network</p>
+        <p class="heading">
+            <a name="Zoom"></a>Zooming and Panning
+        </p>
+        <p> <span class="heading2">Zooming:</span> To zoom use the mouse-wheel or the pinch-to-zoom gesture on trackpads.</p> 
+        <p><span class="heading2">Panning:</span> To pan press the command or control key while left-clicking and dragging. Note that by default <a href="Network/menu.html#Autozoom">auto-zoom</a> is turned on; if you plan to zoom in and pan a lot it should be turend off. To fit all objects on screen hit the "F" key to invoke the <a href="Network/toolbar.html#ZoomFit">zoom to fit</a> command.</p>
+
+        <p class="heading">Moving Objects</p>
+        <p>To begin create a <a href="Network/buildingnets.html#selectObjects">selection</a>--usually by left-click dragging a lasso around what you want.  Then drag or nudge these items:</p>
+        <p><span class="heading2">Basic moving:</span> Simply left click and drag the selected items.</p>
+        <p><span class="heading2">Nudging:</span> For fine tuning, users can also use the arrow keys (with Shift held down) to "nudge" selected items.  The nudge amount in pixels can be set in the <a href="Network/network_prefs.html">network preferences</a> dialog.</p>
+
+        <p class="heading">Running a Network</p>
 
         <p>
             <a id="RunningNet"></a><u>Running a network:</u> When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user "runs" the network it comes to life--an <a href="Network/update.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the play button

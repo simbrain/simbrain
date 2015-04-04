@@ -134,6 +134,18 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
+    public void contextualIncrement(Neuron n) {
+        n.setActivation(ceiling);
+        n.getNetwork().fireNeuronChanged(n);
+    }
+
+    @Override
+    public void contextualDecrement(Neuron n) {
+        n.setActivation(floor);
+        n.getNetwork().fireNeuronChanged(n);
+    }
+
+    @Override
     public double getGraphicalLowerBound() {
         return floor - 1;
     }

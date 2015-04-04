@@ -77,9 +77,6 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
         neuron.setBuffer(val);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
@@ -93,9 +90,6 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();

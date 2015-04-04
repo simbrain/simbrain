@@ -17,9 +17,9 @@
     </a>
     <div class="text" id="main_docs">
         <div class="navi">
-            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Basics of Building and Editing Networks</p>
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Basics of Building and Editing Basics</p>
         </div>
-        <h1>Building and Editing Networks</h1>
+        <h1>Building and Editing Basics</h1>
 
         <p>Network editing in Simbrain is modeled on a familiar "draw" interface which involves creating screen elements, copying, and pasting.  This page focuses an adding nodes and configuring screen objects.  There are special techniques for connecting neurons with synapses described on the <a href="connections.html">connections page</a>.  Group level operations, for connecting neuron groups to each other are described in the <a href="groups.html">group pages</a>.</p>
 
@@ -39,23 +39,18 @@
             <p><span class="heading2">Creating networks or groups of nodes:</span> Subnets are created using <span class="command">Insert &gt; Add Network</span>. <a href="./subnetwork.html">Subnetworks</a> and small groups of neurons can be created, copied, and repeatedly pasted to quickly create many sets of similar elements. </p>
 
         </blockquote>
-        <p class="heading">
-            <a name="Zoom"></a>Zooming and Panning
-        </p>
-        <blockquote>
-            <p> <span class="heading2">Zooming:</span> To zoom use the mouse-wheel or the pinch-to-zoom gesture on trackpads.</p> 
-            <p><span class="heading2">Panning:</span> To pan press the command or control key while left-clicking and dragging. Note that by default <a href="menu.html#Autozoom">auto-zoom</a> is turned on; if you plan to zoom in and pan a lot it should be turend off. To fit all objects on screen hit the "F" key to invoke the <a href="toolbar.html#ZoomFit">zoom to fit</a> command.</p>
-        </blockquote>
 
         <p class="heading"> <a name="selectObjects"></a>Selecting Objects</p>
         <p> Neurons, weights, groups, and textboxes can be selected so that operations can be performed on the selected group of items (e.g., randomizing selected items, nudging them up or down, etc.). Selecting neurons and weights is important, because many Simbrain operations apply to selected sets of weights and/or nodes.  Groups are selected by their <a href="groups.html#interactionBox">interaction boxes</a>.</p>
         <p> The selection interface basically works the way most computer drawing programs work. Use the left-click button to "lasso" or "rubberband" screen items. Once some items are selected, you can hold down the shift key and single-click to fine tune your selection. </p>
+        <p><img src="../../Images/Arrow.gif" height="18" width="18" border = "1"> Note that most selection operations must be done in selection mode, the default mode, which is entered by pressing "S" or the selection button.</p>
         <blockquote>
-            <p><span class="heading2">Selection mode</span>: All selection operations must be done in selection mode, the default mode, which is entered by pressing "S" or the selection button <img src="../../Images/Arrow.gif" height="18" width="18">.</p>
+
             <p><span class="heading2">Lasso</span>: Left-click and drag the lasso around screen items you want to select. As items are selected a box appears around them.</p>
             <p><span class="heading2">Lassoing weights</span>: It can be hard to click on individual weights directly, so they can also be selected by dragging the lasso across the line associated with a weight, which is much easier.</p>
             <p><span class="heading2">Single click</span>: Single left-click on nodes and weights to select individual screen items. Zooming in on items can facilitate this.</p>
             <p><span class="heading2">Shift key </span>: Once some items are selected, you can hold down the shift key to add more items to your selection. Hold down Shift while lassoing to add or remove groups items; hold down Shift while single-clicking to add or remove single items. </p>
+            <p><span class="heading2">Key Shortcuts </span>: "n" to select all nodes; "w" to select all weights; "a" to select nodes and weights.  These are super useful!  (Also, once selected: "r" to randomize, "c" to clear, and arrows to increment activation.) </p>
         </blockquote>
 
 
@@ -72,13 +67,6 @@
             <p><span class="heading2">Set activation values</span>: The activation value (and hence color) of neurons and the excitatory or inhibitory strength (and hence color and size) of weights can be manually adjusted. To do so, select one or more neurons and weights (both can be adjusted at the same time), and press the up and down arrow keys to increase or decrease these values. The amount increased or decreased is set by the "increment" field. Right and left arrow keys can also be used to increase or decrease these value. </p>
             <p><span class="heading2">Clearing and randomizing values</span>: Note that while screen items are selected, neuron values can also be set to zero by pressing "C" on the keyboard (weight values are not then set to zero, because this is equivalent to deleting them, which can be done with the delete key). Pressing "R" will randomize all selected screen items, neurons and weights.</p>
         </blockquote>
-
-        <p class="heading">Moving Objects </p>
-        <blockquote>
-            <p><span class="heading2">Basic moving:</span> Simply left click and drag the selected items, as you would a window or any other screen item. Groups of items can be moved by selecting and left-click dragging them.</p>
-            <p><span class="heading2">Nudging:</span> For fine tuning, users can also use the arrow keys (with Shift held down) to "nudge" selected items.  The nudge amount in pixels can be set in the <a href="network_prefs.html">network preferences</a> dialog.</p>
-        </blockquote>
-
 
         <p class="heading"> <a id="copyPaste"></a>Copy and Paste </p>
             <p>Selected items (including neuron groups, but not yet subnetworks) can be copied, cut, and paste similarly to the way they are on most contemporary GUI's. Lasso select groups of items, then fine tune your selection using Shift to add or remove items. </p>

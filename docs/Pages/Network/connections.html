@@ -63,27 +63,16 @@
             <p><span class="heading2">Scripts: </span> Highly customized connections (e.g. those used in the cortical branching script) can be created using <a href="../Scripting.html">scripts</a>.</p>
         </blockquote>
 
-        <p> <span class="heading">Editing Connections</span> </p>
-        <p>Synapses are usually created as simple excitatory synapses with no special properties.  Once created, synapses can be edited by double-clicking or using the synapse adjustment panel. Synapses in <a href="groups/SynapseGroup.html">synapse groups</a> have a complex suite of tools for viewing and customizing. </p>
-
-
-        <p class="heading">
-            <a name="WeightMatrixViewer"></a>View Connections as a Weight Matrix </p>
-        <p style="float:right; margin: 30px;"><img width="400px;" src="../../Images/weightmatrixviewer.png"></p>
-        <p align="left">The <span class="command">Show Weight Matrix</span> option can be selected after right clicking any neuron or group of neurons.&nbsp; <a href="#sourceTarget">Source and target neurons</a> must be set.&nbsp;&nbsp; The window that appears represents the&nbsp; source (red) neurons and target (green) neurons as columns.&nbsp; Entries represent the strength of connections.&nbsp; (Non-existing connections are not fully supported: they are represented by a zero that cannot change).
-        </p>
-        <p>One can manipulate the strength of connections through the weight matrix viewer. Clicking on a cell allows one to manipulate the synaptic strength of the connection represented by the cell. One can also randomize the values in the matrix, set values from a .csv file or save values to a .csv file.</p>
-        <p><span class="heading2">Weight Matrix Viewer Toolbar</span></p>
+        <p><span class="heading">Editing Connections</span> </p>
         <blockquote>
-            <p><img src="../../Images/Rand.png" height="18"><span class="heading2"> Randomize: </span> Pressing the Random button will uniformly randomize the strength of all conections represented in the weight matrix viewer between two numbers (default (1,-1))
-            </p>
-            <p><img src="../../Images/Prefs.gif" height="18"><span class="heading2"> Preferences: </span> Pressing the Preferences button will allow one to set the upper and lower bounds on the viewer's randomize function.
-            </p>
-            <p><img src="../../Images/Open.png" height="18"><span class="heading2"> Open: </span> Pressing the Open button allows one to open a .csv file and set the values of the connections represented by the viewer to the values specified in the file. Files representing matrices different from the dimensions of the weight matrix shown in the viewer are unsuitable for this task.
-            </p>
-            <p><img src="../../Images/Save.png" height="18"><span class="heading2"> Save: </span> Pressing the Save button allows one to save the weight matrix as a .csv file, which can be opened later (as above).
-            </p>
+            <p>Synapses are usually created as simple excitatory synapses with no special properties.  Once created, synapses can be edited by double-clicking or using the synapse adjustment panel. Synapses in <a href="groups/SynapseGroup.html">synapse groups</a> have a complex suite of tools for viewing and customizing. </p>
         </blockquote>
+
+        <p class="heading">View Connections as a Weight Matrix </p>
+        <blockquote>
+            <p>See <a href="weightMatrixViewer.html">weight matrix viewer</a> documentation.</p>
+        </blockquote>
+
     </div>
 </body>
 

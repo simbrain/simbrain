@@ -47,14 +47,7 @@
             Pictured to the right is an example of all the different visualizations of synapse groups a user may encounter in Simbrain. Although there are different visualizations for unidirectional, bidirectional, and recurrent synapse groups, it is important to note that fundamentally they all represent the same underlying construct. By right clicking any synapse group interaction box, the user has the ability to "toggle synapse visiblity". Toggling synapse visibility either reveals each of the individual synapses constituting the group (and would look like the first image pictured to the right) if the group is currently being represented by an arrow. If the all the synapses in the group are currently visible toggling synapse visibility will remove all the individual synapse graphics from the network panel and replace them with a single green arrow. For very large synapse groups (> ~10,000) it is <b>not advisable</b> to make each indvidiual synapse visible. In such cases the connectivity structure is obscured by the sheer number of synapses, and worse, the GUI may become slow or unresponsive (depending on the machine and how many synapses are being made visible at once).
         </p>
         <p class="heading">Group Properties & Editing Scope</p>
-        <blockquote>
-            The basic information that synapse groups store and maintain on the group level and about their constituent synapses includes the following:
-        </blockquote>
-        <blockquote>
-            <p>
-                <span class="heading">
-                    Basic & Group Level Properties&nbsp;</span>
-            </p>
+           <p> The basic information that synapse groups store and maintain on the group level and about their constituent synapses includes the following:</p>
             <blockquote>
 
                 <p><span class="heading2">Group ID: </span>Unique labelling that identifies the group.
@@ -72,8 +65,7 @@
                 <p><span class="heading2">Parent: </span>Denotes the parent group, if any.</p>
                 <p><span class="heading2">Source/Target Group: </span>The neuron group which acts as a source(target) to this synapse group. Specifically the whole of the synapses comprising this group represent the efferent(afferent) synapses of the source(target) neuron group, which connects the source group to the target group. In other words a given synapse group mediates the flow of activation between its source and target group. It should be noted that there can be no more than 1 synapse group connecting two neuron groups in a particular direction. That is, there cannot be more than one synapse group with the same source and target neuron group. </p>
             </blockquote>
-        </blockquote>
-        <blockquote>
+
             <p><span class="heading">Synapse Properties & Type&nbsp;</span>
             </p>
             <blockquote>
@@ -88,33 +80,44 @@
                     <br> Synapse groups allow users to edit some properties of the overall connectivity structure of the synapses in the group. In some cases like <a href="../connections/sparse.html">sparse</a>, users can manipulate the connection density of the synapse group after creation. Otherwise, it is not an option to edit the connection manager post-creation.
                 </p>
             </blockquote>
-        </blockquote>
-        <br>
-        <p><a id="weightVisualization"></a><span class="heading">Weight Visualization & Manipulation</span>
-        </p>
+
+        <p><a id="weightVisualization"></a><span class="heading">Weight Visualization & Manipulation</span></p>
         <blockquote>
-            <p>The synapse group dialog contains two separate entries for the manipulation and visualization of the synaptic strengths of the synapses in the group.</p>
-            <h4>Synapse Adjustment Panel (Histogram)</h4>
-            <img src="../../../Images/SynapseGroupHistogram.png" height="400" width="400" align="left" hspace="20px" vspace="10px">
-
-            <p>The first is the synapse adjustment panel, which represents the weights that comprise the group in the form of a histogram. The synapse adjustment panel can be found as a part of the general editing/creation dialog for synapse groups or by right-clicking the group and selecting <i><b>"Adjust Synapses"</i>
-                </b> from the menu. From here it is possible to assign different <a href="../../Utils/Randomizers/Randomizers.html">probability distributions</a> to the excitatory and/or inhibitory weights in the group. It is also possible to change the ratio of excitatory and inhibitory synapses in the group from here*. The histogram can be made to display weight values for synapses of both or only one polarity, and optionally can overlay the two for a direct comparison.</p>
-
-            <p>The <a href="../../Plot/histogram.html">histogram</a> panel also displays some basic information about the weights and synapses in the group. Pictured left, one can see that the histogram panel displays the total population as well as the population of synapses of each type. It also displays the mean, median, and standard deviation of the synapse values, which are calculated using the selected polarity(ies). For instance if "Both" is selected these values are calculated using both polarities, assigning negative values to inhibitory weights. If "Overlay" is selected, it will display these values for all synapses in the group, using the absolute value of all inhibitory weight values. Finally if a single polarity is selected it will display those statistics only for the synapses of that polarity, again using absolute values for inhibitory synaptic weights. </p>
-
-            <img src="../../../Images/SynapseGroupRandomizers.png" height="228" width="400" align="right" hspace="20px" vspace="10px">
-
-            <p>Occasionally outside entities like <a href="../../Scripting.html">scripts</a> or <a href="../training.html">trainers</a> will alter synaptic weights in a way which changes their polarity without alerting the synapse group. This is easy to spot as the histogram will show that some "excitatory" synapses have a negative value and/or some "inhibitory" synapses have a positive value. In order to reconcile this, the user is given access to a "Revalidate" button located in this panel. Revalidating a synapse group will cause it to iterate over all the synapses in the group and assign them to the correct set based on their polarity (the sign of their strength/weight).</p>
-
-            <p>* <i>Although it is not in the GUI as of 3.0, neurons can also possess a polarity. If that is the case then all efferent synapses from that neuron must be of the same polarity as the neuron. In these cases editing the ratio of excitatory to inhibitory synapses is impossible from this panel.</i>
-            </p>
-
-            <h4>Weight Matrix Viewer</h4>
-
-            <p>See <a href="../weightMatrixViewer.html">weight matrix viewer</a> documentation.</p>
-
-
+            <p>See <a href="../weightVisualization.html">weight visualization</a> documentation.</p>
         </blockquote>
+
+        <p class="heading">
+            <a name="RightClick"></a>Right Click Menu</p>
+        <!-- TODO: Fill it in.  A template from neuron group is below -->
+        <!-- <blockquote>
+            <span class="heading2">Edit: </span>Edit group properties. This opens the group properties panel which includes the above sections. The is the same as double-clicking on the interaction box.
+            <br>
+            <span class="heading2">Rename Group: </span> Input another name for the group.
+            <br>
+            <span class="heading2">Remove Group: </span> Delete the group.
+            <br>
+            <span class="heading2">Select Neurons: </span>Select all neurons in the group.
+            <br>
+            <span class="heading2">Select Incoming Synapses:</span> Selects all incoming synapse groups and/or loose synapses.
+            <br>
+            <span class="heading2">Select Outgoing Synapses:</span> Selects all outgoing synapse groups and/or loose synapses.
+            <br>
+            <span class="heading2">Clamp Neurons: </span>Clamp all neurons in the group. See <a href="../neuron.html#clamping">Clamping</a>.
+            <br>
+            <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
+            <br>
+            <span class="heading2">Set Group as Source: </span> Set the group as source group for some future synaptic connections.
+            <br>
+            <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
+            <br>
+            <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
+            <br>
+            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the network and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.
+            <br>
+            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector. It establishes this sort of connection and a new vector will be forwarded at each workspace update.
+            <br>
+            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>.
+        </blockquote> -->
     </div>
 </body>
 

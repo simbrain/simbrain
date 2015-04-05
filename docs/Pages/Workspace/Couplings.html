@@ -17,6 +17,7 @@
         <div class="navi">
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Couplings</p>
         </div>
+
         <h1>Couplings</h1>
         <p>A coupling is a one-way informational link between two objects in a Simbrain simulation. Couplings allow information to flow between components in the Simbrain <a href="../Workspace.html">workspace</a> (e.g. from a network to a bar chart). A coupling consists of a producer and a consumer. Producers and consumers are <a href="#Attributes">attributes</a>. The basic way couplings work is simple. A producer gathers information from a source object (usually calling a "getter" method on an underlying java object), and then passes the result to a target object (usually calling a "setter" method).</p>
         <p>Couplings have different types, depending on what the datatype of the underlying getter and setter methods is. There are several types of couplings, including</p>
@@ -29,11 +30,12 @@
         </p>
         <p>Couplings are managed using the <a href="#CouplingManager">Coupling Manager</a> or via various shortcuts described below in <a href="#Creation">Coupling Creation.</a>
         </p>
+
         <p><span class="heading">Scalar Couplings</span>
         </p>
         <p>An easy way to get a feel for how couplings work is through the example of scalar couplings. An example is shown below that links a <a href="../Network.html">Network</a> to an <a href="../Worlds/OdorWorld/OdorWorld.html">OdorWorld</a>. In this example one of the couplings in the pursuer simulation is shown (the simulation has 5 couplings total, one for each neuron). The coupling shown takes the current activation of the "turn right" neuron (the producer) and sends it to the turn right action on the mouse (the consumer). Note that in this example, the mouse will turn right when the workspace is updated, because there is more right turning activation than left turning activation.
         </p>
-        <div style="text-align: center;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/ScalarCoupling.png">
+        <div style="float: right; padding: 30px;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/ScalarCoupling.png">
         </div>
         <br>
         <p>There are many examples of scalar couplings that can be made. Here are some examples where the producer is a neuron:
@@ -57,9 +59,6 @@
         </p>
         <p>The basic idea with vector couplings is the same as with scalar couplings, but they involve <i>lists</i> of numbers. In the image shown below, we see that the producer is the whole neuron group (which is interfaced with via the interaction box), and the consumer is the whole histogram component. The coupling takes an activation vector, consisting of the 9 activation values of the network, and sends it to the the histogram. As can be seen, two neurons have activations below 0, three have activations betwen .5 and 1, three have activations of 2, and one has an activation above 2.
         </p>
-        <div style="text-align: center;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/VectorCoupling.png">
-        </div>
-        <br>
         <p>These vectors can get huge! Tens of thousands of neuron activations! As with scalar couplings, there are many types of activations that can be made.Here are some examples where the producer is a neuron group:
             <ul>
                 <li>A coupling from one neuron group to another.</li>
@@ -68,6 +67,8 @@
                 <li>A coupling from a neuron group's activation to text in a <a href="../Worlds/TextWorld/TextWorld.html">Text World</a>. For example, when a vector is close enough to a specific vector (in a vector space) make the word "hello" appear in the text world.</li>
             </ul>
         </p>
+        <div style="float: left; padding: 30px;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/VectorCoupling.png">
+        </div>
         <p>Here are some examples where the consumer is a neuron group:
             <ul>
                 <li>A coupling from an agent's sensor vector to a neuron group.</li>
@@ -95,8 +96,8 @@
         </p>
         <p>Not all attributes are automatically "visible" in the relevant gui components (coupling manager, menus, etc. described below). The reason is that there are so many things that can be attributes (every numerical property of every neuron and synapse in a neural network, for example), that it would overwhelm the gui. Each component has some attributes visible by default. To modify what the visible attributes are, use the set attribute visibility dialog, accessible from the <span style="font-weight: bold;">coupling manager. </span>For example, in this dialog, we see available attributes for the currently selected network component. Only neuron activations are visible in this component. When clicking on the visibility checkboxes notice that attributes appear and disappear in the producer list window.
         </p>
-        <p style="text-align: center;">
-            <img style="width: 433px; height: 154px;" alt="Attribute Visibility Dialog" src="../../Images/AttributeVisibilityDialog.png">
+        <p style="float: left; padding: 30px;">
+            <img style="width: 433px;" alt="Attribute Visibility Dialog" src="../../Images/AttributeVisibilityDialog.png">
         </p>
 
         <p><a name="CouplingManager"><span class="heading">Coupling Manager</a>
@@ -117,7 +118,7 @@
             <br>
         </p>
         <br>
-        <p style="text-align: center;"><img style="width: 534px; height: 312px;" src="../../Images/CouplingDialog.png">
+        <p style="float: right; padding: 30px;"><img style="width: 534px; height: 312px;" src="../../Images/CouplingDialog.png">
         </p>
         </p>
 
@@ -131,7 +132,7 @@
                 <li>Using <a href="../Scripting.html">scripts</a> one create couplings programmatically. Several of the scripts in the script menu create couplings, and the user is encouraged to look at this code to see how couplings can be created in this way.</li>
             </ol>
         </p>
-        <p style="text-align: center;"><img style="border: 1px solid ; width: 500px" alt="example" src="../../Images/EasyCoupling.png">
+        <p style="float: left; padding: 30px;"><img style="border: 1px solid ; width: 500px" alt="example" src="../../Images/EasyCoupling.png">
         </p>
 
     </div>

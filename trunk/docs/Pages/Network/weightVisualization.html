@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Weight Visualization & Manipulation </p>
+        </div>
+
+        <h1>Weight Visualization & Manipulation</h1>
+
+        <p>Tools for visualizing and adjusting weights can be invoked by selecting an arbitrary set of weights and invoking the <a href="#adjustSynapseDialog">synapse adjustment dialog</a> (from the edit menu or using command-R), or in the various tabs of the <a href="groups/SynapseGroup.html">synapse group</a> dialog, which is invoked by double clicking on a synapse group's interaction box or right-clicking on it and selecting <i>Adjust Synapses</i> from the menu.</p></p>
+
+        <p>This page describes most of the tabs of the <a href="groups/SynapseGroup.html">synapse group</a> dialog, except for the first properties tab.</p>
+
+        <p class="heading">Synapse Values Tab</p>
+
+
+        <img src="../../Images/SynapseGroupHistogram.png" height="400" width="400" align="left" hspace="20px" vspace="10px" border = "1">
+
+        <a id="synapseStats"></a><p class="heading2">Synapse Statistics</p>
+
+        <p>The top part of the adjust synapses tab shows basic statistics about a populations of synapses.   Basic numerical statistics, as well a <a href="../Plot/histogram.html">histogram</a> can be made to display weight statistics and values for synapses of both or only one polarity, and optionally can overlay the two for a direct comparison.Which polarities are viewed is set using the combo box:</p>
+
+        <p><u>Both:</u> Values are calculated using both polarities, assigning negative values to inhibitory weights.</p>
+        <p><u>Overlay: </u>  If "Overlay" is selected, it will display these values for all synapses in the group, using the absolute value of all inhibitory weight values.</p>
+        <p><u>Excitatory / Inhibitory: </u> If a single polarity is selected it will display those statistics only for the synapses of that polarity, again using absolute values for inhibitory synaptic weights.</p>
+
+        <p class="heading2">Revalidate</p>
+        <p>Occasionally outside entities like <a href="../../Scripting.html">scripts</a> or <a href="../training.html">trainers</a> will alter synaptic weights in a way which changes their polarity without alerting the synapse group. This is easy to spot as the histogram will show that some "excitatory" synapses have a negative value and/or some "inhibitory" synapses have a positive value. In order to reconcile this, the user is given access to a "Revalidate" button located in this panel. Revalidating a synapse group will cause it to iterate over all the synapses in the group and assign them to the correct set based on their polarity (the sign of their strength/weight).</p>
+
+        <p class="heading2">Excitatory / Inhibitory Ratio</p>
+        <p> It is also possible to change the ratio of excitatory and inhibitory synapses in the group from here.  The ratio can be set in three ways.  Setting it one way will updated the other displays.</p>
+        <p><u>Main slider bar:</u> Slide to determine percentage of excitatory synapses.</p>
+        <p><u>Percent Excitatory / Inhibitory: </u> Text field to set the value more precisely.</p>
+
+        <p class="heading2">Excitatory and Inhibitory Distributions</p>
+        <img src="../../Images/SynapseGroupRandomizers.png" height="228" width="400" align="right" hspace="20px" vspace="10px" border = "1">
+        <p>The probability distributions used to determine the strengths of excitatory and inhibitory synapses can be set at the bottom of the synapse values tab, using <a href="../utils/Randomizers/Randomizers.html">randomizer</a> panels.</p>
+
+        <p class="heading">Excitatory and Inhibitory Synapse Types</p>
+        <p>In this tab the basic properties of the inhibitory and excitatory synapses can be separately set.  The basic dialog is the same as that used for <a href="synapse.html">synapses</a>. </p>
+
+        <p>Note: <i>Although it is not in the GUI as of 3.0, neurons can also possess a polarity. If that is the case then all efferent synapses from that neuron must be of the same polarity as the neuron. In these cases editing the ratio of excitatory to inhibitory synapses is impossible from this panel.</i></p>
+
+        <a id ="weightMatrixViewer"></a> <h1>Weight Matrix Viewer</h1>
+        <p>The weight matrix viewer allows weights connecting two sets of neurons to be viewed in a tabular format.  They can be used either for <a href="../Network.html#loose">loose neurons</a> or within <a href="groups/SynapseGroup.html">synapse groups</a>.</p>
+
+        <p>One can manipulate the strength of connections through the weight matrix viewer. Clicking on a cell allows one to manipulate the synaptic strength of the connection represented by the cell.  Cells can also be selected (e.g. using command-A) or shift-selected, and then groups of them randomized or otherwise altered.  Values can also be loaded from a .csv file. Their values can also be saved to a .csv file (see toolbar below)</p>
+
+        <p><span class="heading2">Loose Neuron Weight Matrix Viewer</span> </p>
+        <p style="float:left; margin: 30px;"><img width="250px;" src="../../Images/weightmatrixviewer.png" border = "1"></p>
+        <p>To view the synapses connecting two sets of loose neurons set <a href="connections.html#sourceTarget">source and target neurons</a> and then select  <span class="command">Show Weight Matrix</span> from the edit menu or by right clicking on any of the relevant neurons. Cells in the table correspond to connections between source (red) neurons as rows and target (green) neurons as columns. Values in these cells represent the strengths of connections.  Non-existent connections are represented by gray boxes (see the image below).
+        </p>
+
+        <p><span class="heading2">Synapse Group Weight Matrix Viewer</span></p>
+        <p style="float:right; margin: 30px;"><img src="../../Images/WeightMatrixViewer2.png" height="350" border = "1"></p>
+        <p>In this context the matrix represents the weights of a <a href="groups/SynapseGroup.html">synapse group</a>, which connects a source and target neuron group.  Cells in the table correspond to connections between neurons in the source neuron group (rows) and target neuron group (column). Values in these cells represent the strength of connections.</p>
+
+        <p>Note: Currently the weight matrix viewer is disabled for synapse groups with more than 10,000 synapses. This is due to the fact that a table of that size would be unnavigable, and of dubious use. At that size individual synapses are much less important. This is also to prevent users from accidentally attempting to view <i>extremely</i> large tables (much greater than 10,000 entries), which can cause the JVM to run out of memory.</p>
+
+        <p><span class="heading2">Weight Matrix Viewer Toolbar</span></p>
+        <blockquote>
+            <p><img src="../../Images/Rand.png" height="18"><u> Randomize:</u> Pressing the Random button will uniformly randomize the strength of all connections represented in the weight matrix viewer between two numbers (default (1,-1))
+            </p>
+            <p><img src="../../Images/Prefs.gif" height="18"><u> Preferences:</u> Pressing the Preferences button will allow one to set the upper and lower bounds on the viewer's randomize function.
+            </p>
+            <p><img src="../../Images/Open.png" height="18"><u> Open:</u> Pressing the Open button allows one to open a .csv file and set the values of the connections represented by the viewer to the values specified in the file.  The .csv being loaded must have the same dimensions as the weight matrix of the synapse group.
+            </p>
+            <p><img src="../../Images/Save.png" height="18"><u> Save:</u> Pressing the Save button allows one to save the weight matrix as a .csv file.
+            </p>
+        </blockquote>
+
+        <a id ="adjustSynapseDialog"></a> <p><span class="heading">Synapse Adjustment Dialog</span> </p>
+
+        <p>The top part of this dialog shows <a href="#synapseStats">synapse statistics</a> about the selected set of synapses.   The bottom part contains tabs that can be used to adjust the synapses, by pressing the Apply button.   Changes are immediately shown in the top statistics area.</p>
+
+        <p style="float:left; margin: 30px;"><img width="300px;" src="../../Images/AdjustSynapsesDialog.png"></p>
+
+        <p>The dialog is invoked in the same way the weight matrix viewer is, by selecting <a href="connections.html#sourceTarget">source and target</a> neurons and then using a right-click menu.
+        </p>
+        <p><span class="heading2">Randomizer</span> </p>
+        <p>Use a <a href="../utils/Randomizers/Randomizers.html">randomizer</a> to set the weight strengths. </p>
+        <p><span class="heading2">Perturber</span> </p>
+        <p>Add random values to weight strengths, using a <a href="../utils/Randomizers/Randomizers.html">randomizer</a>.</p>
+        <p><span class="heading2">Pruner</span></p>
+        <p> Remove all synapses with a value below the indicated threshold by pressing the button.</p>
+        <p><span class="heading2">Scaler</span></p>
+        <p>Scale all synapse values up or down by changing their strengths as much as the indicated percentage.</p>
+
+    </div>
+</body>
+
+</html>

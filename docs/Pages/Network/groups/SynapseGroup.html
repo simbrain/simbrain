@@ -41,12 +41,37 @@
             </table>
         </p>
         <p>
-            Synapse groups represent a unified construct allowing users to interact with the aggregated whole of all the synapses connecting two <a href="./NeuronGroup.html">Neuron Groups</a>. In very large networks, operating on synapses on an indvidual basis would be impractical; Synapse Groups offer a means by which users can manipulate all synapses with common source and target destinations. This includes things like mass manipulation of synapse properties, learning rules, and the display of synaptic strength data. Synapse groups automatically organize and separate synapses by their polarity (i.e. whether or not they are excitatory or inhibitory, as determined by the sign of their weight value). Therefore the excitatory synapses in a synapse group may be manipulated independently of the group's inhibitory synapses.
+            Synapse groups represent a unified construct allowing users to interact with the aggregated whole of all the synapses connecting two <a href="./NeuronGroup.html">Neuron Groups</a>. In very large networks, operating on synapses on an individual basis would be impractical; Synapse Groups offer a means by which users can manipulate all synapses with common source and target destinations. This includes things like mass manipulation of synapse properties, learning rules, and the display of synaptic strength data. Synapse groups automatically organize and separate synapses by their polarity (i.e. whether or not they are excitatory or inhibitory, as determined by the sign of their weight value). Therefore the excitatory synapses in a synapse group may be manipulated independently of the group's inhibitory synapses.
         </p>
+
+        <p>Pictured here is an example of all the different visualizations of synapse groups a user may encounter in Simbrain. Although there are different visualizations for unidirectional, bidirectional, and recurrent synapse groups, it is important to note that fundamentally they all represent the same underlying construct.
+        </p>
+        <a id = synapseVisibility></a><p class="heading">Synapse Visibility</p>
+
         <p>
-            Pictured to the right is an example of all the different visualizations of synapse groups a user may encounter in Simbrain. Although there are different visualizations for unidirectional, bidirectional, and recurrent synapse groups, it is important to note that fundamentally they all represent the same underlying construct. By right clicking any synapse group interaction box, the user has the ability to "toggle synapse visiblity". Toggling synapse visibility either reveals each of the individual synapses constituting the group (and would look like the first image pictured to the right) if the group is currently being represented by an arrow. If the all the synapses in the group are currently visible toggling synapse visibility will remove all the individual synapse graphics from the network panel and replace them with a single green arrow. For very large synapse groups (> ~10,000) it is <b>not advisable</b> to make each indvidiual synapse visible. In such cases the connectivity structure is obscured by the sheer number of synapses, and worse, the GUI may become slow or unresponsive (depending on the machine and how many synapses are being made visible at once).
+         By right clicking any synapse group interaction box, the user has the ability to "toggle synapse visiblity". Toggling synapse visibility either reveals each of the individual synapses constituting the group.</p>
+         <blockquote>
+            <p><span class="heading2">Visible synapses: </span> In this mode (first of the four images here) all synapses can be seen, and can be directly edited like synapses generally are.   However, these are not <a href="../../Network.html#looseSynapse">loose synapses</a>. They are still members of  a group and so it is suggested that they be interacted with primarily at the group level, via the <a href="../groups.html#interactionBox">interaction box</a>. </p>
+            <p><span class="heading2">Momentum: </span> Here the group of synapses is replaced by a green arrow with an <a href="../groups.html#interactionBox">interaction box</a> inthe center.   This is the preferred mode of dealing with large groups of synapses.</p>
+
+         </blockquote>
+         <p><u>Note:</u> For very large synapse groups (> ~10,000) it is <i>not advisable</i> to make each indvidiual synapse visible. In such cases the connectivity structure is obscured by the sheer number of synapses, and worse, the GUI may become slow or unresponsive (depending on the machine and how many synapses are being made visible at once).
         </p>
-        <p class="heading">Group Properties & Editing Scope</p>
+
+        <a id="synapseGroupCreation"></a><p class="heading">Synapse Group Creation</p>
+
+        <p>To manually create a synapse group, select the source neuron group by its interaction box, designate it as a source neuron group (either by pressing "1" or invoking the <span class="command">set as source</span> menu command), and then select a target neuron group by selecting it, and invoke the synapse creation dialog (either by pressing "2" or invoking the <span class="command">Connect Neuron Group with Synapse Group</span> command).  Cf the <a href="../connections#quick12">quick 1 2</a> method for neurons.  The same thing works when manually connecting neuron groups with synapse groups.</p>
+
+        <p>Before the actual synapse group is created a synapse group creation dialog will appear.</p>
+
+        <p>Synapse groups are also parts of <a href="../subnetwork.html">subnetworks</a> and are automatically created when most subnetworks are created.  </p>
+
+
+        <p class="heading">Synapse Group Creation and Edit Dialogs</p>
+
+        <p>When creating a synapse group or editing one, a dialog shows up that allows many features to be viewed and edited.  The tabs of this dialog are described on this page and on the <a href="../weightVisualization.html">weight visualization page</a>.</</p>
+
+        <p class="heading">Synapse Group Properties</p>
            <p> The basic information that synapse groups store and maintain on the group level and about their constituent synapses includes the following:</p>
             <blockquote>
 
@@ -56,68 +81,66 @@
                 </p>
 
                 <p><span class="heading2">Population: </span>Number of synapses in the group.</p>
-                <p><span class="heading2">Optimize As Group:</span> An advanced option for speeding up the data representation and update speed of synapse groups. When a synapse group has this option selected, it maintains prototype excitatory and inhibitory synapses, which it pulls data from in order to display information about the group. This is as opposed to iterating over every synapse in the group and checking a particular value to ensure all synapses have the same value. Similarly, when updating the synapse group, iteration over synapses of a given polarity will be skipped entirely if the prototype of that polarity indicates that the synapses of that type are <a href="../synapse.html#Frozen">frozen</a> or <a href="../synapse/Static.html">static</a>. This feature assumes that if the user is working whe synapse <b>groups</b>, then their interaction with individual synapses will be minimal. If a single synapse were to be changed independently of the synapse group's tools for doing so, those changes would not be reflected in the synapse group dialog.
+                <p><span class="heading2">Optimize As Group:</span> An advanced option for speeding up the data representation and update speed of synapse groups. When a synapse group has this option selected, it maintains prototype excitatory and inhibitory synapses, which it pulls data from in order to display information about the group. This is as opposed to iterating over every synapse in the group and checking a particular value to ensure all synapses have the same value. Similarly, when updating the synapse group, iteration over synapses of a given polarity will be skipped entirely if the prototype of that polarity indicates that the synapses of that type are <a href="../synapse.html#Frozen">frozen</a> or <a href="../synapse/Static.html">static</a>. This feature assumes that if the user is working whe synapse <b>groups</b>, then their interaction with individual synapses will be minimal. If a single synapse were to be changed independently of the synapse group tools for doing so, those changes would not be reflected in the synapse group dialog.
                 </p>
                 <p><span class="heading2">Excitatory Type: </span> The type or update rule governing the excitatory synapses in the group. See the page on <a href="../synapse.html">synapses</a> for a complete listing.
                 </p>
-                <p><span class="heading2">Inhibitory Type: </span>TThe type or update rule governing the excitatory synapses in the group. See the page on <a href="../synapse.html">synapses</a> for a complete listing.
+                <p><span class="heading2">Inhibitory Type: </span> The type or update rule governing the excitatory synapses in the group. See the page on <a href="../synapse.html">synapses</a> for a complete listing.
                 </p>
                 <p><span class="heading2">Parent: </span>Denotes the parent group, if any.</p>
                 <p><span class="heading2">Source/Target Group: </span>The neuron group which acts as a source(target) to this synapse group. Specifically the whole of the synapses comprising this group represent the efferent(afferent) synapses of the source(target) neuron group, which connects the source group to the target group. In other words a given synapse group mediates the flow of activation between its source and target group. It should be noted that there can be no more than 1 synapse group connecting two neuron groups in a particular direction. That is, there cannot be more than one synapse group with the same source and target neuron group. </p>
             </blockquote>
 
-            <p><span class="heading">Synapse Properties & Type&nbsp;</span>
+            <p><span class="heading">Synapse Group Types</span>
             </p>
             <blockquote>
-                Synapse groups allow users to edit en masse the properties of the synapses that comprise the group. This includes the basic properties like delay, or bounds, but also the synapse update rule(s) and spike responder(s) and its(their) own independent properties. Since synapse groups segregate synapses by polarity, these changes can be applied to excitatory or inhibitory synapses independently. For a full listing of the properties of synapses which can be changed see the page on <a href="../synapse.html">synapses</a>. Sufficed to say, synapse groups allow you to manipulate all the synapses in the group as you would an individual synapse.
+                Synapse groups allow users to edit en masse the properties of the synapses that comprise the group. This includes the basic properties like delay, or bounds, but also the synapse update rule(s) and spike responder(s) and its(their) own independent properties. Since synapse groups segregate synapses by polarity, these changes can be applied to excitatory or inhibitory synapses independently. For a full listing of the properties of synapses which can be changed see the page on <a href="../synapse.html">synapses</a>. Synapse groups allow you to manipulate all the synapses in the group as you would an individual synapse.
             </blockquote>
             <p>
-                <span class="heading">Connection Type&nbsp;</span>
+                <span class="heading">Connection Types</span>
             </p>
             <blockquote>
                 <p>
-                    During creation, the user must choose which type of <a href="../connections.html">connector</a> should be used to determine how (and what) synaptic connections are made. For a full listing as well as links to the details of how each connection manager functions, see the page on <a href="connections.html">connections</a>.
+                    During creation, the user must choose which type of <a href="../connections.html">connection type</a> should be used to determine how (and what) synaptic connections are made. For a full listing as well as links to the details of how each connection manager functions, see the page on <a href="connections.html">connections</a>.
                     <br> Synapse groups allow users to edit some properties of the overall connectivity structure of the synapses in the group. In some cases like <a href="../connections/sparse.html">sparse</a>, users can manipulate the connection density of the synapse group after creation. Otherwise, it is not an option to edit the connection manager post-creation.
                 </p>
             </blockquote>
 
-        <p><a id="weightVisualization"></a><span class="heading">Weight Visualization & Manipulation</span></p>
+        <p><a id="weightVisualization"></a><span class="heading">Synapse Values</span></p>
         <blockquote>
-            <p>See <a href="../weightVisualization.html">weight visualization</a> documentation.</p>
+            <p>This tab is covered in the <a href="../weightVisualization.html">weight visualization</a> documentation.</p>
         </blockquote>
 
         <p class="heading">
             <a name="RightClick"></a>Right Click Menu</p>
-        <!-- TODO: Fill it in.  A template from neuron group is below -->
-        <!-- <blockquote>
+        <blockquote>
             <span class="heading2">Edit: </span>Edit group properties. This opens the group properties panel which includes the above sections. The is the same as double-clicking on the interaction box.
-            <br>
-            <span class="heading2">Rename Group: </span> Input another name for the group.
             <br>
             <span class="heading2">Remove Group: </span> Delete the group.
             <br>
-            <span class="heading2">Select Neurons: </span>Select all neurons in the group.
+            <span class="heading2">Select Synapses: </span>Select all neurons in the group.  Suggest using this primarily when synapses are <a href="#synapseVisibility">visible</a>
             <br>
-            <span class="heading2">Select Incoming Synapses:</span> Selects all incoming synapse groups and/or loose synapses.
+            <span class="heading2">Select Incoming Neurons:</span> Selects all pre-synaptic neurons for synapses in this group.
             <br>
-            <span class="heading2">Select Outgoing Synapses:</span> Selects all outgoing synapse groups and/or loose synapses.
+            <span class="heading2">Select Outgoing Synapses:</span> Selects all post-synaptic neurons for synapses in this group.
             <br>
-            <span class="heading2">Clamp Neurons: </span>Clamp all neurons in the group. See <a href="../neuron.html#clamping">Clamping</a>.
+            <span class="heading2">Adjust synapses: </span>Opens the <a href="../weightVisualization.html#adjustSynapseDialog">synapse adjustment panel</a> for this group of synapses. But note that it is suggested that the synapse group dialog be preferred for this kind of manipulation and visualization.</a>.
             <br>
-            <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
+            <span class="heading2">Show Weight Matrix: </span>shows the <a href="../weightVisualization.html#weightMatrixViewer">weight matrix viewer</a> for this grouof synapses.
             <br>
-            <span class="heading2">Set Group as Source: </span> Set the group as source group for some future synaptic connections.
+            <span class="heading2">Freeze / Unfreeze synapses: </span> <a href="../synapse.html#Frozen">Freezes or unfreezes</a> all synapses in this group.  Learning will cease.
             <br>
-            <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
+            <span class="heading2">Enable / Disable synapses: </span> <a href="../synapse.html#Enabled">Enables or disables</a> all synapses in this group.  They will stop passing information along; functionally equivalent to (temporarily) removing the group.
+            <br>
+            <span class="heading2">Toggle synapse visibility: </span> Toggles <a href="#synapseVisibility">synapse visibility</a>.
             <br>
             <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
             <br>
-            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the network and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.
+            <span class="heading2">Send Vector Coupling To: </span> Copies all strengths in the group and represents them as a flat vector (matrix couplings are not currently supported). This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.
             <br>
-            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector. It establishes this sort of connection and a new vector will be forwarded at each workspace update.
+            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the weight strengths of the synapses in this group based on the incoming vector.
             <br>
-            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>.
-        </blockquote> -->
+        </blockquote>
     </div>
 </body>
 

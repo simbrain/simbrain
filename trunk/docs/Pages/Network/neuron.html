@@ -9,7 +9,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
     <link href="../../Styles.css" rel="stylesheet" type="text/css" />
 </head>
 
@@ -24,7 +23,7 @@
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
         </div>
         <h1>Neurons</h1>
-            <div id="menu" style="margin-left: 30px;">
+            <div id="menu">
                 <p class="menubold">Neuron Types</p>
                 <blockquote>
                     <p><a href="neuron/AdExIF.html">AdEx Integrate & Fire (s, &delta;t)</a>
@@ -74,7 +73,7 @@
             Neurons contain a generic set of parameters and utilities common to virtually any model neuron (activation, boundaries, lists of incoming / outgoing synapses, methods to sum synapse strengths, etc.), but themselves have no "type" beyond what is delegated to an <i>update rule</i>. When we speak of a neuron of a given type we are really referring to a neuron which possesses an update rule of that type, since the update rule is what ultimately determines the behavior of the neuron. To the right is a menu of all the different neuron models (neuron update rules), which Simbrain currently possesses out of the box. Editing a neuron allows the user to also edit the properties of its update rule or change the update rule entirely (thereby changing the neuron model).
         </p>
 
-        <p class="heading">Quick Adjustment of Neuron Properties</p>
+        <p class="heading">Quick Keyboard Adjustment of Neuron Properties</p>
         <p>By selecting a neuron or set of neurons and pressing certain buttons, those neuron's properties can quickly be adjusted.  This can be done while a network is running and can be useful for exploring a networks' properties.</p>
         <blockquote>
             <p><a name="incrementing"></a><span class="heading2">Increment / Decrement: </span> Press the up and down buttons to adjust neuron activations.  If the up key is pressed, the <a href="#increment">increment</a> amount of a given neuron is added to the current activation, without regard to bounds or the nature of the neuron's update rule. </p>
@@ -85,22 +84,16 @@
         </blockquote>
 
 
-        <p class="heading">Editing Neuron Properties </p>
-        <p>More detailed adjustments  parameters can be adjusted as follows:</p>
+        <p class="heading">Neuron Dialog / Editing Neurons </p>
+        <p>More detailed adjustments  parameters can be adjusted using the neuron dialog.  The dialog contains several sections, including a section for adjusting common neuron properties, described below, and a section specific to the neuron type (these parameters are discussed in the relevant sub-pages). </p>
+
+        <p style="padding: 40px; float:right;"><img src="../../Images/NeuronDialog.png" width="250"></p>
+
+        <p>The neuron dialog can be invoked in the following ways:</p>
         <blockquote>
             <p><span class="heading2">Setting single neurons: </span>Double click on a neuron or right click on it and select set properties.</p>
             <p><span class="heading2">Setting multiple neurons:</span> Select more than one neuron, and either double click on one of the neurons,  select set properties from the popup or network menu, or use press command-E. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons. </p>
         </blockquote>
-
-        <p class="heading">Popup Menu (Selected Neurons) </p>
-        <p>When right clicking on a neuron a popup-menu appears whose actions will usually apply to selected neurons.  Most of these actions are described in the <a href="menu.html">menu documentation</a>.  The following actions only appear in the popup menu:</p>
-        <p>
-            <blockquote>
-                <span class="heading2">Send Scalar Coupling To</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from selected source nodes' activation to a target consumer.
-                <br>
-                <span class="heading2">Receive Scalar Coupling From</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from a target producer elsewhere in Simbrain to the selected node, which treats them as an external <a href="#inputType">input</a> to the neuron.<span class="heading2"></span>
-            </blockquote>
-        </p>
 
         <p class="heading">
             <a name="NeuronProperties"></a>Common Neuron Properties</p>
@@ -145,7 +138,17 @@
                 Synaptic inputs are a bit more complicated than weighted inputs as they attempt to capture some of the dynamics of real synapses in the brain. This type of input is meant specifically for translating action potentials (spikes) created when spiking neurons fire into a continuous value which can be interpreted by other neurons. (So this input type is not meaningful if the pre-synaptic neuron does not produce action potentials). Synaptic inputs perform a weighted sum over the <i>post-synaptic responses</i> of the incoming synapses, which are themselves governed by <a href="./synapse/spikeResponder.html">spike responders</a>. More details can be found in the <a href="./synapse/spikeResponder.html">spike responder</a> and <a href="spikingneurons.html">spiking neuron</a> documentation pages. The basic idea is that spikes are modeled as being instantaneous in time and spike responders generate a continuous value from this instantaneous one, for example producing a decaying stream of input to the post-synaptic neuron after a spike (as in the animated image above).
             </blockquote>
         </p>
-    
+
+        <p class="heading">Popup Menu (Selected Neurons) </p>
+        <p>When right clicking on a neuron a popup-menu appears whose actions will usually apply to selected neurons.  Most of these actions are described in the <a href="menu.html#menuEdit">menu documentation</a>.  The following actions only appear in the popup menu:</p>
+        <p>
+            <blockquote>
+                <span class="heading2">Send Scalar Coupling To</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from selected source nodes' activation to a target consumer.
+                <br>
+                <span class="heading2">Receive Scalar Coupling From</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from a target producer elsewhere in Simbrain to the selected node, which treats them as an external <a href="#inputType">input</a> to the neuron.<span class="heading2"></span>
+            </blockquote>
+        </p>
+
     </div>
 </body>
 

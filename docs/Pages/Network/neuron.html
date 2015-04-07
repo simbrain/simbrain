@@ -14,10 +14,9 @@
 
 <body>
     <a href="../../SimbrainDocs.html">
+        <div class="logo">
+        </div>
     </a>
-    <div class="logo">
-        <a href="../../SimbrainDocs.html"> </a>
-    </div>
     <div id="main_docs">
         <div class="navi">
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
@@ -83,11 +82,10 @@
             <p><span class="heading2">Clear: </span> Press the "c" key or the "eraser" button on the toolbar to set the activations of all selected neurons to 0. </p>
         </blockquote>
 
-
         <p class="heading">Neuron Dialog / Editing Neurons </p>
-        <p>More detailed adjustments  parameters can be adjusted using the neuron dialog.  The dialog contains several sections, including a section for adjusting common neuron properties, described below, and a section specific to the neuron type (these parameters are discussed in the relevant sub-pages). </p>
+        <p>More detailed adjustments  parameters can be adjusted using the neuron dialog.  The dialog contains several sections, including a section for adjusting common neuron properties, described below, and a section specific to the neuron update rule (these parameters are discussed in the relevant sub-pages). </p>
 
-        <p style="padding: 40px; float:right;"><img src="../../Images/NeuronDialog.png" width="250"></p>
+        <p style="padding: 40px; float:right;"><img src="../../Images/NeuronDialog.png" width="250" border = "1"></p>
 
         <p>The neuron dialog can be invoked in the following ways:</p>
         <blockquote>
@@ -106,7 +104,7 @@
             <p><span class="heading2"><a name="LowBound"></a>Lower bound:</span> This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the "least active" color for a neuron.</p>
             <p><a id="priority"></a><span class="heading2">Priority:</span> The priority of a given neuron, used in <a href="update.html#priority">priority based update</a>.  Lower numbers correspond to higher priority (think of first priority, second priority, etc.), and will be updated first when the network's update method is set to priority based update.  Priorities can be viewed in the GUI using the <a href="menu.html">view</a> menu.</p>
             <p><a id="increment"></a><span class="heading2">Increment:</span> This sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
-            <p><span class="heading2">Input Type:</span> This field sets the input as <a href="#wtdinput">weighted</a> or synaptic.</p>
+            <p><span class="heading2">Input Type:</span> This field sets the <a href="#inputType">input type</a> as weighted or synaptic.</p>
         </blockquote>
         <p class="heading"><a id="clamping"></a>Clamping</p>
         <p>In general, a clamped neuron will not change over time; it is "clamped" to its current value. The clamped neuron does not consult its update rule in order to update it's activation.  It sits on whatever value it's had. It holds on to current activation.  <b>Note:</b> However the clamped neurons values can still be changed by external sources.  Manually pressing the up and down buttons will force them to change.  Also, <a href="training/testInputs.html">testing input tables</a>, used in many <a href="subnetwork.html">subnetworks</a>, can modify clamped neurons. The clamp neurons button <img style="width: 18px; height: 18px;" alt="Clamp Neuron" src="../../Images/Clamp_N.png" /> in <a href="groups/NeuronGroup.html">neuron group</a> clamps all the neurons in that group.</p>

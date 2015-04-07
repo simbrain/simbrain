@@ -43,10 +43,15 @@
         </div>
         <p></p>
         <h1>Synapses</h1>
-        <p>Synapses, also known as weights, are represented in Simbrain by a colored semicircle. The size of the semicircle is proportional to how far the synaptic strength is between 0 and its upper or lower bound. The exact strength can be determined by lingering over a synapse or double clicking on it. The color of a synapse represents whether the strength is: greater than 0, red; less than 0, blue; or equal to 0, white. The last case represents, as it were, the absence of a weight. These conventions can be adjusted in the <a href="network_prefs.html">preference dialog.</a>&nbsp;</p>
 
-        <p class="heading">Quick Adjustment of Synapse Properties</p>
-        <p>By selecting a synapse or set of synapses and pressing certain buttons, those synapses's properties can quickly be adjusted.  This can be done while a network is running and can be useful for exploring a networks' properties.</p>
+        <p>In Simbrain, synapses, also known as weights, exist either as <a href="../Network.html#loose">loose synapses</a> or within <a href="groups/SynapseGroup.html">synapse groups</a>. This pages describes general synapse properties, the synapse dialog, and how to edit loose synapses.</p>
+
+        <p>Loose synapses are represented by a colored semicircle. The size of the semicircle is proportional to how far the synaptic strength is between 0 and its upper or lower bound. The exact strength can be determined by lingering over a synapse or double clicking on it. The color of a synapse represents whether the strength is: greater than 0, red; less than 0, blue; or equal to 0, white. The last case represents, as it were, the absence of a weight. These conventions can be adjusted in the <a href="network_prefs.html">preference dialog.</a>&nbsp;</p>
+
+        <p style="float:left; padding: 30px;"> <img src="../../Images/simple_net.gif" height="175" border="1"></p>
+
+        <p class="heading">Quick Keyboard Adjustment of Synapse Properties</p>
+        <p>By <a href="buildingnets.html#selectObjects">selecting</a> a set of weights (e.g. by pressing "w", or by lassoing over a group of lines) and pressing certain buttons, those weight's properties can quickly be adjusted.</p>
         <blockquote>
             <p><a id="incrementing"></a><span class="heading2">Increment / Decrement: </span> Press the up and down buttons to adjust synapse strengths.  If the up key is pressed, the <a href="#increment">increment</a> amount of a given synapse is added to the current strength.  The size of the weight should be visibly changing.   Similarly for the down key. </p>
             <p><span class="heading2">Randomize: </span> Press the "r" key or the 
@@ -54,23 +59,28 @@
             <p><span class="heading2">Clear: </span> Press the "c" key or the "eraser" button on the toolbar to set the strengths of all selected synapses to 0. </p>
         </blockquote>
 
-        <p class="heading">Editing Synapse Properties </p>
-        <br>
-        <p>To set a single synapse, double click or right click on it and select <span class="command">set properties</span>. Since synapses are relatively small, you can either zoom in or lasso the synapse of interest.</p>
-        <p>To set multiple synapses, select more than one synapse, and either double click on one of the synapses you have selected, or select <span class="command">set properties</span> from the popup or network menu. A dialogue box pertaining to multiple synapses will appear. If the selected synapses are of different synapse types, only the common properties appear. Consistent properties are shown as normal, while inconsistent properties have "..." in the text box. Any changes, including changes to the fields where parameters have been marked as inconsistent, are applied to all of the selected synapses.</p>
+        <p class="heading">Synapse Dialog / Editing Synapses </p>
+        <p>More detailed adjustments  parameters can be adjusted using the synapse dialog.  The dialog contains several sections, including a section for adjusting common synapse properties, described below, a section specific to the synapse update rule (these parameters are discussed in the relevant sub-pages), and a section for setting <a href="synapse/spikeResponder.html">spike responders</a>, if any. </p>
+
+        <p style="padding: 40px; float:right;"><img src="../../Images/SynapseDialog.png" width="250" border = "1"></p>
+
+        <p>The synapse dialog can be invoked in the following ways:</p>
+        <blockquote>
+            <p><span class="heading2">Setting single synapses: </span>To set a single synapse, double click or right click on it and select <span class="command">set properties</span>. Since synapses are relatively small, you can either zoom in or lasso the synapse of interest.</p>
+            <p><span class="heading2">Setting multiple synapses:</span> To set multiple synapses, select more than one synapse, and either double click on one of the synapses you have selected, or select <span class="command">set properties</span> from the popup or network menu. A dialogue box pertaining to multiple synapses will appear. If the selected synapses are of different synapse types, only the common properties appear. Consistent properties are shown as normal, while inconsistent properties have "..." in the text box. Any changes, including changes to the fields where parameters have been marked as inconsistent, are applied to all of the selected synapses.</p>
+        </blockquote>
 
         <p class="heading">Popup Menu (Selected Synapses) </p>
         <p>When right clicking on a synapse a popup-menu appears whose actions will usually apply to selected synapses.  Most of these actions are described in the <a href="menu.html#menuEdit">menu documentation</a>.  The following actions only appear in the popup menu:</p>
         <p>
             <blockquote>
-                <span class="heading2">Send Scalar Coupling To</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from selected source synapse's strength to a target consumer.
-                <br>
-                <span class="heading2">Receive Scalar Coupling From</span>: Create a <a href="../Workspace/Couplings.html">coupling</a> from a target producer elsewhere in Simbrain to the selected synapse.<span class="heading2"></span>
+                <p><span class="heading2">Send Scalar Coupling To: </span> Creates a coupling such that this synapse's strength is forwarded to some other scalar consumer in Simbrain, e.g. a time-series graph. See the <a href="../../workspace/Couplings.html">couplings</a> page.</p>
+                <p><span class="heading2">Receive Scalar Coupling from: </span> Creates a coupling such that this synapse's strength is set by the value of some other scalar producer in Simbrain.</p>
             </blockquote>
         </p>
 
         <p class="heading">Common Synapse Properties </p>
-        <p>These are properties common to all synapses, regardless of type. All of them have some reflection in the GUI interface, but some of them <em>only</em> matter to the GUI interface (e.g. increment). For some synapses, upper bound and lower bound does not have a significant role other than to limit how larget the graphical representation of the synapse can be. </p>
+        <p>These are properties common to all synapses, regardless of type. All of them have some reflection in the GUI interface, but some of them <em>only</em> matter to the GUI interface (e.g. increment). For some synapses, upper bound and lower bound does not have a significant role other than to limit how large the graphical representation of the synapse can be. </p>
         <blockquote>
             <p><span class="heading2">Strength</span>: The strength is how "strong" this synapse is. This is represented by the size of the weight. Once a synapse has been selected, strength can be incremented by the up and down arrows or can be randomized. </p>
             <p><span class="heading2"><a id="Enabled"></a>Enabled / Disabled</span>: An enabled synapse operates as usual, transmitting information from a source neuron to a target neuron. If disabled the synapse will no longer do this. Functionally, the synapse does not exist.</p>
@@ -80,10 +90,6 @@
             <p> <a id="increment"></a><span class="heading2">Increment</span>: The increment field sets the amount that a synapse is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the synapse will increase its strength by .1.
             </p>
             <p><span class="heading2">Delay</span>: A positive integer that delays how many iterations, or time-steps, must occur before the pre-synaptic signal, or the activation of the pre-synaptic neuron, is delivered.</p>
-            <p><span class="heading2">Clipping</span>:&nbsp; Similar to <a href="neuron.html#clipping">neuron clipping</a>.
-            </p>
-            <p><span class="heading2">Send Scalar Coupling To: </span> Creates a coupling such that this synapse's strength is forwarded to some other scalar consumer in Simbrain, e.g. a time-series graph. See the <a href="../../workspace/Couplings.html">couplings</a> page.</p>
-            <p><span class="heading2">Receive Scalar Coupling from: </span> Creates a coupling such that this synapse's strength is set by the value of some other scalar producer in Simbrain.</p>
         </blockquote>
     </div>
 </body>

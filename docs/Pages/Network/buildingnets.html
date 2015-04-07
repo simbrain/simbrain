@@ -23,21 +23,19 @@
 
         <p>Network editing in Simbrain is modeled on a familiar "draw" interface which involves creating screen elements, copying, and pasting.  This page focuses an adding nodes and configuring screen objects.  There are special techniques for connecting neurons with synapses described on the <a href="connections.html">connections page</a>.  Group level operations, for connecting neuron groups to each other are described in the <a href="groups.html">group pages</a>.</p>
 
-        <p class="heading">
-            <a name="NewNode"></a>Creating Nodes </p>
+        <p class="heading"> <a name="createObjects"></a>Creating Objects </p>
+        <p>Here is how to create single objects and groups of objects.  Primarily nodes are discussed here, but similar ideas apply for text objects, neuron groups, and other Simbrain objects.</p>
+
         <blockquote>
             <p><span class="heading2">Creating a node:</span> Nodes are created by pressing "P" or by pressing the new node button <img src="../../Images/AddNeuron.png" height="18" width="18"> in the toolbar. Any new nodes will be created at the last position clicked on-screen. </p>
             <p><span class="heading2">Creating a line of nodes:</span> Repeatedly pressing "P" or the new node button results in a line of nodes being created beginning at the last clicked position.</p>
-            <p><span class="heading2">Creating specific types of neurons:</span> By default, new nodes are <a href="./neuron/linear.html">Linear</a>. The default node type cannot currently be changed, though this is planned. To create a node of a specific type, simply create a new node, right click the node, then go to "Edit 1 Selected Neuron". From there one can select any neuron type in Simbrain from a dropdown menu.</p>
-            <p><span class="heading2">Creating many nodes:</span> To create many nodes at once one can go to <span class="command">Insert &gt; Add Neurons</span> and instantly create an arbitrary number of neurons specified in the Add Neurons window. Upon closing windows requesting information on the type and layout of the neurons will appear. Information on laying out groups of neurons can be found on the <a href="./layouts.html">Layouts</a> page. Alternately, to create many nodes of a specific type one can:
+            <p><span class="heading2">Creating specific types of neurons:</span> By default, new nodes are <a href="./neuron/linear.html">Linear</a>. The default node type cannot currently be changed, though this is planned. To create a node of a specific type, simply create a new node, double click or right click the node and edit (or click command-E).  From there one can select any neuron type in Simbrain from a dropdown menu. The same thing can be done for groups of nodes: select them all and double clcik on one </p>
+            <p><span class="heading2">Add neurons dialog:</span> To create many nodes at once one can go to <span class="command">Insert &gt; Add Neurons</span> and instantly create an arbitrary number of neurons specified in the Add Neurons window.  You can determine what type of neurons will be created (this part of the dialog is the same as the <a href="neuron.html">neuron dialog</a>) and how they will be layed out (see <a href="./layouts.html">layouts</a>).  There is also a checkbox which will make these neurons be created as a group.
             </p>
-            <ul>
-                <li>Create a node, set its type (as specified above), and then copy and paste repeatedly.</li>
-                <li>Create many default nodes, <a href="#selectObjects">select</a> all of them, right click any of them, and change their type using the neuron dialog.</li>
-            </ul>
-
-            <p><span class="heading2">Creating networks or groups of nodes:</span> Subnets are created using <span class="command">Insert &gt; Add Network</span>. <a href="./subnetwork.html">Subnetworks</a> and small groups of neurons can be created, copied, and repeatedly pasted to quickly create many sets of similar elements. </p>
-
+            <p><span class="heading2">Copy paste:</span> Create a node, set its type (as specified above), and then <a href="#copyPaste">copy and paste</a> repeatedly.
+            </p>
+            <p><span class="heading2">Creating subnetworks or groups of nodes:</span> Subnets are created using <span class="command">Insert &gt; Add Network</span>. <a href="./subnetwork.html">Subnetworks</a> and small groups of neurons can be created, copied, and repeatedly pasted to quickly create many sets of similar elements. </p>
+            <p><span class="heading2">Creating synapses or synapse groups:</span> See the <a href="connections.html">connections</a> documentation.</p>
         </blockquote>
 
         <p class="heading"> <a name="selectObjects"></a>Selecting Objects</p>

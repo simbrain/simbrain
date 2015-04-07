@@ -3,8 +3,6 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -12,34 +10,31 @@
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
         <div class="navi">
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Feedforward</p>
         </div>
-
         <p></p>
         <h1>Feedfoward Network</h1>
 
-        <div><img style="float:right; padding-left: 20px; padding-right: 50px;" width="225" src="../../../Images/feedforward.png">
-        </div>
+        <p style="float:right; padding: 30px;"><img width="200" src="../../../Images/feedforward.png"> </p>
+        
+        <p>A feed-forward network, comprising a sequence of <a href="../groups/BareNeuronGroup.html">neuron groups</a> connected by all-to-all <a href="../groups/SynapseGroup.html">synapse groups</a>. <a href="backpropnetwork.html">Backprop networks</a> and <a href="lmsnetwork.html">LMS networks</a> are subtypes of feedforward networks. Activation in the bottom layer of a feed-forward network will propagate up the network, layer by layer. </p>
 
-        <p>A feed-forward network, comprising a sequence of <a href="../groups/BareNeuronGroup.html">neuron groups</a> connected by all-to-all <a href="../groups/SynapseGroup.html">synapse groups</a>. Activation in the bottom layer will propagate up the network. </p>
+        <p style="float:left; padding: 10px;"><img width="400" src="../../../Images/ff_creation.png"> </p>
 
         <p><span class="heading">Creation Dialog</span>
         </p>
 
-        <p>The network's topology is specified in a creation dialog:</p>
-        <blockquote>
-            <p><span class="heading2">Number of Layers:</span> Sets the number of layers in the betwork.  Enter a value in the text field and press <b>change</b>.  When you do, the dialog changes, allowing you to specify number of neurons and neuron type separately from each layer.  Layer 1 is the input layer.
-            </p>
-            <p><span class="heading2">Number of Neurons:</span> Sets the number of neurons for a given layer.
-            </p>
-            <p><span class="heading2">Neuron Type:</span> Sets the neuron type for a given layer.  By default these are variants of a <a href="../neuron/SigmoidalDiscrete.html">discrete sigmoidal</a> neuron.</p>
-        </blockquote>
-        <p><img width="375" src="../../../Images/ff_creation.png">
+        <p>A feed-forward network's topology is specified using a creation dialog with these fields:</p>
+        <p><span class="heading2">Number of Layers:</span> Sets the number of layers in the betwork. Enter a value in the text field and press <b>change</b>. When you do, the dialog changes, allowing you to specify number of neurons and neuron type separately from each layer. Layer 1 is the input layer.
+        </p>
+        <p><span class="heading2">Number of Neurons:</span> Sets the number of neurons for a given layer.
+        </p>
+        <p><span class="heading2">Neuron Type:</span> Sets the neuron type for a given layer. By default these are variants of a <a href="../neuron/SigmoidalDiscrete.html">discrete sigmoidal</a> neuron.</p>
+
         </p>
     </div>
 </body>

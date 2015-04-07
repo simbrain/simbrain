@@ -29,10 +29,19 @@
                 </p>
             </blockquote>
         </div>
+
         <h1>Neuron Group</h1>
-        <p>A neuron group is a group consisting of a neuron(s) in which is represented by an enclosure of the neuron(s). The label at the top of the enclosure is the group's name (defaulted to the type of neuron group). There are various types of neuron group (listed to the right) in Simbrain, each of which has numerous parameters that can be set. This page covers properties common to all of the different neuron group types. Details of each type can be found on their respective page. </p>
+        <p>A neuron group is a logical grouping of neurons which is surrounded by a gray line and an <a href="../groups.html#interactionBox">interaction box</a>. There are various types of neuron group (listed to the right) in Simbrain, each of which has parameters that can be set, and they are also constituents of <a href="../subnetwork.html">subnetworks</a>. This page covers properties common to all of the different neuron group types. Details of each type can be found on their respective page. </p>
+
+        <p>To create a neuron group either use the <span class="command">insert menu</span> and select <span class="command">bare neuron group</span> or use the <span class="command">Insert > Add neurons...</span> command and select the checkbox to create a group.</p>
+        
+        <p>Neuron groups can also be <a href="../buildingnets.html#copyPaste">copy and pasted</a>.</p>
+
+        <p>For information on connecting neuron groups with synapse groups see <a href="SynapseGroup.html#synapseGroupCreation">the synapse group creation</a> documentation.</p>
+        
         <p class="heading">
             <a name="EditDialog"></a>Creation/Edit Dialog</p>
+        
         <p class="heading">
             <a name="summary"></a>Summary
         </p>
@@ -57,6 +66,7 @@
         <blockquote>
             <p>See the <a href="../training/testInputs.html">test inputs</a> page.</p>
         </blockquote>
+
         <p class="heading">
             <a name="RightClick"></a>Right Click Menu</p>
         <blockquote>
@@ -76,15 +86,15 @@
             <br>
             <span class="heading2">Unclamp Neurons: </span>Unclamp all the neurons in the group
             <br>
-            <span class="heading2">Set Group as Source: </span> Set the group as source group for some future synaptic connections.
+            <span class="heading2">Set Group as Source: </span> Set the group as source group.  Used when creating synapse groups.   The concept is the same as with individual neurons described <a href="../connections.html#sourceTarget">here</a> but with neuron groups rather than individual neuron.
             <br>
             <span class="heading2">Clear Source Neuron Groups: </span>Deselect the group as source neuron group.
             <br>
             <span class="heading2">Connect Neuron Group with Synapse Group: </span> Connect source and target neuron groups with a synapse group.
             <br>
-            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the network and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.
+            <span class="heading2">Send Vector Coupling To: </span> Copies all activation values in the neuron group and represents them as a vector where each element in the vector is the activation value of a single neuron in the group. This creates a coupling such that this vector is forwarded to some other component in Simbrain. See the <a href="../../workspace/Couplings.html">couplings</a> page.
             <br>
-            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector. It establishes this sort of connection and a new vector will be forwarded at each workspace update.
+            <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector.
             <br>
             <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>.
         </blockquote>

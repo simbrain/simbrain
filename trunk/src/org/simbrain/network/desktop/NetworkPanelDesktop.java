@@ -319,8 +319,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
         contextMenu.add(new DeleteAction(this));
         contextMenu.addSeparator();
 
-        contextMenu.add(this.getActionManager().getGroupMenu());
-        contextMenu.addSeparator();
+        //contextMenu.add(this.getActionManager().getGroupMenu());
+        //contextMenu.addSeparator();
 
         // Workspace workspace = getNetworkPanel().getWorkspace();
         // if (workspace.getGaugeList().size() > 0) {

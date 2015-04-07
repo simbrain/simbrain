@@ -153,9 +153,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         // Weight adjustment stuff
         menu.addSeparator();
-        Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
-            public void actionPerformed(final ActionEvent event) {
-                selectSynapses();
+        //Action adjustSynapses = new AbstractAction("Adjust Synapses...") {
+        //    public void actionPerformed(final ActionEvent event) {
+        //        selectSynapses();
                 // TODO: Check after synapse group code stabilizes for more
                 // efficient way.
                 // final SynapseAdjustmentPanel synapsePanel =
@@ -173,9 +173,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
                 // synapsePanel.removeListeners();
                 // }
                 // });
-            }
-        };
-        menu.add(adjustSynapses);
+            //}
+        //};
+        //menu.add(adjustSynapses);
         menu.add(new JMenuItem(showWeightMatrixAction));
 
         // Freezing actions

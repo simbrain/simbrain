@@ -68,38 +68,38 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         update();
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean isDraggable() {
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasToolTipText() {
         return false;
     }
 
-    /** @Override. */
+    /** @Override */
     protected String getToolTipText() {
         return null;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasContextMenu() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
@@ -121,21 +121,21 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         return contextMenu;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasPropertyDialog() {
         return false;
     }
 
-    /** @Override. */
+    /** @Override */
     protected JDialog getPropertyDialog() {
         return null;
     }
 
-    /** @Override. */
+    /** @Override */
     public void resetColors() {
     }
 
-    /** @Override. */
+    /** @Override */
     public void propertyChange(PropertyChangeEvent arg0) {
         setBounds(pStyledText.getBounds());
     }

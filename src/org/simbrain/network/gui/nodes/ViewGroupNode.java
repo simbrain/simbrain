@@ -64,65 +64,65 @@ public class ViewGroupNode extends ScreenElement implements
         }
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean isSelectable() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean showSelectionHandle() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     public boolean isDraggable() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasToolTipText() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /** @Override. */
+    /** @Override */
     protected String getToolTipText() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasContextMenu() {
         return true;
     }
 
-    /** @Override. */
+    /** @Override */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
         contextMenu.add(new UngroupAction(getNetworkPanel(), this));
         return contextMenu;
     }
 
-    /** @Override. */
+    /** @Override */
     protected boolean hasPropertyDialog() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /** @Override. */
+    /** @Override */
     protected JDialog getPropertyDialog() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /** @Override. */
+    /** @Override */
     public void resetColors() {
     }
 
-    /** @see PNode. */
+    /** @see PNode */
     public void propertyChange(PropertyChangeEvent arg0) {
         xOffset = oldPosition.getX() - this.getOffset().getX();
         yOffset = oldPosition.getY() - this.getOffset().getY();

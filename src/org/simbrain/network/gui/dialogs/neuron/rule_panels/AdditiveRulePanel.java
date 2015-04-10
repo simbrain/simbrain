@@ -65,8 +65,6 @@ public class AdditiveRulePanel extends AbstractNeuronRulePanel {
 
     /**
      * Creates an instance of this panel.
-     *
-     * @param net Network
      */
     public AdditiveRulePanel() {
         super();

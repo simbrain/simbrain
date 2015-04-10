@@ -46,6 +46,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
     /**
      * Create a new selection event handler.
+     * @param networkPanel 
      */
     public WandEventHandler(NetworkPanel networkPanel) {
         super();

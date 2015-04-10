@@ -779,9 +779,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * neurons with the exact same position as the given neuron as a part 
      * of the returned list.
      * 
-     * @param n
-     * @param radius
-     * @return
+     * @param n the neurons
+     * @param radius the radius to search within.
+     * @return neurons in the group within a certain radius
      */
     public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
         ArrayList<Neuron> ret = new ArrayList<Neuron>((int)(size()/0.75f));

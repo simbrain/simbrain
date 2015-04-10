@@ -84,7 +84,7 @@ final class DragEventHandler extends PDragSequenceEventHandler {
     /**
      * Create a new selection event handler.
      *
-     * @param networkPanel
+     * @param networkPanel parent panel
      */
     public DragEventHandler(NetworkPanel networkPanel) {
         super();

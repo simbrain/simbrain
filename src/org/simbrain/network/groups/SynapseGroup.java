@@ -1265,7 +1265,7 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param excitatoryRandomizer
+     * @param excitatoryRandomizer the randomizer to be used to determine the weights of excitatory synapses.
      */
     public void setExcitatoryRandomizer(
             PolarizedRandomizer excitatoryRandomizer) {
@@ -1274,7 +1274,7 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param inhibitoryRandomizer
+     * @param inhibitoryRandomizer the randomizer to be used to determine the weights of inbihitory synapses.
      */
     public void setInhibitoryRandomizer(
             PolarizedRandomizer inhibitoryRandomizer) {
@@ -1282,7 +1282,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * @param excitatoryRandomizer
+     * @param excitatoryRandomizer 
      * @param inhibitoryRandomizer
      */
     public void setRandomizers(PolarizedRandomizer excitatoryRandomizer,
@@ -1425,7 +1425,8 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param template
+     * @param template the set synapse template
+     * @param polarity 
      */
     public void setAndConformToTemplate(Synapse template, Polarity polarity) {
         setDelay(template.getDelay(), polarity);
@@ -1448,7 +1449,7 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param delay
+     * @param delay the set delay
      * @param polarity
      */
     public void setDelay(int delay, Polarity polarity) {

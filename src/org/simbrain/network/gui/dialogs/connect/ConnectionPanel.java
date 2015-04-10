@@ -197,6 +197,7 @@ public final class ConnectionPanel {
 
     /**
      * Test the connection panel.
+     * @param args 
      */
     public static void main(String[] args) {
         NetworkPanel np = new NetworkPanel(new Network());

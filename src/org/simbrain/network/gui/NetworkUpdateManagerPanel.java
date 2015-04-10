@@ -75,6 +75,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
 
     /**
      * Creates a new update manager panel.
+     * @param network 
+     * @param parentDialog
      */
     public NetworkUpdateManagerPanel(final Network network,
             final StandardDialog parentDialog) {

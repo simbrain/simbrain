@@ -78,7 +78,7 @@ public class NetworkHierarchyPanel extends JScrollPane {
     /**
      * Construct the panel.
      *
-     * @param networkPanel
+     * @param networkPanel parent panel.
      */
     public NetworkHierarchyPanel(NetworkPanel networkPanel) {
         super();

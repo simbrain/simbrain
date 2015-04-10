@@ -48,7 +48,6 @@ public class SpikingThresholdRulePanel extends AbstractNeuronRulePanel {
     /**
      * Creates a new instance of the probabilistic spiking neuron panel.
      *
-     * @param net Network
      */
     public SpikingThresholdRulePanel() {
         super();

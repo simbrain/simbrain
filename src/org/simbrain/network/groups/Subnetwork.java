@@ -214,7 +214,7 @@ public abstract class Subnetwork extends Group {
      * Adds an already constructed synapse group to the subnetwork and provides
      * it with an appropriate label.
      *
-     * @param synGrp
+     * @param synGrp group to add
      */
     public void addAndLabelSynapseGroup(SynapseGroup synGrp) {
         addSynapseGroup(synGrp);
@@ -401,7 +401,7 @@ public abstract class Subnetwork extends Group {
      * this subnetwork. This list <b>is</b> modifiable, but this method is
      * protected... use with care.
      *
-     * @return
+     * @return flat neuron list
      */
     protected List<Neuron> getModifiableNeuronList() {
         List<Neuron> ret = new ArrayList<Neuron>();

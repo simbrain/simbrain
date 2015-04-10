@@ -101,9 +101,9 @@ public class ConnectionSynapsePropertiesPanel extends JPanel implements
 
     /**
      *
-     * @param parent
-     * @param synapseGroup
-     * @return
+     * @param parent parent panel
+     * @param synapseGroup the synapse group whose connection object is set
+     * @return the new synapse connection
      */
     public static ConnectionSynapsePropertiesPanel
             createSynapsePropertiesPanel(

@@ -62,8 +62,8 @@ public class ConnectionUtilities {
      * assigned default strengths based on their polarity depending on which
      * randomizers are null.
      *
-     * @param exciteRand 
-     * @param inhibRand 
+     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses. 
+     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
      * @param synapses the synapses to modify
      * @throws IllegalArgumentException
@@ -131,8 +131,8 @@ public class ConnectionUtilities {
     /**
      *
      * @param synapses the synapses to modify
-     * @param exciteRand 
-     * @param inhibRand
+     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses. 
+     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      */
     public static void randomizeSynapses(Collection<Synapse> synapses,
         PolarizedRandomizer exciteRand, PolarizedRandomizer inhibRand) {
@@ -163,7 +163,7 @@ public class ConnectionUtilities {
      * the given excitatory randomizer.
      *
      * @param synapses the synapses to modify
-     * @param exciteRand
+     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses. 
      */
     public static void randomizeExcitatorySynapses(
         Collection<Synapse> synapses, PolarizedRandomizer exciteRand) {
@@ -184,7 +184,7 @@ public class ConnectionUtilities {
      * the synapses in the list is known ahead of time.
      *
      * @param synapses the synapses to modify
-     * @param exciteRand
+     * @param exciteRand the randomizer to be used to determine the weights of excitatory synapses. 
      */
     public static void randomizeExcitatorySynapsesUnsafe(
         Collection<Synapse> synapses, PolarizedRandomizer exciteRand) {
@@ -200,7 +200,7 @@ public class ConnectionUtilities {
      * the given inhibitory randomizer.
      *
      * @param synapses the synapses to modify
-     * @param inhibRand
+     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      */
     public static void randomizeInhibitorySynapses(
         Collection<Synapse> synapses, PolarizedRandomizer inhibRand) {
@@ -221,7 +221,7 @@ public class ConnectionUtilities {
      * the synapses in the list is known ahead of time.
      *
      * @param synapses the synapses to modify
-     * @param inhibRand
+     * @param inhibRand the randomizer to be used to determine the weights of inhibitory synapses.
      */
     public static void randomizeInhibitorySynapsesUnsafe(
         Collection<Synapse> synapses, PolarizedRandomizer inhibRand) {
@@ -235,7 +235,7 @@ public class ConnectionUtilities {
     /**
      *
      * @param synapses the synapses to modify
-     * @return
+     * @return excitatory synapses
      */
     public static ArrayList<Synapse> getExcitatorySynapses(
         Collection<Synapse> synapses) {
@@ -251,8 +251,8 @@ public class ConnectionUtilities {
 
     /**
      *
-     * @param synapses
-     * @return
+     * @param synapses the synapses to modify
+     * @return inhibitory synapses
      */
     public static ArrayList<Synapse> getInhibitorySynapses(
         Collection<Synapse> synapses) {
@@ -321,9 +321,9 @@ public class ConnectionUtilities {
      * Throws an exception if the template synapses do not match the appropriate
      * polarities implied by their names.
      *
-     * @param synapses
-     * @param exTemplateSynapse
-     * @param inTemplateSynapse
+     * @param synapses the synpases to modify
+     * @param exTemplateSynapse temporary set containing all excitatory synapses
+     * @param inTemplateSynapse temporary set containing all inhibitory synapses
      */
     public static void conformToTemplates(Collection<Synapse> synapses,
         Synapse exTemplateSynapse, Synapse inTemplateSynapse) {
@@ -388,7 +388,7 @@ public class ConnectionUtilities {
 
     /**
      *
-     * @param excitatoryRatio
+     * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
      * @param exciteCount
      * @param inhibCount
      * @param s
@@ -451,7 +451,7 @@ public class ConnectionUtilities {
      *
      * @param exciteRule
      * @param inhibRule
-     * @param synapses
+     * @param synapses 
      */
     public static void applyLearningRules(SynapseUpdateRule exciteRule,
         SynapseUpdateRule inhibRule, List<Synapse> synapses) {

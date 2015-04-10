@@ -44,6 +44,8 @@ public class NetworkUtils {
      *            the list of objects to check for consistency
      * @param methodName
      *            the method to be invoked (uses reflection)
+     * @param theClass
+     *            the class method is in
      * @return true if the list of objects returns the same value for
      *         methodName, false otherwise
      */

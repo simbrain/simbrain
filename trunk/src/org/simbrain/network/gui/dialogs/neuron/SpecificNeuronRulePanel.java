@@ -280,7 +280,7 @@ public class SpecificNeuronRulePanel extends JPanel implements EditablePanel {
      * Directly access the neuron panel to utilize its methods without using
      * this class as an intermediary. An example of this can be seen in
      *
-     * @see org.simbrain.network.gui.dialogs.AddNeuronsDialog.java
+     * @see AddNeuronsDialog
      * @return the currently displayed neuron update rule panel
      */
     public AbstractNeuronRulePanel getNeuronPanel() {

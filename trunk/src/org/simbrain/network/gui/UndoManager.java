@@ -24,7 +24,7 @@ import java.util.Stack;
  * Manage undo / redo operations in the network panel.
  *
  * @author jeffyoshimi
- * @see NetworkPanel.
+ * @see NetworkPanel
  */
 public class UndoManager {
 

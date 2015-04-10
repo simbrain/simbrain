@@ -34,6 +34,7 @@ public final class LoadNeuronScriptAction extends AbstractAction {
 
     /**
      * Load a custom neuron script.
+     * @param neuron 
      */
     public LoadNeuronScriptAction(final Neuron neuron) {
         super("Load...");

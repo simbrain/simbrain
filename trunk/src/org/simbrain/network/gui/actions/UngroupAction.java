@@ -42,7 +42,8 @@ public final class UngroupAction extends AbstractAction {
     /**
      * Ungroup selected objects.
      *
-     * @param networkPanel network panel, must not be null
+     * @param networkPanel network panel, must not be null.
+     * @param node the node being modify
      */
     public UngroupAction(final NetworkPanel networkPanel,
             final ViewGroupNode node) {

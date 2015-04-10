@@ -392,7 +392,7 @@ public class Sparse implements ConnectNeurons {
 
     /**
      *
-     * @param newSparsity
+     * @param newSparsity new sparsity connection
      * @return
      */
     public void removeToSparsity(double newSparsity) {
@@ -440,7 +440,7 @@ public class Sparse implements ConnectNeurons {
 
     /**
      *
-     * @param newSparsity
+     * @param newSparsity new sparsity connection
      * @return
      */
     public void addToSparsity(double newSparsity) {

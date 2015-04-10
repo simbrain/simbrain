@@ -248,7 +248,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
     }
 
     /**
-     * @see AbstractAction.
+     * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent e) {
         boolean found = false;
@@ -311,7 +311,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
     }
 
     /**
-     * @see AbstractAction.
+     * @see AbstractAction
      */
     public void valueChanged(final ListSelectionEvent e) {
         if (e.getSource() == fList) {

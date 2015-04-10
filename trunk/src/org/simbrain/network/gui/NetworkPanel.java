@@ -373,6 +373,7 @@ public class NetworkPanel extends JPanel {
     
     /**
      * Create a new Network panel.
+     * @param Network the network panel being created.
      */
     public NetworkPanel(final Network Network) {
         super();
@@ -3098,9 +3099,9 @@ public class NetworkPanel extends JPanel {
      * A copy of displayPanel except returning a subclass of Window. Here to
      * temporarily resolve ongoing conflict between classes using generic frame
      * and classes using window.
-     * @param panel
-     * @param title
-     * @return
+     * @param panel the display panel
+     * @param title the title of the panel
+     * @return the new frame
      */
     public JDialog displayPanelInWindow(final JPanel panel, String title) {
         JDialog frame = new GenericJDialog();

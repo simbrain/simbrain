@@ -106,7 +106,7 @@ public class CondensedConnectionPanel {
     /**
      * Returns the density based connection panel so that other classes can
      * set certain properties of the panel independent of this class.
-     * @return
+     * @return the density 
      */
     public SparseConnectionPanel getConnectorPanel() {
         return connectorPanel;

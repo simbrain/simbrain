@@ -120,9 +120,9 @@ public class TestInputPanel extends DataPanel {
     /**
      * Create the test input panel.
      *
-     * @param networkPanel
-     * @param inputNeurons
-     * @param dataHolder
+     * @param networkPanel networkPanel, must not be null.
+     * @param inputNeurons input neurons of the network to be tested.
+     * @param dataHolder the class whose data should be edited.
      * @return the constructed panel.
      */
     public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel,

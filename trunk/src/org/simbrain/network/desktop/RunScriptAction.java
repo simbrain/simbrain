@@ -47,6 +47,7 @@ public final class RunScriptAction extends AbstractAction {
 
     /**
      * Create a new script action for the workspace.
+     * @param networkPanel parent panel.
      */
     public RunScriptAction(NetworkPanel networkPanel) {
         super("Run Script...");

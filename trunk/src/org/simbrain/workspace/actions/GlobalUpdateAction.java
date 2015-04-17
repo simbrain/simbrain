@@ -38,6 +38,7 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
     /**
      * Create an open data world with the specified workspace.
+     * @param workspace
      */
     public GlobalUpdateAction(Workspace workspace) {
         super("Global update", workspace);
@@ -79,7 +80,9 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         workspace.iterate();
     }

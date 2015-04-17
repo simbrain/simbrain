@@ -58,6 +58,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
         SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList.get(0);

@@ -145,6 +145,8 @@ public class EchoStateNetwork extends Subnetwork {
      *            number of reservoir nodes
      * @param outputNodes
      *            number of output nodes
+     * @param initialPosition
+     * 		      the initial position
      */
     public EchoStateNetwork(final Network network, int inputNodes,
         int reservoirNodes, int outputNodes, Point2D initialPosition) {
@@ -195,6 +197,7 @@ public class EchoStateNetwork extends Subnetwork {
      *
      * @param neuronGroup
      * @param synapseGroup
+     * @param spectralRadius
      */
     public void initializeReservoir(NeuronGroup neuronGroup,
         SynapseGroup synapseGroup, double spectralRadius) {

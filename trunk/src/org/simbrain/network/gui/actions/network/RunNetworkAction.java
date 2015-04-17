@@ -54,7 +54,9 @@ public final class RunNetworkAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.setRunning(true);
         Executors.newSingleThreadExecutor().execute(new Runnable() {

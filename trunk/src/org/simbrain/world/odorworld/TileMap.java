@@ -19,6 +19,9 @@ public class TileMap {
     /**
      * Creates a new TileMap with the specified width and height (in number of
      * tiles) of the map.
+     * @param width
+     * @param height
+     * 
      */
     public TileMap(int width, int height) {
         tiles = new Image[width][height];
@@ -27,6 +30,7 @@ public class TileMap {
 
     /**
      * Gets the width of this TileMap (number of tiles across).
+     * @return
      */
     public int getWidth() {
         return tiles.length;
@@ -34,6 +38,7 @@ public class TileMap {
 
     /**
      * Gets the height of this TileMap (number of tiles down).
+     * @return
      */
     public int getHeight() {
         return tiles[0].length;
@@ -42,6 +47,9 @@ public class TileMap {
     /**
      * Gets the tile at the specified location. Returns null if no tile is at
      * the location or if the location is out of bounds.
+     * @param x
+     * @param y
+     * @return
      */
     public Image getTile(int x, int y) {
         if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
@@ -53,6 +61,9 @@ public class TileMap {
 
     /**
      * Sets the tile at the specified location.
+     * @param x
+     * @param y
+     * @param tile
      */
     public void setTile(int x, int y, Image tile) {
         tiles[x][y] = tile;
@@ -60,6 +71,7 @@ public class TileMap {
 
     /**
      * Adds a OdorWorldEntity object to this map.
+     * @param sprite
      */
     public void addSprite(OdorWorldEntity sprite) {
         sprites.add(sprite);
@@ -67,6 +79,7 @@ public class TileMap {
 
     /**
      * Removes a OdorWorldEntity object from this map.
+     * @param sprite
      */
     public void removeSprite(OdorWorldEntity sprite) {
         sprites.remove(sprite);
@@ -75,6 +88,7 @@ public class TileMap {
     /**
      * Gets an Iterator of all the Sprites in this map, excluding the player
      * OdorWorldEntity.
+     * @return
      */
     public Iterator getSprites() {
         return sprites.iterator();

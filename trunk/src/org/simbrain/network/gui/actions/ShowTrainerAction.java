@@ -77,7 +77,9 @@ public final class ShowTrainerAction extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         // Trainer trainer = new Trainer(networkPanel.getNetwork(),
         // networkPanel.getSourceModelNeurons(),

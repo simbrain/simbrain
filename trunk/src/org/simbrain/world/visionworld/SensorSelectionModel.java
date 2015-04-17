@@ -140,7 +140,7 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
 
     /**
      * Return true if the specified sensor is selected.
-     *
+     * @param sensor
      * @return true if the specified sensor is selected
      */
     public boolean isSelected(final Sensor sensor) {

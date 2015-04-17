@@ -60,6 +60,7 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     /**
      * Create new Projection Component.
+     * @param name
      */
     public ProjectionComponent(final String name) {
         super(name);

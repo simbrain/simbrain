@@ -55,6 +55,7 @@ public class OdorWorldRenderer {
 
     /**
      * Sets the background to draw.
+     * @param background
      */
     public void setBackground(Image background) {
         this.background = background;
@@ -62,6 +63,10 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the odor world.
+     * @param world
+     * @param screenWidth
+     * @param screenHeight
+     * @param g
      */
     public void draw(Graphics2D g, OdorWorld world, int screenWidth,
             int screenHeight) {
@@ -163,8 +168,9 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the speech balloon.
-     *
+     * @param effector
      * @return the buffered image
+     * 
      */
     public BufferedImage getSpeechBalloon(Speech effector) {
         BufferedImage vocalize = new BufferedImage(80, 60,
@@ -201,7 +207,7 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the thought bubble.
-     *
+     * @param sensor
      * @return the buffered image
      */
     public BufferedImage getHearingSensorImage(Hearing sensor) {

@@ -44,7 +44,9 @@ public final class AlignHorizontalAction extends ConditionallyEnabledAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.alignHorizontal();
     }

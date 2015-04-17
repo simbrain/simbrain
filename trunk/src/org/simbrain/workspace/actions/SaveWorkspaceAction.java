@@ -37,6 +37,7 @@ public final class SaveWorkspaceAction extends DesktopAction {
 
     /**
      * Create a save workspace action with the specified workspace.
+     * @param desktop
      */
     public SaveWorkspaceAction(SimbrainDesktop desktop) {
         super("Save Workspace", desktop);
@@ -48,7 +49,9 @@ public final class SaveWorkspaceAction extends DesktopAction {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         desktop.save();
     }

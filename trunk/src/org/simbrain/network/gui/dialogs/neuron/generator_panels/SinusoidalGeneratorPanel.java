@@ -77,6 +77,7 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronRulePanel {
 
     /**
      * Populates the field with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

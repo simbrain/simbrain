@@ -56,7 +56,9 @@ public class AddEffectorDialog extends StandardDialog implements ActionListener 
     /** Panel for setting effector type. */
     private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-    /** Effector Dialog add effector constructor. */
+    /** Effector Dialog add effector constructor. 
+     * @param entity
+     */
     public AddEffectorDialog(OdorWorldEntity entity) {
         this.entity = entity;
         this.rotatingEntity = (RotatingEntity) entity;

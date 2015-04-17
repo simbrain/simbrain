@@ -113,6 +113,7 @@ public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

@@ -48,6 +48,7 @@ public class NeuronNoiseGenPanel extends RandomizerPanel {
      *
      * @param noiseyNeurons
      *            the neurons
+     * @exception ClassCastException
      */
     public void commitRandom(List<Neuron> noiseyNeurons)
         throws ClassCastException {

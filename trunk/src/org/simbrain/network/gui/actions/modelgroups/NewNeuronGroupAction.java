@@ -48,7 +48,9 @@ public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> neuronList = networkPanel.getSelectedModelNeurons();
         if (neuronList.size() > 0) {

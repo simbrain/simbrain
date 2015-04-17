@@ -57,6 +57,7 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     /**
      * @{inheritDoc
+     * @return the discrete time type
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -78,6 +79,7 @@ public class LogisticRule extends NeuronUpdateRule implements
      *              constructor} is the preferred method of copying because
      *              {@link #init(Neuron) init} is called on the neuron parameter
      *              automatically.
+     * @return         
      */
     public LogisticRule deepCopy() {
         LogisticRule ln = new LogisticRule();
@@ -89,6 +91,7 @@ public class LogisticRule extends NeuronUpdateRule implements
 
     /**
      * @{inheritDoc
+     * @param neuron
      */
     public void update(Neuron neuron) {
 

@@ -36,13 +36,16 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
 
     /**
      * Create a clear workspace action with the specified workspace.
+     * @param desktop
      */
     public ClearWorkspaceAction(SimbrainDesktop desktop) {
         super("Clear Workspace", desktop.getWorkspace());
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         desktop.clearDesktop();
     }

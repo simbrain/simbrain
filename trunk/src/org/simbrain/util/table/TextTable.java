@@ -32,6 +32,8 @@ public class TextTable extends MutableTable<String> {
 
     /**
      * Construct a text table.
+     * @param rows
+     * @param cols
      */
     public TextTable(final int rows, final int cols) {
         init(rows, cols);
@@ -42,6 +44,7 @@ public class TextTable extends MutableTable<String> {
 
     /**
      * Construct table from a set of strings.
+     * @param dictionary
      */
     public TextTable(final Set<String> dictionary) {
         init(dictionary.size(), 1);
@@ -100,7 +103,7 @@ public class TextTable extends MutableTable<String> {
      *            rows
      * @param allowColumnChanges whether to allow data with a different number
      *            of columns
-     * @throws Exception
+     * @exception TableDataException
      */
     public void readData(final File file, final boolean allowRowChanges,
             final boolean allowColumnChanges) throws TableDataException {

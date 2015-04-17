@@ -46,6 +46,7 @@ public class RunningAverageRule extends NeuronUpdateRule {
 
     /**
      * {@inheritDoc}
+     * @param neuron
      */
     public void init(Neuron neuron) {
         // No implementation

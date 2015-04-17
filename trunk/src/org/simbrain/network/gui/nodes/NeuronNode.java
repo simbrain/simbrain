@@ -365,17 +365,23 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 .getBounds().getCenterY() + DIAMETER - 10);
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return screen element selectable
+     */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return screen element show a selection handle
+     */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return able to drag screen element
+     */
     public boolean isDraggable() {
         return true;
     }

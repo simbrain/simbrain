@@ -8,11 +8,13 @@ package org.simbrain.world.threedee;
 public interface Sensor {
     /**
      * {@inheritDoc}
+     * @return
      */
     Double getValue();
 
     /**
      * {@inheritDoc}
+     * @return
      */
     String getDescription();
 }

@@ -195,6 +195,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
 
     /**
      * {@inheritDoc}
+     * @param neuron
      */
     public void init(Neuron neuron) {
         setInputLists(neuron);

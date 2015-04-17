@@ -183,8 +183,8 @@ public class HistogramModel extends ChartModel {
 
     /**
      * Reset the data in the model.
-     *
      * @param data the data to set
+     * @param names 
      */
     public void resetData(List<double[]> data, List<String> names) {
         this.data = data;

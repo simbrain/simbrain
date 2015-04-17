@@ -204,6 +204,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
     /**
      * Construct the Projection GUI.
+     * @param frame
+     * @param component
      */
     public ProjectionGui(final GenericFrame frame,
             final ProjectionComponent component) {

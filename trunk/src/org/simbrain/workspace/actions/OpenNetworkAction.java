@@ -48,7 +48,9 @@ public final class OpenNetworkAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = ".";
         try {

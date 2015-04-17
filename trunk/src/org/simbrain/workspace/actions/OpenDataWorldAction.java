@@ -48,7 +48,9 @@ public final class OpenDataWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = ".";
         try {

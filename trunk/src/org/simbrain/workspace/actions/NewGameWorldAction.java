@@ -34,12 +34,15 @@ public final class NewGameWorldAction extends WorkspaceAction {
 
     /**
      * Create a new odor world action with the specified workspace.
+     * @param workspace
      */
     public NewGameWorldAction(Workspace workspace) {
         super("Game World", workspace);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         GameComponent component = new GameComponent();
         workspace.addWorkspaceComponent(component);

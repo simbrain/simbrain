@@ -151,6 +151,7 @@ public class RasterPlotPanel extends JPanel {
 
     /**
      * Return button panel in case user would like to add custom buttons.
+     * @return
      */
     public JPanel getButtonPanel() {
         return buttonPanel;

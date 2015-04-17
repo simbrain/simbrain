@@ -274,6 +274,9 @@ public class NTree implements Iterable<DataPoint> {
 
         /**
          * compares two points on one dimension
+         * @param o1
+         * @param o2
+         * @return
          */
         public int compare(DataPoint o1, DataPoint o2) {
             double difference = o1.get(dimension) - o2.get(dimension);
@@ -574,6 +577,7 @@ public class NTree implements Iterable<DataPoint> {
 
     /**
      * Returns an iterator over this tree
+     * @return 
      */
     public Iterator<DataPoint> iterator() {
         return list.iterator();

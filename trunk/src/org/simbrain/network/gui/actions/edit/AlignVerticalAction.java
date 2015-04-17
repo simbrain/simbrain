@@ -42,7 +42,9 @@ public final class AlignVerticalAction extends ConditionallyEnabledAction {
         putValue(SHORT_DESCRIPTION, "Align selected neurons vertically");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.alignVertical();
     }

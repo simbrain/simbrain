@@ -341,7 +341,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             this.bounds = bounds;
         }
 
-        /** @see PNodeFilter */
+        /** @see PNodeFilter 
+         * @param node
+         * @return
+         */
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.getGlobalBounds()
@@ -361,7 +364,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             return (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee);
         }
 
-        /** @see PNodeFilter */
+        /** @see PNodeFilter 
+         * @param node
+         * @return
+         */
         public boolean acceptChildrenOf(final PNode node) {
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
@@ -385,7 +391,11 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /** @see PInputEventFilter */
+        /** @see PInputEventFilter 
+         * @param event
+         * @param type
+         * @return
+         */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             EditMode editMode = networkPanel.getEditMode();

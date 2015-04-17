@@ -50,7 +50,9 @@ public final class ShowEditToolBarAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action

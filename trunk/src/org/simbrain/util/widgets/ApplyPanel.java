@@ -133,6 +133,7 @@ public class ApplyPanel extends JPanel implements EditablePanel {
     /**
      * Allows outside parties to add other listeners to the apply panel's apply
      * button.
+     * @param l
      */
     public void addActionListener(ActionListener l) {
         applyButton.addActionListener(l);

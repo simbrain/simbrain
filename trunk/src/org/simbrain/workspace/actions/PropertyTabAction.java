@@ -36,6 +36,7 @@ public final class PropertyTabAction extends AbstractAction {
 
     /**
      * Create an open data world with the specified workspace.
+     * @param desktop
      */
     public PropertyTabAction(SimbrainDesktop desktop) {
         super("Property Tabs");
@@ -43,7 +44,9 @@ public final class PropertyTabAction extends AbstractAction {
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         desktop.toggleDock();
     }

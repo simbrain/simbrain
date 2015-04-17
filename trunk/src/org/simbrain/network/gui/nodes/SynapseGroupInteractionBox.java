@@ -57,6 +57,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      *
      * @param net
      *            parent network panel
+     * @param synapseGroup
      */
     public SynapseGroupInteractionBox(NetworkPanel net,
         SynapseGroup synapseGroup) {

@@ -43,7 +43,9 @@ public final class NewScatterPlotAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Scatter Plot");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         ScatterPlotComponent plot = new ScatterPlotComponent("");
         workspace.addWorkspaceComponent(plot);

@@ -43,7 +43,9 @@ public final class SpaceVerticalAction extends ConditionallyEnabledAction {
         putValue(SHORT_DESCRIPTION, "Space selected neurons vertically");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.spaceVertical();
     }

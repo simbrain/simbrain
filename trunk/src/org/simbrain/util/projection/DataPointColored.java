@@ -46,6 +46,7 @@ public class DataPointColored extends DataPoint {
 
     /**
      * Default constructor for adding datasets.
+     * @param data
      */
     public DataPointColored(double[] data) {
         super(data);

@@ -25,7 +25,6 @@ public interface DifferentiableUpdateRule {
      * The inverse of the activation function.
      *
      * @param val the value being sent through the neuron's derivative
-     * @param neuron the neuron this derivative is being taken from
      * @return the derivative of the neuron's activation function with respect
      *         to val.
      */

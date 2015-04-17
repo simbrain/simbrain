@@ -1734,9 +1734,9 @@ public class SynapseGroup extends Group {
      * to the polarity parameter and returns a result matching the type
      * specified by the passed function.
      *
+     * @param <T>
      * @param check
      * @param polarity
-     * @param prototype
      * @return
      */
     public <T> T checkSynapses(SynapseParameterGetter<T> check,
@@ -1779,6 +1779,7 @@ public class SynapseGroup extends Group {
      * parameter) on all the synapses in the set(s) corresponding to the
      * specified polarity.
      *
+     * @param <T>
      * @param set
      * @param val
      * @param polarity

@@ -92,6 +92,7 @@ public class DataColoringManager {
 
     /**
      * Construct a data coloring manager.
+     * @param projector
      */
     public DataColoringManager(Projector projector) {
         this.projector = projector;
@@ -167,6 +168,7 @@ public class DataColoringManager {
 
     /**
      * Set the coloring method.
+     * @param selectedMethod
      */
     public void setColoringMethod(String selectedMethod) {
         if (selectedMethod == "None") {
@@ -270,6 +272,7 @@ public class DataColoringManager {
 
     /**
      * Set hot point coloring mode to on (true) or off (false).
+     * @param hotPointMode
      */
     public void setHotPointMode(boolean hotPointMode) {
         this.hotPointMode = hotPointMode;

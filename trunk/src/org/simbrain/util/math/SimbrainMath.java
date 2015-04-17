@@ -697,6 +697,7 @@ public class SimbrainMath {
      * definitely less than 0.2 and usually less than 0.05.
      * 
      * @return
+     * @param wtMatrix
      */
     public static long [] getMatrixRowCompression(double [][] wtMatrix) {
     	List<Long> wts = new ArrayList<Long>();
@@ -733,6 +734,7 @@ public class SimbrainMath {
     }
     /**
      * Test randPermuteWithExclusion.
+     * @param yarhg
      */
     public static void main(String[] yarhg) {
         int[][] blarg = new int[10000][9999];

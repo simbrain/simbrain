@@ -68,17 +68,23 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         update();
     }
 
-    /** @Override */
+    /** @Override 
+     * @return
+     */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @Override */
+    /** @Override 
+     * @return
+     */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @Override */
+    /** @Override 
+     * @return
+     */
     public boolean isDraggable() {
         return true;
     }
@@ -135,7 +141,9 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     public void resetColors() {
     }
 
-    /** @Override */
+    /** @Override
+     * @param arg0
+      */
     public void propertyChange(PropertyChangeEvent arg0) {
         setBounds(pStyledText.getBounds());
     }
@@ -202,10 +210,11 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * Creates an attribute set of the specified kind.
      *
      * @author Aaron Dixon
-     *
+     * @param fontName name of font in attribute set
      * @param fontSize size of font in attribute set
      * @param italic italic or not
-     * @return the resulting attriube set
+     * @param bold  bold or not
+     * @return the resulting attribute set
      */
     public static SimpleAttributeSet createAttributeSet(String fontName,
             int fontSize, boolean italic, boolean bold) {

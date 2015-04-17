@@ -109,7 +109,9 @@ public class NetworkScriptMenu {
             this.network = panel.getNetwork();
         }
 
-        /** @see AbstractAction */
+        /** @see AbstractAction 
+         * @param event
+         */
         public void actionPerformed(final ActionEvent event) {
 
             Interpreter interpreter = new Interpreter();

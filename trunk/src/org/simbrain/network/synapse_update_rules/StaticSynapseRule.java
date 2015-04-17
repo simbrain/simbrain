@@ -54,6 +54,7 @@ public class StaticSynapseRule extends SynapseUpdateRule {
 
     /**
      * Return clipped.
+     * @return
      */
     public boolean isClipped() {
         return clipped;

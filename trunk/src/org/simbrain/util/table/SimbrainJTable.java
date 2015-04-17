@@ -426,7 +426,7 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     *
+     * @return
      */
     public JToolBar getToolbarNormalize() {
         if (getData() instanceof NumericTable) {

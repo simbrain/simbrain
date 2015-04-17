@@ -64,6 +64,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     private double effect, netInput, act;
 
     /**
+     * @return
      * @{inheritDoc
      */
     public TimeType getTimeType() {
@@ -71,6 +72,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     /**
+     * @return
      * @{inheritDoc
      */
     public IACRule deepCopy() {

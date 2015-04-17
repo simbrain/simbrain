@@ -688,6 +688,7 @@ public class Utils {
      * True if collection A has a non-empty intersection with collection B,
      * false otherwise.
      *
+     * @param <T>
      * @param A first collection
      * @param B second collection
      * @return A intersects B

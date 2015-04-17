@@ -72,6 +72,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     /**
      * Default constructor.
+     * @param name
      */
     public OdorWorldComponent(final String name) {
         super(name);

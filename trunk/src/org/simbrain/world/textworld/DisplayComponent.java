@@ -132,6 +132,11 @@ public class DisplayComponent extends WorkspaceComponent {
 
     /**
      * {@inheritDoc}
+     * @param input
+     * @param name
+     * @param format
+     * @return
+     * 
      */
     public static DisplayComponent open(InputStream input, String name,
             String format) {

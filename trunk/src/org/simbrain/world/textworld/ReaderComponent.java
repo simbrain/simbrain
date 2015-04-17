@@ -109,6 +109,10 @@ public class ReaderComponent extends WorkspaceComponent {
 
     /**
      * {@inheritDoc}
+     * @param input
+     * @param name
+     * @param format
+     * @return 
      */
     public static ReaderComponent open(InputStream input, String name,
             String format) {

@@ -58,6 +58,7 @@ public class LMSOfflineTrainingPanel extends JPanel implements EditablePanel {
      *
      * @param panel the parent network panel
      * @param trainer the LMSOffline trainer to represent
+     * @param parentFrame
      */
     public LMSOfflineTrainingPanel(final NetworkPanel panel,
         final LMSOffline trainer, final Window parentFrame) {

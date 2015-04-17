@@ -37,6 +37,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
 
     /**
      * Default constructor.
+     * @param connection
      */
     public OneToOnePanel(final OneToOne connection) {
         super();

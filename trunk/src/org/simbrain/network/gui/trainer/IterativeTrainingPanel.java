@@ -105,6 +105,7 @@ public class IterativeTrainingPanel extends JPanel {
 
     /**
      * Test method for GUI layout.
+     * @param args
      */
     public static void main(String args[]) {
         IterativeTrainingPanel test = new IterativeTrainingPanel(null, null);

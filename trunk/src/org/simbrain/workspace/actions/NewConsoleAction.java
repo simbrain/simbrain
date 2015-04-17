@@ -35,6 +35,7 @@ public final class NewConsoleAction extends WorkspaceAction {
 
     /**
      * Create a new console action with the specified workspace.
+     * @param workspace
      */
     public NewConsoleAction(Workspace workspace) {
         super("New Console", workspace);
@@ -42,7 +43,9 @@ public final class NewConsoleAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New console");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         ConsoleComponent console = new ConsoleComponent("");
         workspace.addWorkspaceComponent(console);

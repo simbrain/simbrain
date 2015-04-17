@@ -31,6 +31,8 @@ public class Matrices {
      * Computes the Moore-Penrose pseudoinverse using the SVD method.
      *
      * Modified version of the original implementation by Kim van der Linde.
+     * @param x
+     * @return
      */
     public static Matrix pinv(Matrix x) {
         if (x.rank() < 1) {

@@ -27,6 +27,7 @@ public class GameAttributes {
 
     /**
      * {@inheritDoc}
+     * @return
      */
     public String getDescription() {
         return model.getName();
@@ -34,6 +35,7 @@ public class GameAttributes {
 
     /**
      * {@inheritDoc}
+     * @return
      */
     public WorkspaceComponent getParentComponent() {
         return parent;

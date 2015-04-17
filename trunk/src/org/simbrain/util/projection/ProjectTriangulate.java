@@ -37,6 +37,7 @@ public class ProjectTriangulate extends ProjectionMethod {
 
     /**
      * Default PCA project.
+     * @param projector
      */
     public ProjectTriangulate(Projector projector) {
         super(projector);

@@ -52,7 +52,9 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         // TODO: Consider just updating the nodes while we have them
         //  (though this breaks model-view separation)

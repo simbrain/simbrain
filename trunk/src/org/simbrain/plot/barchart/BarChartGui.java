@@ -201,7 +201,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
     public void update() {
     }
 
-    /** @see ActionListener */
+    /** @see ActionListener 
+     * @param arg0
+     */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(

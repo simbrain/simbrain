@@ -83,7 +83,7 @@ public class OdorWorld {
     /**
      * Update world.
      *
-     * @time an integer representation of time.
+     * @param time an integer representation of time.
      */
     public void update(int time) {
         for (OdorWorldEntity object : entityList) {

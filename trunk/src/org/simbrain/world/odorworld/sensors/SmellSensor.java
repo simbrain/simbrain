@@ -108,7 +108,7 @@ public class SmellSensor extends Sensor {
 
     /**
      * The current value at an index.
-     *
+     * @param index
      * @return the currentValue
      */
     public double getCurrentValue(int index) {

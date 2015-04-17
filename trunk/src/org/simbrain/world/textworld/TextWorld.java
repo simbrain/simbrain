@@ -168,6 +168,7 @@ public abstract class TextWorld {
 
     /**
      * Notify listeners that the caret position has changed.
+     * @param newItem
      */
     public void fireCurrentItemChanged(TextItem newItem) {
         for (TextListener listener : listenerList) {

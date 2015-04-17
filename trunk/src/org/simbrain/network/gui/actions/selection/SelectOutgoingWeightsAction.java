@@ -56,7 +56,9 @@ public final class SelectOutgoingWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Select All Outgoing Weights");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> list = networkPanel.getSelectedModelNeurons();
         List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();

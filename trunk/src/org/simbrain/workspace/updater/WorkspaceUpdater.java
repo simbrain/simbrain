@@ -558,6 +558,7 @@ public class WorkspaceUpdater {
          * Creates a new UpdateThread with the current thread number.
          *
          * @param runnable The runnable this thread will execute.
+         * @return current thread number
          */
         public Thread newThread(final Runnable runnable) {
             synchronized (this) {

@@ -75,6 +75,7 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
 
     /**
      * @{inheritDoc
+     * @param neuron
      */
     public void update(Neuron neuron) {
         // Advances the model by dt and returns the new voltage
@@ -114,6 +115,7 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
 
     /**
      * {@inheritDoc}
+     * @param neuron
      */
     public void init(Neuron neuron) {
 
@@ -258,6 +260,8 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
     /**
      * Converts a voltage from the modern convention to the convention used by
      * the program.
+     * @param voltage
+     * @return
      */
     public float convertV(float voltage) {
         return (float) (-1 * voltage - resting_v);

@@ -217,10 +217,14 @@ public class UpdateActionManager {
      */
     public interface UpdateManagerListener {
 
-        /** An action was added. */
+        /** An action was added. 
+         * @param action
+         */
         public void actionAdded(UpdateAction action);
 
-        /** An action was removed. */
+        /** An action was removed. 
+         * @param action
+         */
         public void actionRemoved(UpdateAction action);
 
         /** The action order was changed. */

@@ -36,13 +36,16 @@ public final class NewDataWorldAction extends WorkspaceAction {
 
     /**
      * Create a new data world action with the specified workspace.
+     * @param workspace
      */
     public NewDataWorldAction(Workspace workspace) {
         super("Data World", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         DataWorldComponent world = DataWorldComponent.createDataWorld(
                 new NumericTable(), "");

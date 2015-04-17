@@ -46,6 +46,7 @@ public class BasicEntity extends OdorWorldEntity {
 
     /**
      * Construct a default entity.
+     * @param world
      */
     public BasicEntity(final OdorWorld world) {
         super(DEFAULT_IMAGE, world);
@@ -55,6 +56,7 @@ public class BasicEntity extends OdorWorldEntity {
      * Construct a basic entity with a single image location.
      *
      * @param imageLocation image location
+     * @param world
      */
     public BasicEntity(final String imageLocation, final OdorWorld world) {
         super(STATIC_IMAGE_DIR + imageLocation, world);

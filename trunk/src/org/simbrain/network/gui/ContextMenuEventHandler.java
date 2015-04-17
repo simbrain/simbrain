@@ -58,7 +58,9 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         networkPanel.setLastClickedPosition(canvasPosition);
     }
 
-    /** @see PBasicInputEventHandler */
+    /** @see PBasicInputEventHandler 
+     * @param event
+     */
     public void mousePressed(final PInputEvent event) {
         if (event.isPopupTrigger()) {
             networkPanel.createNetworkContextMenu();
@@ -66,7 +68,9 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         }
     }
 
-    /** @see PBasicInputEventHandler */
+    /** @see PBasicInputEventHandler 
+     * @param event
+     */
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {
             networkPanel.createNetworkContextMenu();

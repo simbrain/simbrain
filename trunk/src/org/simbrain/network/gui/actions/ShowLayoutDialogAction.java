@@ -40,7 +40,9 @@ public class ShowLayoutDialogAction extends ConditionallyEnabledAction {
                 + " layout to selected neurons");
     }
 
-    /** @see ActionEvent */
+    /** @see ActionEvent 
+     * @param e
+     */
     public void actionPerformed(ActionEvent e) {
         LayoutDialog dialog;
         dialog = new LayoutDialog(layout, networkPanel);

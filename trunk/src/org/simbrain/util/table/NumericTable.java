@@ -256,7 +256,7 @@ public class NumericTable extends MutableTable<Double> implements
      *            rows
      * @param allowColumnChanges whether to allow data with a different number
      *            of columns
-     * @throws Exception
+     * @exception TableDataException
      */
     public void readData(final File file, final boolean allowRowChanges,
             final boolean allowColumnChanges) throws TableDataException {

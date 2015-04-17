@@ -43,7 +43,9 @@ public final class NewHistogramAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Histogram");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         HistogramComponent plot = new HistogramComponent("");
         workspace.addWorkspaceComponent(plot);

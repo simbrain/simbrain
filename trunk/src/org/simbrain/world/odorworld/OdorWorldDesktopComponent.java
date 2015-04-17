@@ -46,6 +46,8 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     /**
      * Default constructor.
+     * @param frame
+     * @param component
      */
     public OdorWorldDesktopComponent(GenericFrame frame,
             OdorWorldComponent component) {

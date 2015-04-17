@@ -225,7 +225,9 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
     public void update() {
     }
 
-    /** @see ActionListener */
+    /** @see ActionListener
+     * @param arg0
+     */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             for (int i = getWorkspaceComponent().getModel()

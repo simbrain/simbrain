@@ -63,7 +63,9 @@ public final class ShowHelpAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show help via local web page");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         SwingUtilities.invokeLater(new Runnable() {

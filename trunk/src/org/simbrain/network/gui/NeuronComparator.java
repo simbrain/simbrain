@@ -49,6 +49,9 @@ public class NeuronComparator implements java.util.Comparator<Neuron> {
 
     /**
      * @see NeuronComparator
+     * @param p1
+     * @param p2
+     * @return 
      */
     public int compare(final Neuron p1, final Neuron p2) {
         double d1;

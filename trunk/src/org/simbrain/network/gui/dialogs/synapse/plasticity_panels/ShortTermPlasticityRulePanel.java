@@ -86,6 +86,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapseRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 

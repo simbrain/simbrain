@@ -123,7 +123,16 @@ public class SceneGraphBrowser extends JPanel {
             sb.append("]");
         }
 
-        /** @see DefaultTreeCellRenderer */
+        /** @see DefaultTreeCellRenderer 
+         * @param tree
+         * @param value
+         * @param isSelected
+         * @param isExpanded
+         * @param isLeaf
+         * @param row
+         * @param hasFocus
+         * @return
+         */
         public Component getTreeCellRendererComponent(final JTree tree,
                 final Object value, final boolean isSelected,
                 final boolean isExpanded, final boolean isLeaf, final int row,
@@ -164,42 +173,65 @@ public class SceneGraphBrowser extends JPanel {
             listenerList = new EventListenerList();
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel 
+         * @param parent
+         * @param index
+         * @return
+         */
         public Object getChild(final Object parent, final int index) {
             return ((PNode) parent).getChild(index);
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel
+         * @param parent
+         * @return
+         */
         public int getChildCount(final Object parent) {
             return ((PNode) parent).getChildrenCount();
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel 
+         * @param parent
+         * @param child
+         * @return
+         */
         public int getIndexOfChild(final Object parent, final Object child) {
             return -1;
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel
+         * @return
+         */
         public Object getRoot() {
             return root;
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel 
+         * @param node
+         * @return
+         */
         public boolean isLeaf(final Object node) {
             return (getChildCount(node) == 0);
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel 
+         @param l
+         */
         public void addTreeModelListener(final TreeModelListener l) {
             listenerList.add(TreeModelListener.class, l);
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel 
+         * @param l
+         */
         public void removeTreeModelListener(final TreeModelListener l) {
             listenerList.remove(TreeModelListener.class, l);
         }
 
-        /** @see TreeModel */
+        /** @see TreeModel
+         * @param path
+         * @param newValue
+         */
         public void valueForPathChanged(final TreePath path,
                 final Object newValue) {
             // empty

@@ -52,7 +52,9 @@ public final class ShowPrioritiesAction extends AbstractAction {
                 "Show neuron priorities (for use in priority update)");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();

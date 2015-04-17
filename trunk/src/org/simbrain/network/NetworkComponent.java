@@ -357,6 +357,10 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     /**
      * {@inheritDoc}
+     * @param input
+     * @param name
+     * @param format
+     * @return
      */
     public static NetworkComponent open(final InputStream input,
             final String name, final String format) {

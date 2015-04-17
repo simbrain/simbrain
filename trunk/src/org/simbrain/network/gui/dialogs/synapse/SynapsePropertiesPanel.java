@@ -72,6 +72,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      *            being used to fill the panel with default values (creation).
      * @param parent
      *            the parent window, made available for easy resizing.
+     * @return 
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
         final Collection<Synapse> synapseList, final Window parent) {
@@ -94,6 +95,7 @@ public class SynapsePropertiesPanel extends JPanel implements EditablePanel {
      * @param showSpecificRuleParams
      *            whether or not to display the synapse update rule's details
      *            initially
+     * @return		          
      */
     public static SynapsePropertiesPanel createSynapsePropertiesPanel(
         final Collection<Synapse> synapseList, final Window parent,

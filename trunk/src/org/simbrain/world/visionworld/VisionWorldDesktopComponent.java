@@ -44,6 +44,7 @@ public final class VisionWorldDesktopComponent extends
     /**
      * Create a new vision world frame with the specified workspace.
      *
+     * @param frame
      * @param component component, must not be null
      */
     public VisionWorldDesktopComponent(GenericFrame frame,

@@ -55,7 +55,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         this.networkPanel = networkPanel;
     }
 
-    /** @see PDragSequenceEventHandler */
+    /** @see PDragSequenceEventHandler 
+     * @param event
+     */
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
         networkPanel.setLastClickedPosition(event.getPosition());
@@ -64,7 +66,9 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    /** @see PDragSequenceEventHandler */
+    /** @see PDragSequenceEventHandler 
+     * @param event
+     */
     public void mouseClicked(final PInputEvent event) {
 
         super.mouseClicked(event);
@@ -143,7 +147,10 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             this.ellipse = ellipse;
         }
 
-        /** @see PNodeFilter */
+        /** @see PNodeFilter 
+         * @param node
+         * @return
+         */
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = ellipse.intersects(node
@@ -154,7 +161,10 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             return (isPickable && boundsIntersects && !isLayer && !isCamera);
         }
 
-        /** @see PNodeFilter */
+        /** @see PNodeFilter 
+         * @param node
+         * @return
+         */
         public boolean acceptChildrenOf(final PNode node) {
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
@@ -176,7 +186,11 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /** @see PInputEventFilter */
+        /** @see PInputEventFilter 
+         * @param event
+         * @param type
+         * @return 
+         */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             EditMode editMode = networkPanel.getEditMode();

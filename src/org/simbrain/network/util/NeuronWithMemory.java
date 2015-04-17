@@ -33,6 +33,8 @@ public class NeuronWithMemory extends Neuron {
 
     /**
      * {@inheritDoc}
+     * @param parent
+     * @param updateRule
      */
     public NeuronWithMemory(Network parent, String updateRule) {
         super(parent, updateRule);

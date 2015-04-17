@@ -35,13 +35,16 @@ public final class NewVisionWorldAction extends WorkspaceAction {
 
     /**
      * Create a new vision world action with the specified workspace.
+     * @param workspace
      */
     public NewVisionWorldAction(Workspace workspace) {
         super("Vision World (Beta)", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Glasses.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         workspace.addWorkspaceComponent(new VisionWorldComponent(""));
     }

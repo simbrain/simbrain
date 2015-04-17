@@ -185,7 +185,7 @@ public class LMSOffline extends Trainer {
 
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
-     * TODO: Fix progress updates to reflect actual training times & %s
+     * TODO: Fix progress updates to reflect actual training times &#38; %s
      * @param network the trainable network being trained
      */
     public void weinerHopfSolution(Trainable network) {

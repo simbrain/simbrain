@@ -41,6 +41,7 @@ public final class ScriptEditorAction extends AbstractAction {
 
     /**
      * Open a script editor.
+     * @param desktop
      */
     public ScriptEditorAction(final SimbrainDesktop desktop) {
         super("Edit / Run Script...");
@@ -49,7 +50,9 @@ public final class ScriptEditorAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Edit / Run Script...");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         String scriptDirectory = ".";
         try {

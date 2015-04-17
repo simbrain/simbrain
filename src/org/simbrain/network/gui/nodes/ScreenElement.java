@@ -317,7 +317,9 @@ public abstract class ScreenElement extends PPath.Float {
                     (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
-        /** @see PBasicInputEventHandler */
+        /** @see PBasicInputEventHandler 
+         * @param event
+         */
         public void mousePressed(final PInputEvent event) {
 
             if (event.isPopupTrigger()) {
@@ -325,7 +327,9 @@ public abstract class ScreenElement extends PPath.Float {
             }
         }
 
-        /** @see PBasicInputEventHandler */
+        /** @see PBasicInputEventHandler 
+         * @param event
+         */
         public void mouseReleased(final PInputEvent event) {
 
             if (event.isPopupTrigger()) {
@@ -354,7 +358,9 @@ public abstract class ScreenElement extends PPath.Float {
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
         }
 
-        /** @see PBasicInputEventHandler */
+        /** @see PBasicInputEventHandler 
+         * @param event
+         */
         public void mouseClicked(final PInputEvent event) {
 
             if (event.getClickCount() == 2) {

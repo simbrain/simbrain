@@ -42,7 +42,9 @@ public final class NewRasterPlotAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Raster Plot");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         RasterPlotComponent plot = new RasterPlotComponent("");
         workspace.addWorkspaceComponent(plot);

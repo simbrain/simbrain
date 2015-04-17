@@ -79,6 +79,8 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
 
     /**
      * Creates a new frame of type TextWorld.
+     * @param frame
+     * @param component
      */
     public DisplayComponentDesktopGui(GenericFrame frame,
             DisplayComponent component) {

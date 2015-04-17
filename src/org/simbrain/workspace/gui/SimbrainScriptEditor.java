@@ -49,7 +49,7 @@ public class SimbrainScriptEditor extends ScriptEditor {
 
     /**
      * Initialize the script editor panel with some initial text.
-     *
+     * @param desktop
      * @param initialText the initial text.
      */
     public SimbrainScriptEditor(SimbrainDesktop desktop,

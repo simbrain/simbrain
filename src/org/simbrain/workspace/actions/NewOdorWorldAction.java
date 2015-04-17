@@ -40,13 +40,16 @@ public final class NewOdorWorldAction extends WorkspaceAction {
 
     /**
      * Create a new odor world action with the specified workspace.
+     * @param workspace
      */
     public NewOdorWorldAction(Workspace workspace) {
         super("Odor World", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SwissIcon.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         OdorWorldComponent worldComponent = new OdorWorldComponent("");
         workspace.addWorkspaceComponent(worldComponent);

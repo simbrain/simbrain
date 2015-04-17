@@ -53,8 +53,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
      *            the connection to apply
      * @param name
      *            the name of this action
-     * @param isSelfConnect
-     *            whether to connect selected neurons to themselves or not.
+     *
      */
     public ApplyConnectionAction(final NetworkPanel networkPanel,
         ConnectNeurons connection, String name) {
@@ -68,7 +67,9 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         String title = "Connect ";

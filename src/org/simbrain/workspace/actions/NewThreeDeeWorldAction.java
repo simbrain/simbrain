@@ -33,12 +33,15 @@ public final class NewThreeDeeWorldAction extends WorkspaceAction {
 
     /**
      * Create a new odor world action with the specified workspace.
+     * @param workspace
      */
     public NewThreeDeeWorldAction(Workspace workspace) {
         super("3D World", workspace);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 //        ThreeDeeComponent component = new ThreeDeeComponent("");
 //        workspace.addWorkspaceComponent(component);

@@ -121,6 +121,7 @@ public abstract class OdorWorldEntity {
      * Construct an odor world entity from a single image location.
      *
      * @param imageLocation the image location
+     * @param world
      */
     public OdorWorldEntity(final String imageLocation, OdorWorld world) {
         this.animation = new Animation(imageLocation);
@@ -172,6 +173,7 @@ public abstract class OdorWorldEntity {
     // TODO: Say in docs if this is upper right or not (but not center).
     /**
      * Gets this OdorWorldEntity's current x position.
+     * @return
      */
     @DisplayOrder(val = 50)
     public float getX() {
@@ -180,6 +182,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Gets this OdorWorldEntity's current y position.
+     * @return
      */
     @DisplayOrder(val = 60)
     public float getY() {
@@ -188,6 +191,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Sets this OdorWorldEntity's current x position.
+     * @param newx
      */
     public void setX(final float newx) {
         // System.out.println("x:" + newx);
@@ -209,6 +213,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Sets this OdorWorldEntity's current y position.
+     * @param newy
      */
     public void setY(final float newy) {
         // System.out.println("y:" + newy);
@@ -259,7 +264,9 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's width, based on the size of the current
      * image.
+     * @return
      */
+    
     public int getWidth() {
         while (getImage().getWidth(null) < 0) {
             ;
@@ -270,6 +277,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets this OdorWorldEntity's height, based on the size of the current
      * image.
+     * @return
      */
     public int getHeight() {
         while (getImage().getHeight(null) < 0) {
@@ -281,6 +289,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     * @return
      */
     @DisplayOrder(val = 80)
     public float getVelocityX() {
@@ -290,6 +299,7 @@ public abstract class OdorWorldEntity {
     /**
      * Gets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     * @return
      */
     @DisplayOrder(val = 90)
     public float getVelocityY() {
@@ -299,6 +309,7 @@ public abstract class OdorWorldEntity {
     /**
      * Sets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     * @param dx
      */
     public void setVelocityX(final float dx) {
         this.dx = dx;
@@ -307,6 +318,7 @@ public abstract class OdorWorldEntity {
     /**
      * Sets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
+     * @param dy
      */
     public void setVelocityY(final float dy) {
         this.dy = dy;
@@ -351,6 +363,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Gets this OdorWorldEntity's current image.
+     * @return
      */
     public Image getImage() {
         return animation.getImage();

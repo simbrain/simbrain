@@ -83,6 +83,7 @@ public class ProjectSammon extends IterableProjectionMethod {
 
     /**
      * Default sammon projector constructor.
+     * @param projector
      */
     public ProjectSammon(Projector projector) {
         super(projector);

@@ -33,7 +33,6 @@ public interface InvertibleUpdateRule {
      *
      * @param val the value being sent through the neuron's inverse activation
      *            function
-     * @param neuron the neuron this inverse value is being mapped from
      * @return the inverse activation of parameter val
      */
     double getInverse(double val);

@@ -33,6 +33,7 @@ public final class NewDocViewerAction extends WorkspaceAction {
 
     /**
      * Create a new console action with the specified workspace.
+     * @param workspace
      */
     public NewDocViewerAction(Workspace workspace) {
         super("New Doc Viewer", workspace);
@@ -40,7 +41,9 @@ public final class NewDocViewerAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New doc viewer");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         DocViewerComponent component = new DocViewerComponent();
         workspace.addWorkspaceComponent(component);

@@ -53,8 +53,6 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Bar chart model constructor.
-     *
-     * @param parent component
      */
     public BarChartModel() {
     }
@@ -90,6 +88,7 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Adds a new column to the dataset.
+     * @param index
      */
     public void addColumn(final int index) {
         dataset.addValue(0, new Integer(1), new Integer(index + 1));

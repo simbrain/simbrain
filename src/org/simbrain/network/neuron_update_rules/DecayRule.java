@@ -80,6 +80,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
     /**
      * @{inheritDoc
+     * @return
      */
     public DecayRule deepCopy() {
         DecayRule dn = new DecayRule();
@@ -97,6 +98,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
     /**
      * @{inheritDoc
+     * @param neuron
      */
     public void update(Neuron neuron) {
         double val = neuron.getActivation() + inputType.getInput(neuron);

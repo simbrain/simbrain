@@ -92,6 +92,7 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

@@ -77,8 +77,8 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
     /**
      * Creates a new attribute list panel.
-     *
      * @param workspace reference to workspace
+     * @param attributeType
      */
     public PotentialAttributePanel(final Workspace workspace,
             ProducerOrConsumer attributeType) {
@@ -181,6 +181,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
     /**
      * @see ActionListener
+     * @param event
      */
     public void actionPerformed(final ActionEvent event) {
 
@@ -272,6 +273,12 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
         /**
          * @overrides java.awt.Component
+         * @param list
+         * @param object
+         * @param index
+         * @param isSelected
+         * @param cellHasFocus
+         * @return
          */
         public java.awt.Component getListCellRendererComponent(
                 final JList list, final Object object, final int index,
@@ -318,6 +325,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
         /**
          * {@inheritDoc}
+         * @return
          */
         public boolean clearWorkspace() {
             return false;

@@ -176,6 +176,12 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
 
         /**
          * @overrides java.awt.Component
+         * @param list
+         * @param object
+         * @param index
+         * @param isSelected
+         * @param cellHasFocus
+         * @return
          */
         public java.awt.Component getListCellRendererComponent(
                 final JList list, final Object object, final int index,

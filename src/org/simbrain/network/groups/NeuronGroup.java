@@ -1278,6 +1278,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     /**
      * @param testData
      *            the testData to set
+     * @exception IllegalArgumentException
      */
     public void setTestData(double[][] testData)
             throws IllegalArgumentException {

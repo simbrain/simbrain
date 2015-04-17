@@ -32,6 +32,7 @@ public class SingleStepPanel extends JPanel {
 
     /**
      * Construct panel.
+     * @param trainer
      */
     public SingleStepPanel(final Trainer trainer) {
         final JLabel currentInput = new JLabel("Input: ");

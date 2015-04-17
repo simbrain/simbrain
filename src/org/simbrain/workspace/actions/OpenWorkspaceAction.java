@@ -37,6 +37,7 @@ public final class OpenWorkspaceAction extends DesktopAction {
 
     /**
      * Create an open workspace action with the specified workspace.
+     * @param desktop
      */
     public OpenWorkspaceAction(SimbrainDesktop desktop) {
         super("Open Workspace File (.zip) ...", desktop);
@@ -48,7 +49,9 @@ public final class OpenWorkspaceAction extends DesktopAction {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         desktop.openWorkspace();
     }

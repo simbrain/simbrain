@@ -55,7 +55,9 @@ public final class SelectAllNeuronsAction extends AbstractAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.clearSelection();
         networkPanel.setSelection(networkPanel.getNeuronNodes());

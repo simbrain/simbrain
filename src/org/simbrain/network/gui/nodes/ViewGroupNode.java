@@ -64,19 +64,25 @@ public class ViewGroupNode extends ScreenElement implements
         }
     }
 
-    /** @Override */
+    /** @Override 
+     * @return 
+     */
     public boolean isSelectable() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override */
+    /** @Override
+     * @return
+      */
     public boolean showSelectionHandle() {
         // TODO Auto-generated method stub
         return true;
     }
 
-    /** @Override */
+    /** @Override 
+     * @return
+     */
     public boolean isDraggable() {
         // TODO Auto-generated method stub
         return true;
@@ -122,7 +128,9 @@ public class ViewGroupNode extends ScreenElement implements
     public void resetColors() {
     }
 
-    /** @see PNode */
+    /** @see PNode 
+     * @param arg0
+     */
     public void propertyChange(PropertyChangeEvent arg0) {
         xOffset = oldPosition.getX() - this.getOffset().getX();
         yOffset = oldPosition.getY() - this.getOffset().getY();

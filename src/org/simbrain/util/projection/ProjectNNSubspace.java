@@ -39,6 +39,7 @@ public class ProjectNNSubspace extends ProjectionMethod {
 
     /**
      * Default PCA project.
+     * @param projector
      */
     public ProjectNNSubspace(Projector projector) {
         super(projector);

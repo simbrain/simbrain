@@ -53,7 +53,9 @@ public class AddSensorDialog extends StandardDialog implements ActionListener {
     /** Panel for setting sensor type. */
     private LabelledItemPanel typePanel = new LabelledItemPanel();
 
-    /** Sensor Dialog add sensor constructor. */
+    /** Sensor Dialog add sensor constructor. 
+     * @param entity
+     */
     public AddSensorDialog(OdorWorldEntity entity) {
         this.entity = entity;
         init("Add Sensor");

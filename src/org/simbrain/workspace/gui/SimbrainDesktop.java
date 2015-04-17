@@ -220,8 +220,6 @@ public class SimbrainDesktop {
 
         /**
          * Add a new <c>SimbrainComponent</c>.
-         *
-         * @param component
          */
         @SuppressWarnings("unchecked")
         public void componentAdded(final WorkspaceComponent workspaceComponent) {
@@ -1315,6 +1313,7 @@ public class SimbrainDesktop {
 
     /**
      * Returns the internal desktop object. Sometimes useful in scripts.
+     * @return
      */
     public JDesktopPane getDesktop() {
         return desktop;

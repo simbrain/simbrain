@@ -25,7 +25,7 @@ import java.util.List;
  * Superclass for tables which can be modified.
  *
  * @author jyoshimi
- *
+ *@param <T>
  */
 public abstract class MutableTable<T> extends SimbrainDataTable<T> {
 

@@ -122,14 +122,20 @@ public class TextEventHandler extends PStyledTextEventHandler implements
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /** @see PInputEventFilter */
+        /** @see PInputEventFilter 
+         * @param event
+         * @param type
+         * @return
+         */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
             EditMode editMode = networkPanel.getEditMode();
             return (editMode.isText() && super.acceptsEvent(event, type));
         }
     }
 
-    /** @Override */
+    /** @Override 
+     * @param arg0
+     */
     public void actionPerformed(ActionEvent arg0) {
     }
 

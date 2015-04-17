@@ -52,7 +52,9 @@ public final class ZeroSelectedObjectsAction extends ConditionallyEnabledAction 
         networkPanel.getActionMap().put(this, this);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         for (NeuronNode node : networkPanel.getSelectedNeurons()) {
             node.getNeuron().clear();

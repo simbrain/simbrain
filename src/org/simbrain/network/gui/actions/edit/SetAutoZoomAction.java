@@ -52,7 +52,9 @@ public final class SetAutoZoomAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
         networkPanel.setAutoZoomMode(cb.isSelected());

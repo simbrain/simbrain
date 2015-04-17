@@ -301,17 +301,23 @@ public final class SynapseNode extends ScreenElement {
         return new Point2D.Double(weightX, weightY);
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return
+     */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return
+     */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return
+     */
     public boolean isDraggable() {
         return false;
     }
@@ -326,7 +332,9 @@ public final class SynapseNode extends ScreenElement {
         return String.valueOf(synapse.getToolTipText());
     }
 
-    /** @see ScreenElement */
+    /** @see ScreenElement 
+     * @return
+     */
     public boolean hasContextMenu() {
         return true;
     }

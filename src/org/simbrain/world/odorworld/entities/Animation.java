@@ -72,6 +72,8 @@ public class Animation {
     /**
      * Adds an image to the animation with the specified duration (time to
      * display the image).
+     * @param image
+     * @param frameDuration
      */
     public synchronized void addFrame(final Image image,
             final long frameDuration) {

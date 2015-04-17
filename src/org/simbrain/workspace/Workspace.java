@@ -199,6 +199,7 @@ public class Workspace {
      *
      * @param producerKeys source producing attributes
      * @param consumerKeys target consuming attributes
+     * @exception UmatchedAttributesException
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(final List<PotentialProducer> producerKeys,
@@ -310,7 +311,7 @@ public class Workspace {
      * separate thread. For example:
      *
      * <pre>
-     * {@code
+     * {@code}
      *  Executors.newSingleThreadExecutor().execute(new Runnable() {
      *               public void run() {
      *                   // Do one thing

@@ -80,6 +80,8 @@ public class AttributeList<E> {
     /**
      * Helper object for use with couplings. An object of this class is
      * associated with one dimension of a smell sensor.
+     * 
+     * @param <E>
      */
     public class GetterSetter<E> {
 

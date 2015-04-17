@@ -97,6 +97,7 @@ public class SynapsePropertiesExtended extends JPanel {
     /**
      * Fills the values of the text fields based on the corresponding values of
      * the synapses to be edited.
+     * @param synapseCollection
      */
     public void fillFieldValues(Collection<Synapse> synapseCollection) {
         Synapse synapseRef = synapseCollection.iterator().next();
@@ -176,6 +177,7 @@ public class SynapsePropertiesExtended extends JPanel {
     /**
      * Uses the values from text fields to alter corresponding values in the
      * synapse(s) being edited. Called externally to apply changes.
+     * @param synapses
      */
     public void commitChanges(Collection<Synapse> synapses) {
         // Upper Bound

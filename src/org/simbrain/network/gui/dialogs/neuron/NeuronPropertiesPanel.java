@@ -81,6 +81,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      *            used to fill the panel with default values (creation).
      * @param parent
      *            the parent window, made available for easy resizing.
+     * @return
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
         final List<Neuron> neuronList, final Window parent) {
@@ -103,6 +104,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      * @param nuspExtendedDisplay
      *            whether or not to display the neuron update rule's details
      *            initially
+     * @return 
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
         final List<Neuron> neuronList, final Window parent,
@@ -134,6 +136,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      * @param displayIDInfo
      *            manually sets whether or not neuron id information is
      *            displayed. rule's details initially
+     * @return
      */
     public static NeuronPropertiesPanel createCombinedNeuronInfoPanel(
         final List<Neuron> neuronList, final Window parent,

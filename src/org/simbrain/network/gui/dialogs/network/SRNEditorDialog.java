@@ -46,6 +46,7 @@ public class SRNEditorDialog extends SupervisedTrainingDialog {
      * recurrent network.
      *
      * @param panel the network panel the SRN will be tied to
+     * @param srn
      */
     public SRNEditorDialog(final NetworkPanel panel, SimpleRecurrentNetwork srn) {
         super(panel, srn);

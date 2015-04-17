@@ -52,8 +52,6 @@ public class TimeSeriesModel extends ChartModel {
 
     /**
      * Time series model constructor.
-     *
-     * @param parent component
      */
     public TimeSeriesModel() {
         defaultInit();

@@ -71,6 +71,8 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
     /**
      * Connection dialog default constructor.
+     * @param panel
+     * @param parentWindow
      */
     public QuickConnectPreferencesPanel(NetworkPanel panel,
             final Window parentWindow) {

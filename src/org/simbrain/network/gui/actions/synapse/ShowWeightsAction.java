@@ -51,7 +51,9 @@ public final class ShowWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show weights in GUI (Use 5 to toggle)");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action

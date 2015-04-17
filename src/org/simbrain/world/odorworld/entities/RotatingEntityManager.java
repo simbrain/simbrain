@@ -108,6 +108,7 @@ public class RotatingEntityManager {
      *
      * @param tileBaseName base name used to access the relevant set of image,
      *            which are named in a standard way
+     * @param duration          
      * @return horse tree map
      */
     public static TreeMap<Double, Animation> getRotatingTileset(

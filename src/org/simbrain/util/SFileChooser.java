@@ -238,6 +238,7 @@ public class SFileChooser {
     /**
      * Shows dialog for saving files.
      *
+     * @param file
      * @return Name of file saved
      */
     public File showSaveDialog(final File file) {
@@ -397,6 +398,9 @@ public class SFileChooser {
 
         /**
          * Implements file name filter for native file dialog.
+         * @param dir
+         * @param name
+         * @return
          */
         public boolean accept(File dir, String name) {
             return extension.equalsIgnoreCase(getExtension(name));
@@ -461,6 +465,9 @@ public class SFileChooser {
 
         /**
          * Implements file name filter for native file dialog.
+         * @param dir
+         * @param name
+         * @return 
          */
         public boolean accept(File dir, String name) {
             return extensions.contains(getExtension(name));

@@ -78,6 +78,7 @@ public class ThreeValueRulePanel extends AbstractNeuronRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

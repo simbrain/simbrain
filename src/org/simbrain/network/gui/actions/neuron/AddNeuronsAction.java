@@ -76,7 +76,9 @@ public final class AddNeuronsAction extends AbstractAction {
 
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         AddNeuronsDialog and = AddNeuronsDialog
                 .createAddNeuronsDialog(networkPanel);

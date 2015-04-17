@@ -45,6 +45,7 @@ public class GridLayoutPanel extends AbstractLayoutPanel {
 
     /**
      * Default constructor.
+     * @param layout
      */
     public GridLayoutPanel(GridLayout layout) {
         this.layout = layout;

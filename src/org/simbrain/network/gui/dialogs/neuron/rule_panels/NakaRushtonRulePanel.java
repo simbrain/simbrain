@@ -113,6 +113,7 @@ public class NakaRushtonRulePanel extends AbstractNeuronRulePanel implements
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

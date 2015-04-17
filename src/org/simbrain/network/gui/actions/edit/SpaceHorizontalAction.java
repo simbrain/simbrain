@@ -43,7 +43,9 @@ public final class SpaceHorizontalAction extends ConditionallyEnabledAction {
         putValue(SHORT_DESCRIPTION, "Space selected neurons horizontally");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.spaceHorizontal();
     }

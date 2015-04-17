@@ -52,7 +52,9 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
         this.desktop = desktop;
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         StandardDialog dialog = new StandardDialog();
         final WorkspaceUpdateManagerPanel updatePanel = new WorkspaceUpdateManagerPanel(

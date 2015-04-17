@@ -82,6 +82,9 @@ public class FindReplaceDialog extends JPanel {
 
     /**
      * Construct the panel.
+     * 
+     * @param frame
+     * @param editor
      */
     public FindReplaceDialog(final JFrame frame, final ScriptEditor editor) {
         setLayout(new GridLayout(4, 1));

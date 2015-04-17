@@ -2876,6 +2876,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Overridden so that multi-line tooltips can be used.
+     * @return 
      */
     public JToolTip createToolTip() {
         return new JMultiLineToolTip();
@@ -2918,6 +2919,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * {@inheritDoc}
+     * @param name
      */
     public void setTitle(String name) {
         /* no implementation */
@@ -3011,8 +3013,6 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Adds an internal menu bar; used in applets.
-     *
-     * @param applet
      */
     public void addInternalMenuBar() {
         toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));

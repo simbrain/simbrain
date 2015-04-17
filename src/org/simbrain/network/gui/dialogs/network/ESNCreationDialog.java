@@ -801,6 +801,7 @@ public class ESNCreationDialog extends StandardDialog {
 
     /**
      * Main function to test dialog.
+     * @param args
      */
     public static void main(String[] args) {
         ESNCreationDialog dialog = ESNCreationDialog

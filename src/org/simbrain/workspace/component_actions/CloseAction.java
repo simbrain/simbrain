@@ -57,7 +57,9 @@ public final class CloseAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Close this component");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         workspaceComponent.close();
     }

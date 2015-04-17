@@ -114,6 +114,7 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      *            the parent window
      * @param synapseGroup
      *            the group to adjust
+     * @param isCreation          
      * @return the constructed panel
      */
     public static SynapseGroupAdjustmentPanel

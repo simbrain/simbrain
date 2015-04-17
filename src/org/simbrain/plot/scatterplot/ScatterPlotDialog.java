@@ -179,7 +179,9 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         model.setShowHistory(showHistory.isSelected());
     }
 
-    /** @see ActionListener */
+    /** @see ActionListener 
+     * @param arg0
+     */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("AutoRange")) {
             maxRangeField.setEnabled(!autoRange.isSelected());

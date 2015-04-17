@@ -78,8 +78,8 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
     /**
      * Odor world frame menu constructor.
-     * 
      * @param frame Frame to create menu
+     * @param world 
      */
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame,
             OdorWorld world) {

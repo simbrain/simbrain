@@ -57,8 +57,9 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
 
 	/**
 	 * Construct the Competitive Training Controls Panel.
-	 *
+	 * @param panel
 	 * @param trainer reference to the Competitive trainer
+	 * @param network
 	 */
 	public CompetitiveTrainerControlsPanel(final NetworkPanel panel,
 			final CompetitiveTrainer trainer, final CompetitiveNetwork network) {

@@ -52,8 +52,6 @@ public class RasterModel extends ChartModel {
 
     /**
      * Raster series model constructor.
-     *
-     * @param parent component
      */
     public RasterModel() {
         defaultInit();

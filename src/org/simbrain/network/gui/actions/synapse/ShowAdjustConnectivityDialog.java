@@ -78,7 +78,9 @@ public final class ShowAdjustConnectivityDialog extends AbstractAction {
         }
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         ConnectivityAdjustmentPanel panel = new ConnectivityAdjustmentPanel(
                 new Sparse(), networkPanel);

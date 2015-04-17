@@ -432,6 +432,7 @@ public class Dataset {
     /**
      * Print out low dimensional points so maple can plot them Just does low
      * dimension = 2.
+     * @param ps
      */
     public void resultsToMaple(PrintStream ps) {
         double[] y;

@@ -34,6 +34,7 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
 
     /**
      * Default constructor.
+     * @param layout
      */
     public LineLayoutPanel(LineLayout layout) {
         this.layout = layout;

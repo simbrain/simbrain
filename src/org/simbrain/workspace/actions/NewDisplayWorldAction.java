@@ -35,6 +35,7 @@ public final class NewDisplayWorldAction extends WorkspaceAction {
 
     /**
      * Create a new text world action with the specified workspace.
+     * @param workspace
      */
     public NewDisplayWorldAction(Workspace workspace) {
         super("TextWorld-Display", workspace);
@@ -42,7 +43,9 @@ public final class NewDisplayWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         DisplayComponent world = new DisplayComponent("");
         workspace.addWorkspaceComponent(world);

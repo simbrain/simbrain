@@ -69,8 +69,6 @@ public class ScatterPlotModel extends ChartModel {
 
     /**
      * Scatter plot model constructor.
-     *
-     * @param parent component
      */
     public ScatterPlotModel() {
         setChartColors();

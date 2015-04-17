@@ -61,8 +61,8 @@ public class StraightEffectorPanel extends AbstractEffectorPanel {
 
     /**
      * Constructor for the case where an effector is being edited.
-     *
      * @param entity the entity to which a straight movement effector is added.
+     * @param effector
      */
     public StraightEffectorPanel(OdorWorldEntity entity,
             StraightMovement effector) {

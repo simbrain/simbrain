@@ -52,6 +52,7 @@ public class ESNOfflineTrainingPanel extends JPanel {
      *
      * @param panel the parent network panel
      * @param esn the underlying network
+     * @param frame
      */
     public ESNOfflineTrainingPanel(final NetworkPanel panel,
         final EchoStateNetwork esn, final Window frame) {

@@ -41,8 +41,8 @@ public final class EditSmellSourceAction extends AbstractAction {
 
     /**
      * Create a new open plot action.
-     *
      * @param component GUI component, must not be null.
+     * @param entity
      */
     public EditSmellSourceAction(final OdorWorldPanel component,
             OdorWorldEntity entity) {

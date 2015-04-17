@@ -268,12 +268,16 @@ public final class Sensor {
         description = sb.toString();
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc} 
+     * @return
+     */
     public String getDescription() {
         return description;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc} 
+     * @return
+     */
     public Double getValue() {
         return Double.valueOf(sample);
     }

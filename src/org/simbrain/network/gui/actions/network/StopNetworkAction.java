@@ -49,7 +49,9 @@ public final class StopNetworkAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Stop iterating the network");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.setRunning(false);
     }

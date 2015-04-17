@@ -57,6 +57,7 @@ public class StochasticGeneratorPanel extends AbstractNeuronRulePanel {
 
     /**
      * Populates the fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
 

@@ -54,7 +54,9 @@ public final class CutAction extends ConditionallyEnabledAction {
     }
 
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         networkPanel.cut();
     }

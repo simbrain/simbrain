@@ -120,6 +120,10 @@ public final class VisionWorldComponent extends WorkspaceComponent {
 
     /**
      * {@inheritDoc}
+     * @param input
+     * @param name
+     * @param format
+     * @return
      */
     public static VisionWorldComponent open(InputStream input, String name,
             String format) {

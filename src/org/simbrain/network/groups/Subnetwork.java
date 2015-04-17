@@ -478,6 +478,7 @@ public abstract class Subnetwork extends Group {
 
     /**
      * {@inheritDoc}
+     * @return
      */
     public boolean getEnabled() {
         return false;
@@ -485,6 +486,7 @@ public abstract class Subnetwork extends Group {
 
     /**
      * {@inheritDoc}
+     * @param enabled
      */
     public void setEnabled(boolean enabled) {
     }

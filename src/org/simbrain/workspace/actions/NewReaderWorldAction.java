@@ -35,6 +35,7 @@ public final class NewReaderWorldAction extends WorkspaceAction {
 
     /**
      * Create a new text world action with the specified workspace.
+     * @param workspace
      */
     public NewReaderWorldAction(Workspace workspace) {
         super("TextWorld-Reader", workspace);
@@ -42,7 +43,9 @@ public final class NewReaderWorldAction extends WorkspaceAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         ReaderComponent world = new ReaderComponent("");
         workspace.addWorkspaceComponent(world);

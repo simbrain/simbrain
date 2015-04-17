@@ -60,6 +60,7 @@ public class Speech extends Effector {
      *
      * @param parent parent entity
      * @param phrase the phrase associated with this effector
+     * @param threshold
      */
     public Speech(OdorWorldEntity parent, String phrase, double threshold) {
         super(parent, "Say: \"" + phrase + "\"");

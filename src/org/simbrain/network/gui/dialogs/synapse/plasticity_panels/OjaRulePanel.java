@@ -67,6 +67,7 @@ public class OjaRulePanel extends AbstractSynapseRulePanel {
 
     /**
      * Populate fields with current data.
+     * @param ruleList
      */
     public void fillFieldValues(List<SynapseUpdateRule> ruleList) {
 

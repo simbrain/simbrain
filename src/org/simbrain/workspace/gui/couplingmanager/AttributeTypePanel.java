@@ -50,6 +50,7 @@ public class AttributeTypePanel extends JPanel {
      * Workspace component list panel constructor.
      *
      * @param component desktop reference.
+     * @param poc
      */
     public AttributeTypePanel(final WorkspaceComponent component,
             final ProducerOrConsumer poc) {

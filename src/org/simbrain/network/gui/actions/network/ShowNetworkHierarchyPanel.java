@@ -51,7 +51,9 @@ public final class ShowNetworkHierarchyPanel extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show Network Hierarchy");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
 
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();

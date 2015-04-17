@@ -346,6 +346,7 @@ public class SmellSource {
      * (whether it is a "noisy object", and how the stimulus decays). That is,
      * calculate the proximal stimulus this distal stimulus gives rise to.
      *
+     * @param dimension
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */

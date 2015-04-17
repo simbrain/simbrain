@@ -75,7 +75,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     /**
      * Default constructor.
-     *
+     * @param frame
      * @param component reference to model component
      */
     public DataWorldDesktopComponent(final GenericFrame frame,

@@ -132,6 +132,7 @@ public class GroupSerializer {
      *            row compressed matrix where column values are separated by a
      *            new row code (-1 or 0xffffffff) representing positions in a
      *            sparse matrix
+     * @param precision           
      * @return the compressed byte array representation of the row compressed
      *         matrix riCompressedMat.
      */

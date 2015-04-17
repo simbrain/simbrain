@@ -48,7 +48,9 @@ public final class ApplyLayoutAction extends ConditionallyEnabledAction {
                 + " layout to selected neurons");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();

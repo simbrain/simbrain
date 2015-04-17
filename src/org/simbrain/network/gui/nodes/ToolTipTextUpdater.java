@@ -58,7 +58,9 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
      */
     protected abstract String getToolTipText();
 
-    /** @see PBasicInputEventHandler */
+    /** @see PBasicInputEventHandler 
+     * @param event
+     */
     public final void mouseEntered(final PInputEvent event) {
 
         event.setHandled(true);
@@ -67,7 +69,9 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
         // }
     }
 
-    /** @see PBasicInputEventHandler */
+    /** @see PBasicInputEventHandler
+     * @param event
+     */
     public final void mouseExited(final PInputEvent event) {
 
         event.setHandled(true);

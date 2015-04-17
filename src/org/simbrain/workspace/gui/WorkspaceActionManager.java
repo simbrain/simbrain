@@ -353,7 +353,9 @@ public class WorkspaceActionManager {
             this.workspace = desktop.getWorkspace();
         }
 
-        /** @see AbstractAction */
+        /** @see AbstractAction 
+         * @param event
+         */
         public void actionPerformed(final ActionEvent event) {
 
             Interpreter interpreter = new Interpreter();

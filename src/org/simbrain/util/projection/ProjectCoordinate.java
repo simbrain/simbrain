@@ -40,6 +40,7 @@ public class ProjectCoordinate extends ProjectionMethod {
 
     /**
      * Default projector coordinate constructor.
+     * @param projector
      */
     public ProjectCoordinate(Projector projector) {
         super(projector);

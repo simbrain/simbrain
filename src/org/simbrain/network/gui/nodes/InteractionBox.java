@@ -60,6 +60,7 @@ public class InteractionBox extends ScreenElement {
 
     /**
      * Create a new tab node.
+     * @param net
      */
     public InteractionBox(final NetworkPanel net) {
         super(net);

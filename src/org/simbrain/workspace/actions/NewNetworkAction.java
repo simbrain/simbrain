@@ -38,6 +38,7 @@ public final class NewNetworkAction extends WorkspaceAction {
 
     /**
      * Create a new network action with the specified workspace.
+     * @param workspace
      */
     public NewNetworkAction(Workspace workspace) {
         super("New Network", workspace);
@@ -49,7 +50,9 @@ public final class NewNetworkAction extends WorkspaceAction {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event 
+     */
     public void actionPerformed(final ActionEvent event) {
         workspace.addWorkspaceComponent(new NetworkComponent(""));
     }

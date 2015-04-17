@@ -66,6 +66,7 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
 
     /**
      * {@inheritDoc}
+     * @return
      */
     public boolean clearWorkspace() {
         return false;

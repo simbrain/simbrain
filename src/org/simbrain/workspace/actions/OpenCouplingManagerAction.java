@@ -39,6 +39,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
 
     /**
      * Create an open data world with the specified workspace.
+     * @param desktop
      */
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
         super("Open Coupling Manager...");
@@ -47,7 +48,9 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Open coupling manager");
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         desktop.addInternalFrame(frame);

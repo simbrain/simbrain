@@ -33,6 +33,7 @@ public class ProjectPCA extends ProjectionMethod {
 
     /**
      * Default PCA project.
+     * @param projector
      */
     public ProjectPCA(Projector projector) {
         super(projector);

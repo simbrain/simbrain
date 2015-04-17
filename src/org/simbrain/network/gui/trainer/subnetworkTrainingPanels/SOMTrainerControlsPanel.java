@@ -63,8 +63,9 @@ public class SOMTrainerControlsPanel extends JPanel {
 
     /**
      * Construct the SOM Training Controls Panel.
-     *
+     * @param panel
      * @param trainer reference to the SOM trainer
+     * @param network
      */
     public SOMTrainerControlsPanel(final NetworkPanel panel,
             final SOMTrainer trainer, final SOMNetwork network) {

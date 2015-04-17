@@ -34,6 +34,7 @@ public final class QuitWorkspaceAction extends DesktopAction {
 
     /**
      * Create a clear workspace action with the specified workspace.
+     * @param desktop
      */
     public QuitWorkspaceAction(SimbrainDesktop desktop) {
         super("Quit", desktop);
@@ -43,7 +44,9 @@ public final class QuitWorkspaceAction extends DesktopAction {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         desktop.quit(false);
     }

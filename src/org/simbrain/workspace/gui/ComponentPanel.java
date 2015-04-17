@@ -124,6 +124,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener,
     }
 
     /**
+     * @return
      * {@inheritDoc}
      */
     public boolean clearWorkspace() {
@@ -222,6 +223,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener,
 
         /**
          * Add a new component to the list.
+         * @param component
          */
         public void addRow(WorkspaceComponent component) {
             data.add(component);

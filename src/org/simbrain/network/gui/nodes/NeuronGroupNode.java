@@ -818,6 +818,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	  *
 	  * @param map
 	  * @param terminaMap
+	  * @return
 	  */
 	 public LinkedHashMap<Point2D, Point2D> untangle(
 			 LinkedHashMap<Point2D, Point2D> map,

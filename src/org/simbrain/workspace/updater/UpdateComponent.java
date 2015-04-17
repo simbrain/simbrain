@@ -34,6 +34,7 @@ public class UpdateComponent implements UpdateAction {
     private final WorkspaceUpdater updater;
 
     /**
+     * @param updater
      * @param component component to update
      */
     public UpdateComponent(WorkspaceUpdater updater,

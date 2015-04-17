@@ -57,7 +57,9 @@ public final class RunScriptAction extends AbstractAction {
         this.networkPanel = networkPanel;
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         SFileChooser fileChooser = new SFileChooser(SCRIPT_MENU_DIRECTORY,
                 "Run Script", "bsh");

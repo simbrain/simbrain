@@ -40,13 +40,16 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
 
     /**
      * Create an open odor world action with the specified workspace.
+     * @param workspace
      */
     public OpenOdorWorldAction(Workspace workspace) {
         super("Odor World", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SwissIcon.png"));
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public void actionPerformed(final ActionEvent event) {
         String defaultDirectory = ".";
         try {

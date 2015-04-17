@@ -60,7 +60,9 @@ class EditModeAction extends AbstractAction {
         this.editMode = editMode;
     }
 
-    /** @see AbstractAction */
+    /** @see AbstractAction 
+     * @param event
+     */
     public final void actionPerformed(final ActionEvent event) {
         networkPanel.setEditMode(editMode);
     }

@@ -65,7 +65,7 @@ import org.simbrain.workspace.gui.GuiComponent;
  *
  * Examples of html code for local links and images:
  *
- * <img src = "file:docs/Images/World.png">
+ * <img src = "file:docs/Images/World.gif" alt="world">
  * <a href = "file:docs/SimbrainDocs.html">Local link</a>.
  *
  */

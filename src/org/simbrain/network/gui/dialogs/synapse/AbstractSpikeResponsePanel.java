@@ -147,7 +147,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
      * the spike responders of all of them in accordance with the values entered
      * into the panel's fields. This method is meant to ensure that each synapse
      * has the correct kind of spike responder, then pass the list to
-     * {@link #writeValuesToRules(List)} to make the actual changes.
+     * {@link #writeValuesToRules(Collection)} to make the actual changes.
      *
      * @param synapses
      *            the synapses to which spike responder changes will be
@@ -182,7 +182,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
 
     /**
      * Are we replacing rules or editing them? Replacing happens when
-     * {@link #commitChanges(List)} is called on a synapse panel whose rule is
+     * {@link #commitChanges(Collection)} is called on a synapse panel whose rule is
      * different from the rules of the synapses being edited.
      *
      * @return replacing or editing

@@ -121,7 +121,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      * displayed is manually set. This is the case when the number of synapses
      * (such as when adding multiple synapses) is unknown at the time of
      * display. In fact this is probably the only reason to use this factory
-     * method over {@link #createBasicSynapseInfoPanel(List, Window)}.
+     * method over {@link #createBasicSynapseInfoPanel(Collection, Window)}.
      *
      * @param synapses
      *            the synapses whose information is being displayed/made

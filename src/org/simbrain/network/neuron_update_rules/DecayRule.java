@@ -79,7 +79,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc} 
      * @return
      */
     public DecayRule deepCopy() {
@@ -97,7 +97,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc}
      * @param neuron
      */
     public void update(Neuron neuron) {

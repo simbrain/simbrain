@@ -75,7 +75,6 @@ public class Randomizer {
      * Copy constructor.
      *
      * @param dup the <code>RandomSource</code> to duplicate.
-     * @return the duplicated <code>RandomSource</code> object.
      */
     public Randomizer(final Randomizer dup) {
         setPdf(dup.getPdf());

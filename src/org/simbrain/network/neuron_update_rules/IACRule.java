@@ -65,7 +65,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
     /**
      * @return
-     * @{inheritDoc
+     * {@inheritDoc}
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -73,7 +73,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
 
     /**
      * @return
-     * @{inheritDoc
+     * {@inheritDoc}
      */
     public IACRule deepCopy() {
         IACRule iac = new IACRule();

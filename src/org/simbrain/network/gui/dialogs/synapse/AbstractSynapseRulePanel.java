@@ -154,7 +154,7 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
      * class). In the creation case, the template synapse including the rule
      * edited by this panel is copied. There is no reason outside convention for
      * this to be the case. Do NOT use this method repeatedly to commit changes
-     * to multiple synapses, {@link #commitChanges(List)} does this much more
+     * to multiple synapses, {@link #commitChanges(Collection)} does this much more
      * efficiently.
      *
      * @param synapse
@@ -188,7 +188,7 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
 
     /**
      * Are we replacing rules or editing them? Replacing happens when
-     * {@link #commitChanges(List)} is called on a synapse panel whose rule is
+     * {@link #commitChanges(Collection)} is called on a synapse panel whose rule is
      * different from the rules of the synapses being edited.
      *
      * @return replacing or editing

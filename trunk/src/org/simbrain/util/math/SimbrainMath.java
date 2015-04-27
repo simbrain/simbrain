@@ -342,9 +342,9 @@ public class SimbrainMath {
      * to their start points the line segments intersect. If either parameter is
      * not on [0, 1], the line segments do not intersect. If all that is needed
      * is information on
-     * <ul>
+     * 
      * if
-     * </ul>
+     * 
      * the line segments intersect, then Lin2D.linesIntersect(...) is preferred.
      * It is up to whoever calls this function to determine if an intersection
      * actually occurs by checking the returned vector (as a Point2D) of

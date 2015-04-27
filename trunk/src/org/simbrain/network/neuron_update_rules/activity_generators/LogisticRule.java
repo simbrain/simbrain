@@ -56,7 +56,7 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc}
      * @return the discrete time type
      */
     public TimeType getTimeType() {
@@ -64,7 +64,7 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void init(Neuron neuron) {
@@ -72,13 +72,13 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @{inheritDoc <b>Unsafe for activity generators</b>. If copied across a
+     * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
      *              set of neurons, {@link #init(Neuron) init} must be called to
      *              ensure rational behavior for an activity generator. The
      *              {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy
      *              constructor} is the preferred method of copying because
      *              {@link #init(Neuron) init} is called on the neuron parameter
-     *              automatically.
+     *              automatically. 
      * @return         
      */
     public LogisticRule deepCopy() {
@@ -90,7 +90,7 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc}
      * @param neuron
      */
     public void update(Neuron neuron) {

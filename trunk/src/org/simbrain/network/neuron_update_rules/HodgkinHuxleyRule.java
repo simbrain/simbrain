@@ -74,7 +74,7 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
     float vClampValue = convertV(0F);
 
     /**
-     * @{inheritDoc
+     * {@inheritDoc} 
      * @param neuron
      */
     public void update(Neuron neuron) {

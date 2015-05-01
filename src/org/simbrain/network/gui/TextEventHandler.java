@@ -133,9 +133,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements
         }
     }
 
-    /** @Override 
-     * @param arg0
-     */
+    @Override
     public void actionPerformed(ActionEvent arg0) {
     }
 

@@ -247,10 +247,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
         commitChanges();
     }
 
-    /**
-     * @see AbstractAction
-     * @param e
-     */
+    @Override
     public void actionPerformed(final ActionEvent e) {
         boolean found = false;
         if (e.getSource() == jtfFonts) {
@@ -311,10 +308,7 @@ public class TextDialog extends StandardDialog implements ActionListener,
         }
     }
 
-    /**
-     * @see AbstractAction
-     * @param e
-     */
+    @Override
     public void valueChanged(final ListSelectionEvent e) {
         if (e.getSource() == fList) {
             if (fList.getSelectedValue() != null) {

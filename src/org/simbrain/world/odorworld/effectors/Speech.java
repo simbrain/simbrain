@@ -118,9 +118,6 @@ public class Speech extends Effector {
         this.activated = activated;
     }
 
-    // **
-    // * @return the amount // obsolete?
-    // */
     public double getAmount() {
         return amount;
     }

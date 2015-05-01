@@ -31,7 +31,6 @@ import org.piccolo2d.extras.util.PNodeLocator;
 /**
  * Selection handle.
  *
- * <p>
  * Usage:
  *
  * <pre>
@@ -46,10 +45,6 @@ import org.piccolo2d.extras.util.PNodeLocator;
  * SelectionHandle.removeSelectionHandleFrom(node)
  * </pre>
  *
- * </p>
- *
- * @see #addSelectionHandleTo(PNode)
- * @see #removeSelectionHandleFrom(PNode)
  */
 public final class SourceHandle extends PHandle {
 

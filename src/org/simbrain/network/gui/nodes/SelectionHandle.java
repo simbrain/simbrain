@@ -32,7 +32,6 @@ import org.piccolo2d.extras.util.PNodeLocator;
 /**
  * The graphical handle drawn around selected PNodes.
  *
- * <p>
  * Usage:
  *
  * <pre>
@@ -46,8 +45,6 @@ import org.piccolo2d.extras.util.PNodeLocator;
  * PNode node = ...;
  * SelectionHandle.removeSelectionHandleFrom(node)
  * </pre>
- *
- * </p>
  *
  * @see #addSelectionHandleTo(PNode)
  * @see #removeSelectionHandleFrom(PNode)

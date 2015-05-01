@@ -75,11 +75,11 @@ public class LogisticRule extends NeuronUpdateRule implements
      * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
      *              set of neurons, {@link #init(Neuron) init} must be called to
      *              ensure rational behavior for an activity generator. The
-     *              {@link #RandomNeuronRule(RandomNeuronRule, Neuron) copy
+     *              {@link RandomNeuronRule#RandomNeuronRule(RandomNeuronRule, Neuron) copy
      *              constructor} is the preferred method of copying because
      *              {@link #init(Neuron) init} is called on the neuron parameter
      *              automatically. 
-     * @return         
+     * @return a copy of this node         
      */
     public LogisticRule deepCopy() {
         LogisticRule ln = new LogisticRule();

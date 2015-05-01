@@ -21,7 +21,7 @@ package org.simbrain.workspace;
 /**
  * Encapsulates type information about potential attribute. Used to determine
  * which potential attributes are visible in coupling creation GUI. Displayed as
- * typename:method<datatype>
+ * typename:method&lt;datatype&gt;
  *
  * @author jyoshimi
  */

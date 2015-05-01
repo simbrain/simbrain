@@ -1068,7 +1068,7 @@ public class SynapseGroup extends Group {
     /**
      * A forwarding method to SimbrainMath.getMatrixRowCompression(double [][]).
      * Returns a row compressed representation of the weight matrix represented
-     * by this synapse group using the <num synapses>,<index vals>,<wt vals>
+     * by this synapse group using the &lt;num synapses&gt;,&lt;index vals&gt;,&lt;wt vals&gt;
      * format. Storing all values as longs (and the double wt vals in long-bit
      * form).
      *
@@ -1386,9 +1386,9 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the excitatory prototype synapse, allowing more detailed synapse
      * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplateExcitatory(Synapse)}
+     * many values call {@link #setAndConformToTemplate(Synapse, Polarity)}
      *
-     * @return
+     * @return the prototype synapse
      */
     public Synapse getExcitatoryPrototype() {
         return Synapse.copyTemplateSynapse(excitatoryPrototype);
@@ -1397,9 +1397,9 @@ public class SynapseGroup extends Group {
     /**
      * Reveals the inhibitory prototype synapse, allowing more detailed synapse
      * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplateInhibitory(Synapse)}
+     * many values call {@link #setAndConformToTemplate(Synapse, Polarity)}
      *
-     * @return
+     * @return the prototype synapse
      */
     public Synapse getInhibitoryPrototype() {
         return Synapse.copyTemplateSynapse(inhibitoryPrototype);

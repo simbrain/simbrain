@@ -36,7 +36,6 @@ import org.simbrain.network.gui.NetworkPanel;
  * and property dialog, and support. Screen elements are automatically support
  * the primary user interactions in the network panel.
  *
- * <p>
  * Subclasses of this class must implement the following methods:
  *
  * <pre>
@@ -59,7 +58,6 @@ import org.simbrain.network.gui.NetworkPanel;
  * protected abstract JDialog getPropertyDialog();
  * </pre>
  *
- * </p>
  */
 public abstract class ScreenElement extends PPath.Float {
 

@@ -391,9 +391,7 @@ public class Sparse implements ConnectNeurons {
     }
 
     /**
-     *
      * @param newSparsity new sparsity connection
-     * @return
      */
     public void removeToSparsity(double newSparsity) {
         if (newSparsity >= connectionDensity) {
@@ -439,9 +437,7 @@ public class Sparse implements ConnectNeurons {
     }
 
     /**
-     *
      * @param newSparsity new sparsity connection
-     * @return
      */
     public void addToSparsity(double newSparsity) {
         if (newSparsity <= connectionDensity) {
@@ -568,9 +564,6 @@ public class Sparse implements ConnectNeurons {
      * source neuron and all available target neurons will actually be made.
      *
      * @param connectionDensity
-     * @return the connections added or removed to achieve the desired density
-     *         if density is being changed after connections have already been
-     *         made
      */
     public void setConnectionDensity(
         final double connectionDensity) {

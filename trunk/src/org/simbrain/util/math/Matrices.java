@@ -8,12 +8,12 @@ public class Matrices {
      * The difference between 1 and the smallest exactly representable number
      * greater than one. Gives an upper bound on the relative error due to
      * rounding of floating point numbers.
+     * 
+     * Retrieved from http://the-lost-beauty.blogspot.com/2009/04/moore-penrose-pseudoinverse
+     *            -in-jama.html
      *
      * @author Ahmed Abdelkader
      *         (http://www.blogger.com/profile/01141303576931872803)
-     * @retrived:
-     *            http://the-lost-beauty.blogspot.com/2009/04/moore-penrose-pseudoinverse
-     *            -in-jama.html
      */
     public static double MACHEPS = 2E-16;
 
@@ -32,7 +32,7 @@ public class Matrices {
      *
      * Modified version of the original implementation by Kim van der Linde.
      * @param x
-     * @return
+     * @return the pseudo-inverse
      */
     public static Matrix pinv(Matrix x) {
         if (x.rank() < 1) {

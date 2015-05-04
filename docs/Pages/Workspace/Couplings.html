@@ -19,15 +19,37 @@
         </div>
 
         <h1>Couplings</h1>
-        <p>A coupling is a one-way informational link between two objects in a Simbrain simulation. Couplings allow information to flow between components in the Simbrain <a href="../Workspace.html">workspace</a> (e.g. from a network to a bar chart). A coupling consists of a producer and a consumer. Producers and consumers are <a href="#Attributes">attributes</a>. The basic way couplings work is simple. A producer gathers information from a source object (usually calling a "getter" method on an underlying java object), and then passes the result to a target object (usually calling a "setter" method).</p>
-        <p>Couplings have different types, depending on what the datatype of the underlying getter and setter methods is. There are several types of couplings, including</p>
-        <ul>
-            <li>Scalar couplings (doubles in the underlying code).</li>
-            <li>Vector couplings (double-arrays).  Note that these are shown as green in the coupling manager.</li>
-            <li>Text couplings (Strings)</li>
-        </ul>
-        <p>There could be other coupling types as well (the underlying code only requires that the producer and consumer in a coupling have the same data type).
+
+        <p>A coupling is a one-way informational link between two objects in a Simbrain simulation. Couplings allow information to flow between components in the Simbrain <a href="../Workspace.html">workspace</a> (e.g. from a network to a bar chart). A coupling consists of a producer and a consumer. Producers and consumers are <a href="#Attributes">attributes</a>.</p>
+        <p style="float:left; padding: 20px;">
+            <img src="../../Images/Coupling_General.png" height = "100">
         </p>
+        <p>The basic scheme is shown in this image (this kind of depiction is used throughout these documents). The coupling contains a producer and consumer attribute which are of the same type, and it functions to pass information from the producer to the consumer .  A producer gathers information from a source object and then passes the result to a target object.</p>
+
+        <p>In the underlying java code, the producer is generally calling a "getter" function, which retrieves some information from a Simbrain object, and the consumer is generally passing information retrieved from a getter function on to a setter function.
+        </p>
+
+        <p><span class="heading">Coupling Types</span>
+        </p>
+
+        <p>There are different types of couplings, depending on the datatype of the underlying attributes. Currently Simbrain has three types of couplings</p>
+        <p style="float: right; padding: 20px;">
+            <img src="../../Images/Coupling_Examples.png" height = "250">
+        </p>
+        <ol>
+            <li>Scalar couplings (doubles in the underlying code).</li>
+            <li>Vector couplings (double-arrays).  These are shown as green in the coupling manager.</li>
+            <li>Text couplings (Strings).  These are shown as blue in the coupling manager.</li>
+        </ol>
+        <p>There could be other coupling types as well.  The underlying code only requires that the producer and consumer in a coupling have the same data type.</p>
+        <p>Shown here an example of each type of coupling.  To emphasize that attribute types must match, they are shown as "puzzle-pieces" which must be fit to each others: scalar attributes as interlocking triangular shapes, vector attributes as interlocking zig-zags , and text attributes as interlocking curves.</p>
+
+        <p> These types of icon are also used throughout the documentation, e.g. in the <a href="../Worlds/OdorWorld/couplings_overview.html">odor world coupling overview</a>.
+        </p>
+
+        <!-- Expand above to a list -->
+
+        <p>An example</p>
         <p>Couplings are managed using the <a href="#CouplingManager">Coupling Manager</a> or via various shortcuts described below in <a href="#Creation">Coupling Creation.</a>
         </p>
 
@@ -35,9 +57,6 @@
         </p>
         <p>An easy way to get a feel for how couplings work is through the example of scalar couplings. An example is shown below that links a <a href="../Network.html">Network</a> to an <a href="../Worlds/OdorWorld/OdorWorld.html">OdorWorld</a>. In this example one of the couplings in the pursuer simulation is shown (the simulation has 5 couplings total, one for each neuron). The coupling shown takes the current activation of the "turn right" neuron (the producer) and sends it to the turn right action on the mouse (the consumer). Note that in this example, the mouse will turn right when the workspace is updated, because there is more right turning activation than left turning activation.
         </p>
-        <div style="float: right; padding: 30px;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/ScalarCoupling.png">
-        </div>
-        <br>
         <p>There are many examples of scalar couplings that can be made. Here are some examples where the producer is a neuron:
             <ul>
                 <li>A coupling from a single neuron to a single neuron in another network.</li>
@@ -46,6 +65,8 @@
                 <li>A coupling from a neuron's activation to a specific column in a <a href="../Worlds/DataWorld/DataWorld.html">Data World</a>. If the data world is in iteration mode, then with each iteration of the workspace the current neuron activation is "logged" in a specific column of the dataworld.</li>
                 <li>A coupling from a neuron's activation to text in a <a href="../Worlds/TextWorld/TextWorld.html">Text World</a>. For example, when the neuron is active above .5 make the word "hello" appear in the text world</li>
             </ul>
+        </p>
+        <p style="float: left; padding: 30px;"><img style="width: 400px" alt="Couplings Diagram" src="../../Images/ScalarCoupling.png">
         </p>
         <p>Here are some examples where the consumer is a neuron:
             <ul>
@@ -67,8 +88,8 @@
                 <li>A coupling from a neuron group's activation to text in a <a href="../Worlds/TextWorld/TextWorld.html">Text World</a>. For example, when a vector is close enough to a specific vector (in a vector space) make the word "hello" appear in the text world.</li>
             </ul>
         </p>
-        <div style="float: left; padding: 30px;"><img style="width: 500px" alt="Couplings Diagram" src="../../Images/VectorCoupling.png">
-        </div>
+        <p style="float: right; padding: 30px;"><img width="500px" alt="Couplings Diagram" src="../../Images/VectorCoupling.png">
+        </p>
         <p>Here are some examples where the consumer is a neuron group:
             <ul>
                 <li>A coupling from an agent's sensor vector to a neuron group.</li>

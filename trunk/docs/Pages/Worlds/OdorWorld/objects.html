@@ -21,7 +21,9 @@
         <br>
         <p><img src="../../../Images/Swiss.gif" width="32" height="32"> Any object that appears in the Odor World window is an entity with properties that can be set in the <a href="entitydialog.html">entity dialog</a> (which appears when you double click on the object, or right click on it and select <span class="command">Edit Entity</span>). That dialog gives a sense of what is possible with Odor World objects. Objects can be dragged around. They have velocity properties which can also be set so that they can be made to translate (move along straight line paths) at every iteration. Since the world wraps around by default, these objects will continually move through the world.</p>
 
-        <p><a href="agents.html">Agents</a> are a special kind of object that can be <a href="../../Workspace/Couplings.html">coupled</a> to other Simbrain components, in particular neural networks, which can control their movements in subtle ways. They can also serve as smell sources.</p>.
+        <p><a href="agents.html">Agents</a> are a special kind of object that can be <a href="../../Workspace/Couplings.html">coupled</a> to other Simbrain components, in particular neural networks, which can control their movements in subtle ways. They can also serve as smell sources.</p>
+
+        <p>To get started understanding how agent sensors and effectors work see the <a href="Couplings_Overview.html">couplings overview</a> page.</p>
 
         <p><a name="SmellSource"></a><span class="heading">Smell Sources and Stimulus Vectors</span>
         </p>
@@ -32,10 +34,10 @@
 
         <p>By associating different objects with different stimulus vectors, you can make them have a differential impact on the sensory neurons of a network. For example, you can make it the case that every swiss cheese will provide an input value of 10 to the first component of smell sensor, while fish will send inputs of 10 to second component of a smell sensor</p>
 
-        <p><span class="heading">Sensor Vectors</span>
+        <p><a id="SensorVector="></a><span class="heading">Sensor Vectors</span>
         </p>
 
-        <p>We can think of a <a href="sensors.html#smell">smell sensor</a> as having, at any time, a "sensory vector" that is the result of scaling all the stimulus vectors in its vicinity based on how far away they are.  An agent's smell sensor is updated by taking each object around it, scaling its stimulus vector by a decay function, and then adding all these decayed stimulus vectors together. The basic process is illustrated below, where two objects with two stimulus vectors are sensed by the agent's left smell sensor. </p>
+        <p>A <a href="sensors.html#smell">smell sensor</a> is associated with a "sensor vector", that is the result of scaling all the stimulus vectors in its vicinity based their distance from that sensor (using decay functions), and then adding these scaled stimulus vectors together.  The process is illustrated below, where two objects with two stimulus vectors are sensed by the agent's left smell sensor. </p>
 
         <!-- <p style="text-align: center"><img src="../../../Images/OdorWorldDiagram.png" style="width: 500px" alt="Odor World Diagram">
         </p> -->
@@ -49,9 +51,9 @@
 
         <p>Smell sensors are producers in <a href="../../Workspace/Couplings.html">couplings</a>.  The current value of a sensor vector (either the whole vector, or one component) are sent to neurons and neuron groups (or other components) in Simbrain. Smell sensors can produce scalar and vector values.  Vector values are just the sensor vector that occurs after summing and scaling as described above.  Scalar values are particular components of these sensory vectors.  Thus "Smell-Left-1" is the name of a scalar producer that will send the value of <em>first component</em> of the left sensor of an agent, and "Smell-Left-2" is the name of a scalar producer that will send the value of <em>third component</em> of that sensor.</p>
 
-        <p>This image clarifies how this works, for the case where the sensor vector for an agent's left sensor is (1,0,.9,0,0)<p>.
+        <!--  <p>This image clarifies how this works, for the case where the sensor vector for an agent's left sensor is (1,0,.9,0,0)<p>.
 
-        <p style="text-align: center"><img src="../../../Images/OdorWorldProducers.png" style="width: 500px" alt="Odor World Producers"></p>
+        <p style="text-align: center"><img src="../../../Images/OdorWorldProducers.png" style="width: 500px" alt="Odor World Producers"></p> -->
 
         <p>Note that there are only 5 scalar producers for each smell sensor.</p>
 

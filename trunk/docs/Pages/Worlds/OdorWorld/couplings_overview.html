@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo"></div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="OdorWorld.html">OdorWorld</a> &gt; Couplings Overview</p>
+        </div>
+
+        <h1>Couplings Overview</h1>
+        <br>
+
+        <p>Agents in odor world can be connected to other workspace components using <a href="../../Workspace/Couplings.html">couplings</a>.  The image below uses the graphical notation set up on the couplings page.   Consumers take in information and use it to control the agent via <a href="effectors.html">effectors</a>, moving it and producing speech bubbles.   Producers take information "coming out" of the agent's <a href="sensors.html">sensors</a> and send it elsewhere in simbrain, e.g. to neurons or neuron groups. </p> 
+
+        <div align = "center" style="padding: 20px;"><img src="../../../Images/OdorWorld_Attributes.png" height="250"></div>
+
+        <p>Currently, the most heavily used odor world couplings are the smell sensors / producers.  Scalar sensor attributes are linked to particular components of the <a href="objects.html#SensorVector">sensor vector</a> associated with a smell sensor, and vector sensor sensors are associated with the whole sensor vector. In the example above we see the vector producer for the left smell sensor and also the scalar producer for its third component.</p>
+
+        <p>Effectors and the other sensor types are more straightforward.  For example, a scalar consumer for straight movement will move the agent forward by an amount proportional to the producer's value.  A tile sensor / producer will send out a scalar value whenever the agent is at a particular location in the world.   The speech effector / consumer makes the agent say something in a speech bubble (this makes more sense when the agent is a person!). The hearing producer sends out a scalar single whenever the agent "hears" another agent say something with its speech effector. </p>
+
+    </div>
+</body>
+
+</html>

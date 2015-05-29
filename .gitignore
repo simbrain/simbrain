@@ -2,3 +2,5 @@
 /build/main
 /build/apidocs
 /dist
+*.sublime-project
+*.sublime-workspace

@@ -3,32 +3,23 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
         <div class="navi">
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; DataWorld</p>
         </div>
-
         <h1>DataWorld</h1>
-        <p>Data Worlds are essentially spreadsheets or tables that can be used to store data.  They are wrappers around <a href="../../Utils/Tables/Tables.html">Simbrain Tables</a>.</p>
-        
-        <p>Columns in a data world table can be producers or consumers (see <a href="couplings.html">couplings</a>). When columns produce data, during each workspace upate the values in the current row and that column are sent to a consumer (e.g. a neuron). When columns consume data,during each workspace upate the values coming from a producer (e.g. a neuron) is written to that column, in the current row. </p>
+        <p>Data Worlds are essentially spreadsheets or tables that can be used to send data to and recevieve data from (primarily) neural networks. They are wrappers around <a href="../../Utils/Tables/Tables.html">Simbrain Tables</a>.</p>
 
         <p>A standard use of data worlds is to provide inputs to a neural network. In that case, each row in a Data World corresponds to an input or output vector, and each column corresponds to an input node in a neural network.</p>
-
         <p class="heading">File</p>
         <blockquote>
             <p><span class="heading2">Open / Save</span>: Open and save a world as a .xml file. When saving this way (from DataWorld window), the format is less human readable but all associated information about the DataWorld is saved, e.g. if iteration mode is turned on, it will be saved. </p>
@@ -42,19 +33,13 @@
         <p class="heading">Edit</p>
         <blockquote>
             <p> See <a href="../../Utils/Tables/Menus.html#edit">Tables/Menus</a>.</p>
-
         </blockquote>
-
         <p class="heading">Pop-up Menu</p>
-
         <!-- <p class="heading">Right-click over Data Sheet</p> -->
         <blockquote>
             <p><span class="heading2">Send Coupling To:</span> Sends the highlighted data to another world to be coupled. See <a href="../../Workspace/Couplings.html">couplings</a> for more information.</p>
-
             <p><span class="heading2">Receive Coupling From:</span> Receives data from another world to be coupled with the highlighted data. See <a href="../../Workspace/Couplings.html">couplings</a> for more information.</p>
-
             <p> See <a href="../../Utils/Tables/Menus.html#popup">Tables/Menus</a> for other menu items.</p>
-
             <!--
                     </blockquote>
                     <p class="heading">Right-click over Send Buttons</p>
@@ -68,8 +53,22 @@
             <p> See <a href="../../Utils/Tables/Toolbars.html">Tables/Toolbars</a>.</p>
         </blockquote>
 
-    </div>
+        <p class="heading" id = "dataworldcoupling">Data World Couplings</p>
 
+        <p style="float:right; padding-left: 20px;"><img style="width: 700px" alt="Couplings Diagram" src="../../../Images/DataWorld_Couplings.png" border="1">
+        </p>
+
+        <blockquote>
+
+            <p>For more information see the <a href="../../Workspace/Couplings.html">Coupling</a> documentation.</p>
+
+            <p>Columns in a data world table can be scalar consumers or producers.  When columns consume data, during each workspace upate the values coming from a producer (e.g. a neuron) are written to that column, in the current row. When columns produce data, during each workspace upate the values in the current row and that column are sent to a consumer (e.g. a neuron). With vector consumers a vector of values is applied to the current row; with vector producers the values in the current row are sent to consumers elsewhere in Simbrain.</p>
+
+            <p>For example, if a neuron producer is coupled to a data world consumer for column 5 of a Data World, then when the network is iterated, the neuron would take on the value in the third row and current column of the Data World.  By turning on iteration mode a whole list of values can be sent to a neuron over time in this way.  The <span class="command">STDP Workspace</span> simulation provides a useful example.</p>
+
+        </blockquote>
+
+    </div>
 </body>
 
 </html>

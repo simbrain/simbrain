@@ -19,34 +19,32 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../connections.html">Connections</a></p>
         </div>
         <h1>Excitatory/Inhibitory Properties<br></h1>
-        <br>
         <p>
             The Excitatory/Inhibitory properties dialog is a sub-panel within the dialogs for making <a href="./alltoall.html">all to all</a> and <a href="sparse.html">sparse</a> connections. Within this sub-panel the user can set the percentage of connections which are excitatory (always complimentary to the percentage of inhibitory connections), the type of synapses to be used for inhibitory and excitatory connections, and the range and distribution of the strengths of inhibitory and excitatory connections.
         </p>
-        <br>
+        <p style="float:right; padding: 20px;"><img style="height: 450px;" src="../../../Images/inhibitExciteSubPanel.png" border="1"></p>
+        <p class="heading">Setting Basic Data</span>
+        </p>
         <blockquote>
-            <p><img style="border-style: solid; border-color: transparent; border-width: 10px 10px 0px; width: 487px; height: 500px;" src="../../../Images/inhibitExciteSubPanel.png" align="right"></p>
-
-        	<span class="heading">Setting Basic Data</span>
-        	<br><br>
-        	<div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See <a href="../../../Pages/Network/synapse.html#synapseProperties">common synpase properties</a>.
-        	</div>
-        	<br>
-            <span class="heading">Udating Synapse Types</span>
-            <br>
-            <div align="justify">When clicking on the synapse type, a drop down menu will appear with a list of synapse types. Users may select the kind of synapse to be used between a set of source and target neurons and furthermore specify different types of synapses to be used for inhibitory or excitatory connections, should they chose to. When clicking "Settings," a drop down menu will appear with properties users can modify (descriptions of the different types of synpase connections with their properties can be found <a href="../synapse.html">here</a>). </div>
-            <br>
-            <span class="heading">Setting Spike Responders</span>
-        	<br><br>
-        	<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See <a href="../../../Pages/Network/synapse/spikeResponder.html"> spike responder</a>.</p>
-        	<br>
-            <span class="heading">Setting the Ratio of Excitatory to Inhibitory Connections</span>
-            <br>
-            <div align="justify">The percentage of connections which are excitatory over inhibitory can be set using the Excitatory/Inhibitory slider or by specifying the percent of excitatory connections manually in the % Excitatory text field. Moving the slider completely to the left entails that all connections will be inhibitory (weight strength in the inhibitory range, generally some value less than 0), likewise moving the slider completely to the right entails that all connections will be excitatory (weight strength in the excitatory range, generally some value greater than 0). All slider values in between will produce varying ratios of excitatory and inhibitory connections. Setting the % of excitatory connections manually with the text field entails (100-value entered)% of connections will be inhibitory.</div>
-            <br>
-            <span class="heading">Randomizing Connection Strengths</span>
-            <br>
-            <div align="justify">Using the above buttons one can randomize connection strengths before laying down connections, furthmore one can specify the parameters used to randomize these values. Otherwise, synaptic strengths will default to 1 for excitatory connections and -1 for inhibitory connections. Clicking the dice button (after clicking the checkbox to enable randomized weights) will bring up a <a href="../noisegenerator.html">random panel</a> wherein the distribution type (uniform or gaussian), the upper and lower bounds, and the standard deviation (if applicable) can be set. As with other inhibitory/excitatory properties, the parameters for randomily generating strength values is distinct for inhibitory and excitatory connections. For instance: in the above picture, randomized excitatory weights have been selected as evidenced by the colorized dice; assuming their properties were then set, connection strengths for excitatory connections will lie in the specified distribution and all inhibitory connections will have a strength of -1.</div>
+            <p>See <a href="../../../Pages/Network/synapse.html#synapseProperties">common synpase properties</a>.
+            </p>
+        </blockquote>
+        <p class="heading">Udating Synapse Types</p>
+        <blockquote>
+            When clicking on the synapse type, a drop down menu will appear with a list of synapse types. Users may select the kind of synapse to be used between a set of source and target neurons and furthermore specify different types of synapses to be used for inhibitory or excitatory connections, should they chose to. When clicking "Settings," a drop down menu will appear with properties users can modify (descriptions of the different types of synpase connections with their properties can be found <a href="../synapse.html">here</a>).
+        </blockquote>
+        <p class="heading">Setting Spike Responders</p>
+        <blockquote>
+            See <a href="../../../Pages/Network/synapse/spikeResponder.html"> spike responder</a>
+        </blockquote>
+        <p class="heading">Setting the Ratio of Excitatory to Inhibitory Connections</span>
+        </p>
+        <blockquote>
+            The percentage of connections which are excitatory over inhibitory can be set using the Excitatory/Inhibitory slider or by specifying the percent of excitatory connections manually in the % Excitatory text field. Moving the slider completely to the left entails that all connections will be inhibitory (weight strength in the inhibitory range, generally some value less than 0), likewise moving the slider completely to the right entails that all connections will be excitatory (weight strength in the excitatory range, generally some value greater than 0). All slider values in between will produce varying ratios of excitatory and inhibitory connections. Setting the % of excitatory connections manually with the text field entails (100-value entered)% of connections will be inhibitory.
+        </blockquote>
+        <p class="heading">Randomizing Connection Strengths</p>
+        <blockquote>
+            Using the above buttons one can randomize connection strengths before laying down connections, furthmore one can specify the parameters used to randomize these values. Otherwise, synaptic strengths will default to 1 for excitatory connections and -1 for inhibitory connections. Clicking the dice button (after clicking the checkbox to enable randomized weights) will bring up a <a href="../noisegenerator.html">random panel</a> wherein the distribution type (uniform or gaussian), the upper and lower bounds, and the standard deviation (if applicable) can be set. As with other inhibitory/excitatory properties, the parameters for randomily generating strength values is distinct for inhibitory and excitatory connections. For instance: in the above picture, randomized excitatory weights have been selected as evidenced by the colorized dice; assuming their properties were then set, connection strengths for excitatory connections will lie in the specified distribution and all inhibitory connections will have a strength of -1.
         </blockquote>
     </div>
 </body>

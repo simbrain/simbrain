@@ -17,7 +17,7 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; DataWorld</p>
         </div>
         <h1>DataWorld</h1>
-        <p>Data Worlds are essentially spreadsheets or tables that can be used to send data to and recevieve data from (primarily) neural networks. They are wrappers around <a href="../../Utils/Tables/Tables.html">Simbrain Tables</a>.</p>
+        <p>Data Worlds are essentially spreadsheets or tables that can be used to send data to and recevieve data from (primarily) neural networks. They are wrappers around <a href="../../Utils/Tables/Tables.html">Simbrain Tables</a>.  The main feature of data worlds is that they are set up to always have a current row.  That row is what is used to send and receive data.   If <span class="command">edit > iteration mode</span> is set then at each workspace update the current row is advanced.  This can be useful for sending data to a network or recording data from a network.  The <span class="command">STDP Workspace</span> simulation provides a useful example of a dataworld in action.</p>
 
         <p>A standard use of data worlds is to provide inputs to a neural network. In that case, each row in a Data World corresponds to an input or output vector, and each column corresponds to an input node in a neural network.</p>
         <p class="heading">File</p>
@@ -25,7 +25,7 @@
             <p><span class="heading2">Open / Save</span>: Open and save a world as a .xml file. When saving this way (from DataWorld window), the format is less human readable but all associated information about the DataWorld is saved, e.g. if iteration mode is turned on, it will be saved. </p>
             <p><span class="heading2">Save-As</span>: Saves a world as a&nbsp;.xml file with a name specified by the user.<span class="heading2"></span>
             </p>
-            <p><span class="heading2">Import/Export .csv &gt; Import (.csv) </span>: Import data from a .csv file (comma separated values).<span class="heading2"></span>
+            <p><span class="heading2">Import/Export .csv &gt; Import (.csv) </span>: Import data from a .csv file (comma separated values).
             </p>
             <p><span class="heading2">Import/Export .csv &gt; Export (.csv) </span>: Export data to a .csv file (comma separated values).</p>
             <p><span class="heading2">Close</span>: Closes the current DataWorld. </p>
@@ -52,22 +52,19 @@
         <blockquote>
             <p> See <a href="../../Utils/Tables/Toolbars.html">Tables/Toolbars</a>.</p>
         </blockquote>
-
-        <p class="heading" id = "dataworldcoupling">Data World Couplings</p>
-
+        <p class="heading" id="couplings">Data World Couplings</p>
         <p style="float:right; padding-left: 20px;"><img style="width: 700px" alt="Couplings Diagram" src="../../../Images/DataWorld_Couplings.png" border="1">
         </p>
-
         <blockquote>
-
             <p>For more information see the <a href="../../Workspace/Couplings.html">Coupling</a> documentation.</p>
 
-            <p>Columns in a data world table can be scalar consumers or producers.  When columns consume data, during each workspace upate the values coming from a producer (e.g. a neuron) are written to that column, in the current row. When columns produce data, during each workspace upate the values in the current row and that column are sent to a consumer (e.g. a neuron). With vector consumers a vector of values is applied to the current row; with vector producers the values in the current row are sent to consumers elsewhere in Simbrain.</p>
+            <p>Remember that data worlds have a current row, and that data is sent from and received to that row. The current row can be associated with vector consumers and producers, and scalar consumers and producers.</p>
 
-            <p>For example, if a neuron producer is coupled to a data world consumer for column 5 of a Data World, then when the network is iterated, the neuron would take on the value in the third row and current column of the Data World.  By turning on iteration mode a whole list of values can be sent to a neuron over time in this way.  The <span class="command">STDP Workspace</span> simulation provides a useful example.</p>
+            <p>Vector couplings are straightforward.   Vector producers take the value of the current row and send it out to a vector consumer, e.g. a <a href="../../Network/networkcouplings.html#group">neuron group</a>.  Vector consumers receive a vector value and apply it to the current row, truncating if necessary.</p>
+
+            <p>Scalar couplings are tied to specific columns.  Thus these attributes have names like "Column 1".  A scalar producer for a column takes the value of that column in the current row and sends it to a scalar consumer, e.g. a <a href="../../Network/networkcouplings.html#loose">neuron</a>.   A scalar consumer for a column receives a scalar value and it applies it to that column, at the current row.</p>
 
         </blockquote>
-
     </div>
 </body>
 

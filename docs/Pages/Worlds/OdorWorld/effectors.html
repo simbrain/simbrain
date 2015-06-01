@@ -36,7 +36,9 @@
 
         <p>To display an agent's effectors, double click on the agent in Odor World and select the effectors tab. The effector panel lists all of an agent's effectors along with its effector type and label. Labels can be renamed by double clicking on the label column.
         </p>
-        <p style="text-align: center;"><img style="width: 400px;" alt="Effectors" src="../../../Images/OdorWorld_EffectorPanel.png">
+
+        <p style="float: left; padding: 30px;">
+            <img src="../../../Images/OdorWorld_EffectorPanel.png" width="340" border="1">
         </p>
 
         <p>To edit an effector, right click on any part of the row and select "Edit effector..."</p>
@@ -50,8 +52,12 @@
 
         <p>A straight effector moves the agent straight forward in Odor World. As long as the neuron coupled with the effector is active, the agent will continue to try to move directly forward in Odor World. The distance that the agent moves per time step is the product of the activation in the neuron and the base movement amount.
         </p>
-        <p style="text-align: center;" class="heading"><img style="width: 304px;" alt="Straight Effector" src="../../../Images/OdorWorld_StraightEffector.png">
+
+        <p style="float: right; padding: 30px;">
+            <img src="../../../Images/OdorWorld_StraightEffector.png" width="250" border="1">
         </p>
+
+
         <blockquote>
             <p><span class="heading2">Base movement amount:</span>Determines the distance in pixels that the agent moves when this effector is activated.
         </blockquote>
@@ -60,20 +66,27 @@
         </p>
         <p>This effector controls changes in an agent's heading.   When a turning effector is activated, the turning direction and amount are multiplied and the product is added to the agent's current heading.  By default left and right turning effectors are provided.  If a new turning effector is added it is up to the user to make the label match what the effector does.
         </p>
-        <p style="text-align: center;" class="heading"><img style="width: 304px" alt="Turning Effector" src="../../../Images/OdorWorld_TurningEffector.png">
-        </p>
+
+
         <blockquote>
             <p><span class="heading2">Turning direction:</span>Determines the direction of that the agent turns to. A positive value makes the agent left. A negative value makes the agent turn right.  Any number besides 1 or -1 will also scale the amount of the turning.  Basically a scalar multiplied times turning amount to determine change in an agent's heading.</p>
             <p><span class="heading2">Turning amount:</span>Determines how much the agent turns in the turning direction.</p>
         </blockquote>
+
+
+        <p style="float: left; padding: 30px;">
+            <img src="../../../Images/OdorWorld_TurningEffector.png" width="250" border="1">
+        </p>
 
         <p><span class="heading"><a name="speech">Speech</a></span>
         </p>
 
         <p>When a speech effector is activated, it stimulates any <a href="sensors.html#hearing">hearing</a> sensor an agent with a matching utterance value.  
         </p>
-        <p style="text-align: center;" class="heading"><img style="width: 304px;" alt="Speech effector" src="../../../Images/OdorWorld_SpeechEffector.png">
-        </p>
+
+        <p style="float: right; padding: 30px;">
+            <img src="../../../Images/OdorWorld_SpeechEffector.png" width="250" border="1">
+
         <blockquote>
             <p><span class="heading2">Utterance:</span>The string or phrase associated with this effector. A hearing effector gets activated when it senses a speech effector of the same utterance.</p>
             <p><span class="heading2">Threshold:</span>An amount which must be exceeded for the effector to be activated.   When coupled to a neuron, the neuron must have a value above this for the speech effector gets activated.</p>

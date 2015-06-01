@@ -20,9 +20,13 @@
         <h1>Couplings Overview</h1>
         <br>
 
-        <p>Agents in odor world can be connected to other workspace components using <a href="../../Workspace/Couplings.html">couplings</a>.  The image below uses the graphical notation set up on the couplings page.   Consumers take in information and use it to control the agent via <a href="effectors.html">effectors</a>, moving it and producing speech bubbles.   Producers take information "coming out" of the agent's <a href="sensors.html">sensors</a> and send it elsewhere in simbrain, e.g. to neurons or neuron groups. </p> 
+        <p>Agents in odor world can be connected to other workspace components using <a href="../../Workspace/Couplings.html">couplings</a>.  The image below uses the graphical notation set up on the couplings page.</p>
+
+        <p>Couplings are mainly attached to agents.  Consumers take in information and use it to control the agent via <a href="effectors.html">effectors</a>, moving it and producing speech bubbles.   Producers take information "coming out" of the agent's <a href="sensors.html">sensors</a> and send it elsewhere in simbrain, e.g. to neurons or neuron groups. </p> 
 
         <div align = "center" style="padding: 20px;"><img src="../../../Images/OdorWorld_Attributes.png" height="250"></div>
+
+        <p>One confusing point here is that sensors don't seem like "producers" (they are sensing things after all, which seems like consuming), and effectors don't seem like "consumers".  That seems backwards.  To address this, think of the agent as a body only, without a brain, and think of producers and consumers relative to that brain.   When the agent smell's something, or hears something, it must send that information to the brain.  So it is receiving information from the environmnt then producing that information for the brain.  Similarly, effectors must receive information from the brain via a consumer, and then move the agent's body.   </p>
 
         <p>Currently, the most heavily used odor world couplings are the smell sensors / producers.  Scalar sensor attributes are linked to particular components of the <a href="objects.html#SensorVector">sensor vector</a> associated with a smell sensor, and vector sensor sensors are associated with the whole sensor vector. In the example above we see the vector producer for the left smell sensor and also the scalar producer for its third component.</p>
 

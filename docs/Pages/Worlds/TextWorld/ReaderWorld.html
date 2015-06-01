@@ -23,7 +23,8 @@
 
         <p>The basic way reader worlds work is that you load some text of interest in to the main window (just copy and paste in). Then, at each iteration of the workspace, the current token (either a word or a character; see "parsing" below) is highlighted, and is converted in to single number (scalar) or vector of numbers and sent to another component via couplings. Here is how this works schematically:</p>
 
-        <p align="center"><img src="../../../Images/ReaderWorldDiagram.png" width="500" border="1">
+        <p style="float: left; padding: 30px;">
+            <img src="../../../Images/ReaderWorld.png" width="500" border="1">
         </p>
 
         <p>Since reader worlds produce numbers or lists of numbers, they are producers in <a href="../../Workspace/Couplings.html">couplings</a>. There are two kinds of reader world producers:</p>
@@ -41,10 +42,11 @@
             <p><span class="heading2">Vector dictionary:</span> a map that associates words with specific vectors. When a given word is parsed, if a match is found in the vector dictionary that vector is sent to any coupled consumers. Stored in the "vector dictionary".</p>
         </blockquote>
 
-        <p align="center"><img src="../../../Images/ReaderWorldDialogs.png" width="700" border="1">
-        </p>
-
         <p>For example in a network you could right click on a node, go to "receive scalar coupling from" and then in the context menu choose "ReaderWorld1" and then "a" to make that neuron respond to the letter a being parsed.</p>
+
+        <p style="float: right; padding: 20px;">
+            <img src="../../../Images/ReaderWorldDialogs.png" width="600" border="1">
+        </p>
 
         <p> <span class="heading"><a name="ParseTypes"></a>Parse Types</span>
         </p>

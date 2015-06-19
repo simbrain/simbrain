@@ -442,17 +442,36 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public JMenu getNeuronGroupProducerMenu(NeuronGroup neuronGroup) {
 
         if (component.getWorkspaceComponent() != null) {
+            JMenu topMenu = new JMenu("Send Vector Coupling to");
+            
+            // TODO: Can pull from a helper method in NetworkComponent to ensure common naming 
+            
+            // Activations
             PotentialProducer producer = component
                     .getWorkspaceComponent()
                     .getAttributeManager()
                     .createPotentialProducer(neuronGroup, "getActivations",
                             double[].class);
-            producer.setCustomDescription("Neuron Group: "
+            producer.setCustomDescription("Neuron Group Activations: "
                     + neuronGroup.getLabel());
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send Vector Coupling to", component
+                    "Activations", component
                             .getWorkspaceComponent().getWorkspace(), producer);
-            return producerMenu;
+            topMenu.add(producerMenu);
+
+            // Spikes
+            PotentialProducer producer2 = component
+                    .getWorkspaceComponent()
+                    .getAttributeManager()
+                    .createPotentialProducer(neuronGroup, "getSpikeIndexes",
+                            double[].class);
+            producer2.setCustomDescription("Neuron Group Spikes: "
+                    + neuronGroup.getLabel());
+            JMenu producerMenu2 = new CouplingMenuProducer(
+                    "Spike Indices", component
+                            .getWorkspaceComponent().getWorkspace(), producer2);
+            topMenu.add(producerMenu2);
+            return topMenu;
         }
         return null;
     }

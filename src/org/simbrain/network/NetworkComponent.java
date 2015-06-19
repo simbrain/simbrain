@@ -82,9 +82,9 @@ public final class NetworkComponent extends WorkspaceComponent {
                 String.class, false));
         addProducerType(new AttributeType(this, "Synapse", "getStrength",
                 double.class, false));
-        addProducerType(new AttributeType(this, "NeuronGroup",
+        addProducerType(new AttributeType(this, "NeuronGroupActivations",
                 "getActivations", double[].class, true));
-        addProducerType(new AttributeType(this, "NeuronGroup",
+        addProducerType(new AttributeType(this, "NeuronGroupSpikes",
                 "getSpikeIndices", double[].class, true));
         addProducerType(new AttributeType(this, "SynapseGroup",
                 "getWeightVector", double[].class, true));
@@ -180,7 +180,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      * different places and is important to be consistent about.
      *
      * @param component network component
-     * @param neuron the neuron that will produce activations
+     * @param neuron the neuron that will consume activations
      * @param methodName the name of the method called by this consumer
      * @return the neuron consumer
      */
@@ -192,6 +192,15 @@ public final class NetworkComponent extends WorkspaceComponent {
         return consumer;
     }
 
+    /**
+     * Helper method for making synapse consumers, since it happens in a few
+     * different places and is important to be consistent about.
+     *
+     * @param component network component
+     * @param synapse the  synapse that will "consume" strengths
+     * @param methodName the name of the method called by this consumer
+     * @return the synapse consumer
+     */
     public static PotentialConsumer getSynapseConsumer(
             NetworkComponent component, Synapse synapse, String methodName) {
         PotentialConsumer consumer = component.getAttributeManager()
@@ -265,6 +274,15 @@ public final class NetworkComponent extends WorkspaceComponent {
         return producer;
     }
     
+    /**
+     * Helper method for making synapse producers, since it happens in a few
+     * different places and is important to be consistent about.
+     *
+     * @param component network component
+     * @param synapse the synapse that will "produce" strengths
+     * @param methodName the name of the method called by this producer
+     * @return the synapse producer
+     */
     public static PotentialProducer getSynapseProducer(
             NetworkComponent component, Synapse synapse, String methodName) {
         PotentialProducer producer = component.getAttributeManager()
@@ -290,23 +308,26 @@ public final class NetworkComponent extends WorkspaceComponent {
                     producer.setCustomDescription(description);
                     returnList.add(producer);
                 }
-            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroup")) {
-                // Handle NeuronGroup attributes
+            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroupActivations")) {
                 for (Group group : network.getFlatGroupList()) {
                     if (group instanceof NeuronGroup) {
                         PotentialProducer producer = getAttributeManager()
                                 .createPotentialProducer(group,
                                         "getActivations", double[].class);
-                        producer.setCustomDescription("Neuron Group: "
+                        producer.setCustomDescription("Neuron Group Activations: "
                                 + group.getLabel());
                         returnList.add(producer);
-                        PotentialProducer producer2 = getAttributeManager()
+                    }
+                }
+            } else if (type.getTypeName().equalsIgnoreCase("NeuronGroupSpikes")) {
+                for (Group group : network.getFlatGroupList()) {
+                    if (group instanceof NeuronGroup) {
+                        PotentialProducer producer = getAttributeManager()
                                 .createPotentialProducer(group,
                                         "getSpikeIndexes", double[].class);
-                        producer2.setCustomDescription("Spike Trains: "
+                        producer.setCustomDescription("Neuron Group Spikes: "
                                 + group.getLabel());
-                        returnList.add(producer2);
-
+                        returnList.add(producer);
                     }
                 }
             } else if (type.getTypeName().equalsIgnoreCase("SynapseGroup")) {

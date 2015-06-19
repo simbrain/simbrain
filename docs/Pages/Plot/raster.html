@@ -8,38 +8,34 @@
 </head>
 
 <body>
-
     <a href="../../SimbrainDocs.html">
         <div class="logo">
         </div>
     </a>
-
     <div id="main_docs">
         <div class="navi">
-
             <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt;
                 <a href="../Plot.html">Plot</a> &gt; Raster </p>
         </div>
-
         <h1>Raster</h1>
-
-        <p>TODO.</p>
-
-         <p><img style="float:right" width="500" src="../../Images/Untitled.gif">
-        </p>
-
-<!--          <p><img style="float:right" width="425" src="../../Images/JumpAndDecay.gif">
-        </p>
-
+       <!--  <p><img style="float:right" width="500" src="../../Images/rasterPlotExample.gif">
+        </p> -->
+        <p>Can be used in 2 modes, activation or spiking mode.</p>
+        <p class="heading2">Activation Mode</p>
+        <blockquote>The horizontal axis is time steps (like time series plot). The vertical axis shows which values occur in the network being plotted. If a network's activation vector is all 0's, a few 1's, and a .5, then 0, .5, and 1 are shown in the raster plot.</blockquote>
+        <p class="heading2">Spiking Mode</p>
+        <blockquote>In spiking mode, this is used with a neuron group spike train attribute. See <a href="../Network/networkcouplings.html">Coupling Networks</a>. The vertical axis shows the indices of neurons that have spiked. It only advances when some neurons have spiked.</blockquote>
         <p class="heading">Component Panel</p>
         <blockquote>
-            <p style="margin-left: 10px;"><span class="heading2">Add:</span> Add a time series to the plot.</p>
-            <p style="margin-left: 10px;"><span class="heading2">Remove:</span> Remove a time series from the plot.</p>
+            <p style="margin-left: 10px;"><span class="heading2">Add:</span> Add a times series to the plot.</p>
+            <p style="margin-left: 10px;"><span class="heading2">Remove:</span> Remove a times from the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Clear Graph Data:</span> Clears all data from the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Show Graph Properties:</span> Opens up properties menu for the plot.</p>
         </blockquote>
-
+   
         <p class="heading">Menus</p>
+        <blockquote>Share the same menu properties as the time series plot. See <a href="time_series.html#timeSeriesMenu">Menus</a>.</blockquote>
+    <!--  
         <blockquote>
             <p style="margin-left: 10px;" class="heading">File</p>
 
@@ -61,14 +57,13 @@
             <p style="margin-left: 10px;" class="heading">Help</p>
             <br>
             <p style="margin-left: 30px;">Opens main help page of time series. </p>
-
+        -->
             <p class="heading">Right-Click Menu</p>
             <blockquote>
                 <p>The context menu is a <a href="jfreechart_menu.html">JFreeChart menu</a>.</p>
             </blockquote>
 
-        </blockquote> -->
-
+        </blockquote> 
     </div>
 </body>
 

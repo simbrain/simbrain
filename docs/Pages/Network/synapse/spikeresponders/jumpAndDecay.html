@@ -36,18 +36,16 @@
         <p>
             Where $PSR(t)_{ij}$ is the post-synaptic response of the synapse connecting neuron $j$ to $i$, $w_{ij}$ is the absolute efficacy or "weight/strength" of the synapse connecting neuron $j$ to neuron $i$, $J$ is the jump height, $\Delta_t$ is the difference between time of the last spike at neuron $j$ ($t_0$) and the current time ($t_0 - t$), $\tau$ is the decay time constant, and $b$ is the baseline value that $PSR_{ij}$ will decay to as $e^\left(\Delta_t / \tau \right) \rightarrow 0$.
         </p>
-        <p span class="heading">Jump Height</span>
-        </p>
+        <p class="heading">Jump Height</p>
         <blockquote>
-            TODO
+            This value is multiplied by the <a href="../../synapse.html#Strength">strength</a> to determine the total instantaneous rise in a post-synaptic response to an action potential or spike.
         </blockquote>
-        <p span class="heading">Base-Line</span>
-        </p>
+        <p class="heading">Base-Line</p>
         <blockquote>
-            TODO
+            The post-synaptic response value when no spike have occurred. Alternatively, the post synaptic response to which
+            <insert spike responder name here> decays to over time.
         </blockquote>
-        <p span class="heading">Time Constant</span>
-        </p>
+        <p class="heading">Time Constant</p>
         <blockquote>
             The time constant of decay and recovery (ms).
         </blockquote>

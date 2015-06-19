@@ -50,6 +50,19 @@
 
         <p style="float:left; padding: 30px;"> <img src="../../Images/simple_net.gif" height="175" border="1"></p>
 
+        <p class="heading">Common Synapse Properties </p> <a name="synapseProperties"></a>
+        <p>These are properties common to all synapses, regardless of type. All of them have some reflection in the GUI interface, but some of them <em>only</em> matter to the GUI interface (e.g. increment). For some synapses, upper bound and lower bound does not have a significant role other than to limit how large the graphical representation of the synapse can be. </p>
+        <blockquote>
+            <p><span class="heading2"><a id="Strength">Strength</span>: The strength is how "strong" this synapse is. This is represented by the size of the weight. Once a synapse has been selected, strength can be incremented by the up and down arrows or can be randomized. </p>
+            <p><span class="heading2"><a id="Enabled"></a>Enabled / Disabled</span>: An enabled synapse operates as usual, transmitting information from a source neuron to a target neuron. If disabled the synapse will no longer do this. Functionally, the synapse does not exist.</p>
+            <p><span class="heading2"><a id="Frozen"></a>Frozen / Unfrozen</span>: If frozen, a synapse's strength will not be changed by learning. Local synapse update rules won't be called when the network is updated, and supervised learning is also prevented from adjusting synapses. Compare <a href="neuron.html#clamping">clamping</a> in neurons. <b>Note:</b> However, a frozen synapse's strength can still be set externally, via the keyboard and input tables.</p>
+            <p><span class="heading2"><a id="upperbound"></a>Upper Bound </span>: This field plays different roles depending on the type of the synapse, but in general it determines the maximum strength of a weight. It also determines the range of colors which a neuron can take on. This, along with the lower bound field, determines the bounds of randomization.</p>
+            <p><span class="heading2"><a id="lowerbound"></a>Lower Bound </span>: This field, like the upper bound, plays different roles depending on the type of the synapse, but in general it determines the minimum strength of a weight. It also determines the range of colors which a neuron can take on. This, along with the upper bound, determines the bounds of randomization.</p>
+            <p> <a id="increment"></a><span class="heading2">Increment</span>: The increment field sets the amount that a synapse is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the synapse will increase its strength by .1.
+            </p>
+            <p><span class="heading2">Delay</span>: A positive integer that delays how many iterations, or time-steps, must occur before the pre-synaptic signal, or the activation of the pre-synaptic neuron, is delivered.</p>
+        </blockquote>
+
         <p class="heading">Quick Keyboard Adjustment of Synapse Properties</p>
         <p>By <a href="buildingnets.html#selectObjects">selecting</a> a set of weights (e.g. by pressing "w", or by lassoing over a group of lines) and pressing certain buttons, those weight's properties can quickly be adjusted.</p>
         <blockquote>
@@ -79,18 +92,6 @@
             </blockquote>
         </p>
 
-        <p class="heading">Common Synapse Properties </p> <a name="synapseProperties"></a>
-        <p>These are properties common to all synapses, regardless of type. All of them have some reflection in the GUI interface, but some of them <em>only</em> matter to the GUI interface (e.g. increment). For some synapses, upper bound and lower bound does not have a significant role other than to limit how large the graphical representation of the synapse can be. </p>
-        <blockquote>
-            <p><span class="heading2">Strength</span>: The strength is how "strong" this synapse is. This is represented by the size of the weight. Once a synapse has been selected, strength can be incremented by the up and down arrows or can be randomized. </p>
-            <p><span class="heading2"><a id="Enabled"></a>Enabled / Disabled</span>: An enabled synapse operates as usual, transmitting information from a source neuron to a target neuron. If disabled the synapse will no longer do this. Functionally, the synapse does not exist.</p>
-            <p><span class="heading2"><a id="Frozen"></a>Frozen / Unfrozen</span>: If frozen, a synapse's strength will not be changed by learning. Local synapse update rules won't be called when the network is updated, and supervised learning is also prevented from adjusting synapses. Compare <a href="neuron.html#clamping">clamping</a> in neurons. <b>Note:</b> However, a frozen synapse's strength can still be set externally, via the keyboard and input tables.</p>
-            <p><span class="heading2"><a id="upperbound"></a>Upper Bound </span>: This field plays different roles depending on the type of the synapse, but in general it determines the maximum strength of a weight. It also determines the range of colors which a neuron can take on. This, along with the lower bound field, determines the bounds of randomization.</p>
-            <p><span class="heading2"><a id="lowerbound"></a>Lower Bound </span>: This field, like the upper bound, plays different roles depending on the type of the synapse, but in general it determines the minimum strength of a weight. It also determines the range of colors which a neuron can take on. This, along with the upper bound, determines the bounds of randomization.</p>
-            <p> <a id="increment"></a><span class="heading2">Increment</span>: The increment field sets the amount that a synapse is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the synapse will increase its strength by .1.
-            </p>
-            <p><span class="heading2">Delay</span>: A positive integer that delays how many iterations, or time-steps, must occur before the pre-synaptic signal, or the activation of the pre-synaptic neuron, is delivered.</p>
-        </blockquote>
     </div>
 </body>
 

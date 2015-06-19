@@ -43,7 +43,7 @@ public class RasterPlotGui extends GuiComponent<RasterPlotComponent> {
     private RasterPlotPanel rasterPanel;
 
     /**
-     * Construct a time series plot gui.
+     * Construct a raster plot gui.
      *
      * @param frame parent frame
      * @param component the underlying component

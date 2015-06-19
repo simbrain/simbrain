@@ -36,11 +36,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
     /** The data model. */
     private final RasterModel model;
 
-    /** Time Series consumer type. */
-    private AttributeType timeSeriesConsumerType;
+    /** Raster Plot consumer type. */
+    private AttributeType rasterPlotConsumerType;
 
     /**
-     * Create new time series plot component.
+     * Create new raster plot component.
      *
      * @param name name
      */
@@ -53,7 +53,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Creates a new time series component from a specified model. Used in
+     * Creates a new raster plot component from a specified model. Used in
      * deserializing.
      *
      * @param name chart name
@@ -84,18 +84,18 @@ public class RasterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
+        rasterPlotConsumerType = new AttributeType(this, "Series", "setValue",
                 double.class, true);
-        addConsumerType(timeSeriesConsumerType);
+        addConsumerType(rasterPlotConsumerType);
     }
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (timeSeriesConsumerType.isVisible()) {
+        if (rasterPlotConsumerType.isVisible()) {
             for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-                String description = timeSeriesConsumerType
-                        .getSimpleDescription("Time Series " + (i + 1));
+                String description = rasterPlotConsumerType
+                        .getSimpleDescription("Raster Series " + (i + 1));
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(this, "setValues",
                                 new Class[] { double[].class, Integer.class },
@@ -162,7 +162,7 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Opens a saved time series plot.
+     * Opens a saved raster plot.
      *
      * @param input stream
      * @param name name of file
@@ -206,12 +206,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Set the value of a specified data source (one curve in the time series
-     * plot). This is the main method for updating the data in a time series
-     * chart.
+     * Set the value of a specified data source (one curve in the raster 
+     * plot). This is the main method for updating the data in a raster plot
      *
-     * @param values the current "y-axis" value for the time series
-     * @param index which time series curve to set.
+     * @param values the current "y-axis" value for the raster series
+     * @param index which raster series to set.
      */
     public void setValues(final double[] values, final Integer index) {
         // TODO: Throw exception if index out of current bounds

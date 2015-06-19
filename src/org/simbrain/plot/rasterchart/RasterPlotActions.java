@@ -34,11 +34,11 @@ public class RasterPlotActions {
     /**
      * Shows a properties dialog for the trainer.
      *
-     * @param timeSeriesPanel reference to time series plot panel
+     * @param rasterPlotPanel reference to time series plot panel
      * @return the action
      */
     public static Action getPropertiesDialogAction(
-            final RasterPlotPanel timeSeriesPanel) {
+            final RasterPlotPanel rasterPlotPanel) {
         return new AbstractAction() {
 
             // Initialize
@@ -52,7 +52,7 @@ public class RasterPlotActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.showPropertiesDialog();
+                rasterPlotPanel.showPropertiesDialog();
             }
         };
     }

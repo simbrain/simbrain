@@ -40,7 +40,7 @@ import org.simbrain.util.propertyeditor.gui.ReflectivePropertyEditor;
 
 /**
  * Display a raster plot. This component can be used independently of the
- * time series workspace component.
+ * raster plot workspace component.
  *
  * TODO: Make a version that extends this, like network panel case. Then
  * document in UML

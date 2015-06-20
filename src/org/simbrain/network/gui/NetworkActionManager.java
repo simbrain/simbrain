@@ -496,8 +496,6 @@ public final class NetworkActionManager {
                         new AddGroupAction(networkPanel,
                                 BackpropCreationDialog.class, "Backprop"),
                         new AddGroupAction(networkPanel,
-                                BoltzmannCreationDialog.class, "Boltzmann Machine"),
-                        new AddGroupAction(networkPanel,
                              BPTTCreationDialog.class,
                             "Backprop Through Time"),
                         new AddGroupAction(networkPanel,

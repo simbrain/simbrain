@@ -393,9 +393,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                     writeCounter++;
                 }
             } else {
-                for (int i = 0, n = size(); i < n; i++) {
-                    valueWriter.print(neuronList.get(i).getActivation());
+                for (int i = 0, n = size() - 1; i < n; i++) {
+                    valueWriter.print(neuronList.get(i).getActivation() + ", ");
                 }
+                valueWriter.print(neuronList.get(size()-1).getActivation());
+                valueWriter.println();
                 writeCounter++;
             }
         } catch (NullPointerException e) {

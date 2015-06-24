@@ -13,4 +13,5 @@ help_simbrain() {
     print("getNetwork(\"MyNet\").randomizeNeurons()");
     print("print(getNetwork(\"MyNet\"));");
     print("showGUI(getComponent(\"MyNet\"));");
+    print("createScriptLines();");
 }

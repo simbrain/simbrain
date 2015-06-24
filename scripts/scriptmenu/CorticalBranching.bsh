@@ -17,6 +17,18 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.*;
 import org.simbrain.workspace.*;
 
+//
+// The cortical branching model is an idealized system of interconnected units
+// wherein each unit has some probability of activating another unit. When tuned
+// properly these networks display a characteristic branching ratio across time
+// (the average number of active units resulting from any one active unit). They
+// are used as a model of criticality and have been shown to be able to
+// reproduce the same characteristic size and duration neural avalanches
+// recorded from groups of living neurons.
+//
+// See Rashid V. Williams-García, Mark Moore, John M. Beggs, and Gerardo Ortiz
+//  http://arxiv.org/abs/1405.6232
+//
 {
 
     // Simulation Parameters
@@ -28,10 +40,6 @@ import org.simbrain.workspace.*;
     double SPONTANEOUS_ACT = 10E-5; // 10E-5
     double KAPPA = 0.9; // 0.9
     double B_VALUE = 1.6;
-
-
-
-
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");

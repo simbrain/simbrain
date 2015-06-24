@@ -24,13 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.listeners.GroupAdapter;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
-import org.simbrain.network.update_actions.NeuronGroupRecorder;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
@@ -140,10 +138,6 @@ public class NetworkUpdateManager {
         for (Group group : network.getGroupList()) {
             if (group.isTopLevelGroup()) {
                 availableActionList.add(new UpdateGroup(group));
-            }
-            if (group instanceof NeuronGroup) {
-                availableActionList.add(new NeuronGroupRecorder(
-                        (NeuronGroup) group));
             }
         }
 

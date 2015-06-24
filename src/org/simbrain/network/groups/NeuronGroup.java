@@ -300,8 +300,14 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         } else {
             Network.updateNeurons(neuronList);
         }
+        if (isRecording()) {
+            writeActsToFile();
+        }
     }
 
+    // TODO: Could move the next few methods to a NeuronRecorder class or some more generic
+    // utility class.
+    
     /**
      * Creates a file which activations will be written to and activates the
      * necessary output streams. Uses the name of the the group for the name of
@@ -312,8 +318,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * {@link #recordAsSpikes} to true, since {@link #writeActsToFile()} writes
      * activations differently if the neuron group contains only spiking
      * neurons.
+     *
+     * @param outputFile the file to write the activations to 
      */
-    public void startRecording() {
+    public void startRecording(final File outputFile) {
         boolean spikeRecord = true;
         for (Neuron n : neuronList) {
             if (!n.getUpdateRule().isSpikingNeuron()) {
@@ -323,7 +331,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         recordAsSpikes = spikeRecord;
         recording = true;
-        outputFile = new File(this.getLabel() + " " + fileNum++ + ".csv");
         try {
             if (valueWriter != null) {
                 valueWriter.close();
@@ -333,6 +340,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.getParentNetwork().fireGroupParametersChanged(this);
     }
 
     /**
@@ -344,6 +352,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             valueWriter = null;
         }
         recording = false;
+        this.getParentNetwork().fireGroupParametersChanged(this);
     }
 
     /**

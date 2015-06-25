@@ -96,7 +96,7 @@
             <br>
             <span class="heading2">Recieve Vector Coupling from: </span> Takes some vector forwarded from some other component and sets the activation values of the neurons in the group based on the incoming vector.
             <br>
-            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording. This will only work if the appropriate recording update action is a part of the network update sequence. See <a href="../update.html">update actions</a>.
+            <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording.   When starting recording a dialog shows up asking you to specify a name for the spike recording file.  If the network is a spiking network then the each line of the file begins with a time and is followed by neuron id's (in this case the ".csv" file is not really csv).
         </blockquote>
     </div>
 </body>

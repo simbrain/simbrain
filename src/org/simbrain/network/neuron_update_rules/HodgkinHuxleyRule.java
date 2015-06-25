@@ -80,7 +80,7 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
     public void update(Neuron neuron) {
         // Advances the model by dt and returns the new voltage
 
-        double v = inputType.getInput(neuron) + getAppliedInput();
+        double v = inputType.getInput(neuron);
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
         dh = (ah * (1 - h) - bh * h) * dt;

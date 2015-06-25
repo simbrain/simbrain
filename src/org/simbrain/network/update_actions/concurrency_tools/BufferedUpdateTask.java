@@ -66,16 +66,6 @@ public class BufferedUpdateTask implements Task {
 		}
 	}
 
-	@Override
-	public boolean isPoison() {
-		return false;
-	}
-
-	@Override
-	public boolean isWaiting() {
-		return false;
-	}
-	
 	public Neuron[] getHosts() {
 		return hosts;
 	}

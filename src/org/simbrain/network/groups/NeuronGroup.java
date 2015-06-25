@@ -31,7 +31,6 @@ import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
@@ -41,7 +40,6 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.Utils;
 
 /**
@@ -108,23 +106,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     private boolean recordAsSpikes;
 
-    /**
-     * The output file activations will be written to if this neuron group's
-     * activity is being recorded.
-     */
-    private File outputFile;
-
     /** The output stream which writes activation values to a file.*/
     private PrintWriter valueWriter;
 
     /** Whether or not this group is in a state that allows recording. */
     private boolean recording;
-
-    /**
-     * A number attached to the end of a file name to differentiate it if
-     * multiple start/stop recording calls are made to the same neuron group.
-     */
-    private int fileNum = 0;
 
     /**
      * Whether or not this neuron group is in input mode. If the group is in
@@ -270,33 +256,22 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         Runtime.getRuntime().gc();
     }
 
+    /**
+     * Updates all the neurons in the neuron group according to their 
+     * NeuronUpdateRule(s). If the group is in input mode reads in the next
+     * set of values from the input table and sets the neuron values
+     * accordingly.
+     */
     @Override
     public void update() {
         if (inputMode) {
             if (testData == null) {
                 throw new NullPointerException("Test data variable is null,"
                         + " but neuron group " + getLabel() + " is in input"
-                                + " mode.");
+                        + " mode.");
             }
-            if (inputIndex >= testData.length) {
-                inputIndex = 0;
-            }
-            if (isSpikingNeuronGroup) {
-                int i = 0;
-                for (Neuron n : neuronList) {
-                    ((SpikingNeuronUpdateRule) n.getUpdateRule())
-                            .setAppliedInput(testData[inputIndex][i++]);
-                }
-                for (Neuron n : neuronList) {
-                    n.update();
-                }
-                for (Neuron n : neuronList) {
-                    n.setToBufferVals();
-                }
-            } else {
-                forceSetActivations(testData[inputIndex]);
-            }
-            inputIndex++;
+            // Surrounded by checks, so actually safe.
+            readNextInputUnsafe();
         } else {
             Network.updateNeurons(neuronList);
         }
@@ -304,10 +279,52 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             writeActsToFile();
         }
     }
-
-    // TODO: Could move the next few methods to a NeuronRecorder class or some more generic
-    // utility class.
     
+    /**
+     * A forwarding method surrounding {@link #readNextInputUnsafe()} in the
+     * appropriate checks to make it safe. This allows outside classes to
+     * force the neuron group to read in and set activations according to
+     * the value(s) in its input table.
+     */
+    public void readNextInputs() {
+        if (inputMode) {
+            if (testData == null) {
+                throw new NullPointerException("Test data variable is null,"
+                        + " but neuron group " + getLabel() + " is in input"
+                        + " mode.");
+            }
+            // Surrounded by checks, so actually safe.
+            readNextInputUnsafe();
+        } else {
+            throw new IllegalStateException("Neuron Group " + getLabel()
+                    + " is not in input mode.");
+        }
+    }
+    
+    /**
+     * If this neuron group has an input table reads in the next entry on the
+     *  table. If all inputs have been read this method resets the counter and
+     *  starts again from the beginning of the table. 
+     *  
+     *  For spiking neuron update rules, values read in are treated as current
+     *  being injected into the cell, for non-spiking neurons activations are
+     *  set immediately to the value at that index in the table.
+     *  
+     *  This method is unsafe because it does not check if the group is in
+     *  input mode or if the input table is non-null. 
+     */
+    private void readNextInputUnsafe() {
+        if (inputIndex >= testData.length) {
+            inputIndex = 0;
+        }
+        if (isSpikingNeuronGroup()) {
+            setInputValues(testData[inputIndex]);
+        } else {
+            forceSetActivations(testData[inputIndex]);
+        }
+        inputIndex++;
+    }
+
     /**
      * Creates a file which activations will be written to and activates the
      * necessary output streams. Uses the name of the the group for the name of
@@ -341,6 +358,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             e.printStackTrace();
         }
         this.getParentNetwork().fireGroupParametersChanged(this);
+        this.getParentNetwork().fireGroupChanged(this, "Recording Started");
     }
 
     /**
@@ -353,6 +371,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         recording = false;
         this.getParentNetwork().fireGroupParametersChanged(this);
+        this.getParentNetwork().fireGroupChanged(this, "Recording Stopped");
     }
 
     /**
@@ -640,26 +659,6 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
-     * Set activations of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     *
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param inputs
-     *            the input vector as a double array.
-     */
-    public void setActivations(double[] inputs) {
-        int i = 0;
-        for (Neuron neuron : neuronList) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuron.setActivation(inputs[i++]);
-        }
-    }
-
-    /**
      * Set input values of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
      *
@@ -670,12 +669,30 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *            the input vector as a double array.
      */
     public void setInputValues(double[] inputs) {
-        int i = 0;
-        for (Neuron neuron : neuronList) {
+        for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
                 break;
             }
-            neuron.setInputValue(inputs[i++]);
+            neuronList.get(i).setInputValue(inputs[i]);
+        }
+    }
+    
+    /**
+     * Set activations of neurons using an array of doubles. Assumes the order
+     * of the items in the array matches the order of items in the neuronlist.
+     *
+     * Does not throw an exception if the provided input array and neuron list
+     * do not match in size.
+     *
+     * @param inputs
+     *            the input vector as a double array.
+     */
+    public void setActivations(double[] inputs) {
+        for (int i = 0, n = size(); i < n; i++) {
+            if (i >= inputs.length) {
+                break;
+            }
+            neuronList.get(i).setActivation(inputs[i]);
         }
     }
 
@@ -691,12 +708,11 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      *            the input vector as a double array.
      */
     public void forceSetActivations(double[] inputs) {
-        int i = 0;
-        for (Neuron neuron : neuronList) {
+        for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
                 break;
             }
-            neuron.forceSetActivation(inputs[i++]);
+            neuronList.get(i).forceSetActivation(inputs[i]);
         }
     }
 
@@ -1471,25 +1487,8 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                     + " testData");
         }
         this.inputMode = inputMode;
-        if (inputMode) {
-            List<NetworkUpdateAction> netActs = getParentNetwork()
-                    .getUpdateManager().getActionList();
-            for (NetworkUpdateAction nua : netActs) {
-                if (nua instanceof ConcurrentBufferedUpdate) {
-                    ((ConcurrentBufferedUpdate) nua).excludeNeurons(
-                            getNeuronList());
-                }
-            }
-        } else {
-            List<NetworkUpdateAction> netActs = getParentNetwork()
-                    .getUpdateManager().getActionList();
-            for (NetworkUpdateAction nua : netActs) {
-                if (nua instanceof ConcurrentBufferedUpdate) {
-                    ((ConcurrentBufferedUpdate) nua).includeNeurons(
-                            getNeuronList());
-                }
-            }
-        }
+        this.getParentNetwork().fireGroupChanged(this,
+                getLabel() + " input mode " + inputMode);
     }
 
     public boolean isSpikingNeuronGroup() {

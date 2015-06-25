@@ -113,7 +113,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
         double dVm =
             timeStep
                 * (-(memPotential - restingPotential) + resistance
-                    * (iSyn + backgroundCurrent + getAppliedInput()))
+                    * (iSyn + backgroundCurrent))
                 / timeConstant;
 
         memPotential += dVm;

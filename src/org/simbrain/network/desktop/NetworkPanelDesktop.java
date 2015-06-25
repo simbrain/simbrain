@@ -482,7 +482,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
             PotentialConsumer consumer = component
                     .getWorkspaceComponent()
                     .getAttributeManager()
-                    .createPotentialConsumer(neuronGroup, "setInputValues",
+                    .createPotentialConsumer(neuronGroup, "setActivations",
                             double[].class);
             consumer.setCustomDescription("Neuron Group: "
                     + neuronGroup.getLabel());

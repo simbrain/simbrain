@@ -50,7 +50,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements
 
     @Override
     public void update(Neuron neuron) {
-        final double input = inputType.getInput(neuron) + getAppliedInput()
+        final double input = inputType.getInput(neuron)
                 + (addNoise ? noiseGenerator.getRandom() : 0);
         if (input >= threshold) {
             neuron.setSpkBuffer(true);

@@ -149,7 +149,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
         // Calc dV/dt for membrane potential
         double dVdt = (g_L * slopeFactor * Math.exp((v_mem - v_Th)
                 / slopeFactor))
-                + i_leak + iSyn_ex + iSyn_in + i_bg - w + getAppliedInput();
+                + i_leak + iSyn_ex + iSyn_in + i_bg - w;
 
         // Add noise if there is any to be added
 		if (addNoise) {

@@ -84,7 +84,6 @@ public class NetworkUpdateManager {
             NetworkUpdateAction nua = actions.next();
             if (nua instanceof ConcurrentBufferedUpdate) {
                 actions.remove();
-                ((ConcurrentBufferedUpdate) nua).shutdown();
                 actionList.add(ConcurrentBufferedUpdate
                         .createConcurrentBufferedUpdate(network));
                 break;

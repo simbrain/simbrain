@@ -99,7 +99,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		double i_L = g_L * (vMembrane - vRest_L);
 		double i_ion = i_Ca + i_K + i_L;
 		
-		return (((getAppliedInput() + i_bg - i_ion - i_syn) / cMembrane)
+		return (((i_bg - i_ion - i_syn) / cMembrane)
 				+ noiseGenerator.getRandom());
 	}
 	

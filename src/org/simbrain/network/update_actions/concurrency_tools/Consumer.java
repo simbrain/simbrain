@@ -33,13 +33,6 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate.CyclicTaskQu
 public class Consumer implements Runnable {
 
     /**
-     * The synchronizing barrier which causes this consumer to wait for other
-     * other entities to finish their tasks before this consumer attempts to
-     * take on more tasks.
-     */
-    private volatile CyclicBarrier barrier;
-
-    /**
      * The blocking queue containing tasks this consumer will attempt to
      * execute.
      */
@@ -68,9 +61,7 @@ public class Consumer implements Runnable {
      *            for debugging, but can be used to call out an individual
      *            consumer elsewhere.
      */
-    public Consumer(CyclicBarrier barrier, CyclicTaskQueue taskQueue,
-            int no) {
-        this.barrier = barrier;
+    public Consumer(CyclicTaskQueue taskQueue, int no) {
         this.taskQueue = taskQueue;
         this.idNo = no;
     }
@@ -88,10 +79,6 @@ public class Consumer implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void setBarrier(CyclicBarrier barrier) {
-        this.barrier = barrier;
     }
 
     public int getId_no() {

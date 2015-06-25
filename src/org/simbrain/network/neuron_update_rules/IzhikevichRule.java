@@ -96,7 +96,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
-        inputs += iBg + getAppliedInput();
+        inputs += iBg;
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
         val = activation

@@ -31,9 +31,5 @@ import java.util.concurrent.BrokenBarrierException;
 public interface Task {
 
 	void perform() throws InterruptedException, BrokenBarrierException;
-	
-	boolean isPoison();
-	
-	boolean isWaiting();
-	
+
 }

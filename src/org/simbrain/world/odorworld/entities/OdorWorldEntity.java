@@ -591,6 +591,7 @@ public abstract class OdorWorldEntity {
      */
     public void postSerializationInit() {
         getAnimation().initializeImages();
+        currentlyHeardPhrases  = new ArrayList<String>();
         // Temporary hack because collision is turned off and some entities are
         // saved in a collided state
         this.collision = false;

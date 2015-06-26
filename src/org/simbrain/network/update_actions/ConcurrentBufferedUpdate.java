@@ -128,9 +128,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     private volatile Thread producer;
 
     private final List<NeuronGroup> inputGroups = new ArrayList<NeuronGroup>();
-    
+
     private final List<NeuronGroup> outputGroups = new ArrayList<NeuronGroup>();
-    
+
     private Thread collectorThread = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -165,7 +165,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     private volatile int ops = 0;
 
     private final SynchronizationPoint syncPoint;
-    
+
     /**
      * A static factory method that creates a concurrent buffered update class
      * for a network. See {@link #ConcurrentBufferedUpdate(Network)}.
@@ -204,7 +204,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      */
     private ConcurrentBufferedUpdate(final Network network) {
         this.network = network;
-        currentAvailableProcessors = getAvailableConsumerProcessors();
+        currentAvailableProcessors = getAvailableConsumerProcessors() - 1;
         syncPoint = new SynchronizationPoint(currentAvailableProcessors);
         for (Neuron n : network.getFlatNeuronList()) {
             neurons.add(n);
@@ -222,13 +222,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         for (int i = 0, n = inputGroups.size(); i < n; i++) {
             inputGroups.get(i).readNextInputs();
         }
-        taskSet.reset(); // Allow consumers to draw from the task set
-        //        while(true) {
-        //            if (syncPoint.getSyncCount()
-        //                    == currentAvailableProcessors) break;
-        //        }
+        taskSet.reset();
         try {
-            synchronized(syncPoint.getSyncCounter()) {
+            synchronized (syncPoint.getSyncCounter()) {
                 syncPoint.getSyncCounter().wait();
             }
 
@@ -395,7 +391,6 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
     }
 
-
     private int getAvailableConsumerProcessors() {
         return Runtime.getRuntime().availableProcessors();
     }
@@ -410,9 +405,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     }
 
     /**
-     * A memory saving version of a BlockingQueue specifically set up to
-     * prevent memory leaks in the form of LinkedList nodes and with the
-     * express purpose of making synchronization points easier to implement.
+     * A memory saving version of a BlockingQueue specifically set up to prevent
+     * memory leaks in the form of LinkedList nodes and with the express purpose
+     * of making synchronization points easier to implement.
      * 
      * @author Zach Tosi
      *
@@ -482,7 +477,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         }
 
         public void reset() {
-            synchronized(indexPtr) {
+            synchronized (indexPtr) {
                 indexPtr.set(0);
                 syncPoint.setWorkAvailable(true);
             }
@@ -533,10 +528,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
                 Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
                 Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(0.1);
-        exRand.setParam2(0.05);
-        inRand.setParam1(0.3);
-        inRand.setParam2(0.15);
+        exRand.setParam1(0.025);
+        exRand.setParam2(0.0125);
+        inRand.setParam1(0.075);
+        inRand.setParam2(0.03);
         System.out.println("Begin Network Construction...");
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng,
                 new Sparse(0.01, false, false),
@@ -549,9 +544,9 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         ConvolvedJumpAndDecay inhibJD = new ConvolvedJumpAndDecay();
         inhibJD.setTimeConstant(6);
         sg.setSpikeResponder(inhibJD, Polarity.INHIBITORY);
-//        STDPRule stdp = new STDPRule();
-//        stdp.setLearningRate(0.0001);
-//        sg.setLearningRule(stdp, Polarity.BOTH);
+        STDPRule stdp = new STDPRule();
+        stdp.setLearningRate(0.0001);
+        sg.setLearningRule(stdp, Polarity.BOTH);
         net.addGroup(ng);
         net.addGroup(sg);
         long end = System.nanoTime();
@@ -573,7 +568,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         net.getUpdateManager().addAction(cbu);
         System.out.println(cbu.currentAvailableProcessors);
         // Quick tune up...
-        for (int i = 0; i < 16000; i++) {
+        for (int i = 0; i < 10000; i++) {
             if (i % 100 == 0) {
                 System.out.println(i + "...");
             }

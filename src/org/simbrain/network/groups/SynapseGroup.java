@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1068,52 +1067,72 @@ public class SynapseGroup extends Group {
     /**
      * A forwarding method to SimbrainMath.getMatrixRowCompression(double [][]).
      * Returns a row compressed representation of the weight matrix represented
-     * by this synapse group using the &lt;num synapses&gt;,&lt;index vals&gt;,&lt;wt vals&gt;
-     * format. Storing all values as longs (and the double wt vals in long-bit
-     * form).
+     * by this synapse group using the &lt;num synapses&gt;,&lt;index
+     * vals&gt;,&lt;wt vals&gt; format. Storing all values as longs (and the
+     * double wt vals in long-bit form).
      *
-     * @return a row compressed representation of the weight matrix derived
-     * from this synapse group. All values are stored as longs, and row
-     * changes are denoted by -1.
+     * @return a row compressed representation of the weight matrix derived from
+     *         this synapse group. All values are stored as longs, and row
+     *         changes are denoted by -1.
      */
     public long[] getRowCompressedMatrixRepresentation() {
+        double[][] pairs = new double[size()][3];
+        int i = 0;
         int j = 0;
         // Create numbers for neurons... less expensive than constant
         // indexOf calls to array lists.
+        Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
         Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
+        for (Neuron n : getSourceNeurons()) {
+            sourceMap.put(n, i++);
+        }
         for (Neuron n : getTargetNeurons()) {
             targetMap.put(n, j++);
         }
-        int index = 0;
-        // 2 * size() for number of synapses (each weight and PSR must be
-        // stored). + # source neurons for each -1 marker representing a change
-        // in the row
-        int numel = (2 * size()) + getSourceNeuronGroup().size();
-        // + size() for the column indices tied to each
-        long[] compRowRep = new long[numel + size()];
-        numel--;
-        compRowRep[index++] = size();
-        for (Neuron n : getSourceNeurons()) {
-            Map<Integer, Neuron> reverseMap = new HashMap<Integer, Neuron>(30);
-            List<Integer> indices = new ArrayList<Integer>();
-            for (Neuron m : n.getFanOut().keySet()) {
-                if (targetMap.get(m) != null) {
-                    int ind = targetMap.get(m);
-                    indices.add(ind);
-                    reverseMap.put(ind, m);
+
+        int k = 0;
+        for (Synapse s : getAllSynapses()) {
+            pairs[k++] = new double[] { sourceMap.get(s.getSource()),
+                    targetMap.get(s.getTarget()), s.getStrength() };
+        }
+
+        Comparator<double[]> rowColOrderer = new Comparator<double[]>() {
+            @Override
+            public int compare(double[] o1, double[] o2) {
+                if (o1[0] < o2[0]) {
+                    return -1;
+                } else if (o1[0] > o2[0]) {
+                    return 1;
+                } else {
+                    if (o1[1] < o2[1]) {
+                        return -1;
+                    } else if (o1[1] > o2[1]) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
                 }
             }
-            Collections.sort(indices);
-            for (int k = 0, z = indices.size(); k < z; k++) {
-                compRowRep[index] = indices.get(k);
-                compRowRep[index + numel] = Double.doubleToLongBits(n
-                        .getFanOut().get(reverseMap.get(indices.get(k)))
-                        .getStrength());
-                index++;
-            }
-            if (index + numel < compRowRep.length) {
-                compRowRep[index++] = -1L;
-                numel--;
+        };
+        Arrays.sort(pairs, rowColOrderer);
+        int numSyns = size();
+        int numSrc = sourceNeuronGroup.size();
+        System.out.println(sourceNeuronGroup.size());
+        long[] compRowRep = new long[numSrc + (2 * numSyns)];
+        int currRow = 0;
+        int m = 0;
+        compRowRep[0] = numSyns;
+        for (int l = 1, n = numSyns + numSrc; l < n; l++) {
+            if (m == numSyns)
+                break;
+            if (pairs[m][0] != currRow) {
+                compRowRep[l] = -1L;
+                currRow++;
+            } else {
+                compRowRep[l] = (long) pairs[m][1];
+                compRowRep[numSyns + numSrc + m] = Double.doubleToLongBits(
+                        pairs[m][2]);
+                m++;
             }
         }
         return compRowRep;

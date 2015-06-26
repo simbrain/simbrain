@@ -18,9 +18,12 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
@@ -85,39 +88,40 @@ public class STDPRule extends SynapseUpdateRule {
         duplicateSynapse.setW_minus(this.getW_minus());
         duplicateSynapse.setW_plus(this.getW_plus());
         duplicateSynapse.setLearningRate(this.getLearningRate());
+        duplicateSynapse.setHebbian(hebbian);
         return duplicateSynapse;
     }
 
+    private boolean hebbian = true;
+
+    private double delta_w = 0;
+
     @Override
     public void update(Synapse synapse) {
-        final boolean sourceSpiking = synapse.getSource().getUpdateRule()
-                .isSpikingNeuron();
-        final boolean targetSpiking = synapse.getTarget().getUpdateRule()
-                .isSpikingNeuron();
-        if (!sourceSpiking || !targetSpiking) {
-            return; // STDP is non-sensical if one of the units doesn't spike...
-        }
-        final SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse
-                .getSource().getUpdateRule();
-        final SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
-                .getTarget().getUpdateRule();
-        double delta_t, delta_w;
-        final double timeStep = synapse.getNetwork().getTimeStep();
-        final double delay = synapse.getDelay() * timeStep;
+        if (synapse.getSource().isSpike() || synapse.getTarget().isSpike()) {
+            try {
+                final double str = synapse.getStrength();
+                final double delta_t = ((((SpikingNeuronUpdateRule) synapse
+                        .getSource().getUpdateRule()).getLastSpikeTime())
+                        - ((SpikingNeuronUpdateRule) synapse
+                        .getTarget().getUpdateRule()).getLastSpikeTime())
+                        * (hebbian ? 1 : -1);   // Reverse time window for
+                                                // anti-hebbian
 
-        delta_t = (src.getLastSpikeTime() + delay)
-                - tar.getLastSpikeTime();
-        if (delta_t < 0) {
-            delta_w = W_plus * Math.exp(delta_t / tau_plus)
-                    * learningRate;
-        } else if (delta_t > 0) {
-            delta_w = -W_minus * Math.exp(-delta_t / tau_minus)
-                    * learningRate;
-        } else {
-            delta_w = 0;
+                if (delta_t < 0) {
+                    delta_w = W_plus * Math.exp(delta_t / tau_plus)
+                            * learningRate;
+                } else if (delta_t > 0) {
+                    delta_w = -W_minus * Math.exp(-delta_t / tau_minus)
+                            * learningRate;
+                }
+                // Subtracts deltaW if inhibitory adds otherwise
+                synapse.setStrength(str + (Math.signum(str) * delta_w));
+            } catch (ClassCastException cce) {
+                cce.printStackTrace();
+                System.out.println("Don't use non-spiking neurons with STDP!");
+            }
         }
-        synapse.setStrength(synapse.clip(synapse.getStrength()
-                + (delta_w * timeStep)));
     }
 
     /**
@@ -193,6 +197,14 @@ public class STDPRule extends SynapseUpdateRule {
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
+    }
+
+    public boolean isHebbian() {
+        return hebbian;
+    }
+
+    public void setHebbian(boolean hebbian) {
+        this.hebbian = hebbian;
     }
 
 }

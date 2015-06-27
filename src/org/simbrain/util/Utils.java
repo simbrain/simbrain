@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
@@ -48,6 +50,17 @@ public class Utils {
 
     /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
+    
+    /**
+     * Helper method that returns the date and time in a format that can be used
+     * to create filenames.
+     * 
+     * @return the formatted time string
+     */
+    public static String getTimeString() {
+        return new SimpleDateFormat("MM-dd-YY_k-mm").format(Calendar
+                .getInstance().getTime());
+    }
 
     /**
      * Read a csv (comma-separated-values) files.

@@ -23,9 +23,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +51,7 @@ import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -402,7 +401,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
                     SFileChooser chooser = new SFileChooser(".",
                             "comma-separated-values (csv)", "csv");
                     File theFile = chooser.showSaveDialog("Recording_"
-                            + getTimeString() + ".csv");
+                            + Utils.getTimeString() + ".csv");
                     if (theFile != null) {
                         neuronGroup.startRecording(theFile);
                     }
@@ -415,18 +414,6 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 		return menu;
 	}
 	
-    /**
-     * Helper method that returns the date and time in a format that can be used
-     * to create filenames.
-     * 
-     * @return the formatted time string
-     */
-    private String getTimeString() {
-        return new SimpleDateFormat("MM-dd-YY_k-mm").format(Calendar
-                .getInstance().getTime());
-    }
-
-
 	/**
 	 * Custom interaction box for Subnetwork node. Ensures a property dialog
 	 * appears when the box is double-clicked.

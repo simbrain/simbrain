@@ -44,6 +44,7 @@ import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.Utils;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 
 /**
@@ -228,7 +229,7 @@ public class SynapseGroup extends Group {
     private byte [] fullSynapseRep = null;
 
     /** Whether or not to use the compressed rep or the full rep. */
-    private boolean useFullRepOnSave = true;
+    private boolean useFullRepOnSave = false;
 
     /**
      * Completely creates a synapse group between the two neuron groups with all
@@ -971,6 +972,9 @@ public class SynapseGroup extends Group {
         return retArray;
     }
 
+    //TODO: Consider putting some of the below methods or part of their bodies
+    // into SimbrainMath or Utils
+    
     /**
      * For large, sparse synapse groups this will cause a heap overflow. Use
      * {@link #getRowCompressedMatrixRepresentation()} instead.
@@ -1014,88 +1018,45 @@ public class SynapseGroup extends Group {
      * for very sparse synapse groups between very large neuron groups.
      * @return a 2D array with a number of rows equal to the total number of
      * synapses and a number of columns equal to 3. Each row contains the
-     * synapse strength, the source index number and the target index number in
-     * that order. This array is then sorted by source index.
+     * the source index number, the target index number, and the strength in
+     * that order. This array is then sorted by source index then target index.
+     * Ex:  
+     *      1   2   .9
+     *      0   3   5.3
+     *      0   1   -.1
+     * Becomes:
+     *      0   1   -.1
+     *      0   3   5.3
+     *      1   2   .9
      */
     public double [][] getNumericIndices() {
-        double[][] indexedMatrix =
-                new double[size()][3];
-        int i = 0;
-        int j = 0;
-        // Create numbers for neurons... less expensive than constant
-        // indexOf calls to array lists.
-        Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
-        Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
-        for (Neuron n : getSourceNeurons()) {
-            sourceMap.put(n, i++);
-        }
-        for (Neuron n : getTargetNeurons()) {
-            targetMap.put(n, j++);
-        }
-        int k = 0;
-        // Construct uncompressed matrix from weights
-        for (Synapse s : getExcitatorySynapses()) {
-            i = sourceMap.get(s.getSource());
-            j = targetMap.get(s.getTarget());
-            indexedMatrix[k][0] = s.getStrength();
-            indexedMatrix[k][1] = i;
-            indexedMatrix[k++][2] = j;
-        }
-        for (Synapse s : getInhibitorySynapses()) {
-            i = sourceMap.get(s.getSource());
-            j = targetMap.get(s.getTarget());
-            indexedMatrix[k][0] = s.getStrength();
-            indexedMatrix[k][1] = i;
-            indexedMatrix[k++][2] = j;
-        }
-        Comparator<double []> rowSorter = new Comparator<double []>() {
-            @Override
-            public int compare(double[] o1, double[] o2) {
-                if (o1[1] < o2[1]) {
-                    return -1;
-                } else if (o1[1] > o2[1]) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        };
-        Arrays.sort(indexedMatrix, rowSorter);
-        return indexedMatrix;
-    }
-
-    /**
-     * A forwarding method to SimbrainMath.getMatrixRowCompression(double [][]).
-     * Returns a row compressed representation of the weight matrix represented
-     * by this synapse group using the &lt;num synapses&gt;,&lt;index
-     * vals&gt;,&lt;wt vals&gt; format. Storing all values as longs (and the
-     * double wt vals in long-bit form).
-     *
-     * @return a row compressed representation of the weight matrix derived from
-     *         this synapse group. All values are stored as longs, and row
-     *         changes are denoted by -1.
-     */
-    public long[] getRowCompressedMatrixRepresentation() {
         double[][] pairs = new double[size()][3];
         int i = 0;
         int j = 0;
         // Create numbers for neurons... less expensive than constant
         // indexOf calls to array lists.
-        Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>();
-        Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>();
+        Map<Neuron, Integer> sourceMap = new HashMap<Neuron, Integer>(
+                (int) (sourceNeuronGroup.size() / 0.75));
+        Map<Neuron, Integer> targetMap = new HashMap<Neuron, Integer>(
+                (int) (targetNeuronGroup.size() / 0.75));
+        // Assign indices to each source and target neuron in a lookup table
+        // so that synapses can be identified by a source and target index
         for (Neuron n : getSourceNeurons()) {
             sourceMap.put(n, i++);
         }
         for (Neuron n : getTargetNeurons()) {
             targetMap.put(n, j++);
         }
-
+        // Put each synapse strength into a table [i, j, w], where i is the
+        // source neuron index in a weight matrix, j is the target index and
+        // w is the synapse strength. 
         int k = 0;
         for (Synapse s : getAllSynapses()) {
             pairs[k++] = new double[] { sourceMap.get(s.getSource()),
                     targetMap.get(s.getTarget()), s.getStrength() };
         }
-
+        // Create a comparator to sort synapse table entries by source, then
+        // by column.
         Comparator<double[]> rowColOrderer = new Comparator<double[]>() {
             @Override
             public int compare(double[] o1, double[] o2) {
@@ -1114,7 +1075,18 @@ public class SynapseGroup extends Group {
                 }
             }
         };
+        // And sort the table
         Arrays.sort(pairs, rowColOrderer);
+        return pairs;
+    }
+
+    /**
+     * @return a row compressed representation of the weight matrix derived from
+     *         this synapse group. All values are stored as longs, and row
+     *         changes are denoted by -1.
+     */
+    public long[] getRowCompressedMatrixRepresentation() {
+        double[][] pairs = getNumericIndices();
         int numSyns = size();
         int numSrc = sourceNeuronGroup.size();
         System.out.println(sourceNeuronGroup.size());
@@ -1139,6 +1111,46 @@ public class SynapseGroup extends Group {
     }
 
     /**
+     * Saves the synapse group to a file in linked list format which can be
+     * read by most graph analysis software, in particular as of 6/27/2015
+     * the author is aware of both OSLOM and Infomap which can interpret the 
+     * linked list format. 
+     * 
+     * Format is as follows:
+     * source index    target index    weight
+     * 
+     * By default ".dat" is appended to the given filename since .dat is the
+     * standard extension for linked lists.
+     * 
+     * @param filename the name to be given to the file
+     */
+    public void saveToFileAsLinkedList(String filename) {
+        try (FileWriter fw = new FileWriter(filename + ".dat");
+                PrintWriter pw = new PrintWriter(fw);) {
+            double [][] pairs = getNumericIndices();
+            int offset = this.isRecurrent() ? 0 : sourceNeuronGroup.size();
+            for (int i = 0, n = pairs.length; i < n; i++) {
+                pw.print((int) pairs[i][0]);
+                pw.print(" ");
+                pw.print((int) pairs[i][1] + offset);
+                pw.print(" ");
+                pw.println(pairs[i][2]);
+            }
+        } catch (IOException ie) {
+            ie.printStackTrace();
+            System.out.println("Synapse group linked-list write failed.");
+        }
+    }
+    
+    /**
+     * See: {@link #saveToFileAsLinkedList(String)}
+     * Uses the default name which is: label + date & time
+     */
+    public void saveToFileAsLinkedList() {
+        saveToFileAsLinkedList(getLabel() + "_" + Utils.getTimeString());
+    }
+    
+    /**
      * Saves the weight matrix represented by this synapse group to a file.
      * @param filename the name of the file to be used
      * @throws OutOfMemoryError if {@link #getWeightMatrix()} causes an
@@ -1149,30 +1161,6 @@ public class SynapseGroup extends Group {
                 PrintWriter pw = new PrintWriter(fw);)
         {
             double [][] wtMat = getWeightMatrix();
-            for (double [] row : wtMat) {
-                for (double col : row) {
-                    pw.print(col + ", ");
-                }
-                pw.println();
-            }
-        } catch (IOException ie) {
-            System.err.println("Failed to save Synapse Group " + getLabel()
-                    + " as matrix. File IO issue.");
-            ie.printStackTrace();
-        }
-    }
-
-    /**
-     * Saves to a file using the numeric indexes instead of as a full weight
-     * matrix.
-     * @param filename the name of the file in which to store the numeric
-     * indexes of the weights.
-     */
-    public void saveToFileAsIndexes(String filename) {
-        try (FileWriter fw = new FileWriter(filename);
-                PrintWriter pw = new PrintWriter(fw);)
-        {
-            double [][] wtMat = getNumericIndices();
             for (double [] row : wtMat) {
                 for (double col : row) {
                     pw.print(col + ", ");

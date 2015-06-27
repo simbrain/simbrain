@@ -1089,7 +1089,6 @@ public class SynapseGroup extends Group {
         double[][] pairs = getNumericIndices();
         int numSyns = size();
         int numSrc = sourceNeuronGroup.size();
-        System.out.println(sourceNeuronGroup.size());
         long[] compRowRep = new long[numSrc + (2 * numSyns)];
         int currRow = 0;
         int m = 0;

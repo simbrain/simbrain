@@ -131,6 +131,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      * been called so as to determine when to flush the output stream.
      */
     private int writeCounter = 0;
+    
+    /**
+     * This used to be how neuron group recordings were labeled. This is now
+     * only here for backwards compatibility.
+     */
+    @Deprecated
+    private int fileNum = 0;
 
     /**
      * Construct a new neuron group from a list of neurons.

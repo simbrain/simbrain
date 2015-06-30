@@ -40,7 +40,7 @@
             <p> </p>
             <p><span class="heading2">Logistic</span>
             </p>
-            <p>A scaled version of the logistic function $\frac{1}{1 + e^-x}$.
+            <p>A scaled version of the logistic function $\frac{1}{1 + e^{-x}}$.
             </p>
             <p>$$ a \,\,\,= \,\,\, \frac{u-l}{2}\,logistic \left( \frac{4 m(W + b)}{u-l}\right) \,\,+\,\, l $$
             <p> </p></p>
@@ -50,10 +50,10 @@
             <p>$$ a \,\,\,= \,\,\, \frac{u-l}{2}\,tanh \left( \frac{2 m(W + b)}{u-l} \right)  \,\,+\,\, \frac{u+l}{2} $$</p>
 
             <p>Where: <br>
-                $$ W \;\;=\;\; x_i(t \;+\; \delta t) \;=\; x_i(t) \left(1 - \frac{a\delta t}{\tau} \right) \;+\; \frac{\delta t}{\tau} \sum\limits{j = 0}^N w_{ji}r_j(t) \;\;+\;\; \zeta $$
+                $$ W \;\;=\;\; x_i(t \;+\; \Delta t) \;=\; x_i(t) \left(1 - \frac{a\Delta t}{\tau} \right) \;+\; \frac{\Delta t}{\tau} \sum\limits_{j = 0}^N w_{ji}r_j(t) \;\;+\;\; \zeta $$
                 <br>
                 in the continuous case and:
-                $$ W \;\;=\;\; \sum\limits{j = 0}^N w_{ji}r_j(t) \;\;+\;\; \zeta$$
+                $$ W \;\;=\;\; \sum\limits_{j = 0}^N w_{ji}r_j(t) \;\;+\;\; \zeta$$
                 <br>
                 in the discrete case. Here $r_j(t)$ refers to the activation value of pre-synaptic neuron $j$ at time $t$, and $x_i(t)$ refers to a net activation value which the sigmoid function squashes to produce the activation value for the neuron.
 
@@ -62,7 +62,7 @@
         </blockquote>
         <p class="heading">Time Constant ($\tau$)</p>
         <blockquote>
-            <p>The time constant controls how quickly the numerical integration occurs.  Larger values for the time constant produce slower, smoother changes.   Smaller values produce faster, more discrete changes.   If <b>timeConstant * leakConstant == network time-step</b> (or vice versa), behavior is equivalent to discrete sigmoid.</p>
+            <p>The time constant controls how quickly the numerical integration occurs.  Larger values for the time constant produce slower, smoother changes.   Smaller values produce faster, more discrete changes. If $ a \cdot dt = \tau $ this is equivalent to the discrete case</p>
         </blockquote>
         <p class="heading">Leak Constant ($a$)</p>
         <blockquote>
@@ -73,7 +73,7 @@
         <blockquote>
             <p>The bias is a fixed amount of input to the node, denoted by <em>b</em> above. This shifts the inflection point to the left or right of the origin.</p>
         </blockquote>
-        <p class="heading">Slope($m$)</p>
+        <p class="heading">Slope ($m$)</p>
         <blockquote>
             <p>The slope at the inflection point is denoted by <em>m</em> above. This represents how steep the sigmoidal is.</p>
         </blockquote>

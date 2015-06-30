@@ -27,7 +27,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * <b>SigmoidalRule</b> provides various implementations of a standard
  * sigmoidal neuron.
  *
- * TODO: Discuss renaming "DiscreteSigmoidalRule"
+ * TODO: Possibly rename to "DiscreteSigmoidalRule"
  *
  * @author Zach Tosi
  * @author Jeff Yoshimi
@@ -65,7 +65,6 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
 
         double val = inputType.getInput(neuron) + bias;
 
-        // TODO: Discuss how noise is added
         if (addNoise) {
             val += noiseGenerator.getRandom();
         }

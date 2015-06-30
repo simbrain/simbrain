@@ -25,11 +25,8 @@
         <h1>Spike Timing Dependent Plasticity (STDP)</h1>
         <p span=""><a href="https://en.wikipedia.org/wiki/Spike-timing-dependent_plasticity">Spike Timing Dependent Plasticity</a> is a variant on the <a href="https://en.wikipedia.org/wiki/Hebbian_theory">Hebb rule</a> for synapses between spiking neurons, where the relative timing of pre and post-synaptic spikes determines whether the synapse is strengthened or weakened. When a pre-synaptic neuron spikes before the post-synaptic neuron, the weight is strengthened (this is <a href="https://en.wikipedia.org/wiki/Long-term_potentiation">long term potentiation</a> or "LTP"). When the pre-synaptic spike occurs after the post-synaptic spike, the weight is weakened (this is <a href="https://en.wikipedia.org/wiki/Long-term_depression">long term depression</a> or "LTD").</p>
         <p span="">
-        	$$ \Delta w_{ij} \;=\; \eta W_{+/-} exp \left(- \frac{|u|}{\tau_{+/-}} \right) $$
-        	 where:
-        	$$ u = t_{post} \;-\; t_{pre} $$
-        	 Such that LTP occurs when the post synaptic cell fires afte the pre-synaptic cell and vice versa for LTD. The sign of $\Delta w_{ij}$ in this case depends on the sign of $w_{ij}$ such that inhibitory synapses also increase in value absolute value under the same conditions as excitatory synapses. This window can be reversed if the anti-hebbian flag is set to true, i.e. anti-causal relationships will produce LTP and causal relationships will produce LTD.
-        	<br>
+            $$ \Delta w_{ij} \;=\; \eta W_{+/-} exp \left(- \frac{|u|}{\tau_{+/-}} \right) $$ where: $$ u = t_{post} \;-\; t_{pre} $$ Such that LTP occurs when the post synaptic cell fires afte the pre-synaptic cell and vice versa for LTD. The sign of $\Delta w_{ij}$ in this case depends on the sign of $w_{ij}$ such that inhibitory synapses also increase in value absolute value under the same conditions as excitatory synapses. This window can be reversed if the anti-hebbian flag is set to true, i.e. anti-causal relationships will produce LTP and causal relationships will produce LTD.
+            <br>
         </p>
         <p>Note that if post and/or pre-synaptic neuron is not spiking, then this behaves like a clamped synapse. However this is not recommended and can harm performance. STDP assumes that both the source and target neurons are spiking neurons.</p>
         <p class="heading">Time constant ($\tau_{+/-}$)</p>
@@ -47,8 +44,11 @@
             <p span="span">Multiplied by delta-w in every time step to control how quickly the synapse changes.
             </p>
         </blockquote>
-        <br><br>
-        <p>Source: Jean-Philippe Thivierge and Paul Cisek (2008), <a href="http://www.ncbi.nlm.nih.gov/pubmed/18685022">Nonperiodic Synchronization in Heterogeneous Networks of Spiking Neurons</a>. <i>Journal of Neuroscience. </i> Also drew on this <a href="http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity">Scholarpedia article on STDP</a>.</p>
+        <p class="heading">Sources</p>
+        <blockquote>
+            <p>Source: Jean-Philippe Thivierge and Paul Cisek (2008), <a href="http://www.ncbi.nlm.nih.gov/pubmed/18685022">Nonperiodic Synchronization in Heterogeneous Networks of Spiking Neurons</a>. <i>Journal of Neuroscience. </i></p>
+            <p>Also drew on this <a href="http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity">Scholarpedia article on STDP</a>.</p>
+        </blockquote>
     </div>
 </body>
 

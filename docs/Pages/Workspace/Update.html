@@ -30,11 +30,11 @@
         </p>
 
         <blockquote>
-            <p><span class="heading2">Play / Stop:</span><img alt="play" src="../../Images/Play.png">Continuously run the simulation until the user presses the same button.</p>
+            <p><span class="heading2">Play / Stop:</span> <img alt="play" src="../../Images/Play.png">Continuously run the simulation until the user presses the same button.</p>
             <p><span class="heading2">Step:</span> <img alt="step" src="../../Images/Step.png"> iteration the simulation one time.</p>
-            <p><span class="heading2">Time:</span>When a simulation is run iterations or "simulation time" are tracked. This time is represented in the toolbar, and can be reset to 0 by double clicking on the text label.</p>
-            <p><span class="heading2">Run indicator:</span>While a simulation is running a small animated icon is displayed to draw attention to the fact that the simulation is running.</p>
-            <p><span class="heading2">Simulation delay:</span>Can be used to slow the simulation down from its max speed for easier observation of some processes. See <a href="Preferences.html">preferences dialog</a>.</p>
+            <p><span class="heading2">Time:</span> When a simulation is run iterations or "simulation time" are tracked. This time is represented in the toolbar, and can be reset to 0 by double clicking on the text label.</p>
+            <p><span class="heading2">Run indicator:</span> While a simulation is running a small animated icon is displayed to draw attention to the fact that the simulation is running.</p>
+            <p><span class="heading2">Simulation delay:</span> Can be used to slow the simulation down from its max speed for easier observation of some processes. See <a href="Preferences.html">preferences dialog</a>.</p>
         </blockquote>
 
         <p><span class="heading"><a label="UpdateSequence"></a>Update Sequence Dialog</span>
@@ -49,8 +49,8 @@
         <blockquote>
             <p><span class="heading2">Add action: </span>Adds one of a set of predefined action. These actions are discussed below.</p>
             <p><span class="heading2">Remove selected actions(s): </span>Remove all highlighted actions in the main window.</p>
-            <p><span class="heading2">Custom action:</span>Creates a custom update action. A script editor opens up, with comments that indicate how to go about creating the custom update action. Users have access to the underlying <i>workspace</i> object and the gui <i>desktop</i>. See <a href="../Scripting.html">scripting</a> for more on how to create these scripts. <b>Note:</b>To edit an existing custom action, double click on it.</p>
-            <p><span class="heading2">Changing update order.</span>To change the order of update actions, drag them around in the update sequence panel or use the arrow buttons.
+            <p><span class="heading2">Custom action:</span> Creates a custom update action. A script editor opens up, with comments that indicate how to go about creating the custom update action. Users have access to the underlying <i>workspace</i> object and the gui <i>desktop</i>. See <a href="../Scripting.html">scripting</a> for more on how to create these scripts. <b>Note:</b>To edit an existing custom action, double click on it.</p>
+            <p><span class="heading2">Changing update order:</span> To change the order of update actions, drag them around in the update sequence panel or use the arrow buttons.
             <p><span class="heading2">Move Up In Sequence</span>: Move selected action up one in the sequence.
             </p>
             <p><span class="heading2">Move To Top Of Sequence:</span> Move selected action to the very top of the sequence.
@@ -68,7 +68,7 @@
 
         <p><b>Note:</b> Any update action can be added multiple times, so that (for example) on each iteration a single component gets updated multiple times, or buffered update happens more than once.</p>
 
-        <p><b>Note:</b>If buffered update is removed, care must be taken since when new components and couplings are added to the workspace, they will not automatically be put in the current update sequence.</p>
+        <p><b>Note:</b> If buffered update is removed, care must be taken since when new components and couplings are added to the workspace, they will not automatically be put in the current update sequence.</p>
 
         <p>Here is a screenshot of the dialog:</p>
 
@@ -86,9 +86,9 @@
             <p>In this scheme each component is updated in parallel on each update, then the couplings are updated. Information on how this update occurs is in the <span class="command">Updater tab</span> of the <a href="PropertyTabs.html">property tabs</a> at the bottom of the Simbrain desktop.</p>
             <p>Note that in this scheme, there is a <u>time lag</u> between updates. What happens in one component is not "felt" in another until after an iteration of the workspace, since a coupling's producer value must first update to a buffer, then the consumer is updated on the next iteration.</p>
 
-            <p><span class="heading2">Update Component:</span>This action updates a single <a href="Component.html">component</a>. The name of the component is shown to make it easy to identify.</p>
+            <p><span class="heading2">Update Component:</span> This action updates a single <a href="Components.html">component</a>. The name of the component is shown to make it easy to identify.</p>
 
-            <p><span class="heading2">Update Coupling:</span>This action updates a <a href="Coupling.html">coupling</a>, pulling the producer value and applying it to the consumer. It is dispalyed as <i>source component > target component</i>.</p>
+            <p><span class="heading2">Update Coupling:</span> This action updates a <a href="Couplings.html">coupling</a>, pulling the producer value and applying it to the consumer. It is dispalyed as <i>source component > target component</i>.</p>
 
             <p><a label="Custom"></a><span class="heading">Custom Updating</span></p>
 

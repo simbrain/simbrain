@@ -284,6 +284,8 @@ public class DataWorldComponent extends WorkspaceComponent {
             } else if (consumerList.contains(object)) {
                 return "consumerList:" + ((ColumnAttribute) object).getIndex();
             }
+        } else if (object instanceof NumericTable) {
+            return "table";
         }
         return null;
     }
@@ -291,6 +293,12 @@ public class DataWorldComponent extends WorkspaceComponent {
     @Override
     public Object getObjectFromKey(String objectKey) {
         try {
+
+            // Return the whole table. Used for vector couplings
+            if (objectKey.startsWith("table")) {
+                return dataTable;
+            }
+            // Return a column attribute
             String producerOrConsumer = objectKey.split(":")[0];
             String index = objectKey.split(":")[1];
             int i = Integer.parseInt(index);

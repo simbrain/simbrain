@@ -21,3 +21,4 @@ scrollpane
 scrollbar
 sexy
 tabbed
+palette

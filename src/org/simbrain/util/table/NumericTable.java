@@ -125,7 +125,7 @@ public class NumericTable extends MutableTable<Double> implements
     public void setVectorCurrentRow(double[] data) {
         int i = getCurrentRow();
         for (int j = 0; j < data.length; j++) {
-            if (j < this.getColumnCount()) {
+            if (j < this.getLogicalColumnCount()) {
                 this.setLogicalValue(i, j, data[j], false);
             }
         }
@@ -140,7 +140,7 @@ public class NumericTable extends MutableTable<Double> implements
     public double[] getVectorCurrentRow() {
         double[] retVec = new double[this.getColumnCount()];
         int currRow = getCurrentRow();
-        for (int i = 0; i < this.getColumnCount(); i++) {
+        for (int i = 0; i < this.getLogicalColumnCount(); i++) {
             retVec[i] = this.getLogicalValueAt(currRow, i);
         }
         return retVec;
@@ -153,7 +153,7 @@ public class NumericTable extends MutableTable<Double> implements
      * @param value value to set
      */
     public void setValueCurrentRow(final int column, final double value) {
-        setValue(currentRow, column, value);
+        setLogicalValue(currentRow, column, value, true);
     }
 
     /**

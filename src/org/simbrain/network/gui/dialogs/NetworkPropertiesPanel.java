@@ -35,6 +35,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -128,6 +129,12 @@ public class NetworkPropertiesPanel extends JPanel {
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
 
+    /** Check box for whether to use subsampling. */
+    private JCheckBox cbUseSubSampling = new JCheckBox();
+
+    /** Text field for number of subsamples to use. */
+    private JTextField tfNumSubSamples = new JTextField();
+
     /**
      * This method is the default constructor.
      *
@@ -183,6 +190,15 @@ public class NetworkPropertiesPanel extends JPanel {
         nudgeAmountField.setColumns(3);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
         miscPanel.addItem("Wand radius", wandRadiusField);
+
+        // Subsampling Stuff
+        miscPanel.add(new JSeparator(JSeparator.HORIZONTAL));
+        miscPanel.addItem("Use Subsampling for large neuron groups",
+                cbUseSubSampling);
+        miscPanel.addItem("Number of Subsamples / Subsampling Threshold",
+                tfNumSubSamples);
+        updateSubSamplingStuff();
+
         // TODO: tooltips for all this
         mainVertical.add(miscPanel);
 
@@ -225,7 +241,20 @@ public class NetworkPropertiesPanel extends JPanel {
                 setIndicatorColor();
             }
         });
+        cbUseSubSampling.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateSubSamplingStuff();
+            }
+        });
     }
+
+    /**
+     * Update the num subsamples text field (enabled only if subsampling is selected).
+     */
+    protected void updateSubSamplingStuff() {
+        tfNumSubSamples.setEnabled(cbUseSubSampling.isSelected());
+   }
 
     /**
      * Update relevant colors based on combo box. As noted in
@@ -280,14 +309,15 @@ public class NetworkPropertiesPanel extends JPanel {
         weightSizeMaxSlider.setValue(SynapseNode.getMaxDiameter());
         weightSizeMinSlider.setValue(SynapseNode.getMinDiameter());
         showTimeBox.setSelected(networkPanel.getShowTime());
-        wandRadiusField.setText(Integer.toString(EditMode
-                .getWandRadius()));
+        wandRadiusField.setText(Integer.toString(EditMode.getWandRadius()));
         timeStepField.setText(Double.toString(networkPanel.getNetwork()
                 .getTimeStep()));
-        nudgeAmountField.setText(Double.toString(NetworkPanel
-                .getNudgeAmount()));
+        nudgeAmountField
+                .setText(Double.toString(NetworkPanel.getNudgeAmount()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(Network
                 .getSynapseVisibilityThreshold()));
+        cbUseSubSampling.setSelected(NeuronGroup.isUseSubSampling());
+        tfNumSubSamples.setText(Integer.toString(NeuronGroup.getNumSubSamples()));
     }
 
     /**
@@ -301,14 +331,17 @@ public class NetworkPropertiesPanel extends JPanel {
                 .getText()));
         Network.setSynapseVisibilityThreshold(Integer
                 .parseInt(tfSynapseVisibilityThreshold.getText()));
-        EditMode.setWandRadius(
-                Integer.parseInt(wandRadiusField.getText()));
+        EditMode.setWandRadius(Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {
             networkPanel.getEditMode().resetWandCursor();
             networkPanel.updateCursor();
         }
         networkPanel.setShowTime(showTimeBox.isSelected());
         networkPanel.repaint();
+        
+        NeuronGroup.setUseSubSampling(cbUseSubSampling.isSelected());
+        NeuronGroup.setNumSubSamples(Integer.parseInt(tfNumSubSamples
+                .getText()));
     }
 
     /**

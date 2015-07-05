@@ -33,7 +33,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
@@ -41,6 +40,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
@@ -62,7 +62,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     /** The description of the update rule governing the group. */
     private String updateRule;
-
+ 
     /**
      * Mostly here for backwards compatibility {@link #recordAsSpikes} is
      * ultimately the more important variable.
@@ -132,6 +132,18 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
      */
     private int writeCounter = 0;
     
+    /** Indices used with subsampling. */
+    private int[] subsamplingIndices;
+    
+    /**
+     * Reset the indices used for subsampling
+     */
+    public void resetSubsamplingIndices() {
+        if (neuronList != null) {
+            subsamplingIndices = SimbrainMath.randPermute(0, neuronList.size());   
+        }
+    }
+    
     /**
      * This used to be how neuron group recordings were labeled. This is now
      * only here for backwards compatibility.
@@ -155,6 +167,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
         updateRule = getNeuronType();
+        resetSubsamplingIndices();
     }
 
     /**
@@ -190,6 +203,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         layout.setInitialLocation(initialPosition);
         layout.layoutNeurons(this.getNeuronList());
         updateRule = getNeuronType();
+        resetSubsamplingIndices();
     }
 
     /**
@@ -205,6 +219,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public NeuronGroup(final Network network, Point2D initialPosition) {
         super(network);
         layout.setInitialLocation(initialPosition);
+        resetSubsamplingIndices();
     }
 
     /**
@@ -232,6 +247,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             this.addNeuron(new Neuron(network, neuron));
         }
         this.updateRule = toCopy.updateRule;
+        resetSubsamplingIndices();
     }
 
     @Override
@@ -611,6 +627,9 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
                 getParentNetwork().fireNeuronAdded(neuron);
             }
         }
+        if (fireEvent) {
+            resetSubsamplingIndices();            
+        }
     }
 
     /**
@@ -634,6 +653,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         if (isEmpty()) {
             delete();
         }
+        resetSubsamplingIndices();
     }
 
     /**
@@ -737,6 +757,13 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         return retArray;
     }
     
+    /**
+     * Returns an array of spike indices used in couplings, (e.g. to a raster
+     * plot). For example, if a neuron group has 9 neurons, and neurons 1 and 4
+     * just spiked, the producer will send the list (1,0,0,4,0,0,0,0,0).
+     * 
+     * @return the spike index array
+     */
     public double[] getSpikeIndexes() {
         List<Double> inds = new ArrayList<Double>(size());
         int i = 0;
@@ -1504,5 +1531,70 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     public void setSpikingNeuronGroup(boolean isSpikingNeuronGroup) {
         this.isSpikingNeuronGroup = isSpikingNeuronGroup;
+    }
+
+    /**
+     * Whether to use subsampling (for large neuron groups, only using a sample
+     * of activations for external components)
+     */
+    private static boolean useSubSampling = true;
+
+    /**
+     * Number of subsamples to take. This value is also implicitly a threshold.
+     * If a neuron group has more than this many neurons, and subsampling is
+     * turned on, a vector with this many components is returned by (
+     * {@link getExternalActivations}
+     */
+    private static int numSubSamples = 100;
+
+    /**
+     * Returns a vector of activations to be used by some object external to the
+     * neuron group. If subsampling is turned on only some sample of these
+     * activations will be returned. Thus if plotting activations of a thousand
+     * node network, a sample of 100 activations might be returned.
+     *
+     * @return the vector of external activations.
+     */
+    public double[] getExternalActivations() {
+        if (!useSubSampling) {
+            return getActivations();
+        }
+        if (neuronList.size() < numSubSamples) {
+            return getActivations();
+        } else {
+            double[] retArray = new double[numSubSamples];
+            for (int i = 0; i < numSubSamples; i++) {
+                retArray[i] = neuronList.get(i).getActivation();
+            }
+            return retArray;            
+        }
+    }
+
+    /**
+     * @return the useSubSampling
+     */
+    public static boolean isUseSubSampling() {
+        return useSubSampling;
+    }
+
+    /**
+     * @param useSubSampling the useSubSampling to set
+     */
+    public static void setUseSubSampling(boolean useSubSampling) {
+        NeuronGroup.useSubSampling = useSubSampling;
+    }
+
+    /**
+     * @return the numSubSamples
+     */
+    public static int getNumSubSamples() {
+        return numSubSamples;
+    }
+
+    /**
+     * @param numSubSamples the numSubSamples to set
+     */
+    public static void setNumSubSamples(int numSubSamples) {
+        NeuronGroup.numSubSamples = numSubSamples;
     }
 }

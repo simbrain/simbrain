@@ -175,7 +175,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
             setRecurrent(connection.getSynapseGroup().isRecurrent());
             allowSelfConnect = connection.isSelfConnectionAllowed();
         } else {
-            // Assumes only one source and one target group are slected if any 
+            // Assumes only one source and one target group are selected if any 
             // are
             if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
                 NeuronGroup source = networkPanel.getSourceModelGroups().get(0);

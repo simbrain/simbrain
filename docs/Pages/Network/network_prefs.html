@@ -52,7 +52,9 @@
             </p>
             <p><span class="heading2">Restore defaults:</span> Restore settings in the main tab to their default values.
             </p>
-
+            <p><span class="heading2">Use subsampling:</span>  If checked, use <a href="./groups/NeuronGroup.html#Subsampling">subsampling</a>, which means that when a neuron group is large (has more neurons than <span class="command">number of subsamples</span>), only use that many subsamples when sending a vector of activations to external components using couplings.
+            </p>
+            <p><span class="heading2">Number of subsamples:</span> Number of subsamples to take. This value is effectively a threshold as well:only when a neuron group has more than this many neurons is  a subsample used when getting activations from a group.</p>
         </blockquote>
         <p class="heading">Connections</p>
         <blockquote>

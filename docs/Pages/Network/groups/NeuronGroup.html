@@ -98,6 +98,11 @@
             <br>
             <span class="heading2">Start/ Stop Recording: </span> Starts recording the activation values from the neuron group to a .csv file or stops if it is already recording.   When starting recording a dialog shows up asking you to specify a name for the spike recording file.  If the network is a spiking network then the each line of the file begins with a time and is followed by neuron id's (in this case the ".csv" file is not really csv).
         </blockquote>
+        <p class="heading">
+            <a name="Subsampling"></a>Subsampling</p>
+        <blockquote>
+            <p>When a large neuron groups is <a href="../../Workspace/Couplings.html">coupled</a> to an external component (e.g. a <a href="../../../Pages/Plot/projection.html">Projection Plot</a>), the relevant compuations can become quite expensive and slow the simulation down.  In these situations <a href="https://en.wikipedia.org/wiki/Sampling_(statistics)">statistical sampling</a> is used.   For example, when activations are sent from a neuron group with 1000 neurons to a plot, only 100 of the neuron activations will be sent (assuming subsampling is turned on and <span class="command">numSubsamples</span> is 100).  Some subset of the neurons in a neuron group are sampled.   The parameters for subsampling are set in the <a href="../network_prefs.html">Network Preferences</a> dialog.  </p>
+        </blockquote>
     </div>
 </body>
 

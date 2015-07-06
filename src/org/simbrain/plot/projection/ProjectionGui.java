@@ -382,12 +382,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         // Init the adjust dimension combo boxes
         updateCoordinateProjectionComboBoxes();
         adjustDimension1.setModel(adjustDimension1Model);
-        try {
-            adjustDimension1.setSelectedIndex(SimbrainPreferences
-                    .getInt("projectorHiD1"));
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
         adjustDimension1.addActionListener(new ActionListener() {
 
             @Override
@@ -407,12 +401,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         });
         adjustDimension2.setModel(adjustDimension2Model);
-        try {
-            adjustDimension2.setSelectedIndex(SimbrainPreferences
-                    .getInt("projectorHiD2"));
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
         adjustDimension2.addActionListener(new ActionListener() {
 
             @Override

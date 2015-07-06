@@ -83,8 +83,6 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
                 + "tables");
         DEFAULT_MAP.put("projectorTolerance", .1);
-        DEFAULT_MAP.put("projectorHiD1", 1);
-        DEFAULT_MAP.put("projectorHiD2", 2);
         DEFAULT_MAP.put("projectorSammonPerturbationAmount", .1);
         DEFAULT_MAP.put("projectorSammonEpsilon", .5);
         DEFAULT_MAP.put("textWorldDictionaryDirectory", ".");

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/Blas.jar"/>
+	<classpathentry kind="lib" path="lib/bsh-2.1b5.jar"/>
+	<classpathentry kind="lib" path="lib/colt.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/Jama-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.17.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.14.jar"/>
+	<classpathentry kind="lib" path="lib/jgap.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="lib/ojalgo-35.0.jar"/>
+	<classpathentry kind="lib" path="lib/optimization.jar"/>
+	<classpathentry kind="lib" path="lib/piccolo2d-core-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/piccolo2d-extras-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/rsyntaxtextarea.jar"/>
+	<classpathentry kind="lib" path="lib/ssj.jar"/>
+	<classpathentry kind="lib" path="lib/swinglabs-0.8.0.jar"/>
+	<classpathentry kind="lib" path="lib/utils.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.4.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

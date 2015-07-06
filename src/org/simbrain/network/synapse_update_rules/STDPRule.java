@@ -107,7 +107,6 @@ public class STDPRule extends SynapseUpdateRule {
                         .getTarget().getUpdateRule()).getLastSpikeTime())
                         * (hebbian ? 1 : -1);   // Reverse time window for
                                                 // anti-hebbian
-
                 if (delta_t < 0) {
                     delta_w = W_plus * Math.exp(delta_t / tau_plus)
                             * learningRate;
@@ -115,8 +114,11 @@ public class STDPRule extends SynapseUpdateRule {
                     delta_w = -W_minus * Math.exp(-delta_t / tau_minus)
                             * learningRate;
                 }
-                // Subtracts deltaW if inhibitory adds otherwise
-                synapse.setStrength(str + (Math.signum(str) * delta_w));
+                if(Math.signum(str) == -1) {
+                    synapse.setStrength(str - delta_w);
+                } else {
+                    synapse.setStrength(str + delta_w);
+                }
             } catch (ClassCastException cce) {
                 cce.printStackTrace();
                 System.out.println("Don't use non-spiking neurons with STDP!");

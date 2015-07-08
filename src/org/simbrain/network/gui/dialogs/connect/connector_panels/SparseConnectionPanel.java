@@ -134,6 +134,10 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
     /** Whether to allow recurrent connections. */
     private boolean recurrentConnection = false;
 
+    /**
+     * If true then this sparse connection object is being edited, as opposed to
+     * created.
+     */
     private final boolean editing;
 
     /**
@@ -188,6 +192,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
                     setRecurrent(source.equals(target));
 
                 } else {
+                    // Called when Quick Properties (see QuickConnectDialog) is used
                     Set<Neuron> sources =
                             new HashSet<Neuron>(networkPanel
                                     .getSourceModelNeurons());

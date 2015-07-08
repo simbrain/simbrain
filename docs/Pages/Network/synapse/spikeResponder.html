@@ -4,11 +4,10 @@
 
 <head>
     <title>Simbrain Documentation</title>
-     <script type="text/x-mathjax-config">
+    <script type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
     </script>
-    <script type="text/javascript"
-        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css" />
@@ -17,7 +16,6 @@
 <body>
     <a href="../../../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
@@ -27,7 +25,8 @@
         <div id="menu">
             <p class="menubold">Response Functions</p>
             <blockquote>
-                <p> <a href="./spikeresponders/ConvolvedJumpAndDecay.html">Convolved Jump and Decay</a><br>
+                <p> <a href="./spikeresponders/ConvolvedJumpAndDecay.html">Convolved Jump and Decay</a>
+                    <br>
                     <a href="./spikeresponders/probabilistic.html">Probabilistic</a>
                     <br />
                     <a href="./spikeresponders/jumpAndDecay.html">Jump and Decay</a>
@@ -42,7 +41,10 @@
         <p>
             <h1>Spike Responders</h1>
         </p>
-        <p>In Simbrain all action potentials are modelled as Dirac delta functions, (the Dirac delta function is 1 at exactly 0 and 0 for all other values on [-&infin;, &infin;]). This just means that they are instantaneous in time and that insofar as the neuron that emitted the spike is concerned no spike is more or less powerful than another. However, this is problematic because everything takes <i>some</i> amount of time, and so spike responders exist as a generic term for any function which assigns a temporally extended value to an instantaneous pre-synaptic spike. Generally speaking (and by default) all synapses originating at a <a href="../spikingneurons.html">spiking neuron</a> have a spike responder and use that spike responder to determine how strongly they should impact their target neuron.</p>
+        <p>In Simbrain all action potentials are modelled as <a href="https://en.wikipedia.org/wiki/Dirac_delta_function">Dirac delta functions</a>, (the Dirac delta function is 1 at exactly 0 and 0 for all other values on [-&infin;, &infin;]). This just means that they are instantaneous in time and that insofar as the neuron that emitted the spike is concerned no spike is more or less powerful than another. However, this is problematic because everything takes <i>some</i> amount of time, and so spike responders exist as a generic term for any function which assigns a temporally extended value to an instantaneous pre-synaptic spike. Generally speaking (and by default) all synapses originating at a <a href="../spikingneurons.html">spiking neuron</a> have a spike responder and use that spike responder to determine how strongly they should impact their target neuron.</p>
+
+        <p>The top right neuron in the image here shows a spike responder in action.  When the neuron that connects to it spikes, the spike responder produces a 1 which then decays to zero (see <a href="./spikeresponders/jumpAndDecay.html">Jump and Decay</a>).</p>
+        <img src="../../../Images/Spk&NonSpk.gif" align="left" height = "200px" hspace="20px" vspace="10px" border="1">
         <p>In biological settings, when a spike arrives at a post-synaptic cell (the target neuron of the spiking neuron), a &quot;wave&quot; of activation is created. This is modeled using a &quot;response function&quot; which characterizes a synaptic current, the influx of chemicals into a target cell which occurs when vesicles are released from a source neuron. In more formal terms (most) spike responders perform a <a href="http://en.wikipedia.org/wiki/Convolution"><i>convolution</i></a> of some function and the Dirac delta function representing spikes.</p>
         <p>The input to a neuron using the synaptic input type uses the post synaptic response as determined by the impinging synapses' post-synaptic response, as determined by the spike responder. This input takes many forms depending on the neuron type of the post-synaptic cell, but the general form of the input equation is as follows:</p>
         <blockquote>
@@ -50,10 +52,9 @@
         </blockquote>
         <p>Where $x_{syn}$ represents either pure synaptic current, the conductance (or fraction of open ion channels of a given type), or net input depending on the target neuron. $PSR_{j}$ is the post synaptic response of synapse j as determined its the spike responder. The spike responder determines the PSR using two variables: $\Delta_{spk}$ or the time since the last spike of the pre-synaptic neuron, and $w_{j}$, the absolute synaptic efficacy (also known as the "strength" or "weight") of the impinging synapse.
         </p>
-         <p>In sum, what is passed on to the post-synaptic neuron is the value of the response function scaled by the strength of the weight. That being said, there are a number of unique response functions that dramatically change the utility of the spike interaction. The response function can be thought of as the wave form of the response to a spike.</p>
+        <p>In sum, what is passed on to the post-synaptic neuron is the value of the response function scaled by the strength of the weight. That being said, there are a number of unique response functions that dramatically change the utility of the spike interaction. The response function can be thought of as the wave form of the response to a spike.</p>
         </blockquote>
         </p>
-
     </div>
 </body>
 

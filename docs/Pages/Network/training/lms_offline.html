@@ -25,16 +25,16 @@
 
         <h1>Least Mean Squares Offline</h1>
 
-        <p>The offline LMS rule a non-iterative method for computing a weight matrix for associating input vectors and target vectors in a dataset. [link to training set] in a training</p>
+        <p>The offline LMS rule a non-iterative method for computing a weight matrix for associating input vectors and target vectors in a training dataset (see <a href="trainingDialog.html">training dialog</a>).</p>
 
-        <p>The lms offline trainer is configurd using a special panel, shown here, and is used primarily used by the <a href="../network/lmsnetwork.html">least mean square network</a> and <a href="../network/echostatenetwork.html">echo state network</a>, though it can also be used by <a href="../../Scripting.html">scripts</a> and in other ways.  The following parameter can be modified.</p>
+        <p>The lms offline trainer is configured using a special panel, shown here, and is used primarily used by the <a href="../network/lmsnetwork.html">least mean square network</a> and <a href="../network/echostatenetwork.html">echo state network</a>, though it can also be used by <a href="../../Scripting.html">scripts</a> and in other ways.  The following parameter can be modified.</p>
 
         <p>Note for this algorithm you have to make sure the output node range is greater than the range of the target values. Also it sometimes it helps to change output nodes to linear.</p>
 
         <blockquote>
             <p><span class="heading2">Training Type: Wiener-Hopf</span>: The <a href="http://en.wikipedia.org/wiki/Wiener%E2%80%93Hopf_method">wiener-hopf</a> method for lms offline.</p>
-            <p><span class="heading2">Training Type: Moore-Penrose</span>: The <a href="http://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_pseudoinverse">moore penrose</a> method for lms offline. Moore-Penrose is stable in some cases when Winer Hopf is not.</p>
-            <p><span class="heading2">Ridge regression</span>, Noise: Ridge regression and adding noise help when a matrix that is rank deficient. Prevents over-fitting, makes rank slightly higher.</p>
+            <p><span class="heading2">Training Type: Moore-Penrose</span>: The <a href="http://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_pseudoinverse">moore penrose</a> method for lms offline. Moore-Penrose is stable in some cases when Wiener Hopf is not.</p>
+            <p><span class="heading2">Ridge regression, Noise</span>: Ridge regression and adding noise help when a matrix that is rank deficient. These options help prevent over-fitting by making rank slightly higher.</p>
         </blockquote>
 
     </div>

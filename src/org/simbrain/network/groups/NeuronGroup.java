@@ -165,6 +165,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
         }
+        // Very slow to add to a copy on write array list so do it this way
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
         updateRule = getNeuronType();
         resetSubsamplingIndices();
@@ -199,6 +200,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         for (int i = 0; i < numNeurons; i++) {
             addNeuron(new Neuron(net), false);
         }
+        // Very slow to add to a copy on write array list so do it this way
         neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
         layout.setInitialLocation(initialPosition);
         layout.layoutNeurons(this.getNeuronList());

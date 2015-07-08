@@ -427,7 +427,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
                     throw new NumberFormatException();
                 }
                 for (int i = 0; i < numNeurons; i++) {
-                    neuronGroup.addNeuron(template.deepCopy());
+                    neuronGroup.addNeuron(template.deepCopy(), false);
                 }
                 layoutPanel.commitChanges();
                 neuronGroup.setLayout(layoutPanel.getCurrentLayout());

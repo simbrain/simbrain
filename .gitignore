@@ -4,3 +4,6 @@
 /dist
 *.sublime-project
 *.sublime-workspace
+*.classpath
+*.project
+/bin1/

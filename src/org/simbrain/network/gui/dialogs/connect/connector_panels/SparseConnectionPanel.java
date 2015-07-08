@@ -154,7 +154,7 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
         sap.initializeLayout();
         return sap;
     }
-
+    
     /**
      * Constructs a gui panel for adjusting the sparsity of a sparse connect
      * neurons object, and initializes all appropriate listeners.
@@ -178,11 +178,17 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
             // Assumes only one source and one target group are selected if any 
             // are
             if (networkPanel.getSelectedModelNeuronGroups().size() > 0) {
-                NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
-                NeuronGroup target =
-                    networkPanel.getSelectedModelNeuronGroups().get(0);
-                numTargs = target.size();
-                setRecurrent(source.equals(target));
+                try {
+                    NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
+                    NeuronGroup target =
+                            networkPanel.getSelectedModelNeuronGroups().get(0);
+                    numTargs = target.size();
+                    setRecurrent(source.equals(target));
+                } catch (IndexOutOfBoundsException e) {
+                    setRecurrent(true);
+                    numTargs = (int) 1E4;
+                    synsPerSource.setVisible(false);
+                }
             } else {
                 Set<Neuron> sources =
                     new HashSet<Neuron>(networkPanel.getSelectedModelNeurons());
@@ -197,6 +203,8 @@ public class SparseConnectionPanel extends AbstractConnectionPanel implements
             }
         }
     }
+    
+    
 
     /**
      * Initializes the panel's layout

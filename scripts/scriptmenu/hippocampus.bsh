@@ -1,0 +1,441 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.subnetworks.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.workspace.*;
+import org.simbrain.util.*;
+import javax.swing.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+//
+// Simulation of the Squire Alvarez Hippocampus model (PNAS, 1994).
+//
+// Implemented by Jeff Rodny and Jeff Yoshimi
+//
+void main() {
+
+  // Clear workspace
+  workspace.clearWorkspace();
+
+  // Build hippocampal model
+
+  // Set up
+  Network network = new Network();
+  NetworkComponent networkComponent = new NetworkComponent("Hippocampus", network);
+  workspace.addWorkspaceComponent(networkComponent);
+  desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(250, 10, 700, 650);
+
+  // LC1
+  CompetitiveGroup LC1 = new CompetitiveGroup(network, 4);
+  LC1.setLabel("Left Cortex 1");
+  LC1.applyLayout();
+  LC1.setLocation(0,0);
+  network.addGroup(LC1);
+
+  // LC2
+  CompetitiveGroup LC2 = new CompetitiveGroup(network, 4);
+  LC2.setLabel("Left Cortex 2");
+  LC2.applyLayout();
+  LC2.setLocation(0,400);
+  network.addGroup(LC2);
+
+  // RC1
+  CompetitiveGroup RC1 = new CompetitiveGroup(network, 4);
+  RC1.setLabel("Right Cortex 1");
+  RC1.applyLayout();
+  RC1.setLocation(800,0);
+  network.addGroup(RC1);
+
+  // RC2
+  CompetitiveGroup RC2 = new CompetitiveGroup(network, 4);
+  RC2.setLabel("Right Cortex 2");
+  RC2.applyLayout();
+  RC2.offset(800,400);
+  network.addGroup(RC2);
+
+  // Hippocampus
+  CompetitiveGroup hippocampus = new CompetitiveGroup(network, 4);
+  hippocampus.setLabel("Hippocampus");
+  hippocampus.applyLayout();
+  hippocampus.offset(400,600);
+  network.addGroup(hippocampus);
+
+
+  // Make hippocampal synapse groups
+  SynapseGroup HtoLC1 = SynapseGroup.createSynapseGroup(hippocampus, LC1, new AllToAll());
+  HtoLC1.setLabel("H to LC1");
+  network.addGroup(HtoLC1);
+//  HtoLC1.setLearningRate(0.1);
+  SynapseGroup HtoLC2 = SynapseGroup.createSynapseGroup(hippocampus, LC2, new AllToAll());
+  HtoLC2.setLabel("H to LC2");
+  network.addGroup(HtoLC2);
+  //HtoLC2.setLearningRate(0.1);
+  SynapseGroup HtoRC1 = SynapseGroup.createSynapseGroup(hippocampus, RC1, new AllToAll());
+  HtoRC1.setLabel("H to RC1");
+  network.addGroup(HtoRC1);
+ // HtoRC1.setLearningRate(0.1);
+  SynapseGroup HtoRC2 = SynapseGroup.createSynapseGroup(hippocampus, RC2, new AllToAll());
+  HtoRC2.setLabel("H to RC2");
+  network.addGroup(HtoRC2);
+ // HtoRC2.setLearningRate(0.1);
+  SynapseGroup LC1toH = SynapseGroup.createSynapseGroup(LC1, hippocampus, new AllToAll());
+  LC1toH.setLabel("LC1 to H");
+  network.addGroup(LC1toH);
+ // LC1toH.setLearningRate(0.1);
+  SynapseGroup LC2toH = SynapseGroup.createSynapseGroup(LC2, hippocampus, new AllToAll());
+  LC2toH.setLabel("LC2 to H");
+  network.addGroup(LC2toH);
+ // LC2toH.setLearningRate(0.1);
+  SynapseGroup RC1toH = SynapseGroup.createSynapseGroup(RC1, hippocampus, new AllToAll());
+  RC1toH.setLabel("RC1 to H");
+  network.addGroup(RC1toH);
+ // RC1toH.setLearningRate(0.1);
+  SynapseGroup RC2toH = SynapseGroup.createSynapseGroup(RC2, hippocampus, new AllToAll());
+  RC2toH.setLabel("RC2 to H");
+  network.addGroup(RC2toH);
+ // RC2toH.setLearningRate(0.1);
+
+  // Make cortico-cortical synapse groups
+  SynapseGroup LC1toRC1 = SynapseGroup.createSynapseGroup(LC1, RC1, new AllToAll());
+  LC1toRC1.setLabel("LC1 to RC1");
+  network.addGroup(LC1toRC1);
+ // LC1toRC1.setLearningRate(0.002);
+  SynapseGroup LC1toRC2 = SynapseGroup.createSynapseGroup(LC1, RC2, new AllToAll());
+  LC1toRC2.setLabel("LC1 to RC2");
+  network.addGroup(LC1toRC2);
+ // LC1toRC2.setLearningRate(0.002);
+  SynapseGroup LC2toRC1 = SynapseGroup.createSynapseGroup(LC2, RC1, new AllToAll());
+  LC2toRC1.setLabel("LC2 to RC1");
+  network.addGroup(LC2toRC1);
+ // LC2toRC1.setLearningRate(0.002);
+  SynapseGroup LC2toRC2 = SynapseGroup.createSynapseGroup(LC2, RC2, new AllToAll());
+  LC2toRC2.setLabel("LC2 to RC2");
+  network.addGroup(LC2toRC2);
+  //LC2toRC2.setLearningRate(0.002);
+  SynapseGroup RC1toLC1 = SynapseGroup.createSynapseGroup(RC1, LC1, new AllToAll());
+  RC1toLC1.setLabel("RC1 to LC1");
+  network.addGroup(RC1toLC1);
+  //RC1toLC1.setLearningRate(0.002);
+  SynapseGroup RC1toLC2 = SynapseGroup.createSynapseGroup(RC1, LC2, new AllToAll());
+  RC1toLC2.setLabel("RC1 to LC2");
+  network.addGroup(RC1toLC2);
+  ///RC1toLC2.setLearningRate(0.002);
+  SynapseGroup RC2toLC1 = SynapseGroup.createSynapseGroup(RC2, LC1, new AllToAll());
+  RC2toLC1.setLabel("RC2 to LC1");
+  network.addGroup(RC2toLC1);
+  //RC2toLC1.setLearningRate(0.002);
+  SynapseGroup RC2toLC2 = SynapseGroup.createSynapseGroup(RC2, LC2, new AllToAll());
+  RC2toLC2.setLabel("RC2 to LC2");
+  network.addGroup(RC2toLC2);
+ // RC2toLC2.setLearningRate(0.002);
+
+
+  // Variables
+  hippoLesioned = false;
+  learningEnabled  = true;
+
+  // Set up internal frame
+  JInternalFrame internalFrame = new JInternalFrame("Train / Test", true, true);
+  LabelledItemPanel panel = new LabelledItemPanel();
+  Random generator = new Random(); 
+
+   // Start making the buttons!
+   JButton button1 = new JButton("Pattern 1");
+   button1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                       setUpTrainButton(network, new double[]{1,0,0,0});
+                   }
+                   });
+
+            }});
+   panel.addItem("Train", button1);
+   
+   JButton button2 = new JButton("Pattern 2");
+   button2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                       setUpTrainButton(network, new double[]{0,1,0,0});
+                   }
+                   });
+
+            }});
+   panel.addItem("Train", button2);
+
+   JButton button3 = new JButton("Pattern 3");
+   button3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                       setUpTrainButton(network, new double[]{0,0,1,0});
+                   }
+                   });
+
+            }});
+   panel.addItem("Train", button3);
+
+   JButton button4 = new JButton("Pattern 4");
+   button4.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                           setUpTrainButton(network, new double[]{0,0,0,1});                                   
+                       }
+                   });
+
+            }});
+   panel.addItem("Train", button4);
+
+   // Consolidation
+   JButton buttonConsolidate = new JButton("Do it");
+   buttonConsolidate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                            double[] activations;
+                            int actNeuron = generator.nextInt(4);
+                            if (actNeuron == 0) {
+                              activations = new double[]{1,0,0,0};
+                            } else if (actNeuron == 1) {
+                              activations = new double[]{0,1,0,0};
+                            } else if (actNeuron == 2) {
+                              activations = new double[]{0,0,1,0};
+                            } else if (actNeuron == 3) {
+                              activations = new double[]{0,0,0,1};
+                            }
+                            NeuronGroup HP  = network.getGroupByLabel("Hippocampus");
+                            network.clearActivations();
+                            HP.setClamped(true);
+                            HP.forceSetActivations(activations);
+                            iterate(1);
+                            HP.setClamped(false);
+                       }
+                   });
+
+            }});
+   panel.addItem("Consolidate", buttonConsolidate);
+
+   // Hippocampus checkbox
+   JCheckBox hippoButton = new JCheckBox("Hippocampus");
+   hippoButton.setSelected(hippoLesioned);
+   hippoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               if(hippoLesioned == true) {
+                   hippoLesioned = false;
+               } else {
+                   hippoLesioned = true;
+               }
+               enableHippocampus(network, hippoLesioned);
+            }});
+   panel.addItem("Lesioned", hippoButton);
+
+   // Freeze weights checkbox
+   JCheckBox freezeButton = new JCheckBox("On");
+   freezeButton.setSelected(learningEnabled);
+   freezeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               if(learningEnabled == true) {
+                   learningEnabled = false;
+               } else {
+                   learningEnabled = true;
+               }
+               network.freezeSynapses(!learningEnabled);
+            }});
+   panel.addItem("Learning", freezeButton);
+
+
+   JButton button21 = new JButton("Pattern 1");
+   button21.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                           setUpTestButton(network, new double[]{1,0,0,0});                                      
+                       }
+                   });
+
+            }});
+   panel.addItem("Test", button21);
+
+   JButton button22 = new JButton("Pattern 2");
+   button22.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                           setUpTestButton(network, new double[]{0,1,0,0});                                      
+                       }
+                   });
+
+            }});
+   panel.addItem("Test", button22);
+
+   JButton button23 = new JButton("Pattern 3");
+   button23.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                           setUpTestButton(network, new double[]{0,0,1,0});                                      
+                       }
+                   });
+
+            }});
+   panel.addItem("Test", button23);
+
+   JButton button24 = new JButton("Pattern 4");
+   button24.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+               Executors.newSingleThreadExecutor().execute(new Runnable() {
+                   public void run() {
+                           setUpTestButton(network, new double[]{0,0,0,1});                                      
+                       }
+                   });
+
+            }});
+   panel.addItem("Test", button24);
+
+   // Set up Frame
+   internalFrame.setLocation(10,10);
+   internalFrame.getContentPane().add(panel);
+   internalFrame.setVisible(true);
+   internalFrame.pack();
+   desktop.addInternalFrame(internalFrame);
+
+}
+
+//
+// Iterate the simulation a specific number of times and don't move forward in the
+// script until done.
+//
+void iterate(int iterations) {
+   CountDownLatch iterationLatch = new CountDownLatch(1);
+   workspace.iterate(iterationLatch, iterations);
+   try {
+       iterationLatch.await();
+   } catch (InterruptedException e) {
+       e.printStackTrace();
+   }
+}
+
+//
+// Enable / disable the hippocampus
+//
+void enableHippocampus(Network network, boolean lesioned) {
+   SynapseGroup HtoLC1 = network.getGroupByLabel("H to LC1");
+   SynapseGroup HtoLC2 = network.getGroupByLabel("H to LC2");
+   SynapseGroup HtoRC1 = network.getGroupByLabel("H to RC1");
+   SynapseGroup HtoRC2 = network.getGroupByLabel("H to RC2");
+   SynapseGroup LC1toH = network.getGroupByLabel("LC1 to H");
+   SynapseGroup LC2toH = network.getGroupByLabel("LC2 to H");
+   SynapseGroup RC1toH = network.getGroupByLabel("RC1 to H");
+   SynapseGroup RC2toH = network.getGroupByLabel("RC2 to H");
+
+   HtoLC1.setEnabled(!lesioned);
+   HtoLC2.setEnabled(!lesioned);
+   HtoRC1.setEnabled(!lesioned);
+   HtoRC2.setEnabled(!lesioned);
+   LC1toH.setEnabled(!lesioned);
+   LC2toH.setEnabled(!lesioned);
+   RC1toH.setEnabled(!lesioned);
+   RC2toH.setEnabled(!lesioned);
+}
+
+//
+// Set up a train button that will clamp the the cortical neurons, then
+// train the network for three iterations, then unclamp the cortical neurons.
+//
+void setUpTrainButton(Network network, double[] activations) {
+   NeuronGroup LC1  = network.getGroupByLabel("Left Cortex 1");
+   NeuronGroup LC2  = network.getGroupByLabel("Left Cortex 2");
+   NeuronGroup RC1  = network.getGroupByLabel("Right Cortex 1");
+   NeuronGroup RC2  = network.getGroupByLabel("Right Cortex 2");
+   NeuronGroup HP  = network.getGroupByLabel("Hippocampus");
+
+   // Clamp nodes and set activations
+   LC1.setClamped(true);
+   LC2.setClamped(true);
+   RC1.setClamped(true);
+   RC2.setClamped(true);
+   LC1.forceSetActivations(activations);
+   LC2.forceSetActivations(activations);
+   RC1.forceSetActivations(activations);
+   RC2.forceSetActivations(activations);
+   HP.forceSetActivations(new double[]{0,0,0,0});
+
+   // Iterate 3 times
+   iterate(3);
+
+   // Unclamp nodes
+   LC1.setClamped(false);
+   LC2.setClamped(false);
+   RC1.setClamped(false);
+   RC2.setClamped(false);
+}
+
+//
+// Set up a test button that will clamp half of the cortical neurons, then
+// runs the network for three iterations, then unclamp the cortical neurons.
+//
+void setUpTestButton(Network network, double[] activations) {
+   NeuronGroup LC1  = network.getGroupByLabel("Left Cortex 1");
+   NeuronGroup LC2  = network.getGroupByLabel("Left Cortex 2");
+   NeuronGroup HP  = network.getGroupByLabel("Hippocampus");
+
+   // Clamp nodes and set activations
+   LC1.setClamped(true);
+   LC2.setClamped(true);
+   LC1.forceSetActivations(activations);
+   LC2.forceSetActivations(activations);
+
+   // Iterate 3 times
+   iterate(3);
+
+   // Unclamp nodes
+   LC1.setClamped(false);
+   LC2.setClamped(false);
+}
+
+// Run the simulation.
+main();
+
+
+// TODO: Put below in doc viewer
+// <html>
+// <body>
+// <b>Hippocampus model</b>
+// <br>
+// Based on Alvarez and Squire (1994)
+// <br>
+// To test this model:
+// <br>
+// (1) Train model on cortical patterns by training patterns 1-4, twice. <br>
+// (In order to 'train,' simply press the corresponding button once) 
+// That is, train in this sequence: Pattern 1 > Pattern 2 > Pattern 3 > Pattern 4 > Pattern 1 > Pattern 2 > Pattern 3 > Pattern 4
+// <br>
+// (2) Turn off learning.   
+// <br>
+// (3) Test 1-4.  This corresponds to recall right after learning in the non-amnesia case.  
+// Left cortex is activated, and the same pattern should occur in the right cortex.
+// There should be no errors at this point.
+// <br>
+// (4) Lesion hippocampus.  This is the recall right after learning in the amnesia case. 
+// Errors are likely to occur in this case.  
+// Left cortex will be activated but the same pattern may not occur in the right cortex.
+// <br>
+// (5) Conslidate.   To do this, first unlesion the hippocampus and turn learning on.  Then press the consolidate button some number of times.  
+// This is like time passing between learning and recall. 
+// <br>
+// (6) Turn learning off and test 1-4.   Do this with or without the hippocampus lesioned.   You will get different error rates.
+// Compare results with the two forgetting curves in Alvarez and Squire Fig. 2.
+// <br>
+// </body>
+// </html>

@@ -18,21 +18,19 @@
                 <a href="../Plot.html">Plot</a> &gt; Raster </p>
         </div>
         <h1>Raster</h1>
+        <p style="float: right; padding: 30px;"><img src="../../Images/RasterPlot.png" height="350" border="1"></p>
         <p>A spike raster plot displays the spiking activity of a group of neurons over time (for more information see <a href="https://praneethnamburi.wordpress.com/2015/02/05/simulating-neural-spike-trains/">this page</a>). In a raster plot each row (y-axis) corresponds to the index of a neuron in a neuron group. The columns (x-axis) corresponds to the current time in the simulation. The presence of a dot in a given row and column, indicates that the neuron whose index corresponds to that row produced an action potential (spike) at the time corresponding to that column. For instance, if neuron 2 spikes at time 10 a dot will appear in row 2 at the column representing the 10th time index. Extending this it can be seen that a raster plot displays the pattern of spikes across a neuron group over time.</p>
-
-        <p>It should be noted that thus far raster plot has only been discussed in the context of spiking neurons. This is no coincidence, as this particular plot is only intended to work with spiking neurons. Although a user could send raw activation values to a raster plot, as of Simbrain 3.0 this will simply show up as a time-series of the activation values. To use raster plot be sure to couple the "spike indices" producer rather than the activation values. For more information see the discussion of vector couplings on the <a href="../Network/networkcouplings.html#group">network couplings</a> page.</p>
-          <p style="float: right; padding: 30px;"><img src="../../Images/RasterPlot.png" height="250" border="1"></p>
         <p class="heading">Component Panel</p>
+        <p>It should be noted that thus far raster plot has only been discussed in the context of spiking neurons. This is no coincidence, as this particular plot is only intended to work with spiking neurons. Although a user could send raw activation values to a raster plot, as of Simbrain 3.0 this will simply show up as a time-series of the activation values. To use raster plot be sure to couple the "spike indices" producer rather than the activation values. For more information see the discussion of vector couplings on the <a href="../Network/networkcouplings.html#group">network couplings</a> page.</p>
         <blockquote>
             <p style="margin-left: 10px;"><span class="heading2">Add:</span> Add representation of the spikes of a neuron group to the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Remove:</span> Remove a time series of spikes of a neuron group from the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Clear Graph Data:</span> Clears all data from the plot.</p>
             <p style="margin-left: 10px;"><span class="heading2">Show Graph Properties:</span> Opens up properties menu for the plot.</p>
         </blockquote>
-   
         <p class="heading">Menus</p>
         <blockquote>Share the same menu properties as the time series plot. See <a href="time_series.html#timeSeriesMenu">Menus</a>.</blockquote>
-    <!--  
+        <!--  
         <blockquote>
             <p style="margin-left: 10px;" class="heading">File</p>
 
@@ -55,12 +53,11 @@
             <br>
             <p style="margin-left: 30px;">Opens main help page of time series. </p>
         -->
-            <p class="heading">Right-Click Menu</p>
-            <blockquote>
-                <p>The context menu is a <a href="jfreechart_menu.html">JFreeChart menu</a>.</p>
-            </blockquote>
-
-        </blockquote> 
+        <p class="heading">Right-Click Menu</p>
+        <blockquote>
+            <p>The context menu is a <a href="jfreechart_menu.html">JFreeChart menu</a>.</p>
+        </blockquote>
+        </blockquote>
     </div>
 </body>
 

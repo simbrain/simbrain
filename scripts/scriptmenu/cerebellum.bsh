@@ -488,7 +488,7 @@ void addTimeSeries() {
 //
 void addDocViewer() {
 	DocViewerComponent docViewer = new DocViewerComponent("Information");
-	docViewer.setText("<h1>Cerbellum Model</h1>" +
+	docViewer.setText("<h1>Cerebellum Model</h1>" +
         "A model developed by Charles C. Peck, Tyler Streeter, and James Kozloski. Simbrain implementation by Jeff Rodny and Jeff Yoshimi." +
         "<br><br>" +
         "The model illustrates how novelty is initially processed by the basal ganglia and then transferred to the cerebellum." +
@@ -501,17 +501,17 @@ void addDocViewer() {
         "<br><br>" +
         "Notice that the 'Dopamine' neuron affects output through the <u>left</u> 'To Spinal Cord' neuron.  The <u>right</u> 'To Spinal Cord' neuron is how the <u>cerebellum</u> affects output.  The cerebellum affects output through activation of the red nucleus and the major cerebellar neurons (DCN, Inferior Olive, Purkinje, Granule Cells)." +
         "<br><br>" +
-        "Over time, the input output mapping will be trasnferred to cerbellum.  This happens via learning at the parallel fibers, the connections from the granule cells to the Purkinje cell, based on the activity of the outgoing synapses from the Purkinje cell (i.e Climbing Fibers (CF)). As Peck, Streeter, and Kolsloki say: 'Parallel fiber synapses undergo LTD when co-active with climbing fiber activity and LTP when active without coincident climbing fiber activity.'" +
+        "Over time, the input output mapping will be transferred to cerebellum.  This happens via learning at the parallel fibers, the connections from the granule cells to the Purkinje cell, based on the activity of the outgoing synapses from the Purkinje cell (i.e Climbing Fibers (CF)). As Peck, Streeter, and Kolsloki say: 'Parallel fiber synapses undergo LTD when co-active with climbing fiber activity and LTP when active without coincident climbing fiber activity.'" +
         "<br><br>" +
         "To see this in action, press the 'Train: 10 Trials' button.  This causes 10 trials of dopamine-mediated learning to occur.  After the 10 trials are done, press the 'Test: No Dopamine' button. This inhibits dopamine-mediated learning.  But notice that the correct mapping now occurs, and is mediated by the cerebellar circuit.  The cerebellum has acquired the correct mapping." +
-        "<br><br>" +
+        "<br>" +
         "<h3>Summary: What to do to illustrate the model</hr><br>" +
         "<br>" +
         "<ol>" +
         "<li>Upon first opening the simulation, press the 'Test: No Dopamine' button to see the initial behavior of the cerebellum without targets or Dopamine intervention.  Notice in the time series that Dopamine (blue) stays flat, since it is not operating.  Notice that both inputs give the same output.</li>" +
         "<li>Now press the 'Train: 10 Trials' button. This will use the Dopamine system to train the model on the correct input-output pattern 10 times.</li>" +
         "<li>Press the 'Test: No Dopamine' button again. Now the correct input output patterns are produced without Dopmaine.  The cerebellum has learned the mapping.  Notice the correct oscillation of output (red) in the time series. </li>" +
-        "</ol><br><br>" + 
+        "</ol><br>" + 
         "Note: The Go and No Go nodes represent sparsified outputs of the granule cells hypothetically produced by more complex afferent projections. There are other simplifications and some misleading features of this simulation.   We hope to update it in a future release."
         );
     // TODO: Explain what time series is doing

@@ -24,20 +24,20 @@ import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 
-public class IzhikevichRule extends SpikingNeuronUpdateRule implements
+public class FitshughNagumo extends SpikingNeuronUpdateRule implements
     NoisyUpdateRule {
 
     /** Recovery. */
     private double recovery;
 
-    /** W. */
+    /** W. - recovery variable */
     private double w;
 
-    /** V. */
+    /** V. - membrane potential */
     private double v;
 
     /** Constant background current. KEEP */
-    private double iBg = ...;
+    private double iBg = 14;
 
     /** Threshold value to signal a spike. KEEP */
     private double threshold = 30;
@@ -51,12 +51,10 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     /**
      * {@inheritDoc}
      */
-    public IzhikevichRule deepCopy() {
-        IzhikevichRule in = new IzhikevichRule();
-        in.setA(getA());
-        in.setB(getB());
-        in.setC(getC());
-        in.setD(getD());
+    public FitshughNagumo deepCopy() {
+        FitshughNagumo in = new FitshughNagumo();
+        in.setW(getW());
+        in.setV(getV());
         in.setAddNoise(getAddNoise());
         in.noiseGenerator = new Randomizer(noiseGenerator);
 
@@ -111,59 +109,31 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     }
 
     /**
-     * @return Returns the a.
+     * @return Returns the w.
      */
-    public double getA() {
-        return a;
+    public double getW() {
+        return w;
     }
 
     /**
-     * @param a The a to set.
+     * @param w The w to set.
      */
-    public void setA(final double a) {
-        this.a = a;
+    public void setW(final double w) {
+        this.w = w;
     }
 
     /**
-     * @return Returns the b.
+     * @return Returns the v.
      */
-    public double getB() {
-        return b;
+    public double getV() {
+        return v;
     }
 
     /**
-     * @param b The b to set.
+     * @param v The v to set.
      */
-    public void setB(final double b) {
-        this.b = b;
-    }
-
-    /**
-     * @return Returns the c.
-     */
-    public double getC() {
-        return c;
-    }
-
-    /**
-     * @param c The c to set.
-     */
-    public void setC(final double c) {
-        this.c = c;
-    }
-
-    /**
-     * @return Returns the d.
-     */
-    public double getD() {
-        return d;
-    }
-
-    /**
-     * @param d The d to set.
-     */
-    public void setD(final double d) {
-        this.d = d;
+    public void setV(final double v) {
+        this.v = v;
     }
 
     public double getiBg() {
@@ -204,7 +174,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
     @Override
     public String getDescription() {
-        return "Izhikevich";
+        return "FitshughNagumo";
     }
 
     public double getThreshold() {

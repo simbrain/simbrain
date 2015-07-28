@@ -22,13 +22,12 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
+import java.lang.Math;
 
 
 public class FitshughNagumo extends SpikingNeuronUpdateRule implements
     NoisyUpdateRule {
 
-    /** Recovery. */
-    private double recovery;
 
     /** W. - recovery variable */
     private double w;
@@ -37,10 +36,10 @@ public class FitshughNagumo extends SpikingNeuronUpdateRule implements
     private double v;
 
     /** Constant background current. KEEP */
-    private double iBg = 14;
+    private double iBg = 0;
 
     /** Threshold value to signal a spike. KEEP */
-    private double threshold = 30;
+    private double threshold = 1;
 
     /** Noise dialog. */
     private Randomizer noiseGenerator = new Randomizer();
@@ -78,16 +77,11 @@ public class FitshughNagumo extends SpikingNeuronUpdateRule implements
             inputs += noiseGenerator.getRandom();
         }
         inputs += iBg;
-        recovery += (timeStep * (a * ((b * activation) - recovery)));
+        w += (timeStep * (0.08*(v+0.7-(0.8*w))));
 
-        val = activation
-            + (timeStep * (((.04 * (activation * activation))
-                + (5 * activation) + 140)
-                - recovery + inputs));
+        v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs));
         // You want this
-        if (val >= threshold) {
-            val = c;
-            recovery += d;
+        if (v >= threshold) {
             neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
         } else {
@@ -95,7 +89,7 @@ public class FitshughNagumo extends SpikingNeuronUpdateRule implements
             setHasSpiked(false, neuron);
         }
         //till here
-        neuron.setBuffer(val);
+        neuron.setBuffer(v);
     }
 
     /**

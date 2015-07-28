@@ -25,7 +25,7 @@ import org.simbrain.util.randomizer.Randomizer;
 import java.lang.Math;
 
 
-public class FitshughNagumo extends SpikingNeuronUpdateRule implements
+public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     NoisyUpdateRule {
 
 
@@ -50,8 +50,8 @@ public class FitshughNagumo extends SpikingNeuronUpdateRule implements
     /**
      * {@inheritDoc}
      */
-    public FitshughNagumo deepCopy() {
-        FitshughNagumo in = new FitshughNagumo();
+    public FitzhughNagumo deepCopy() {
+        FitzhughNagumo in = new FitzhughNagumo();
         in.setW(getW());
         in.setV(getV());
         in.setAddNoise(getAddNoise());
@@ -168,7 +168,7 @@ public class FitshughNagumo extends SpikingNeuronUpdateRule implements
 
     @Override
     public String getDescription() {
-        return "FitshughNagumo";
+        return "FitzhughNagumo";
     }
 
     public double getThreshold() {

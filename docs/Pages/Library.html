@@ -3,17 +3,13 @@
 
 <head>
     <title>Simbrain Documentation</title>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-
     <link href="../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
     <a href="../SimbrainDocs.html">
         <div class="logo">
-
         </div>
     </a>
     <div id="main_docs">
@@ -22,32 +18,23 @@
                 <br>
             </p>
         </div>
-
         <h1>Using simbrain as a library</h1>
+        <p>Simbrain can be used as a library in a separate java program. The easiest way to do this is to simply include Simbrain.jar in a project's classpath.</p>  
 
-        <p>Simbrain can be used as a library in a separate java program. &nbsp; To do this, you must get <a href="http://code.google.com/p/simbrain/source/checkout">Simbrain from source</a> and then use <a href="http://ant.apache.org/">ant</a> to build the jar files of interest. Currently (1) a network jar with no gui and (2) a network jar with gui are supported.&nbsp;&nbsp; To create these use:
+        <p>Ant tasks to build some packages separately are also provided. To create a network jar by itself or just a network gui jar, separately from the workspace:  
         </p>
         <div class="command" style="margin-left: 40px;">&gt; ant networkjar
             <br> &gt; ant networkguijar
         </div>
         <br>
-        <p>To get a feel for how to use the Simbrain API,&nbsp; try opening up different <a href="Scripting.html">scripts</a> in (for example) the scriptmenu directory.</p>
-
+        <p>(However these not currently used often and so are not well tested.)</p>
+        <p>To get a feel for how to use the Simbrain as an API,&nbsp; try opening up different <a href="Scripting.html">scripts</a>.</p>
         <p><span class="heading">Applets</span>
         </p>
         <p>Applets can be deployed using the networkgui.jar.&nbsp; (More information on how to do this is forthcoming).
-            <br>
-            <br>
         </p>
-        <p>
-            <br>
-            <br>
-        </p>
-
-
         <span style="font-weight: bold;"></span>
     </div>
-
 </body>
 
 </html>

@@ -22,7 +22,7 @@
 
         <h1>Training Dialog</h1>
 
-        <p>Some version of a trainig dialog is used in many places in Simbrain, including: <a href="../network/backpropnetwork.html">backprop</a>, <a href="../network/lmsnetwork.html">least mean square nets</a>, <a href="../network/srn.html">simple recurrent nets</a>, <a href="../network/echostatenetwork.html">echo state nets</a>, <a href="../network/hopfieldnetwork.html">hopfield nets</a>, <a href="../network/competitivenetwork.html">competitive nets</a>, and <a href="../network/som.html">self-organizing maps</a>.  This page describes the main elements that occur in these pages. For items specific to a particular network type see those pages.</p>
+        <p>Some version of a trainig dialog is used in many places in Simbrain, including: <a href="../network/backpropnetwork.html">backprop</a>, <a href="../network/lmsnetwork.html">least mean square nets</a>, <a href="../network/srn.html">simple recurrent nets</a>, <a href="../network/echostatenetwork.html">echo state nets</a>, <a href="../network/hopfieldnetwork.html">hopfield nets</a>, <a href="../network/competitivenetwork.html">competitive nets</a>, and <a href="../network/som.html">self-organizing maps</a>.  For items specific to a particular network type see those pages.</p>
 
         <p><img style="float:right;" width="450" src="../../../Images/TrainingDialog.png">
         </p>
@@ -32,7 +32,7 @@
         <p><span class="heading">Training Tab</span>
         </p>
 
-        <p>This is the main tab where training takes place.   It is also the tab that varies most from network to network (the input, training, and validation tabs are simple tables of data).   Shown here is an example of the training tab for a backprop network.  Buttons are included for randomizing waits, iterating the algorithm, and tracking error. In other cases (e.g. Hopfield, or LMS using offline training) there is just a single button which runs the algorithm a single time.</p>
+        <p>This is the main tab, where training takes place.   It is also the tab that varies most from one network type to the next.   Shown here is an example of the training tab for a backprop network.  Buttons are included for randomizing waits, iterating the algorithm, and tracking error. In other cases (e.g. Hopfield, or LMS using offline training) there is just a single button which runs the algorithm a single time.</p>
 
         <p>Some buttons that occur in training tabs include:</p>
 
@@ -52,12 +52,11 @@
         <p><span class="heading">Input Data / Target Data</span>
         </p>
 
-        <p>Training a network generally involves specifying one or more tables of data. These tables can be quickly edited (e.g. column data can be normalized and all data randomized). Cf. the <a href="../../Utils/Tables/Tables.html">table documentation</a>.</p>
+        <p>These tabs allow a user to edit the <a href="https://en.wikipedia.org/wiki/Test_set">training set</a> for a learning algorithm.   Training a network generally involves specifying one or more tables of data. These tables can be quickly edited (e.g. column data can be normalized and all data randomized). Cf. the <a href="../../Utils/Tables/Tables.html">table documentation</a>.</p>
 
-        <p><a href="http://en.wikipedia.org/wiki/Unsupervised_learning">Unsupervised learning</a> uses one input table (som, competitive, hopfield), while  <a href="http://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> (backprop, lms, simple recurrent, echo state) uses input and target tables.</p>
+        <p><a href="http://en.wikipedia.org/wiki/Unsupervised_learning">Unsupervised learning</a> uses one input table (som, competitive, hopfield), while  <a href="http://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> (backprop, lms, simple recurrent, echo state) uses input and target tables. Each row of these tables corresponds to one input or target vector.</p>
 
-        <p>Each row of these tables corresponds to one input or target vector.  Columns correspond to neurons: input neurons for input data, output neurons for target data.  For example, if a network has 3 inputs nodes and 2 output nodes, then the input table will have three columns, and the target table will have 2 columns.  For networks that use supervised learning, the input and target tables should have the same number of rows.  Each row of the input data table is an input vector, and the corresponding row of the target data table is the  desired vector that should be produced for that input, if training is successful.  
-        </p>
+        <p>Columns correspond to neurons: input neurons for input data, output neurons for target data.  In a supervised learning example, if a network has 3 inputs nodes and 2 output nodes, then the input table will have three columns, and the target table will have 2 columns. The input and target tables should have the same number of rows and each input / target row pair is a single "training example" from overall training set.  Each row of the input data table is an input vector, and the corresponding row of the target data table is the  desired vector that should be produced for that input, if training is successful.  </p>
 
         <p>For example, suppose we want to train a network to compute the classic exclusive-or or XOR function, via these associations:</p>
         <blockquote>
@@ -94,7 +93,7 @@
         <p><span class="heading">Validate Input Data</span>
         </p>
 
-        <p>This tab is used to test a network after it has been trained.  The component used to do this is the <a href="testInputs.html">test inputs component</a>.</p>
+        <p>This tab is used to test a network after it has been trained.  It contains a <a href="https://en.wikipedia.org/wiki/Test_set">test set</a>.  The component used to do this is the <a href="testInputs.html">test inputs component</a>.</p>
 
     </div>
 </body>

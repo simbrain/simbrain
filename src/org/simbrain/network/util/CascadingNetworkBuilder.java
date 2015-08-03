@@ -128,8 +128,8 @@ public final class CascadingNetworkBuilder {
                     tempList.add(targetNeuron);
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    Synapse synapse = new Synapse(baseNeuron, targetNeuron,
-                            new StaticSynapseRule());
+                    Synapse synapse = new Synapse(network, baseNeuron,
+                            targetNeuron, new StaticSynapseRule());
                     network.addSynapse(synapse);
                 }
             }

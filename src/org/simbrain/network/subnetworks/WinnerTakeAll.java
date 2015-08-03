@@ -83,8 +83,8 @@ public class WinnerTakeAll extends NeuronGroup {
     }
 
     @Override
-    public WinnerTakeAll deepCopy() {
-    	return new WinnerTakeAll(this.getParentNetwork(), this);
+    public WinnerTakeAll deepCopy(Network newNetwork) {
+    	return new WinnerTakeAll(newNetwork, this);
     }
     
     @Override

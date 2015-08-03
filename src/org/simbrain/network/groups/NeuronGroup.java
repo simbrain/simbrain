@@ -246,15 +246,15 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
         for (Neuron neuron : toCopy.getNeuronList()) {
-            this.addNeuron(new Neuron(network, neuron));
+            this.addNeuron(new Neuron(network, neuron), false);
         }
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();
     }
 
     @Override
-    public NeuronGroup deepCopy() {
-        return new NeuronGroup(this.getParentNetwork(), this);
+    public NeuronGroup deepCopy(Network newParent) {
+        return new NeuronGroup(newParent, this);
     }
 
     @Override

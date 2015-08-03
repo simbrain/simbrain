@@ -17,6 +17,8 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.core.Network;
+
 /**
  * 
  * An interface so that subclasses of groups can be copied accurately.
@@ -27,11 +29,15 @@ package org.simbrain.network.groups;
  */
 public interface CopyableGroup<T extends Group> {
 
-	/** 
-	 * Returns a deep copy of a copyable group using the same root network as
-	 * the original.
-	 * @return a deep copy of a group
-	 */
-	T deepCopy();
+	/**
+     * Returns a deep copy of a copyable group using the same root network as
+     * the original.
+     * 
+     * @param parentNetwork the parent network for this group, potentially
+     *            different from the original (used when copying and pasting
+     *            from one network to another)
+     * @return a deep copy of a group
+     */
+	T deepCopy(Network parentNetwork);
 	
 }

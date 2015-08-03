@@ -20,6 +20,7 @@ package org.simbrain.network.gui;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -40,7 +41,7 @@ public class Clipboard {
     // NetworkPanel.getSelectedModelElements()
 
     /** Static list of cut or copied objects. */
-    private static ArrayList clipboard = new ArrayList();
+    private static ArrayList copiedObjects = new ArrayList();
 
     /** List of components which listen for changes to this clipboard. */
     private static HashSet listenerList = new HashSet();
@@ -52,18 +53,18 @@ public class Clipboard {
      * Clear the clipboard.
      */
     public static void clear() {
-        clipboard = new ArrayList();
+        copiedObjects = new ArrayList();
         fireClipboardChanged();
     }
 
     /**
-     * Add objects to the clipboard.
+     * Add objects to the clipboard.  This happens with cut and copy.
      *
      * @param objects objects to add
      */
     public static void add(final ArrayList objects) {
-        clipboard = objects;
-        // System.out.println("add-->"+ Arrays.asList(objects));
+        copiedObjects = objects;
+        //System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged();
     }
 
@@ -72,19 +73,17 @@ public class Clipboard {
      *
      * @param net the network to paste into
      */
-    public static void paste(final NetworkPanel net) {
-
+    public static void paste(final NetworkPanel net) {        
         if (isEmpty()) {
             return;
         }
 
         // Create a copy of the clipboard objects.
-        ArrayList copy = CopyPaste.getCopy(net.getNetwork(), clipboard);
-        // System.out.println("paste-->"+ Arrays.asList(copy));
+        ArrayList copy = CopyPaste.getCopy(net.getNetwork(), copiedObjects);
 
         // Gather data for translating the object then add the objects to the
         // network.
-        Point2D upperLeft = SimnetUtils.getUpperLeft(clipboard);
+        Point2D upperLeft = SimnetUtils.getUpperLeft(copiedObjects);
         translate(copy, getPasteOffset(net, upperLeft, "X"),
                 getPasteOffset(net, upperLeft, "Y"));
         net.getNetwork().addObjects(copy);
@@ -120,7 +119,7 @@ public class Clipboard {
      * @return true if there's nothing in the clipboard, false otherwise
      */
     public static boolean isEmpty() {
-        return clipboard.isEmpty();
+        return copiedObjects.isEmpty();
     }
 
     /**
@@ -137,7 +136,7 @@ public class Clipboard {
      */
     private static double getPasteOffset(final NetworkPanel net,
             final Point2D upperLeft, final String xOrY) {
-
+        
         if (xOrY.equals("X")) {
             return (net.getBeginPosition().getX() - upperLeft.getX() - ((net
                     .getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));

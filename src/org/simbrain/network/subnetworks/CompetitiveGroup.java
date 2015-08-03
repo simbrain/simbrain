@@ -138,8 +138,8 @@ public class CompetitiveGroup extends NeuronGroup {
     }
     
     @Override
-    public CompetitiveGroup deepCopy() {
-    	return new CompetitiveGroup(this.getParentNetwork(), this);
+    public CompetitiveGroup deepCopy(Network newParent) {
+    	return new CompetitiveGroup(newParent, this);
     }
 
     @Override

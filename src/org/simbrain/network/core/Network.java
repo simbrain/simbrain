@@ -589,8 +589,10 @@ public class Network {
      * and must be transferred in to a group. This is what happens in converting
      * loose neurons to a neuron group. It also happens to be the way the add
      * neurons dialog does things (it defaults to adding neurons, but if a user
-     * wants they can be put in a group) This is not part of the standard neuron
+     * wants they can be put in a group). This is not part of the standard neuron
      * group creation process.
+     * 
+     * TODO: Confusing; if possible refactor so that this method is not needed.
      *
      * @param list
      *            the list of neurons to transfer

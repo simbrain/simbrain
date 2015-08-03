@@ -74,13 +74,13 @@ public final class NetworkComponent extends WorkspaceComponent {
     private void init() {
 
         // Initialize attribute types and their default visibility
-        addProducerType(new AttributeType(this, "Neuron", "getActivation",
+        addProducerType(new AttributeType(this, "Neuron Activation", "getActivation",
                 double.class, true));
-        addProducerType(new AttributeType(this, "Neuron", "getUpperBound",
+        addProducerType(new AttributeType(this, "Neuron Upper Bound", "getUpperBound",
                 double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "getLowerBound",
+        addProducerType(new AttributeType(this, "Neuron Lower Bound", "getLowerBound",
                 double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "getLabel",
+        addProducerType(new AttributeType(this, "Neuron Label", "getLabel",
                 String.class, false));
         addProducerType(new AttributeType(this, "Synapse", "getStrength",
                 double.class, false));
@@ -91,15 +91,15 @@ public final class NetworkComponent extends WorkspaceComponent {
         addProducerType(new AttributeType(this, "SynapseGroup",
                 "getWeightVector", double[].class, true));
 
-        addConsumerType(new AttributeType(this, "Neuron", "setInputValue",
+        addConsumerType(new AttributeType(this, "Neuron Input Value", "setInputValue",
                 double.class, true));
-        addConsumerType(new AttributeType(this, "Neuron", "setActivation",
+        addConsumerType(new AttributeType(this, "Neuron Activation", "setActivation",
                 double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setUpperBound",
+        addConsumerType(new AttributeType(this, "Neuron Upper Bound", "setUpperBound",
                 double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setLowerBound",
+        addConsumerType(new AttributeType(this, "Neuron Lower Bound", "setLowerBound",
                 double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "setLabel",
+        addConsumerType(new AttributeType(this, "Neuron Label", "setLabel",
                 String.class, false));
         addConsumerType(new AttributeType(this, "Synapse", "setStrength",
                 double.class, false));
@@ -232,10 +232,20 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("Neuron")) {
-                for (Neuron neuron : network.getFlatNeuronList()) {
-                    returnList.add(getNeuronConsumer(this, neuron,
-                            type.getMethodName()));
+            if (type.getTypeName().startsWith("Neuron ")) {
+                if (type.getTypeName().equalsIgnoreCase("Neuron Input Value")) {
+                    for (Neuron neuron : network.getFlatNeuronList()) {
+                        returnList.add(getNeuronConsumer(this, neuron,
+                                type.getMethodName()));
+                    }
+                } else {
+                    for (Neuron neuron : network.getFlatNeuronList()) {
+                        String description = type.getDescription(neuron.getId());
+                        PotentialConsumer consumer = getAttributeManager()
+                                .createPotentialConsumer(neuron, type); 
+                        consumer.setCustomDescription(description);
+                        returnList.add(consumer);
+                    }
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {
@@ -328,10 +338,20 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("Neuron")) {
-                for (Neuron neuron : network.getFlatNeuronList()) {
-                    returnList.add(getNeuronProducer(this, neuron,
-                            type.getMethodName()));
+            if (type.getTypeName().startsWith("Neuron ")) {
+                if (type.getTypeName().equalsIgnoreCase("Neuron Activation")) {
+                    for (Neuron neuron : network.getFlatNeuronList()) {
+                        returnList.add(getNeuronProducer(this, neuron,
+                                type.getMethodName()));
+                    }
+                } else {
+                    for (Neuron neuron : network.getFlatNeuronList()) {
+                        String description = type.getDescription(neuron.getId());
+                        PotentialProducer producer = getAttributeManager()
+                                .createPotentialProducer(neuron, type); 
+                        producer.setCustomDescription(description);
+                        returnList.add(producer);
+                    }
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : network.getFlatSynapseList()) {

@@ -47,6 +47,11 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     /** Add noise to the neuron. */
     private boolean addNoise;
 
+    // TODO
+    private double c;
+    private double refractoryPeriod;
+
+
     /**
      * {@inheritDoc}
      */
@@ -178,7 +183,7 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
-
+    
     public double getRefractoryPeriod() {
         return refractoryPeriod;
     }

@@ -4,6 +4,7 @@ import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.*;
 import org.simbrain.network.networks.*;
 import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.workspace.*;
 import org.simbrain.network.connections.*;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -64,7 +65,7 @@ import org.simbrain.util.math.*;
     // Set synapses to STDP if requested
     if (useSTDP) {
         for(Synapse synapse : network.getFlatSynapseList()) {
-            synapse.setLearningRule("STDPRule");
+            synapse.setLearningRule(new STDPRule());
         }
     }
 

@@ -130,7 +130,13 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
     private final List<NeuronGroup> inputGroups = new ArrayList<NeuronGroup>();
 
     private final List<NeuronGroup> outputGroups = new ArrayList<NeuronGroup>();
-
+    
+    // Deprecated fields for xstream backwards compatibility
+    @Deprecated 
+    private volatile boolean dead = false;  
+    @Deprecated 
+    private final AtomicBoolean shutdownSignal = new AtomicBoolean(false);
+    
     private Thread collectorThread = new Thread(new Runnable() {
         @Override
         public void run() {

@@ -7,3 +7,7 @@
 *.classpath
 *.project
 /bin1/
+.idea/*
+*.iml
+out/*
+

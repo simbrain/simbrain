@@ -31,29 +31,8 @@ import org.simbrain.network.gui.dialogs.neuron.generator_panels.LogisticGenerato
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.RandomGeneratorPanel;
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.SinusoidalGeneratorPanel;
 import org.simbrain.network.gui.dialogs.neuron.generator_panels.StochasticGeneratorPanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.BinaryRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ContinuousSigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.DecayRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IACRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IntegrateAndFireRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.IzhikevichRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.LinearRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.NakaRushtonRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SpikingThresholdRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.ThreeValueRulePanel;
-import org.simbrain.network.neuron_update_rules.AdExIFRule;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.neuron_update_rules.ContinuousSigmoidalRule;
-import org.simbrain.network.neuron_update_rules.DecayRule;
-import org.simbrain.network.neuron_update_rules.IACRule;
-import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.neuron_update_rules.IzhikevichRule;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
-import org.simbrain.network.neuron_update_rules.ThreeValueRule;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.*;
+import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
@@ -76,7 +55,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
 
     // Populate the Rule Map
     static {
-    	RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
+        RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
         RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
         RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
         RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
@@ -95,6 +74,9 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
             new SpikingThresholdRulePanel());
         RULE_MAP.put(new ThreeValueRule().getDescription(),
             new ThreeValueRulePanel());
+        RULE_MAP.put(new MorrisLecarRule().getDescription(), new MorrisLecarRulePanel());
+        RULE_MAP.put(new FitzhughNagumo().getDescription(), new FitzhughNagumoRulePanel());
+
     }
 
     /**

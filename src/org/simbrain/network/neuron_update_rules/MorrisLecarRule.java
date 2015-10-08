@@ -122,8 +122,26 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	
 	@Override
 	public NeuronUpdateRule deepCopy() {
-		// TODO Auto-generated method stub
-		return null;
+		MorrisLecarRule cpy = new MorrisLecarRule();
+		cpy.setAddNoise(this.getAddNoise());
+		cpy.g_Ca = this.g_Ca;
+		cpy.g_K = this.g_K;
+		cpy.cMembrane = this.cMembrane;
+		cpy.g_L = this.g_L;
+		cpy.i_bg = this.i_bg;
+		cpy.phi = this.phi;
+		cpy.v_m1 = this.v_m1;
+		cpy.v_m2 = this.v_m2;
+		cpy.v_w1 = this.v_w1;
+		cpy.v_w2 = this.v_w2;
+		cpy.threshold = this.threshold;
+		cpy.vRest_Ca = this.vRest_Ca;
+		cpy.vRest_k = this.vRest_k;
+		cpy.vRest_L = this.vRest_L;
+		cpy.w_K = this.w_K;
+		cpy.noiseGenerator = new Randomizer(this.noiseGenerator);
+
+		return cpy;
 	}
 
 	@Override

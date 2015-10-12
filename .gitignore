@@ -2,8 +2,11 @@
 /build/main
 /build/apidocs
 /dist
+/scripts/scriptmenu/archives
 *.sublime-project
 *.sublime-workspace
 *.classpath
 *.project
-/bin1/
+/.idea/*
+*.iml
+out/*

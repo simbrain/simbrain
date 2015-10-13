@@ -73,8 +73,8 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
         RULE_MAP.put(new HebbianThresholdRule().getDescription(),
             new HebbianThresholdRulePanel());
         RULE_MAP.put(new OjaRule().getDescription(), new OjaRulePanel());
-        RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
-            new ShortTermPlasticityRulePanel());
+        //RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
+        //    new ShortTermPlasticityRulePanel());
         RULE_MAP.put(new STDPRule().getDescription(), new STDPRulePanel());
         RULE_MAP.put(new SubtractiveNormalizationRule().getDescription(),
             new SubtractiveNormalizationRulePanel());

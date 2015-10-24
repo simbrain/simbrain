@@ -88,8 +88,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
     @Override
     public void update(final Neuron neuron) {
         timeStep = neuron.getNetwork().getTimeStep();
-//        final boolean refractory = getLastSpikeTime() + refractoryPeriod
-//                >= neuron.getNetwork().getTime();
         final double activation = neuron.getActivation();
         double inputs = 0;
         inputs = inputType.getInput(neuron);

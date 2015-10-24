@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -37,6 +38,8 @@ import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
@@ -229,6 +232,18 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      */
     public static String[] getGeneratorlist() {
         return GENERATOR_MAP.keySet().toArray(new String[RULE_MAP.size()]);
+    }
+    
+    /**
+     * @return List of randomizers.
+     */
+    public static ArrayList<Randomizer> getRandomizers(
+            List<NeuronUpdateRule> ruleList) throws ClassCastException {
+        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((NoisyUpdateRule) ruleList.get(i)).getNoiseGenerator());
+        }
+        return ret;
     }
 
 }

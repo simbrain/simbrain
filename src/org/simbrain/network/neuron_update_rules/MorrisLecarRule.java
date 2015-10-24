@@ -51,15 +51,15 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	private double w_K;
 	
 	/** Potassium channel time constant/decay rate (s^-1). */
-	private double phi = 1.0/15.0;
+	private double phi = 0.06667; // 1/15
 	
-	/** Background current (mA). */
+	/** Background current (nA). */
 	private double i_bg = 46;
 	
 	/** Threshold for neurotransmitter release (mV) */
-	private double threshold = 10;
+	private double threshold = 40;
 	
-	/** A source of noise (mA). */
+	/** A source of noise (nA). */
 	private Randomizer noiseGenerator = new Randomizer();
 	
 	{
@@ -76,9 +76,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		
 		double dVdt = dVdt(vMembrane, i_syn);
 		double dWdt = dWdt(vMembrane, w_K);
-
-		
-		
 		
 		double vmFut = vMembrane + dt * dVdt;
 		double wKFut = w_K + dt * dWdt;
@@ -98,9 +95,11 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		double i_K = g_K * w_K * (vMembrane - vRest_k);
 		double i_L = g_L * (vMembrane - vRest_L);
 		double i_ion = i_Ca + i_K + i_L;
-		
-		return (((i_bg - i_ion - i_syn) / cMembrane)
-				+ noiseGenerator.getRandom());
+		double i_noise = 0;
+		if (getAddNoise()) {
+		    i_noise = noiseGenerator.getRandom();
+		}
+		return ((i_bg - i_ion + i_syn + i_noise) / cMembrane);
 	}
 	
 	private double dWdt(double vMembrane, double w_K) {

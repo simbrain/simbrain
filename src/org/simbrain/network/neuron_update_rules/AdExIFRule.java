@@ -137,7 +137,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		v_mem = neuron.getActivation();
 
 		// Retrieve incoming ex/in currents or proportion of open channels
-		double[] ei = inputType.getNormalizedSeparatedInput(neuron);
+		double[] ei = inputType.getSeparatedInput(neuron);
 
 		// Calculate incoming excitatory and inhibitory voltage changes
 		double iSyn_ex = g_e_bar * ei[0] * (exReversal - v_mem);

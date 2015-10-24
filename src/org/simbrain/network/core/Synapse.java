@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -46,6 +47,12 @@ public class Synapse {
 
     /** A default spike responder. */
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
+
+    /** Default upper bound. */
+    private static double DEFAULT_UPPER_BOUND = 10;
+
+    /** Default lower bound. */
+    private static double DEFAULT_LOWER_BOUND = -10;
 
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
@@ -84,10 +91,10 @@ public class Synapse {
     private double increment = 1;
 
     /** Upper limit of synapse. */
-    private double upperBound = 100;
+    private double upperBound = DEFAULT_UPPER_BOUND;
 
     /** Lower limit of synapse. */
-    private double lowerBound = -100;
+    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     /** Time to delay sending activation to target neuron. */
     private int delay;
@@ -129,6 +136,20 @@ public class Synapse {
      * target neuron before allowing certain changes.
      */
     private final boolean isTemplate;
+
+    /** Initialize properties */
+    static {
+        Properties properties = Utils.getSimbrainProperties();
+        if (properties.containsKey("weightUpperBound")) {
+            DEFAULT_UPPER_BOUND = Double.parseDouble(properties.getProperty("weightUpperBound"));
+
+        }
+        if (properties.containsKey("weightLowerBound")) {
+            DEFAULT_LOWER_BOUND = Double.parseDouble(properties.getProperty("weightLowerBound"));
+
+        }
+
+    }
 
     /**
      * Construct a synapse using a source and target neuron, defaulting to

@@ -109,19 +109,6 @@ public class AdditiveRulePanel extends AbstractNeuronRulePanel {
     }
 
     /**
-     * @return List of radomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((AdditiveRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
-    }
-
-    /**
      * Fill field values to default values for additive neuron.
      */
     public void fillDefaultValues() {

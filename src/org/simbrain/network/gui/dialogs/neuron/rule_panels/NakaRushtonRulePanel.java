@@ -182,19 +182,6 @@ public class NakaRushtonRulePanel extends AbstractNeuronRulePanel implements
     }
 
     /**
-     * @return an arraylist of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-        for (NeuronUpdateRule rule : ruleList) {
-            if (rule instanceof NakaRushtonRule) {
-                ret.add(((NakaRushtonRule) rule).getNoiseGenerator());
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {

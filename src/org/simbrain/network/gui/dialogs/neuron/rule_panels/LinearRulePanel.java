@@ -110,19 +110,6 @@ public class LinearRulePanel extends AbstractNeuronRulePanel {
     }
 
     /**
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((LinearRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
-    }
-
-    /**
      * Fill field values to default values for linear neuron.
      */
     public void fillDefaultValues() {

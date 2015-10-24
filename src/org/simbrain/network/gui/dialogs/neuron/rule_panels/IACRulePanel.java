@@ -111,17 +111,6 @@ public class IACRulePanel extends AbstractNeuronRulePanel {
     }
 
     /**
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((IACRule) ruleList.get(i)).getNoiseGenerator());
-        }
-        return ret;
-    }
-
-    /**
      * Fill field values to default values for binary neuron.
      */
     public void fillDefaultValues() {

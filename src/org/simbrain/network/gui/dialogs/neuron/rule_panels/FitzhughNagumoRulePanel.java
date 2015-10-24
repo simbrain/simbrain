@@ -1,21 +1,25 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.ParameterGetter;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.FitzhughNagumo;
-import org.simbrain.network.neuron_update_rules.MorrisLecarRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
+import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.TristateDropDown;
-
-
-import javax.swing.*;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -23,11 +27,14 @@ import java.util.List;
  */
 public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
 
-    /** W. - recovery variable */
-    private JTextField tfw = new JTextField();
-
-    /** V. - membrane potential */
-    private JTextField tfv = new JTextField();
+    /** A variable governs overall rate of recovery equation. */
+    private JTextField tfA = new JTextField();
+    
+    /** Influence of V on recovery variable */
+    private JTextField tfB = new JTextField();
+    
+    /** Influence of W on future values of W */
+    private JTextField tfC = new JTextField();
 
     /** Constant background current. KEEP */
     private JTextField tfIbg = new JTextField();
@@ -38,7 +45,9 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
     private TristateDropDown isAddNoise = new TristateDropDown();
     private JTabbedPane tabbedPane = new JTabbedPane();
     private LabelledItemPanel mainTab = new LabelledItemPanel();
-
+    /** Random tab. */
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
+    
     /** A reference to the neuron update rule being edited. */
     private static final FitzhughNagumo prototypeRule = new FitzhughNagumo();
 
@@ -46,10 +55,14 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
     public FitzhughNagumoRulePanel() {
         super();
         this.add(tabbedPane);
-        mainTab.add("W. - recovery variable", tfw);
-        mainTab.add("V. - membrane potential", tfv);
-        mainTab.add("Constant background current. KEEP", tfIbg);
-        mainTab.add("Threshold value to signal a spike. KEEP", tfThreshold);
+        mainTab.addItem("A (Recovery Rate): ", tfA);
+        mainTab.addItem("B (Rec. Voltage Dependence): ", tfB);
+        mainTab.addItem("C (Rec. Self Dependence): ", tfC);
+        mainTab.addItem("Background Current (nA)", tfIbg);
+        mainTab.addItem("Spike threshold", tfThreshold);
+        mainTab.addItem("Add noise: ", isAddNoise);
+        tabbedPane.add(mainTab, "Properties");
+        tabbedPane.add(randTab, "Noise");
     }
 
 
@@ -67,32 +80,46 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
 
         // TODO: Use lambda expressions when we upgrade to be Java 8 compat
 
-        //w
-        ParameterGetter<NeuronUpdateRule, Double> gwGetter =
+        //a
+        ParameterGetter<NeuronUpdateRule, Double> aGetter =
                 new ParameterGetter<NeuronUpdateRule, Double>() {
                     @Override
                     public Double getParameter(NeuronUpdateRule source) {
-                        return ((FitzhughNagumo) source).getW();
+                        return ((FitzhughNagumo) source).getA();
                     }
                 };
-        if (!NetworkUtils.isConsistent(ruleList, gwGetter)) {
-            tfw.setText(SimbrainConstants.NULL_STRING);
+        if (!NetworkUtils.isConsistent(ruleList, aGetter)) {
+            tfA.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfw.setText(Double.toString(gwGetter.getParameter(neuronRef)));
+            tfA.setText(Double.toString(aGetter.getParameter(neuronRef)));
         }
-
-        //v
-        ParameterGetter<NeuronUpdateRule, Double> vGetter =
+        
+        //b
+        ParameterGetter<NeuronUpdateRule, Double> bGetter =
                 new ParameterGetter<NeuronUpdateRule, Double>() {
                     @Override
                     public Double getParameter(NeuronUpdateRule source) {
-                        return ((FitzhughNagumo) source).getV();
+                        return ((FitzhughNagumo) source).getB();
                     }
                 };
-        if (!NetworkUtils.isConsistent(ruleList, vGetter)) {
-            tfv.setText(SimbrainConstants.NULL_STRING);
+        if (!NetworkUtils.isConsistent(ruleList, bGetter)) {
+            tfB.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfv.setText(Double.toString(vGetter.getParameter(neuronRef)));
+            tfB.setText(Double.toString(bGetter.getParameter(neuronRef)));
+        }
+        
+        //c
+        ParameterGetter<NeuronUpdateRule, Double> cGetter =
+                new ParameterGetter<NeuronUpdateRule, Double>() {
+                    @Override
+                    public Double getParameter(NeuronUpdateRule source) {
+                        return ((FitzhughNagumo) source).getC();
+                    }
+                };
+        if (!NetworkUtils.isConsistent(ruleList, cGetter)) {
+            tfC.setText(SimbrainConstants.NULL_STRING);
+        } else {
+            tfC.setText(Double.toString(cGetter.getParameter(neuronRef)));
         }
 
         //iBg
@@ -122,14 +149,26 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
         } else {
             tfThreshold.setText(Double.toString(thrGetter.getParameter(neuronRef)));
         }
+        
+        // Handle Noise
+        if (!NetworkUtils.isConsistent(ruleList, FitzhughNagumo.class,
+                "getAddNoise"))
+            isAddNoise.setNull();
+        else
+            isAddNoise.setSelected(neuronRef.getAddNoise());
+
+        randTab.fillFieldValues(getRandomizers(ruleList));
     }
 
+    
     @Override
     public void fillDefaultValues() {
-        tfw.setText(Double.toString(prototypeRule.getW()));
-        tfv.setText(Double.toString(prototypeRule.getV()));
+        tfA.setText(Double.toString(prototypeRule.getA()));
+        tfB.setText(Double.toString(prototypeRule.getB()));
+        tfC.setText(Double.toString(prototypeRule.getC()));
         tfIbg.setText(Double.toString(prototypeRule.getiBg()));
         tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
+        randTab.fillDefaultValues();
     }
 
     @Override
@@ -157,27 +196,36 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
     @Override
     protected void writeValuesToRules(List<Neuron> neurons) {
         int numNeurons = neurons.size();
-        //w
-        double w = Utils.doubleParsable(tfw);
-        if (!Double.isNaN(w)) {
+        //a
+        double a = Utils.doubleParsable(tfA);
+        if (!Double.isNaN(a)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((FitzhughNagumo) neurons.get(i).getUpdateRule())
-                        .setW(w);
+                        .setA(a);
             }
         }
 
-        //v
-        double v = Utils.doubleParsable(tfv);
-        if (!Double.isNaN(v)) {
+        //b
+        double b = Utils.doubleParsable(tfB);
+        if (!Double.isNaN(b)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((FitzhughNagumo) neurons.get(i).getUpdateRule())
-                        .setV(v);
+                        .setB(b);
             }
         }
-
+        
+        //c
+        double c = Utils.doubleParsable(tfC);
+        if (!Double.isNaN(c)) {
+            for (int i = 0; i < numNeurons; i++) {
+                ((FitzhughNagumo) neurons.get(i).getUpdateRule())
+                        .setC(c);
+            }
+        }
+        
         //iBg
         double ibg = Utils.doubleParsable(tfIbg);
-        if (!Double.isNaN(v)) {
+        if (!Double.isNaN(ibg)) {
             for (int i = 0; i < numNeurons; i++) {
                 ((FitzhughNagumo) neurons.get(i).getUpdateRule())
                         .setiBg(ibg);
@@ -190,6 +238,19 @@ public class FitzhughNagumoRulePanel extends AbstractNeuronRulePanel {
             for (int i = 0; i < numNeurons; i++) {
                 ((FitzhughNagumo) neurons.get(i).getUpdateRule())
                         .setThreshold(thr);
+            }
+        }
+        
+        // Add Noise?
+        if (!isAddNoise.isNull()) {
+            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+                    .getTRUE();
+            for (int i = 0; i < numNeurons; i++) {
+                ((FitzhughNagumo) neurons.get(i).getUpdateRule())
+                        .setAddNoise(addNoise);
+            }
+            if (addNoise) {
+                randTab.commitRandom(neurons);
             }
         }
     }

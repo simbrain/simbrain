@@ -5,6 +5,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.ParameterGetter;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
+import org.simbrain.network.neuron_update_rules.FitzhughNagumo;
 import org.simbrain.network.neuron_update_rules.MorrisLecarRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
@@ -12,6 +14,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
 
 import javax.swing.*;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -65,13 +68,13 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
     /** Threshold for neurotransmitter release (mV) */
     private JTextField tfThreshold = new JTextField();
 
-
     private TristateDropDown isAddNoise = new TristateDropDown();
 
     private JTabbedPane tabbedPane = new JTabbedPane();
 
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
-
+    /** Random tab. */
+    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
+    
     /** A reference to the neuron update rule being edited. */
     private static final MorrisLecarRule prototypeRule = new MorrisLecarRule();
 
@@ -79,22 +82,34 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
     public MorrisLecarRulePanel() {
         super();
         this.add(tabbedPane);
-        mainTab.addItem("Calcium Channel Conductance (Micro Siemens/cm^2)", tfG_Ca);
-        mainTab.addItem("Potassium channel conductance (micro Siemens/cm^2)", tfG_K);
-        mainTab.addItem("Leak conductance (micro Siemens/cm^2)", tfG_L);
-        mainTab.addItem("Resting potential calcium (mV)", tfVRest_Ca);
-        mainTab.addItem("Resting potential potassium (mV)", tfvRest_k);
-        mainTab.addItem("Resting potential for leak current (mV)", tfVRest_L);
-        mainTab.addItem("Membrane capacitance per unit area (micro Farads/cm^2)", tfCMembrane);
-        mainTab.addItem("Membrane voltage constant 1", tfV_M1);
-        mainTab.addItem("Membrane voltage constant 2", tfV_M2);
-        mainTab.addItem("Potassium channel constant 1", tfV_W1);
-        mainTab.addItem("Potassium channel constant 2", tfV_W2);
-        mainTab.addItem("Fraction of open potassium channels", tfW_K);
-        mainTab.addItem("Potassium channel time constant/decay rate (s^-1)", tfPhi);
-        mainTab.addItem("Background current (mA)", tfI_Bg);
-        mainTab.addItem("Threshold for neurotransmitter release (mV)", tfThreshold);
-        tabbedPane.add(mainTab, "MorrisLecarFields");
+        LabelledItemPanel cellPanel = new LabelledItemPanel();
+        cellPanel.addItem("Capacitance (\u03BCF/cm\u00B2)", tfCMembrane);
+        cellPanel.addItem("Voltage const. 1", tfV_M1);
+        cellPanel.addItem("Voltage const. 2", tfV_M2);
+        cellPanel.addItem("Threshold (mV)", tfThreshold);
+        cellPanel.addItem("Background current (nA)", tfI_Bg);
+        cellPanel.addItem("Add noise: ", isAddNoise);
+        
+        
+        LabelledItemPanel ionPanel = new LabelledItemPanel();
+        ionPanel.addItem("Ca\u00B2\u207A conductance (\u03BCS/cm\u00B2)",
+                tfG_Ca);
+        ionPanel.addItem("K\u207A conductance (\u03BCS/cm\u00B2)", tfG_K);
+        ionPanel.addItem("Leak conductance (\u03BCS/cm\u00B2)", tfG_L);
+        ionPanel.addItem("Ca\u00B2\u207A equilibrium (mV)", tfVRest_Ca);
+        ionPanel.addItem("K\u207A equilibrium (mV)", tfvRest_k);
+        ionPanel.addItem("Leak equilibrium (mV)", tfVRest_L);
+
+        LabelledItemPanel potas = new LabelledItemPanel();
+        potas.addItem("K\u207A const. 1", tfV_W1);
+        potas.addItem("K\u207A const. 2", tfV_W2);
+        potas.addItem("Open K\u207A channels", tfW_K);
+        potas.addItem("K\u207A \u03C6", tfPhi);
+
+        tabbedPane.add(cellPanel, "Membrane Properties");
+        tabbedPane.add(ionPanel, "Ion Properties");
+        tabbedPane.add(potas, "K\u207A consts.");
+        tabbedPane.add(randTab, "Noise");
     }
 
     @Override
@@ -219,7 +234,7 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         if (!NetworkUtils.isConsistent(ruleList, vm1Getter)) {
             tfV_M1.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfV_M1.setText(Double.toString(cmGetter.getParameter(neuronRef)));
+            tfV_M1.setText(Double.toString(vm1Getter.getParameter(neuronRef)));
         }
 
         // v_m2
@@ -289,7 +304,7 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         if (!NetworkUtils.isConsistent(ruleList, phiGetter)) {
             tfPhi.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfPhi.setText(Double.toString(wkGetter.getParameter(neuronRef)));
+            tfPhi.setText(Double.toString(phiGetter.getParameter(neuronRef)));
         }
 
         // i_bg
@@ -303,7 +318,7 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         if (!NetworkUtils.isConsistent(ruleList, ibgGetter)) {
             tfI_Bg.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfI_Bg.setText(Double.toString(wkGetter.getParameter(neuronRef)));
+            tfI_Bg.setText(Double.toString(ibgGetter.getParameter(neuronRef)));
         }
 
         // threshold
@@ -319,6 +334,15 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         } else {
             tfThreshold.setText(Double.toString(thrGetter.getParameter(neuronRef)));
         }
+        
+        // Handle Noise
+        if (!NetworkUtils.isConsistent(ruleList, MorrisLecarRule.class,
+                "getAddNoise"))
+            isAddNoise.setNull();
+        else
+            isAddNoise.setSelected(neuronRef.getAddNoise());
+
+        randTab.fillFieldValues(getRandomizers(ruleList));
     }
 
     @Override
@@ -338,6 +362,7 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         tfPhi.setText(Double.toString(prototypeRule.getPhi()));
         tfI_Bg.setText(Double.toString(prototypeRule.getI_bg()));
         tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
+        randTab.fillDefaultValues();
     }
 
     @Override
@@ -494,6 +519,19 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
             for (int i = 0; i < numNeurons; i++) {
                 ((MorrisLecarRule) neurons.get(i).getUpdateRule())
                         .setThreshold(thr);
+            }
+        }
+        
+        // Add Noise?
+        if (!isAddNoise.isNull()) {
+            boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
+                    .getTRUE();
+            for (int i = 0; i < numNeurons; i++) {
+                ((FitzhughNagumo) neurons.get(i).getUpdateRule())
+                        .setAddNoise(addNoise);
+            }
+            if (addNoise) {
+                randTab.commitRandom(neurons);
             }
         }
     }

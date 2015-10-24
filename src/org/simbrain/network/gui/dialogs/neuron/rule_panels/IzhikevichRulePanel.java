@@ -142,17 +142,6 @@ public class IzhikevichRulePanel extends AbstractNeuronRulePanel {
     }
 
     /**
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((IzhikevichRule) ruleList.get(i)).getNoiseGenerator());
-        }
-        return ret;
-    }
-
-    /**
      * Populate fields with default data.
      */
     public void fillDefaultValues() {

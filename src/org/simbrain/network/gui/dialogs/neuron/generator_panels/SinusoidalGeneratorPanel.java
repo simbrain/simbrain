@@ -111,20 +111,6 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronRulePanel {
     }
 
     /**
-     * @return List of randomizers.
-     */
-    private ArrayList<Randomizer>
-        getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((SinusoidalRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
-    }
-
-    /**
      * Populates the fields with default data.
      */
     public void fillDefaultValues() {

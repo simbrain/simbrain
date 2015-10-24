@@ -51,15 +51,15 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	private double w_K;
 	
 	/** Potassium channel time constant/decay rate (s^-1). */
-	private double phi = 1.0/15.0;
+	private double phi = 0.06667; // 1/15
 	
-	/** Background current (mA). */
+	/** Background current (nA). */
 	private double i_bg = 46;
 	
 	/** Threshold for neurotransmitter release (mV) */
-	private double threshold = 10;
+	private double threshold = 40;
 	
-	/** A source of noise (mA). */
+	/** A source of noise (nA). */
 	private Randomizer noiseGenerator = new Randomizer();
 	
 	{
@@ -76,9 +76,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		
 		double dVdt = dVdt(vMembrane, i_syn);
 		double dWdt = dWdt(vMembrane, w_K);
-
-		
-		
 		
 		double vmFut = vMembrane + dt * dVdt;
 		double wKFut = w_K + dt * dWdt;
@@ -98,9 +95,11 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		double i_K = g_K * w_K * (vMembrane - vRest_k);
 		double i_L = g_L * (vMembrane - vRest_L);
 		double i_ion = i_Ca + i_K + i_L;
-		
-		return (((i_syn + i_bg - i_ion) / cMembrane)
-				+ noiseGenerator.getRandom());
+		double i_noise = 0;
+		if (getAddNoise()) {
+		    i_noise = noiseGenerator.getRandom();
+		}
+		return ((i_bg - i_ion + i_syn + i_noise) / cMembrane);
 	}
 	
 	private double dWdt(double vMembrane, double w_K) {
@@ -122,8 +121,26 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	
 	@Override
 	public NeuronUpdateRule deepCopy() {
-		// TODO Auto-generated method stub
-		return null;
+		MorrisLecarRule cpy = new MorrisLecarRule();
+		cpy.setAddNoise(this.getAddNoise());
+		cpy.g_Ca = this.g_Ca;
+		cpy.g_K = this.g_K;
+		cpy.cMembrane = this.cMembrane;
+		cpy.g_L = this.g_L;
+		cpy.i_bg = this.i_bg;
+		cpy.phi = this.phi;
+		cpy.v_m1 = this.v_m1;
+		cpy.v_m2 = this.v_m2;
+		cpy.v_w1 = this.v_w1;
+		cpy.v_w2 = this.v_w2;
+		cpy.threshold = this.threshold;
+		cpy.vRest_Ca = this.vRest_Ca;
+		cpy.vRest_k = this.vRest_k;
+		cpy.vRest_L = this.vRest_L;
+		cpy.w_K = this.w_K;
+		cpy.noiseGenerator = new Randomizer(this.noiseGenerator);
+
+		return cpy;
 	}
 
 	@Override

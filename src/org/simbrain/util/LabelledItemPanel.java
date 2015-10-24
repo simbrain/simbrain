@@ -32,7 +32,7 @@ import javax.swing.JPanel;
  *
  * @author David Fraser
  * @author Michael Harris
- * @author ztosi
+ * @author Zach Tosi
  *
  */
 public class LabelledItemPanel extends JPanel {

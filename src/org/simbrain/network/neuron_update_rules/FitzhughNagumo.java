@@ -36,20 +36,25 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     private double v;
 
     /** Constant background current. KEEP */
-    private double iBg = 0;
+    private double iBg = 1;
 
     /** Threshold value to signal a spike. KEEP */
-    private double threshold = 1;
+    private double threshold = 1.9;
 
     /** Noise dialog. */
     private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
     private boolean addNoise;
-
-    // TODO
-    private double c;
-    private double refractoryPeriod;
+    
+    /** Recovery rate */
+    private double a = 0.08;
+    
+    /** Recovery dependence on voltage. */
+    private double b = 1;
+    
+    /** Recovery self-dependence. */
+    private double c = 0.8;
 
 
     /**
@@ -64,15 +69,13 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
 
         return in;
     }
-    private double timeStep;
-    private double inputs = 0;
-    private double val;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void update(final Neuron neuron) {
-        timeStep = neuron.getNetwork().getTimeStep();
+        double timeStep = neuron.getNetwork().getTimeStep();
 //        final boolean refractory = getLastSpikeTime() + refractoryPeriod
 //                >= neuron.getNetwork().getTime();
         final double activation = neuron.getActivation();
@@ -82,9 +85,9 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
             inputs += noiseGenerator.getRandom();
         }
         inputs += iBg;
-        w += (timeStep * (0.08*(v+0.7-(0.8*w))));
+        w += (timeStep * (a*(b*v+0.7-(c*w))));
 
-        v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs));
+        v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
         // You want this
         if (v >= threshold) {
             neuron.setSpkBuffer(true);
@@ -183,13 +186,28 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }
+
+    public double getA() {
+        return a;
+    }
     
-    public double getRefractoryPeriod() {
-        return refractoryPeriod;
+    public double getB() {
+        return b;
     }
-
-    public void setRefractoryPeriod(double refractoryPeriod) {
-        this.refractoryPeriod = refractoryPeriod;
+    
+    public double getC(){
+        return c;
     }
-
+    
+    public void setA(double a) {
+        this.a = a;
+    }
+    
+    public void setB(double b) {
+        this.b = b;
+    }
+    
+    public void setC(double c) {
+        this.c = c;
+    }
 }

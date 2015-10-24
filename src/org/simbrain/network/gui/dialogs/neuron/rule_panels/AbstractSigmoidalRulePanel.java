@@ -76,23 +76,6 @@ public abstract class AbstractSigmoidalRulePanel extends
     protected SquashingFunction initialSfunction;
 
     /**
-     * @param ruleList
-     *            the list of neuron update rules from which to extract
-     *            randomizers.
-     * @return List of randomizers.
-     */
-    protected ArrayList<Randomizer> getRandomizers(
-        List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((AbstractSigmoidalRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
-    }
-
-    /**
      * @return the combo box responsible for setting the specific squashing
      * function
      */

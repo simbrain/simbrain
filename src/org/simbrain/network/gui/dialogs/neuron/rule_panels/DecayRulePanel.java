@@ -187,18 +187,6 @@ public class DecayRulePanel extends AbstractNeuronRulePanel implements
     }
 
     /**
-     * @return A list of randomizers.
-     */
-    private ArrayList<Randomizer> getRandomizers(List<NeuronUpdateRule> ruleList) {
-        ArrayList<Randomizer> ret = new ArrayList<Randomizer>();
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((DecayRule) ruleList.get(i)).getNoiseGenerator());
-        }
-
-        return ret;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

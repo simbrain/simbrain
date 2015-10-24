@@ -8,5 +8,6 @@
 *.classpath
 *.project
 /.idea/*
+./bin/
 *.iml
 out/*

@@ -2,8 +2,10 @@ help() {
     print("");
     print("All lines must end in semicolons, \";\"");
     print("Use java syntax.");
+    print("Some commands correspond to files in the scripts directory " +
+    	"(Simbrain\\scripts\\console), which contain comments that explain what they do.");
     print("");
-    print("help_simbrain(); for simbrain specific help");
+    print("help_simbrain(); for help specific to Simbrain console scripts");
     print("help_beanshell(); for general beanshell commands.");
     print("");
 }

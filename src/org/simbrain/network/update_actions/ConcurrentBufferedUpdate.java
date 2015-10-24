@@ -422,7 +422,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 
         // TODO: Make this dependent on the number of neurons to be update and
         // the number of available processor cores.
-        private static final int DEFAULT_TASK_PARTITION_RATIO = 256;
+        private static final int DEFAULT_TASK_PARTITION_RATIO = 16;
 
         private AtomicInteger indexPtr;
 

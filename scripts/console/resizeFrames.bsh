@@ -1,0 +1,19 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
+import javax.swing.*;
+
+//
+// Moves all desktop frames to a place where they are visible. 
+//
+void resizeFrames() {
+	SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+	int height = desktop.getFrame().getSize().getHeight();
+	int width = desktop.getFrame().getSize().getWidth();
+	int i = 0;
+    for(JInternalFrame frame : desktop.getDesktop().getAllFrames()) {
+    	frame.setBounds(i*15,i*15,width/2,height/2);
+    	frame.toFront();
+    	i++;
+    }
+
+}

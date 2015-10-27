@@ -114,7 +114,7 @@ public class NetworkMenuBar {
         editMenu.add(networkPanel.createSpacingMenu());
         editMenu.addSeparator();
         // editMenu.add(actionManager.getShowIOInfoMenuItem());
-        editMenu.add(actionManager.getSetAutoZoomMenuItem());
+        editMenu.add(actionManager.getSetAutoZoomToggleButton());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());

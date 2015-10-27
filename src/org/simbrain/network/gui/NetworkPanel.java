@@ -18,12 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -1563,6 +1558,7 @@ public class NetworkPanel extends JPanel {
             mainTools.add(action);
         }
         mainTools.add(actionManager.getZoomToFitPageAction());
+        mainTools.add(actionManager.getSetAutoZoomToggleButton());
 
         return mainTools;
     }
@@ -2475,7 +2471,7 @@ public class NetworkPanel extends JPanel {
      */
     public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
-        actionManager.getSetAutoZoomMenuItem().setSelected(autoZoomMode);
+        actionManager.getSetAutoZoomToggleButton().setSelected(autoZoomMode);
         repaint();
     }
 

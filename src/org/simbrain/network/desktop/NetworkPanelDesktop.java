@@ -207,8 +207,6 @@ public class NetworkPanelDesktop extends NetworkPanel {
         toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getSetAutoZoomMenuItem());
-        viewMenu.addSeparator();
         // viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowPrioritiesAction());
         // viewMenu.add(actionManager.getShowNetworkHierarchyPanel());

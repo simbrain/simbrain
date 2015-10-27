@@ -18,12 +18,10 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Set auto zoom.
@@ -40,23 +38,21 @@ public final class SetAutoZoomAction extends AbstractAction {
      */
     public SetAutoZoomAction(final NetworkPanel networkPanel) {
 
-        super("Auto Zoom");
-
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        putValue(SHORT_DESCRIPTION,
-                "If autozoom is turned on the network will always set zoom so that all network items are visible");
+        putValue(SHORT_DESCRIPTION, "Toggle auto-zoom (if on, all network objects fit to screen)");
 
         this.networkPanel = networkPanel;
 
     }
 
-    /** @see AbstractAction 
+    /**
+     * @see AbstractAction
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+        AbstractButton cb = (AbstractButton) event.getSource();
         networkPanel.setAutoZoomMode(cb.isSelected());
     }
 }

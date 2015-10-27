@@ -18,12 +18,11 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
+import javax.swing.*;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.OneToOne;
@@ -95,6 +94,9 @@ import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.resource.ResourceManager;
+
+import static org.simbrain.resource.ResourceManager.*;
 
 /**
  * Network action manager.
@@ -170,7 +172,7 @@ public final class NetworkActionManager {
     private final Action spaceHorizontalAction;
 
     /** Set auto zoom action. */
-    private final JCheckBoxMenuItem setAutoZoomAction;
+    private final JToggleButton setAutoZoomAction;
 
     /** Set neuron properties action. */
     private final Action setNeuronPropertiesAction;
@@ -316,7 +318,10 @@ public final class NetworkActionManager {
         showNetworkHierarchyAction = new JCheckBoxMenuItem(
                 new ShowNetworkHierarchyPanel(networkPanel));
 
-        setAutoZoomAction = new JCheckBoxMenuItem(new SetAutoZoomAction(networkPanel));
+        setAutoZoomAction = new JToggleButton(new SetAutoZoomAction(networkPanel));
+        setAutoZoomAction.setSelectedIcon(ResourceManager.getImageIcon("AutoZoomOn.png"));
+        setAutoZoomAction.setIcon(ResourceManager.getImageIcon("AutoZoomOff.png"));
+        setAutoZoomAction.setBorder(BorderFactory.createEtchedBorder());
         setAutoZoomAction.setSelected(networkPanel.getAutoZoomMode());
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
@@ -717,7 +722,7 @@ public final class NetworkActionManager {
      *
      * @return the set auto zoom check box menu item
      */
-    public JCheckBoxMenuItem getSetAutoZoomMenuItem() {
+    public JToggleButton getSetAutoZoomToggleButton() {
         return setAutoZoomAction;
     }
 

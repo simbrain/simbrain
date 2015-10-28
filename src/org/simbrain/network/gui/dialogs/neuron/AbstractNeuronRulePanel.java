@@ -44,7 +44,7 @@ import org.simbrain.util.randomizer.Randomizer;
 /**
  * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
  * parameters of specific neuron rule types.
- *
+ * <p/>
  * Optimization has been emphasized for methods intended for neuron creation
  * rather than editing on the assumption that the former will be far more common
  * for large numbers of neurons.
@@ -52,34 +52,35 @@ import org.simbrain.util.randomizer.Randomizer;
 @SuppressWarnings("serial")
 public abstract class AbstractNeuronRulePanel extends JPanel {
 
-    /** Associations between names of rules and panels for editing them. */
+    /**
+     * Associations between names of rules and panels for editing them.
+     */
     public static final LinkedHashMap<String, AbstractNeuronRulePanel> RULE_MAP =
-        new LinkedHashMap<String, AbstractNeuronRulePanel>();
+            new LinkedHashMap<String, AbstractNeuronRulePanel>();
 
-    // Populate the Rule Map
+    // Populate the Rule Map.  Place items in alphabetical order so they appear that way in the GUI combo box.
     static {
         RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
         RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
         RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
+        RULE_MAP.put(new FitzhughNagumo().getDescription(), new FitzhughNagumoRulePanel());
         RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
         RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
-            new IntegrateAndFireRulePanel());
+                new IntegrateAndFireRulePanel());
         RULE_MAP.put(new IzhikevichRule().getDescription(),
-            new IzhikevichRulePanel());
+                new IzhikevichRulePanel());
         RULE_MAP.put(new LinearRule().getDescription(), new LinearRulePanel());
-        RULE_MAP.put(new NakaRushtonRule().getDescription(),
-            new NakaRushtonRulePanel());
-        RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
-            ContinuousSigmoidalRulePanel.createContinuousSigmoidalRulePanel());
-        RULE_MAP.put(new SigmoidalRule().getDescription(),
-            SigmoidalRulePanel.createSigmoidalRulePanel());
-        RULE_MAP.put(new SpikingThresholdRule().getDescription(),
-            new SpikingThresholdRulePanel());
-        RULE_MAP.put(new ThreeValueRule().getDescription(),
-            new ThreeValueRulePanel());
         RULE_MAP.put(new MorrisLecarRule().getDescription(), new MorrisLecarRulePanel());
-        RULE_MAP.put(new FitzhughNagumo().getDescription(), new FitzhughNagumoRulePanel());
-
+        RULE_MAP.put(new NakaRushtonRule().getDescription(),
+                new NakaRushtonRulePanel());
+        RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
+                ContinuousSigmoidalRulePanel.createContinuousSigmoidalRulePanel());
+        RULE_MAP.put(new SigmoidalRule().getDescription(),
+                SigmoidalRulePanel.createSigmoidalRulePanel());
+        RULE_MAP.put(new SpikingThresholdRule().getDescription(),
+                new SpikingThresholdRulePanel());
+        RULE_MAP.put(new ThreeValueRule().getDescription(),
+                new ThreeValueRulePanel());
     }
 
     /**
@@ -87,18 +88,18 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * them.
      */
     public static final LinkedHashMap<String, AbstractNeuronRulePanel> GENERATOR_MAP =
-        new LinkedHashMap<String, AbstractNeuronRulePanel>();
+            new LinkedHashMap<String, AbstractNeuronRulePanel>();
 
     // Populate the Generator Map
     static {
         GENERATOR_MAP.put(new LogisticRule().getDescription(),
-            new LogisticGeneratorPanel());
+                new LogisticGeneratorPanel());
         GENERATOR_MAP.put(new RandomNeuronRule().getDescription(),
-            new RandomGeneratorPanel());
+                new RandomGeneratorPanel());
         GENERATOR_MAP.put(new SinusoidalRule().getDescription(),
-            new SinusoidalGeneratorPanel());
+                new SinusoidalGeneratorPanel());
         GENERATOR_MAP.put(new StochasticRule().getDescription(),
-            new StochasticGeneratorPanel());
+                new StochasticGeneratorPanel());
     }
 
     /**
@@ -122,9 +123,8 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     /**
      * Populate fields with current data.
      *
-     * @param ruleList
-     *            the list of rules being used to determine which values should
-     *            be used to fill the fields with data.
+     * @param ruleList the list of rules being used to determine which values should
+     *                 be used to fill the fields with data.
      */
     public abstract void fillFieldValues(final List<NeuronUpdateRule> ruleList);
 
@@ -140,8 +140,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * recommended. Instead pass a list of the neurons to be changed into
      * {@link #commitChanges(List) commitChanges}.
      *
-     * @param neuron
-     *            the neuron to which changes are being committed to.
+     * @param neuron the neuron to which changes are being committed to.
      */
     public abstract void commitChanges(final Neuron neuron);
 
@@ -152,10 +151,9 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * <b> false </b>, indicating to the panel that it is editing rather than
      * changing/replacing existing neuron update rules.
      *
-     * @param neurons
-     *            the list of neurons which are being edited and to which
-     *            changes based on the values in the fields of this panel will
-     *            be committed
+     * @param neurons the list of neurons which are being edited and to which
+     *                changes based on the values in the fields of this panel will
+     *                be committed
      */
     public abstract void commitChanges(final List<Neuron> neurons);
 
@@ -166,8 +164,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * whether this method is used for committing or the rules are deleted and
      * replaced entirely, in which case this method is not called.
      *
-     * @param neurons
-     *            the neurons whose rules are being <b>edited</b>, not replaced.
+     * @param neurons the neurons whose rules are being <b>edited</b>, not replaced.
      */
     protected abstract void writeValuesToRules(final List<Neuron> neurons);
 
@@ -175,8 +172,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * Override to add custom notes or other text to bottom of panel. Can be
      * html formatted.
      *
-     * @param text
-     *            Text to be added
+     * @param text Text to be added
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
@@ -212,9 +208,8 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * or creating new ones and replacing the update rule of each of the neurons
      * being edited.
      *
-     * @param replace
-     *            used to tell the panel if it's being used to replace neuron
-     *            update rules.
+     * @param replace used to tell the panel if it's being used to replace neuron
+     *                update rules.
      */
     protected void setReplace(boolean replace) {
         this.replacing = replace;
@@ -233,7 +228,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     public static String[] getGeneratorlist() {
         return GENERATOR_MAP.keySet().toArray(new String[RULE_MAP.size()]);
     }
-    
+
     /**
      * @return List of randomizers.
      */

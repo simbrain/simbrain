@@ -258,6 +258,19 @@ public abstract class TextWorld {
     }
 
     /**
+     * Returns the text of the current item
+     *
+     * @return text of current item, or null if current item is null.
+     */
+    public String getCurrentText() {
+        if (currentItem == null) {
+            return "";
+        } else {
+            return currentItem.getText();
+        }
+    }
+
+    /**
      * Returns a "preview" of the next character in the world. Used in some
      * scripts.
      *

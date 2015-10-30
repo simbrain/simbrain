@@ -21,6 +21,9 @@ import java.awt.Color;
     double sparsity = .2;
     double excitatoryRatio = .5;
 
+    // CLEAR CURRENT WORKSPACE
+    workspace.clearWorkspace();
+
     // BUILD NETWORK
     NetworkComponent networkComponent = new NetworkComponent("Recurrent Network");
     workspace.addWorkspaceComponent(networkComponent);
@@ -33,7 +36,7 @@ import java.awt.Color;
     }
 
     // LAYOUT NEURONS
-    LineLayout layout = new LineLayout(10,10, 70, LineOrientation.HORIZONTAL);
+    LineLayout layout = new LineLayout(10,10,50, LineOrientation.HORIZONTAL);
     layout.layoutNeurons(network.getNeuronList());
 
     // CREATE SYNAPSES 

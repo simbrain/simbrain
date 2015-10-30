@@ -12,6 +12,7 @@ import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.neurons.*;
 import org.simbrain.util.*;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.randomizer.*;
 import org.simbrain.util.math.*;
@@ -21,6 +22,8 @@ import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
 import java.io.*;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.concurrent.*;
+import javax.*;
 
 //
 // Elman 1990.   Trained to predict the next phoneme in a sequence.   Plot errors
@@ -29,13 +32,13 @@ import java.util.*;
 // There are three words in the simple vocabulary: ba, dii, and guuu
 //
 // Authors: Jeff Yoshimi and Sam Spevak
-//
 
 //
 // Adjustible parameters
 //
 int strlength = 200; // Length of the phoneme string for training. Elman used 1000.
 int trainingSteps = 100; // How many iterations to train the SRN.  Elman used 200.
+
 //
 // Public variables
 //
@@ -47,6 +50,17 @@ DisplayWorld displayWorld;
 String phonemeString;
 double[][] inputData;
 double[][] targetData;
+String NET_NAME = "Word Stream";
+String READER_NAME = "Word-stream (ba, dii, guuu)";
+String DISPLAY_NAME = "Predicted phonemes (ba, dii, guuu)";
+boolean buildDone = false;
+String[][] phonemeCodes = {
+        { "b", "1,0,1,0,0,1"},
+        { "d", "1,0,1,1,0,1"},
+        { "g", "1,0,1,0,1,1"},
+        { "a", "0,1,0,0,1,1"},
+        { "i", "0,1,0,1,0,1"},
+        { "u", "0,1,0,1,1,1"}};
 
 //
 // Main parts of simulation
@@ -54,24 +68,28 @@ double[][] targetData;
 void main() {
 
     workspace.clearWorkspace();
-
-    buildNetwork();
-    buildReaderWorld();
-    buildDisplayWorld();
+    SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+            buildNetwork();
+            buildReaderWorld();
+            buildDisplayWorld();
+        }
+    });            
     loadCustomUpdater();
     trainNetwork();
     srn.getInputLayer().setClamped(false);
     readerWorld.setPosition(0);
 
-    // Manually configure the update order.  A bit hard-codey, but not sure what a cleaner
-    // way to do it is.  Indices determined by checking the available actions in (desktop menu)
-    // File > Edit Update Sequence > Add Action.   
-    List actions = workspace.getUpdater().getUpdateManager().getAvailableActionList();
-    workspace.getUpdater().getUpdateManager().clear();
-    workspace.getUpdater().getUpdateManager().addAction(actions.get(4));
-    workspace.getUpdater().getUpdateManager().addAction(actions.get(1));
-    workspace.getUpdater().getUpdateManager().addAction(actions.get(2));
-    workspace.getUpdater().getUpdateManager().addAction(actions.get(3));
+    UpdateActionManager manager = workspace.getUpdater().getUpdateManager();
+    UpdateAction couplingAction = manager.getUpdateAction("Update coupling");
+    UpdateAction netAction = manager.getUpdateAction("Update " + NET_NAME);
+    UpdateAction readerAction = manager.getUpdateAction("Update " + READER_NAME);
+    UpdateAction displayAction = manager.getUpdateAction("Update " + DISPLAY_NAME);
+    manager.clear();
+    manager.addAction(couplingAction);
+    manager.addAction(netAction);
+    manager.addAction(readerAction);
+    manager.addAction(displayAction);
 
     //loadTimeSeries
     //addDocs();
@@ -81,7 +99,7 @@ void main() {
 // Create and train the SRN
 //
 void buildNetwork() {
-    networkComponent = new NetworkComponent("Elman Phoneme Predicter");
+    networkComponent = new NetworkComponent(NET_NAME);
     network = networkComponent.getNetwork();
     srn = new SimpleRecurrentNetwork(network, 6, 20, 6);
     workspace.addWorkspaceComponent(networkComponent);
@@ -99,6 +117,8 @@ void buildNetwork() {
 // Train the SRN
 //
 void trainNetwork() {
+    print("Train:" + Thread.currentThread());
+
 
     // Set up training data.   Target vectors are just the input vectors from 
     //   one time step in the past.    
@@ -111,15 +131,23 @@ void trainNetwork() {
     srn.getTrainingSet().setInputData(inputData);
     srn.getTrainingSet().setTargetData(targetData);
 
+    // Make a logging window    
+    WorkspaceComponent logComponent = new DisplayComponent("Training Network...");    
+    workspace.addWorkspaceComponent(logComponent);
+    DisplayWorld logErrorWindow = logComponent.getWorld();
+    desktop.getDesktopComponent(logComponent).getParentFrame().setVisible(true);
+
     // Train the SRN
     SRNTrainer trainer = new SRNTrainer(srn);
     trainer.randomize();
     trainer.setLearningRate(.1);
     trainer.setMomentum(0);
+    logErrorWindow.addText("Logging errors during SRN training.\n");
     for (int i = 0; i < trainingSteps; i++) {
         trainer.iterate();
-        print("-->" + trainer.getError());
+        logErrorWindow.addText("Error: " + trainer.getError() + "\n");
     }
+    desktop.getDesktopComponent(logComponent).getParentFrame().setIcon(true);
 
     // Clear network, Update graphics
     network.clearActivations();
@@ -135,7 +163,7 @@ void buildReaderWorld() {
     // Reader world
     WorkspaceComponent readerWorldComponent = new ReaderComponent("Word-stream (ba, dii, guuu)");    
     readerWorld = readerWorldComponent.getWorld();
-    readerWorld.loadTokenToVectorDict(Utils.getStringMatrix(new File("./simulations/tables/elmanPhonemes.csv")));
+    readerWorld.loadTokenToVectorDict(phonemeCodes);
     readerWorld.setParseStyle(ParseStyle.CHARACTER);
     workspace.addWorkspaceComponent(readerWorldComponent);
     desktop.getDesktopComponent(readerWorldComponent).getParentFrame().setBounds(17,15,418,308);
@@ -146,33 +174,24 @@ void buildReaderWorld() {
     workspace.getCouplingManager().addCoupling(new Coupling(readerWorldProducer, inputLayerConsumer));
 }
 
-
 //
 // Add the reader world which reads in the phonemes, and the diplay world which displays the current prediction.
 //
 void buildDisplayWorld() {
 
-    WorkspaceComponent displayComponent = new DisplayComponent("Predicted phonemes");    
+    WorkspaceComponent displayComponent = new DisplayComponent(DISPLAY_NAME);    
     workspace.addWorkspaceComponent(displayComponent);
     displayWorld = displayComponent.getWorld();
     desktop.getDesktopComponent(displayComponent).getParentFrame().setBounds(16,318,412,310);
-    displayWorld.loadVectorToTokenDict(Utils.getStringMatrix(new File("./simulations/tables/elmanPhonemes.csv")));
-
-    // dict.addEntry("b", new double[] {1,0,1,0,0,1} );
-    // dict.addEntry("d", new double[] {1,0,1,1,0,1} );
-    // dict.addEntry("g", new double[] {1,0,1,0,1,1} );
-    // dict.addEntry("a", new double[] {0,1,0,0,1,1} );
-    // dict.addEntry("l", new double[] {0,1,0,1,0,1} );
-    // dict.addEntry("u", new double[] {0,1,0,1,1,1} );              
-
-    // // Couple network to display world
-    // PotentialConsumer displayWorldConsumer = displayComponent.getStringConsumer();
-    // PotentialProducer wordLayerProducer = networkComponent.getAttributeManager()
-    // .createPotentialProducer(wordLayer, "getLabelsOfActiveNeurons",
-    //     String.class, new Class[] { double.class },
-    //     new Object[] { displayWordThreshold });
-    // workspace.getCouplingManager().addCoupling(new Coupling(wordLayerProducer, displayWorldConsumer));
-    displayWorld.addText("Predicted\tActual\t Error \n");  
+    displayWorld.loadVectorToTokenDict(phonemeCodes);
+    displayWorld.addText("Network output is shown in this window.\n\n" +
+            "Column one shows the current phoneme and the phoneme the network predicts is coming next.\n" + 
+            "Column two shows the the phoneme that actually comes next.\n" + 
+            "Column three shows the error between the vectors coding these phonemes.\n" + 
+            "To run press the desktop play button." + 
+            "Notice that error drops within words (when character sequences are predictable)," +
+            "and rises between words.\n\n");
+    displayWorld.addText("Curr > Pred.\tActual\t Error \n");  
 }
 
 //
@@ -206,11 +225,12 @@ void loadCustomUpdater() {
                 }
             }
             // Predicted next phoneme is the character corresponding to the current output
+            String currentPhoneme = readerWorld.getCurrentText();
             String predictedPhoneme = displayWorld.getClosestWord(srn.getOutputLayer().getActivations());
             //print(Arrays.toString(srn.getOutputLayer().getActivations()) + "-->" + predictedPhoneme);
 
             // Display current info in display world
-            displayWorld.addText(predictedPhoneme + "\t" + nextChar + "\t " + Utils.round(error,3) + "\n");  
+            displayWorld.addText(currentPhoneme + "->" + predictedPhoneme + "\t" + nextChar + "\t " + Utils.round(error,3) + "\n");  
         }
 
       };
@@ -259,4 +279,10 @@ String makeElmanString() {
 //
 // Run the simulation
 //
-main();
+Executors.newSingleThreadExecutor().execute(new Runnable() {
+   public void run() {
+        main();
+    }
+});
+
+

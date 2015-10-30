@@ -249,6 +249,41 @@ public class UpdateActionManager {
         addAction(new UpdateAllBuffered(workspaceUpdater));
     }
 
+
+    /**
+     * Returns an update action matching the provided name, or null if none is found.
+     * 
+     * @param toFind name of action to find
+     * @return the matching update action, or null if none found
+     */
+    public UpdateAction getAction(String toFind) {
+        for(UpdateAction action : getAvailableActionList()) {
+            if(action.getDescription().equalsIgnoreCase(toFind)) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns an update action whose description begins with the provided string.
+     *
+     * TODO: This facilitates access to update actions, but not in a very pretty way. It is used by
+     * ElmanPhonemes.bsh. Probably need to add some kind of id field or something to UpdateAction.
+     *
+     * @param toFind the string to match
+     * @return matching update action or null if no match found
+     */
+    public UpdateAction getUpdateAction(String toFind) {
+        for (UpdateAction action : getAvailableActionList()) {
+            if (action.getDescription().startsWith(toFind)) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * Returns a list of network update actions that can be added.
      *

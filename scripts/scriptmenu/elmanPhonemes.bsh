@@ -50,7 +50,7 @@ DisplayWorld displayWorld;
 String phonemeString;
 double[][] inputData;
 double[][] targetData;
-String NET_NAME = "Word Stream";
+String NET_NAME = "Simple Recurrent Network";
 String READER_NAME = "Word-stream (ba, dii, guuu)";
 String DISPLAY_NAME = "Predicted phonemes (ba, dii, guuu)";
 boolean buildDone = false;
@@ -81,7 +81,8 @@ void main() {
     readerWorld.setPosition(0);
 
     UpdateActionManager manager = workspace.getUpdater().getUpdateManager();
-    UpdateAction couplingAction = manager.getUpdateAction("Update coupling");
+    UpdateAction couplingAction = manager.getUpdateAction("Update coupling (" +
+        READER_NAME + ">" + NET_NAME + ")");
     UpdateAction netAction = manager.getUpdateAction("Update " + NET_NAME);
     UpdateAction readerAction = manager.getUpdateAction("Update " + READER_NAME);
     UpdateAction displayAction = manager.getUpdateAction("Update " + DISPLAY_NAME);
@@ -117,8 +118,6 @@ void buildNetwork() {
 // Train the SRN
 //
 void trainNetwork() {
-    print("Train:" + Thread.currentThread());
-
 
     // Set up training data.   Target vectors are just the input vectors from 
     //   one time step in the past.    

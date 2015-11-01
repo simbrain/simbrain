@@ -37,7 +37,6 @@ import java.util.concurrent.*;
 int trainingSteps = 10; // How many iterations to train the SRN.
 int numSentences = 1000; // In Elman 10,000
 int numHiddenUnits = 50; // In Elman 150
-// TODO: Show error in workspace
 
 //
 // Public variables
@@ -100,7 +99,8 @@ void main() {
     readerWorld.setPosition(0);
 
     UpdateActionManager manager = workspace.getUpdater().getUpdateManager();
-    UpdateAction couplingAction = manager.getUpdateAction("Update coupling");
+    UpdateAction couplingAction = manager.getUpdateAction("Update coupling (" +
+        READER_NAME + ">" + NET_NAME + ")");
     UpdateAction netAction = manager.getUpdateAction("Update " + NET_NAME);
     UpdateAction readerAction = manager.getUpdateAction("Update " + READER_NAME);
     UpdateAction displayAction = manager.getUpdateAction("Update " + DISPLAY_NAME);

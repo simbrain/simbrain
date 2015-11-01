@@ -266,23 +266,25 @@ public class UpdateActionManager {
     }
 
     /**
-     * Returns an update action whose description begins with the provided string.
+     * Returns an update action whose description corresponds to the provided
+     * string (case is ignored).
      *
-     * TODO: This facilitates access to update actions, but not in a very pretty way. It is used by
-     * ElmanPhonemes.bsh. Probably need to add some kind of id field or something to UpdateAction.
+     * TODO: This facilitates access to update actions, but not in a very
+     * pretty way. It is used by ElmanPhonemes.bsh and ElmanSentences.bsh.
+     * Probably need to add some kind of id field or something to
+     * UpdateAction so that it's easier to retrieve the update actions.
      *
      * @param toFind the string to match
      * @return matching update action or null if no match found
      */
     public UpdateAction getUpdateAction(String toFind) {
         for (UpdateAction action : getAvailableActionList()) {
-            if (action.getDescription().startsWith(toFind)) {
+            if (action.getDescription().equalsIgnoreCase(toFind)) {
                 return action;
             }
         }
         return null;
     }
-
 
     /**
      * Returns a list of network update actions that can be added.

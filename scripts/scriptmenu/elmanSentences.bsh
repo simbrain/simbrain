@@ -1,0 +1,400 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.subnetworks.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.trainers.*;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
+import org.simbrain.network.neurons.*;
+import org.simbrain.util.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updater.*;
+import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.randomizer.*;
+import org.simbrain.util.math.*;
+import org.simbrain.util.projector.*;
+import org.simbrain.world.textworld.*;
+import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
+import java.io.*;
+import java.awt.geom.Point2D;
+import java.util.*;
+import java.util.concurrent.*;
+
+//
+// Elman 1990.   Trained to predict the next word in a sentence.  Elman used 10,000
+// sentences.  
+//
+// Authors: Jeff Yoshimi and Sam Spevak
+//
+
+//
+// Adjustible parameters
+//
+int trainingSteps = 10; // How many iterations to train the SRN.
+int numSentences = 1000; // In Elman 10,000
+int numHiddenUnits = 50; // In Elman 150
+// TODO: Show error in workspace
+
+//
+// Public variables
+//
+NetworkComponent networkComponent;
+Network network;
+SimpleRecurrentNetwork srn;
+ReaderWorld readerWorld;
+DisplayWorld displayWorld;
+String phonemeString;
+double[][] inputData;
+double[][] targetData;
+String NET_NAME = "Simple Recurrent Network";
+String READER_NAME = "Generated Sentences";
+String DISPLAY_NAME = "Next Predicted Word";
+String[][] elmanSentences = {
+    {"man",     "1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"woman",   "0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"cat",     "0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"mouse",   "0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"book",    "0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"rock",    "0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"dragon",  "0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"monster", "0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"glass",   "0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"plate",   "0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"cookie",  "0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0"},
+    {"break",   "0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0"},
+    {"think",   "0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0"},
+    {"sleep",   "0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0"},
+    {"see",     "0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0"},
+    {"chase",   "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0"},
+    {"move",    "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0"},
+    {"break",   "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0"},
+    {"smell",   "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0"},
+    {"see",     "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0"},
+    {"bread",   "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0"},
+    {"smash",   "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0"},
+    {"eat",     "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1"}};
+
+//
+// Main parts of simulation
+//
+void main() {
+
+    workspace.clearWorkspace();
+
+    // Do most of the gui stuff from java event queue
+    SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+            buildNetwork();
+            buildReaderWorld();
+            buildDisplayWorld();
+        }
+    }); 
+
+    loadCustomUpdater();
+    trainNetwork();
+    srn.getInputLayer().setClamped(false);
+    readerWorld.setPosition(0);
+
+    UpdateActionManager manager = workspace.getUpdater().getUpdateManager();
+    UpdateAction couplingAction = manager.getUpdateAction("Update coupling");
+    UpdateAction netAction = manager.getUpdateAction("Update " + NET_NAME);
+    UpdateAction readerAction = manager.getUpdateAction("Update " + READER_NAME);
+    UpdateAction displayAction = manager.getUpdateAction("Update " + DISPLAY_NAME);
+    manager.clear();
+    manager.addAction(couplingAction);
+    manager.addAction(netAction);
+    manager.addAction(readerAction);
+    manager.addAction(displayAction);
+
+    //loadTimeSeries    
+    //addDocs();    
+}
+
+//
+// Create and train the SRN
+//
+void buildNetwork() {
+    networkComponent = new NetworkComponent(NET_NAME);
+    network = networkComponent.getNetwork();
+    srn = new SimpleRecurrentNetwork(network, 23, numHiddenUnits, 23);
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(446,15,592,551);
+    network.addGroup(srn);
+    srn.getInputLayer().setLowerBound(0);      
+    srn.getInputLayer().setUpperBound(1);      
+    srn.getOutputLayer().setLowerBound(0);      
+    srn.getOutputLayer().setUpperBound(1);     
+}
+
+//
+// Train the SRN
+//
+void trainNetwork() {
+
+    // Set up training data.   Target vectors are just the input vectors from 
+    //   one time step in the past.    
+    inputData = makeElmanVector();
+    targetData = new double[inputData.length][inputData[0].length];
+    System.arraycopy(inputData, 1,targetData, 0, inputData.length - 1);
+    // print(Utils.doubleMatrixToString(inputData));
+    // print("-------");
+    // print(Utils.doubleMatrixToString(targetData));
+    srn.getTrainingSet().setInputData(inputData);
+    srn.getTrainingSet().setTargetData(targetData);
+
+    // Make a logging window    
+    WorkspaceComponent logComponent = new DisplayComponent("Training Network...");    
+    workspace.addWorkspaceComponent(logComponent);
+    DisplayWorld logErrorWindow = logComponent.getWorld();
+    desktop.getDesktopComponent(logComponent).getParentFrame().setVisible(true);
+
+
+    // Train the SRN
+    SRNTrainer trainer = new SRNTrainer(srn);
+    trainer.randomize();
+    trainer.setLearningRate(.04);
+    for (int i = 0; i < trainingSteps; i++) {
+        trainer.iterate();
+        logErrorWindow.addText("Error: " + trainer.getError() + "\n");
+    }
+    desktop.getDesktopComponent(logComponent).getParentFrame().setIcon(true);
+
+    // Clear network, Update graphics
+    network.clearActivations();
+    network.fireNeuronsUpdated();
+
+}
+
+//
+// Add the reader world which reads in the phonemes, and the diplay world which displays the current prediction.
+//
+void buildReaderWorld() {
+
+    // Reader world
+    WorkspaceComponent readerWorldComponent = new ReaderComponent(READER_NAME);    
+    readerWorld = readerWorldComponent.getWorld();
+    readerWorld.loadTokenToVectorDict(elmanSentences);
+    readerWorld.setParseStyle(ParseStyle.WORD);
+    workspace.addWorkspaceComponent(readerWorldComponent);
+    desktop.getDesktopComponent(readerWorldComponent).getParentFrame().setBounds(17,15,418,308);
+
+    // Couple reader world to network
+    PotentialProducer readerWorldProducer = readerWorldComponent.getPotentialProducers().get(0); // Assumes vector thing is first
+    PotentialConsumer inputLayerConsumer = networkComponent.getAttributeManager().createPotentialConsumer(srn.getInputLayer(),"setInputValues", double[].class);
+    workspace.getCouplingManager().addCoupling(new Coupling(readerWorldProducer, inputLayerConsumer));
+}
+
+//
+// Add the reader world which reads in the phonemes, and the diplay world which displays the current prediction.
+//
+void buildDisplayWorld() {
+
+    WorkspaceComponent displayComponent = new DisplayComponent(DISPLAY_NAME);    
+    workspace.addWorkspaceComponent(displayComponent);
+    displayWorld = displayComponent.getWorld();
+    desktop.getDesktopComponent(displayComponent).getParentFrame().setBounds(16,318,412,310);
+    displayWorld.loadVectorToTokenDict(elmanSentences);        
+    displayWorld.addText("Current\tPredicted\tActual\t Error \n");  
+}
+
+//
+// Load the custom network updater
+//
+void loadCustomUpdater() {
+
+
+    NetworkUpdateAction networkUpdateAction = new NetworkUpdateAction() {
+        public String getDescription() {
+          return "Update SRN error";
+        }
+
+        public String getLongDescription() {
+            return "Update SRN Error (since this is not part of regular training, but rather being computed on  each workspace iteration";
+        }
+
+        public void invoke() {
+
+            // What is the next word in the reader world
+            String nextWord = readerWorld.previewNextToken();
+            // Find the vector associated with that word
+            double[] vec = readerWorld.getMatchingVector(nextWord);
+            // Error is the distance between that vector and the actual output now
+            double error;
+            if (vec != null) {
+                try {
+                    error = SimbrainMath.getMeanSquaredError(srn.getOutputLayer().getActivations(), vec);        
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // Predicted next word is the word corresponding to the current output
+            String currentWord = readerWorld.getCurrentText();
+            String predictedWord = displayWorld.getClosestWord(srn.getOutputLayer().getActivations());
+
+            // Display current info in display world
+            displayWorld.addText(currentWord + "\t" + predictedWord + "\t" + nextWord + "\t " 
+                + Utils.round(error,3) + "\n");  
+        }
+
+      };
+  network.addUpdateAction(networkUpdateAction);
+  
+}
+
+//
+// Make the strings of vectors encoding the sentences 
+//
+double[][] makeElmanVector() {
+    List<String> noun_hum = Arrays.asList("man", "woman");
+    List<String> noun_anim = Arrays.asList("cat", "mouse");
+    List<String> noun_inanim = Arrays.asList("book", "rock");
+    List<String> noun_agress = Arrays.asList("dragon", "monster");
+    List<String> noun_frag = Arrays.asList("glass", "plate");
+    List<String> noun_food = Arrays.asList("cookie", "bread");
+    List<String> verb_intran = Arrays.asList("think", "sleep");
+    List<String> verb_tran = Arrays.asList("see", "chase");
+    List<String> verb_agpat = Arrays.asList("move", "break");
+    List<String> verb_percept = Arrays.asList("see", "smell");
+    List<String> verb_destroy = Arrays.asList("break", "smash");
+    List<String> verb_eat = Arrays.asList("eat");
+
+    StringBuilder sentences = new StringBuilder();
+
+    for (int i = 0; i < numSentences; i++) {
+        Random generator = new Random();
+        switch (generator.nextInt(14)) {
+        case 0:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_eat.get(generator.nextInt(1)));
+            sentences.append(" ");
+            sentences.append(noun_food.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 1:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_percept.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_frag.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 2:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_destroy.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_frag.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 3:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_intran.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 4:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_tran.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 5:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_agpat.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_inanim.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 6:
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_agpat.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 7:
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_eat.get(generator.nextInt(1)));
+            sentences.append(" ");
+            sentences.append(noun_food.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 8:
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_tran.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 9:
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_agpat.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_inanim.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 10:
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_agpat.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 11:
+            sentences.append(noun_inanim.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_agpat.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 12:
+            sentences.append(noun_agress.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_destroy.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(noun_frag.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 13:
+            sentences.append(noun_agress.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_eat.get(generator.nextInt(1)));
+            sentences.append(" ");
+            sentences.append(noun_hum.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 14:
+            sentences.append(noun_agress.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_eat.get(generator.nextInt(1)));
+            sentences.append(" ");
+            sentences.append(noun_anim.get(generator.nextInt(2)));
+            sentences.append("\n");
+        case 15:
+            sentences.append(noun_agress.get(generator.nextInt(2)));
+            sentences.append(" ");
+            sentences.append(verb_eat.get(generator.nextInt(1)));
+            sentences.append(" ");
+            sentences.append(noun_food.get(generator.nextInt(2)));
+            sentences.append("\n");
+        default:
+            break;
+        }
+
+    }
+
+    String theText = sentences.toString();
+    readerWorld.setText(theText);
+    List words = Arrays.asList(theText.split("\\s"));
+    double[][] retMatrix = new double[words.size()][23];
+    int rowIndex = 0;
+    for (String word : words) {
+        //print(Utils.doubleMatrixToString(readerWorld.getMatchingVector(word)));
+        System.arraycopy(readerWorld.getMatchingVector(word), 0, retMatrix[rowIndex], 0, 23);
+        rowIndex++;
+    }
+    return retMatrix;
+}
+
+//
+// Run the simulation
+//
+Executors.newSingleThreadExecutor().execute(new Runnable() {
+   public void run() {
+        main();
+    }
+});

@@ -18,13 +18,9 @@
  */
 package org.simbrain.util.genericframe;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.beans.PropertyVetoException;
-
 import javax.swing.JMenuBar;
+import java.awt.*;
+import java.beans.PropertyVetoException;
 
 /**
  * Abstraction which is neutral between JFrames, JInternalFrames, and JDialogs.
@@ -75,4 +71,5 @@ public interface GenericFrame {
 
     public void setMaximizable(boolean b);
 
+    public void toFront();
 }

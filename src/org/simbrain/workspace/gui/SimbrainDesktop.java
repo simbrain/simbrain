@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -53,6 +54,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -192,6 +194,9 @@ public class SimbrainDesktop {
 
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
+    
+    /** Menu for re-centering windows. */
+    private static JMenu recenterMenu;
 
     /** Interpreter for terminal. */
     Interpreter interpreter;
@@ -643,7 +648,41 @@ public class SimbrainDesktop {
     private JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(actionManager.getPropertyTabAction());
+        viewMenu.addSeparator();
+        initializeRecenterWindowMenu();
+        viewMenu.add(recenterMenu);
         return viewMenu;
+    }
+    
+    /**
+     * Create a menu for re-centering windows in case they get "lost" off-screen.
+     */
+    private void initializeRecenterWindowMenu() {
+        recenterMenu = new JMenu("Recenter window");
+        final Workspace workspace = this.getWorkspace();
+        for (WorkspaceComponent component : workspace.getComponentList()) {
+            JMenuItem item = createRecenterWindowMenuItem(component.getName());
+            item.setName(component.getName());
+            recenterMenu.add(item);
+        }
+    }  
+
+    /** Create new Menu item to be added to re-center-window menu */
+    private JMenuItem createRecenterWindowMenuItem(String title) {
+        return new JMenuItem(new AbstractAction(title) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //find which window we need to bring to front
+                for (WorkspaceComponent component : workspace.getComponentList()) {
+                    if (component.getName().equals(getValue(AbstractAction.NAME))) {
+                        GuiComponent c = guiComponents.get(component);
+                        // Re-centers windows to top left at 10,10
+                        c.getParentFrame().setLocation(10, 10);
+                        c.getParentFrame().toFront();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -829,6 +868,19 @@ public class SimbrainDesktop {
             }
 
             @Override
+            public void internalFrameOpened(InternalFrameEvent e) {
+                super.internalFrameOpened(e);
+
+                String title = workspaceComponent.getName();
+                if (recenterMenu != null) {
+                    JMenuItem item =  guiComponent
+                            .getDesktop().createRecenterWindowMenuItem(title);
+                    item.setName(title);
+                    recenterMenu.add(item);
+                }
+            }
+
+            @Override
             public void internalFrameClosing(final InternalFrameEvent e) {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
                     boolean hasCancelled = guiComponent.showHasChangedDialog();
@@ -838,6 +890,21 @@ public class SimbrainDesktop {
                 }
                 guiComponent.close();
             }
+
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e) {
+                super.internalFrameClosed(e);
+                if (recenterMenu != null) {
+                    for (int i = 0; i < recenterMenu.getItemCount(); i++) {
+                        if (recenterMenu.getItem(i).getName()
+                                .equals(e.getInternalFrame().getTitle())) {
+                            recenterMenu.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
     } // End DesktopInternalFrame
 
@@ -945,8 +1012,8 @@ public class SimbrainDesktop {
         // Other initialization
         componentFrame.addComponentListener(componentListener);
         componentFrame.setContentPane(guiComponent);
-        componentFrame.setVisible(true);
         registerComponentInstance(workspaceComponent, guiComponent);
+        componentFrame.setVisible(true);
         componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
         guiComponent.postAddInit();

@@ -18,8 +18,57 @@
  */
 package org.simbrain.workspace.gui;
 
-import bsh.Interpreter;
-import bsh.util.JConsole;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
@@ -70,51 +119,8 @@ import org.simbrain.world.textworld.ReaderComponentDesktopGui;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyVetoException;
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Stack;
-import java.util.Vector;
+import bsh.Interpreter;
+import bsh.util.JConsole;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
@@ -188,6 +194,9 @@ public class SimbrainDesktop {
 
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
+    
+    /** Menu for re-centering windows. */
+    private static JMenu recenterMenu;
 
     /** Interpreter for terminal. */
     Interpreter interpreter;
@@ -631,29 +640,34 @@ public class SimbrainDesktop {
         return fileMenu;
     }
 
-
     /**
      * Create the workspace view menu.
      *
      * @return view menu
      */
     private JMenu createViewMenu() {
-        System.out.println("here" + this.getWorkspace().getComponentList().size());
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(actionManager.getPropertyTabAction());
         viewMenu.addSeparator();
-        JMenu windowRecenter = new JMenu("Recenter window");
+        initializeRecenterWindowMenu();
+        viewMenu.add(recenterMenu);
+        return viewMenu;
+    }
+    
+    /**
+     * Create a menu for re-centering windows in case they get "lost" off-screen.
+     */
+    private void initializeRecenterWindowMenu() {
+        recenterMenu = new JMenu("Recenter window");
         final Workspace workspace = this.getWorkspace();
         for (WorkspaceComponent component : workspace.getComponentList()) {
             JMenuItem item = createRecenterWindowMenuItem(component.getName());
             item.setName(component.getName());
-            windowRecenter.add(item);
+            recenterMenu.add(item);
         }
-        viewMenu.add(windowRecenter);
-        return viewMenu;
-    }
+    }  
 
-    /** create new Menu item to be added to Recenter Window Menu */
+    /** Create new Menu item to be added to re-center-window menu */
     private JMenuItem createRecenterWindowMenuItem(String title) {
         return new JMenuItem(new AbstractAction(title) {
             @Override
@@ -662,7 +676,7 @@ public class SimbrainDesktop {
                 for (WorkspaceComponent component : workspace.getComponentList()) {
                     if (component.getName().equals(getValue(AbstractAction.NAME))) {
                         GuiComponent c = guiComponents.get(component);
-                        //Setting location to top left at 10x10,should it be something else?
+                        // Re-centers windows to top left at 10,10
                         c.getParentFrame().setLocation(10, 10);
                         c.getParentFrame().toFront();
                     }
@@ -856,14 +870,13 @@ public class SimbrainDesktop {
             @Override
             public void internalFrameOpened(InternalFrameEvent e) {
                 super.internalFrameOpened(e);
-                JMenu reCenterWindowMenu = getRecenterWindowMenu();
 
                 String title = workspaceComponent.getName();
-                if (reCenterWindowMenu != null) {
+                if (recenterMenu != null) {
                     JMenuItem item =  guiComponent
                             .getDesktop().createRecenterWindowMenuItem(title);
                     item.setName(title);
-                    reCenterWindowMenu.add(item);
+                    recenterMenu.add(item);
                 }
             }
 
@@ -881,39 +894,15 @@ public class SimbrainDesktop {
             @Override
             public void internalFrameClosed(InternalFrameEvent e) {
                 super.internalFrameClosed(e);
-                JMenu reCenterMenu = getRecenterWindowMenu();
-                if (reCenterMenu != null) {
-                    for (int i = 0; i < reCenterMenu.getItemCount(); i++) {
-                        if (reCenterMenu.getItem(i).getName()
+                if (recenterMenu != null) {
+                    for (int i = 0; i < recenterMenu.getItemCount(); i++) {
+                        if (recenterMenu.getItem(i).getName()
                                 .equals(e.getInternalFrame().getTitle())) {
-                            reCenterMenu.remove(i);
+                            recenterMenu.remove(i);
                             break;
                         }
                     }
                 }
-            }
-
-            // Gives Recenter Window View sub menu
-            private JMenu getRecenterWindowMenu() {
-                JMenuBar menuBar = guiComponent.getDesktop().getFrame().getJMenuBar();
-
-                //find View menu
-                JMenu view = null;
-                for (int i = 0; i < menuBar.getMenuCount(); i++) {
-                    JMenu tmp = menuBar.getMenu(i);
-                    if (tmp != null && tmp.getText().equals("View")) {
-                        view = tmp;
-                        break;
-                    }
-                }
-                if (view != null) {
-                    for (int i = 0; i < view.getMenuComponentCount(); i++) {
-                        if (view.getItem(i) != null && view.getItem(i).getText().equals("Recenter window")) {
-                            return (JMenu) view.getItem(i);
-                        }
-                    }
-                }
-                return null;
             }
 
         }

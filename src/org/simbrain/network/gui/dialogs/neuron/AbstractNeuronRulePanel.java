@@ -86,7 +86,6 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
 
     // Populate the Rule Map.  Place items in alphabetical order so they appear that way in the GUI combo box.
     static {
-    	RULE_MAP.put(new ProductRule().getDescription(), new ProductRulePanel());
         RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
         RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
         RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
@@ -100,6 +99,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
         RULE_MAP.put(new MorrisLecarRule().getDescription(), new MorrisLecarRulePanel());
         RULE_MAP.put(new NakaRushtonRule().getDescription(),
                 new NakaRushtonRulePanel());
+        RULE_MAP.put(new ProductRule().getDescription(), new ProductRulePanel());
         RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
                 ContinuousSigmoidalRulePanel.createContinuousSigmoidalRulePanel());
         RULE_MAP.put(new SigmoidalRule().getDescription(),

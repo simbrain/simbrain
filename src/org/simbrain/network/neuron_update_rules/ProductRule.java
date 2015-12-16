@@ -21,15 +21,15 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>Product</b> is a TODO.
+ * <b>Product rule</b> units compute the product of the activations of incoming
+ * units.  Used in Long Short Term Memory cells.
  */
 public class ProductRule extends NeuronUpdateRule implements
     BoundedUpdateRule, ClippableUpdateRule,
@@ -83,8 +83,11 @@ public class ProductRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
-        double wtdInput = inputType.getInput(neuron);
-        double val = (1 * wtdInput) + 0;
+        double val = 1;
+        for (Synapse s : neuron.getFanIn()) {
+            val *= s.calcWeightedSum();
+            //val *= s.getSource().getActivation();
+        }
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

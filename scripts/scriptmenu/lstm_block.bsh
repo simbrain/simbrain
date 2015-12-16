@@ -26,7 +26,8 @@ import java.util.*;
  * @author Jeff Yoshimi
  * 
  */
-{	
+{
+
 	// Parameters
 	int INPUTS = 25;
 	double GRID_SPACE = 50;

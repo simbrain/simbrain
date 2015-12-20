@@ -20,7 +20,7 @@ private NetworkUpdateAction action;
 	String groupLabel  = "Group_1";
 	NeuronGroup neuronGroup =  network.getGroupByLabel(groupLabel);
 
-	// Customize this
+	// The custom action 
 	this.action = new NetworkUpdateAction() {
 		public void invoke() {
 			// For now just printing to system.out.   Can easily change this code

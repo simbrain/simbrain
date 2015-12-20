@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+
+    <title>Simbrain Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <a href="../../../SimbrainDocs.html">
+        <div class="logo">
+
+        </div>
+    </a>
+    <div id="main_docs">
+        <div class="navi">
+            <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Product</p>
+        </div>
+        <p></p>
+        <h1>Product Neuron</h1>
+        <p>Activation is some variant of a product of incoming activations. They are used in <a href="https://en.wikipedia.org/wiki/Long_short-term_memory">Long Short Term Memory</a> networks.  Also see the discussion of Sigma Pi units in the original <a href="https://mitpress.mit.edu/books/parallel-distributed-processing">PDP Volumes</a>.</p>
+ 
+        <!-- Use math package to make this nice! -->
+        <p class="heading">Use Weights</p>
+        <blockquote>
+            <p>If false (the default case), activation is a product of incoming activations.</p>
+            <p>If true, activation is a product of incoming activation / weight products, or (in the case of <a href="../spikingneurons.html">spiking neurons</a>) post-synaptic-responses (see <a href="../synapse/spikeResponder.html">the spike responder</a> docs).</p>
+        </blockquote>
+        <p class="heading">Add Noise</p>
+        <blockquote>
+            <p>If this is set to true, random values are added to the activation via a noise generator. The random values are added after the Product activation function is applied. For details how the noise generator works, click <a href="../../Utils/Randomizers/Randomizers.html">here</a>.</p>
+        </blockquote>
+    </div>
+</body>
+
+</html>

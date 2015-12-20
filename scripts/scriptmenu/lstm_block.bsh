@@ -27,29 +27,7 @@ import java.util.*;
  * 
  */
 {
-	// Define a new neuron update rule for product units (AND gates)
-	// used in Long Short Term Memory cells
-	private class ProductRule extends LinearRule {
-		public void update(Neuron neuron) {
-			val = 1;
-			for (Synapse s : neuron.getFanIn()) {
-				val *= s.calcWeightedSum();
-			}
-			
-			if (getAddNoise()) {
-				val += getNoiseGenerator().getRandom();
-			}
-			
-			neuron.setBuffer(val);
-		}
-		
-		public String getDescription() {
-			return "Product";
-		}
-	}
 
-    print("Here I am..." + Thread.currentThread());
-	
 	// Parameters
 	int INPUTS = 25;
 	double GRID_SPACE = 50;

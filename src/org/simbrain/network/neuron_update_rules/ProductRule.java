@@ -29,12 +29,18 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>Product rule</b> units compute the product of the activations of incoming
- * units.  Used in Long Short Term Memory cells.
+ * units.  Used in "Long Short Term Memory" and "Sigma-Pi" networks.
  */
 public class ProductRule extends NeuronUpdateRule implements
     BoundedUpdateRule, ClippableUpdateRule,
     NoisyUpdateRule {
 
+    // TODO: Could this just extend LinearRule?
+
+    /** Whether to use weights by default. */
+    private static final boolean DEFAULT_USE_WEIGHTS = false;
+
+    
     /** The Default upper bound. */
     private static final double DEFAULT_UPPER_BOUND = 1.0;
 
@@ -58,6 +64,9 @@ public class ProductRule extends NeuronUpdateRule implements
 
     /** The lower bound of the activity if clipping is used. */
     private double lowerBound = DEFAULT_LOWER_BOUND;
+    
+    /** Whether to use weights or not. */
+    private boolean useWeights = DEFAULT_USE_WEIGHTS;
 
     /**
      * {@inheritDoc}
@@ -71,6 +80,7 @@ public class ProductRule extends NeuronUpdateRule implements
      */
     public ProductRule deepCopy() {
         ProductRule ln = new ProductRule();
+        ln.setUseWeights(getUseWeights());
         ln.setClipped(isClipped());
         ln.setAddNoise(getAddNoise());
         ln.setUpperBound(getUpperBound());
@@ -83,10 +93,20 @@ public class ProductRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     public void update(Neuron neuron) {
+
         double val = 1;
-        for (Synapse s : neuron.getFanIn()) {
-            val *= s.calcWeightedSum();
-            //val *= s.getSource().getActivation();
+        if (useWeights) {
+            for (Synapse s : neuron.getFanIn()) {
+                val *= s.getPsr();
+            }            
+        } else {
+            for (Synapse s : neuron.getFanIn()) {
+                val *= s.getSource().getActivation();
+            }            
+        }
+        // Special case of isolated neuron
+        if (neuron.getFanIn().size() == 0) {
+            val = 0;
         }
 
         if (addNoise) {
@@ -214,6 +234,20 @@ public class ProductRule extends NeuronUpdateRule implements
     @Override
     public void setClipped(boolean clipping) {
         this.clipping = clipping;
+    }
+
+    /**
+     * @return the useWeights
+     */
+    public boolean getUseWeights() {
+        return useWeights;
+    }
+
+    /**
+     * @param useWeights the useWeights to set
+     */
+    public void setUseWeights(boolean useWeights) {
+        this.useWeights = useWeights;
     }
 
 }

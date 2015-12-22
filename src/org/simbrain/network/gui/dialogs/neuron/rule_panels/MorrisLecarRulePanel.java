@@ -56,9 +56,6 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
     /** Potassium channel constant 2. */
     private JTextField tfV_W2 = new JTextField();
 
-    /** Fraction of open potassium channels. */
-    private JTextField tfW_K = new JTextField();
-
     /** Potassium channel time constant/decay rate (s^-1). */
     private JTextField tfPhi = new JTextField();
 
@@ -103,7 +100,6 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         LabelledItemPanel potas = new LabelledItemPanel();
         potas.addItem("K\u207A const. 1", tfV_W1);
         potas.addItem("K\u207A const. 2", tfV_W2);
-        potas.addItem("Open K\u207A channels", tfW_K);
         potas.addItem("K\u207A \u03C6", tfPhi);
 
         tabbedPane.add(cellPanel, "Membrane Properties");
@@ -279,19 +275,6 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
             tfV_W2.setText(Double.toString(vw2Getter.getParameter(neuronRef)));
         }
 
-        // w_k
-        ParameterGetter<NeuronUpdateRule, Double> wkGetter =
-                new ParameterGetter<NeuronUpdateRule, Double>() {
-                    @Override
-                    public Double getParameter(NeuronUpdateRule source) {
-                        return ((MorrisLecarRule) source).getW_K();
-                    }
-                };
-        if (!NetworkUtils.isConsistent(ruleList, wkGetter)) {
-            tfW_K.setText(SimbrainConstants.NULL_STRING);
-        } else {
-            tfW_K.setText(Double.toString(wkGetter.getParameter(neuronRef)));
-        }
 
         // phi
         ParameterGetter<NeuronUpdateRule, Double> phiGetter =
@@ -358,7 +341,6 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
         tfV_M2.setText(Double.toString(prototypeRule.getV_m2()));
         tfV_W1.setText(Double.toString(prototypeRule.getV_w1()));
         tfV_W2.setText(Double.toString(prototypeRule.getV_w2()));
-        tfW_K.setText(Double.toString(prototypeRule.getW_K()));
         tfPhi.setText(Double.toString(prototypeRule.getPhi()));
         tfI_Bg.setText(Double.toString(prototypeRule.getI_bg()));
         tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
@@ -483,15 +465,6 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
             for (int i = 0; i < numNeurons; i++) {
                 ((MorrisLecarRule) neurons.get(i).getUpdateRule())
                         .setV_w2(vW2);
-            }
-        }
-
-        // w_k
-        double wK = Utils.doubleParsable(tfW_K);
-        if (!Double.isNaN(wK)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((MorrisLecarRule) neurons.get(i).getUpdateRule())
-                        .setW_K(wK);
             }
         }
 

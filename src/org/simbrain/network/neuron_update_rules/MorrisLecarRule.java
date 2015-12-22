@@ -260,14 +260,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 		this.v_w2 = v_w2;
 	}
 
-	public double getW_K() {
-		return w_K;
-	}
-
-	public void setW_K(double w_K) {
-		this.w_K = w_K;
-	}
-
 	public double getPhi() {
 		return phi;
 	}

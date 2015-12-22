@@ -1,22 +1,22 @@
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.ParameterGetter;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
-import org.simbrain.network.neuron_update_rules.FitzhughNagumo;
 import org.simbrain.network.neuron_update_rules.MorrisLecarRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.TristateDropDown;
-
-import javax.swing.*;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Amanda Pandey <amanda.pandey@gmail.com>
@@ -500,7 +500,7 @@ public class MorrisLecarRulePanel extends AbstractNeuronRulePanel{
             boolean addNoise = isAddNoise.getSelectedIndex() == TristateDropDown
                     .getTRUE();
             for (int i = 0; i < numNeurons; i++) {
-                ((FitzhughNagumo) neurons.get(i).getUpdateRule())
+                ((MorrisLecarRule) neurons.get(i).getUpdateRule())
                         .setAddNoise(addNoise);
             }
             if (addNoise) {

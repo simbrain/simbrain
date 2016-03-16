@@ -49,10 +49,10 @@ public class Synapse {
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
 
     /** Default upper bound. */
-    private static double DEFAULT_UPPER_BOUND = 10;
+    private static double DEFAULT_UPPER_BOUND = 100;
 
     /** Default lower bound. */
-    private static double DEFAULT_LOWER_BOUND = -10;
+    private static double DEFAULT_LOWER_BOUND = -100;
 
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
@@ -177,7 +177,7 @@ public class Synapse {
      */
     public Synapse(Neuron source, Neuron target, double initialStrength) {
         this(source, target);
-        this.setStrength(initialStrength);
+        this.forceSetStrength(initialStrength);
     }
 
     /**

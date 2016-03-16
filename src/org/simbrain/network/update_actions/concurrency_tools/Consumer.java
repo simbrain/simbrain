@@ -19,7 +19,6 @@
 package org.simbrain.network.update_actions.concurrency_tools;
 
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate.CyclicTaskQueue;
 

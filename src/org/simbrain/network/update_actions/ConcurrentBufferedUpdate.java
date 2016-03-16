@@ -568,7 +568,8 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
      * @param args
      */
     public static void main(String[] args) {
-        final int numNeurons = 1000;
+        final int numNeurons = 1992;
+        double density = .1;
         System.out.println(System.getProperty("java.vm.name"));
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Press any key, then ENTER.");
@@ -576,7 +577,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         long start = System.nanoTime();
         Network net = new Network();
         net.setFireUpdates(false);
-        net.setTimeStep(0.5);
+        net.setTimeStep(0.1);
         NeuronGroup ng = new NeuronGroup(net, numNeurons);
         ng.setRecordAsSpikes(true);
         ng.setLabel(beginToken);
@@ -585,36 +586,51 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         upRule.setAddNoise(true);
         ng.setNeuronType(upRule);
         Randomizer rand = new Randomizer(ProbDistribution.NORMAL);
-        for (Neuron n : ng.getNeuronList()) {
+        for (Neuron neuron : ng.getNeuronList()) {
+        	IzhikevichRule iz = new IzhikevichRule();
             if (Math.random() < 0.2) {
-                rand.setParam1(0);
-                rand.setParam2(2);
-                n.setPolarity(Polarity.INHIBITORY);
+                neuron.setPolarity(Polarity.INHIBITORY);
+                iz.setRefractoryPeriod(1.0);
+                double rVal = Math.random();
+                iz.setA(0.02 + (0.08 * rVal));
+                iz.setB(0.25 - (0.05 * rVal));
+                iz.setC(-65);
+                iz.setD(2);
+                rand.setParam2(0.5);
             } else {
-                rand.setParam1(0);
-                rand.setParam2(5);
-                n.setPolarity(Polarity.EXCITATORY);
+                neuron.setPolarity(Polarity.EXCITATORY);
+                iz.setRefractoryPeriod(2.0);
+                iz.setA(0.02);
+                iz.setB(0.2);
+                double rVal = Math.random();
+                rVal *= rVal;
+                iz.setC(-65.0 + (15.0 * rVal));
+                iz.setD(8.0 - (6 * rVal));
+                rand.setParam2(1.2);
             }
-            ((IzhikevichRule) n.getUpdateRule())
-                    .setNoiseGenerator(new Randomizer(rand));
+            iz.setiBg(3.5);
+            iz.setAddNoise(true);
+            iz.setNoiseGenerator(rand);
+            neuron.setUpdateRule(iz);
         }
         GridLayout gl = new GridLayout();
         gl.layoutNeurons(ng.getNeuronList());
         PolarizedRandomizer exRand = new PolarizedRandomizer(
-                Polarity.EXCITATORY, ProbDistribution.UNIFORM);
+                Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
-                Polarity.INHIBITORY, ProbDistribution.UNIFORM);
-        exRand.setParam1(1);
-        exRand.setParam2(2);
-        inRand.setParam1(1);
-        inRand.setParam2(5);
+                Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
+        exRand.setParam1(.25);
+        exRand.setParam2(1);
+        inRand.setParam1(2);
+        inRand.setParam2(2);
         System.out.println("Begin Network Construction...");
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng,
-                new Sparse(0.1, false, false),
-                0.1, exRand, inRand);
+                new Sparse(density, false, false),
+                .8, exRand, inRand);
         for (Synapse s : sg.getAllSynapses()) {
             s.setId(null);
             s.setFrozen(true);
+            s.forceSetStrength(s.getStrength()/5);
         }
         sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
         ConvolvedJumpAndDecay inhibJD = new ConvolvedJumpAndDecay();
@@ -645,13 +661,13 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         for (BufferedUpdateTask but : cbu.taskSet.taskArray) {
             siz += but.getHosts().length;
         }
-        System.out.println(siz);
+//        System.out.println(siz);
         System.out.println();
-//        for (int i = 0; i < 5000; i++) {
-//            net.update();
+        for (int i = 0; i < 10000; i++) {
+            net.update();
 //            int upC = i+1;
 //            int synC = i+1;
-//            for (Neuron n : ng.getNeuronList()) {
+////            for (Neuron n : ng.getNeuronList()) {
 //                if(((IzhikevichRule) n.getUpdateRule()).upCount.intValue() != upC) {
 //                	System.out.println("UP " + upC + " " + ((IzhikevichRule) n.getUpdateRule()).upCount.intValue());
 //                }
@@ -659,19 +675,17 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 //                	System.out.println("SYN " + synC + " " + n.syncCount.intValue());
 //                }
 //            }
-//        }
+        }
 //        
 //        for (Neuron n : ng.getNeuronList()) {
-//            System.out.print(((IzhikevichRule) n.getUpdateRule()).upCount.intValue() + "\t");
-//            System.out.print(n.syncCount.intValue() + "\t");
-//            System.out.println(((IzhikevichRule) n.getUpdateRule()).getSpikeCount());
+//            System.out.println(((IzhikevichRule) n.getUpdateRule()).getFiringRate(n));
 //        }
         // // final int TEST_ITERATIONS = 500;
         //net.getUpdateManager().clear();
         //ConcurrentBufferedUpdate cbu = ConcurrentBufferedUpdate
         //        .createConcurrentBufferedUpdate(net);
         //net.getUpdateManager().addAction(cbu);
-        System.out.println(cbu.currentAvailableProcessors);
+//        System.out.println(cbu.currentAvailableProcessors);
         // Quick tune up...
         for (int i = 0; i < 10000; i++) {
             if (i % 100 == 0) {
@@ -708,10 +722,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
 //        // ng.startRecording();
         start = System.nanoTime();
         ng.startRecording(new File("outs.csv"));
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 100000; i++) {
             net.update();
         }
-        ng.stopRecording();
+        //ng.stopRecording();
         end = System.nanoTime();
         System.out.println("Parallel: "
                 + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));

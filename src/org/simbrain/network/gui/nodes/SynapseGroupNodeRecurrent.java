@@ -78,6 +78,8 @@ public class SynapseGroupNodeRecurrent extends SynapseGroupNode {
         arrowHead = new PPath.Float();
         arcCurve = new PPath.Float();
         arrowHead.setStroke(null);
+        // TODO: Below may look a bit better.   But then overlap is visible.   Need to find a way to nicely join the arc and head.
+        //arrowHead.setTransparency(0.5f); 
         arrowHead.setPaint(Color.green);
         strokeWidth = (float) (group.getSourceNeuronGroup().getMaxDim() / 6);
         arcCurve.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_SQUARE,

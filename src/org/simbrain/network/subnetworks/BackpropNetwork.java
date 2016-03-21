@@ -43,12 +43,23 @@ public class BackpropNetwork extends FeedForward implements Trainable {
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
-        super(network, nodesPerLayer, initialPosition, new Neuron(network,
-                new LinearRule()));
+        super(network, nodesPerLayer, initialPosition,
+                new Neuron(network, new LinearRule()));
         setLabel("Backprop");
-
     }
 
+    /**
+     * Construct a new backprop network with a default location of (0,0).
+     *
+     * @param network reference to root network
+     * @param nodesPerLayer number of layers
+     */
+    public BackpropNetwork(Network network, int[] nodesPerLayer) {
+        super(network, nodesPerLayer, new Point2D.Double(1, 1),
+                new Neuron(network, new LinearRule()));
+        setLabel("Backprop");
+    }
+    
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;

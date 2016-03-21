@@ -26,6 +26,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 
 /**
  * Backprop trainer. An implementation of the backpropagation learning
@@ -73,6 +74,22 @@ public class BackpropTrainer extends IterableTrainer {
     public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
         super(network);
         this.layers = layers;
+        errorMap = new HashMap<Neuron, Double>();
+        weightDeltaMap = new HashMap<Synapse, Double>();
+        biasDeltaMap = new HashMap<Neuron, Double>();
+        this.setIteration(0);
+        mse = 0;
+        // SimnetUtils.printLayers(layers);
+    }
+    
+    /**
+     * Create a backprop trainer for a backrop net.
+     *
+     * @param network the network to train.
+     */
+    public BackpropTrainer(BackpropNetwork network) {
+        super(network);
+        this.layers = network.getNeuronGroupsAsList();
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();

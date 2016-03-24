@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -26,6 +29,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.ParameterEditor;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -45,16 +49,16 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     private static final boolean DEFAULT_CLIPPING = true;
 
     /** Slope. */
-    private double slope = 1;
+    public double slope = 1;
 
     /** Bias. */
-    private double bias = 0;
+    public double bias = 0;
 
-    /** Noise dialog. */
+    /** Noise generator. */
     private Randomizer noiseGenerator = new Randomizer();
 
     /** Add noise to the neuron. */
-    private boolean addNoise;
+    private boolean addNoise = false;
 
     /** Clipping. */
     private boolean clipping = DEFAULT_CLIPPING;
@@ -261,5 +265,17 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     public void setClipped(boolean clipping) {
         this.clipping = clipping;
     }
+
+    // TODO: This can now be removed.  Put this on the panel side
+    /**
+     * List of property editors for use by neuron property dialogs.
+     */
+    public static List<ParameterEditor> editorList = Arrays.asList(
+            new ParameterEditor<NeuronUpdateRule, Double>(Double.class, "slope",
+                    (r) -> ((LinearRule) r).getSlope(),
+                    (r, val) -> ((LinearRule) r).setSlope((double) val)),
+            new ParameterEditor<NeuronUpdateRule, Double>(Double.class, "bias",
+                    (r) -> ((LinearRule) r).getBias(),
+                    (r, val) -> ((LinearRule) r).setBias((double) val)));
 
 }

@@ -57,7 +57,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.CondensedConnectionPanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.AbstractSigmoidalRulePanel;
 import org.simbrain.network.gui.dialogs.neuron.rule_panels.ContinuousSigmoidalRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.rule_panels.SigmoidalRulePanel;
+import org.simbrain.network.gui.dialogs.neuron.rule_panels.DiscreteSigmoidalRulePanel;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -726,10 +726,9 @@ public class ESNCreationDialog extends StandardDialog {
          *
          */
         public void resetLabelColors() {
-            JComboBox<SquashingFunction> impCb = rulePanel
-                    .getCbImplementation();
-            SquashingFunction func = (SquashingFunction) impCb
-                    .getSelectedItem();
+            JComboBox impCb = rulePanel.getCbImplementation();
+            SquashingFunction func = SquashingFunction.getFunctionFromIndex(impCb
+                    .getSelectedIndex());
             typeLabel.setText(func.toString());
             // TODO: Cleanup/generalize
             if (func == SquashingFunction.TANH) {
@@ -771,20 +770,18 @@ public class ESNCreationDialog extends StandardDialog {
          */
         public void setTimeType(TimeType timeType) {
             if (timeType == TimeType.DISCRETE) {
-                rulePanel = SigmoidalRulePanel.createSigmoidalRulePanel();
+                rulePanel = new DiscreteSigmoidalRulePanel();
             } else {
-                rulePanel = ContinuousSigmoidalRulePanel
-                        .createContinuousSigmoidalRulePanel();
+                rulePanel = new ContinuousSigmoidalRulePanel();
             }
             // Update the Type Label based on the selection in the combobox
-            final JComboBox<SquashingFunction> impCb = rulePanel
-                    .getCbImplementation();
-            impCb.setSelectedItem(DEFAULT_INITIAL_FUNCTION);
+            final JComboBox impCb = rulePanel.getCbImplementation();
+            impCb.setSelectedIndex(SquashingFunction.getIndexFromFunction(DEFAULT_INITIAL_FUNCTION));
             impCb.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SquashingFunction func = (SquashingFunction) impCb
-                            .getSelectedItem();
+                    SquashingFunction func = SquashingFunction
+                            .getFunctionFromIndex(impCb.getSelectedIndex());
                     typeLabel.setText(func.toString());
                     // TODO: Cleanup/generalize
                     resetLabelColors();

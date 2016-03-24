@@ -34,12 +34,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * <b>RandomizerPanel</b> an interface for setting parameters of a randomizer
@@ -50,6 +51,9 @@ import org.simbrain.util.widgets.TristateDropDown;
  */
 public class RandomizerPanel extends JPanel {
 
+    /** Parent window reference to use in repacking and recentering. */
+    private Window parent;
+
     /** Distribution combo box. */
     private JComboBox<ProbDistribution> cbDistribution =
         new JComboBox<ProbDistribution>(ProbDistribution.values());
@@ -57,6 +61,8 @@ public class RandomizerPanel extends JPanel {
     // Initialize distribution.
     {
         cbDistribution.setSelectedItem(Randomizer.DEFAULT_DISTRIBUTION);
+        // Remove null distribution.  Kind of hacky...
+        cbDistribution.removeItemAt(cbDistribution.getItemCount()-1);
     }
 
     /**
@@ -84,13 +90,13 @@ public class RandomizerPanel extends JPanel {
                 }
                 cardPanel.repaint();
                 repaint();
-                if (parent != null)
+                if (parent != null) {
                     parent.pack();
+                    parent.setLocationRelativeTo(null);
+                }
             }
         }
-    };
-
-    private final Window parent;
+    };    
 
     /**
      * This method is the default constructor. The parent window is set to null
@@ -123,8 +129,6 @@ public class RandomizerPanel extends JPanel {
     private void layoutPanel() {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
-        //        GridBagConstraints gbc = new GridBagConstraints();
-        //        gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new LabelledItem("Distribution: ", cbDistribution),
             BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);
@@ -162,30 +166,36 @@ public class RandomizerPanel extends JPanel {
      *            List of randomizers
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
-        Randomizer rand = (Randomizer) randomizers.get(0);
-        if (randomizers.size() == 1) {
-            fillFieldValues(rand);
-            return;
-        }
-        if (!NetworkUtils.isConsistent(randomizers, Randomizer.class,
-            "getPdf")) {
-            cbDistribution.setSelectedItem(SimbrainConstants.NULL_STRING);
-            NullRandPanel nrp = new NullRandPanel();
-            cardMap.put(null, nrp);
+
+        ParameterGetter<Randomizer, ProbDistribution> pdfGetter = (
+                r) -> ((Randomizer) r).getPdf();
+        if (!NetworkUtils.isConsistent(randomizers, pdfGetter)) {
+            if (!(cbDistribution.getItemCount() == ProbDistribution.values().length)) {
+                cbDistribution.addItem(ProbDistribution.NULL);
+                cbDistribution.setSelectedIndex(cbDistribution.getItemCount()-1);                
+            }
             cardPanel.removeAll();
-            cardPanel.add(nrp.getPanel(), SimbrainConstants.NULL_STRING);
+            cardPanel.add(new JPanel());
             cardPanel.repaint();
-            if (parent != null)
+            if (parent != null) {
                 parent.pack();
+                parent.setLocationRelativeTo(null);
+            }
         } else {
+            if (cbDistribution.getItemCount() == ProbDistribution.values().length) {
+                cbDistribution.removeItem(ProbDistribution.NULL);
+            }
+            Randomizer rand = (Randomizer) randomizers.get(0);
             ProbDistPanel rp = cardMap.get(rand.getPdf());
             cbDistribution.setSelectedItem(rand.getPdf());
-            rp.fillFieldValues(rand);
+            rp.fillFieldValues(randomizers); 
             cardPanel.removeAll();
             cardPanel.add(rp.getPanel());
             cardPanel.repaint();
-            if (parent != null)
+            if (parent != null) {
                 parent.pack();
+                parent.setLocationRelativeTo(null);
+            }
         }
 
     }
@@ -202,8 +212,10 @@ public class RandomizerPanel extends JPanel {
         cardPanel.removeAll();
         cardPanel.add(rp.getPanel());
         cardPanel.repaint();
-        if (parent != null)
+        if (parent != null) {
             parent.pack();
+            parent.setLocationRelativeTo(null);
+        }
     }
 
     /**
@@ -216,8 +228,10 @@ public class RandomizerPanel extends JPanel {
         cardPanel.removeAll();
         cardPanel.add(rp.getPanel());
         cardPanel.repaint();
-        if (parent != null)
+        if (parent != null) {
             parent.pack();
+            parent.setLocationRelativeTo(null);
+        }
     }
 
     /**
@@ -235,9 +249,6 @@ public class RandomizerPanel extends JPanel {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
@@ -252,7 +263,7 @@ public class RandomizerPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled) {
         cbDistribution.setEnabled(enabled);
-        if (!cbDistribution.getSelectedItem()
+        if (!cbDistribution.getSelectedItem().toString()
             .equals(SimbrainConstants.NULL_STRING)) {
             cardMap.get((ProbDistribution) cbDistribution.getSelectedItem())
                 .setEnabled(enabled);
@@ -269,8 +280,8 @@ public class RandomizerPanel extends JPanel {
     /**
      * @return Returns the isUseBoundsBox.
      */
-    public TristateDropDown getTsClipping() {
-        if (cbDistribution.getSelectedItem()
+    public YesNoNull getTsClipping() {
+        if (cbDistribution.getSelectedItem().toString()
             .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
@@ -282,7 +293,7 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the tfLowBound.
      */
     public JTextField getTfLowBound() {
-        if (cbDistribution.getSelectedItem()
+        if (cbDistribution.getSelectedItem().toString()
             .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
@@ -294,7 +305,7 @@ public class RandomizerPanel extends JPanel {
      * @return Returns the tfUpBound.
      */
     public JTextField getTfUpBound() {
-        if (cbDistribution.getSelectedItem()
+        if (cbDistribution.getSelectedItem().toString()
             .equals(SimbrainConstants.NULL_STRING)) {
             return null;
         }
@@ -304,7 +315,8 @@ public class RandomizerPanel extends JPanel {
 
     /**
      * Provides a string summary of the field values.
-     * @return
+     *
+     * @return the summary
      */
     public String getSummary() {
         ProbDistribution pdf =
@@ -333,6 +345,9 @@ public class RandomizerPanel extends JPanel {
                 break;
             case PARETO:
                 newText = "Pareto: \u03B1=" + param1 + " min=" + param2;
+                break;
+            case NULL:
+                newText = SimbrainConstants.NULL_STRING;
                 break;
             default:
                 newText = "???";
@@ -365,36 +380,15 @@ public class RandomizerPanel extends JPanel {
     }
 
     /**
-     * A null ProbDist panel which cannot under any circumstance actually edit
-     * anything. It displays nothing and serves only as a place holder in
-     * instances where multiple randomizers are selected with different
-     * probability density functions.
-     *
-     * @author Zach Tosi
+     * Set the parent window.
      */
-    private class NullRandPanel extends ProbDistPanel {
-
-        public NullRandPanel() {
-            super();
-        }
-
-        public void fillFieldValues(Randomizer rand) {
-            // Do nothing...
-        }
-
-        public void fillFieldValues(ArrayList<Randomizer> rands) {
-            // Do nothing...
-        }
-
-        public void fillDefaultValues() {
-            // Do nothing...
-        }
-
-        public void commitRandom(Randomizer rand) {
-            // Do nothing...
-        }
+    public void setParent(Window parent) {
+        this.parent = parent;
     }
-
+    
+    /**
+     * Test main.
+     */
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         RandomizerPanel rp = new RandomizerPanel(frame);

@@ -18,7 +18,12 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -120,6 +125,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
@@ -565,12 +571,18 @@ public class NetworkPanel extends JPanel {
             @Override
             public void
                 neuronTypeChanged(final NetworkEvent<NeuronUpdateRule> e) {
+                // Can use this to allow activity generators to become neurons or vice
+                // versa.  Must add a method that changes the shape object on the neuron node
+                // and then removes and adds the appropriate pnode to the NeuronNode
+                //NeuronNode node = (NeuronNode) objectNodeMap.get(e.getObject());
+                //if  (node != null) {
+                //    node.updateShape();                    
+                //}
             }
 
             @Override
             public void neuronMoved(final NetworkEvent<Neuron> e) {
                 NeuronNode node = (NeuronNode) objectNodeMap.get(e.getSource());
-
                 // In previous versions checked NeuronNode.isMoving == false.
                 // See NeuronNode isMoving comments
                 if (node != null) {
@@ -816,10 +828,12 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Use the GUI to add a new neuron to the underlying network model.
+     * 
+     * @param baseRule the neuron update rule to use for the new neuron
      */
-    public void addNeuron() {
+    public void addNeuron(final NeuronUpdateRule baseRule) {
 
-        final Neuron neuron = new Neuron(getNetwork(), new LinearRule());
+        final Neuron neuron = new Neuron(getNetwork(), baseRule);
         Point2D p = whereToAdd;
         neuron.setX(p.getX());
         neuron.setY(p.getY());
@@ -3287,5 +3301,6 @@ public class NetworkPanel extends JPanel {
 		if (!updateComplete && this.updateComplete.get() != 0) { return; }
 		this.updateComplete.set(updateComplete ? 0 : 3);
 	}
+
 
 }

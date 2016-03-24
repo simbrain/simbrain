@@ -18,48 +18,27 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.randomizer.gui.RandomizerPanel;
-import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * <b>SinusoidalNeuronPanel</b>.
+ * <b>SinusoidalGeneratorPanel</b> edits a sinusoidal actiity generator.
  */
 public class SinusoidalGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** Phase field. */
-    private JTextField tfPhase = new JTextField();
-
-    /** Frequency field. */
-    private JTextField tfFrequency = new JTextField();
-
-    /** Add noise combo box. */
-    private TristateDropDown isAddNoise = new TristateDropDown();
-
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
-
-    /** Random panel. */
-    private RandomizerPanel randPanel;// = new RandomizerPanel();
 
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();
 
     /** A reference to the neuron rule being edited. */
-    private SinusoidalRule neuronRef = new SinusoidalRule();
+    private SinusoidalRule prototypeRule = new SinusoidalRule();
 
     /**
      * Creates an instance of this panel.
@@ -68,125 +47,23 @@ public class SinusoidalGeneratorPanel extends AbstractNeuronRulePanel {
     public SinusoidalGeneratorPanel() {
         super();
         this.add(tabbedPanel);
+        JTextField tfPhase = createTextField(
+                (r) -> ((SinusoidalRule) r).getPhase(),
+                (r, val) -> ((SinusoidalRule) r).setPhase((double) val));
+        JTextField tfFrequency = createTextField(
+                (r) -> ((SinusoidalRule) r).getFrequency(),
+                (r, val) -> ((SinusoidalRule) r).setFrequency((double) val));
         mainPanel.addItem("Phase", tfPhase);
         mainPanel.addItem("Frequency", tfFrequency);
-        mainPanel.addItem("Add noise", isAddNoise);
+        mainPanel.addItem("Add noise", getAddNoise());
         tabbedPanel.add(mainPanel, "Main");
-        tabbedPanel.add(randPanel, "Noise");
-    }
-
-    /**
-     * Populates the field with current data.
-     * @param ruleList
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-
-        neuronRef = (SinusoidalRule) ruleList.get(0);
-
-        // (Below) Handle consistency of multiple selections
-
-        // Handle Frequency
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-            "getFrequency"))
-            tfFrequency.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
-
-        // Handle Phase
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-            "getPhase"))
-            tfPhase.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfPhase.setText(Double.toString(neuronRef.getPhase()));
-
-        // Handle Noise
-        if (!NetworkUtils.isConsistent(ruleList, SinusoidalRule.class,
-            "getAddNoise"))
-            isAddNoise.setNull();
-        else
-            isAddNoise.setSelected(neuronRef.getAddNoise());
-
-        randPanel.fillFieldValues(getRandomizers(ruleList));
-
-    }
-
-    /**
-     * Populates the fields with default data.
-     */
-    public void fillDefaultValues() {
-        neuronRef = new SinusoidalRule();
-        tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
-        tfPhase.setText(Double.toString(neuronRef.getPhase()));
-        isAddNoise.setSelected(neuronRef.getAddNoise());
-        randPanel.fillDefaultValues();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(Neuron neuron) {
-
-        if (neuron.getUpdateRule() instanceof SinusoidalRule) {
-            neuronRef = (SinusoidalRule) neuron.getUpdateRule();
-        } else {
-            neuron.setUpdateRule(neuronRef);
-        }
-
-        // Phase
-        if (!tfPhase.getText().equals(SimbrainConstants.NULL_STRING))
-            neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
-
-        // Frequency
-        if (!tfFrequency.getText().equals(SimbrainConstants.NULL_STRING))
-            neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
-
-        // Noise
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-
-        randPanel.commitRandom(neuronRef.getNoiseGenerator());
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(List<Neuron> neurons) {
-
-        // Phase
-        if (!tfPhase.getText().equals(SimbrainConstants.NULL_STRING))
-            neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
-
-        // Frequency
-        if (!tfFrequency.getText().equals(SimbrainConstants.NULL_STRING))
-            neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
-
-        // Noise
-        if (!isAddNoise.isNull())
-            neuronRef.setAddNoise(isAddNoise.isSelected());
-
-        randPanel.commitRandom(neuronRef.getNoiseGenerator());
-
-        for (Neuron n : neurons) {
-            n.setUpdateRule(neuronRef);
-        }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NeuronUpdateRule getPrototypeRule() {
-        return neuronRef;
+        tabbedPanel.add(getNoisePanel(), "Noise");
     }
 
     @Override
-    protected void writeValuesToRules(List<Neuron> neurons) {
-        // TODO Auto-generated method stub
-
+    public final NeuronUpdateRule getPrototypeRule() {
+        return prototypeRule.deepCopy();
     }
+
 
 }

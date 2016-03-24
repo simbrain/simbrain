@@ -984,6 +984,7 @@ public class Network {
 
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
+        xstream.omitField(Neuron.class, "generator");
 
         // TODO: Backwards compatible
         xstream.omitField(Synapse.class, "sendWeightedInput");

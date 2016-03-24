@@ -65,6 +65,10 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
      */
     private double refractoryPeriod = 0.0; //ms
 
+    //TODO
+    private double timeStep;
+    private double val;
+
     /**
      * {@inheritDoc}
      */
@@ -74,14 +78,11 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
         in.setB(getB());
         in.setC(getC());
         in.setD(getD());
+        in.setiBg(getiBg());
         in.setAddNoise(getAddNoise());
         in.noiseGenerator = new Randomizer(noiseGenerator);
-
         return in;
     }
-    private double timeStep;
-    private double inputs = 0;
-    private double val;
     /**
      * {@inheritDoc}
      */

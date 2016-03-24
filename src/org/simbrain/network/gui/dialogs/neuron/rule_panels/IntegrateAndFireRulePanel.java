@@ -18,27 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.Utils;
-import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.widgets.TristateDropDown;
 
 /**
- * <b>IntegrateAndFireNeuronPanel</b>.
+ * <b>IntegrateAndFireNeuronPanel</b> edits an integrate and fire neuron.
  */
 public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
 
@@ -49,32 +37,25 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Time constant field. */
-    private JTextField tfTimeConstant = new JTextField();
+    private JTextField tfTimeConstant;
 
     /** Threshold field. */
-    private JTextField tfThreshold = new JTextField();
+    private JTextField tfThreshold;
 
     /** Reset field. */
-    private JTextField tfReset = new JTextField();
+    private JTextField tfReset;
 
     /** Resistance field. */
-    private JTextField tfResistance = new JTextField();
+    private JTextField tfResistance;
 
     /** Resting potential field. */
-    private JTextField tfRestingPotential = new JTextField();
+    private JTextField tfRestingPotential;
 
     /** Background current field. */
-    private JTextField tfBackgroundCurrent = new JTextField();
-
-    /** Random tab. */
-    private NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
-
-    /** Add noise combo box. */
-    private TristateDropDown isAddNoise = new TristateDropDown();
+    private JTextField tfBackgroundCurrent;
 
     /** A reference to the neuron update rule being edited. */
-    private static final IntegrateAndFireRule prototypeRule =
-        new IntegrateAndFireRule();
+    private static final IntegrateAndFireRule prototypeRule = new IntegrateAndFireRule();
 
     /**
      * Creates a new instance of the integrate and fire neuron panel.
@@ -82,211 +63,45 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
     public IntegrateAndFireRulePanel() {
         super();
         this.add(tabbedPane);
+
+        tfTimeConstant = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getTimeConstant(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setTimeConstant((double) val));
+        tfThreshold = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getThreshold(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setThreshold((double) val));
+        tfReset = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getResetPotential(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setResetPotential((double) val));
+        tfResistance = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getResistance(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setResistance((double) val));
+        tfRestingPotential = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getRestingPotential(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setRestingPotential((double) val));
+        tfBackgroundCurrent = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getBackgroundCurrent(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setBackgroundCurrent((double) val));
+
         mainTab.addItem("Threshold (mV)", tfThreshold);
         mainTab.addItem("Resting potential (mV)", tfRestingPotential);
         mainTab.addItem("Reset potential (mV)", tfReset);
         mainTab.addItem("Resistance (M\u03A9)", tfResistance);
         mainTab.addItem("Background Current (nA)", tfBackgroundCurrent);
         mainTab.addItem("Time constant (ms)", tfTimeConstant);
-        mainTab.addItem("Add noise", isAddNoise);
+        mainTab.addItem("Add noise", getAddNoise());
         tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
+        tabbedPane.add(getNoisePanel(), "Noise");
     }
 
-    /**
-     * Populate fields with current data.
-     * @param ruleList
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-
-        IntegrateAndFireRule neuronRef = (IntegrateAndFireRule) ruleList.get(0);
-
-        // (Below) Handle consistency of multiple selections
-
-        // Handle Resting Potential
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getRestingPotential"))
-            tfRestingPotential.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfRestingPotential.setText(Double.toString(neuronRef
-                .getRestingPotential()));
-
-        // Handle Resistance
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getResistance"))
-            tfResistance.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfResistance.setText(Double.toString(neuronRef.getResistance()));
-
-        // Handle Add Noise
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getAddNoise"))
-            isAddNoise.setNull();
-        else
-            isAddNoise.setSelected(neuronRef.getAddNoise());
-
-        // Handle Reset Potential
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getResetPotential"))
-            tfReset.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfReset.setText(Double.toString(neuronRef.getResetPotential()));
-
-        // Handle Time Constant
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getTimeConstant"))
-            tfTimeConstant.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfTimeConstant
-                .setText(Double.toString(neuronRef.getTimeConstant()));
-
-        // Handle Threshold
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getThreshold"))
-            tfThreshold.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-
-        // Handle Background Current
-        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireRule.class,
-            "getBackgroundCurrent"))
-            tfBackgroundCurrent.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfBackgroundCurrent.setText(Double.toString(neuronRef
-                .getBackgroundCurrent()));
-
-        randTab.fillFieldValues(getRandomizers(ruleList));
-
-    }
-
-    /**
-     * Populate fields with default data.
-     */
-    public void fillDefaultValues() {
-        tfRestingPotential.setText(Double.toString(prototypeRule
-            .getRestingPotential()));
-        tfResistance.setText(Double.toString(prototypeRule.getResistance()));
-        tfReset.setText(Double.toString(prototypeRule.getResetPotential()));
-        tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
-        tfBackgroundCurrent.setText(Double.toString(prototypeRule
-            .getBackgroundCurrent()));
-        tfTimeConstant
-            .setText(Double.toString(prototypeRule.getTimeConstant()));
-        isAddNoise.setSelected(prototypeRule.getAddNoise());
-        randTab.fillDefaultValues();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void commitChanges(Neuron neuron) {
-
-        if (!(neuron.getUpdateRule() instanceof IntegrateAndFireRule)) {
-            neuron.setUpdateRule(prototypeRule.deepCopy());
-        }
-
-        writeValuesToRules(Collections.singletonList(neuron));
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(List<Neuron> neurons) {
-
-        if (isReplace()) {
-            IntegrateAndFireRule neuronRef = prototypeRule.deepCopy();
-            for (Neuron n : neurons) {
-                n.setUpdateRule(neuronRef.deepCopy());
-            }
-        }
-        writeValuesToRules(neurons);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeValuesToRules(List<Neuron> neurons) {
-        int numNeurons = neurons.size();
-
-        // Time Constant
-        double timeConstant = Utils.doubleParsable(tfTimeConstant);
-        if (!Double.isNaN(timeConstant)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setTimeConstant(timeConstant);
-            }
-        }
-
-        // Threshold
-        double threshold = Utils.doubleParsable(tfThreshold);
-        if (!Double.isNaN(threshold)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setThreshold(threshold);
-            }
-        }
-
-        // Background Current
-        double backgroundCurrent = Utils.doubleParsable(tfBackgroundCurrent);
-        if (!Double.isNaN(backgroundCurrent)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setBackgroundCurrent(backgroundCurrent);
-            }
-        }
-
-        // Reset
-        double reset = Utils.doubleParsable(tfReset);
-        if (!Double.isNaN(reset)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setResetPotential(reset);
-            }
-        }
-
-        // Resistance
-        double resistance = Utils.doubleParsable(tfResistance);
-        if (!Double.isNaN(resistance)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setResistance(resistance);
-            }
-        }
-
-        // Resting Potential
-        double restingPotential = Utils.doubleParsable(tfRestingPotential);
-        if (!Double.isNaN(restingPotential)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setRestingPotential(restingPotential);
-            }
-        }
-
-        // Add Noise?
-        if (!isAddNoise.isNull()) {
-            boolean addNoise =
-                isAddNoise.getSelectedIndex() == TristateDropDown
-                    .getTRUE();
-            for (int i = 0; i < numNeurons; i++) {
-                ((IntegrateAndFireRule) neurons.get(i).getUpdateRule())
-                    .setAddNoise(addNoise);
-
-            }
-            if (addNoise) {
-                randTab.commitRandom(neurons);
-            }
-        }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected IntegrateAndFireRule getPrototypeRule() {
+    protected final IntegrateAndFireRule getPrototypeRule() {
         return prototypeRule.deepCopy();
     }
 

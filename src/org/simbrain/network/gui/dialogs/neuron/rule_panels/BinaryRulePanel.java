@@ -18,20 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.Utils;
 
 /**
  * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
@@ -39,19 +31,7 @@ import org.simbrain.util.Utils;
  */
 public class BinaryRulePanel extends AbstractNeuronRulePanel {
 
-    /** Threshold for this neuron. */
-    private JTextField tfThreshold = new JTextField();
-
-    /** Ceiling */
-    private JTextField tfUpbound = new JTextField();
-
-    /** Floor */
-    private JTextField tfLowbound = new JTextField();
-
-    /** Bias for this neuron. */
-    private JTextField tfBias = new JTextField();
-
-    /** Main tab for neuron prefernces. */
+    /** Main tab for neuron preferences. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** A reference to the neuron rule being edited. */
@@ -63,141 +43,32 @@ public class BinaryRulePanel extends AbstractNeuronRulePanel {
     public BinaryRulePanel() {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        mainTab.addItem("Threshold", tfThreshold);
-        mainTab.addItem("On Value", tfUpbound);
-        mainTab.addItem("Off Value", tfLowbound);
-        mainTab.addItem("Bias", tfBias);
+
+        JTextField biasField = createTextField(
+                (r) -> ((BinaryRule) r).getBias(),
+                (r, val) -> ((BinaryRule) r).setBias((double) val));
+        JTextField lowerBoundField = createTextField(
+                (r) -> ((BinaryRule) r).getLowerBound(),
+                (r, val) -> ((BinaryRule) r).setLowerBound((double) val));
+
+        JTextField upperBoundField = createTextField(
+                (r) -> ((BinaryRule) r).getUpperBound(),
+                (r, val) -> ((BinaryRule) r).setUpperBound((double) val));
+
+        JTextField thresholdField = createTextField(
+                (r) -> ((BinaryRule) r).getThreshold(),
+                (r, val) -> ((BinaryRule) r).setThreshold((double) val));
+
+        mainTab.addItem("Threshold", thresholdField);
+        mainTab.addItem("On Value", upperBoundField);
+        mainTab.addItem("Off Value", lowerBoundField);
+        mainTab.addItem("Bias", biasField);
         mainTab.setAlignmentX(CENTER_ALIGNMENT);
         this.add(mainTab);
     }
 
-    /**
-     * Populate fields with current data.
-     * @param ruleList
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-
-        BinaryRule neuronRef = (BinaryRule) ruleList.get(0);
-
-        // (Below) Handle consistency of multiple selections
-
-        // Handle Threshold
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class,
-                "getThreshold"))
-            tfThreshold.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-
-        // Handle Lower Value
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getLowerBound"))
-            tfLowbound.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfLowbound.setText(Double.toString(neuronRef.getLowerBound()));
-
-        // Handle Upper Value
-        if (!NetworkUtils
-                .isConsistent(ruleList, BinaryRule.class, "getUpperBound"))
-            tfUpbound.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfUpbound.setText(Double.toString(neuronRef.getUpperBound()));
-
-        // Handle Bias
-        if (!NetworkUtils.isConsistent(ruleList, BinaryRule.class, "getBias"))
-            tfBias.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfBias.setText(Double.toString(neuronRef.getBias()));
-
-    }
-
-    /**
-     * Fill field values to default values for binary neuron.
-     */
-    public void fillDefaultValues() {
-        tfThreshold.setText(Double.toString(prototypeRule.getThreshold()));
-        tfUpbound.setText(Double.toString(prototypeRule.getUpperBound()));
-        tfLowbound.setText(Double.toString(prototypeRule.getLowerBound()));
-        tfBias.setText(Double.toString(prototypeRule.getBias()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void commitChanges(final Neuron neuron) {
-
-        if (!(neuron.getUpdateRule() instanceof BinaryRule)) {
-            neuron.setUpdateRule(prototypeRule.deepCopy());
-        }
-
-        writeValuesToRules(Collections.singletonList(neuron));
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(final List<Neuron> neurons) {
-
-        if (isReplace()) {
-            BinaryRule neuronRef = prototypeRule.deepCopy();
-            for (Neuron n : neurons) {
-                n.setUpdateRule(neuronRef.deepCopy());
-            }
-        }
-
-        writeValuesToRules(neurons);
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeValuesToRules(final List<Neuron> neurons) {
-
-        int numNeurons = neurons.size();
-
-        // Threshold
-        double threshold = Utils.doubleParsable(tfThreshold);
-        if (!Double.isNaN(threshold)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((BinaryRule) neurons.get(i).getUpdateRule())
-                        .setThreshold(threshold);
-            }
-        }
-
-        // Lower Value
-        double lv = Utils.doubleParsable(tfLowbound);
-        if (!Double.isNaN(lv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((BinaryRule) neurons.get(i).getUpdateRule()).setFloor(lv);
-            }
-        }
-
-        // Upper Value
-        double uv = Utils.doubleParsable(tfUpbound);
-        if (!Double.isNaN(uv)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((BinaryRule) neurons.get(i).getUpdateRule()).setCeiling(uv);
-            }
-        }
-
-        // Bias
-        double bias = Utils.doubleParsable(tfBias);
-        if (!Double.isNaN(bias)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((BinaryRule) neurons.get(i).getUpdateRule()).setBias(bias);
-            }
-        }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected BinaryRule getPrototypeRule() {
+    protected final BinaryRule getPrototypeRule() {
         return prototypeRule.deepCopy();
     }
 

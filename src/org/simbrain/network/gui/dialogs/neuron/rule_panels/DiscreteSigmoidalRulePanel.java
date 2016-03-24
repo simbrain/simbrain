@@ -18,52 +18,41 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 
 /**
- * <b>LinearNeuronPanel</b> edits a linear rule neuron.
+ * <b>SigmoidalRulePanel</b>. A rule panel for editing neurons which use a
+ * discrete sigmoid squashing function as their update rule.
+ * 
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
  */
-public class LinearRulePanel extends AbstractNeuronRulePanel {
+@SuppressWarnings("serial")
+public class DiscreteSigmoidalRulePanel extends AbstractSigmoidalRulePanel {
 
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /** Main tab. */
-    private LabelledItemPanel mainTab = new LabelledItemPanel();
-
-    /** A reference to the neuron update rule being edited. */
-    private static final LinearRule prototypeRule = new LinearRule();
+    /** A reference to the neuron rule being edited. */
+    private static SigmoidalRule prototypeRule = new SigmoidalRule();
 
     /**
-     * Creates an instance of this panel.
+     * Creates the discrete sigmoidal rule panel, but does not initialize the
+     * listeners responsible for altering the panel in response to the selected
+     * squashing function.
      */
-    public LinearRulePanel() {
+    public DiscreteSigmoidalRulePanel() {
+        super();
         this.add(tabbedPane);
-        JTextField slopeField = createTextField(
-                (r) -> ((LinearRule) r).getSlope(),
-                (r, val) -> ((LinearRule) r).setSlope((double) val));
-        JTextField biasField = createTextField(
-                (r) -> ((LinearRule) r).getBias(),
-                (r, val) -> ((LinearRule) r).setBias((double) val));
-        mainTab.addItem("Slope", slopeField);
-        mainTab.addItem("Bias", biasField);
-        mainTab.addItem("Add noise", this.getAddNoise());
+        mainTab.addItem("Implementation", cbImplementation);
+        mainTab.addItem("Bias", tfBias);
+        mainTab.addItem("Slope", tfSlope);
+        mainTab.addItem("Add Noise", getAddNoise());
         tabbedPane.add(mainTab, "Main");
-        
         tabbedPane.add(getNoisePanel(), "Noise");
-       
     }
 
     @Override
     protected final NeuronUpdateRule getPrototypeRule() {
         return prototypeRule.deepCopy();
     }
-
 
 }

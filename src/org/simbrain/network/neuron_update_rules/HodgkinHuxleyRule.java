@@ -1,20 +1,37 @@
-/**
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Hodgkin-Huxley Neuron.
  *
  * Adapted from software written by Anthony Fodor, with help from Jonathan
- * Vickrey. TODO: No implementation.
+ * Vickrey.
  */
-public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
+public class HodgkinHuxleyRule extends NeuronUpdateRule
+        implements NoisyUpdateRule {
 
     /** Sodium Channels */
     private float perNaChannels = 100f;
@@ -24,9 +41,6 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
 
     /** Resting Membrane Potential */
     private double resting_v = 65;
-
-    /** */
-    private double elapsedTime = 0;
 
     /** */
     private double dv;
@@ -45,9 +59,6 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
 
     /** // rate constants */
     private double an, bn, am, bm, ah, bh;
-
-    /** time step */
-    private double dt;
 
     /** Ek-Er, Ena - Er, Eleak - Er */
     private double vk, vna, vl;
@@ -73,23 +84,27 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
     /** */
     float vClampValue = convertV(0F);
 
-    /**
-     * {@inheritDoc} 
-     * @param neuron
-     */
+    /** Noise dialog. */
+    private Randomizer noiseGenerator = new Randomizer();
+
+    /** Add noise to the neuron. */
+    private boolean addNoise = false;
+
+    @Override
     public void update(Neuron neuron) {
+
         // Advances the model by dt and returns the new voltage
 
         double v = inputType.getInput(neuron);
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
-        dh = (ah * (1 - h) - bh * h) * dt;
+        dh = (ah * (1 - h) - bh * h) * neuron.getNetwork().getTimeStep();
         bm = 4 * Math.exp(v / 18);
         am = 0.1 * (v + 25) / (Math.exp((v + 25) / 10) - 1);
         bn = 0.125 * Math.exp(v / 80);
         an = 0.01 * (v + 10) / (Math.exp((v + 10) / 10) - 1);
-        dm = (am * (1 - m) - bm * m) * dt;
-        dn = (an * (1 - n) - bn * n) * dt;
+        dm = (am * (1 - m) - bm * m) * neuron.getNetwork().getTimeStep();
+        dn = (an * (1 - n) - bn * n) * neuron.getNetwork().getTimeStep();
 
         n4 = n * n * n * n;
         m3h = m * m * m * h;
@@ -97,14 +112,13 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
         na_current = gna * m3h * (v - vna);
         k_current = gk * n4 * (v - vk);
 
-        dv = -1 * dt * (k_current + na_current + gl * (v - vl)) / cm;
+        dv = -1 * neuron.getNetwork().getTimeStep()
+                * (k_current + na_current + gl * (v - vl)) / cm;
 
         neuron.setBuffer(-1 * (v + dv + resting_v));
         h += dh;
         m += dm;
         n += dn;
-
-        elapsedTime += dt;
 
         // if (vClampOn)
         // v = vClampValue;
@@ -112,22 +126,18 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
         // getV() converts the model's v to present day convention
 
     }
-
-    /**
-     * {@inheritDoc}
-     * @param neuron
-     */
-    public void init(Neuron neuron) {
-
+    
+    // Initializer quickly hacked from old init. Zach this is in your hands to fix! :)
+     {
         cm = 1.0;
-        double v = neuron.getActivation();
+        double v = -70; // Arbitrary starting voltage
+        double dv = .001; // Arbitrary starting dv.  Not sure how to set.
         vna = -115;
         vk = 12;
         vl = -10.613;
         gna = perNaChannels * 120 / 100;
         gk = perKChannels * 36 / 100;
         gl = 0.3;
-        dt = .005;
 
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
@@ -135,16 +145,14 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
         am = 0.1 * (v + 25) / (Math.exp((v + 25) / 10) - 1);
         bn = 0.125 * Math.exp(v / 80);
         an = 0.01 * (v + 10) / (Math.exp((v + 10) / 10) - 1);
-        dh = (ah * (1 - h) - bh * h) * dt;
-        dm = (am * (1 - m) - bm * m) * dt;
-        dn = (an * (1 - n) - bn * n) * dt;
+        dh = (ah * (1 - h) - bh * h) * dv;
+        dm = (am * (1 - m) - bm * m) * dv;
+        dn = (an * (1 - n) - bn * n) * dv;
 
         // start these parameters in steady state
         n = an / (an + bn);
         m = am / (am + bm);
         h = ah / (ah + bh);
-
-        update(neuron);
 
     }
 
@@ -229,22 +237,6 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
         return cm;
     }
 
-    public void setDt(double inDt) {
-        dt = inDt;
-    }
-
-    public double getDt() {
-        return dt;
-    }
-
-    public double getElapsedTime() {
-        return elapsedTime;
-    }
-
-    public void resetElapsedTime() {
-        elapsedTime = 0.0;
-    }
-
     public double getN() {
         return n;
     }
@@ -260,6 +252,7 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
     /**
      * Converts a voltage from the modern convention to the convention used by
      * the program.
+     * 
      * @param voltage
      * @return
      */
@@ -291,14 +284,45 @@ public class HodgkinHuxleyRule extends SpikingNeuronUpdateRule {
         this.temp = temp;
     }
 
+    @Override
     public NeuronUpdateRule deepCopy() {
-        // TODO
-        return null;
+        HodgkinHuxleyRule hhr = new HodgkinHuxleyRule();
+        hhr.set_vClampValue(this.get_vClampValue());
+        hhr.setAddNoise(this.getAddNoise());
+        hhr.setCm(this.getCm());
+        hhr.setEk(this.getEk());
+        hhr.setEna(this.getEna());
+        hhr.setNoiseGenerator(this.getNoiseGenerator());
+        hhr.setPerKChannels(this.getPerKChannels());
+        hhr.setPerNaChannels(this.getPerNaChannels());
+        hhr.setTemp(this.getTemp());
+        hhr.setVClampOn(this.getVClampOn());
+        return hhr;
     }
 
     @Override
     public String getDescription() {
         return "Hodgkin-Huxley";
+    }
+
+    @Override
+    public Randomizer getNoiseGenerator() {
+        return noiseGenerator;
+    }
+
+    @Override
+    public void setNoiseGenerator(Randomizer rand) {
+        noiseGenerator = rand;
+    }
+
+    @Override
+    public boolean getAddNoise() {
+        return addNoise;
+    }
+
+    @Override
+    public void setAddNoise(boolean noise) {
+        this.addNoise = noise;
     }
 
 }

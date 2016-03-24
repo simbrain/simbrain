@@ -19,11 +19,16 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.ParameterEditor;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**

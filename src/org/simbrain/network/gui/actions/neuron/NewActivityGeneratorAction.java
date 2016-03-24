@@ -21,40 +21,33 @@ package org.simbrain.network.gui.actions.neuron;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * New neuron action.
+ * New activity generator action.
  */
-public final class NewNeuronAction extends AbstractAction {
+public final class NewActivityGeneratorAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
     /**
-     * Create a new neuron action with the specified network panel.
+     * Create a new activity generator action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public NewNeuronAction(final NetworkPanel networkPanel) {
-        super("Add Neuron");
+    public NewActivityGeneratorAction(final NetworkPanel networkPanel) {
+        super("Add Activity Generator");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
-        putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
-
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('p'), this);
-        networkPanel.getActionMap().put(this, this);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png")); // TODO
 
     }
 
@@ -62,6 +55,6 @@ public final class NewNeuronAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.addNeuron(new LinearRule());
+        networkPanel.addNeuron(new StochasticRule());
     }
 }

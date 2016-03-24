@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
@@ -107,9 +108,6 @@ public class Neuron {
     /** List of synapses attaching to this neuron. */
     private ArrayList<Synapse> fanIn = new ArrayList<Synapse>(
             PRE_ALLOCATED_NUM_SYNAPSES);
-
-    /** A marker for whether or not the update rule is an input generator. */
-    private boolean generator;
 
     /** x-coordinate of this neuron in 2-space. */
     private double x;
@@ -306,7 +304,6 @@ public class Neuron {
             getNetwork().updateTimeType();
             getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
         }
-        setGenerator(updateRule instanceof ActivityGenerator);
     }
 
     /**
@@ -1032,7 +1029,7 @@ public class Neuron {
             synapse.randomize();
         }
     }
-    
+
     /**
      * A method that returns a list of all the neuron update rules associated
      * with a list of neurons.
@@ -1043,12 +1040,8 @@ public class Neuron {
      *         neurons
      */
     public static List<NeuronUpdateRule> getRuleList(List<Neuron> neuronList) {
-        List<NeuronUpdateRule> ruleSet = new ArrayList<NeuronUpdateRule>();
-
-        for (Neuron n : neuronList) {
-            ruleSet.add(n.getUpdateRule());
-        }
-        return ruleSet;
+        return neuronList.stream().map(Neuron::getUpdateRule)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1066,27 +1059,6 @@ public class Neuron {
      */
     public void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
-    }
-
-    /**
-     * @return Whether or not this is an input generator.
-     */
-    public boolean isGenerator() {
-        return generator;
-    }
-
-    /**
-     * Mark this neuron as an input generator. Automatically sets the
-     * {@link #fanIn fan-in list} to null if true.
-     *
-     * @param generator
-     *            Whether or not this is being set as an input generator.
-     */
-    public void setGenerator(boolean generator) {
-        this.generator = generator;
-        if (generator) {
-            fanIn = null;
-        }
     }
 
     /**

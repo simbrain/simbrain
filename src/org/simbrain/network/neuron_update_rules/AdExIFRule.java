@@ -218,9 +218,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		return "AdEx Integrate and Fire";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Randomizer getNoiseGenerator() {
 		return noiseGenerator;

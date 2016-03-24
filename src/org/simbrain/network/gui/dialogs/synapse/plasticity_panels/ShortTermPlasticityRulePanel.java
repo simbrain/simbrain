@@ -31,7 +31,7 @@ import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * <b>ShortTermPlasticitySynapsePanel</b>.
@@ -51,7 +51,7 @@ public class ShortTermPlasticityRulePanel extends AbstractSynapseRulePanel {
     private final JTextField tfDecayRate = new JTextField();
 
     /** Plasticity type combo box. */
-    private final TristateDropDown cbPlasticityType = new TristateDropDown(
+    private final YesNoNull cbPlasticityType = new YesNoNull(
         "Depression", "Facilitation");
 
     /** Synapse reference. */

@@ -32,7 +32,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * Panel which displays the specific parameters of a particular synapse learning
@@ -45,7 +45,7 @@ import org.simbrain.util.widgets.TristateDropDown;
 public class SynapsePropertiesExtended extends JPanel {
 
     /** Freeze synapse field. */
-    private TristateDropDown frozenDD = new TristateDropDown();
+    private YesNoNull frozenDD = new YesNoNull();
 
     // TODO: Implement...
     // private TristateDropDown clippingDD = new TristateDropDown();
@@ -210,9 +210,9 @@ public class SynapsePropertiesExtended extends JPanel {
             }
         }
         // Frozen ?
-        boolean frozen = frozenDD.getSelectedIndex() == TristateDropDown
+        boolean frozen = frozenDD.getSelectedIndex() == YesNoNull
                 .getTRUE();
-        if (frozenDD.getSelectedIndex() != TristateDropDown.getNULL()) {
+        if (frozenDD.getSelectedIndex() != YesNoNull.getNULL()) {
             for (Synapse s : synapses) {
                 s.setFrozen(frozen);
             }

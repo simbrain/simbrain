@@ -20,15 +20,13 @@ package org.simbrain.util.widgets;
 
 import java.awt.Dimension;
 
-import javax.swing.JComboBox;
-
 /**
- * <b>TristateDropDown</b> ceates a combo box that has three states; True, false
+ * <b>YesNoNull</b> creates a combo box that has three states; True, false
  * and null. It is used where it needs to be determined if multiple items have
- * the same value. (e.g. Multiple selected neurons.)
+ * the same value, or are inconsistent. (e.g. Multiple selected neurons.)
  */
 @SuppressWarnings("serial")
-public class TristateDropDown extends JComboBox<String> {
+public class YesNoNull extends ChoicesWithNull  {
 
     /** Integer value for true. */
     private static final int TRUE = 0;
@@ -42,7 +40,7 @@ public class TristateDropDown extends JComboBox<String> {
     /**
      * Default constructor.
      */
-    public TristateDropDown() {
+    public YesNoNull() {
         super();
         addItem("Yes");
         addItem("No");
@@ -56,23 +54,10 @@ public class TristateDropDown extends JComboBox<String> {
      * @param itemOne Add first item to combo box
      * @param itemTwo Add second item to combo box
      */
-    public TristateDropDown(final String itemOne, final String itemTwo) {
+    public YesNoNull(final String itemOne, final String itemTwo) {
         super();
         addItem(itemOne);
         addItem(itemTwo);
-    }
-
-    /**
-     * Sets the tristate drop down box to null. If the box does not have a null
-     * entry (i.e. has only 2 items), adds a null entry and sets it as the
-     * selected item.
-     */
-    public void setNull() {
-        if (this.getItemCount() == 2) {
-            addItem("...");
-        }
-
-        setSelectedIndex(NULL);
     }
 
     /**
@@ -102,19 +87,6 @@ public class TristateDropDown extends JComboBox<String> {
     }
 
     /**
-     * Determines if value is null.
-     *
-     * @return true or false if value is null
-     */
-    public boolean isNull() {
-        if (this.getSelectedIndex() == NULL) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * @return false value.
      */
     public static int getFALSE() {
@@ -134,4 +106,5 @@ public class TristateDropDown extends JComboBox<String> {
     public static int getTRUE() {
         return TRUE;
     }
+
 }

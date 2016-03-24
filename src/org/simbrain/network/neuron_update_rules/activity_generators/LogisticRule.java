@@ -28,31 +28,26 @@ import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 /**
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
- *
- * TODO: This should be an input generator
  */
 public class LogisticRule extends NeuronUpdateRule implements
         BoundedUpdateRule, ClippableUpdateRule, ActivityGenerator {
 
-    public static final double DEFAULT_FLOOR = 0.0;
-
     /** Growth rate. */
     private double growthRate = 3.9;
 
-    private double ceiling = 1.0;
+    private double ceiling = 10.0;
 
-    private double floor = -1.0;
+    private double floor = -10.0;
+
+    public LogisticRule() {
+        super();
+    }
 
     public LogisticRule(LogisticRule lr, Neuron n) {
         super();
         this.ceiling = lr.getUpperBound();
         this.floor = lr.getLowerBound();
         this.growthRate = lr.getGrowthRate();
-        init(n);
-    }
-
-    public LogisticRule() {
-        super();
     }
 
     /**
@@ -62,15 +57,6 @@ public class LogisticRule extends NeuronUpdateRule implements
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void init(Neuron neuron) {
-        neuron.setGenerator(true);
-    }
-
     /**
      * {@inheritDoc} <b>Unsafe for activity generators</b>. If copied across a
      *              set of neurons, {@link #init(Neuron) init} must be called to

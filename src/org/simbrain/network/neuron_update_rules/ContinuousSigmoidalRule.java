@@ -79,26 +79,17 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      * @param sFunction
      *            the implementation to use.
      */
-    public ContinuousSigmoidalRule(SquashingFunction sFunction) {
+    public ContinuousSigmoidalRule(final SquashingFunction sFunction) {
         super();
         this.sFunction = sFunction;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ContinuousSigmoidalRule deepCopy() {
+    public final ContinuousSigmoidalRule deepCopy() {
         ContinuousSigmoidalRule sn = new ContinuousSigmoidalRule();
+        sn = (ContinuousSigmoidalRule) super.baseDeepCopy(sn);
         sn.setTimeConstant(getTimeConstant());
         sn.setLeakConstant(getLeakConstant());
-        sn.setBias(getBias());
-        sn.setSquashFunctionType(getSquashFunctionType());
-        sn.setSlope(getSlope());
-        sn.setAddNoise(getAddNoise());
-        sn.setUpperBound(getUpperBound());
-        sn.setLowerBound(getLowerBound());
-        sn.noiseGenerator = new Randomizer(noiseGenerator);
         return sn;
     }
 
@@ -140,11 +131,8 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void contextualIncrement(Neuron n) {
+    public final void contextualIncrement(final Neuron n) {
         double act = n.getActivation();
         if (act < getUpperBound()) {
             act += getIncrement();
@@ -156,11 +144,9 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void contextualDecrement(Neuron n) {
+    public final void contextualDecrement(final Neuron n) {
         double act = n.getActivation();
         if (act > getLowerBound()) {
             act -= getIncrement();
@@ -190,22 +176,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         return sFunction.derivVal(val, up, lw, diff);
     }
 
-    /**
-     * @return Returns the inflectionPoint.
-     */
-    @Override
-    public double getBias() {
-        return bias;
-    }
-
-    /**
-     * @param inflectionY
-     *            The inflectionY to set.
-     */
-    @Override
-    public void setBias(final double inflectionY) {
-        this.bias = inflectionY;
-    }
 
     /**
      * @return Returns the inflectionPointSlope.
@@ -258,66 +228,12 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     /**
-     * @return the type
-     */
-    public SquashingFunction getSquashFunctionType() {
-        if (sFunction == null) {
-            sFunction = SquashingFunction.LOGISTIC;
-        }
-        return sFunction;
-    }
-
-    /**
-     * @param type
-     *            the type to set
-     */
-    public void setSquashFunctionType(SquashingFunction type) {
-        this.sFunction = type;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setUpperBound(double ceiling) {
-        this.upperBound = ceiling;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLowerBound(double floor) {
-        this.lowerBound = floor;
-    }
-
-    /**
      * @return the time constant
      */
     public double getTimeConstant() {
         return tau;
     }
 
-    /**
-     * @param timeConstant
-     *            the new time constant
-     */
     public void setTimeConstant(double timeConstant) {
         this.tau = timeConstant;
     }
@@ -342,7 +258,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     @Override
-    public void clear(Neuron neuron) {
+    public final void clear(Neuron neuron) {
         super.clear(neuron);
         netActivation = 0;
     }

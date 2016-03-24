@@ -266,5 +266,4 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule,
     public void setClipped(boolean clipping) {
         this.clipping = clipping;
     }
-
 }

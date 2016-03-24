@@ -203,7 +203,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
 
         combinedNeuronInfoPanel = ApplyPanel
                 .createApplyPanel(NeuronPropertiesPanel
-                        .createCombinedNeuronInfoPanel(
+                        .createNeuronPropertiesPanel(
                                 neuronGroup.getNeuronList(), parent));
         ((ApplyPanel) combinedNeuronInfoPanel).addActionListener(
                 new ActionListener() {
@@ -271,7 +271,7 @@ public class NeuronGroupPanel extends JPanel implements GroupPropertiesPanel,
             summaryPanel = new SummaryPanel(neuronGroup, true);
 
             combinedNeuronInfoPanel = NeuronPropertiesPanel
-                    .createCombinedNeuronInfoPanel(neuronGroup.getNeuronList(),
+                    .createNeuronPropertiesPanel(neuronGroup.getNeuronList(),
                             parent);
 
             layoutPanelWrapper = new JPanel();

@@ -18,15 +18,13 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.NTree;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>DisplayWorld</b> intuitively models "speaking", though it can also be
@@ -171,6 +169,7 @@ public class DisplayWorld extends TextWorld {
      */
     public void postOpenInit() {
         if (persistentData.isEmpty()) {
+
             return;
         }
         vectorToTokenDict = new NTree(persistentData.get(0).getDimension());
@@ -179,7 +178,7 @@ public class DisplayWorld extends TextWorld {
         }
     }
 
-    /**
+    /**di
      * @return the displayThreshold
      */
     public double getDisplayThreshold() {

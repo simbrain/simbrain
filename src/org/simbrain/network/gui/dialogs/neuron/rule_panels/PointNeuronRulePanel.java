@@ -18,27 +18,22 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.Utils;
 
 /**
- * <b>PointNeuronPanel</b> TODO: Check this class for consistency. Excitatory
+ * <b>PointNeuronPanel</b> TODO:Excitatory
  * normalization was removed because it was both unused and had no accessor
  * methods in PointNeuronRule.
+ * 
+ * TODO: Not yet wired up in the new style (since it's not visible in the GUI right now)
  */
 public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
 
@@ -111,230 +106,8 @@ public class PointNeuronRulePanel extends AbstractNeuronRulePanel {
         tabbedPane.add(outputFunctionTab, "Output Function");
     }
 
-    /**
-     * Populate fields with current data.
-     * @param ruleList
-     */
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-
-        PointNeuronRule neuronRef = (PointNeuronRule) ruleList.get(0);
-
-        // (Below) Handle consistency of multiple selections
-
-        // Handle Excitatory Reversal
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getExcitatoryReversal"))
-            tfER.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
-
-        // Handle Inhibitory Reversal
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getInhibitoryReversal"))
-            tfIR.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
-
-        // Handle Leak Reversal
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getLeakReversal"))
-            tfLR.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
-
-        // Handle Leak Conductance
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getLeakConductance"))
-            tfLC.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-
-        // TODO: Was there a reason this wasn't handled previously?
-        // Handle Output Function
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getOutputFunction")) {
-            cbOutputFunction.addItem(SimbrainConstants.NULL_STRING);
-            cbOutputFunction.setSelectedIndex(cbOutputFunction.getItemCount());
-        } else
-            cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
-
-        // Handles Threshold Potential
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getThresholdPotential"))
-            tfThreshold.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfThreshold.setText(Double.toString(neuronRef
-                    .getThresholdPotential()));
-
-        // Handle Gain
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getGain"))
-            tfGain.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfGain.setText(Double.toString(neuronRef.getGain()));
-
-        // Handle Bias
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getBias"))
-            tfBias.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfBias.setText(Double.toString(neuronRef.getBias()));
-
-        // TODO: Was there a reason this wasn't handled previously?
-        // Handle Time Averaging
-        if (!NetworkUtils.isConsistent(ruleList, PointNeuronRule.class,
-                "getNetTimeConstant"))
-            tfTimeAveraging.setText(SimbrainConstants.NULL_STRING);
-        else
-            tfTimeAveraging.setText(Double.toString(neuronRef
-                    .getNetTimeConstant()));
-
-    }
-
-    /**
-     * Populate fields with default data.
-     */
-    public void fillDefaultValues() {
-        tfER.setText(Double.toString(prototypeRule.getExcitatoryReversal()));
-        tfIR.setText(Double.toString(prototypeRule.getInhibitoryReversal()));
-        tfLR.setText(Double.toString(prototypeRule.getLeakReversal()));
-        tfLC.setText(Double.toString(prototypeRule.getLeakConductance()));
-        // cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
-        tfThreshold.setText(Double.toString(prototypeRule
-                .getThresholdPotential()));
-        tfGain.setText(Double.toString(prototypeRule.getGain()));
-        tfBias.setText(Double.toString(prototypeRule.getBias()));
-        tfTimeAveraging.setText(Double.toString(prototypeRule
-                .getNetTimeConstant()));
-        // tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void commitChanges(Neuron neuron) {
-
-        if (!(neuron.getUpdateRule() instanceof PointNeuronRule)) {
-            neuron.setUpdateRule(prototypeRule.deepCopy());
-        }
-
-        writeValuesToRules(Collections.singletonList(neuron));
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commitChanges(List<Neuron> neurons) {
-
-        if (isReplace()) {
-            PointNeuronRule neuronRef = prototypeRule.deepCopy();
-            for (Neuron n : neurons) {
-                n.setUpdateRule(neuronRef.deepCopy());
-            }
-        }
-
-        writeValuesToRules(neurons);
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeValuesToRules(List<Neuron> neurons) {
-        int numNeurons = neurons.size();
-
-        // Excitatory Reversal
-        double er = Utils.doubleParsable(tfER);
-        if (!Double.isNaN(er)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setExcitatoryReversal(er);
-            }
-        }
-
-        // Inhibitory Reversal
-        double ir = Utils.doubleParsable(tfIR);
-        if (!Double.isNaN(ir)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setInhibitoryReversal(ir);
-            }
-        }
-
-        // Leak Reversal
-        double lr = Utils.doubleParsable(tfLR);
-        if (!Double.isNaN(lr)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setLeakReversal(lr);
-            }
-        }
-
-        // Leak Conductance
-        double lc = Utils.doubleParsable(tfLC);
-        if (!Double.isNaN(lc)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setLeakConductance(lc);
-            }
-        }
-
-        // Output function
-        if (!cbOutputFunction.getSelectedItem()
-                .equals(SimbrainConstants.NULL_STRING)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setOutputFunction((OutputFunction) cbOutputFunction
-                                .getSelectedItem());
-            }
-        }
-
-        // Threshold
-        double threshold = Utils.doubleParsable(tfThreshold);
-        if (!Double.isNaN(threshold)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setThresholdPotential(threshold);
-            }
-        }
-
-        // Gain
-        double gain = Utils.doubleParsable(tfGain);
-        if (!Double.isNaN(gain)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setGain(gain);
-            }
-        }
-
-        // Bias
-        double bias = Utils.doubleParsable(tfBias);
-        if (!Double.isNaN(bias)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setBias(bias);
-            }
-        }
-
-        // Time Averaging Time Constant
-        double tatc = Utils.doubleParsable(tfTimeAveraging);
-        if (!Double.isNaN(tatc)) {
-            for (int i = 0; i < numNeurons; i++) {
-                ((PointNeuronRule) neurons.get(i).getUpdateRule())
-                        .setNetTimeConstant(tatc);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NeuronUpdateRule getPrototypeRule() {
+    protected final NeuronUpdateRule getPrototypeRule() {
         return prototypeRule.deepCopy();
     }
 

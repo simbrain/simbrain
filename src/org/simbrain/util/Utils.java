@@ -228,6 +228,15 @@ public class Utils {
             return Double.NaN;
         }
     }
+    // Float version of above.  Ran out of time to generalize.   Todo.  (JKY).
+    public static float floatParsable(JTextField tField) {
+        try {
+            String text = tField.getText().replaceFirst("\\s+", "");
+            return SimbrainConstants.LOCAL_FORMATTER.parse(text).floatValue();
+        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+            return Float.NaN;
+        }
+    }
 
     /**
      * Like {@link #doubleParsable(JTextField)} but checks for the formatting of a

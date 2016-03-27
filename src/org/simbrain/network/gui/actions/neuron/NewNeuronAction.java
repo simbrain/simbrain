@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -61,6 +62,6 @@ public final class NewNeuronAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.addNeuron();
+        networkPanel.addNeuron(new LinearRule());
     }
 }

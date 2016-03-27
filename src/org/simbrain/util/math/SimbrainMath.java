@@ -631,7 +631,7 @@ public class SimbrainMath {
     }
 
     /**
-     * Returns the mean squared error between a source and target vector. .
+     * Returns the mean squared error between a source and target vector.
      *
      * @param src source vector
      * @param tar target vector

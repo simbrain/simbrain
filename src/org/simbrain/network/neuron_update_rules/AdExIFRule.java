@@ -145,16 +145,20 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 
 		// Calculate voltage changes due to leak
 		double i_leak = g_L * (leakReversal - v_mem);
-
+		double ibg = i_bg;
+		
+		
+        // Add noise if there is any to be added
+        if (addNoise) {
+            ibg += noiseGenerator.getRandom();
+        }
+		
         // Calc dV/dt for membrane potential
         double dVdt = (g_L * slopeFactor * Math.exp((v_mem - v_Th)
                 / slopeFactor))
-                + i_leak + iSyn_ex + iSyn_in + i_bg - w;
+                + i_leak + iSyn_ex + iSyn_in + ibg - w;
 
-        // Add noise if there is any to be added
-		if (addNoise) {
-			dVdt += noiseGenerator.getRandom();
-		}
+
 
 		// Factor in membane capacitance...
 		dVdt /= memCapacitance;
@@ -214,9 +218,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 		return "AdEx Integrate and Fire";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Randomizer getNoiseGenerator() {
 		return noiseGenerator;

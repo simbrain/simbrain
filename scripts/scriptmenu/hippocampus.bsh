@@ -45,28 +45,28 @@ void main() {
   CompetitiveGroup LC2 = new CompetitiveGroup(network, 4);
   LC2.setLabel("Left Cortex 2");
   LC2.applyLayout();
-  LC2.setLocation(0,400);
+  LC2.setLocation(0,800);
   network.addGroup(LC2);
 
   // RC1
   CompetitiveGroup RC1 = new CompetitiveGroup(network, 4);
   RC1.setLabel("Right Cortex 1");
   RC1.applyLayout();
-  RC1.setLocation(800,0);
+  RC1.setLocation(1600,0);
   network.addGroup(RC1);
 
   // RC2
   CompetitiveGroup RC2 = new CompetitiveGroup(network, 4);
   RC2.setLabel("Right Cortex 2");
   RC2.applyLayout();
-  RC2.offset(800,400);
+  RC2.offset(1600,800);
   network.addGroup(RC2);
 
   // Hippocampus
   CompetitiveGroup hippocampus = new CompetitiveGroup(network, 4);
   hippocampus.setLabel("Hippocampus");
   hippocampus.applyLayout();
-  hippocampus.offset(400,600);
+  hippocampus.offset(800,1200);
   network.addGroup(hippocampus);
 
 

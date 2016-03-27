@@ -23,15 +23,14 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
- *
- * TODO: This should be an input generator
  */
 public class RandomNeuronRule extends NeuronUpdateRule implements
-        BoundedUpdateRule, ActivityGenerator {
+        BoundedUpdateRule, ActivityGenerator, NoisyUpdateRule {
 
     /** Noise source. */
     private Randomizer randomizer = new Randomizer();
@@ -47,21 +46,19 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
         return TimeType.DISCRETE;
     }
 
+    public RandomNeuronRule() {
+        super();
+    }
+
     public RandomNeuronRule(Neuron n) {
         super();
-        init(n);
         randomizer.setUpperBound(getUpperBound());
         randomizer.setLowerBound(getLowerBound());
     }
 
     public RandomNeuronRule(RandomNeuronRule rn, Neuron n) {
         super();
-        init(n);
-        setRandomizer(new Randomizer(rn.randomizer));
-    }
-
-    public RandomNeuronRule() {
-        super();
+        setNoiseGenerator(new Randomizer(rn.randomizer));
     }
 
     /**
@@ -85,19 +82,6 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
         neuron.setBuffer(randomizer.getRandom());
     }
 
-    /**
-     * @return Returns the randomizer.
-     */
-    public Randomizer getRandomizer() {
-        return randomizer;
-    }
-
-    /**
-     * @param randomizer The randomizer to set.
-     */
-    public void setRandomizer(final Randomizer randomizer) {
-        this.randomizer = randomizer;
-    }
 
     @Override
     public String getDescription() {
@@ -120,11 +104,6 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public void init(Neuron n) {
-        n.setGenerator(true);
-    }
-
-    @Override
     public void setUpperBound(double ceiling) {
         this.ceiling = ceiling;
     }
@@ -132,5 +111,24 @@ public class RandomNeuronRule extends NeuronUpdateRule implements
     @Override
     public void setLowerBound(double floor) {
         this.floor = floor;
+    }
+    
+    @Override
+    public Randomizer getNoiseGenerator() {
+        return randomizer;
+    }
+
+    @Override
+    public void setNoiseGenerator(Randomizer rand) {
+        randomizer = rand;        
+    }
+
+    @Override
+    public boolean getAddNoise() {
+        return true;
+    }
+
+    @Override
+    public void setAddNoise(boolean noise) {
     }
 }

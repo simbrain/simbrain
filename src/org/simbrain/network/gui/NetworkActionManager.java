@@ -18,11 +18,14 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JToggleButton;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.OneToOne;
@@ -40,7 +43,6 @@ import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.edit.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.edit.AlignVerticalAction;
-import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
@@ -54,6 +56,7 @@ import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.edit.TextEditModeAction;
 import org.simbrain.network.gui.actions.edit.WandEditModeAction;
 import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
+import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.network.IterateNetworkAction;
@@ -62,6 +65,7 @@ import org.simbrain.network.gui.actions.network.ShowNetworkHierarchyPanel;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.network.gui.actions.network.StopNetworkAction;
+import org.simbrain.network.gui.actions.neuron.NewActivityGeneratorAction;
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
@@ -80,7 +84,7 @@ import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
-import org.simbrain.network.gui.dialogs.network.*;
+import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveGroupCreationDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveNetworkCreationDialog;
 import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
@@ -95,8 +99,6 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.resource.ResourceManager;
-
-import static org.simbrain.resource.ResourceManager.*;
 
 /**
  * Network action manager.
@@ -204,6 +206,9 @@ public final class NetworkActionManager {
     /** Create a neuron group. */
     private final Action neuronGroupAction;
 
+    /** Create an activity generator. */
+    private final Action activityGeneratorAction;
+
     /** Connection types. */
     private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf,
             oneToOne, oneToOneSelf, radial, radialSelf, sparse, sparseSelf;
@@ -281,6 +286,7 @@ public final class NetworkActionManager {
         wandEditModeAction = new WandEditModeAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
+        activityGeneratorAction = new NewActivityGeneratorAction(networkPanel);
         zeroSelectedObjectsAction = new ZeroSelectedObjectsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
@@ -573,6 +579,15 @@ public final class NetworkActionManager {
      */
     public Action getNewNeuronAction() {
         return newNeuronAction;
+    }
+    
+    /**
+     * Return the new activity generator
+     *
+     * @return the new activity generator
+     */
+    public Action getNewActivityGeneratorAction() {
+        return activityGeneratorAction;
     }
 
     /**

@@ -123,23 +123,13 @@ public class AddNeuronsDialog extends StandardDialog {
             final NetworkPanel networkPanel) {
         final AddNeuronsDialog addND = new AddNeuronsDialog(networkPanel);
         addND.combinedNeuronInfoPanel = NeuronPropertiesPanel
-                .createCombinedNeuronInfoPanel(
+                .createNeuronPropertiesPanel(
                         Collections.singletonList(addND.baseNeuron), addND,
-                        false, false);
+                        false);
         addND.init();
-        addND.combinedNeuronInfoPanel.getUpdateInfoPanel().getCbNeuronType()
-                .addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                addND.updateHelp();
-                            }
-                        });
-                    }
-                });
+        addND.combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType()
+                .addActionListener(e -> SwingUtilities
+                        .invokeLater(() -> addND.updateHelp()));
         return addND;
     }
 
@@ -258,11 +248,11 @@ public class AddNeuronsDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
-        if (combinedNeuronInfoPanel.getUpdateInfoPanel().getCbNeuronType()
+        if (combinedNeuronInfoPanel.getUpdateRulePanel().getCbNeuronType()
                 .getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
-            String name = (String) combinedNeuronInfoPanel.getUpdateInfoPanel()
+            String name = (String) combinedNeuronInfoPanel.getUpdateRulePanel()
                     .getCbNeuronType().getSelectedItem();
             helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
                     + ".html");

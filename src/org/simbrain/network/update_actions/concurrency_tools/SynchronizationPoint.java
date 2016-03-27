@@ -24,7 +24,17 @@ public class SynchronizationPoint implements Task {
                     syncCounter.notifyAll();
             }
         }
+        long t = System.currentTimeMillis();
         while (true) {
+        	if (System.currentTimeMillis() - t > 30000) {
+        		synchronized(this) {
+        			try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+        		}
+        	}
             if (workAvailable.get()) break;
         }
         syncCounter.decrementAndGet();

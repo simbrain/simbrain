@@ -32,7 +32,7 @@ import org.simbrain.network.gui.dialogs.synapse.AbstractSynapseRulePanel;
 import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * <b>HebbianThresholdSynapsePanel</b>.
@@ -49,8 +49,8 @@ public class HebbianThresholdRulePanel extends AbstractSynapseRulePanel {
     private final JTextField tfOutputThreshold = new JTextField();
 
     /** Output threshold combo box. */
-    private final TristateDropDown isOutputThresholdSliding =
-        new TristateDropDown();
+    private final YesNoNull isOutputThresholdSliding =
+        new YesNoNull();
 
     /** Synapse refernece. */
     private static final HebbianThresholdRule prototypeRule =

@@ -37,8 +37,10 @@ import javax.swing.SwingUtilities;
 import org.simbrain.resource.ResourceManager;
 
 /**
- *
- *
+ * A drop down triangle that can be used to hide information that is only
+ * revealed when the triangle is clicked. Note that this is just the triangle.
+ * It does not "contain" the thing that becomes visible or invisible An action
+ * listener must be added for that.
  *
  * @author Zach Tosi
  *

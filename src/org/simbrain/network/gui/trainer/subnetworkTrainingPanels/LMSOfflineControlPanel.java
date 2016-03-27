@@ -219,7 +219,7 @@ public class LMSOfflineControlPanel extends JPanel {
             }
         });
 
-        // If the noise distritbuion has been changed, change the summary
+        // If the noise distribution has been changed, change the summary
         // description.
         noisePanel.getCbDistribution().addActionListener(new ActionListener() {
             @Override

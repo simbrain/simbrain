@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.update_actions.concurrency_tools;
 
-import java.util.Random;
-
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 
 /**
  * 
@@ -60,9 +57,7 @@ public class BufferedUpdateTask implements Task {
 				break;
 			}
 			hosts[i].update();
-			if (!hosts[i].getUpdateRule().isSkipsSynapticUpdates()) {
-				hosts[i].updateFanIn();
-			}
+			hosts[i].updateFanIn();
 		}
 	}
 

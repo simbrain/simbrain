@@ -27,34 +27,23 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
  * value of the upper bound if a random variable is above a specified firing
  * probability, and the lower bound otherwise. Ignores inputs.
+ * 
+ * TODO: Separate spiking from non-spiking version?
  */
 public class StochasticRule extends SpikingNeuronUpdateRule implements
          ActivityGenerator {
 
     /** The default firing probability for the Neuron. */
-    private static final double DEFAULT_FIRING_PROBABILITY = .5;
+    private static final double DEFAULT_FIRING_PROBABILITY = .05;
 
     /** Probability the neuron will fire. */
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
-
-    /** Lower value field. */
-    private double lowerValue = -1;
-
-    /** Upper value field. */
-    private double upperValue = 1;
-
+    
     /**
      * {@inheritDoc}
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void init(Neuron neuron) {
-        neuron.setGenerator(true);
     }
 
     /**
@@ -66,15 +55,17 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
         return sn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update(Neuron neuron) {
         double rand = Math.random();
-        if (rand > firingProbability) {
-            neuron.setBuffer(upperValue);
+        if (rand > 1-firingProbability) {
+            neuron.setSpkBuffer(true);
+            setHasSpiked(true, neuron);
+            neuron.setBuffer(1);
         } else {
-            neuron.setBuffer(lowerValue);
+            neuron.setSpkBuffer(false);
+            setHasSpiked(false, neuron);
+            neuron.setBuffer(0); // Make this a separate variable?
         }
     }
 
@@ -95,34 +86,6 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
     @Override
     public String getDescription() {
         return "Stochastic";
-    }
-
-    /**
-     * @return the lowerValue
-     */
-    public double getLowerValue() {
-        return lowerValue;
-    }
-
-    /**
-     * @param lowerValue the lowerValue to set
-     */
-    public void setLowerValue(double lowerValue) {
-        this.lowerValue = lowerValue;
-    }
-
-    /**
-     * @return the upperValue
-     */
-    public double getUpperValue() {
-        return upperValue;
-    }
-
-    /**
-     * @param upperValue the upperValue to set
-     */
-    public void setUpperValue(double upperValue) {
-        this.upperValue = upperValue;
     }
 
 }

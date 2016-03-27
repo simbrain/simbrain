@@ -111,5 +111,4 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements
     public void setAddNoise(boolean noise) {
         this.addNoise = noise;
     }
-
 }

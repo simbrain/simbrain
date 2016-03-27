@@ -19,44 +19,52 @@
         </div>
         <p></p>
         <h1>Morris-Lecar Neuron</h1>
-        <p>The <a href="https://en.wikipedia.org/wiki/Morris%E2%80%93Lecar_model">Morris Lecar</a> neuron model (also see this <a href="http://www.scholarpedia.org/article/Morris-Lecar_model">Scholarpedia</a> article) is a 2-dimensional neuron model which models neural dynamics based on calcium and potasium conductances.</p>
+
+        <p>The <a href="https://en.wikipedia.org/wiki/Morris%E2%80%93Lecar_model">Morris Lecar</a> neuron model (also see this <a href="http://www.scholarpedia.org/article/Morris-Lecar_model">Scholarpedia</a> article) is a 2-dimensional neuron model which models neural dynamics based on calcium and potassium conductances.  A simplification of Hodgkin-Huxley dynamics without the sodium channels.  Potassium and calcium can capture many of the core dynamics. 
+
+        <p>Part of a family of 2-variable neuron activation models.</p>
+
+        <p>As a family tree, Hodgkin-Huxley came first, then FitzHugh-Nagumo, then Morris-Lecar</p>
+
+        <p>Membrane potential is what shows as activation.</p>
+
+        <p>Parameter descriptions are given here though it may help to simply think of these as the parameters of a complex dynamical system.  More detailed description of similar parameters are in the <a href="AdExIF.html">AdEx</a> docs.</p>
+
         <p class="heading">Membrane Properties</p>
         <blockquote>
-            <p><span class="heading2">Capacitance (&#181;F&#47;cm&#178;): </span> TODO </p>
+            <p><span class="heading2">Capacitance (&#181;F&#47;cm&#178;): </span> Behaves like a time constant.  Higher capacitance leads to slower changes in the cell. </p>
             <br>
-            <p><span class="heading2">Voltage const. 1: </span> TODO </p>
+            <p><span class="heading2">Voltage const. 1: </span> How does calcium respond to voltage. </p>
             <br>
-            <p><span class="heading2">Voltage const. 2:</span> TODO </p>
+            <p><span class="heading2">Voltage const. 2:</span> How does calcium respond to voltage. </p>
             <br>
-            <p><span class="heading2">Threshold (mV):</span> TODO</p>
+            <p><span class="heading2">Threshold (mV):</span> voltages above this make the neuron spike.</p>
             <br>
-            <p><span class="heading2">Background current (nA):</span> TODO </p>
+            <p><span class="heading2">Background current (nA):</span> A constant level of current that can be set. </p>
             <br>
-            <p><span class="heading2">Add Noise:</span> TODO </p>
+            <p><span class="heading2">Add Noise:</span> Whether to add noise to </p>
         </blockquote>
         <p class="heading">Ion Properties</p>
         <blockquote>
-            <p><span class="heading2">Ca<sup>2+</sup> Conductance (&#181;F&#47;cm&#178;): </span> TODO </p>
+            <p><span class="heading2">Ca<sup>2+</sup> Conductance (&#181;S): </span> Calcium conductance.  If higher, voltage pulled more quickly to Ca<sup>2+</sup> equilibrium. </p>
             <br>
-            <p><span class="heading2">K<sup>+</sup> Conductance (&#181;F&#47;cm&#178;): </span> TODO </p>
+            <p><span class="heading2">K<sup>+</sup> Conductance (&#181;S): </span> Potassium conductance.  If higher, voltage pulled more quickly to K<sup>+</sup> equilibrium. </p>
             <br>
-            <p><span class="heading2">Leak Conductance (&#181;F&#47;cm&#178;):</span> TODO </p>
+            <p><span class="heading2">Leak Conductance (&#181;S):</span> Leak conductance.  If higher, voltage pulled more quickly to Leak equilibrium.   </p>
             <br>
-            <p><span class="heading2">Ca<sup>2+</sup> Equilibrium (mV):</span> TODO</p>
+            <p><span class="heading2">Ca<sup>2+</sup> Equilibrium (mV):</span> Calcium equilibrium.</p>
             <br>
-            <p><span class="heading2">K<sup>+</sup> Equilibrium (mV):</span> TODO </p>
+            <p><span class="heading2">K<sup>+</sup> Equilibrium (mV):</span> Potassium equilibrium. </p>
             <br>
-            <p><span class="heading2">Leak Equilibrium (mV):</span> TODO </p>
+            <p><span class="heading2">Leak Equilibrium (mV):</span> Leak equilibrium.</p>
         </blockquote>
         <p class="heading">K<sup>+</sup> Consts.</p>
         <blockquote>
-            <p><span class="heading2">K<sup>+</sup> Const. 1: </span> TODO </p>
+            <p><span class="heading2">K<sup>+</sup> Const. 1: </span> V3 on the Scholarpedia page, which roughly corresponds to how potassium current responds to membrane voltage.</p>
             <br>
-            <p><span class="heading2">K<sup>+</sup> Const. 2: </span> TODO </p>
+            <p><span class="heading2">K<sup>+</sup> Const. 2: </span> V4 on the Scholarpedia page.</p>
             <br>
-            <p><span class="heading2">Open K<sup>+</sup> Channels:</span> TODO </p>
-            <br>
-            <p><span class="heading2">K<sup>+</sup>&#966;:</span> TODO </p>
+            <p><span class="heading2">K<sup>+</sup>&#966;:</span> Potassium channel time constant/decay rate.   If higher, potassium changes more slowly.</p>
         </blockquote>
         <p class="heading">Noise</p>
         <blockquote>See <a href="../../Utils/Randomizers/Randomizers.html">here</a>.</blockquote>

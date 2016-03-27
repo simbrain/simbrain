@@ -182,6 +182,25 @@ public class FeedForward extends Subnetwork {
     }
 
     /**
+     * Returns the hidden layer of a 3 layer network (or just the second layer).
+     *
+     * @return the hidden layer
+     */
+    public NeuronGroup getHiddenLayer() {
+        return getHiddenLayer(1);
+    }
+    
+    /**
+     * Returns a specified hidden layer (1 is just above input layer, etc.).
+     * 
+     * @param index hidden layer index
+     * @return the hidden layer
+     */
+    public NeuronGroup getHiddenLayer(int index) {
+        return getNeuronGroup(index + 1);
+    }
+
+    /**
      * Returns the output layer.
      *
      * @return the output layer

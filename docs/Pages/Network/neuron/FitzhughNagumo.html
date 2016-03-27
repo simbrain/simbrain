@@ -19,27 +19,32 @@
         </div>
         <p></p>
         <h1>FitzHugh-Nagumo Neuron</h1>
-        <p>The <a href="https://en.wikipedia.org/wiki/FitzHugh%E2%80%93Nagumo_model">FitzHugh-Nagumo</a> neuron model (also see this <a href="http://www.scholarpedia.org/article/FitzHugh-Nagumo_model">Scholarpedia</a> article), is a 2-d simplification of the 4-d Hodkin-Huxley model.</p>
+        <p>The <a href="https://en.wikipedia.org/wiki/FitzHugh%E2%80%93Nagumo_model">FitzHugh-Nagumo</a> neuron model (also see this <a href="http://www.scholarpedia.org/article/FitzHugh-Nagumo_model">Scholarpedia</a> article; note that our notation here follows the Scholarpedia article, not the wikipedia article), is a 2-d simplification of the 4-d Hodkin-Huxley model (the variables are voltage and internal recovery variable w).  A close and simpler cousin of Moris-Lecar models.  Based on the idea that a non-linear voltage term and a recovery term will capture most observed spiking dynamics.</p>
+
+        <p>As a family tree, Hodkin-Huxley came first, then FitzHugh-Nagumo, then Moris-Lecar</p>
+
+        <p>Parameter descriptions are given here though it may help to simply think of these as abstract parameters of a complex dynamical system.  More detailed description of similar parameters are in the <a href="AdExIF.html">AdEx</a> docs.</p>
+
         <p class="heading">A &#40;Recovery Rate&#41;</p>
         <blockquote>
-            <p>TODO</p>
+            <p>Abstract measure of how much "resource" a cell is depleting in response to large changes in voltage. A time constant for V and the recovery variable w.<p>
         </blockquote>
         <p class="heading">B &#40;Rec. Voltage Dependence&#41;</p>
         <blockquote>
-            <p>TODO</p>
+            <p>How much the recovery variable w depends on voltage.</p>
         </blockquote>
         <p class="heading">C &#40;Rec. Self Dependence&#41;</p>
         <blockquote>
-            <p>TODO</p>
+            <p>How quickly the recovery variable recovers to its baseline value.</p>
         </blockquote>
         <p class="heading">Background Current &#40;nA&#41;</p>
         <blockquote>
-            <p>TODO</p>
+            <p>Background current to the cell.</p>
         </blockquote>
         </blockquote>
         <p class="heading">Add noise</p>
         <blockquote>
-            <p>TODO. Click <a href="../../Utils/Randomizers/Randomizers.html">here</a> for noise properties.</p>
+            <p>Click <a href="../../Utils/Randomizers/Randomizers.html">here</a> for noise properties.</p>
         </blockquote>
     </div>
 </body>

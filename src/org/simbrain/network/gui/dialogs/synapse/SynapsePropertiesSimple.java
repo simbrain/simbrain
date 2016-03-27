@@ -46,7 +46,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.EditablePanel;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * Panel showing basic properties of a set of synapses, e.g. id, strength, and
@@ -64,7 +64,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
      * A switch for determining whether or not the synapse will send a weighted
      * input.
      */
-    private final TristateDropDown synapseEnabled = new TristateDropDown(
+    private final YesNoNull synapseEnabled = new YesNoNull(
         "Enabled", "Disabled");
 
     /**
@@ -308,8 +308,8 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
         } else {
             synapseEnabled
                 .setSelectedIndex(synapseRef.isEnabled()
-                    ? TristateDropDown
-                        .getTRUE() : TristateDropDown.getFALSE());
+                    ? YesNoNull
+                        .getTRUE() : YesNoNull.getFALSE());
         }
 
     }
@@ -384,9 +384,9 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
         }
 
         // Enabled?
-        boolean enabled = synapseEnabled.getSelectedIndex() == TristateDropDown
+        boolean enabled = synapseEnabled.getSelectedIndex() == YesNoNull
             .getTRUE();
-        if (synapseEnabled.getSelectedIndex() != TristateDropDown.getNULL()) {
+        if (synapseEnabled.getSelectedIndex() != YesNoNull.getNULL()) {
             for (Synapse s : synapseList) {
                 s.setEnabled(enabled);
             }

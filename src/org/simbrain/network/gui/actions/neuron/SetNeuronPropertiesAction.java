@@ -93,7 +93,6 @@ public final class SetNeuronPropertiesAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-
         networkPanel.showSelectedNeuronProperties();
 
     }

@@ -11,3 +11,4 @@
 ./bin/
 *.iml
 out/*
+/bin1/

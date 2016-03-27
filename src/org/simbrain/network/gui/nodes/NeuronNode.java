@@ -38,6 +38,8 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
+import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 
 /**
@@ -58,8 +60,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Font for input and output labels. */
     public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
 
-    /** Main circle of node. */
+    /** Main shape. */
+    private PPath mainShape;
+    
+    /** Circle shape for representing neurons. */
     private PPath circle = PPath.createEllipse(0 - DIAMETER / 2,
+            0 - DIAMETER / 2, DIAMETER, DIAMETER);
+    
+    /** Square shape for representing activity generators. */
+    private PPath square = PPath.createRectangle(0 - DIAMETER / 2,
             0 - DIAMETER / 2, DIAMETER, DIAMETER);
 
     /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
@@ -133,8 +142,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void init() {
 
-        addChild(circle);
-
+        if(neuron.getUpdateRule() instanceof ActivityGenerator) {
+            mainShape = square;           
+        } else {
+            mainShape = circle;
+        }
+        
+        addChild(mainShape);
+        
         priorityText.setFont(PRIORITY_FONT);
         labelBackground.setPaint(this.getNetworkPanel().getBackground());
         labelBackground.setBounds(labelText.getBounds());
@@ -150,7 +165,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         // The main circle is what users select
-        PBounds bounds = circle.getBounds();
+        PBounds bounds = mainShape.getBounds();
         setBounds(bounds);
 
     }
@@ -171,6 +186,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (!currentTextVisibility) {
             return;
         }
+        
         double act = neuron.getActivation();
         activationText.setScale(1);
         setActivationTextPosition();
@@ -180,7 +196,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         priorityText.setText("" + neuron.getUpdatePriority()); // todo: respond
         // to listener
 
-        if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and 1
+        if (java.lang.Double.isNaN(neuron.getActivation())) {
+            activationText.setText("NaN");
+            activationText.scale(.7);
+            activationText.translate(-4, 3);
+        } else if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and 1
             activationText.setFont(NEURON_FONT_BOLD);
             String text = Utils.round(act, 1);
             if (text.startsWith("0.")) {
@@ -262,22 +282,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         double activation = neuron.getActivation();
         // Force to blank if 0 (or close to it)
         if ((activation > -.1) && (activation < .1)) {
-            circle.setPaint(Color.white);
+            mainShape.setPaint(Color.white);
         } else if (activation > 0) {
             float saturation = checkSaturationValid((float) Math.abs(activation
                     / neuron.getUpdateRule().getGraphicalUpperBound()));
-            circle.setPaint(Color.getHSBColor(hotColor, saturation, 1));
+            mainShape.setPaint(Color.getHSBColor(hotColor, saturation, 1));
         } else if (activation < 0) {
             float saturation = checkSaturationValid((float) Math.abs(activation
                     / neuron.getUpdateRule().getGraphicalLowerBound()));
-            circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
+            mainShape.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
         if (neuron.isSpike()) {
-            circle.setStrokePaint(spikingColor);
-            circle.setPaint(spikingColor);
+            mainShape.setStrokePaint(spikingColor);
+            mainShape.setPaint(spikingColor);
         } else {
-            circle.setStrokePaint(SynapseNode.getLineColor());
+            mainShape.setStrokePaint(SynapseNode.getLineColor());
         }
     }
 
@@ -291,15 +311,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         // Set label text
         if ((!neuron.getLabel().equalsIgnoreCase(""))
                 || (!neuron.getLabel().equalsIgnoreCase(
-                        NeuronDialog.NULL_STRING))) {
+                        SimbrainConstants.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(circle.getX() - labelText.getWidth() / 2
-                    + DIAMETER / 2, circle.getY() - DIAMETER / 2 - 1);
+            labelText.setOffset(mainShape.getX() - labelText.getWidth() / 2
+                    + DIAMETER / 2, mainShape.getY() - DIAMETER / 2 - 1);
             labelBackground.setBounds(labelText.getFullBounds());
 
             // update bounds to include text
-            PBounds bounds = circle.getBounds();
+            PBounds bounds = mainShape.getBounds();
             bounds.add(labelText.localToParent(labelText.getBounds()));
             setBounds(bounds);
 
@@ -332,8 +352,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void setActivationTextPosition() {
         if (activationText != null) {
-            activationText.setOffset(circle.getX() + DIAMETER / 4 + 2,
-                    circle.getY() + DIAMETER / 4 + 1);
+            activationText.setOffset(mainShape.getX() + DIAMETER / 4 + 2,
+                    mainShape.getY() + DIAMETER / 4 + 1);
         }
     }
 
@@ -361,7 +381,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (priorityText == null || !currentTextVisibility) {
             return;
         }
-        priorityText.setOffset(circle.getBounds().getCenterX(), circle
+        priorityText.setOffset(mainShape.getBounds().getCenterX(), mainShape
                 .getBounds().getCenterY() + DIAMETER - 10);
     }
 
@@ -409,7 +429,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @return the center point of this node.
      */
     public Point2D getCenter() {
-        return circle.getGlobalBounds().getCenter2D();
+        return mainShape.getGlobalBounds().getCenter2D();
     }
 
     /** @see ScreenElement */
@@ -561,7 +581,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     public void resetColors() {
-        circle.setStrokePaint(SynapseNode.getLineColor());
+        mainShape.setStrokePaint(SynapseNode.getLineColor());
         // TODO: Check if change only?
         labelBackground.setPaint(NetworkPanel.getBackgroundColor());
         updateColor();

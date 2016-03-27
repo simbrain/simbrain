@@ -30,12 +30,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.util.ParameterGetter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.util.widgets.LabelledItem;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * A panel representing a given probability distribution.
@@ -61,8 +62,8 @@ public class ProbDistPanel {
     private JTextField tfParam2 = new JTextField(DEFAULT_TF_SIZE);
 
     /** Clipping combo box. */
-    private TristateDropDown tsClipping =
-        new TristateDropDown();
+    private YesNoNull tsClipping =
+        new YesNoNull();
 
     /** The panel where all items are placed. */
     private JPanel mainPanel = new JPanel();
@@ -71,12 +72,18 @@ public class ProbDistPanel {
     private final ProbDistribution pdf;
 
     /**
+     * Construct null panel.
+     */
+    protected ProbDistPanel() {
+        pdf = null;
+    }
+    
+    /**
      * Creates a panel within this class that is globally accessible
      * representing an editor for a randomizer with a specific probability
      * distribution.
      *
-     * @param pdf
-     *            the probability distribution the main panel will represent
+     * @param pdf the probability distribution the main panel will represent
      */
     public ProbDistPanel(ProbDistribution pdf) {
         this.pdf = pdf;
@@ -105,9 +112,6 @@ public class ProbDistPanel {
         fillDefaultValues();
     }
 
-    protected ProbDistPanel() {
-        pdf = null;
-    }
 
     /**
      * Populates the fields with current values.
@@ -117,40 +121,36 @@ public class ProbDistPanel {
      */
     public void fillFieldValues(final ArrayList<Randomizer> randomizers) {
         Randomizer rand = (Randomizer) randomizers.get(0);
-        if (randomizers.size() == 1) {
-            fillFieldValues(rand);
-            return;
-        }
 
-        if (NetworkUtils.isConsistent(randomizers,
-            Randomizer.class, "getParam1")) {
+        ParameterGetter<Randomizer,Double> p1Getter = (r) -> ((Randomizer)r).getParam1();
+        if (NetworkUtils.isConsistent(randomizers, p1Getter)) {
             tfParam1.setText(Double.toString(rand.getParam1()));
         } else {
             tfParam1.setText(SimbrainConstants.NULL_STRING);
         }
 
-        if (NetworkUtils.isConsistent(randomizers,
-            Randomizer.class, "getParam2")) {
+        ParameterGetter<Randomizer,Double> p2Getter = (r) -> ((Randomizer)r).getParam2();
+        if (NetworkUtils.isConsistent(randomizers, p2Getter)) {
             tfParam2.setText(Double.toString(rand.getParam2()));
         } else {
             tfParam2.setText(SimbrainConstants.NULL_STRING);
         }
 
         if (!pdf.equals(ProbDistribution.UNIFORM)) {
-            if (NetworkUtils.isConsistent(randomizers,
-                Randomizer.class, "getLowerBound")) {
+            ParameterGetter<Randomizer,Double> lbGetter = (r) -> ((Randomizer)r).getLowerBound();
+            if (NetworkUtils.isConsistent(randomizers, lbGetter)) {
                 tfLowBound.setText(Double.toString(rand.getLowerBound()));
             } else {
                 tfLowBound.setText(SimbrainConstants.NULL_STRING);
             }
-            if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
-                "getUpperBound")) {
+            ParameterGetter<Randomizer,Double> ubGetter = (r) -> ((Randomizer)r).getUpperBound();
+            if (NetworkUtils.isConsistent(randomizers, ubGetter)) {
                 tfUpBound.setText(Double.toString(rand.getUpperBound()));
             } else {
                 tfUpBound.setText(SimbrainConstants.NULL_STRING);
             }
-            if (NetworkUtils.isConsistent(randomizers, Randomizer.class,
-                "getClipping")) {
+            ParameterGetter<Randomizer,Boolean> clippingGetter = (r) -> ((Randomizer)r).getClipping();
+            if (NetworkUtils.isConsistent(randomizers, clippingGetter)) {
                 tsClipping.setSelected(rand.getClipping());
             } else {
                 tsClipping.setNull();
@@ -197,6 +197,10 @@ public class ProbDistPanel {
      */
     public void commitRandom(final Randomizer rand) {
         rand.setPdf(pdf);
+        
+        if (pdf == ProbDistribution.NULL) {
+            return;
+        }
 
         double param1 = Utils.doubleParsable(tfParam1);
         if (tfParam1.isEnabled() && !Double.isNaN(param1)) {
@@ -277,7 +281,7 @@ public class ProbDistPanel {
     /**
      * @return Returns the isUseBoundsBox.
      */
-    public TristateDropDown getTsClipping() {
+    public YesNoNull getTsClipping() {
         return tsClipping;
     }
 

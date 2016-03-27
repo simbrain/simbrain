@@ -18,16 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.generator_panels;
 
-import java.awt.GridLayout;
-import java.util.List;
-
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
+import org.simbrain.util.LabelledItemPanel;
 
 /**
  * <b>LogisticNeuronPanel</b> TODO: Work into new Input Generator Framework,
@@ -35,90 +32,30 @@ import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
  */
 public class LogisticGeneratorPanel extends AbstractNeuronRulePanel {
 
-    /** Growth rate field. */
-    private JTextField tfGrowthRate = new JTextField();
+    /** Main panel. */
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
+
+    /** A reference to the neuron rule being edited. */
+    private LogisticRule prototypRule  = new LogisticRule();
 
     /**
      * Creates an instance of this panel.
      */
     public LogisticGeneratorPanel() {
         super();
-        setLayout(new GridLayout(1, 2));
-        add(new JLabel("Growth Rate: "));
-        add(tfGrowthRate);
-        this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"
-                + "For that, set update rule to sigmoidal.<p> "
-                + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
-    }
-
-    // /**
-    // * Populate fields with current data.
-    // */
-    // public void fillFieldValues() {
-    // LogisticRule neuronRef = (LogisticRule) ruleList.get(0);
-    //
-    // tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-    //
-    // // Handle consistency of multiple selections
-    // if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
-    // "getGrowthRate")) {
-    // tfGrowthRate.setText(NULL_STRING);
-    // }
-    // }
-
-    /**
-     * Populate fields with default data.
-     */
-    public void fillDefaultValues() {
-        LogisticRule neuronRef = new LogisticRule();
-        tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
-    }
-
-    // /**
-    // * Called externally when the dialog is closed, to commit any changes
-    // made.
-    // */
-    // public void commitChanges() {
-    // for (int i = 0; i < ruleList.size(); i++) {
-    // LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
-    //
-    // if (!tfGrowthRate.getText().equals(NULL_STRING)) {
-    // neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
-    // .getText()));
-    // }
-    // }
-    // }
-
-    @Override
-    public void commitChanges(Neuron neuron) {
-        // TODO Auto-generated method stub
-
+        JTextField tfGrowthRate = createTextField(
+                (r) -> ((LogisticRule) r).getGrowthRate(),
+                (r, val) -> ((LogisticRule) r).setGrowthRate((double) val));
+        mainPanel.addItem("Growth Rate", tfGrowthRate);
+        add(mainPanel);
+        this.addBottomText(
+                "<html>Note 1: This is not a sigmoidal logistic function. <p>"
+                        + "For that, create a neuron and set its update rule to sigmoidal.<p> "
+                        + " Note 2: for chaos, try growth rates between 3.6 and 4</html>");
     }
 
     @Override
-    public void commitChanges(List<Neuron> neuron) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void fillFieldValues(List<NeuronUpdateRule> ruleList) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NeuronUpdateRule getPrototypeRule() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected void writeValuesToRules(List<Neuron> neurons) {
-        // TODO Auto-generated method stub
-
+    public final NeuronUpdateRule getPrototypeRule() {
+        return prototypRule.deepCopy();
     }
 }

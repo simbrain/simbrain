@@ -183,6 +183,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNeuronAction());
+        insertMenu.add(actionManager.getNewActivityGeneratorAction());
         insertMenu.addSeparator();
         insertMenu.add(new AddNeuronsAction(this));
         insertMenu.addSeparator();

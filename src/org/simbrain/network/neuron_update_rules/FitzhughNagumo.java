@@ -22,12 +22,10 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
-import java.lang.Math;
 
 
 public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     NoisyUpdateRule {
-
 
     /** W. - recovery variable */
     private double w;
@@ -56,23 +54,22 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     /** Recovery self-dependence. */
     private double c = 0.8;
 
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public FitzhughNagumo deepCopy() {
         FitzhughNagumo in = new FitzhughNagumo();
         in.setW(getW());
         in.setV(getV());
+        in.setA(getA());
+        in.setB(getB());
+        in.setC(getC());
+        in.setThreshold(getThreshold());
         in.setAddNoise(getAddNoise());
-        in.noiseGenerator = new Randomizer(noiseGenerator);
+        in.setNoiseGenerator(new Randomizer(noiseGenerator)); //TODO: think
 
         return in;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(final Neuron neuron) {
         double timeStep = neuron.getNetwork().getTimeStep();

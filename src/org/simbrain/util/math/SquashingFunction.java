@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.math;
 
+import org.simbrain.util.widgets.ChoicesWithNull;
+
 /**
  * An enumerated type containing methods for calculating values of different
  * squashing functions, their inverses, and their derivatives.
@@ -28,17 +30,14 @@ package org.simbrain.util.math;
  */
 public enum SquashingFunction {
 
-
-
-
     /** Arctangent. */
     ARCTAN {
 
-        /** The max value as x -> inf of f(x) = arctan(x) .*/
-        private static final double DEFAULT_ARCTAN_CEIL = Math.PI/2;
+        /** The max value as x -> inf of f(x) = arctan(x) . */
+        private static final double DEFAULT_ARCTAN_CEIL = Math.PI / 2;
 
-        /** The min value as x -> -inf of f(x) = arctan(x) .*/
-        private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI/2;
+        /** The min value as x -> -inf of f(x) = arctan(x) . */
+        private static final double DEFAULT_ARCTAN_FLOOR = -Math.PI / 2;
 
         @Override
         public String toString() {
@@ -125,7 +124,7 @@ public enum SquashingFunction {
         /** The max value as x -> inf of f(x) = tanh(x). */
         private static final double DEFAULT_TANH_CEIL = 1.0;
 
-        /** The max value as x -> -inf of f(x) = tanh(x).*/
+        /** The max value as x -> -inf of f(x) = tanh(x). */
         private static final double DEFAULT_TANH_FLOOR = -1.0;
 
         @Override
@@ -164,7 +163,8 @@ public enum SquashingFunction {
 
     /**
      * The Null String "..." used in cases where neurons with different
-     * squashing functions are selected simultaneously.
+     * squashing functions are selected simultaneously. Note this must be the
+     * last item for consistency with the names function below.
      */
     NULL_STRING {
 
@@ -201,7 +201,6 @@ public enum SquashingFunction {
             return 0;
         }
     };
-
 
     /*
      * ****************************************************************
@@ -251,14 +250,14 @@ public enum SquashingFunction {
             double slope);
 
     /**
-     * @return the default upper boundary (ceiling) of this particular
-     * squashing function.
+     * @return the default upper boundary (ceiling) of this particular squashing
+     *         function.
      */
     public abstract double getDefaultUpperBound();
 
     /**
      * @return the default lower boundary (floor) of this particular squashing
-     * function.
+     *         function.
      */
     public abstract double getDefaultLowerBound();
 
@@ -466,6 +465,44 @@ public enum SquashingFunction {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
         return a * (diff / Math.PI) * (1 / (1 + Math.pow(a * val, 2)));
+    }
+
+    /**
+     * Helper method to get the list of squashing function names as an array
+     * Used to populate combo box.
+     *
+     * @return list of squashing function names, as an array.
+     */
+    public static String[] names() {
+        SquashingFunction[] states = values();
+        String[] names = new String[states.length - 1];
+        // The last item is the ... item which should not be part of the list
+        for (int i = 0; i < states.length - 1; i++) {
+            names[i] = states[i].toString();
+        }
+        return names;
+    }
+
+    /**
+     * Helper function to make it easy to go from integer index to Squashing
+     * function (so that choiceboxes can interact with this).
+     * 
+     * @param index integer index
+     * @return the associated squashing function
+     */
+    public static SquashingFunction getFunctionFromIndex(int index) {
+        return SquashingFunction.values()[index];
+    }
+    
+    /**
+     * Another helper function for, in this case, going from functions
+     * to indices.
+     *
+     * @param function the Squashing Function who index is sought
+     * @return the index of that function
+     */
+    public static int getIndexFromFunction(SquashingFunction function) {
+        return function.ordinal();
     }
 
 }

@@ -1,0 +1,162 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.subnetworks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.network.synapse_update_rules.spikeresponders.*;
+import org.simbrain.util.*;
+import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.randomizer.*;
+import org.simbrain.util.math.*;
+import org.simbrain.workspace.*;
+import java.awt.geom.Point2D;
+
+//
+// Simulate a cortical microcolumn as in Dehaene et. al. 2003
+//
+void main() {
+
+    // Set up
+    workspace.clearWorkspace();
+    Network network = new Network();
+    NetworkComponent networkComponent = new NetworkComponent("Dehane", network);
+    workspace.addWorkspaceComponent(networkComponent);
+
+    // Build the Columns
+    List<NeuronGroup> A1 = buildColumn(network, 0, 0);
+    NetworkTextObject A1Label = new NetworkTextObject(network, 0, -50, "Column A1");
+    network.addText(A1Label);
+
+    List<NeuronGroup> B1 = buildColumn(network, 1000, 0);
+    NetworkTextObject B1Label = new NetworkTextObject(network, 1000, -50, "Column B1");
+    network.addText(B1Label);
+
+    // Create the inter-columnar connections
+
+    // Cheat sheet: 
+    //     index 0 --> super
+    //     index 1 --> layerIV
+    //     index 2 --> infra
+    //     index 3 --> thalamic
+
+    // Sample A1 Supra --> B1 Layer IV connection. TODO. Finish!
+    addSynapseGroup(network, A1.get(0), B1.get(1), "A1 Supra --> B1 Layer IV", 3, .05, 1, 1, 7);
+
+}
+
+//
+// Create one column at a specified location
+//
+List<NeuronGroup> buildColumn(Network network, int init_x, int init_y) {
+
+    // Simulation paramaters
+    int numSuperGranular = 120;
+    int numLayerIV= 120;
+    int numInfra = 120;
+    int numThamalic = 120;
+
+    // Set up return list
+    List<NeuronGroup> returnList = new ArrayList();
+
+    // Template integrate and fire neuron
+    IntegrateAndFireRule templateIntFire = new IntegrateAndFireRule();
+    templateIntFire.setThreshold(-48);
+    templateIntFire.setResetPotential(-80);
+    templateIntFire.setTimeConstant(10);
+    templateIntFire.setRestingPotential(-67);    
+
+    // Supergranular neuron group
+    NeuronGroup supergranular = new NeuronGroup(network, new Point2D.Double(init_x, init_y-2400), numSuperGranular);
+    supergranular.setNeuronType(templateIntFire);
+    supergranular.setLayout(new GridLayout(50,50, (int)Math.sqrt(numSuperGranular)));
+    supergranular.setLabel("super");
+    supergranular.applyLayout();    
+    network.addGroup(supergranular);
+    returnList.add(supergranular);
+
+    // Layer IV
+    NeuronGroup layerIV = new NeuronGroup(network, new Point2D.Double(init_x,init_y-1600), numLayerIV);
+    layerIV.setNeuronType(templateIntFire);
+    layerIV.setLayout(new GridLayout(50,50, (int)Math.sqrt(numInfra)));
+    layerIV.applyLayout();    
+    layerIV.setLabel("IV");
+    network.addGroup(layerIV);
+    returnList.add(layerIV);
+
+    // Infragranular neuron group
+    NeuronGroup infragranular = new NeuronGroup(network, new Point2D.Double(init_x,init_y-800), numInfra);
+    infragranular.setNeuronType(templateIntFire);
+    infragranular.setLayout(new GridLayout(50,50, (int)Math.sqrt(numInfra)));
+    infragranular.applyLayout();    
+    infragranular.setLabel("infra");
+    network.addGroup(infragranular);
+    returnList.add(infragranular);
+
+    // Thalamic neuron group
+    NeuronGroup thalamic= new NeuronGroup(network, new Point2D.Double(init_x,init_y), numThamalic);
+    thalamic.setNeuronType(templateIntFire);
+    thalamic.setLayout(new GridLayout(50,50, (int)Math.sqrt(numThamalic)));
+    thalamic.setLabel("thalamic");
+    thalamic.applyLayout();    
+    network.addGroup(thalamic);
+    returnList.add(thalamic);
+
+    // Inhibitory Intra-Columnar Connections
+    addSynapseGroup(network, infragranular, infragranular, "InfraGranular Inhibitory", 2, .12, 0, 1, 7);
+    addSynapseGroup(network, thalamic, thalamic, "Thalamic Inhibitory", 2, .12, 0, 1, 7);
+    addSynapseGroup(network, supergranular, supergranular, "Supergranular Inhibitory", 2, .12, 0, 1, 7);    
+    addSynapseGroup(network, layerIV, layerIV, "layerIV Inhibitory", 2, .12, 0, 1, 7);
+
+    // Excitatory Intra-Columnar Connections
+    addSynapseGroup(network, infragranular, layerIV, "InfraGranular to Layer IV", 7, .05, 1, .5, 2.4);
+    addSynapseGroup(network, layerIV, supergranular, "Layer IV to Supragranular", 2, .15, 1, .5, 2.4);
+    addSynapseGroup(network, thalamic, infragranular, "Thalamic to Infra", 3, .1, 1, .5, 2.4);
+    addSynapseGroup(network, thalamic, layerIV, "Thalamic to Layer IV", 3, .2, 1, .5, 2.4);
+    addSynapseGroup(network, infragranular, thalamic, "InfraGranular to Thalamic", 8, .075, 1, .5, 2.4);
+    addSynapseGroup(network, infragranular, supergranular, "InfraGranular to Supragranular", 7, .05, 1, .5, 2.4);
+    addSynapseGroup(network, supergranular, infragranular, "Supragranular to Infragranular", 2, .1, 1, .5, 2.4);
+
+    // Return neuron group list
+    return returnList;
+
+}
+
+//
+// Add a synapse group.
+//
+// riseConstant = tau_1
+// decayConstant = tau_2
+//
+void addSynapseGroup(Network network, NeuronGroup source, NeuronGroup target, String label,
+    int delay, double meanSynStrength, double excitatoryRatio, 
+    double riseConstant, double decayConstant) {
+
+    // Create randomizers (param1 is mean, param2 is stdev)
+    PolarizedRandomizer exciteRand = new PolarizedRandomizer(Polarity.EXCITATORY);
+    exciteRand.setPdf(ProbDistribution.NORMAL);
+    exciteRand.setParam2(meanSynStrength);
+    PolarizedRandomizer inhibRand = new PolarizedRandomizer(Polarity.INHIBITORY);
+    inhibRand.setPdf(ProbDistribution.NORMAL);
+    inhibRand.setParam2(meanSynStrength);
+
+    // Spike responder
+    JumpAndDecay responder = new JumpAndDecay();
+    responder.setJumpHeight(riseConstant);
+    responder.setTimeConstant(decayConstant);
+
+    // Add the synapse group
+    SynapseGroup toAdd = SynapseGroup.createSynapseGroup(source, target,new Sparse(.6, false, false), excitatoryRatio, exciteRand, inhibRand);
+    toAdd.setDelay(delay, Polarity.BOTH);
+    toAdd.setSpikeResponder(responder, Polarity.BOTH);
+    toAdd.setLabel(label);
+    network.addGroup(toAdd);    
+
+}
+
+
+// Run the simulation.
+main();

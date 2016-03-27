@@ -18,21 +18,16 @@
  */
 package org.simbrain.network.gui.dialogs.neuron.rule_panels;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.dialogs.neuron.AbstractNeuronRulePanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronNoiseGenPanel;
+import org.simbrain.network.gui.dialogs.neuron.NoiseGeneratorPanel;
 import org.simbrain.network.neuron_update_rules.AbstractSigmoidalRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.math.SquashingFunction;
-import org.simbrain.util.randomizer.Randomizer;
-import org.simbrain.util.widgets.TristateDropDown;
+import org.simbrain.util.widgets.ChoicesWithNull;
+import org.simbrain.util.widgets.YesNoNull;
 
 /**
  * A rule panel containing all the variables and methods which would be shared
@@ -41,20 +36,19 @@ import org.simbrain.util.widgets.TristateDropDown;
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public abstract class AbstractSigmoidalRulePanel extends
-    AbstractNeuronRulePanel {
+public abstract class AbstractSigmoidalRulePanel
+        extends AbstractNeuronRulePanel {
 
+    //TODO: Clean up top
+    
     /** Implementation combo box. */
-    protected JComboBox<SquashingFunction> cbImplementation =
-        new JComboBox<SquashingFunction>(new SquashingFunction[] {
-            SquashingFunction.ARCTAN, SquashingFunction.LOGISTIC,
-            SquashingFunction.TANH, });
+    protected ChoicesWithNull cbImplementation;
 
     /** Bias field. */
-    protected JTextField tfBias = new JTextField();
+    protected JTextField tfBias;
 
     /** Slope field. */
-    protected JTextField tfSlope = new JTextField();
+    protected JTextField tfSlope;
 
     /** Tabbed pane. */
     protected JTabbedPane tabbedPane = new JTabbedPane();
@@ -62,25 +56,28 @@ public abstract class AbstractSigmoidalRulePanel extends
     /** Main tab. */
     protected LabelledItemPanel mainTab = new LabelledItemPanel();
 
-    /** Random tab. */
-    protected NeuronNoiseGenPanel randTab = new NeuronNoiseGenPanel();
-
-    /** Add noise combo box. */
-    protected TristateDropDown isAddNoise = new TristateDropDown();
-
     /**
-     * The initially selected squashing function (or NULL_STRING), used for
-     * determining how to fill field values based on the selected
-     * implementation.
+     * Construct the abstract panel.
      */
-    protected SquashingFunction initialSfunction;
-
-    /**
-     * @return the combo box responsible for setting the specific squashing
-     * function
-     */
-    public JComboBox<SquashingFunction> getCbImplementation() {
-        return cbImplementation;
+    protected AbstractSigmoidalRulePanel() {
+        cbImplementation = createDropDown(
+                (r) -> ((AbstractSigmoidalRule) r).getSquashFunctionInt(),
+                (r, val) -> ((AbstractSigmoidalRule) r)
+                        .setSquashFunctionInt((int) val));
+        cbImplementation.setItems(SquashingFunction.names());
+        tfSlope = createTextField(
+                (r) -> ((AbstractSigmoidalRule) r).getSlope(),
+                (r, val) -> ((AbstractSigmoidalRule) r).setSlope((double) val));
+        tfBias = createTextField((r) -> ((AbstractSigmoidalRule) r).getBias(),
+                (r, val) -> ((AbstractSigmoidalRule) r).setBias((double) val));
     }
 
+    /**
+     * Return the combo box. 
+     *
+     * @return the cbImplementation
+     */
+    public ChoicesWithNull getCbImplementation() {
+        return cbImplementation;
+    }
 }

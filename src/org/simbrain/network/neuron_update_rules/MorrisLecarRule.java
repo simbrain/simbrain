@@ -59,6 +59,9 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	/** Threshold for neurotransmitter release (mV) */
 	private double threshold = 40;
 	
+    /** Add noise to neuron. */
+    private boolean addNoise;
+
 	/** A source of noise (nA). */
 	private Randomizer noiseGenerator = new Randomizer();
 	
@@ -150,12 +153,12 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 
 	@Override
 	public Randomizer getNoiseGenerator() {
-		return new Randomizer(noiseGenerator);
+		return noiseGenerator;
 	}
 
 	@Override
 	public void setNoiseGenerator(Randomizer rand) {
-		// Does Nothing
+		this.noiseGenerator = rand;
 	}
 
 	public void setNoiseAmplitude(double amp) {
@@ -164,12 +167,12 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	
 	@Override
 	public boolean getAddNoise() {
-		return true;
+		return addNoise;
 	}
 
 	@Override
-	public void setAddNoise(boolean noise) {
-		// Does nothing
+	public void setAddNoise(boolean addNoise) {
+		this.addNoise = addNoise;
 	}
 
 	public double getG_Ca() {
@@ -258,14 +261,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 
 	public void setV_w2(double v_w2) {
 		this.v_w2 = v_w2;
-	}
-
-	public double getW_K() {
-		return w_K;
-	}
-
-	public void setW_K(double w_K) {
-		this.w_K = w_K;
 	}
 
 	public double getPhi() {

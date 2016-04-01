@@ -19,16 +19,11 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.ParameterEditor;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
@@ -76,35 +71,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     /** The lower bound of the activity if clipping is used. */
     private double floor = DEFAULT_FLOOR;
 
-    /**
-     * @return Time type.
-     */
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
-    }
-
-    /**
-     * {@inheritDoc} 
-     * @return
-     */
-    public DecayRule deepCopy() {
-        DecayRule dn = new DecayRule();
-        dn.setRelAbs(getRelAbs());
-        dn.setDecayAmount(getDecayAmount());
-        dn.setDecayFraction(getDecayFraction());
-        dn.setClipped(isClipped());
-        dn.setUpperBound(getUpperBound());
-        dn.setLowerBound(getLowerBound());
-        dn.setIncrement(getIncrement());
-        dn.setAddNoise(getAddNoise());
-        dn.noiseGenerator = new Randomizer(noiseGenerator);
-        return dn;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param neuron
-     */
+    @Override
     public void update(Neuron neuron) {
         double val = neuron.getActivation() + inputType.getInput(neuron);
         double decayVal = 0;
@@ -143,9 +110,27 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
         neuron.setBuffer(val);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
+    @Override
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
+    }
+
+    @Override
+    public DecayRule deepCopy() {
+        DecayRule dn = new DecayRule();
+        dn.setRelAbs(getRelAbs());
+        dn.setDecayAmount(getDecayAmount());
+        dn.setDecayFraction(getDecayFraction());
+        dn.setClipped(isClipped());
+        dn.setUpperBound(getUpperBound());
+        dn.setLowerBound(getLowerBound());
+        dn.setIncrement(getIncrement());
+        dn.setAddNoise(getAddNoise());
+        dn.noiseGenerator = new Randomizer(noiseGenerator);
+        return dn;
+    }
+
     @Override
     public double clip(double val) {
         if (val > getUpperBound()) {
@@ -157,9 +142,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
@@ -176,9 +158,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void contextualDecrement(Neuron n) {
         double act = n.getActivation();
@@ -237,30 +216,22 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
         this.relAbs = relAbs;
     }
 
-    /**
-     * @return Returns the addNoise.
-     */
+    @Override
     public boolean getAddNoise() {
         return addNoise;
     }
 
-    /**
-     * @param addNoise The addNoise to set.
-     */
+    @Override
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the noiseGenerator.
-     */
+    @Override
     public Randomizer getNoiseGenerator() {
         return noiseGenerator;
     }
 
-    /**
-     * @param noiseGenerator The noiseGenerator to set.
-     */
+    @Override
     public void setNoiseGenerator(final Randomizer noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }

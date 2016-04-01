@@ -65,5 +65,4 @@ public class LinearRulePanel extends AbstractNeuronRulePanel {
         return prototypeRule.deepCopy();
     }
 
-
 }

@@ -18,12 +18,9 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.util.ParameterEditor;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 

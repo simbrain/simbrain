@@ -339,8 +339,13 @@ public class Sparse implements ConnectNeurons {
             Neuron src = sourceNeurons[i];
             Neuron tar;
             int tarLen = targetNeurons.length - 1;
-            int [] o = SimbrainMath.randPermuteWithExclusion(0,
-                    tarLen + 1, i);
+            int [] o = null;
+            if (sourceNeurons == targetNeurons && !selfConnectionAllowed) {
+	            o = SimbrainMath.randPermuteWithExclusion(0,
+	                    tarLen + 1, i);
+            } else {
+	            o = SimbrainMath.randPermute(0, tarLen + 1);
+            }
             for (int j = 0; j < currentOrderingIndices[i]; j++) {
                 tar = targetNeurons[o[j]];
                 Synapse s = new Synapse(src, tar);

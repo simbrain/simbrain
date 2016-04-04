@@ -27,7 +27,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
@@ -158,7 +157,16 @@ public class Network {
      * update.
      */
     private volatile boolean fireUpdates = true;
-
+    
+    /** 
+     * An internal id giving networks unique numbers within the same simbrain
+     * session.
+     */
+    private static int current_id = 0;
+    
+    /** An optional label that defaults to "Network[current_id]".*/
+    private String label ="";
+    
     /** Static initializer */
     {
         try {
@@ -173,6 +181,8 @@ public class Network {
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
+    	label = "Network"+current_id;
+    	current_id++;
         updateManager = new NetworkUpdateManager(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
     }
@@ -420,6 +430,8 @@ public class Network {
         return Collections.unmodifiableList(groupList);
     }
 
+
+    
     /**
      * Returns a list of all neuron groups.
      *
@@ -887,6 +899,33 @@ public class Network {
             }
         }
         return ret;
+    }
+    
+    /**
+     * Create a "flat" list of groups, which only includes sub-groups of subnetworks
+     * and unbound groups.
+     *
+     * @return the flat list
+     */
+    public List<Group> getFlatGroupListNoSubnets() {
+    	List<Group> groups = new ArrayList<Group>();
+    	for (Group g : groupList) {
+    		if (g instanceof Subnetwork) {
+    			List<NeuronGroup> ng = ((Subnetwork)g).getNeuronGroupList();
+    			List<SynapseGroup> sg = ((Subnetwork)g).getSynapseGroupList();
+    			if (!ng.isEmpty()) {
+    				groups.addAll(ng);
+    			}
+    			if (!sg.isEmpty()) {
+    				groups.addAll(sg);
+    			}
+    		} else {
+    			if (!g.isEmpty()) {
+    				groups.add(g);
+    			}
+    		}
+    	}
+    	return groups;
     }
 
     /**
@@ -1860,6 +1899,14 @@ public class Network {
 
     public void setFireUpdates(boolean fireUpdates) {
         this.fireUpdates = fireUpdates;
+    }
+    
+    public String getLabel() {
+    	return label;
+    }
+    
+    public void setLabel(String label) {
+    	this.label = label;
     }
 
 }

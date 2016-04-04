@@ -22,66 +22,30 @@ import org.simbrain.workspace.*;
  * 
  * @author Zach Tosi
  *
- * Creates a network of recurrently connected Izhikevich neurons (Regular
- * Spiking by default). Neurons are placed in a 2D lattice and connections
- * between neurons are probabilistic based on their relative distance from
- * one another. Specifically the probability of a connection existing between
- * Neurons a and b: 
+ * Takes a functional connectivity matrix of an organotypic culture of rat 
+ * somatosensory cortex derived using transfer entropy and makes it the 
+ * (scaled) weight matrix for a network of AdEx neurons. Each AdEx neuron
+ * has some of its parameters altered based on the mean firing rate of the
+ * corresponding neuron in the actual data to make the network dynamics more
+ * realistic. Some random sample of high firing rate neurons are assumed to be
+ * inhibitory.
  *
- *              P(a, b) = C_xy * e ^ -(D(a,b)/lambda^2)
- *
- * Such that x is the polarity (inhibitory or excitatory) of neuron a and
- * y is the polarity of neuron b, and D(a, b) is the Euclidean distance between
- * a and b in pixels. C_xy is a regulating constant which controls the overall
- * proportion of connections between neurons based on their polarity. Thus there
- * are C_ee, C_ei, C_ie, and C_ii values. This is so that (for instance), one
- * can make connections from inhibitory neurons to other inhibitory neurons
- * overall less common than connections from inhibitory to excitatory neurons,
- * etc. Lambda is another regulating constant which represents the average
- * distance between connected neurons. Each synapse has a delay which is a 
- * logarithm of the distance between the neurons it connects. 
- * Equation and parameter values (except lambda) are taken from Maass 2002.
- *
- * Each Izhikevich neuron is connected to exactly one Linear neuron in the
- * second neuron group. Such that the activation of each neuron in the second
- * group corresponds to the current post-synaptic potential of the Izhikevich
- * neuron connected to it. Essentially the neuron group on the right represents
- * the convolved spike trains of the spiking neurons on the left such that
- *
- *              A_n(t + delta_t) = - (delta_t *(A_n(t) / tau)) + S(t)
- *
- * Where A_n(t) is the activation of neuron n at time t, delta_t is the
- * integration time-step, tau is a decay constant and S(t) is whether or not
- * the (only) pre-synaptic Izhikevich neuron has spiked at time t (1 if so, 0
- * otherwise). Since each neuron in the second group recieves only one input,
- * this activity pattern is entirely the result of the spike responder
- * (ConvolvedJumpAndDecay) which governs n's only incoming synapse, not a
- * result of any internal dynamics on the part of neuron n. A_n(t) is just the
- * post synaptic response of the source Izhikevich neuron for a synapse with a
- * strength of 1, and is thus a simple convolution of its spike train. 
- *
- * In summary this code displays a network of randomly connected spiking neurons
- * with a Lognormal weight distribution and distance-based connectivity and
- * displays the convolution of their individual spike trains on the right.
+ * TE analysis and data colleciton were performed by the lab of Dr. John Beggs,
+ * University of Indiana Bloomington Department of Physics 
  *
  */
 {
     // Parameters 
-    final boolean USE_INHIB = false;
+    final boolean USE_INHIB = true;
     final boolean STDP_ON = false;
     int NUM_NEURONS;
     int GRID_SPACE = 25;
-    double EE_CONST = 0.3;
-    double EI_CONST = 0.2;
-    double IE_CONST = 0.4;
-    double II_CONST = 0.1;
-    double LAMBDA = 250;
-
+    String DIR = "./scripts/scriptmenu/RealNeuralNetAdExResources/";
     List<Double> prefFiringRates = new ArrayList<Double>();
     List<Double> sorted = new ArrayList<Double>();
     Scanner scan = null;
     try {
-        FileReader fr = new FileReader("./firingRates.csv");
+        FileReader fr = new FileReader(DIR+"firingRates.csv");
         Scanner scan = new Scanner(fr);
         scan.useDelimiter(",|\\n");
         while (scan.hasNextDouble()) {
@@ -101,13 +65,13 @@ import org.simbrain.workspace.*;
 
     Collections.sort(sorted);
     Collections.reverse(sorted);
-    double inhibThreshold = sorted.get((int)(0.3 * sorted.size()));
+    double inhibThreshold = sorted.get((int)(0.2 * sorted.size()));
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");
     workspace.addWorkspaceComponent(networkComponent);
     Network network = networkComponent.getNetwork();
-    network.setTimeStep(0.5);
+    network.setTimeStep(0.1);
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     layout.setInitialLocation(new Point(10, 10));
     GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
@@ -115,21 +79,16 @@ import org.simbrain.workspace.*;
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
 
-    // Optional code to distribute neurons in 3D space with random z values
-    // Random rand = new Random();
     Randomizer rand = new Randomizer();
     rand.setPdf(ProbDistribution.NORMAL);
     rand.setParam1(0);
-    rand.setParam2(50);
+    rand.setParam2(200);
     Random randi = new Random();
     for (int i = 0; i < NUM_NEURONS; i++) {
         Neuron neuron = new Neuron(network);
         neurons.add(neuron);
         AdExIFRule lif = new AdExIFRule();
         lif.setI_bg(.5);
-        //if (prefFiringRates.get(i) > 17) {
-        //	lif.setV_Th(-50);
-        //}
         double pf = prefFiringRates.get(i);
         double thresh;
         if (prefFiringRates.get(i) > 2) {
@@ -139,27 +98,11 @@ import org.simbrain.workspace.*;
         }
         lif.setV_Th(-50.4 - thresh);
         lif.setV_Reset(-47.7);
-        //System.out.println(-50.4 - thresh);
-        		
-        // Set the preferred firing rate to the firing rate in the data
-        //double tauW = 40000 * Math.exp(-prefFiringRates.get(i)/18);
-        //lif.setTauW((tauW < 50) ? 50 : tauW);
         lif.setA(4);
         lif.setTauW(200);
         lif.setB(0.175); 
-        //double b = 0.02 * Math.exp(-3/((pf) + 1));
-        //lif.setB(b);
-        //if (prefFiringRates.get(i) > 2) {
-        //    lif.setTauW(150);
-        //    lif.setB(0.15);      
-        //}  else {
-        //    
-        //}
-        
         lif.setG_e_bar(1.3 * Math.exp(-prefFiringRates.get(i)/15) + 10);
-        //lif.setUsingIP(false);
         lif.setMemCapacitance(2000/Math.sqrt(pf/2));
-        // Assume that faster firing neurons are inhibitory
         if (prefFiringRates.get(i) > inhibThreshold && USE_INHIB && Math.random() < 0.66) {
         	neuron.setPolarity(Polarity.INHIBITORY);
         } else {
@@ -177,7 +120,7 @@ import org.simbrain.workspace.*;
     ng1.setLabel("AdExIF Network " + new Date().toString() + " ");
 
     // Set neuron coordinates for connection...
-    ng1.setXYZCoordinatesFromFile("xyCoors.csv");
+    ng1.setXYZCoordinatesFromFile(DIR+"xyCoors.csv");
 
     NeuronGroup outs = new NeuronGroup(network, outNeurons);
     outs.setLabel("Spike Visualizer");
@@ -186,13 +129,9 @@ import org.simbrain.workspace.*;
     network.addGroup(outs);
     
 	SynapseGroup sg = new SynapseGroup(ng1, ng1);
-    sg.setUpperBound(1000000, Polarity.EXCITATORY);
-    sg.setLowerBound(0, Polarity.EXCITATORY);
-    sg.setLowerBound(-1000000, Polarity.INHIBITORY);
-    sg.setUpperBound(0, Polarity.INHIBITORY);
     Scanner wtSc = null;
     try {
-        wtSc = new Scanner(new File("./weightMat.csv"));
+        wtSc = new Scanner(new File(DIR+"weightMat.csv"));
         int i = 0;
         int j;
         Scanner lineScan = null;
@@ -207,7 +146,7 @@ import org.simbrain.workspace.*;
                         double val = Double.parseDouble(next);
                         if (val > 0) {
                             Neuron src = ng1.getNeuronList().get(i);
-                            val = src.getPolarity().value(1600000 * val);
+                            val = src.getPolarity().value(3200000 * val);
                             Neuron tar = ng1.getNeuronList().get(j);
                             sg.addSynapseUnsafe(new Synapse(src, tar, val));
                         }
@@ -230,7 +169,18 @@ import org.simbrain.workspace.*;
             wtSc.close();
         }
     }
-	sg.setSpikeResponder(new UDF(), Polarity.BOTH);
+    sg.setUpperBound(1000000, Polarity.EXCITATORY);
+    sg.setLowerBound(0, Polarity.EXCITATORY);
+    sg.setLowerBound(-1000000, Polarity.INHIBITORY);
+    sg.setUpperBound(0, Polarity.INHIBITORY);
+    for (Neuron n : ng1.getNeuronList()) {
+        for (Synapse s : n.getFanOutList()) {
+            s.setStrength(n.getPolarity().value(s.getStrength()));
+        }
+    }
+    UDF spkr = new UDF();
+    spkr.setPSRDecayTimeConstant(5);
+	sg.setSpikeResponder(spkr, Polarity.BOTH);
 	sg.setLabel("Recurrent Synapses");
     final double LOG_2 = Math.log(2);
 	for (Synapse s : sg.getAllSynapses()) {

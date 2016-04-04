@@ -12,7 +12,7 @@ import com.jmatio.types.MLDouble;
 
 {
 
-	List<Group> groups = network.getFlatGroupListNoTopLevel();
+	List<Group> groups = network.getFlatGroupListNoSubnets();
 	List<MLArray> vecData = new ArrayList<MLArray>();
 	for (Group g : groups) {
 		String name = g.getLabel();

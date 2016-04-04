@@ -1,0 +1,36 @@
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.simbrain.network.core.*;
+import org.simbrain.network.groups.*;
+import com.jmatio.io.MatFileWriter;
+import com.jmatio.types.MLArray;
+import com.jmatio.types.MLDouble;
+
+{
+
+	List<Group> groups = network.getFlatGroupListNoTopLevel();
+	List<MLArray> vecData = new ArrayList<MLArray>();
+	for (Group g : groups) {
+		String name = g.getLabel();
+		name = name.replaceAll("[\\s:]+", "_");
+		if (g instanceof NeuronGroup) {
+			vecData.add(new MLDouble(name+"_activations",
+				((NeuronGroup)g).getActivations(), 1));
+		} else {
+			vecData.add(new MLDouble(name+"_weights",
+				((SynapseGroup) g).getWeightMatrix()));
+		}
+	}
+	try {
+		File f = new File(network.getLabel() + "_" + network.getTime()+ ".mat");
+		f.createNewFile();
+		new MatFileWriter(f, vecData);
+	} catch (IOException ie) {
+		ie.printStackTrace();
+	}
+
+}

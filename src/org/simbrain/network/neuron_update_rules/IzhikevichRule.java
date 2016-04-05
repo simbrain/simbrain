@@ -58,6 +58,10 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements
 
     /** Add noise to the neuron. */
     private boolean addNoise;
+    
+    // Backwards compatibility... to be removed
+    @Deprecated
+    private double inputs;
 
     /**
      * An optional absolute refractory period. In many simulations this

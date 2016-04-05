@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFileChooser;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.*;
 import com.jmatio.io.MatFileWriter;
@@ -25,8 +26,14 @@ import com.jmatio.types.MLDouble;
 				((SynapseGroup) g).getWeightMatrix()));
 		}
 	}
+	JFileChooser saveDia = new JFileChooser();
+	saveDia.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
 	try {
-		File f = new File(network.getLabel() + "_" + network.getTime()+ ".mat");
+		File f = new File (new File(network.getLabel() + "_" + network.getTime()+ ".mat").getCanonicalPath());
+		saveDia.setSelectedFile(f);
+		saveDia.showSaveDialog(null);
+		f = saveDia.getSelectedFile();
 		f.createNewFile();
 		new MatFileWriter(f, vecData);
 	} catch (IOException ie) {

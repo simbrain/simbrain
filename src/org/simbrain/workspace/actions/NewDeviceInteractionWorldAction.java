@@ -18,7 +18,7 @@ public class NewDeviceInteractionWorldAction extends WorkspaceAction {
      */
     public NewDeviceInteractionWorldAction (Workspace workspace) {
         super("Device Interaction World", workspace);
-        putValue(SHORT_DESCRIPTION, "New Text World");
+        putValue(SHORT_DESCRIPTION, "New Keyboard World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
 

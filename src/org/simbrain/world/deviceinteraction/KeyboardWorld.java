@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class KeyboardWorld {
 
-    protected final List<Character> tokenDictionary = Arrays.asList('a', 'b', 'c');
+    protected final List<Character> tokenDictionary = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
     private final List<Character> keys = new ArrayList<>();
     private final List<KeyboardListener> listeners = new ArrayList<>();

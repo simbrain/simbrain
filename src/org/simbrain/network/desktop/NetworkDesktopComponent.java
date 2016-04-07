@@ -151,6 +151,7 @@ public final class NetworkDesktopComponent extends
         if (this.getParentFrame().getJMenuBar() == null) {
             createAndAttachMenus();
         }
+        networkPanel.getNetwork().setName(this.getName());
 
         // TODO: Below only needs to happen when opening; but currently it
         // happens also when creating a new network

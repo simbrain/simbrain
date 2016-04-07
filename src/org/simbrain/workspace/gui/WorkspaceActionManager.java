@@ -313,6 +313,7 @@ public class WorkspaceActionManager {
             if (file.isDirectory()) {
                 continue;
             }
+            // TODO: Maybe try sourcing additional files here.  Maybe those in a subdir.
             if (file.getName().endsWith(".bsh")) {
                 list.add(new ScriptAction(desktop, file.getName()));
             }

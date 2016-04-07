@@ -30,7 +30,7 @@ import com.jmatio.types.MLDouble;
 	saveDia.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
 	try {
-		File f = new File (new File(network.getLabel() + "_" + network.getTime()+ ".mat").getCanonicalPath());
+		File f = new File (new File(network.getName() + "_" + network.getTime()+ ".mat").getCanonicalPath());
 		saveDia.setSelectedFile(f);
 		saveDia.showSaveDialog(null);
 		f = saveDia.getSelectedFile();

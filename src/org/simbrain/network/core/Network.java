@@ -164,8 +164,8 @@ public class Network {
      */
     private static int current_id = 0;
     
-    /** An optional label that defaults to "Network[current_id]".*/
-    private String label ="";
+    /** An optional name for the network that defaults to "Network[current_id]".*/
+    private String name ="";
     
     /** Static initializer */
     {
@@ -181,7 +181,7 @@ public class Network {
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
-    	label = "Network"+current_id;
+    	name = "Network"+current_id;
     	current_id++;
         updateManager = new NetworkUpdateManager(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
@@ -1901,12 +1901,12 @@ public class Network {
         this.fireUpdates = fireUpdates;
     }
     
-    public String getLabel() {
-    	return label;
+    public String getName() {
+    	return name;
     }
     
-    public void setLabel(String label) {
-    	this.label = label;
+    public void setName(String name) {
+    	this.name = name;
     }
 
 }

@@ -30,6 +30,11 @@ import java.util.concurrent.*;
 // For more informaiton see:
 // https://mindmodeling.org/cogsci2014/papers/542/paper542.pdf
 //
+// NOTE: In addition to the line around "**" below, you must iterate the workspace 
+//    a few times before running this.
+//    I'm not sure why.  This was not a problem in earlier versions.
+//    I'm not sure when the problem crept in.
+// 
 // Jeff Yoshimi
 //
 void main() {
@@ -75,6 +80,7 @@ void main() {
 
   // Load custom network update script, for training 
   File colorPlots = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "colorPlot.bsh");
+  workspace.iterate(); // ** Needed so that projection reference in colorPlots action works. Not needed in earlier versions.  Annoying.
   workspace.addUpdateAction(new UpdateActionCustom(workspace, colorPlots));
 
   // Set projection tolerance

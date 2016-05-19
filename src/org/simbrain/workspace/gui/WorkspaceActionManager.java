@@ -18,47 +18,10 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
+import bsh.EvalError;
+import bsh.Interpreter;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.actions.ClearWorkspaceAction;
-import org.simbrain.workspace.actions.GlobalRunAction;
-import org.simbrain.workspace.actions.GlobalStopAction;
-import org.simbrain.workspace.actions.GlobalUpdateAction;
-import org.simbrain.workspace.actions.NewConsoleAction;
-import org.simbrain.workspace.actions.NewDataWorldAction;
-import org.simbrain.workspace.actions.NewDisplayWorldAction;
-import org.simbrain.workspace.actions.NewDocViewerAction;
-import org.simbrain.workspace.actions.NewGameWorldAction;
-import org.simbrain.workspace.actions.NewMidiWorldAction;
-import org.simbrain.workspace.actions.NewNetworkAction;
-import org.simbrain.workspace.actions.NewOdorWorldAction;
-import org.simbrain.workspace.actions.NewReaderWorldAction;
-import org.simbrain.workspace.actions.NewVisionWorldAction;
-import org.simbrain.workspace.actions.OpenCouplingListAction;
-import org.simbrain.workspace.actions.OpenCouplingManagerAction;
-import org.simbrain.workspace.actions.OpenDataWorldAction;
-import org.simbrain.workspace.actions.OpenNetworkAction;
-import org.simbrain.workspace.actions.OpenOdorWorldAction;
-import org.simbrain.workspace.actions.OpenWorkspaceAction;
-import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
-import org.simbrain.workspace.actions.PropertyTabAction;
-import org.simbrain.workspace.actions.QuitWorkspaceAction;
-import org.simbrain.workspace.actions.SaveWorkspaceAction;
-import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
-import org.simbrain.workspace.actions.ScriptEditorAction;
-import org.simbrain.workspace.actions.ShowPropertyDialogAction;
-import org.simbrain.workspace.actions.ShowWorkspaceUpdaterDialog;
-import org.simbrain.workspace.actions.WorkspaceAction;
+import org.simbrain.workspace.actions.*;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewHistogramAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
@@ -67,8 +30,15 @@ import org.simbrain.workspace.actions.chart.NewRasterPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
 import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
-import bsh.EvalError;
-import bsh.Interpreter;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Workspace action manager.
@@ -108,6 +78,9 @@ public class WorkspaceActionManager {
 
     /** New vision world action. */
     private final Action newVisionWorldAction;
+
+    /** New device interaction world action. */
+    private final Action newDeviceInteractionWorldAction;
 
     /** New bar chart action. */
     private final Action newBarChartAction;
@@ -231,6 +204,7 @@ public class WorkspaceActionManager {
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
+        newDeviceInteractionWorldAction = new NewDeviceInteractionWorldAction(workspace);
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 
@@ -284,7 +258,7 @@ public class WorkspaceActionManager {
                 newOdorWorldAction, newDisplayWorldAction,
                 newReaderWorldAction,
                 // newThreeDeeWorldAction,
-                newVisionWorldAction });
+                newVisionWorldAction, newDeviceInteractionWorldAction });
     }
 
     /**
@@ -415,6 +389,11 @@ public class WorkspaceActionManager {
     public Action getNewVisionWorldAction() {
         return newVisionWorldAction;
     }
+
+    /**
+     * @return the newDeviceInteractionWorldAction.
+     */
+    public Action getNewDeviceInteractionWorldAction() {return newDeviceInteractionWorldAction; }
 
     /**
      * @return the clearWorkspaceAction.

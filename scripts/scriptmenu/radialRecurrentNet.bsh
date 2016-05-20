@@ -80,9 +80,7 @@ import org.simbrain.workspace.*;
     Network network = networkComponent.getNetwork();
     network.setTimeStep(0.5);
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-    layout.setInitialLocation(new Point(10, 10));
     GridLayout layout2 = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-    layout2.setInitialLocation(new Point(NUM_NEURONS * 100, 10));
     List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
     List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
     // Optional code to distribute neurons in 3D space with random z values
@@ -124,12 +122,12 @@ import org.simbrain.workspace.*;
     }
     NeuronGroup ng1 = new NeuronGroup(network, neurons);
     ng1.setLabel("Izhikevich Network");
+    ng1.setLayout(layout);
+    ng1.applyLayout(new Point2D.Double(0.0 ,10.0));
     NeuronGroup outs = new NeuronGroup(network, outNeurons);
     outs.setLabel("Spike Visualizer");
-    ng1.setLayout(layout);
-    ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
     outs.setLayout(layout2);
-    outs.applyLayout(new Point2D.Double(1000.0, 0.0));
+    outs.applyLayout(new Point2D.Double(1900, 10));
     network.addGroup(ng1);
     network.addGroup(outs);
     

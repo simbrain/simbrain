@@ -27,10 +27,13 @@ import java.util.concurrent.*;
 //
 // Illustrates how states of an agent's network state space can be plotted and its
 // predictions about future states used to color the points in the plot.
+// 
+// TODO: Give some brief overview.
+// 
 // For more informaiton see:
 // https://mindmodeling.org/cogsci2014/papers/542/paper542.pdf
 //
-// NOTE: In addition to the line around "**" below, you must iterate the workspace 
+// NOTE: In addition to the line around "**" below, you must sometimes iterate the workspace 
 //    a few times before running this.
 //    I'm not sure why.  This was not a problem in earlier versions.
 //    I'm not sure when the problem crept in.
@@ -59,7 +62,7 @@ void main() {
   File trainSynapsesFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "trainSynapses.bsh");
   network.addUpdateAction(new CustomUpdate(network, trainSynapsesFile));
 
-  // Uncomment as needed below to print relevant data terminal 
+  // Uncomment as needed below to print relevant data to terminal 
 
   // Script to print outputs to terminal (Must run from terminal to see this)
   //File printActivationsFile = new File("scripts" + FS + "scriptmenu" + FS  + "agentTrails" + FS  + "printActivations.bsh");

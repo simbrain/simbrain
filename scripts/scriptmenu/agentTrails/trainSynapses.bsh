@@ -11,7 +11,7 @@ import org.simbrain.network.layouts.*;
 private NetworkUpdateAction action;
 
 /**
- * Code for training prediction network is here.
+ * Code for training the prediction sub-network.
  */
 {
   NeuronGroup sensoryNet  = network.getGroupByLabel("Sensory");

@@ -105,24 +105,24 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
         return true;
     }
 
-//    /**
-//     * @return the input being injected into this neuron update rule, if any.
-//     */
-//    public double getAppliedInput() {
-//        return appliedInput;
-//    }
-//
-//    /**
-//     * Allows external objects to set the background applied input to this
-//     * neuron. This allows inputs to be passed through the rule's update without
-//     * directly setting the activation. It is much more practical for spiking
-//     * neurons for which it makes much more sense to inject current as input
-//     * since the update rule is in charge of whether or not the neuron spikes.
-//     * @param appliedInput the background stimulation being applied or
-//     *  "injected" into this neuron.
-//     */
-//    public void setAppliedInput(double appliedInput) {
-//        this.appliedInput = appliedInput;
-//    }
+    /**
+     * @return the input being injected into this neuron update rule, if any.
+     */
+    public double getAppliedInput() {
+        return appliedInput;
+    }
+
+    /**
+     * Allows external objects to set the background applied input to this
+     * neuron. This allows inputs to be passed through the rule's update without
+     * directly setting the activation. It is much more practical for spiking
+     * neurons for which it makes much more sense to inject current as input
+     * since the update rule is in charge of whether or not the neuron spikes.
+     * @param appliedInput the background stimulation being applied or
+     *  "injected" into this neuron.
+     */
+    public void setAppliedInput(double appliedInput) {
+        this.appliedInput = appliedInput;
+    }
 
 }

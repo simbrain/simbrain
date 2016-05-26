@@ -30,11 +30,7 @@ import org.simbrain.workspace.*;
  * including neuronal homeostatic plasticity, spike-timing dependent 
  * plasticity, and synaptic normalization.
  * 
- * A SORN model can be implemented entirely through scripting in 
- * Simbrain 3.0, however this simulation takes advantage of 
- * source code that will be present in Simbrain 3.1, in addition
- * to scripting.
- * 
+ * Note that this model uses custom classes in the SORN directory
  * 
  */
 {
@@ -45,6 +41,10 @@ import org.simbrain.workspace.*;
     int EE_KIN = 25; // 10
     int IE_KIN = (int)(0.2 * NUM_NEURONS)/2;
     int EI_KIN = NUM_NEURONS/2;
+
+    // Add custom classes to classpath
+    String FS = System.getProperty("file.separator");
+    addClassPath("scripts" + FS + "scriptmenu" + FS + "SORN" );
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");

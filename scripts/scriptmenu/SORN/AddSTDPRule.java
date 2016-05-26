@@ -1,8 +1,5 @@
-package org.simbrain.network.synapse_update_rules;
-
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
+import org.simbrain.network.synapse_update_rules.*;
 
 public class AddSTDPRule extends STDPRule {
 

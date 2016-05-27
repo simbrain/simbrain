@@ -32,6 +32,8 @@ import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -163,6 +165,9 @@ public class WorkspaceActionManager {
     /** Open script editor action. */
     private final Action showUpdaterDialog;
 
+    /** Reposition windows action. */
+    private final Action repositionAllWindowsAction;
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
@@ -173,6 +178,7 @@ public class WorkspaceActionManager {
      */
     public WorkspaceActionManager(final SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
+                
         clearWorkspaceAction = new ClearWorkspaceAction(desktop);
 
         openDataWorldAction = new OpenDataWorldAction(workspace);
@@ -221,6 +227,8 @@ public class WorkspaceActionManager {
                 desktop);
 
         propertyTabAction = new PropertyTabAction(desktop);
+
+        repositionAllWindowsAction = new RepositionAllWindowsAction(desktop);
 
     }
 
@@ -547,6 +555,13 @@ public class WorkspaceActionManager {
      */
     public Action getShowUpdaterDialog() {
         return showUpdaterDialog;
+    }
+
+    /**
+     * @return the repositionAllWindowsAction
+     */
+    public Action getRepositionAllWindowsAction() {
+        return repositionAllWindowsAction;
     }
 
 }

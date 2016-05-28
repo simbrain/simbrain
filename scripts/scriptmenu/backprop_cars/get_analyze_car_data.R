@@ -1,4 +1,7 @@
-# Cars dataset
+# The calls to mtcars and write.table are the main thing needed for the demo.  
+# The rest is just me (JKY) messing around.
+
+# Get cars dataset
 mtcars
 help("mtcars")
 

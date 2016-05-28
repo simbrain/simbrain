@@ -4,7 +4,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import mean_squared_error
 
 #
-# Load the cars dataset (relevant R commands and output at the botom of this document)
+# Load the cars dataset
 #
 cars = np.genfromtxt ('cars.csv', delimiter=",")
 

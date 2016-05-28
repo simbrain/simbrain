@@ -15,11 +15,15 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 //
-// Set up a backprop network trained on a subset of R's mtcars dataset
-// that shows MSE for test data and also has supplementary nodes that
-// scales input and output data back to their original levels. This makes
-// it easy to just plug in inputs and outputs that are meaningful.
+// Template for creating a backprop network and computing error on a test set.
+// Lines to adjust are marked with "(*)".
+// 
+// Current trained on a subset of R's mtcars dataset.  
+// See the backprop_cars directory for information on how the data was
+// obtained and prepared for use in this script.
 //
+// See this video for more information: 
+// 
 
 // Global variables
 NetworkComponent networkComponent;
@@ -33,20 +37,23 @@ String FS = System.getProperty("file.separator");
 void main() {
   workspace.clearWorkspace();
   buildTrainNetwork();
+  addCustomNodes(); // Can comment this out if custom nodes are not desired (*)
   testNetwork();
 }
 
+//
 // Create and train the backprop network
+// 
 void buildTrainNetwork() {
 
   // Create backprop network
   networkComponent = new NetworkComponent("Backprop Cars");
   network = networkComponent.getNetwork();
-  bp = new BackpropNetwork(network, new int[]{3,5,2}); // 3 inputs, 5 hidden, 2 outputs
+  bp = new BackpropNetwork(network, new int[]{3,5,2}); // 3 inputs, 5 hidden, 2 outputs (*)
   workspace.addWorkspaceComponent(networkComponent);
   network.addGroup(bp);
 
-  // Custom layout
+  // Custom layout.   Comment out for default locations.
   // To get locations I adjusted it how I liked it in the GUI, and from 
   // Simbrain terminal called:
   //     >print(getNetwork("Backprop Cars"));
@@ -54,7 +61,64 @@ void buildTrainNetwork() {
   bp.getHiddenLayer().setLocation(-49.00,-199.00);
   bp.getOutputLayer().setLocation(-170.07,-332.09);
 
-  // Create special input and output nodes that scale values back
+  // Load data (*)
+  bp.getTrainingSet().setInputData(Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_train_in.csv")));
+  bp.getTrainingSet().setTargetData(Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_train_targ.csv")));
+
+  // Train the network (*)
+  BackpropTrainer trainer = new BackpropTrainer(bp, bp.getNeuronGroupsAsList());
+  trainer.randomize();
+  trainer.setLearningRate(.01);
+  int numIterations = 5000;
+  // trainer.setMomentum(.25);
+  System.out.println("------ Training ------ ");
+  for (int i = 0; i < numIterations; i++) {
+    trainer.iterate();
+    if (i % numIterations/10 == 0) {
+      System.out.println("MSE: " + trainer.getError());          
+    }
+  }
+
+  // Update network
+  network.clearActivations();
+  network.fireNeuronsUpdated();
+}
+
+//
+// Compute mean squared error for test data and print to console
+// 
+void testNetwork() {
+
+  // Set Test data (*)
+  double[][] testIn = Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_test_in.csv"));
+  double[][] testTarg = Utils.getDoubleMatrix(new File("scripts" + FS + "scriptmenu" + FS + "backprop_cars" + FS + "cars_test_targ.csv"));
+
+  //Load test data in to input layer (for Gui exploration, not used below).
+  bp.getInputLayer().setTestData(testIn); // To use this input data, setClamped (next line) must be turned off
+  
+  // Iterate through the data and print error info to terminal
+  double totalError = 0;
+  System.out.println();
+  System.out.println("------ Testing ------ ");
+  for(int i = 0; i < testTarg.length;i++) {
+    bp.getInputLayer().forceSetActivations(testIn[i]);
+    bp.update();
+    double[] outputs = bp.getOutputLayer().getActivations();
+    totalError += SimbrainMath.getMeanSquaredError(outputs, testTarg[i]);
+    // System.out.println("Row " + i
+    //       //  + "\toutput: " + Arrays.toString(outputs)
+    //       // + "\ttarget: " + Arrays.toString(testTarg[i])
+    //   + ", mse = " + SimbrainMath.getMeanSquaredError(outputs, testTarg[i]));
+  }
+  System.out.println("\nTest set MSE: " + totalError/testTarg.length);
+
+}
+
+//
+// Create custom input and output nodes for easy testing. 
+//
+void addCustomNodes() {
+    // Create special input and output nodes that scale values back
   // to their original ranges
   Neuron mpgNeuron = new Neuron(network, "LinearRule");
   mpgNeuron.setLabel("MPG");
@@ -109,52 +173,8 @@ void buildTrainNetwork() {
   synapse.setStrength(22.9);
   network.addSynapse(synapse);
 
-  // Load data (check against mtcars[,c("hp","qsec")])
-  bp.getTrainingSet().setInputData(Utils.getDoubleMatrix(new File("simulations" + FS + "tables" + FS + "cars_train_in.csv")));
-  bp.getTrainingSet().setTargetData(Utils.getDoubleMatrix(new File("simulations" + FS + "tables" + FS + "cars_train_targ.csv")));
-
-  // Train the network
-  BackpropTrainer trainer = new BackpropTrainer(bp, bp.getNeuronGroupsAsList());
-  trainer.randomize();
-  trainer.setLearningRate(.01);
-  // trainer.setMomentum(.25);
-  System.out.println("------ Training ------ ");
-  for (int i = 0; i < 5000; i++) {
-    trainer.iterate();
-    if (i % 1000 == 0) {
-      System.out.println("MSE: " + trainer.getError());          
-    }
-  }
-
-  // Update network
-  network.clearActivations();
-  network.fireNeuronsUpdated();
-}
-
-// See how well the network does on test data
-void testNetwork() {
-
-  // Load test data in to input layer (for Gui exploration, not used below)
-  double[][] testIn = Utils.getDoubleMatrix(new File("simulations" + FS + "tables" + FS + "cars_test_in.csv"));
-  double[][] testTarg = Utils.getDoubleMatrix(new File("simulations" + FS + "tables" + FS + "cars_test_targ.csv"));
-  bp.getInputLayer().setTestData(testIn); // To use this input data, setClamped (next line) must be turned off
-  bp.getInputLayer().setClamped(false); // This makes it possible to use the new nodes
-
-  // Iterate through the data and print error info to terminal
-  double totalError = 0;
-  System.out.println();
-  System.out.println("------ Testing ------ ");
-  for(int i = 0; i < testTarg.length;i++) {
-    bp.getInputLayer().forceSetActivations(testIn[i]);
-    bp.update();
-    double[] outputs = bp.getOutputLayer().getActivations();
-    totalError += SimbrainMath.getMeanSquaredError(outputs, testTarg[i]);
-    // System.out.println("Row " + i
-    //       //  + "\toutput: " + Arrays.toString(outputs)
-    //       // + "\ttarget: " + Arrays.toString(testTarg[i])
-    //   + ", mse = " + SimbrainMath.getMeanSquaredError(outputs, testTarg[i]));
-  }
-  System.out.println("\nTest set MSE: " + totalError/testTarg.length);
+  // Required in order to use the custom nodes
+  bp.getInputLayer().setClamped(false); 
 
 }
 
@@ -162,3 +182,4 @@ void testNetwork() {
 // Run the script
 //
 main();
+

@@ -69,7 +69,7 @@ void buildTrainNetwork() {
   BackpropTrainer trainer = new BackpropTrainer(bp, bp.getNeuronGroupsAsList());
   trainer.randomize();
   trainer.setLearningRate(.01);
-  int numIterations = 5000;
+  int numIterations = 15000;
   // trainer.setMomentum(.25);
   System.out.println("------ Training ------ ");
   for (int i = 0; i < numIterations; i++) {

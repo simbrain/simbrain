@@ -266,7 +266,7 @@ public class WorkspaceActionManager {
                 newOdorWorldAction, newDisplayWorldAction,
                 newReaderWorldAction,
                 // newThreeDeeWorldAction,
-                newVisionWorldAction, newDeviceInteractionWorldAction });
+                newVisionWorldAction });
     }
 
     /**

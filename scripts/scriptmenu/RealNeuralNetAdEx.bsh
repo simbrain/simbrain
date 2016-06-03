@@ -218,7 +218,7 @@ import org.simbrain.workspace.*;
     //ng1.setLayout(layout);
     //ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
     outs.setLayout(layout2);
-    outs.applyLayout(new Point2D.Double(1000.0, 0.0));
+    outs.applyLayout(new Point2D.Double(1500.0, 0.0));
     print(sg.size());
     
     network.randomizeNeurons();

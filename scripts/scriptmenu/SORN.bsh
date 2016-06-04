@@ -31,14 +31,13 @@ import org.simbrain.workspace.*;
  * plasticity, and synaptic normalization.
  * 
  * Note that this model uses custom classes in the SORN directory.   
- * Compiled classes provide better performance.   To implement yourself
- * you can use the SORN directory and its files as a template.   You can 
- * compile the java classes directly in the sorn directory, and then refer
- * to those classes using the call to "addClassPath" below.
+ * Compiled classes provide better performance.   To implement something similar
+ * yourself you can use the SORN directory and its files as a template. 
+ * Compile the java classes directly in the sorn directory, and then refer
+ * to them using the call to "addClassPath" below.
  *
- * Also note that the custom classes in the SORN directory extend an existing neuron
- * rule (SpikingThreshold) and synapse update rule (STDP).  This means that we can directly
- * edit many of the properties ofthe resulting neurons and synapses in the GUI.
+ * The custom classes in the SORN directory extend an existing neuron
+ * rule (SpikingThreshold) and synapse update rule (STDP).
  * 
  */
 {

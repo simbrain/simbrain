@@ -101,10 +101,8 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Constructs a competitive network with specified number of neurons.
      *
-     * @param numNeurons
-     *            size of this network in neurons
-     * @param root
-     *            reference to Network.
+     * @param numNeurons size of this network in neurons
+     * @param root reference to Network.
      */
     public CompetitiveGroup(final Network root, final int numNeurons) {
         super(root);
@@ -113,7 +111,7 @@ public class CompetitiveGroup extends NeuronGroup {
         }
         setLabel("Competitive Group");
     }
-    
+
     /**
      * Copy constructor.
      *
@@ -121,25 +119,25 @@ public class CompetitiveGroup extends NeuronGroup {
      * @param oldNet old network.
      */
     public CompetitiveGroup(Network newRoot, CompetitiveGroup oldNet) {
-    	super(newRoot, oldNet);
-    	this.learningRate = oldNet.getLearningRate();
-    	this.winValue = oldNet.getWinValue();
-    	this.loseValue = oldNet.loseValue;
-    	this.normalizeInputs = oldNet.normalizeInputs;
-    	this.useLeakyLearning = oldNet.useLeakyLearning;
-    	this.leakyLearningRate = oldNet.leakyLearningRate;
-    	this.synpaseDecayPercent = oldNet.synpaseDecayPercent;
-    	this.max = oldNet.max;
-    	this.val = oldNet.val;
-    	this.activation = oldNet.activation;
-    	this.winner = oldNet.winner;
-    	this.updateMethod = oldNet.updateMethod;
+        super(newRoot, oldNet);
+        this.learningRate = oldNet.getLearningRate();
+        this.winValue = oldNet.getWinValue();
+        this.loseValue = oldNet.loseValue;
+        this.normalizeInputs = oldNet.normalizeInputs;
+        this.useLeakyLearning = oldNet.useLeakyLearning;
+        this.leakyLearningRate = oldNet.leakyLearningRate;
+        this.synpaseDecayPercent = oldNet.synpaseDecayPercent;
+        this.max = oldNet.max;
+        this.val = oldNet.val;
+        this.activation = oldNet.activation;
+        this.winner = oldNet.winner;
+        this.updateMethod = oldNet.updateMethod;
         setLabel("Competitive Group (copy)");
     }
-    
+
     @Override
     public CompetitiveGroup deepCopy(Network newParent) {
-    	return new CompetitiveGroup(newParent, this);
+        return new CompetitiveGroup(newParent, this);
     }
 
     @Override
@@ -197,15 +195,13 @@ public class CompetitiveGroup extends NeuronGroup {
      * "double deltaw = learningRate" (line 200 at time of writing) cannot
      * possibly change any variables in the class.
      *
-     * @param neuron
-     *            winning neuron.
+     * @param neuron winning neuron.
      */
     private void squireAlvarezWeightUpdate(final Neuron neuron) {
         for (Synapse synapse : neuron.getFanIn()) {
-            double deltaw = learningRate
-                    * synapse.getTarget().getActivation()
-                    * (synapse.getSource().getActivation() - synapse
-                            .getTarget().getAverageInput());
+            double deltaw = learningRate * synapse.getTarget().getActivation()
+                    * (synapse.getSource().getActivation()
+                            - synapse.getTarget().getAverageInput());
             synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
         }
     }
@@ -213,8 +209,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Update winning neuron's weights in accordance with PDP 1, p. 179.
      *
-     * @param neuron
-     *            winning neuron.
+     * @param neuron winning neuron.
      */
     private void rummelhartZipser(final Neuron neuron) {
         double sumOfInputs = neuron.getTotalInput();
@@ -249,8 +244,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Apply leaky learning to provided learning.
      *
-     * @param neuron
-     *            neuron to apply leaky learning to
+     * @param neuron neuron to apply leaky learning to
      */
     private void leakyLearning(final Neuron neuron) {
         double sumOfInputs = neuron.getTotalInput();
@@ -261,8 +255,8 @@ public class CompetitiveGroup extends NeuronGroup {
                     activation = activation / sumOfInputs;
                 }
             }
-            val = incoming.getStrength() + leakyLearningRate
-                    * (activation - incoming.getStrength());
+            val = incoming.getStrength()
+                    + leakyLearningRate * (activation - incoming.getStrength());
             incoming.setStrength(val);
         }
     }
@@ -342,8 +336,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets learning rate.
      *
-     * @param rate
-     *            The new epsilon value.
+     * @param rate The new epsilon value.
      */
     public void setLearningRate(final double rate) {
         this.learningRate = rate;
@@ -361,8 +354,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets the loser value.
      *
-     * @param loseValue
-     *            The new loser value
+     * @param loseValue The new loser value
      */
     public final void setLoseValue(final double loseValue) {
         this.loseValue = loseValue;
@@ -380,8 +372,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets the winner value.
      *
-     * @param winValue
-     *            The new winner value
+     * @param winValue The new winner value
      */
     public final void setWinValue(final double winValue) {
         this.winValue = winValue;
@@ -399,8 +390,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets the leaky learning rate.
      *
-     * @param leakyRate
-     *            Leaky rate value to set
+     * @param leakyRate Leaky rate value to set
      */
     public void setLeakyLearningRate(final double leakyRate) {
         this.leakyLearningRate = leakyRate;
@@ -418,8 +408,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets the normalize inputs value.
      *
-     * @param normalizeInputs
-     *            Normalize inputs value to set
+     * @param normalizeInputs Normalize inputs value to set
      */
     public void setNormalizeInputs(final boolean normalizeInputs) {
         this.normalizeInputs = normalizeInputs;
@@ -437,8 +426,7 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Sets the leaky learning value.
      *
-     * @param useLeakyLearning
-     *            The leaky learning value to set
+     * @param useLeakyLearning The leaky learning value to set
      */
     public void setUseLeakyLearning(final boolean useLeakyLearning) {
         this.useLeakyLearning = useLeakyLearning;
@@ -452,8 +440,7 @@ public class CompetitiveGroup extends NeuronGroup {
     }
 
     /**
-     * @param synpaseDecayPercent
-     *            the synpaseDecayPercent to set
+     * @param synpaseDecayPercent the synpaseDecayPercent to set
      */
     public void setSynpaseDecayPercent(double synpaseDecayPercent) {
         this.synpaseDecayPercent = synpaseDecayPercent;
@@ -467,11 +454,24 @@ public class CompetitiveGroup extends NeuronGroup {
     }
 
     /**
-     * @param updateMethod
-     *            the updateMethod to set
+     * @param updateMethod the updateMethod to set
      */
     public void setUpdateMethod(UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
+    }
+
+    /**
+     * Convenience method for setting update style from scripts.
+     *
+     * @param updateMethod string name of method: "RZ" for Rummelhart Zipser;
+     *            "AS" for Alvarez-Squire
+     */
+    public void setUpdateMethod(String updateMethod) {
+        if (updateMethod.equalsIgnoreCase("RZ")) {
+            this.updateMethod = UpdateMethod.RUMM_ZIPSER;
+        } else if (updateMethod.equalsIgnoreCase("AS")) {
+            this.updateMethod = UpdateMethod.ALVAREZ_SQUIRE;
+        }
     }
 
 }

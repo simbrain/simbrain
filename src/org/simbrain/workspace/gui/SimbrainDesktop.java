@@ -18,11 +18,61 @@
  */
 package org.simbrain.workspace.gui;
 
-import bsh.Interpreter;
-import bsh.util.JConsole;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.Vector;
+
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
+import org.simbrain.custom.rl_agents.RL_AgentTest;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.docviewer.DocViewerDesktopComponent;
 import org.simbrain.network.NetworkComponent;
@@ -72,52 +122,8 @@ import org.simbrain.world.textworld.ReaderComponentDesktopGui;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyVetoException;
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Stack;
-import java.util.Vector;
+import bsh.Interpreter;
+import bsh.util.JConsole;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
@@ -232,7 +238,7 @@ public class SimbrainDesktop {
         public void componentRemoved(
                 final WorkspaceComponent workspaceComponent) {
             GuiComponent<?> component = guiComponents.get(workspaceComponent);
-            if(component == null) {
+            if (component == null) {
                 return;
             }
             guiComponents.remove(component);
@@ -611,10 +617,29 @@ public class SimbrainDesktop {
         scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
+        addCustomSimulations(scriptMenu);
+        scriptMenu.addSeparator();
         for (Action action : actionManager.getScriptActions(this)) {
             scriptMenu.add(action);
         }
         return scriptMenu;
+    }
+
+    /**
+     * Manually add custom simulations.
+     */
+    private void addCustomSimulations(final JMenu scriptMenu) {
+        
+        // Adding the RL Test simulation
+        JMenuItem rlTest = new JMenuItem("RL Test");
+        rlTest.addActionListener(ae -> {
+            RL_AgentTest test = new RL_AgentTest(this);
+            test.run();
+        });
+        scriptMenu.add(rlTest);
+        
+        // (Add more custom simulations here)
+
     }
 
     /**
@@ -655,7 +680,8 @@ public class SimbrainDesktop {
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(actionManager.getPropertyTabAction());
         viewMenu.addSeparator();
-        viewMenu.add(new JMenuItem(actionManager.getRepositionAllWindowsAction()));
+        viewMenu.add(
+                new JMenuItem(actionManager.getRepositionAllWindowsAction()));
         return viewMenu;
     }
 
@@ -753,7 +779,7 @@ public class SimbrainDesktop {
             final Class<? extends GuiComponent<?>> gui) {
         wrappers.put(component, gui);
     }
-    
+
     /**
      * Returns a list of all desktop components.
      *
@@ -866,7 +892,7 @@ public class SimbrainDesktop {
 
             @Override
             public void internalFrameClosed(InternalFrameEvent e) {
-                super.internalFrameClosed(e);                
+                super.internalFrameClosed(e);
             }
 
         }
@@ -957,7 +983,8 @@ public class SimbrainDesktop {
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());
         } else {
-            // This should be coordinated with the logic in RepositionAllWindowsSction
+            // This should be coordinated with the logic in
+            // RepositionAllWindowsSction
             int highestComponentNumber = guiComponents.size();
             componentFrame.setBounds(
                     (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
@@ -1136,7 +1163,7 @@ public class SimbrainDesktop {
             clearComponents();
         }
     }
-    
+
     /**
      * Helper method to clear all components from the desktop.
      */

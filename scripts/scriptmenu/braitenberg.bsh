@@ -86,7 +86,7 @@ import java.util.*;
     panel.addItem("Right weight", weightr);
 
     // Set up Frame
-    internalFrame.setLocation(19,352);
+    internalFrame.setLocation(8,365);
     internalFrame.getContentPane().add(panel);
     internalFrame.setVisible(true);
     internalFrame.pack();

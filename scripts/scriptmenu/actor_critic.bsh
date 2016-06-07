@@ -371,7 +371,7 @@ void makeTimeSeries() {
     chart.getModel().setRangeUpperBound(1);
     chart.getModel().setRangeLowerBound(-1);
     workspace.addWorkspaceComponent(chart);
-    desktop.getDesktopComponent(chart).getParentFrame().setBounds(710, 340, 300, 300);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(710, 355, 300, 300);
 
 
     // Couple network to chart

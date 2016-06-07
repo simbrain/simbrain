@@ -50,7 +50,7 @@ void buildNetwork() {
     Network network = new Network();
     NetworkComponent networkComponent = new NetworkComponent("Cerebellum", network);
     workspace.addWorkspaceComponent(networkComponent);
-    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(332,10,550,600);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(314,11,485,574);
     
 	DecayRule generalRule = new DecayRule();
 	generalRule.setDecayFraction(.25);
@@ -450,7 +450,7 @@ void makeButtons() {
 	
     // Set up Frame
     JInternalFrame internalFrame = new JInternalFrame("Train / Test", true, true);
-    internalFrame.setLocation(7,350);
+    internalFrame.setLocation(4,350);
     internalFrame.getContentPane().add(panel);
     internalFrame.setVisible(true);
     internalFrame.pack();
@@ -470,7 +470,7 @@ void addTimeSeries() {
     chart.getModel().setRangeUpperBound(1);
     chart.getModel().setRangeLowerBound(-1);
     workspace.addWorkspaceComponent(chart);
-    desktop.getDesktopComponent(chart).getParentFrame().setBounds(880,8,380,300);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(785,11,338,290);
 	
 	// Couple network to time series
     PotentialProducer neuronProducer1 = NetworkComponent.getNeuronProducer(networkComponent, network.getNeuronByLabel("Output"), "getActivation");
@@ -516,7 +516,7 @@ void addDocViewer() {
         );
     // TODO: Explain what time series is doing
     workspace.addWorkspaceComponent(docViewer);
-    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(3,11,339,336);
+    desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(3,11,323,336);
 		
 }
 	

@@ -228,7 +228,7 @@ void buildButtonPanel() {
 	});
 
 	// Set up Frame
-	internalFrame.setLocation(11,344);
+	internalFrame.setLocation(2,355);
 	internalFrame.getContentPane().add(panel);
 	internalFrame.setVisible(true);
 	internalFrame.pack();

@@ -2,6 +2,7 @@ import org.simbrain.network.core.*;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.util.randomizer.*;
+import org.simbrain.util.math.*;
 
 /**
  * An implementation of the specific type of threshold neuron used in Lazar,
@@ -20,6 +21,11 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     /** The noise generating randomizer. */
     private Randomizer noiseGenerator = new Randomizer();
 
+    {
+        noiseGenerator.setPdf(ProbDistribution.NORMAL);
+        noiseGenerator.setParam2(0.05);
+    }
+
     /** Whether or not to add noise to the inputs . */
     private boolean addNoise;
 
@@ -31,8 +37,8 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
 
     /** The maximum value the threshold is allowed to take on. */
     private double maxThreshold = 1;
-    
-    private double threshold;
+
+    private double refractoryPeriod = 0;
 
     @Override
     public SORNNeuronRule deepCopy() {
@@ -42,7 +48,8 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         snr.setEtaIP(etaIP);
         snr.sethIP(hIP);
         snr.setMaxThreshold(maxThreshold);
-        snr.setThreshold(threshold);
+        snr.setThreshold(getThreshold());
+        snr.setRefractoryPeriod(getRefractoryPeriod());
         return snr;
     }
     
@@ -51,14 +58,19 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
      */
     @Override
     public void update(Neuron neuron) {
+        // Synaptic Normalization
         neuron.normalizeExcitatoryFanIn();
+        // Sum inputs including noise and applied (external) inputs
         double input = inputType.getInput(neuron)
                 + (addNoise ? noiseGenerator.getRandom() : 0)
                 + getAppliedInput();
-        boolean spk = input >= threshold;
-        // While technically not a spiking update rule this gives us
-        // flexibility. For instance we can use the much more compressed spike
-        // time output file for recording.
+        // Check that we're not still in the refractory period
+        boolean outOfRef = neuron.getNetwork().getTime()
+            > getLastSpikeTime()+refractoryPeriod;
+        // We fire a spike if input exceeds threshold and we're
+        // not in the refractory period
+        boolean spk = outOfRef && (input >= getThreshold());
+        setHasSpiked(spk, neuron);
         neuron.setSpkBuffer(spk);
         neuron.setBuffer(spk ? 1 : 0);
         plasticUpdate(neuron);
@@ -68,9 +80,9 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
      * Homeostatic plasticity of the default SORN network. {@inheritDoc}
      */
     public void plasticUpdate(Neuron neuron) {
-        threshold += etaIP * (neuron.getActivation() - hIP);
-        if (threshold > maxThreshold) {
-            threshold = maxThreshold;
+        setThreshold(getThreshold() + (etaIP * (neuron.getActivation() - hIP)));
+        if (getThreshold() > maxThreshold) {
+            setThreshold(maxThreshold);
         }
     }
     
@@ -120,6 +132,14 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
 
     public void setEtaIP(double etaIP) {
         this.etaIP = etaIP;
+    }
+
+    public void setRefractoryPeriod(double refP) {
+        this.refractoryPeriod = refP;
+    }
+
+    public double getRefractoryPeriod() {
+        return refractoryPeriod;
     }
 
 }

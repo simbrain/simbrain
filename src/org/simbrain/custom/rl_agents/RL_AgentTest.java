@@ -62,6 +62,7 @@ public class RL_AgentTest {
         cheese.setSmellSource(new SmellSource(new double[100]));
         cheese.getSmellSource().randomize();
         cheese.setCenterLocation(200, 200);
+        cheese.getSmellSource().setDispersion(200);
         world.addEntity(cheese);
 
         // Couple the mouse to the network

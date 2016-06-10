@@ -15,7 +15,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         NoisyUpdateRule {
 
     {
-        inputType = InputType.WEIGHTED;
+        inputType = InputType.SYNAPTIC;
     }
 
     /** The noise generating randomizer. */
@@ -72,7 +72,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         boolean spk = outOfRef && (input >= getThreshold());
         setHasSpiked(spk, neuron);
         neuron.setSpkBuffer(spk);
-        neuron.setBuffer(spk ? 1 : 0);
+        neuron.setBuffer(2*(input-getThreshold()));
         plasticUpdate(neuron);
     }
 
@@ -80,7 +80,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
      * Homeostatic plasticity of the default SORN network. {@inheritDoc}
      */
     public void plasticUpdate(Neuron neuron) {
-        setThreshold(getThreshold() + (etaIP * (neuron.getActivation() - hIP)));
+        setThreshold(getThreshold() + (etaIP * ((neuron.isSpike()?1:0) - hIP)));
         if (getThreshold() > maxThreshold) {
             setThreshold(maxThreshold);
         }

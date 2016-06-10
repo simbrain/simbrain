@@ -113,16 +113,19 @@ import org.simbrain.workspace.*;
     RadialSimpleConstrainedKIn ee_con = new RadialSimpleConstrainedKIn(EE_KIN, RADIUS);
     SynapseGroup sg_ee = SynapseGroup.createSynapseGroup(ng, ng, ee_con, 1.0, exRand, inRand);
     sg_ee.setLabel("EE Synapses");
+    sg_ee.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(sg_ee);
 
     RadialSimpleConstrainedKIn ie_con = new RadialSimpleConstrainedKIn(IE_KIN, 100000);
     SynapseGroup sg_ie = SynapseGroup.createSynapseGroup(ngIn, ng, ie_con, 1.0, exRand, inRand);
     sg_ie.setLabel("IE Synapses");
+    sg_ie.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(sg_ie);
 
     RadialSimpleConstrainedKIn ei_con = new RadialSimpleConstrainedKIn(EI_KIN, 100000);
     SynapseGroup sg_ei = SynapseGroup.createSynapseGroup(ng, ngIn, ei_con, 1.0, exRand, inRand);
     sg_ei.setLabel("EI Synapses");
+    sg_ei.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(sg_ei);
 
 	for (Neuron n : neurons) {
@@ -157,22 +160,26 @@ import org.simbrain.workspace.*;
     SynapseGroup input_ee = SynapseGroup.createSynapseGroup(input, ng, input_ee_con, 1.0, exRand, inRand);
     input_ee.setLabel("Input -> Excitatory");
     input_ee.setLearningRule(stdp, Polarity.BOTH);
+    input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(input_ee);
 
     Sparse ee_input_con = new Sparse(0.01, false, false);
     SynapseGroup ee_input = SynapseGroup.createSynapseGroup(ng, input, ee_input_con, 1.0, exRand, inRand);
     ee_input.setLabel("Excitatory -> Input");
     ee_input.setLearningRule(stdp, Polarity.BOTH);
+    ee_input.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(ee_input);
 
     Sparse input_ie_con = new Sparse(0.01, true, false);
     SynapseGroup input_ie = SynapseGroup.createSynapseGroup(input, ngIn, input_ie_con, 1.0, exRand, inRand);
     input_ie.setLabel("Input -> Inhibitory");
+    input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(input_ie);
 
     Sparse ie_input_con = new Sparse(0.01, true, false);
     SynapseGroup ie_input = SynapseGroup.createSynapseGroup(ngIn, input, input_ie_con, 1.0, exRand, inRand);
     ie_input.setLabel("Inhibitory -> Input");
+    ie_input.setSpikeResponder(new Step(), Polarity.BOTH);
     network.addGroup(ie_input);
 
 

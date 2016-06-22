@@ -80,7 +80,7 @@ public abstract class WorkspaceComponent {
      */
     private File currentFile;
 
-    /** Manage create of attributes on this component. */
+    /** Manage creation of attributes on this component. */
     private final AttributeManager attributeManager;
 
     /**

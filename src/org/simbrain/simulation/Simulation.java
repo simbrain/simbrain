@@ -15,12 +15,16 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 //TODO: Document everything
 public class Simulation {
 
     final SimbrainDesktop desktop;
     final Workspace workspace;
+
+    Hashtable<Network, NetworkComponent> netMap = new Hashtable();
+    Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
     /**
      * @param desktop
@@ -37,35 +41,64 @@ public class Simulation {
     public SimbrainDesktop getDesktop() {
         return desktop;
     }
-    
 
-    // Neurons to agent.  So far just one to one
+    // Neurons to agent. So far just one to one
     public void couple(NeuronGroup ng, RotatingEntity entity) {
-        AttributeManager producers = netMap.get(ng.getParentNetwork()).getAttributeManager();          
-        PotentialProducer straightProducer = producers.createPotentialProducer(ng.getNeuronList().get(0), "getActivation", double.class); 
+        AttributeManager producers = netMap.get(ng.getParentNetwork())
+                .getAttributeManager();
+        AttributeManager consumers = odorMap.get(entity.getParentWorld())
+                .getAttributeManager();
 
-        AttributeManager consumers = odorMap.get(entity.getParentWorld()).getAttributeManager();          
-        PotentialConsumer straightConsumer = producers.createPotentialConsumer(entity, "goStraight", double.class); 
+        PotentialProducer straightProducer = producers.createPotentialProducer(
+                ng.getNeuronList().get(0), "getActivation", double.class);
+        PotentialProducer leftProducer = producers.createPotentialProducer(
+                ng.getNeuronList().get(1), "getActivation", double.class);
+        PotentialProducer rightProducer = producers.createPotentialProducer(
+                ng.getNeuronList().get(2), "getActivation", double.class);
 
-        Coupling straightCoupling = new Coupling(straightProducer, straightConsumer);
+        PotentialConsumer straightConsumer = producers
+                .createPotentialConsumer(entity, "goStraight", double.class);
+        PotentialConsumer leftConsumer = producers
+                .createPotentialConsumer(entity, "turnLeft", double.class);
+        PotentialConsumer rightConsumer = producers
+                .createPotentialConsumer(entity, "turnRight", double.class);
+
+        Coupling straightCoupling = new Coupling(straightProducer,
+                straightConsumer);
+        Coupling leftCoupling = new Coupling(leftProducer, leftConsumer);
+        Coupling rightCoupling = new Coupling(rightProducer, rightConsumer);
+
         try {
             workspace.getCouplingManager().addCoupling(straightCoupling);
+            workspace.getCouplingManager().addCoupling(leftCoupling);
+            workspace.getCouplingManager().addCoupling(rightCoupling);
         } catch (UmatchedAttributesException e) {
             e.printStackTrace();
-        }        
+        }
     }
-    
-    Hashtable<Network, NetworkComponent> netMap = new Hashtable();
-    Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
     // Agent to neurons
     public void couple(RotatingEntity entity, NeuronGroup ng) {
+        AttributeManager producers = odorMap.get(entity.getParentWorld())
+                .getAttributeManager();
+        AttributeManager consumers = netMap.get(ng.getParentNetwork())
+                .getAttributeManager();
+
+        PotentialProducer sensoryProducer = producers.createPotentialProducer(
+                ((SmellSensor) entity.getSensors().get(0)), "getCurrentValue",
+                double[].class);
+        PotentialConsumer sensoryConsumer = consumers
+                .createPotentialConsumer(ng, "setActivations", double[].class);
         
+        Coupling sensoryCoupling = new Coupling(sensoryProducer,
+                sensoryConsumer);
+        try {
+            workspace.getCouplingManager().addCoupling(sensoryCoupling);
+        } catch (UmatchedAttributesException e) {
+            e.printStackTrace();
+        }
     }
 
-    // Associate networks with networkcomponents
-    // Associate entities with odorworldcomponents 
-    
     public NetBuilder addNetwork(int x, int y, int width, int height,
             String name) {
         NetworkComponent networkComponent = new NetworkComponent(name);

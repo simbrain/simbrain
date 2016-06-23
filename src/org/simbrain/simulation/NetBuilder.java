@@ -9,13 +9,16 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 //TODO: Not sure this is the best name.  Use it a while then decide.
+//  Maybe change to NetHelper.   
 
 /**
  * A wrapper for a NetworkComponent that makes it easy to add stuff to a
@@ -24,8 +27,8 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 public class NetBuilder {
 
     private final NetworkComponent networkComponent;
-    
-    private final Network network; 
+
+    private final Network network;
 
     /**
      * @param networkComponent
@@ -37,6 +40,13 @@ public class NetBuilder {
 
     double GRID_SPACE = 50; // todo; make this settable
 
+    public Neuron addNeuron(int x, int y) {
+        Neuron neuron = new Neuron(network, "LinearRule");
+        neuron.setLocation(x, y);
+        network.addNeuron(neuron);
+        return neuron;
+    }
+
     public void addNeurons(int x, int y, int numNeurons, String layoutName,
             String type) {
 
@@ -47,7 +57,10 @@ public class NetBuilder {
             newNeurons.add(neuron);
         }
 
-        // LAYOUT NEURONS
+        // Lay out neurons
+        if (layoutName.equalsIgnoreCase("none")) {
+            return;
+        }
         if (layoutName.toLowerCase().contains("line")) {
             if (layoutName.equalsIgnoreCase("vertical line")) {
                 LineLayout lineLayout = new LineLayout(x, y, 50,
@@ -66,13 +79,27 @@ public class NetBuilder {
             gridLayout.layoutNeurons(newNeurons);
 
         }
-    }    
+    }
+    
+    /**
+     * Make a single source -> target connection
+     *
+     * @param source the source neuron
+     * @param target the target neuron
+     */
+    public void connect(Neuron source, Neuron target, double value) {
+        Synapse synapse = new Synapse(source, target);
+        synapse.setStrength(value);
+        source.getNetwork().addSynapse(synapse);
+    }
+
 
     public void connectAllToAll(NeuronGroup source, NeuronGroup target) {
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(source.getNeuronList(), target.getNeuronList());
+        connector.connectAllToAll(source.getNeuronList(),
+                target.getNeuronList());
     }
-    
+
     public SynapseGroup addSynapseGroup(NeuronGroup source,
             NeuronGroup target) {
         SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target);
@@ -80,13 +107,14 @@ public class NetBuilder {
         return sg;
     }
 
-    public NeuronGroup addNeuronGroup(int x, int y, int numNeurons, String layoutName,
-            String type) {
+    public NeuronGroup addNeuronGroup(int x, int y, int numNeurons,
+            String layoutName, String type) {
 
-        NeuronGroup ng = new NeuronGroup(network, new Point2D.Double(x,y), numNeurons);
+        NeuronGroup ng = new NeuronGroup(network, new Point2D.Double(x, y),
+                numNeurons);
         ng.setNeuronType(type);
         network.addGroup(ng);
-        
+
         // LAYOUT NEURONS
         if (layoutName.toLowerCase().contains("line")) {
             if (layoutName.equalsIgnoreCase("vertical line")) {
@@ -107,7 +135,6 @@ public class NetBuilder {
         return ng;
     }
 
-
     public Network getNetwork() {
         return network;
     }
@@ -119,6 +146,23 @@ public class NetBuilder {
         return networkComponent;
     }
 
-
+    //TODO: SHould be able to parameterize vehicle type easily
+    // Move this to sim? Or a new vehicle class?
+    public void addPursuer(int x, int y, RotatingEntity agent, double[] stimulus) {
+        Neuron leftTurn = addNeuron(x, y);
+        Neuron straight = addNeuron(x+50, y);
+        Neuron rightTurn = addNeuron(x+100, y);
+        Neuron leftInput= addNeuron(x, y+100);
+        Neuron rightInput = addNeuron(x+100, y+100);
+        connect(leftInput,leftTurn,1);
+        connect(rightInput,rightTurn,1);
+        
+        // Vector coupling to agent using stimulus
+        // couple(agent.leftsensor, stimulus, leftInput)
+        // couple(agent.rightsensor, stimulus, rightInput)
+        // couple(straight, agent);
+        // couple(leftTurn, agent.turnLeft);
+        // couple(rightTurn, agent.turnRight);
+    }
 
 }

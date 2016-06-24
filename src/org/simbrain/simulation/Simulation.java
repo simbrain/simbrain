@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.workspace.AttributeManager;
 import org.simbrain.workspace.Coupling;
@@ -14,7 +15,9 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 //TODO: Document everything
@@ -126,6 +129,56 @@ public class Simulation {
      */
     public Workspace getWorkspace() {
         return workspace;
+    }
+
+    public void couple(Sensor sensor, int stimulusDimension, Neuron leftInput) {
+        AttributeManager producers = odorMap.get(sensor.getParent().getParentWorld())
+                .getAttributeManager();
+        AttributeManager consumers = netMap
+                .get(leftInput.getNetwork())
+                .getAttributeManager();
+
+        PotentialProducer agentSensor =
+             producers.createPotentialProducer(sensor,
+              "getCurrentValue", double.class,
+              new Class[] { int.class },
+              new Object[] { stimulusDimension });
+        PotentialConsumer sensoryNeuron = consumers
+                .createPotentialConsumer(leftInput, "forceSetActivation", double.class);
+        
+        Coupling agentToNeuronCoupling = new Coupling(agentSensor,
+                sensoryNeuron);
+        
+        try {
+            workspace.getCouplingManager().addCoupling(agentToNeuronCoupling);
+        } catch (UmatchedAttributesException e) {
+            e.printStackTrace();
+        }        
+    }
+
+    public void couple(Neuron straight, Effector effector) {
+
+        AttributeManager producers = netMap
+                .get(straight.getNetwork())
+                .getAttributeManager();
+        AttributeManager consumers = odorMap.get(effector.getParent().getParentWorld())
+                .getAttributeManager();
+        
+        PotentialProducer effectorNeuron = producers
+                .createPotentialProducer(straight, "getActivation", double.class);
+        
+        PotentialConsumer agentEffector =
+             consumers.createPotentialConsumer(effector,
+              "setAmount", double.class);
+  
+        Coupling neuronToAgentCoupling = new Coupling(effectorNeuron,
+                agentEffector);
+        
+        try {
+            workspace.getCouplingManager().addCoupling(neuronToAgentCoupling);
+        } catch (UmatchedAttributesException e) {
+            e.printStackTrace();
+        }       
     }
 
 }

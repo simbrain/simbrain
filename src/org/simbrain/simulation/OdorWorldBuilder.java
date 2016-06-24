@@ -37,11 +37,18 @@ public class OdorWorldBuilder {
         BasicEntity entity = new BasicEntity(imageName, world);
         entity.setLocation(x, y);
         entity.setSmellSource(new SmellSource(6));
-        entity.getSmellSource().setDispersion(200);
         world.addEntity(entity);
         return entity;
     }
 
+    public OdorWorldEntity addEntity(int x, int y, String imageName, double[] stimulus) {
+        BasicEntity entity = new BasicEntity(imageName, world);
+        entity.setLocation(x, y);
+        entity.setSmellSource(new SmellSource(stimulus));
+        world.addEntity(entity);
+        return entity;
+    }
+    
     public OdorWorld getWorld() {
         return world;
     }
@@ -49,5 +56,6 @@ public class OdorWorldBuilder {
     public OdorWorldComponent getOdorWorldComponent() {
         return odorWorldComponent;
     }
+
 
 }

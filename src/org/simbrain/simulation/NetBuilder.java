@@ -15,7 +15,9 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 //TODO: Not sure this is the best name.  Use it a while then decide.
 //  Maybe change to NetHelper.   
@@ -82,13 +84,16 @@ public class NetBuilder {
     }
     
     /**
-     * Make a single source -> target connection
+     * Make a single source -> target connection.
      *
      * @param source the source neuron
      * @param target the target neuron
      */
     public void connect(Neuron source, Neuron target, double value) {
         Synapse synapse = new Synapse(source, target);
+        //TODO: assume value > 0
+        synapse.setLowerBound(-2 * value);
+        synapse.setUpperBound(2 * value);
         synapse.setStrength(value);
         source.getNetwork().addSynapse(synapse);
     }
@@ -144,25 +149,6 @@ public class NetBuilder {
      */
     public NetworkComponent getNetworkComponent() {
         return networkComponent;
-    }
-
-    //TODO: SHould be able to parameterize vehicle type easily
-    // Move this to sim? Or a new vehicle class?
-    public void addPursuer(int x, int y, RotatingEntity agent, double[] stimulus) {
-        Neuron leftTurn = addNeuron(x, y);
-        Neuron straight = addNeuron(x+50, y);
-        Neuron rightTurn = addNeuron(x+100, y);
-        Neuron leftInput= addNeuron(x, y+100);
-        Neuron rightInput = addNeuron(x+100, y+100);
-        connect(leftInput,leftTurn,1);
-        connect(rightInput,rightTurn,1);
-        
-        // Vector coupling to agent using stimulus
-        // couple(agent.leftsensor, stimulus, leftInput)
-        // couple(agent.rightsensor, stimulus, rightInput)
-        // couple(straight, agent);
-        // couple(leftTurn, agent.turnLeft);
-        // couple(rightTurn, agent.turnRight);
     }
 
 }

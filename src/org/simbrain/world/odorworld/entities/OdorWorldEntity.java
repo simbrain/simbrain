@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.DisplayOrder;
@@ -428,6 +429,36 @@ public abstract class OdorWorldEntity {
         }
 
         parentWorld.fireSensorAdded(sensor);
+    }
+    
+    /**
+     * Get the sensor with the specified label, or null if none found.
+     *
+     * @param label label to search for
+     * @return the associated sensor
+     */
+    public final Sensor getSensor(final String label) {
+        for (Sensor sensor : this.getSensors()) {
+            if (sensor.getLabel().equalsIgnoreCase(label)) {
+                return sensor;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Get the effector with the specified label, or null if none found.
+     *
+     * @param label label to search for
+     * @return the associated sensor
+     */
+    public final Effector getEffector(final String label) {
+        for (Effector effector: this.getEffectors()) {
+            if (effector.getLabel().equalsIgnoreCase(label)) {
+                return effector;
+            }
+        }
+        return null;
     }
 
     /**

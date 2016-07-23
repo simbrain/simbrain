@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -48,10 +49,10 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
     private List<Neuron> neuronList;
 
     /** Upper bound field. */
-    private final JTextField tfCeiling = new JTextField();
+    private final JFormattedTextField tfCeiling = new JFormattedTextField();
 
     /** Lower bound field. */
-    private final JTextField tfFloor = new JTextField();
+    private final JFormattedTextField tfFloor = new JFormattedTextField();
 
     /**
      * Label for upper bound text field. Is a class variable so that its
@@ -224,7 +225,7 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
         if (upDiscrepancy) {
             tfCeiling.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfCeiling.setText(Double.toString(upBound));
+            tfCeiling.setValue(upBound);
         }
     }
 
@@ -245,7 +246,7 @@ public class BoundsClippingPanel extends JPanel implements EditablePanel {
         if (lowDiscrepancy) {
             tfFloor.setText(SimbrainConstants.NULL_STRING);
         } else {
-            tfFloor.setText(Double.toString(lowBound));
+            tfFloor.setValue(lowBound);
         }
     }
 

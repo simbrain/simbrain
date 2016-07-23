@@ -29,9 +29,9 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.network.core.Neuron;
@@ -62,7 +62,7 @@ import org.simbrain.util.widgets.YesNoNull;
 @SuppressWarnings("serial")
 public class GeneralNeuronPropertiesPanel extends JPanel
         implements EditablePanel {
-
+	
     /** The neurons being modified. */
     private List<Neuron> neuronList;
 
@@ -70,10 +70,10 @@ public class GeneralNeuronPropertiesPanel extends JPanel
     private final JLabel idLabel = new JLabel();
 
     /** Activation field. */
-    private JTextField tfActivation = new JTextField();
+    private JFormattedTextField tfActivation = new JFormattedTextField();
 
     /** Label Field. */
-    private final JTextField tfNeuronLabel = new JTextField();
+    private final JFormattedTextField tfNeuronLabel = new JFormattedTextField();
 
     /** Panel containing fields for upper bound, lower bound, and clipping. */
     private BoundsClippingPanel boundsClippingPanel;
@@ -91,10 +91,10 @@ public class GeneralNeuronPropertiesPanel extends JPanel
     private final JPanel detailPanel = new JPanel();
 
     /** Increment field. */
-    private final JTextField tfIncrement = new JTextField();
+    private final JFormattedTextField tfIncrement = new JFormattedTextField();
 
     /** Priority Field. */
-    private final JTextField tfPriority = new JTextField();
+    private final JFormattedTextField tfPriority = new JFormattedTextField();
 
     /** Input type dropdown. */
     private final YesNoNull inputType = new YesNoNull(
@@ -282,17 +282,17 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         // Handle Activation
         ParameterGetter<Neuron, Double> actGetter = (n) -> ((Neuron)n).getActivation();
         if (!NetworkUtils.isConsistent(neuronList, actGetter)) {
-            tfActivation.setText(SimbrainConstants.NULL_STRING);
+            tfActivation.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfActivation.setText(Double.toString(neuronRef.getActivation()));
+            tfActivation.setValue(neuronRef.getActivation());
         }
 
         // Handle Label
         ParameterGetter<Neuron, String> lblGetter = (n) -> ((Neuron)n).getLabel();
         if (!NetworkUtils.isConsistent(neuronList, lblGetter)) {
-            tfNeuronLabel.setText(SimbrainConstants.NULL_STRING);
+            tfNeuronLabel.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfNeuronLabel.setText(neuronRef.getLabel());
+            tfNeuronLabel.setValue(neuronRef.getLabel());
         }
 
         // Handle bounds and clipping
@@ -302,9 +302,9 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         ParameterGetter<Neuron, Integer> priorityGetter = (n) -> ((Neuron) n)
                 .getUpdatePriority();
         if (!NetworkUtils.isConsistent(neuronList, priorityGetter)) {
-            tfPriority.setText(SimbrainConstants.NULL_STRING);
+            tfPriority.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfPriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
+            tfPriority.setValue(neuronRef.getUpdatePriority());
         }
 
         // Handle Clamped
@@ -323,10 +323,9 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         ParameterGetter<NeuronUpdateRule, Double> incGeter = (
                 n) -> ((NeuronUpdateRule) n).getIncrement();
         if (!NetworkUtils.isConsistent(ruleList, incGeter)) {
-            tfIncrement.setText(SimbrainConstants.NULL_STRING);
+            tfIncrement.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfIncrement.setText(
-                    Double.toString(neuronRef.getUpdateRule().getIncrement()));
+            tfIncrement.setValue(neuronRef.getUpdateRule().getIncrement());
         }
 
         // Handle input type
@@ -354,7 +353,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         double act = Utils.doubleParsable(tfActivation);
         if (!Double.isNaN(act)) {
             neuronList.stream().forEach(n -> n.forceSetActivation(
-                    Double.parseDouble(tfActivation.getText())));
+                    Utils.doubleParsable(tfActivation.getText())));
         } else {
             // Only successful if the field can't be parsed because
             // it is a NULL_STRING standing in for multiple values

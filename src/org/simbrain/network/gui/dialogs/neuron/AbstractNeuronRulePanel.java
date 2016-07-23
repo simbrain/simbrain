@@ -26,9 +26,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -55,7 +56,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
 
     /** List of editor objects associated with this type of neuron. */
     private List<Editor> editorList = new ArrayList<Editor>();
-
+    
     /**
      * Each neuron panel contains a static final subclass of NeuronUpdateRule
      * variable called a prototype rule. The specific subclass of
@@ -103,10 +104,10 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * @return the text field that will display that property value and be used
      *         to set it.
      */
-    public JTextField createTextField(
+    public JFormattedTextField createTextField(
             ParameterGetter<NeuronUpdateRule, Double> getter,
             ParameterSetter<NeuronUpdateRule, Double> setter) {
-        return (JTextField) this.<Double> createPropertyEditor(Double.class, getter,
+        return (JFormattedTextField) this.<Double> createPropertyEditor(Double.class, getter,
                 setter);
     }
 
@@ -119,10 +120,10 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * @return the text field that will display that property value and be used
      *         to set it.
      */
-    public <V> JTextField createTextField(Class<V> type,
+    public <V> JFormattedTextField createTextField(Class<V> type,
             ParameterGetter<NeuronUpdateRule, V> getter,
             ParameterSetter<NeuronUpdateRule, V> setter) {
-        return (JTextField) this.<V> createPropertyEditor(type, getter, setter);
+        return (JFormattedTextField) this.<V> createPropertyEditor(type, getter, setter);
     }
 
     /**
@@ -175,7 +176,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
             ParameterSetter<NeuronUpdateRule, V> setter) {
 
         if (type == Double.class || type == Float.class) {
-            JTextField field = new JTextField();
+            JFormattedTextField field = new JFormattedTextField();
             editorList.add(new Editor(type, field, getter, setter));
             return field;
         } else if (type == Boolean.class) {
@@ -251,11 +252,11 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     private void fillDoubleField(final Editor<Double> editor,
             final List<NeuronUpdateRule> ruleList) {
         NeuronUpdateRule neuronRef = ruleList.get(0);
-        JTextField textField = (JTextField) editor.component;
+        JFormattedTextField textField = (JFormattedTextField) editor.component;
         if (!NetworkUtils.isConsistent(ruleList, editor.getter)) {
             textField.setText(SimbrainConstants.NULL_STRING);
         } else {
-            textField.setText("" + editor.getter.getParameter(neuronRef));
+            textField.setValue(editor.getter.getParameter(neuronRef));
         }
     }
 
@@ -264,11 +265,11 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     private void fillFloatField(final Editor<Float> editor,
             final List<NeuronUpdateRule> ruleList) {
         NeuronUpdateRule neuronRef = ruleList.get(0);
-        JTextField textField = (JTextField) editor.component;
+        JFormattedTextField textField = (JFormattedTextField) editor.component;
         if (!NetworkUtils.isConsistent(ruleList, editor.getter)) {
             textField.setText(SimbrainConstants.NULL_STRING);
         } else {
-            textField.setText("" + editor.getter.getParameter(neuronRef));
+            textField.setValue(editor.getter.getParameter(neuronRef));
         }
     }
 
@@ -317,7 +318,6 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      * @param neurons the neurons to be written to
      */
     public final void commitChanges(final List<Neuron> neurons) {
-
         // Change all neuron types to the indicated type
         if (isReplacingUpdateRules()) {
             if (getPrototypeRule() != null) {
@@ -349,7 +349,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
      */
     private void commitDouble(final Editor<Double> editor,
             final List<Neuron> neurons) {
-        double value = Utils.doubleParsable((JTextField) editor.component);
+        double value = Utils.doubleParsable((JFormattedTextField) editor.component);
         if (!Double.isNaN(value)) {
             neurons.stream().forEach(
                     r -> editor.setter.setParameter(r.getUpdateRule(), value));
@@ -360,7 +360,7 @@ public abstract class AbstractNeuronRulePanel extends JPanel {
     // to all number types, but got lazy, and this can be improved later. (jky)
     private void commitFloat(final Editor<Float> editor,
             final List<Neuron> neurons) {
-        float value = Utils.floatParsable((JTextField) editor.component);
+        float value = Utils.floatParsable((JFormattedTextField) editor.component);
         if (!Float.isNaN(value)) {
             neurons.stream().forEach(
                     r -> editor.setter.setParameter(r.getUpdateRule(), value));

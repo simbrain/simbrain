@@ -193,38 +193,38 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     public void fillFieldValues() {
     }
     
-    /**
-     * Testing main.
-     */
-    public static void main(String[] args) {
-
-        // Set up a large inconsistent set of rules.
-        List<Neuron> neuronList = new ArrayList<Neuron>();
-        Network network = new Network();
-        for (int i = 0; i < 10000; i++) {
-            Neuron neuron = new Neuron(network);
-            LinearRule rule = new LinearRule();
-            neuron.setUpdateRule(rule);
-            neuronList.add(neuron);
-        }
-//        ((LinearRule) neuronList.get(1).getUpdateRule()).setSlope(-1); // Add an inconsistency in                                                     // slope
-        ((LinearRule) neuronList.get(1).getUpdateRule()).setAddNoise(true); // Add a boolean inconsistency
-
-        // Test the test panel!
-        NeuronDialog dialog = NeuronDialog.createNeuronDialog(neuronList);
-        
-        // Show the test dialog
-        dialog.setLocationRelativeTo(null);
-        dialog.pack();
-        dialog.setVisible(true);
-        
-        System.out.println("Slope "
-                + ((LinearRule) neuronList.get(1).getUpdateRule()).getSlope());
-        System.out.println("Bias "
-                + ((LinearRule) neuronList.get(1).getUpdateRule()).getBias());
-        System.out.println(
-                "Add noise " + ((LinearRule) neuronList.get(1).getUpdateRule())
-                        .getAddNoise());
-    }
+//    /**
+//     * Testing main.
+//     */
+//    public static void main(String[] args) {
+//
+//        // Set up a large inconsistent set of rules.
+//        List<Neuron> neuronList = new ArrayList<Neuron>();
+//        Network network = new Network();
+//        for (int i = 0; i < 10000; i++) {
+//            Neuron neuron = new Neuron(network);
+//            LinearRule rule = new LinearRule();
+//            neuron.setUpdateRule(rule);
+//            neuronList.add(neuron);
+//        }
+////        ((LinearRule) neuronList.get(1).getUpdateRule()).setSlope(-1); // Add an inconsistency in                                                     // slope
+//        ((LinearRule) neuronList.get(1).getUpdateRule()).setAddNoise(true); // Add a boolean inconsistency
+//
+//        // Test the test panel!
+//        NeuronDialog dialog = NeuronDialog.createNeuronDialog(neuronList);
+//        
+//        // Show the test dialog
+//        dialog.setLocationRelativeTo(null);
+//        dialog.pack();
+//        dialog.setVisible(true);
+//        
+//        System.out.println("Slope "
+//                + ((LinearRule) neuronList.get(1).getUpdateRule()).getSlope());
+//        System.out.println("Bias "
+//                + ((LinearRule) neuronList.get(1).getUpdateRule()).getBias());
+//        System.out.println(
+//                "Add noise " + ((LinearRule) neuronList.get(1).getUpdateRule())
+//                        .getAddNoise());
+//    }
 
 }

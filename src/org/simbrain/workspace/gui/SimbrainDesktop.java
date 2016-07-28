@@ -72,8 +72,6 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
-import org.simbrain.custom.other_stuff.TestSim;
-import org.simbrain.custom.rl_agents.RL_AgentTest;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.docviewer.DocViewerDesktopComponent;
 import org.simbrain.network.NetworkComponent;
@@ -618,40 +616,10 @@ public class SimbrainDesktop {
         scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
-        addCustomSimulations(scriptMenu);
-        scriptMenu.addSeparator();
         for (Action action : actionManager.getScriptActions(this)) {
             scriptMenu.add(action);
         }
         return scriptMenu;
-    }
-
-    /**
-     * Manually add custom simulations.
-     * 
-     */
-    private void addCustomSimulations(final JMenu scriptMenu) {
-        
-        // TODO: Consider a way to "inject" menu items from outside
-        
-        // Add the  main test simulation
-        JMenuItem test = new JMenuItem("test");
-        test.addActionListener(ae -> {
-            TestSim testSim = new TestSim(this);
-            testSim.run();
-        });        
-        scriptMenu.add(test);
-
-        // Adding the RL Test simulation
-        JMenuItem rlTest = new JMenuItem("RL Test");
-        rlTest.addActionListener(ae -> {
-            RL_AgentTest rlSim = new RL_AgentTest(this);
-            rlSim.run();
-        });
-        scriptMenu.add(rlTest);
-        
-        // Add more custom simulations here...
-
     }
 
     /**
@@ -1389,7 +1357,7 @@ public class SimbrainDesktop {
 
     /**
      * Returns the internal desktop object. Sometimes useful in scripts.
-     * 
+     *
      * @return
      */
     public JDesktopPane getDesktop() {

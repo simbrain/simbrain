@@ -1,8 +1,0 @@
-Probably rename this package.   "Custom" is wrong...
-
-
-----
-
-- Each sub-package of this package will be it's own custom simulation
-
-- Also providing high level API for making simulations

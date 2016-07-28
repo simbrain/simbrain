@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.propertyeditor.DisplayOrder;
 import org.simbrain.world.odorworld.OdorWorld;

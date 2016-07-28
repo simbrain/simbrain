@@ -270,7 +270,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Integrate and Fire";
     }
 

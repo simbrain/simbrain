@@ -89,7 +89,7 @@ public class ProductRule extends LinearRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Product";
     }
 }

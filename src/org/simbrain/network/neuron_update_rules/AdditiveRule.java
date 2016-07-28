@@ -157,7 +157,7 @@ public class AdditiveRule extends NeuronUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Additive (Continuous Hopfield)";
     }
 

@@ -187,7 +187,7 @@ public class ThreeValueRule extends NeuronUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Three Value";
     }
 

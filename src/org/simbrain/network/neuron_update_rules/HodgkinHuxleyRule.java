@@ -301,7 +301,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Hodgkin-Huxley";
     }
 

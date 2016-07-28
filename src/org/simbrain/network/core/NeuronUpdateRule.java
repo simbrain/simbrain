@@ -302,12 +302,12 @@ public abstract class NeuronUpdateRule {
     }
 
     /**
-     * Returns a brief description of this update rule. Used in combo boxes in
+     * Returns a name for this update rule.  Used in combo boxes in
      * the GUI.
      *
      * @return the description.
      */
-    public abstract String getDescription();
+    public abstract String getName();
 
     /**
      * Returns string for tool tip or short description. Override to provide

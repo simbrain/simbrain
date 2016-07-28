@@ -53,12 +53,12 @@ public abstract class SynapseUpdateRule {
     public abstract SynapseUpdateRule deepCopy();
 
     /**
-     * Returns a brief description of this update rule. Used in combo boxes in
+     * Returns a name for this learning rule. Used in combo boxes in
      * the GUI.
      *
      * @return the description.
      */
-    public abstract String getDescription();
+    public abstract String getName();
 
     /**
      * Set activation to 0; override for other "clearing" behavior (e.g. setting

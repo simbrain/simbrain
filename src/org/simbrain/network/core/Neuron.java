@@ -261,7 +261,7 @@ public class Neuron {
      * @return the neuronUpdateRule's description
      */
     public String getUpdateRuleDescription() {
-        return updateRule.getDescription();
+        return updateRule.getName();
     }
 
     /**

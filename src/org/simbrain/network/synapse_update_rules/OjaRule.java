@@ -44,7 +44,7 @@ public class OjaRule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Oja";
     }
 

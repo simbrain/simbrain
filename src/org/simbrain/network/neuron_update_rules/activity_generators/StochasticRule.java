@@ -84,7 +84,7 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Stochastic";
     }
 

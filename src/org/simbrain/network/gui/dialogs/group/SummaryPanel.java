@@ -265,7 +265,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
             if (NetworkUtils.isConsistent(ng.getNeuronList(), Neuron.class,
                 "getUpdateRuleDescription")) {
                 excitatoryTypeField.setText(ng.getNeuronList().get(0)
-                    .getUpdateRule().getDescription());
+                    .getUpdateRule().getName());
             } else {
                 excitatoryTypeField.setText("Mixed");
             }
@@ -275,7 +275,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 editablePopulationField.setText(Integer
                     .toString(NeuronGroup.DEFAULT_GROUP_SIZE));
                 excitatoryTypeField.setText(Neuron.DEFAULT_UPDATE_RULE
-                    .getDescription());
+                    .getName());
             } else {
                 // Handles if an empty neuron group is selected
                 // (for some reason)...
@@ -351,7 +351,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 }
                 if (!discrepancy) {
                     excitatoryTypeField.setText(protoSyn.getLearningRule()
-                        .getDescription());
+                        .getName());
                 } else {
                     excitatoryTypeField.setText("Mixed");
                 }
@@ -372,7 +372,7 @@ public class SummaryPanel extends JPanel implements EditablePanel {
                 }
                 if (!discrepancy) {
                     inhibitoryTypeField.setText(protoSyn.getLearningRule()
-                        .getDescription());
+                        .getName());
                 } else {
                     inhibitoryTypeField.setText("Mixed");
                 }

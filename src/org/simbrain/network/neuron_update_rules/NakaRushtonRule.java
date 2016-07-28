@@ -291,7 +291,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements
      * {@inheritDoc}
      */
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Naka-Rushton";
     }
 

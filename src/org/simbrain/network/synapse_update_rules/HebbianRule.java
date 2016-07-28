@@ -37,7 +37,7 @@ public class HebbianRule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Hebbian";
     }
 

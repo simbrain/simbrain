@@ -774,7 +774,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Point Neuron";
     }
 //

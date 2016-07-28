@@ -191,7 +191,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule,
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Linear";
     }
 

@@ -37,7 +37,7 @@ public class SubtractiveNormalizationRule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Subtractive Normalization";
     }
 

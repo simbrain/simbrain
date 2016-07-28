@@ -139,7 +139,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Sinusoidal";
     }
 

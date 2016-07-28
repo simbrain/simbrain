@@ -55,7 +55,7 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Hebbian Threshold";
     }
 

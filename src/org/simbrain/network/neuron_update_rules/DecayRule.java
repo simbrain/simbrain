@@ -251,7 +251,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule,
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Decay";
     }
 

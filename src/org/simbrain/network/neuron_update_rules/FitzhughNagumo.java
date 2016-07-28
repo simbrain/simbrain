@@ -172,7 +172,7 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "FitzhughNagumo";
     }
 

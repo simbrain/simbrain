@@ -79,7 +79,7 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Short Term Plasticity";
     }
 

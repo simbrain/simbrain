@@ -147,7 +147,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule
 	}
 
 	@Override
-	public String getDescription() {
+	public String getName() {
 		return "Morris-Lecar";
 	}
 

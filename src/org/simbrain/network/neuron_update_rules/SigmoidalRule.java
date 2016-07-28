@@ -115,7 +115,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
     }
 
     @Override
-    public final String getDescription() {
+    public final String getName() {
         return "Sigmoidal (Discrete)";
     }
 

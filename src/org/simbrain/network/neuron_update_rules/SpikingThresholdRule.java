@@ -88,7 +88,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Spiking Threshold";
     }
 

@@ -108,7 +108,7 @@ public class LogisticRule extends NeuronUpdateRule implements
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Logistic";
     }
 

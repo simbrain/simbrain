@@ -1748,7 +1748,7 @@ public class SynapseGroup extends Group {
         SynapseParameterGetter<String> updateRuleCheck = new SynapseParameterGetter<String>() {
             @Override
             public String getParameterFromSynapse(Synapse synapse) {
-                return synapse.getLearningRule().getDescription();
+                return synapse.getLearningRule().getName();
             }
         };
         String rule = checkSynapses(updateRuleCheck, polarity);

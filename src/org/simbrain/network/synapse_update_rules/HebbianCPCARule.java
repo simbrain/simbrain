@@ -60,7 +60,7 @@ public class HebbianCPCARule extends SynapseUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Hebbian CPCA";
     }
 

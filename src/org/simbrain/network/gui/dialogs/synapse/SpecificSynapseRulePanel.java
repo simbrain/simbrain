@@ -239,7 +239,7 @@ public class SpecificSynapseRulePanel extends JPanel implements EditablePanel {
         } else {
             List<SynapseUpdateRule> synapseList = Synapse
                 .getRuleList(synapseCollection);
-            String synapseName = synapseList.get(0).getDescription();
+            String synapseName = synapseList.get(0).getName();
             synapsePanel = AbstractSynapseRulePanel.RULE_MAP.get(synapseName)
             		.deepCopy();
             synapsePanel.fillFieldValues(synapseList);

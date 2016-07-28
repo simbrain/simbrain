@@ -113,7 +113,7 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public String getDescription() {
+    public String getName() {
         return "Binary";
     }
     

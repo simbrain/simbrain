@@ -145,32 +145,32 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     // Populate the Rule Map. Note! Place items in alphabetical order so they
     // appear that way in the GUI combo box.
     static {
-        RULE_MAP.put(new AdExIFRule().getDescription(), new AdExIFRulePanel());
-        RULE_MAP.put(new BinaryRule().getDescription(), new BinaryRulePanel());
-        RULE_MAP.put(new DecayRule().getDescription(), new DecayRulePanel());
-        RULE_MAP.put(new FitzhughNagumo().getDescription(),
+        RULE_MAP.put(new AdExIFRule().getName(), new AdExIFRulePanel());
+        RULE_MAP.put(new BinaryRule().getName(), new BinaryRulePanel());
+        RULE_MAP.put(new DecayRule().getName(), new DecayRulePanel());
+        RULE_MAP.put(new FitzhughNagumo().getName(),
                 new FitzhughNagumoRulePanel());
-        RULE_MAP.put(new HodgkinHuxleyRule().getDescription(),
+        RULE_MAP.put(new HodgkinHuxleyRule().getName(),
                 new HodgkinHuxleyRulePanel());
-        RULE_MAP.put(new IACRule().getDescription(), new IACRulePanel());
-        RULE_MAP.put(new IntegrateAndFireRule().getDescription(),
+        RULE_MAP.put(new IACRule().getName(), new IACRulePanel());
+        RULE_MAP.put(new IntegrateAndFireRule().getName(),
                 new IntegrateAndFireRulePanel());
-        RULE_MAP.put(new IzhikevichRule().getDescription(),
+        RULE_MAP.put(new IzhikevichRule().getName(),
                 new IzhikevichRulePanel());
-        RULE_MAP.put(new LinearRule().getDescription(), new LinearRulePanel());
-        RULE_MAP.put(new MorrisLecarRule().getDescription(),
+        RULE_MAP.put(new LinearRule().getName(), new LinearRulePanel());
+        RULE_MAP.put(new MorrisLecarRule().getName(),
                 new MorrisLecarRulePanel());
-        RULE_MAP.put(new NakaRushtonRule().getDescription(),
+        RULE_MAP.put(new NakaRushtonRule().getName(),
                 new NakaRushtonRulePanel());
-        RULE_MAP.put(new ProductRule().getDescription(),
+        RULE_MAP.put(new ProductRule().getName(),
                 new ProductRulePanel());
-        RULE_MAP.put(new ContinuousSigmoidalRule().getDescription(),
+        RULE_MAP.put(new ContinuousSigmoidalRule().getName(),
                 new ContinuousSigmoidalRulePanel());
-        RULE_MAP.put(new SigmoidalRule().getDescription(),
+        RULE_MAP.put(new SigmoidalRule().getName(),
                 new DiscreteSigmoidalRulePanel());
-        RULE_MAP.put(new SpikingThresholdRule().getDescription(),
+        RULE_MAP.put(new SpikingThresholdRule().getName(),
                 new SpikingThresholdRulePanel());
-        RULE_MAP.put(new ThreeValueRule().getDescription(),
+        RULE_MAP.put(new ThreeValueRule().getName(),
                 new ThreeValueRulePanel());
     }
 
@@ -183,13 +183,13 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
     // Populate the Activity Generator Map. Note! Place items in alphabetical
     // order so they appear that way in the GUI combo box.
     static {
-        GENERATOR_MAP.put(new LogisticRule().getDescription(),
+        GENERATOR_MAP.put(new LogisticRule().getName(),
                 new LogisticGeneratorPanel());
-        GENERATOR_MAP.put(new RandomNeuronRule().getDescription(),
+        GENERATOR_MAP.put(new RandomNeuronRule().getName(),
                 new RandomGeneratorPanel());
-        GENERATOR_MAP.put(new SinusoidalRule().getDescription(),
+        GENERATOR_MAP.put(new SinusoidalRule().getName(),
                 new SinusoidalGeneratorPanel());
-        GENERATOR_MAP.put(new StochasticRule().getDescription(),
+        GENERATOR_MAP.put(new StochasticRule().getName(),
                 new StochasticGeneratorPanel());
     }
 
@@ -254,7 +254,7 @@ public class UpdateRulePanel extends JPanel implements EditablePanel {
             neuronRulePanel = new EmptyRulePanel();
         } else {
             String neuronName = neuronList.get(0).getUpdateRule()
-                    .getDescription();
+                    .getName();
             neuronRulePanel = ruleMap.get(neuronName);
             neuronRulePanel.setReplacingUpdateRules(false);
             neuronRulePanel.fillFieldValues(Neuron.getRuleList(neuronList));

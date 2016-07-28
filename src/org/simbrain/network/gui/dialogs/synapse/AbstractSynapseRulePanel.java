@@ -64,19 +64,19 @@ public abstract class AbstractSynapseRulePanel extends JPanel {
     static {
         // TODO: Backwards compatibility. Remove for 3.0 after converting all
         // sims
-        RULE_MAP.put(new StaticSynapseRule().getDescription(),
+        RULE_MAP.put(new StaticSynapseRule().getName(),
             new StaticSynapsePanel());
         RULE_MAP
-            .put(new HebbianRule().getDescription(), new HebbianRulePanel());
-        RULE_MAP.put(new HebbianCPCARule().getDescription(),
+            .put(new HebbianRule().getName(), new HebbianRulePanel());
+        RULE_MAP.put(new HebbianCPCARule().getName(),
             new HebbianCPCARulePanel());
-        RULE_MAP.put(new HebbianThresholdRule().getDescription(),
+        RULE_MAP.put(new HebbianThresholdRule().getName(),
             new HebbianThresholdRulePanel());
-        RULE_MAP.put(new OjaRule().getDescription(), new OjaRulePanel());
+        RULE_MAP.put(new OjaRule().getName(), new OjaRulePanel());
         //RULE_MAP.put(new ShortTermPlasticityRule().getDescription(),
         //    new ShortTermPlasticityRulePanel());
-        RULE_MAP.put(new STDPRule().getDescription(), new STDPRulePanel());
-        RULE_MAP.put(new SubtractiveNormalizationRule().getDescription(),
+        RULE_MAP.put(new STDPRule().getName(), new STDPRulePanel());
+        RULE_MAP.put(new SubtractiveNormalizationRule().getName(),
             new SubtractiveNormalizationRulePanel());
     }
 

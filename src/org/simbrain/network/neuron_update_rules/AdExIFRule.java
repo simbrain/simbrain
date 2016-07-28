@@ -214,7 +214,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements
 	}
 
 	@Override
-	public String getDescription() {
+	public String getName() {
 		return "AdEx Integrate and Fire";
 	}
 

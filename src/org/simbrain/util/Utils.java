@@ -429,6 +429,9 @@ public class Utils {
         if (Double.isInfinite(num) || Double.isNaN(num)) {
             return Double.toString(num);
         }
+        if (num == 0) {
+            return "0";
+        }
         BigDecimal bd = new BigDecimal(num);
         return bd.setScale(precision, BigDecimal.ROUND_HALF_UP).toString();
     }

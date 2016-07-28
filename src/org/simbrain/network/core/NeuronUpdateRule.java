@@ -317,7 +317,8 @@ public abstract class NeuronUpdateRule {
      * @return tool tip text
      */
     public String getToolTipText(final Neuron neuron) {
-        return "(" + neuron.getId() + ") Activation: "
+        return  neuron.getId() + ".  Location: (" + (int) neuron.getX()
+                + "," + (int) neuron.getY() + "). Activation: "
                 + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 

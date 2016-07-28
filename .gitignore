@@ -12,3 +12,5 @@
 *.iml
 out/*
 /bin1/
+
+.checkstyle

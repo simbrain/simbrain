@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: simbrain-checkstyle
+    Checkstyle-Configuration: Simbrain Checkstyle
     Description: none
 -->
 <module name="Checker">
@@ -26,6 +26,7 @@
     <module name="JavadocMethod">
       <property name="allowUndeclaredRTE" value="true"/>
       <property name="allowThrowsTagsForSubclasses" value="true"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
     </module>
     <module name="JavadocVariable"/>
     <module name="JavadocStyle">

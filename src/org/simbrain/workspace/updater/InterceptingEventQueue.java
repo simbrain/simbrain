@@ -83,6 +83,7 @@ public class InterceptingEventQueue extends EventQueue implements
     /**
      * Starts queuing tasks.
      */
+    @Override
     public void queueTasks() {
         synchronized (lock) {
             paused = true;
@@ -92,6 +93,7 @@ public class InterceptingEventQueue extends EventQueue implements
     /**
      * Releases the queuing flag.
      */
+    @Override
     public void releaseTasks() {
         synchronized (lock) {
             paused = false;
@@ -101,6 +103,7 @@ public class InterceptingEventQueue extends EventQueue implements
     /**
      * Executes all queued invocation events.
      */
+    @Override
     public void runTasks() {
         LOGGER.debug("starting runTasks");
 
@@ -135,6 +138,7 @@ public class InterceptingEventQueue extends EventQueue implements
      *
      * @param event The AWTEvent to post.
      */
+    @Override
     public void postEvent(final AWTEvent event) {
         LOGGER.trace("event posted: " + event);
 

@@ -26,6 +26,8 @@ import org.simbrain.workspace.Workspace;
 /**
  * Class used to wrap InvocationEvents such that they are synchronized when
  * executed.
+ * 
+ * See https://docs.oracle.com/javase/7/docs/api/java/awt/event/InvocationEvent.html
  *
  * @author Matt Watson
  */
@@ -67,30 +69,22 @@ class SynchronizingInvocationEvent extends InvocationEvent {
         this.event = event;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Exception getException() {
         return event.getException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Throwable getThrowable() {
         return event.getThrowable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public long getWhen() {
         return event.getWhen();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String paramString() {
         return event.paramString();
     }

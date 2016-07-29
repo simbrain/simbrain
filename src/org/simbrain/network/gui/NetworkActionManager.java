@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JToggleButton;
@@ -50,10 +49,10 @@ import org.simbrain.network.gui.actions.edit.EditRandomizerPropertiesAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.actions.edit.RandomizeObjectsAction;
 import org.simbrain.network.gui.actions.edit.SelectionEditModeAction;
-import org.simbrain.network.gui.actions.edit.SetAutoZoomAction;
 import org.simbrain.network.gui.actions.edit.SpaceHorizontalAction;
 import org.simbrain.network.gui.actions.edit.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.edit.TextEditModeAction;
+import org.simbrain.network.gui.actions.edit.ToggleAutoZoom;
 import org.simbrain.network.gui.actions.edit.WandEditModeAction;
 import org.simbrain.network.gui.actions.edit.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.edit.ZoomToFitPageAction;
@@ -98,7 +97,6 @@ import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Network action manager.
@@ -324,11 +322,7 @@ public final class NetworkActionManager {
         showNetworkHierarchyAction = new JCheckBoxMenuItem(
                 new ShowNetworkHierarchyPanel(networkPanel));
 
-        setAutoZoomAction = new JToggleButton(new SetAutoZoomAction(networkPanel));
-        setAutoZoomAction.setSelectedIcon(ResourceManager.getImageIcon("AutoZoomOn.png"));
-        setAutoZoomAction.setIcon(ResourceManager.getImageIcon("AutoZoomOff.png"));
-        setAutoZoomAction.setBorder(BorderFactory.createEtchedBorder());
-        setAutoZoomAction.setSelected(networkPanel.getAutoZoomMode());
+        setAutoZoomAction = new ToggleAutoZoom(networkPanel);
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);

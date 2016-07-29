@@ -29,6 +29,8 @@ import org.simbrain.resource.ResourceManager;
 
 /**
  * Action to re-scale the screen to fit all objects.
+ * 
+ * TODO: No longer used.
  */
 public final class ZoomToFitPageAction extends AbstractAction {
 

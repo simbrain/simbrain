@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
@@ -124,8 +125,6 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
 import org.simbrain.network.subnetworks.BPTTNetwork;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
@@ -1571,7 +1570,8 @@ public class NetworkPanel extends JPanel {
         for (Action action : actionManager.getNetworkModeActions()) {
             mainTools.add(action);
         }
-        mainTools.add(actionManager.getZoomToFitPageAction());
+
+        mainTools.addSeparator();
         mainTools.add(actionManager.getSetAutoZoomToggleButton());
 
         return mainTools;

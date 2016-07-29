@@ -205,9 +205,9 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
         super.drag(event);
 
-        // If the meta (ctrl on pc and linux, command on macs) is down,
+        // If the Shift button is down,
         // pan the canvas.
-        if (event.isMetaDown()) {
+        if (event.isShiftDown()) {
             pan(event);
             return;
         }

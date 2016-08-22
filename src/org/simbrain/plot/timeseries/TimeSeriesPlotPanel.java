@@ -83,7 +83,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void init() {
 
         // Generate the graph
-        chart = ChartFactory.createXYLineChart("Time series", // Title
+        chart = ChartFactory.createXYLineChart("", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
                 model.getDataset(), // Dataset

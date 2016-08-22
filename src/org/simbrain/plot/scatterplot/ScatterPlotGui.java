@@ -104,7 +104,7 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent>
     public void postAddInit() {
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("Scatter Plot", "X", "Y", this
+        chart = ChartFactory.createScatterPlot("", "X", "Y", this
                 .getWorkspaceComponent().getModel().getDataset(),
                 PlotOrientation.VERTICAL, true, false, false);
 

@@ -98,7 +98,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements
     public void postAddInit() {
 
         // Generate the graph
-        chart = ChartFactory.createBarChart("Bar Chart", // chart title
+        chart = ChartFactory.createBarChart("", // chart title
                 "Bar", // domain axis label
                 "Value", // range axis label
                 this.getWorkspaceComponent().getModel().getDataset(), // data

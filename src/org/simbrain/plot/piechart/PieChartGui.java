@@ -97,7 +97,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements
     public void postAddInit() {
 
         // Generate the graph
-        chart = ChartFactory.createPieChart("Pie Chart", this
+        chart = ChartFactory.createPieChart("", this
                 .getWorkspaceComponent().getModel().getDataset(), true, // include
                                                                         // legend
                 true, false);

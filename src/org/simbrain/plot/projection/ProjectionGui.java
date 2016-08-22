@@ -215,7 +215,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> {
         setLayout(new BorderLayout());
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("High Dimensional Projection",
+        chart = ChartFactory.createScatterPlot("",
                 "Projection X", "Projection Y", getWorkspaceComponent()
                         .getProjectionModel().getDataset(),
                 PlotOrientation.VERTICAL, false, true, false);

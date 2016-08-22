@@ -89,7 +89,7 @@ public class RasterPlotPanel extends JPanel {
     public void init() {
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("Raster values", // Title
+        chart = ChartFactory.createScatterPlot("", // Title
                 "Iterations", // x-axis Label
                 "Value(s)", // y-axis Label
                 model.getDataset(), // Dataset

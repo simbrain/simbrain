@@ -38,6 +38,25 @@ import org.simbrain.workspace.*;
  *
  * The custom classes in the SORN directory extend an existing neuron
  * rule (SpikingThreshold) and synapse update rule (STDP).
+ *
+ * Like any liquid state machine (or most recurrent spiking neural networks
+ * with rudimentary stabilizing mechansims) SORNs will encode temporal
+ * information into the state of the reservoir at each time-step. SORNs
+ * in particular do a very goood job of separating inputs, i.e. configuring
+ * itself in such a way that different inputs tend to have very different
+ * representations in terms of the state of the recurrent reservoir. The 
+ * increasing separation between patterns in the reservoir can be observed
+ * as the network self-organizes via one of the dimensionality reduction
+ * plots.
+ * 
+ * To see this, give the SORN an input sequence which has some sort of structure,
+ * that is, an input where the current input has some statistical relationship
+ * to previous inputs, such that certain sequences of inputs make others more
+ * or less likely. 
+ *
+ * It is reccommended that one allows the SORN to self organize, then disables
+ * at least STDP and Synaptic Normalization before training and testing a linear
+ * classifier on the desired data.
  * 
  */
 {

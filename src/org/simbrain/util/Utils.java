@@ -40,6 +40,8 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 
@@ -47,6 +49,8 @@ import com.Ostermiller.util.CSVPrinter;
  * <b>Utils</b>. Utility class for simbrain package.
  */
 public class Utils {
+	 /** Logger. */
+    private static Logger logger = Logger.getLogger(Utils.class);
 
     /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
@@ -654,9 +658,13 @@ public class Utils {
     public static Properties getSimbrainProperties() {
         try {
             Properties properties = new Properties();
-            String fs = System.getProperty("file.separator");
-            properties.load(new FileInputStream("." + fs + "etc" + fs
-                    + "config.properties"));
+            File file = new File("." + FS + "etc" + FS + "config.properties");
+            if (file.exists()) {
+	            properties.load(new FileInputStream(file));
+            }
+            else {
+            	logger.info("Could not find properties file at " + file.getAbsolutePath());
+            }
             return properties;
         } catch (IOException ex) {
             ex.printStackTrace();

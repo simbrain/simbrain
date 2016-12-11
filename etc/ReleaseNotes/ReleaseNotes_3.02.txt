@@ -1,0 +1,11 @@
+Release Notes for Simbrain 3.02
+
+- Some changes to the user interface.   Removing toggle auto-zoom command.   Repositioning and toggling auto-zoom are now done by single or double-clicking the same button.
+- Localized Neuron Text Fields to address issue #35
+- Getting rid of extranneous labels in plots
+- Adding Alex Holcomb's latest sims and some minor updates to some workspace docs
+- Do not fail if properties file is not present.
+- Improvements to SORN Script and other minor script improvements
+- Zoom wheel now zooms about the mouse rather than the center of the screen.
+- Panning now based on  shift rather than "meta"
+- Improved tooltips for neurons

@@ -218,6 +218,7 @@ public class SimbrainDesktop {
          * Clear the Simbrain desktop.
          */
         public void workspaceCleared() {
+            guiComponents.clear();
             desktop.removeAll();
             desktop.repaint();
             frame.setTitle("Simbrain");

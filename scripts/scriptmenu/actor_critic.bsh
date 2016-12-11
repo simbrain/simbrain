@@ -239,8 +239,6 @@ void buildMainSimulation() {
             // Update all value synapses 
             for (Synapse synapse : valueNeuron.getFanIn()) {
                 NeuronWithMemory sourceNeuron = synapse.getSource(); 
-                // Reinforce based on the source neuron's last activation (not its current value), 
-                //  since that is what the current td error reflects.
                 double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
                 //synapse.setStrength(synapse.clip(newStrength)); 
                 synapse.setStrength(newStrength); 
@@ -252,8 +250,6 @@ void buildMainSimulation() {
                 if (neuron.getLastActivation() > 0) {
                     for (Synapse synapse : neuron.getFanIn()) {
                         Neuron sourceNeuron = synapse.getSource(); 
-                        // Reinforce actions based on the source neuron's last activation (not its current value), 
-                        //  since that is what the current td error reflects.
                         double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
                         synapse.setStrength(synapse.clip(newStrength)); 
                         //synapse.setStrength(newStrength); 

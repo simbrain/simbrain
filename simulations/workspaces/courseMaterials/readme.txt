@@ -1,0 +1,1 @@
+These simulations were created by Alex Holcombe are used annually by him at the University of Sydney.  The 2016 instructions are located here: http://www.psych.usyd.edu.au/staff/alexh/teaching/3014webpages_2016/

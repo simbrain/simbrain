@@ -100,5 +100,10 @@ public class Turning extends Effector {
     public String getTypeDescription() {
         return "Turning Movement";
     }
+    
+    @Override
+    public void clear() {
+        setAmount(0);
+    }
 
 }

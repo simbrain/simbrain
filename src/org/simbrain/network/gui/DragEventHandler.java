@@ -153,7 +153,10 @@ final class DragEventHandler extends PDragSequenceEventHandler {
             if (event.isShiftDown()) {
                 priorSelection = new ArrayList(networkPanel.getSelection());
             } else {
-                networkPanel.clearSelection();
+                // Don't clear selection when panning screen
+                if (!event.isMetaDown()) {
+                    networkPanel.clearSelection();                    
+                }
             }
 
             // Create a new selection marquee at the mouse position
@@ -205,9 +208,9 @@ final class DragEventHandler extends PDragSequenceEventHandler {
 
         super.drag(event);
 
-        // If the Shift button is down,
+        // If the command/control button is down,
         // pan the canvas.
-        if (event.isShiftDown()) {
+        if (event.isMetaDown()) {
             pan(event);
             return;
         }

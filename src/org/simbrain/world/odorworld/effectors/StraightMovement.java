@@ -86,4 +86,10 @@ public class StraightMovement extends Effector {
     public String getTypeDescription() {
         return "Straight Movement";
     }
+    
+    @Override
+    public void clear() {
+        setAmount(0);
+    }
+
 }

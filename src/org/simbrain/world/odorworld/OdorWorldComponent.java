@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -72,6 +73,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     /**
      * Default constructor.
+     * 
      * @param name
      */
     public OdorWorldComponent(final String name) {
@@ -250,7 +252,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
-                        for (int i = 0; i < smell.getCurrentValue().length; i++) {
+                        for (int i = 0; i < smell
+                                .getCurrentValue().length; i++) {
                             String description = entity.getName() + ":"
                                     + sensor.getLabel() + "-" + (i + 1);
                             PotentialProducer producer = getAttributeManager()
@@ -274,8 +277,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
                             PotentialProducer producer = getAttributeManager()
                                     .createPotentialProducer(smell,
                                             "getCurrentValue", double[].class);
-                            producer.setCustomDescription(entity.getName()
-                                    + ":" + sensor.getLabel());
+                            producer.setCustomDescription(
+                                    entity.getName() + ":" + sensor.getLabel());
                             returnList.add(producer);
                         }
                     }
@@ -455,5 +458,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
      */
     public OdorWorld getWorld() {
         return world;
+    }
+
+    @Override
+    public void couplingRemoved(Coupling<?> coupling) {
+        Object consumerObject = coupling.getConsumer().getBaseObject();
+        if (consumerObject instanceof Effector) {
+            ((Effector) consumerObject).clear();
+        }
     }
 }

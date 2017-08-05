@@ -65,15 +65,13 @@ public class LayeredNetworkCreationPanel extends JPanel {
     private Box layerPanel = Box.createVerticalBox();
 
     /** List of swing components that describe the layers of the network. */
-    private List<LayerCreationPanel> layerList =
-        new ArrayList<LayerCreationPanel>();
+    private List<LayerCreationPanel> layerList = new ArrayList<LayerCreationPanel>();
 
     /**
      * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
      * governing desired Neuron type for a given layer.
      */
-    public static HashMap<String, NeuronUpdateRule> DEFAULT_NEURON_TYPES =
-        new HashMap<String, NeuronUpdateRule>();
+    public static HashMap<String, NeuronUpdateRule> DEFAULT_NEURON_TYPES = new HashMap<String, NeuronUpdateRule>();
 
     /**
      * Default mapping of Strings to NeuronUpdateRules.
@@ -96,7 +94,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
      * @param parent the parent dialog
      */
     public LayeredNetworkCreationPanel(final int initialNumLayers,
-        final Window parent) {
+            final Window parent) {
         this.parent = parent;
 
         // Set up header
@@ -134,11 +132,23 @@ public class LayeredNetworkCreationPanel extends JPanel {
         layerPanel.removeAll();
         layerList.clear();
         for (int i = numLayers; i > 0; i--) {
-            LayerCreationPanel layer = new LayerCreationPanel(
-                DEFAULT_NEURON_TYPES, "Layer " + i, 5);
+            LayerCreationPanel layer;
             if (i == 1) {
+                layer = new LayerCreationPanel(
+                        DEFAULT_NEURON_TYPES, "Input Layer", 5);
                 layer.setComboBox("Linear");
+            } else if (i == numLayers) {
+                layer = new LayerCreationPanel(
+                        DEFAULT_NEURON_TYPES, "Output Layer", 5);
+                
             } else {
+                if (numLayers == 3) {
+                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES,
+                            "Hidden Layer", 5);                    
+                } else {
+                    layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES,
+                            "Hidden Layer " + (i - 1), 5);
+                }
                 layer.setComboBox("Logistic");
             }
             layerList.add(layer);
@@ -168,18 +178,18 @@ public class LayeredNetworkCreationPanel extends JPanel {
         // Create network
         FeedForward net;
         switch (type) {
-            case "Backprop":
-                net = new BackpropNetwork(panel.getNetwork(), topology,
+        case "Backprop":
+            net = new BackpropNetwork(panel.getNetwork(), topology,
                     panel.getWhereToAdd());
-                break;
-            case "FeedForward":
-                net = new FeedForward(panel.getNetwork(), topology,
+            break;
+        case "FeedForward":
+            net = new FeedForward(panel.getNetwork(), topology,
                     panel.getWhereToAdd());
-                break;
-            default:
-                net = new FeedForward(panel.getNetwork(), topology,
+            break;
+        default:
+            net = new FeedForward(panel.getNetwork(), topology,
                     panel.getWhereToAdd());
-                break;
+            break;
         }
 
         // Set neuron types
@@ -220,8 +230,8 @@ public class LayeredNetworkCreationPanel extends JPanel {
          * @param numNeurons initial number of neurons
          */
         public LayerCreationPanel(
-            final HashMap<String, NeuronUpdateRule> neuronTypeMap,
-            final String label, final int numNeurons) {
+                final HashMap<String, NeuronUpdateRule> neuronTypeMap,
+                final String label, final int numNeurons) {
 
             this.neuronTypeMap = neuronTypeMap;
 
@@ -232,7 +242,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
 
             // Set up combo box
             neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet()
-                .toArray(new String[neuronTypeMap.size()]));
+                    .toArray(new String[neuronTypeMap.size()]));
 
             // Lay out all components horizontally
             Box component = Box.createHorizontalBox();

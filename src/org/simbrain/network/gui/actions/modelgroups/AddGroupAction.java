@@ -22,8 +22,11 @@ import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.group.NeuronGroupCreationDialog;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -56,21 +59,22 @@ public final class AddGroupAction extends AbstractAction {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SHORT_DESCRIPTION, "Add " + name
-                + " group to network");
-
+        putValue(SHORT_DESCRIPTION, "Add " + name + " group to network");
+        if (dialogClass == NeuronGroupCreationDialog.class) {
+            networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                    .put(KeyStroke.getKeyStroke('g'), this);
+            networkPanel.getActionMap().put(this, this);
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         networkPanel.repaint();
         StandardDialog dialog;
         try {
-            dialog = dialogClass.getDeclaredConstructor(
-                    new Class[] { NetworkPanel.class }).newInstance(
-                    networkPanel);
+            dialog = dialogClass
+                    .getDeclaredConstructor(new Class[] { NetworkPanel.class })
+                    .newInstance(networkPanel);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

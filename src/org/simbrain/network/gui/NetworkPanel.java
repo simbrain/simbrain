@@ -2649,6 +2649,25 @@ public class NetworkPanel extends JPanel {
             neuron.offset(offsetX * nudgeAmount, offsetY  * nudgeAmount);
         }
     }
+    
+
+    /**
+     * Clamped / unclamped or freeze / unfreeze selected nodes.
+     *
+     * @param freeze whether to clamp/freeze or not.
+     */
+    public void freezeSelectedObjects(boolean freeze) {
+        for (PNode node : getSelection()) {
+            if (node instanceof NeuronNode) {
+                NeuronNode neuronNode = (NeuronNode) node;
+                neuronNode.getNeuron().setClamped(freeze);
+            }
+            if (node instanceof SynapseNode) {
+                SynapseNode synapseNode = (SynapseNode) node;
+                synapseNode.getSynapse().setFrozen(freeze);
+            }
+        }        
+    }
 
     /**
      * Close model Network.
@@ -3303,6 +3322,5 @@ public class NetworkPanel extends JPanel {
 		if (!updateComplete && this.updateComplete.get() != 0) { return; }
 		this.updateComplete.set(updateComplete ? 0 : 3);
 	}
-
 
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
@@ -90,7 +91,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     // unclear. Leaving it in for now, but consider for deletion. Also see
     // NetworkPanel response to neuronMoved events and SelectionEventHandler.
     // private boolean isMoving = false;
-
+    
+    /** Heavy stroke for clamped nodes. */
+    private static final BasicStroke CLAMPED_STROKE = new BasicStroke(2f);
+    
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
@@ -172,10 +176,25 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Update the neuron view based on the model neuron.
+     *
+     * This should not be called on every update but only when
+     * the neuron is changed.  
      */
     public void update() {
         updateColor();
         updateText();
+        updateClampStatus();
+    }
+    
+    /**
+     * Update the stroke of a node based on whether it is clamped or not.
+     */
+    public void updateClampStatus() {
+        if (neuron.isClamped()) {
+            circle.setStroke(CLAMPED_STROKE);
+        } else {
+            circle.setStroke(DEFAULT_STROKE);
+        }
     }
 
     /**

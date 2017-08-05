@@ -957,6 +957,7 @@ public class Neuron {
      */
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
+        this.getNetwork().fireNeuronChanged(this);
     }
 
     /**

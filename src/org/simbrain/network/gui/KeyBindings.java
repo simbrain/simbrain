@@ -43,8 +43,7 @@ public class KeyBindings {
     /**
      * Add key bindings.
      *
-     * @param panel
-     *            panel in which to add bindings.
+     * @param panel panel in which to add bindings.
      */
     public static void addBindings(final NetworkPanel panel) {
 
@@ -123,6 +122,25 @@ public class KeyBindings {
             }
         });
 
+        // Clamp/unclamp nodes and freeze/unfreeize synapses using Shift-F /
+        // Shift-U
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.SHIFT_MASK),
+                "freeze");
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.SHIFT_MASK),
+                "unfreeze");
+        panel.getActionMap().put("freeze", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.freezeSelectedObjects(true);
+            }
+        });
+        panel.getActionMap().put("unfreeze", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.freezeSelectedObjects(false);
+            }
+        });
+
         // // Undo
         // inputMap.put(
         // KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit
@@ -151,7 +169,7 @@ public class KeyBindings {
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(panel.getNetwork());
-                //System.out.println(panel);
+                // System.out.println(panel);
             }
         });
 
@@ -161,8 +179,8 @@ public class KeyBindings {
                 "scenegraph");
         panel.getActionMap().put("scenegraph", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                SceneGraphBrowser sgb = new SceneGraphBrowser(panel.getCanvas()
-                        .getRoot());
+                SceneGraphBrowser sgb = new SceneGraphBrowser(
+                        panel.getCanvas().getRoot());
                 StandardDialog dialog = new StandardDialog();
                 dialog.setContentPane(sgb);
                 dialog.setTitle("Piccolo Scenegraph Browser");

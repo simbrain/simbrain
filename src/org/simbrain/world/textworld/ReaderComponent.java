@@ -63,10 +63,14 @@ public class ReaderComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        addProducerType(new AttributeType(this, "TokenVectors", double[].class,
-                true));
-        addProducerType(new AttributeType(this, "TokenScalars", double.class, true));
-        addProducerType(new AttributeType(this, "Letters", double.class, false));
+        addProducerType(
+                new AttributeType(this, "TokenVectors", double[].class, true));
+        addProducerType(
+                new AttributeType(this, "TokenScalars", double.class, true));
+        addProducerType(
+                new AttributeType(this, "Letters", double.class, false));
+        addProducerType(
+                new AttributeType(this, "TokenReader", String.class, true));
     }
 
     @Override
@@ -77,6 +81,7 @@ public class ReaderComponent extends WorkspaceComponent {
                 PotentialProducer producer = getAttributeManager()
                         .createPotentialProducer(world, "getCurrentVector",
                                 double[].class);
+                producer.setCustomDescription("Get current vector");
                 returnList.add(producer);
 
             }
@@ -84,24 +89,29 @@ public class ReaderComponent extends WorkspaceComponent {
                 char letter;
                 for (letter = 'a'; letter <= 'z'; letter++) {
                     PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(world,
-                                    "getMatchingScalar", double.class,
-                                    new Class[] { String.class },
-                                    new Object[] { Character.toString(letter)});
+                            .createPotentialProducer(world, "getMatchingScalar",
+                                    double.class, new Class[] { String.class },
+                                    new Object[] {
+                                            Character.toString(letter) });
                     producer.setCustomDescription("Letter " + letter);
                     returnList.add(producer);
                 }
             }
             if (type.getTypeName().equalsIgnoreCase("TokenScalars")) {
-                for(String token : world.getTokenDictionary()) {
+                for (String token : world.getTokenDictionary()) {
                     PotentialProducer producer = getAttributeManager()
-                            .createPotentialProducer(world,
-                                    "getMatchingScalar", double.class,
-                                    new Class[] { String.class },
+                            .createPotentialProducer(world, "getMatchingScalar",
+                                    double.class, new Class[] { String.class },
                                     new Object[] { token });
                     producer.setCustomDescription("Word " + token);
                     returnList.add(producer);
                 }
+            }
+            if (type.getTypeName().equalsIgnoreCase("TokenReader")) {
+                PotentialProducer producer = getAttributeManager()
+                        .createPotentialProducer(world, "getCurrentText", String.class);
+                producer.setCustomDescription("Get current text");
+                returnList.add(producer);
             }
         }
         return returnList;
@@ -109,15 +119,16 @@ public class ReaderComponent extends WorkspaceComponent {
 
     /**
      * {@inheritDoc}
+     * 
      * @param input
      * @param name
      * @param format
-     * @return 
+     * @return
      */
     public static ReaderComponent open(InputStream input, String name,
             String format) {
-        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(
-                input);
+        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream()
+                .fromXML(input);
         return new ReaderComponent(name, newWorld);
     }
 

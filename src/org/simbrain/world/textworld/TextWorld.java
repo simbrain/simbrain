@@ -258,7 +258,7 @@ public abstract class TextWorld {
     }
 
     /**
-     * Returns the text of the current item
+     * Returns the text of the current item.
      *
      * @return text of current item, or null if current item is null.
      */

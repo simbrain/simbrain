@@ -100,7 +100,7 @@ public class DisplayComponent extends WorkspaceComponent {
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("DisplayString")) {
                 for (int i = 0; i < DEFAULT_NUM_STRING_READERS; i++) {
-                    String description = "String reader " + (i + 1);
+                    String description = "Display string " + (i + 1);
                     PotentialConsumer consumer = getStringConsumer();
                     consumer.setCustomDescription(description);
                     returnList.add(consumer);
@@ -122,7 +122,7 @@ public class DisplayComponent extends WorkspaceComponent {
                 PotentialConsumer consumer = getAttributeManager()
                         .createPotentialConsumer(world, "displayClosestWord",
                                 double[].class);
-                consumer.setCustomDescription("Vector reader");
+                consumer.setCustomDescription("Display closest word");
                 returnList.add(consumer);
 
             }

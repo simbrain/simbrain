@@ -21,6 +21,7 @@ package org.simbrain.util.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -29,6 +30,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.CellEditor;
@@ -38,9 +40,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXTable;
 
@@ -96,7 +100,7 @@ public class SimbrainJTable extends JXTable {
     private boolean showNormalizeInPopupMenu = true;
     private boolean showFillInPopupMenu = true;
     private boolean showCSVInPopupMenu = true;
-    
+
     /**
      * Creates a new simbrain gui jtable.
      *
@@ -153,8 +157,8 @@ public class SimbrainJTable extends JXTable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.isControlDown() || (e.getButton() == 1)) {
-                    final int column = convertColumnIndexToModel(columnAtPoint(e
-                            .getPoint()));
+                    final int column = convertColumnIndexToModel(
+                            columnAtPoint(e.getPoint()));
                     if (e.isShiftDown()) {
                         for (int i = 1; i < getRowCount(); i++) {
                             changeSelection(i, column, true, true);
@@ -221,20 +225,20 @@ public class SimbrainJTable extends JXTable {
         // Force edits to take effect right away.
         this.addFocusListener(new FocusAdapter() {
 
-			@Override
-			public void focusLost(FocusEvent e) {
-				CellEditor ce = SimbrainJTable.this.getCellEditor();
-				if (ce != null) {
-					// Save the value being edited before focus was lost...
-					SimbrainJTable.this.getCellEditor().stopCellEditing();
-					// Fire an event so that listeners can commit the changes
-					// if need be 
-					SimbrainJTable.this.firePropertyChange("hasChanged",
-							hasChangedSinceLastSave, true);
-					hasChangedSinceLastSave = true;
-				}
-			}
-        	
+            @Override
+            public void focusLost(FocusEvent e) {
+                CellEditor ce = SimbrainJTable.this.getCellEditor();
+                if (ce != null) {
+                    // Save the value being edited before focus was lost...
+                    SimbrainJTable.this.getCellEditor().stopCellEditing();
+                    // Fire an event so that listeners can commit the changes
+                    // if need be
+                    SimbrainJTable.this.firePropertyChange("hasChanged",
+                            hasChangedSinceLastSave, true);
+                    hasChangedSinceLastSave = true;
+                }
+            }
+
         });
     }
 
@@ -366,10 +370,11 @@ public class SimbrainJTable extends JXTable {
             return toolbar;
         } else if (getData() instanceof TextTable) {
             JToolBar toolbar = new JToolBar();
-            toolbar.add(TableActionManager.getOpenCSVAction(
-                    (TextTable) getData(), allowRowChanges, allowColumnChanges));
-            toolbar.add(TableActionManager
-                    .getSaveCSVAction((TextTable) getData()));
+            toolbar.add(
+                    TableActionManager.getOpenCSVAction((TextTable) getData(),
+                            allowRowChanges, allowColumnChanges));
+            toolbar.add(
+                    TableActionManager.getSaveCSVAction((TextTable) getData()));
             return toolbar;
         }
         return null;
@@ -456,8 +461,9 @@ public class SimbrainJTable extends JXTable {
             return menu;
         } else if (getData() instanceof TextTable) {
             JMenu menu = new JMenu("Import / Export .csv");
-            menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(
-                    (TextTable) getData(), allowRowChanges, allowColumnChanges)));
+            menu.add(new JMenuItem(
+                    TableActionManager.getOpenCSVAction((TextTable) getData(),
+                            allowRowChanges, allowColumnChanges)));
             menu.add(new JMenuItem(TableActionManager
                     .getSaveCSVAction((TextTable) getData())));
             return menu;
@@ -683,7 +689,8 @@ public class SimbrainJTable extends JXTable {
     /**
      * @param showInsertColumnPopupMenu the showInsertColumnPopupMenu to set
      */
-    public void setShowInsertColumnPopupMenu(boolean showInsertColumnPopupMenu) {
+    public void setShowInsertColumnPopupMenu(
+            boolean showInsertColumnPopupMenu) {
         this.showInsertColumnPopupMenu = showInsertColumnPopupMenu;
     }
 
@@ -697,7 +704,8 @@ public class SimbrainJTable extends JXTable {
     /**
      * @param showDeleteColumnPopupMenu the showDeleteColumnPopupMenu to set
      */
-    public void setShowDeleteColumnPopupMenu(boolean showDeleteColumnPopupMenu) {
+    public void setShowDeleteColumnPopupMenu(
+            boolean showDeleteColumnPopupMenu) {
         this.showDeleteColumnPopupMenu = showDeleteColumnPopupMenu;
     }
 
@@ -812,5 +820,72 @@ public class SimbrainJTable extends JXTable {
         }
         return selectedCellIndices;
     }
+
+    //
+    // Improved cell editing courtesy of camick!
+    //
+    // http://www.camick.com/java/source/RXTable.java
+    //
+    private boolean isSelectAllForMouseEvent = true;
+    private boolean isSelectAllForActionEvent = true;
+    private boolean isSelectAllForKeyEvent = true;
+
+    /*
+     * Override to provide Select All editing functionality
+     */
+    @Override
+    public boolean editCellAt(int row, int column, EventObject e) {
+        boolean result = super.editCellAt(row, column, e);
+
+        if (isSelectAllForMouseEvent || isSelectAllForActionEvent
+                || isSelectAllForKeyEvent) {
+            selectAll(e);
+        }
+
+        return result;
+    }
+
+    /*
+     * Select the text when editing on a text related cell is started
+     */
+    private void selectAll(EventObject e) {
+        final Component editor = getEditorComponent();
+
+        if (editor == null || !(editor instanceof JTextComponent))
+            return;
+
+        if (e == null) {
+            ((JTextComponent) editor).selectAll();
+            return;
+        }
+
+        // Typing in the cell was used to activate the editor
+
+        if (e instanceof KeyEvent && isSelectAllForKeyEvent) {
+            ((JTextComponent) editor).selectAll();
+            return;
+        }
+
+        // F2 was used to activate the editor
+
+        if (e instanceof ActionEvent && isSelectAllForActionEvent) {
+            ((JTextComponent) editor).selectAll();
+            return;
+        }
+
+        // A mouse click was used to activate the editor.
+        // Generally this is a double click and the second mouse click is
+        // passed to the editor which would remove the text selection unless
+        // we use the invokeLater()
+
+        if (e instanceof MouseEvent && isSelectAllForMouseEvent) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ((JTextComponent) editor).selectAll();
+                }
+            });
+        }
+    }
+    //// Camick additions end //////
 
 }

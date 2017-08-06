@@ -19,7 +19,6 @@
 package org.simbrain.network.gui;
 
 import java.awt.event.InputEvent;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.piccolo2d.event.PDragSequenceEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.extras.nodes.PStyledText;
+import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
@@ -354,8 +354,8 @@ final class DragEventHandler extends PDragSequenceEventHandler {
                     .intersects(bounds);
             // Allow selection of synapses via the line associated with it
             if (node instanceof SynapseNode) {
-                Line2D.Double line = ((SynapseNode) node).getLine();
-                if (bounds.intersectsLine(line)) {
+                PPath.Float line = ((SynapseNode) node).getLine();
+                if (bounds.intersects(line.getGlobalBounds())) {
                     boundsIntersects = true;
                 }
 

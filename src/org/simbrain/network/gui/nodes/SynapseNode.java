@@ -28,13 +28,9 @@ import javax.swing.JPopupMenu;
 
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.edit.CopyAction;
-import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
-import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 /**
@@ -52,16 +48,8 @@ public final class SynapseNode extends ScreenElement {
     /** Main circle of synapse. */
     private PNode circle;
 
-    /** Line connecting nodes. */
-    private Float line;
-
-    /**
-     * Line2D representation of the PPath, currently used by selection event
-     * listener so that synapses can be selected by lassoing the line.
-     *
-     * TODO: I have a feeling there is a way to avoid this redundancy.
-     */
-    private Line2D.Double publicLine = new Line2D.Double();
+    /** Line connecting nodes. More of a loop for self cocnections. */
+    private PPath.Float line;
 
     /** Reference to source neuron. */
     private NeuronNode source;
@@ -138,26 +126,31 @@ public final class SynapseNode extends ScreenElement {
 
         // Position the synapse
         if (isSelfConnection()) {
-            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter()
-                    .getX() + offset, target.getCenter().getY() + offset));
+            synapseCenter = globalToLocal(
+                    new Point2D.Double(target.getCenter().getX() + offset + 3,
+                            target.getCenter().getY() + offset + 3));
         } else {
-            synapseCenter = globalToLocal(calcCenter(source.getCenter(),
-                    target.getCenter()));
+            synapseCenter = globalToLocal(
+                    calcCenter(source.getCenter(), target.getCenter()));
         }
-        this.offset(synapseCenter.getX() - offset, synapseCenter.getY()
-                - offset);
+        this.offset(synapseCenter.getX() - offset,
+                synapseCenter.getY() - offset);
 
         // Create the circle
         if (circle == null) {
             circle = PPath.createEllipse(0, 0, (float) offset * 2,
                     (float) offset * 2);
             ((PPath) circle).setStrokePaint(null);
-            setBounds(circle.getFullBounds());
         }
+        double ea = 1;
+        double ea2 = ea * 2;
+        PBounds tempBounds = circle.getFullBounds();
+        setBounds(tempBounds.x - ea, tempBounds.y - ea, tempBounds.width + ea2,
+                tempBounds.height + ea2);
 
         // Create the line
         if (line == null) {
-            line = getLine(globalToLocal(synapseCenter));
+            line = createLine(globalToLocal(synapseCenter));
         }
 
         // Update the line (unless it's a self connection)
@@ -165,8 +158,8 @@ public final class SynapseNode extends ScreenElement {
             line.reset();
             line.append(new Line2D.Double(globalToLocal(source.getCenter()),
                     synapseCenter), false);
-            publicLine
-                    .setLine(source.getCenter(), localToGlobal(synapseCenter));
+            // publicLine
+            // .setLine(source.getCenter(), localToGlobal(synapseCenter));
         }
     }
 
@@ -185,7 +178,7 @@ public final class SynapseNode extends ScreenElement {
      * @param center the center of the synapse
      * @return the line
      */
-    private PPath.Float getLine(final Point2D center) {
+    private PPath.Float createLine(final Point2D center) {
         if (isSelfConnection()) {
             return new PPath.Float(new Arc2D.Float((float) getX(),
                     (float) getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
@@ -208,9 +201,9 @@ public final class SynapseNode extends ScreenElement {
             circle.setPaint(excitatoryColor);
         }
         if (source.getNeuron().isSpike()) {
-        	line.setStrokePaint(NeuronNode.getSpikingColor());
+            line.setStrokePaint(NeuronNode.getSpikingColor());
         } else {
-        	line.setStrokePaint(lineColor);
+            line.setStrokePaint(lineColor);
         }
     }
 
@@ -247,10 +240,11 @@ public final class SynapseNode extends ScreenElement {
         if (synapse.getStrength() == 0) {
             diameter = minDiameter;
         } else if (synapse.getStrength() > 0) {
-            diameter = ((maxDiameter - minDiameter) * (strength / upperBound) + minDiameter);
+            diameter = ((maxDiameter - minDiameter) * (strength / upperBound)
+                    + minDiameter);
         } else {
-            diameter = (((maxDiameter - minDiameter) * (Math.abs(strength
-                    / lowerBound))) + minDiameter);
+            diameter = (((maxDiameter - minDiameter)
+                    * (Math.abs(strength / lowerBound))) + minDiameter);
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;
@@ -301,21 +295,24 @@ public final class SynapseNode extends ScreenElement {
         return new Point2D.Double(weightX, weightY);
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return
      */
     public boolean isSelectable() {
         return true;
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return
      */
     public boolean showSelectionHandle() {
         return true;
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return
      */
     public boolean isDraggable() {
@@ -332,7 +329,8 @@ public final class SynapseNode extends ScreenElement {
         return String.valueOf(synapse.getToolTipText());
     }
 
-    /** @see ScreenElement 
+    /**
+     * @see ScreenElement
      * @return
      */
     public boolean hasContextMenu() {
@@ -342,28 +340,28 @@ public final class SynapseNode extends ScreenElement {
     /** @see ScreenElement */
     protected JPopupMenu getContextMenu() {
 
-//        JPopupMenu contextMenu = new JPopupMenu();
-//
-//        contextMenu.add(new CutAction(getNetworkPanel()));
-//        contextMenu.add(new CopyAction(getNetworkPanel()));
-//        contextMenu.add(new PasteAction(getNetworkPanel()));
-//        contextMenu.addSeparator();
-//
-//        contextMenu.add(new DeleteAction(getNetworkPanel()));
-//        contextMenu.addSeparator();
-//
-//        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
-//        contextMenu.addSeparator();
-//
-//        // Workspace workspace = getNetworkPanel().getWorkspace();
-//        // if (workspace.getGaugeList().size() > 0) {
-//        // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-//        // contextMenu.addSeparator();
-//        // }
-//
-//        contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
-//
-//        return contextMenu;
+        // JPopupMenu contextMenu = new JPopupMenu();
+        //
+        // contextMenu.add(new CutAction(getNetworkPanel()));
+        // contextMenu.add(new CopyAction(getNetworkPanel()));
+        // contextMenu.add(new PasteAction(getNetworkPanel()));
+        // contextMenu.addSeparator();
+        //
+        // contextMenu.add(new DeleteAction(getNetworkPanel()));
+        // contextMenu.addSeparator();
+        //
+        // contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
+        // contextMenu.addSeparator();
+        //
+        // // Workspace workspace = getNetworkPanel().getWorkspace();
+        // // if (workspace.getGaugeList().size() > 0) {
+        // // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+        // // contextMenu.addSeparator();
+        // // }
+        //
+        // contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
+        //
+        // return contextMenu;
         return this.getNetworkPanel().getSynapseContextMenu(synapse);
     }
 
@@ -443,9 +441,9 @@ public final class SynapseNode extends ScreenElement {
     /**
      * @return the publicLine
      */
-    public Line2D.Double getLine() {
-        return publicLine;
-    }
+    // public Line2D.Double getLine() {
+    // return publicLine;
+    // }
 
     /**
      * @return the excitatoryColor
@@ -531,14 +529,11 @@ public final class SynapseNode extends ScreenElement {
         SynapseNode.lineColor = lineColor;
     }
 
-    // public void paint(PPaintContext aPaintContext) {
-    // double s = aPaintContext.getScale();
-    // //TODO: Make this settable
-    // if (s < 1) {
-    // this.setVisible(false);
-    // } else {
-    // this.setVisible(true);
-    // }
-    // }
+    /**
+     * @return the line
+     */
+    public PPath.Float getLine() {
+        return line;
+    }
 
 }

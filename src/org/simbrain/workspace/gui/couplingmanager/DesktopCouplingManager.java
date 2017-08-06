@@ -24,6 +24,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Vector;
 
@@ -50,6 +52,9 @@ import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.Produc
  * GUI dialog for creating couplings.
  */
 public class DesktopCouplingManager extends JPanel implements ActionListener {
+
+    /** Flag to ensure that only one dialog is opened at a time. */
+    public static boolean isVisible;
 
     /** List of producing attributes. */
     private PotentialAttributePanel producingAttributes;
@@ -80,6 +85,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         super(new BorderLayout());
         this.desktop = desktop;
         this.frame = frame;
+        isVisible = true;
 
         // Left Panel
         Border leftBorder = BorderFactory.createTitledBorder("Producers");
@@ -96,8 +102,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        bottomPanel.add(new JButton(new ShowHelpAction(
-                "Pages/Workspace/Couplings.html")));
+        bottomPanel.add(new JButton(
+                new ShowHelpAction("Pages/Workspace/Couplings.html")));
 
         bottomPanel.add(couplingMethodComboBox);
 
@@ -129,8 +135,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
 
-        frame.getRootPane().setDefaultButton(okButton);
 
+        frame.getRootPane().setDefaultButton(okButton);
         frame.pack();
 
     }
@@ -172,12 +178,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         if ((potentialProducers.size() == 0)
                 || (potentialConsumers.size() == 0)) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "You must select at least one consuming and producing attribute \n in order to create couplings!",
-                            "No Attributes Selected Warning",
-                            JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "You must select at least one consuming and producing attribute \n in order to create couplings!",
+                    "No Attributes Selected Warning",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 

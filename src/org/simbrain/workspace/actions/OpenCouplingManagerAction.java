@@ -21,6 +21,8 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
@@ -39,6 +41,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
 
     /**
      * Create an open data world with the specified workspace.
+     * 
      * @param desktop
      */
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
@@ -48,21 +51,31 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Open coupling manager");
     }
 
-    /** @see AbstractAction 
+    /**
+     * @see AbstractAction
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         desktop.addInternalFrame(frame);
-        DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
-        frame.setTitle("Coupling Manager");
-        frame.setContentPane(cm);
-        // frame.setSize(850, 420);
-        frame.setResizable(true);
-        frame.setClosable(true);
-        frame.setMaximizable(true);
-        frame.setIconifiable(true);
-        frame.setVisible(true);
-        frame.pack();
+        if (!DesktopCouplingManager.isVisible) {
+            DesktopCouplingManager cm = new DesktopCouplingManager(desktop,
+                    frame);
+            frame.setTitle("Coupling Manager");
+            frame.setContentPane(cm);
+            // frame.setSize(850, 420);
+            frame.setResizable(true);
+            frame.setClosable(true);
+            frame.setMaximizable(true);
+            frame.setIconifiable(true);
+            frame.setVisible(true);
+            frame.pack();
+            frame.addInternalFrameListener(new InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosed(InternalFrameEvent e) {
+                    DesktopCouplingManager.isVisible = false;
+                }
+            });
+        }
     }
 }

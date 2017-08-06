@@ -113,10 +113,17 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                         GuiComponent.this.getParentFrame().setVisible(
                                 workspaceComponent.isGuiOn());
                     }
+
+                    @Override
+                    public void componentClosing() {
+                        close();
+                    }
+
                 });
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
+    
 
     /**
      * If any initialization is needed after adding this component to workspace.
@@ -129,12 +136,20 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * Closes this view.
      */
     public void close() {
+        if (workspaceComponent.hasChangedSinceLastSave()) {
+            boolean hasCancelled = showHasChangedDialog();
+            if (hasCancelled) {
+                return;
+            }
+        }
         closing();
         workspaceComponent.close();
+        getDesktop().unregisterComponent(this);        
     }
 
     /**
-     * Perform cleanup after closing. TODO: Move to model?
+     * Perform cleanup after closing. 
+     * TODO: Rename to guiClosing since workspace has its own
      */
     protected abstract void closing();
 

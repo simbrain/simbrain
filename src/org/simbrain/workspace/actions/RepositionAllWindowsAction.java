@@ -32,9 +32,6 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 public final class RepositionAllWindowsAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
-    
-    //TODO: Make this use all internal frames (see SimbrainDesktop.addInternalFrame)
-    //  And also coordinate spacing with the logic in SimbrainDesktop.addDesktopComponent()
 
     /** Reference to Simbrain Desktop. */
     private SimbrainDesktop desktop;
@@ -56,13 +53,6 @@ public final class RepositionAllWindowsAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        int i = 0;
-        for (GuiComponent<?> c : desktop.getDesktopComponents()) {
-            int height = (int) desktop.getFrame().getSize().getHeight();
-            int width = (int) desktop.getFrame().getSize().getWidth();
-            c.getParentFrame().setBounds(i * 15, i * 15, width / 2, height / 2);
-            c.getParentFrame().toFront();
-            i++;
-        }
+        desktop.repositionAllWindows();
     }
 }

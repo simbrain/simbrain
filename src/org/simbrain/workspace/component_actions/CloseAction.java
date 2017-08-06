@@ -61,6 +61,6 @@ public final class CloseAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        workspaceComponent.close();
+        workspaceComponent.tryClosing();
     }
 }

@@ -85,8 +85,8 @@ public abstract class WorkspaceComponent {
 
     /**
      * If set to true, serialize this component before others. Possibly replace
-     * with priority system later. {@see
-     * org.simbrain.workspace.Workspace#preSerializationInit()}.
+     * with priority system later.
+     * {@see org.simbrain.workspace.Workspace#preSerializationInit()}.
      */
     private int serializePriority = 0;
 
@@ -106,8 +106,8 @@ public abstract class WorkspaceComponent {
      */
     public WorkspaceComponent(final String name) {
         this.name = name;
-        logger.trace(this.getClass().getCanonicalName() + ": " + name
-                + " created");
+        logger.trace(
+                this.getClass().getCanonicalName() + ": " + name + " created");
     }
 
     /**
@@ -129,6 +129,15 @@ public abstract class WorkspaceComponent {
      */
     public List<? extends String> getFormats() {
         return Collections.singletonList(getDefaultFormat());
+    }
+    
+    /**
+     * Fires an event which leads any linked gui components to close, 
+     * which calls the haschanged dialog.
+     */
+    public void tryClosing() {
+        fireComponentClosing();
+        //TODO: If there is no Gui then close must be called directly
     }
 
     /**
@@ -201,7 +210,6 @@ public abstract class WorkspaceComponent {
         for (AttributeListener listener : attributeListeners) {
             listener.attributeTypeVisibilityChanged(type);
         }
-
     }
 
     /**
@@ -279,8 +287,8 @@ public abstract class WorkspaceComponent {
             }
         };
 
-        return Collections.singleton(new ComponentUpdatePart(this, callable,
-                toString(), this));
+        return Collections.singleton(
+                new ComponentUpdatePart(this, callable, toString(), this));
     }
 
     /**
@@ -327,6 +335,15 @@ public abstract class WorkspaceComponent {
     public final void fireComponentToggleEvent() {
         for (WorkspaceComponentListener listener : workspaceComponentListeners) {
             listener.componentOnOffToggled();
+        }
+    }
+
+    /**
+     * Fired when component is closed.
+     */
+    public void fireComponentClosing() {
+        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+            listener.componentClosing();
         }
     }
 

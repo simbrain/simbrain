@@ -223,7 +223,7 @@ public final class OscWorldDesktopComponent extends
 
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {
-            close();
+//            close();
         }
     }
 

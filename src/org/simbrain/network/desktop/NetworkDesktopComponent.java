@@ -104,6 +104,10 @@ public final class NetworkDesktopComponent extends
                     public void componentOnOffToggled() {
                     }
 
+                    @Override
+                    public void componentClosing() {
+                    }
+
                 });
     }
 

@@ -41,4 +41,9 @@ public interface WorkspaceComponentListener {
      */
     public void componentOnOffToggled();
 
+    /**
+     * Called when closing this component.
+     */
+    public void componentClosing();
+
 }

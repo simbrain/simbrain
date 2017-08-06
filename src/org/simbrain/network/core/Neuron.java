@@ -208,6 +208,7 @@ public class Neuron {
         // current api changes would have to be made to add neuron update rule's
         // sub classes.
         getUpdateRule().setInputType(n.getUpdateRule().getInputType());
+        getUpdateRule().setIncrement(n.getUpdateRule().getIncrement());
         forceSetActivation(n.getActivation());
         setInputValue(n.getInputValue());
         setX(n.getX());

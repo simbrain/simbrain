@@ -140,6 +140,16 @@ public class KeyBindings {
                 panel.freezeSelectedObjects(false);
             }
         });
+        
+        // Duplicate selected objects
+        inputMap.put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.META_MASK),
+                "duplicate");
+        panel.getActionMap().put("duplicate", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.duplicate();
+            }
+        });
 
         // // Undo
         // inputMap.put(

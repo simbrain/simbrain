@@ -1778,6 +1778,14 @@ public class NetworkPanel extends JPanel {
         Clipboard.paste(this);
         numberOfPastes++;
     }
+    
+    /**
+     * Duplicates selected objects.
+     */
+    public void duplicate() {
+        copy();
+        paste();
+    }
 
     /**
      * Aligns neurons horizontally.

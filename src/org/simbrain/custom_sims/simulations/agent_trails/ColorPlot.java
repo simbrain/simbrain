@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.agent_trails;
 
+import org.simbrain.util.projection.Halo;
 import org.simbrain.workspace.updater.UpdateAction;
 
 /**
@@ -32,8 +33,8 @@ public class ColorPlot implements UpdateAction {
     @Override
     public void invoke() {
         double[] predictedState = sim.predictionNet.getActivations();
-//        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
-//                predictedState, (float)sim.errorNeuron.getActivation());
+        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
+                predictedState, (float)sim.errorNeuron.getActivation());
     }
 
 }

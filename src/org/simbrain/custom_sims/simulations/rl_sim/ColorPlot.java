@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
+import org.simbrain.util.projection.Halo;
 import org.simbrain.workspace.updater.UpdateAction;
 
 /**
@@ -32,7 +33,7 @@ public class ColorPlot implements UpdateAction {
     @Override
     public void invoke() {
         double[] predictedState = sim.getCombinedPredicted();
-//        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
-//                predictedState, (float) sim.preditionError);
+        Halo.makeHalo(sim.plot.getProjectionModel().getProjector(),
+                predictedState, (float) sim.preditionError);
     }
 }

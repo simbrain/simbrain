@@ -18,8 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -30,6 +35,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.widgets.DropDownTriangle;
+import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 /**
@@ -65,10 +72,10 @@ public class ConnectionDialog extends StandardDialog {
      * @return the constructed dialog
      */
     public static ConnectionDialog createConnectionDialog(
-        final AbstractConnectionPanel optionsPanel,
-        final ConnectNeurons connection, final NetworkPanel networkPanel) {
+            final AbstractConnectionPanel optionsPanel,
+            final ConnectNeurons connection, final NetworkPanel networkPanel) {
         ConnectionDialog cd = new ConnectionDialog(optionsPanel, connection,
-            networkPanel);
+                networkPanel);
         cd.init();
         return cd;
     }
@@ -81,10 +88,12 @@ public class ConnectionDialog extends StandardDialog {
      * @param connection the underlyign connection object
      */
     private ConnectionDialog(final AbstractConnectionPanel optionsPanel,
-        final ConnectNeurons connection, final NetworkPanel networkPanel) {
+            final ConnectNeurons connection, final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         this.connectionPanel = optionsPanel;
     }
+
+    DropDownTriangle detailTriangle;
 
     /**
      * Initialize the connection panel.
@@ -93,13 +102,47 @@ public class ConnectionDialog extends StandardDialog {
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(connectionPanel);
+        detailTriangle = new DropDownTriangle(UpDirection.RIGHT, false,
+                "Synapse Properties", "Synapse Properties", this);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(leftJustify(detailTriangle));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         propertiesPanel = ConnectionSynapsePropertiesPanel
-            .createSynapsePropertiesPanel(this);
+                .createSynapsePropertiesPanel(this);
         mainPanel.add(propertiesPanel);
         eirPanel = SynapsePolarityAndRandomizerPanel
-            .createPolarityRatioPanel(this);
+                .createPolarityRatioPanel(this);
         mainPanel.add(eirPanel);
+        detailTriangle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                updateDetailTriangle();
+            }
+        });
         fillFrame();
+        updateDetailTriangle();
+    }
+
+    /**
+     * Update state of detail triangle.
+     */
+    private void updateDetailTriangle() {
+        propertiesPanel.setVisible(detailTriangle.isDown());
+        propertiesPanel.repaint();
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    /**
+     * https://stackoverflow.com/questions/8335997/
+     * how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
+     */
+    private Component leftJustify(final JPanel panel) {
+        Box b = Box.createHorizontalBox();
+        b.add(Box.createHorizontalStrut(10));
+        b.add(panel);
+        b.add(Box.createHorizontalGlue());
+        return b;
     }
 
     /**
@@ -107,7 +150,7 @@ public class ConnectionDialog extends StandardDialog {
      */
     public void fillFrame() {
         ShowHelpAction helpAction = new ShowHelpAction(
-            "Pages/Network/connections.html");
+                "Pages/Network/connections.html");
         addButton(new JButton(helpAction));
         setContentPane(mainPanel);
     }
@@ -118,22 +161,22 @@ public class ConnectionDialog extends StandardDialog {
         connectionPanel.commitChanges();
         List<Neuron> source = networkPanel.getSourceModelNeurons();
         List<Neuron> target = networkPanel.getSelectedModelNeurons();
-        List<Synapse> synapses = connectionPanel
-                .applyConnection(source, target);
+        List<Synapse> synapses = connectionPanel.applyConnection(source,
+                target);
         ConnectionUtilities.polarizeSynapses(synapses,
-            eirPanel.getPercentExcitatory());
+                eirPanel.getPercentExcitatory());
         propertiesPanel.commitChanges();
         ConnectionUtilities.conformToTemplates(synapses,
-            propertiesPanel.getTemplateExcitatorySynapse(),
-            propertiesPanel.getTemplateInhibitorySynapse());
+                propertiesPanel.getTemplateExcitatorySynapse(),
+                propertiesPanel.getTemplateInhibitorySynapse());
         eirPanel.commitChanges();
         if (eirPanel.exRandomizerEnabled()) {
             ConnectionUtilities.randomizeExcitatorySynapses(synapses,
-                eirPanel.getExRandomizer());
+                    eirPanel.getExRandomizer());
         }
         if (eirPanel.inRandomizerEnabled()) {
             ConnectionUtilities.randomizeInhibitorySynapses(synapses,
-                eirPanel.getInRandomizer());
+                    eirPanel.getInRandomizer());
         }
         networkPanel.getNetwork().fireSynapsesUpdated(synapses);
     }

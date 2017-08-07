@@ -41,6 +41,8 @@ import org.simbrain.resource.ResourceManager;
  * revealed when the triangle is clicked. Note that this is just the triangle.
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
+ * 
+ * Good example of use: GeneralNeuronPropertiesPanel around line 243
  *
  * @author Zach Tosi
  *

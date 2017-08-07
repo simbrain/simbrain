@@ -26,6 +26,7 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
+import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -55,7 +56,7 @@ public abstract class RegisteredSimulation {
     protected final Simulation sim;
 
     static {
-        // REGISTERED_SIMS.add(new TestSim());
+        REGISTERED_SIMS.add(new EdgeOfChaos());
         REGISTERED_SIMS.add(new Hippocampus());
         REGISTERED_SIMS.add(new RL_Sim_Main());
         REGISTERED_SIMS.add(new Cerebellum());

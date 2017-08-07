@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entityList>
+	<agent>
+	    <imageId>Mouse.gif</imageId>
+	    <name>Mouse</name>
+	    <x>43</x>
+	    <y>110</y>
+	    <heading>0</heading>
+	</agent>
+	<entity>
+	    <imageId>Swiss.gif</imageId>
+	    <name>cheese_1</name>
+	    <x>350</x>
+	    <y>29</y>
+	    <stim>0,1,0,0,0,1</stim>
+	    <dispersion>350</dispersion>
+	</entity>
+	<entity>
+	    <imageId>Swiss.gif</imageId>
+	    <name>cheese_2</name>
+	    <x>350</x>
+	    <y>29</y>
+	    <stim>0,1,0,0,0,1</stim>
+	    <dispersion>350</dispersion>
+	</entity>
+	<entity>
+	    <imageId>Pansy.gif</imageId>
+	    <name>flower</name>
+	    <x>350</x>
+	    <y>215</y>
+	    <stim>0,0,0,0,1,1</stim>
+	    <dispersion>350</dispersion>
+	</entity>
+</entityList>

@@ -65,13 +65,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
+import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.docviewer.DocViewerDesktopComponent;
 import org.simbrain.network.NetworkComponent;
@@ -612,11 +612,19 @@ public class SimbrainDesktop {
      * @return script JMenu
      */
     private JMenu createScriptMenu() {
-        JMenu scriptMenu = new JMenu("Scripts");
+        JMenu scriptMenu = new JMenu("Simulations");
         // scriptMenu.add(actionManager.getRunScriptAction());
         scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
+        for (RegisteredSimulation rs : RegisteredSimulation.REGISTERED_SIMS) {
+            JMenuItem item = new JMenuItem(rs.getName());
+            item.addActionListener(ae -> {
+                rs.instantiate(this).run();
+            });
+            scriptMenu.add(item);
+        }
+        scriptMenu.addSeparator();
         for (Action action : actionManager.getScriptActions(this)) {
             scriptMenu.add(action);
         }

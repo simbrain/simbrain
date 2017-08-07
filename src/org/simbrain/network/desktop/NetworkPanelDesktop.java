@@ -445,12 +445,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
             topMenu.add(producerMenu);
 
             // Spikes
-            PotentialProducer producer2 = NetworkComponent
+            PotentialProducer Producer = NetworkComponent
                     .getNeuronGroupProducer(component.getWorkspaceComponent(),
                             neuronGroup, "getSpikeIndexes");
             JMenu producerMenu2 = new CouplingMenuProducer(
                     "Spike Indices", component
-                            .getWorkspaceComponent().getWorkspace(), producer2);
+                            .getWorkspaceComponent().getWorkspace(), Producer);
             topMenu.add(producerMenu2);
             return topMenu;
         }

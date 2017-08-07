@@ -100,13 +100,15 @@ public class RL_Update implements NetworkUpdateAction {
             if (neuron.getLastActivation() > 0) {
                 for (Synapse synapse : neuron.getFanIn()) {
                     Neuron sourceNeuron = synapse.getSource();
-                    double newStrength = synapse.getStrength()
-                            + sim.alpha * tdError.getActivation()
-                                    * sourceNeuron.getLastActivation();
-                    // synapse.setStrength(synapse.clip(newStrength));
-                    synapse.forceSetStrength(newStrength);
-                    // System.out.println(tdError.getActivation() + "," +
-                    // sourceNeuron.getLastActivation());
+                    if (sourceNeuron.getLastActivation() > 0) {
+                        double newStrength = synapse.getStrength()
+                                + sim.alpha * tdError.getActivation()
+                                        * sourceNeuron.getLastActivation();
+                        // synapse.setStrength(synapse.clip(newStrength));
+                        synapse.forceSetStrength(newStrength);
+                        // System.out.println(tdError.getActivation() + "," +
+                        // sourceNeuron.getLastActivation());                        
+                    }
                 }
 
             }

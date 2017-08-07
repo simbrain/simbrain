@@ -23,7 +23,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.DisplayOrder;
@@ -267,7 +266,7 @@ public abstract class OdorWorldEntity {
      * image.
      * @return
      */
-    
+
     public int getWidth() {
         while (getImage().getWidth(null) < 0) {
             ;
@@ -430,9 +429,11 @@ public abstract class OdorWorldEntity {
 
         parentWorld.fireSensorAdded(sensor);
     }
-    
+
     /**
      * Get the sensor with the specified label, or null if none found.
+     *
+     * Some common choices: "Smell-Left", "Smell-Center", and "Smell-Right"
      *
      * @param label label to search for
      * @return the associated sensor
@@ -445,7 +446,7 @@ public abstract class OdorWorldEntity {
         }
         return null;
     }
-    
+
     /**
      * Get the effector with the specified label, or null if none found.
      *
@@ -787,8 +788,12 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void moveNorth(double amount) {
-        if (!isBlocked()) {
+        if (!isBlocked() && (amount != 0)) {
+            if (this instanceof RotatingEntity) {
+                ((RotatingEntity) this).setHeading(90);
+            }
             setY(getY() - (float) amount);
         }
     }
@@ -798,8 +803,12 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void moveSouth(double amount) {
-        if (!isBlocked()) {
+        if (!isBlocked() && (amount != 0)) {
+            if (this instanceof RotatingEntity) {
+                ((RotatingEntity) this).setHeading(270);
+            }
             setY(getY() + (float) amount);
         }
     }
@@ -809,8 +818,12 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void moveEast(double amount) {
-        if (!isBlocked()) {
+        if (!isBlocked() && (amount != 0)) {
+            if (this instanceof RotatingEntity) {
+                ((RotatingEntity) this).setHeading(0);
+            }
             setX(getX() + (float) amount);
         }
     }
@@ -820,8 +833,12 @@ public abstract class OdorWorldEntity {
      *
      * @param amount amount to move by
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void moveWest(double amount) {
-        if (!isBlocked()) {
+        if (!isBlocked() && (amount != 0)) {
+            if (this instanceof RotatingEntity) {
+                ((RotatingEntity) this).setHeading(180);
+            }
             setX(getX() - (float) amount);
         }
     }

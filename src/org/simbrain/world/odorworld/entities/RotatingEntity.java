@@ -34,6 +34,14 @@ import org.simbrain.world.odorworld.OdorWorld;
  * entity. In principle non-rotating entities should be able to have sensors,
  * for example.
  */
+/**
+ * Represents an entity that can rotate.
+ *
+ * TODO: Currently rotating entities are "agents" that can accept sensors and
+ * effectors. The concept of an "Agent" needs to be separated from that of a
+ * rotating entity. In principle non-rotating entities should be able to have
+ * sensors, for example.
+ */
 public class RotatingEntity extends OdorWorldEntity {
 
     /** Images for various angles. */
@@ -124,7 +132,7 @@ public class RotatingEntity extends OdorWorldEntity {
      * @param d the orientation, in degrees
      */
     public void setHeading(final double d) {
-        // System.out.println("setOrientation:" + d);
+        //System.out.println("setHeading:" + d);
         heading = d;
         updateImageBasedOnHeading();
         getParentWorld().fireEntityChanged(this);
@@ -260,6 +268,7 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @param amount amount to turn left. Assumes a positive number.
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void turnLeft(double amount) {
         turn(amount);
     }
@@ -269,6 +278,7 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @param amount
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void turn(double amount) {
         if (amount == 0) {
             return;
@@ -284,6 +294,7 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @param amount amount to turn right. Assumes a positive number.
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void turnRight(double amount) {
         if (amount == 0) {
             return;
@@ -298,6 +309,7 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @param amount
      */
+    //@Consumible(customDescriptionMethod="getId")
     public void goStraight(double amount) {
         if (amount == 0) {
             return;
@@ -308,6 +320,5 @@ public class RotatingEntity extends OdorWorldEntity {
             setY(getY() - (float) (amount * Math.sin(radians)));
         }
     }
-
 
 }

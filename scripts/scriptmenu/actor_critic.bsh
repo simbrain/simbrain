@@ -61,9 +61,9 @@ int location = (tileSize*numTiles) - tileSize/2;
 
 Network network;
 NetworkComponent networkComponent;
-NeuronWithMemory tdErrorNeuron;
-NeuronWithMemory valueNeuron;
-NeuronWithMemory rewardNeuron;
+Neuron tdErrorNeuron;
+Neuron valueNeuron;
+Neuron rewardNeuron;
 OdorWorld world;
 OdorWorldComponent worldComponent;
 RotatingEntity mouse;
@@ -144,34 +144,34 @@ void buildMainSimulation() {
     double topRightX = initTilesX + (numTiles * tileSize) + 30;
 
     // TD, Value, Reward neurons
-    tdErrorNeuron = new NeuronWithMemory(network, "LinearRule");
+    tdErrorNeuron = new Neuron(network, "LinearRule");
     tdErrorNeuron.setLabel("TD");
     tdErrorNeuron.setLocation(topRightX,topY); // TODO: Set location using location of tiles...
     network.addNeuron(tdErrorNeuron);
-    valueNeuron = new NeuronWithMemory(network, "LinearRule");
+    valueNeuron = new Neuron(network, "LinearRule");
     valueNeuron.setLabel("Value");
     valueNeuron.setLocation(topRightX + 50,topY);
     network.addNeuron(valueNeuron);
-    rewardNeuron = new NeuronWithMemory(network, "LinearRule");
+    rewardNeuron = new Neuron(network, "LinearRule");
     rewardNeuron.setLabel("Reward");
     rewardNeuron.setLocation(topRightX + 100,topY);
     //rewardNeuron.getUpdateRule().setBias(-1);
     network.addNeuron(rewardNeuron);
     
     // Action Neurons
-    NeuronWithMemory northNeuron = new NeuronWithMemory(network, "LinearRule");
+    Neuron northNeuron = new Neuron(network, "LinearRule");
     northNeuron.setLabel("North");
     northNeuron.setLocation(topX,topY);
     network.addNeuron(northNeuron);
-    NeuronWithMemory southNeuron = new NeuronWithMemory(network, "LinearRule");
+    Neuron southNeuron = new Neuron(network, "LinearRule");
     southNeuron.setLabel("South");
     southNeuron.setLocation(topX + 50,topY);
     network.addNeuron(southNeuron);
-    NeuronWithMemory westNeuron = new NeuronWithMemory(network, "LinearRule");
+    Neuron westNeuron = new Neuron(network, "LinearRule");
     westNeuron.setLabel("West");
     westNeuron.setLocation(topX + 100,topY);
     network.addNeuron(westNeuron);
-    NeuronWithMemory eastNeuron = new NeuronWithMemory(network, "LinearRule");
+    Neuron eastNeuron = new Neuron(network, "LinearRule");
     eastNeuron.setLabel("East");
     eastNeuron.setLocation(topX + 150,topY);
     network.addNeuron(eastNeuron);
@@ -201,11 +201,11 @@ void buildMainSimulation() {
             // Determine winning neuron and update action neurons
             //  TODO: Break ties randomly
             //  TOOD: Use WTA subnetwork?
-            NeuronWithMemory winningNeuron;
+            Neuron winningNeuron;
             double maxVal; 
             if (Math.random() > epsilon) {
                 maxVal = Double.NEGATIVE_INFINITY;
-                for(NeuronWithMemory neuron : actionNeurons) {
+                for(Neuron neuron : actionNeurons) {
                     if (neuron.getWeightedInputs() > maxVal) {
                         maxVal = neuron.getWeightedInputs();
                         winningNeuron = neuron;
@@ -221,7 +221,7 @@ void buildMainSimulation() {
                 int winner = generator.nextInt(actionNeurons.size());
                 winningNeuron = actionNeurons.get(winner);
             }            
-            for(NeuronWithMemory neuron : actionNeurons) {
+            for(Neuron neuron : actionNeurons) {
                 if (neuron == winningNeuron) {
                     neuron.setActivation(tileSize * movementFactor);
                     neuron.update();
@@ -238,14 +238,14 @@ void buildMainSimulation() {
 
             // Update all value synapses 
             for (Synapse synapse : valueNeuron.getFanIn()) {
-                NeuronWithMemory sourceNeuron = synapse.getSource(); 
+                Neuron sourceNeuron = synapse.getSource(); 
                 double newStrength = synapse.getStrength() + alpha * tdErrorNeuron.getActivation() * sourceNeuron.getLastActivation();
                 //synapse.setStrength(synapse.clip(newStrength)); 
                 synapse.setStrength(newStrength); 
                 //System.out.println("Value Neuron / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
             }
             // Update all actor neurons
-            for (NeuronWithMemory neuron : actionNeurons) {
+            for (Neuron neuron : actionNeurons) {
                 // Just update the last winner
                 if (neuron.getLastActivation() > 0) {
                     for (Synapse synapse : neuron.getFanIn()) {
@@ -277,11 +277,11 @@ void buildMainSimulation() {
                 int y = (k * tileSize) -i * tileIncrement;
                 TileSensor sensor = new TileSensor(mouse,x,y, tileSize, tileSize);
                 mouse.addSensor(sensor);
-                NeuronWithMemory tileNeuron;
+                Neuron tileNeuron;
                 if (lambda == 0) {
-                    tileNeuron = new NeuronWithMemory(network, "LinearRule");                    
+                    tileNeuron = new Neuron(network, "LinearRule");                    
                 } else {
-                    tileNeuron = new NeuronWithMemory(network, "DecayRule");
+                    tileNeuron = new Neuron(network, "DecayRule");
                 }
                 tileNeurons.add(tileNeuron);
                 tileNeuron.setX(initTilesX + (double)x);

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.updater.ComponentUpdatePart;
 
 /**
@@ -626,5 +627,20 @@ public abstract class WorkspaceComponent {
     protected void setSerializePriority(int serializePriority) {
         this.serializePriority = serializePriority;
     }
+    
+    // Convenience methods which forward to attribute manager.
+    //  A small bit of merging from 3.1 refactor
+    public PotentialConsumer createPotentialConsumer(final Object baseObject,
+            final String methodName, final Class<?> dataType) {
+        return attributeManager.createPotentialConsumer(baseObject, methodName,
+                dataType);
+    }
+
+    public PotentialProducer createPotentialProducer(final Object baseObject,
+            final String methodName, final Class<?> dataType) {
+        return attributeManager.createPotentialProducer(baseObject, methodName,
+                dataType);
+    }
+
 
 }

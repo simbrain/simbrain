@@ -20,9 +20,9 @@ import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -184,13 +184,15 @@ public class ActorCritic extends RegisteredSimulation {
             public void invoke() {
 
                 // Update net > movement couplings
-                sim.getWorkspace().getCouplingManager().updateCouplings(effectorCouplings);
+                sim.getWorkspace().getCouplingManager()
+                        .updateCouplings(effectorCouplings);
 
                 // Update world
                 ob.getOdorWorldComponent().update();
 
                 // Update world > tile neurons and plot couplings
-                sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
+                sim.getWorkspace().getCouplingManager()
+                        .updateCouplings(sensorCouplings);
 
                 // Fourth: update network
                 net.getNetworkComponent().update();
@@ -251,14 +253,20 @@ public class ActorCritic extends RegisteredSimulation {
                     tileNeuron.setY(initTilesY + y);
                     network.addNeuron(tileNeuron);
 
-                    PotentialProducer tileProducer = oc.getAttributeManager().createPotentialProducer(sensor, "getValue", double.class);
+                    PotentialProducer tileProducer = oc.getAttributeManager()
+                            .createPotentialProducer(sensor, "getValue",
+                                    double.class);
                     tileProducer.setCustomDescription(sensor.getLabel());
-                    PotentialConsumer neuronConsumer = nc.getAttributeManager().createPotentialConsumer(tileNeuron, "setInputValue", double.class);
+                    PotentialConsumer neuronConsumer = nc.getAttributeManager()
+                            .createPotentialConsumer(tileNeuron,
+                                    "setActivation", double.class);
                     neuronConsumer.setCustomDescription(tileNeuron.getId());
-                    Coupling<?> tileCoupling = new Coupling(tileProducer, neuronConsumer);
+                    Coupling<?> tileCoupling = new Coupling(tileProducer,
+                            neuronConsumer);
                     sensorCouplings.add(tileCoupling);
                     try {
-                        sim.getWorkspace().getCouplingManager().addCoupling(tileCoupling);
+                        sim.getWorkspace().getCouplingManager()
+                                .addCoupling(tileCoupling);
                     } catch (MismatchedAttributesException e) {
                         e.printStackTrace();
                     }
@@ -289,81 +297,82 @@ public class ActorCritic extends RegisteredSimulation {
      */
     private void setCouplings(OdorWorldComponent oc, NetworkComponent nc) {
         effectorCouplings = new ArrayList();
-//
-//        try {
-//
-//            // Absolute movement couplings
-//            outputs.getNeuronList().get(0).setLabel("North");
-//            Producer northProducer = nc.getProducer(
-//                    outputs.getNeuronList().get(0), "getActivation");
-//            Consumer northMovement = oc.getConsumer(mouse, "moveNorth");
-//            // northMovement.setCustomDescription("North");
-//            Coupling northCoupling  = new Coupling(northProducer, northMovement);
-//            effectorCouplings.add(northCoupling);
-//            sim.addCoupling(northCoupling);
-//
-//            outputs.getNeuronList().get(1).setLabel("South");
-//            Producer southProducer = nc.getProducer(
-//                    outputs.getNeuronList().get(1), "getActivation");
-//            Consumer southMovement = oc.getConsumer(mouse, "moveSouth");
-//            // southMovement.setCustomDescription("South");
-//            Coupling southCoupling = new Coupling(southProducer,
-//                    southMovement);
-//            effectorCouplings.add(southCoupling);
-//            sim.addCoupling(southCoupling);
-//
-//            outputs.getNeuronList().get(2).setLabel("East");
-//            Producer eastProducer = nc.getProducer(
-//                    outputs.getNeuronList().get(2), "getActivation");
-//            Consumer eastMovement = oc.getConsumer(mouse, "moveEast");
-//            // eastMovement.setCustomDescription("East");
-//            Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
-//            effectorCouplings.add(eastCoupling);
-//            sim.addCoupling(eastCoupling);
-//
-//            outputs.getNeuronList().get(3).setLabel("West");
-//            Producer westProducer = nc.getProducer(
-//                    outputs.getNeuronList().get(3), "getActivation");
-//            Consumer westMovement = oc.getConsumer(mouse, "moveWest");
-//            // westMovement.setCustomDescription("West");
-//            Coupling westCoupling = new Coupling(westProducer, westMovement);
-//            effectorCouplings.add(westCoupling);
-//            sim.addCoupling(westCoupling);
-//
-//            // Add reward smell coupling
-//            Producer smell = oc.getProducer(mouse.getSensor("Smell-Center"),
-//                    "getCurrentValue", 0);
-//            // smell.setCustomDescription("Reward");
-//            Consumer rewardConsumer = nc.getConsumer(reward,
-//                    "forceSetActivation");
-//            // reward.setCustomDescription("Reward neuron");
-//            Coupling rewardCoupling = new Coupling(smell, rewardConsumer);
-//            sensorCouplings.add(rewardCoupling);
-//            sim.addCoupling(rewardCoupling);
-//        } catch (MismatchedAttributesException e) {
-//            e.printStackTrace();
-//        }
+
+        // Absolute movement couplings
+        outputs.getNeuronList().get(0).setLabel("North");
+        PotentialProducer northProducer = nc.createPotentialProducer(
+                outputs.getNeuronList().get(0), "getActivation", double.class);
+        PotentialConsumer northMovement = oc.createPotentialConsumer(mouse,
+                "moveNorth", double.class);
+        // northMovement.setCustomDescription("North");
+        Coupling northCoupling = new Coupling(northProducer, northMovement);
+        effectorCouplings.add(northCoupling);
+        sim.addCoupling(northCoupling);
+
+        outputs.getNeuronList().get(1).setLabel("South");
+        PotentialProducer southProducer = nc.createPotentialProducer(
+                outputs.getNeuronList().get(1), "getActivation", double.class);
+        PotentialConsumer southMovement = oc.createPotentialConsumer(mouse,
+                "moveSouth", double.class);
+        // southMovement.setCustomDescription("South");
+        Coupling southCoupling = new Coupling(southProducer, southMovement);
+        effectorCouplings.add(southCoupling);
+        sim.addCoupling(southCoupling);
+
+        outputs.getNeuronList().get(2).setLabel("East");
+        PotentialProducer eastProducer = nc.createPotentialProducer(
+                outputs.getNeuronList().get(2), "getActivation", double.class);
+        PotentialConsumer eastMovement = oc.createPotentialConsumer(mouse,
+                "moveEast", double.class);
+        // eastMovement.setCustomDescription("East");
+        Coupling eastCoupling = new Coupling(eastProducer, eastMovement);
+        effectorCouplings.add(eastCoupling);
+        sim.addCoupling(eastCoupling);
+
+        outputs.getNeuronList().get(3).setLabel("West");
+        PotentialProducer westProducer = nc.createPotentialProducer(
+                outputs.getNeuronList().get(3), "getActivation", double.class);
+        PotentialConsumer westMovement = oc.createPotentialConsumer(mouse,
+                "moveWest", double.class);
+        // westMovement.setCustomDescription("West");
+        Coupling westCoupling = new Coupling(westProducer, westMovement);
+        effectorCouplings.add(westCoupling);
+        sim.addCoupling(westCoupling);
+
+        // Add reward smell coupling
+        PotentialProducer smell = oc.getAttributeManager()
+                .createPotentialProducer(
+                        world.getSensor(mouse.getId(), "Sensor_2"),
+                        "getCurrentValue", double.class,
+                        new Class[] { int.class }, new Object[] { 0 });
+        smell.setCustomDescription("Reward");
+        // smell.setCustomDescription("Reward");
+        PotentialConsumer rewardConsumer = nc.createPotentialConsumer(reward,
+                "forceSetActivation", double.class);
+        // reward.setCustomDescription("Reward neuron");
+        Coupling rewardCoupling = new Coupling(smell, rewardConsumer);
+        sensorCouplings.add(rewardCoupling);
+        sim.addCoupling(rewardCoupling);
     }
 
     /**
      * Set up the time series plot.
      */
     private void setUpPlot(NetBuilder net) {
-        // // Create a time series plot
-        // plot = sim.addTimeSeriesPlot(759,377,363,285, "Reward, TD Error");
-        // Coupling rewardCoupling = sim.couple(net.getNetworkComponent(),
-        // reward,
-        // plot.getTimeSeriesComponent(), 0);
-        // Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError,
-        // plot.getTimeSeriesComponent(), 1);
-        // Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value,
-        // plot.getTimeSeriesComponent(), 2);
-        // plot.getTimeSeriesModel().setAutoRange(false);
-        // plot.getTimeSeriesModel().setRangeUpperBound(2);
-        // plot.getTimeSeriesModel().setRangeLowerBound(-1);
-        // sensorCouplings.add(rewardCoupling);
-        // sensorCouplings.add(tdCoupling);
-        // sensorCouplings.add(valueCoupling);
+        // Create a time series plot
+        plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
+        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(), reward,
+                plot.getTimeSeriesComponent(), 0);
+        Coupling tdCoupling = sim.couple(net.getNetworkComponent(), tdError,
+                plot.getTimeSeriesComponent(), 1);
+        Coupling valueCoupling = sim.couple(net.getNetworkComponent(), value,
+                plot.getTimeSeriesComponent(), 2);
+        plot.getTimeSeriesModel().setAutoRange(false);
+        plot.getTimeSeriesModel().setRangeUpperBound(2);
+        plot.getTimeSeriesModel().setRangeLowerBound(-1);
+        sensorCouplings.add(rewardCoupling);
+        sensorCouplings.add(tdCoupling);
+        sensorCouplings.add(valueCoupling);
     }
 
     /**

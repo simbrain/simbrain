@@ -195,7 +195,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         for (NeuronGroup ng : network.getFlatNeuronGroupList()) {
             network.fireGroupChanged(ng, "Check In");
         }
-        System.out.println("Num neurons in task set: " + cbu.taskSet.size());
+        //System.out.println("Num neurons in task set: " + cbu.taskSet.size());
         cbu.collectorThread.start();
         return cbu;
     }
@@ -510,7 +510,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         		if(j % chunkSize == 0) {
         			if (neuronTasks != null) {
         				taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
-        				System.out.println(neuronTasks.length + " " + k++);
+        				//System.out.println(neuronTasks.length + " " + k++);
         			}
     				i = 0;
     				neuronTasks = new Neuron[((neurons.size()-j)
@@ -521,7 +521,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction,
         		j++;
         	}
 			taskList.add(new CallableTask(new BufferedUpdateTask(neuronTasks)));
-			System.out.println(neuronTasks.length + " " + k++);
+			//System.out.println(neuronTasks.length + " " + k++);
         }
         
         public List<Callable<Task>> getCallableTasks() {

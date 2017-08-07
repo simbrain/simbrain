@@ -49,12 +49,12 @@ import com.Ostermiller.util.CSVPrinter;
  * <b>Utils</b>. Utility class for simbrain package.
  */
 public class Utils {
-	 /** Logger. */
+    /** Logger. */
     private static Logger logger = Logger.getLogger(Utils.class);
 
     /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
-    
+
     /**
      * Helper method that returns the date and time in a format that can be used
      * to create filenames.
@@ -62,8 +62,8 @@ public class Utils {
      * @return the formatted time string
      */
     public static String getTimeString() {
-        return new SimpleDateFormat("MM-dd-YY_k-mm").format(Calendar
-                .getInstance().getTime());
+        return new SimpleDateFormat("MM-dd-YY_k-mm")
+                .format(Calendar.getInstance().getTime());
     }
 
     /**
@@ -100,11 +100,13 @@ public class Utils {
 
         try {
             // # is a comment delimeter in net files
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
+            theParser = new CSVParser(new FileInputStream(theFile), "", "",
+                    "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Could not find the file \n"
-                    + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "Could not find the file \n" + theFile, "Warning",
+                    JOptionPane.ERROR_MESSAGE);
 
             return null;
         } catch (Exception e) {
@@ -178,8 +180,9 @@ public class Utils {
         int diff = totalLength - localLength;
         String relativePath = absolutePath.substring(totalLength - diff);
         relativePath = relativePath.replaceAll("/./", "/");
-        relativePath.replace('/', System.getProperty("file.separator")
-                .charAt(0)); // For windows machines..
+        relativePath.replace('/',
+                System.getProperty("file.separator").charAt(0)); // For windows
+                                                                 // machines..
         relativePath = new String("." + relativePath);
 
         return relativePath;
@@ -204,11 +207,9 @@ public class Utils {
      * @return the extracted directory path
      */
     public static String getDir(final File theFile) {
-        return theFile.getAbsolutePath()
-                .substring(
-                        0,
-                        theFile.getAbsolutePath().length()
-                                - theFile.getName().length());
+        return theFile.getAbsolutePath().substring(0,
+                theFile.getAbsolutePath().length()
+                        - theFile.getName().length());
     }
 
     /**
@@ -228,23 +229,26 @@ public class Utils {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).doubleValue();
-        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException
+                | ParseException ex) {
             return Double.NaN;
         }
     }
-    // Float version of above.  Ran out of time to generalize.   Todo.  (JKY).
+
+    // Float version of above. Ran out of time to generalize. Todo. (JKY).
     public static float floatParsable(JTextField tField) {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).floatValue();
-        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException
+                | ParseException ex) {
             return Float.NaN;
         }
     }
 
     /**
-     * Like {@link #doubleParsable(JTextField)} but checks for the formatting of a
-     * string rather than a text field.
+     * Like {@link #doubleParsable(JTextField)} but checks for the formatting of
+     * a string rather than a text field.
      *
      * @param text the text to check
      * @return NaN if invalid, the parsed double otherwise
@@ -253,7 +257,8 @@ public class Utils {
         try {
             text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).doubleValue();
-        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException
+                | ParseException ex) {
             return Double.NaN;
         }
     }
@@ -274,7 +279,8 @@ public class Utils {
         try {
             String text = tField.getText().replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
-        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException
+                | ParseException ex) {
             return null;
         }
     }
@@ -290,7 +296,8 @@ public class Utils {
         try {
             text = text.replaceFirst("\\s+", "");
             return SimbrainConstants.LOCAL_FORMATTER.parse(text).intValue();
-        } catch (NullPointerException | NumberFormatException | ParseException ex) {
+        } catch (NullPointerException | NumberFormatException
+                | ParseException ex) {
             return null;
         }
     }
@@ -299,18 +306,34 @@ public class Utils {
      * Convert an array of doubles into a String.
      *
      * @param theVec the array of doubles to convert
-     * @param delimiter Delimiter
+     * @param delimiter the delimeter
      * @return the String representation of the array
      */
     public static String getVectorString(final double[] theVec,
             final String delimiter) {
+        return getVectorString(theVec, delimiter, 1);
+    }
+
+    /**
+     * Convert an array of doubles into a String, represented to some specified
+     * precision.
+     * 
+     * @param theVec the array of doubles to convert
+     * @param delimiter the delimiter
+     * @param precision how many decimal places to include in the string
+     * @return the String representation of the array
+     */
+    public static String getVectorString(final double[] theVec,
+            final String delimiter, int precision) {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
-            retString = retString.concat("" + round(theVec[i], 1) + delimiter);
+            retString = retString
+                    .concat("" + round(theVec[i], precision) + delimiter);
         }
-
-        retString = retString.concat("" + round(theVec[theVec.length - 1], 1));
+        // Don't use the delimeter for the last component.
+        retString = retString
+                .concat("" + round(theVec[theVec.length - 1], precision));
 
         return retString;
     }
@@ -375,7 +398,8 @@ public class Utils {
      * @param matrix the matrix of doubles
      * @return the matrix of Strings
      */
-    public static String[][] doubleMatrixToStringMatrix(final double[][] matrix) {
+    public static String[][] doubleMatrixToStringMatrix(
+            final double[][] matrix) {
         String[][] ret = new String[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
             ret[i] = doubleArrayToStringArray(matrix[i]);
@@ -446,8 +470,8 @@ public class Utils {
      * @param helpPage Help page
      */
     public static void showHelpPage(final String helpPage) {
-        String url = new String(System.getProperty("user.dir") + FS + "docs"
-                + FS + helpPage);
+        String url = new String(
+                System.getProperty("user.dir") + FS + "docs" + FS + helpPage);
         displayLocalHtmlInBrowser(url);
 
     }
@@ -484,8 +508,8 @@ public class Utils {
      * @return Hue, saturation and brightness
      */
     public static float colorToFloat(final Color clr) {
-        return Color
-                .RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
+        return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(),
+                null)[0];
     }
 
     /**
@@ -640,7 +664,8 @@ public class Utils {
      * @param b Collection
      * @return intersection of two collections
      */
-    public static Collection intersection(final Collection a, final Collection b) {
+    public static Collection intersection(final Collection a,
+            final Collection b) {
         Collection ret = new ArrayList();
         for (Object object : a) {
             if (b.contains(object)) {
@@ -660,10 +685,10 @@ public class Utils {
             Properties properties = new Properties();
             File file = new File("." + FS + "etc" + FS + "config.properties");
             if (file.exists()) {
-	            properties.load(new FileInputStream(file));
-            }
-            else {
-            	logger.info("Could not find properties file at " + file.getAbsolutePath());
+                properties.load(new FileInputStream(file));
+            } else {
+                logger.info("Could not find properties file at "
+                        + file.getAbsolutePath());
             }
             return properties;
         } catch (IOException ex) {
@@ -709,8 +734,8 @@ public class Utils {
         int bLen = B.length;
 
         @SuppressWarnings("unchecked")
-        T[] C = (T[]) Array.newInstance(A.getClass().getComponentType(), aLen
-                + bLen);
+        T[] C = (T[]) Array.newInstance(A.getClass().getComponentType(),
+                aLen + bLen);
         System.arraycopy(A, 0, C, 0, aLen);
         System.arraycopy(B, 0, C, aLen, bLen);
 

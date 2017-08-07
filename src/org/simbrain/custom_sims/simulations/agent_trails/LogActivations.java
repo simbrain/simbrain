@@ -20,10 +20,10 @@ public class LogActivations implements NetworkUpdateAction {
     }
 
     public void invoke() {
-//        sim.activationList.add(
-//                Utils.getVectorString(sim.sensoryNet.getActivations(), ",", 4)
-//                        + "," + Utils.getVectorString(
-//                                sim.predictionNet.getActivations(), ",", 4));
+        sim.activationList.add(
+                Utils.getVectorString(sim.sensoryNet.getActivations(), ",", 4)
+                        + "," + Utils.getVectorString(
+                                sim.predictionNet.getActivations(), ",", 4));
     }
 
     // This is how the action appears in the update manager dialog

@@ -376,14 +376,14 @@ public class Hippocampus extends RegisteredSimulation {
      */
     private void enableHippocampus(boolean lesioned) {
 
-//        HtoLC1.setEnabled(!lesioned);
-//        HtoLC2.setEnabled(!lesioned);
-//        HtoRC1.setEnabled(!lesioned);
-//        HtoRC2.setEnabled(!lesioned);
-//        LC1toH.setEnabled(!lesioned);
-//        LC2toH.setEnabled(!lesioned);
-//        RC1toH.setEnabled(!lesioned);
-//        RC2toH.setEnabled(!lesioned);
+        HtoLC1.setEnabled(!lesioned);
+        HtoLC2.setEnabled(!lesioned);
+        HtoRC1.setEnabled(!lesioned);
+        HtoRC2.setEnabled(!lesioned);
+        LC1toH.setEnabled(!lesioned);
+        LC2toH.setEnabled(!lesioned);
+        RC1toH.setEnabled(!lesioned);
+        RC2toH.setEnabled(!lesioned);
     }
 
     @Override

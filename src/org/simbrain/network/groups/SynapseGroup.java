@@ -1538,6 +1538,16 @@ public class SynapseGroup extends Group {
     }
 
     /**
+     * Enable / disable synapses for both polarities.
+     *
+     * @param enabled whether they should be enabled or not
+     */
+    public void setEnabled(boolean enabled) {
+        setEnabled(enabled, Polarity.BOTH);
+    }
+
+
+    /**
      *
      * @param enabled
      * @param polarity

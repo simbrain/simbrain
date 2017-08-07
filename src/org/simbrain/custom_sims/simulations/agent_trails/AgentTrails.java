@@ -132,10 +132,12 @@ public class AgentTrails extends RegisteredSimulation {
         // Create a time series plot
         plot = sim.addProjectionPlot(194, 312, 441, 308,
                 "Sensory states + Predictions");
+
         plot.getProjectionModel().init(3);
-        plot.getProjectionModel().getProjector().setTolerance(.01);
         sim.couple(net.getNetworkComponent(), sensoryNet,
                 plot.getProjectionPlotComponent());
+        //TODO:Below gets reset as soon as the system runs
+        plot.getProjectionModel().getProjector().setTolerance(.01);
 
         // Configure custom updating
         net.getNetwork().getUpdateManager().clear();

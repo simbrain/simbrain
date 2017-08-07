@@ -249,8 +249,8 @@ public class Simulation {
             TimeSeriesPlotComponent plot, int index) {
         PotentialProducer neuronProducer = network
                 .createPotentialProducer(neuron, "getActivation", double.class);
-        PotentialConsumer timeSeriesConsumer1 = 
-                plot.getPotentialConsumers().get(index);
+        PotentialConsumer timeSeriesConsumer1 = plot.getPotentialConsumers()
+                .get(index);
         Coupling<?> coupling = null;
         coupling = new Coupling(neuronProducer, timeSeriesConsumer1);
         addCoupling(coupling);
@@ -262,15 +262,12 @@ public class Simulation {
      */
     public void couple(NetworkComponent network, NeuronGroup ng,
             ProjectionComponent plot) {
-        // TODO: Best way to handle generics around here?
-        // Producer<?> ngProducer = network.getProducer(ng, "getActivations");
-        // Consumer<?> projConsumer = plot.getConsumer(plot, "addPoint");
-        //
-        // try {
-        // addCoupling(new Coupling(ngProducer, projConsumer));
-        // } catch (MismatchedAttributesException e) {
-        // e.printStackTrace();
-        // }
+        PotentialProducer ngProducer = network.createPotentialProducer(ng,
+                "getActivations", double[].class);
+        PotentialConsumer projConsumer = plot.createPotentialConsumer(plot,
+                "addPoint", double[].class);
+
+        addCoupling(new Coupling(ngProducer, projConsumer));
     }
 
     /**
@@ -280,20 +277,16 @@ public class Simulation {
      * @param ng the neuron group
      */
     public void couple(SmellSensor sensor, NeuronGroup ng) {
-        // NetworkComponent nc = netMap.get(ng.getParentNetwork());
-        // OdorWorldComponent ow = odorMap
-        // .get(sensor.getParent().getParentWorld());
-        //
-        // Producer<?> sensoryProducer = ow.getProducer(sensor,
-        // "getCurrentValues");
-        // Consumer<?> sensoryConsumer = nc.getConsumer(ng,
-        // "forceSetActivations");
-        //
-        // try {
-        // addCoupling(new Coupling(sensoryProducer, sensoryConsumer));
-        // } catch (MismatchedAttributesException e) {
-        // e.printStackTrace();
-        // }
+        NetworkComponent nc = netMap.get(ng.getParentNetwork());
+        OdorWorldComponent ow = odorMap
+                .get(sensor.getParent().getParentWorld());
+
+        PotentialProducer sensoryProducer = ow.createPotentialProducer(sensor,
+                "getCurrentValues", double[].class);
+        PotentialConsumer sensoryConsumer = nc.createPotentialConsumer(ng,
+                "forceSetActivations", double[].class);
+
+        addCoupling(new Coupling(sensoryProducer, sensoryConsumer));
     }
 
     /**
@@ -307,21 +300,20 @@ public class Simulation {
      */
     public void couple(SmellSensor producingSensor, int stimulusDimension,
             Neuron consumingNeuron) {
-        //
-        // NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
-        // OdorWorldComponent ow = odorMap
-        // .get(producingSensor.getParent().getParentWorld());
-        //
-        // Producer<?> agentSensor = ow.getProducer(producingSensor,
-        // "getCurrentValue", stimulusDimension);
-        // Consumer<?> sensoryNeuron = nc.getConsumer(consumingNeuron,
-        // "forceSetActivation");
-        //
-        // try {
-        // addCoupling(new Coupling(agentSensor, sensoryNeuron));
-        // } catch (MismatchedAttributesException e) {
-        // e.printStackTrace();
-        // }
+
+        NetworkComponent nc = netMap.get(consumingNeuron.getNetwork());
+        OdorWorldComponent ow = odorMap
+                .get(producingSensor.getParent().getParentWorld());
+
+        PotentialProducer agentSensor = ow.getAttributeManager()
+                .createPotentialProducer(producingSensor, "getCurrentValue",
+                        double.class, new Class[] { int.class },
+                        new Object[] { stimulusDimension });
+
+        PotentialConsumer sensoryNeuron = nc.createPotentialConsumer(
+                consumingNeuron, "forceSetActivation", double.class);
+
+        addCoupling(new Coupling(agentSensor, sensoryNeuron));
 
     }
 
@@ -330,19 +322,17 @@ public class Simulation {
      */
     public void couple(Neuron neuron, Effector effector) {
 
-        // NetworkComponent nc = netMap.get(neuron.getNetwork());
-        // OdorWorldComponent ow = odorMap
-        // .get(effector.getParent().getParentWorld());
-        //
-        // Producer<?> effectorNeuron = nc.getProducer(neuron, "getActivation");
-        //
-        // Consumer<?> agentEffector = ow.getConsumer(effector, "addAmount");
-        //
-        // try {
-        // addCoupling(new Coupling(effectorNeuron, agentEffector));
-        // } catch (MismatchedAttributesException e) {
-        // e.printStackTrace();
-        // }
+        NetworkComponent nc = netMap.get(neuron.getNetwork());
+        OdorWorldComponent ow = odorMap
+                .get(effector.getParent().getParentWorld());
+
+        PotentialProducer effectorNeuron = nc.createPotentialProducer(neuron,
+                "getActivation", double.class);
+
+        PotentialConsumer agentEffector = ow.createPotentialConsumer(effector,
+                "addAmount", double.class);
+
+        addCoupling(new Coupling(effectorNeuron, agentEffector));
 
     }
 

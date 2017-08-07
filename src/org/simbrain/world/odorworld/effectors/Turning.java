@@ -66,6 +66,7 @@ public class Turning extends Effector {
     @Override
     public void update() {
         ((RotatingEntity) parent).turn(direction * amount);
+        this.amount = 0;
     }
 
     /**
@@ -76,8 +77,20 @@ public class Turning extends Effector {
     }
 
     /**
+     * Add an amount to turning.  Allows for multiple "turns" to be aggregated.
+     *
+     * @param amount amount to turn.
+     */
+    //@Consumible(customDescriptionMethod="getMixedId")
+    public void addAmount(double amount) {
+        this.amount += amount;
+    }
+
+
+    /**
      * @param amount the amount to set
      */
+    //@Consumible(customDescriptionMethod="getMixedId")
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -100,10 +113,6 @@ public class Turning extends Effector {
     public String getTypeDescription() {
         return "Turning Movement";
     }
-    
-    @Override
-    public void clear() {
-        setAmount(0);
-    }
 
+    
 }

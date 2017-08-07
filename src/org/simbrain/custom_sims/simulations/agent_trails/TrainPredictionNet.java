@@ -41,7 +41,7 @@ public class TrainPredictionNet implements NetworkUpdateAction {
     }
 
     /**
-     * Training synapses using delta rule
+     * Training synapses using delta rule.
      */
     private void mainUpdateMethod() {
 

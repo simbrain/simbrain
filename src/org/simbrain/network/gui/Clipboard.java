@@ -20,13 +20,13 @@ package org.simbrain.network.gui;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
@@ -105,6 +105,8 @@ public class Clipboard {
         ArrayList<Object> ret = new ArrayList<Object>();
         for (Object object : list) {
             if (object instanceof Neuron) {
+                ret.add(net.getObjectNodeMap().get(object));
+            } else if (object instanceof Synapse) {
                 ret.add(net.getObjectNodeMap().get(object));
             } else if (object instanceof NetworkTextObject) {
                 ret.add(net.getObjectNodeMap().get(object));

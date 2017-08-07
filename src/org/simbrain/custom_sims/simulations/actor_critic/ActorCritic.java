@@ -19,9 +19,10 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -183,13 +184,13 @@ public class ActorCritic extends RegisteredSimulation {
             public void invoke() {
 
                 // Update net > movement couplings
-//                sim.getWorkspace().updateCouplings(effectorCouplings);
+                sim.getWorkspace().getCouplingManager().updateCouplings(effectorCouplings);
 
                 // Update world
                 ob.getOdorWorldComponent().update();
 
                 // Update world > tile neurons and plot couplings
-//                sim.getWorkspace().updateCouplings(sensorCouplings);
+                sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
                 net.getNetworkComponent().update();
@@ -250,22 +251,17 @@ public class ActorCritic extends RegisteredSimulation {
                     tileNeuron.setY(initTilesY + y);
                     network.addNeuron(tileNeuron);
 
-//                    // Couple tile sensor to tile neuron
-//                    Producer<?> tileProducer = oc.getProducer(sensor,
-//                            "getValue");
-//                    // tileProducer.setCustomDescription(sensor.getLabel());
-//                    Consumer<?> neuronConsumer = nc.getConsumer(tileNeuron,
-//                            "forceSetActivation");
-//                    // neuronConsumer.setCustomDescription(tileNeuron.getId());
-//                    Coupling<?> tileCoupling;
-//                    try {
-//                        tileCoupling = new Coupling(tileProducer,
-//                                neuronConsumer);
-//                        sensorCouplings.add(tileCoupling);
-//                        sim.addCoupling(tileCoupling);
-//                    } catch (MismatchedAttributesException e) {
-//                        e.printStackTrace();
-//                    }
+                    PotentialProducer tileProducer = oc.getAttributeManager().createPotentialProducer(sensor, "getValue", double.class);
+                    tileProducer.setCustomDescription(sensor.getLabel());
+                    PotentialConsumer neuronConsumer = nc.getAttributeManager().createPotentialConsumer(tileNeuron, "setInputValue", double.class);
+                    neuronConsumer.setCustomDescription(tileNeuron.getId());
+                    Coupling<?> tileCoupling = new Coupling(tileProducer, neuronConsumer);
+                    sensorCouplings.add(tileCoupling);
+                    try {
+                        sim.getWorkspace().getCouplingManager().addCoupling(tileCoupling);
+                    } catch (MismatchedAttributesException e) {
+                        e.printStackTrace();
+                    }
 
                     // TODO: Put in group and use sim.connectAllToAll
                     // why does using 0 make weights non-existent

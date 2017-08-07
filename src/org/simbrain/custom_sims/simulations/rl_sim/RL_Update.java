@@ -188,9 +188,9 @@ public class RL_Update implements NetworkUpdateAction {
      * TD Error. Used to drive all learning in the network.
      */
     void updateTDError() {
-//        tdError.setActivation(sim.deltaReward.getActivation()
-//                + sim.gamma * value.getActivation()
-//                - value.getLastActivation());
+        tdError.setActivation(sim.deltaReward.getActivation()
+                + sim.gamma * value.getActivation()
+                - value.getLastActivation());
     }
 
     /**

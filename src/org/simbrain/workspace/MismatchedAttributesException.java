@@ -24,12 +24,12 @@ package org.simbrain.workspace;
  * @author jyoshimi
  *
  */
-public class UmatchedAttributesException extends Exception {
+public class MismatchedAttributesException extends Exception {
 
     /**
      * @param message
      */
-    public UmatchedAttributesException(final String message) {
+    public MismatchedAttributesException(final String message) {
         super(message);
     }
 

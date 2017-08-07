@@ -134,6 +134,9 @@ public class Neuron {
     /** Target value. */
     private double targetValue;
 
+    /** Memory of last activation. */
+    private double lastActivation;
+
     /** Parent group, if any (null if none). */
     private Group parentGroup;
 
@@ -327,6 +330,7 @@ public class Neuron {
      *            Activation
      */
     public void setActivation(final double act) {
+        lastActivation = getActivation();
         if (isClamped()) {
             return;
         } else {
@@ -355,6 +359,7 @@ public class Neuron {
      *            the new activation value
      */
     public void forceSetActivation(final double act) {
+        lastActivation = getActivation();
         activation = act;
     }
 
@@ -623,6 +628,7 @@ public class Neuron {
      *            temporary value
      */
     public void setBuffer(final double d) {
+        lastActivation = getActivation();
         buffer = d;
     }
 
@@ -1181,4 +1187,10 @@ public class Neuron {
         this.spkBuffer = spkBuffer;
     }
 
+    /**
+     * @return the lastActivation
+     */
+    public double getLastActivation() {
+        return lastActivation;
+    }
 }

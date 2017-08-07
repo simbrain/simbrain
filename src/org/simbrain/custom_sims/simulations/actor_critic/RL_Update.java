@@ -1,15 +1,11 @@
 package org.simbrain.custom_sims.simulations.actor_critic;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 
 /**
  * A custom updater for use in applying TD Learning and other custom update
@@ -19,7 +15,7 @@ import org.simbrain.network.groups.SynapseGroup;
  * For background on TD Learning see.
  * http://www.scholarpedia.org/article/Temporal_difference_learning
  */
-//CHECKSTYLE:OFF
+// CHECKSTYLE:OFF
 public class RL_Update implements NetworkUpdateAction {
 
     /** Reference to RL_Sim object that has all the main variables used. */
@@ -75,34 +71,45 @@ public class RL_Update implements NetworkUpdateAction {
         Network.updateNeurons(Collections.singletonList(sim.reward));
         sim.outputs.update();
 
-        //System.out.println("td error:" + value.getActivation() + " + " + reward.getActivation() + " - " + value.getLastActivation());
-//        sim.tdError.forceSetActivation((reward.getActivation() + sim.gamma * value.getActivation()) - value.getLastActivation());
+        // System.out.println("td error:" + value.getActivation() + " + " +
+        // reward.getActivation() + " - " + value.getLastActivation());
+        sim.tdError.forceSetActivation(
+                (reward.getActivation() + sim.gamma * value.getActivation())
+                        - value.getLastActivation());
 
         // Update all value synapses
         for (Synapse synapse : value.getFanIn()) {
             Neuron sourceNeuron = synapse.getSource();
-            // Reinforce based on the source neuron's last activation (not its current value),
-            //  since that is what the current td error reflects.
-//            double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-            //synapse.setStrength(synapse.clip(newStrength));
-//            synapse.forceSetStrength(newStrength); //TODO: Why is this needed?
-            //System.out.println("Value Neuron / Tile neuron (" + sourceNeuron.getId() + "):" + newStrength);
+            // Reinforce based on the source neuron's last activation (not its
+            // current value),
+            // since that is what the current td error reflects.
+            double newStrength = synapse.getStrength()
+                    + sim.alpha * tdError.getActivation()
+                            * sourceNeuron.getLastActivation();
+            // synapse.setStrength(synapse.clip(newStrength));
+            synapse.forceSetStrength(newStrength); // TODO: Why is this needed?
+            // System.out.println("Value Neuron / Tile neuron (" +
+            // sourceNeuron.getId() + "):" + newStrength);
         }
 
-        // Update all actor neurons. Reinforce input > output connection that were
-        //   active at the last time-step.
+        // Update all actor neurons. Reinforce input > output connection that
+        // were
+        // active at the last time-step.
         for (Neuron neuron : sim.outputs.getNeuronList()) {
             // Just update the last winner
-//            if (neuron.getLastActivation() > 0) {
-//                for (Synapse synapse : neuron.getFanIn()) {
-//                    Neuron sourceNeuron = synapse.getSource();
-//                    double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-//                    //synapse.setStrength(synapse.clip(newStrength));
-//                    synapse.forceSetStrength(newStrength);
-//                    //System.out.println(tdError.getActivation() + "," + sourceNeuron.getLastActivation());
-//                }
-//
-//            }
+            if (neuron.getLastActivation() > 0) {
+                for (Synapse synapse : neuron.getFanIn()) {
+                    Neuron sourceNeuron = synapse.getSource();
+                    double newStrength = synapse.getStrength()
+                            + sim.alpha * tdError.getActivation()
+                                    * sourceNeuron.getLastActivation();
+                    // synapse.setStrength(synapse.clip(newStrength));
+                    synapse.forceSetStrength(newStrength);
+                    // System.out.println(tdError.getActivation() + "," +
+                    // sourceNeuron.getLastActivation());
+                }
+
+            }
         }
 
     }

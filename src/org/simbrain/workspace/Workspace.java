@@ -186,7 +186,7 @@ public class Workspace {
                         consumingAttribute.createConsumer());
                 try {
                     getCouplingManager().addCoupling(coupling);
-                } catch (UmatchedAttributesException e) {
+                } catch (MismatchedAttributesException e) {
                     e.printStackTrace();
                 }
             }
@@ -199,12 +199,12 @@ public class Workspace {
      *
      * @param producerKeys source producing attributes
      * @param consumerKeys target consuming attributes
-     * @exception UmatchedAttributesException
+     * @exception MismatchedAttributesException
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(final List<PotentialProducer> producerKeys,
             final List<PotentialConsumer> consumerKeys)
-            throws UmatchedAttributesException {
+            throws MismatchedAttributesException {
 
         Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
 
@@ -215,7 +215,7 @@ public class Workspace {
                 Coupling<?> coupling = new Coupling(producer, consumer);
                 try {
                     getCouplingManager().addCoupling(coupling);
-                } catch (UmatchedAttributesException e) {
+                } catch (MismatchedAttributesException e) {
                     throw e;
                 }
             }
@@ -633,7 +633,7 @@ public class Workspace {
     public void addCoupling(final Coupling<?> coupling) {
         try {
             manager.addCoupling(coupling);
-        } catch (UmatchedAttributesException e) {
+        } catch (MismatchedAttributesException e) {
             e.printStackTrace();
         }
     }

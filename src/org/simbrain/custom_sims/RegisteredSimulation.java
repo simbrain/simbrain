@@ -31,9 +31,11 @@ import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
- *
- * Manage custom simulations.All registered simulations must be added to
- * REGISTERED_SIMS to show up in Simbrain's menu.
+ * Super class for all custom simulations. Also has code to manage custom
+ * simulations.
+ * 
+ * All registered simulations must be added to REGISTERED_SIMS to
+ * show up in Simbrain's menu.
  *
  * @author ztosi
  * @author jyoshimi

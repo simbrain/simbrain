@@ -295,11 +295,11 @@ public class CouplingManager {
      * Adds a coupling to this instance.
      *
      * @param coupling The coupling to add.
-     * @throws UmatchedAttributesException thrown if the attributes in this
+     * @throws MismatchedAttributesException thrown if the attributes in this
      *             coupling have mismatched data types
      */
     public void addCoupling(final Coupling<?> coupling)
-            throws UmatchedAttributesException {
+            throws MismatchedAttributesException {
 
         // If there is already a coupling with the same consumer, remove it,
         // because it does not make sense for one attribute to have multiple
@@ -320,7 +320,7 @@ public class CouplingManager {
                     + ") does not match consumer type ("
                     + CouplingManager.getTypeDescriptor(coupling.getConsumer()
                             .getDataType()) + ")";
-            throw new UmatchedAttributesException(warning);
+            throw new MismatchedAttributesException(warning);
         }
         couplingList.add(coupling);
 
@@ -398,7 +398,7 @@ public class CouplingManager {
                 removeCoupling(coupling);
                 try {
                     addCoupling(new Coupling(producer, consumer));
-                } catch (UmatchedAttributesException e) {
+                } catch (MismatchedAttributesException e) {
                     e.printStackTrace();
                 }
             }

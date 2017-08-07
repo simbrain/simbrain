@@ -42,7 +42,7 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.UmatchedAttributesException;
+import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -195,7 +195,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
                 desktop.getWorkspace().coupleOneToMany(potentialProducers,
                         potentialConsumers);
             }
-        } catch (UmatchedAttributesException e) {
+        } catch (MismatchedAttributesException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(),
                     "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
 

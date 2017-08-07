@@ -49,6 +49,15 @@ public class BinaryRule extends NeuronUpdateRule {
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
+    
+    public BinaryRule() {
+    }
+    
+    public BinaryRule(double floor, double ceil, double threshold) {
+    	this.ceiling = ceil;
+    	this.floor = floor; 
+    	this.threshold = threshold;
+    }
 
     /**
      * {@inheritDoc}

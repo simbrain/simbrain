@@ -18,19 +18,20 @@
  */
 package org.simbrain.network.subnetworks;
 
+import java.util.List;
 import java.util.Random;
+import java.util.ArrayList;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.CopyableGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>WinnerTakeAll</b>.The neuron with the highest weighted input in a
  * winner-take-all network takes on an upper value, all other neurons take on
- * the lower value. In case of a tie the node which wins is arbitrary (the first
- * in an internally maintained list).
+ * the lower value. In case of a tie a randomly chosen member of the "winners"
+ * is returned.
  */
 public class WinnerTakeAll extends NeuronGroup {
 
@@ -51,6 +52,9 @@ public class WinnerTakeAll extends NeuronGroup {
 
     /** Probability of setting the winner randomly, when useRandom is true. */
     private double randomProb = .1;
+
+    /** Random number generator. */
+    private static Random rand = new Random();
 
     /**
      * Copy constructor.
@@ -84,9 +88,9 @@ public class WinnerTakeAll extends NeuronGroup {
 
     @Override
     public WinnerTakeAll deepCopy(Network newNetwork) {
-    	return new WinnerTakeAll(newNetwork, this);
+        return new WinnerTakeAll(newNetwork, this);
     }
-    
+
     @Override
     public String getTypeDescription() {
         return "Winner Take All Group";
@@ -94,67 +98,80 @@ public class WinnerTakeAll extends NeuronGroup {
 
     @Override
     public void update() {
-
-        // Determine the winning neuron
-        int winnerIndex;
+        Neuron winner = getWinner();
         if (useRandom) {
             if (Math.random() < randomProb) {
-                winnerIndex = getRandomWinnerIndex();
-            } else {
-                winnerIndex = getWinningIndex();
+                winner = getNeuronList()
+                        .get(rand.nextInt(getNeuronList().size()));
             }
+        }
+        for (Neuron neuron : getNeuronList()) {
+            if (neuron == winner) {
+                neuron.setActivation(winValue);
+            } else {
+                neuron.setActivation(loseValue);
+            }
+        }
+    }
+
+    /**
+     * Returns the neuron with the greatest net input.
+     *
+     * @return winning neuron
+     */
+    public Neuron getWinner() {
+        return getWinner(getNeuronList());
+    }
+
+    /**
+     * Returns the neuron in the provided list with the greatest net input (or a
+     * randomly chosen neuron among those that "win").
+     *
+     * @param neuronList the list to check
+     * @return the neuron with the highest net input
+     */
+    public static Neuron getWinner(List<Neuron> neuronList) {
+        return getWinner(neuronList, false);
+    }
+
+    /**
+     * Returns the neuron in the provided list with the greatest net input or
+     * activation (or a randomly chosen neuron among those that "win").
+     *
+     * @param neuronList the list to check
+     * @param useActivations if true, use activations instead of net input to
+     *            determine winner
+     * @return the neuron with the highest net input
+     */
+    public static Neuron getWinner(List<Neuron> neuronList,
+            boolean useActivations) {
+
+        if (neuronList.isEmpty()) {
+            return null;
+        }
+
+        List<Neuron> winners = new ArrayList<Neuron>();
+        Neuron winner = neuronList.get(0);
+        winners.add(winner);
+        for (Neuron n : neuronList) {
+            double winnerVal = useActivations ? winner.getActivation()
+                    : winner.getWeightedInputs();
+            double val = useActivations ? n.getActivation()
+                    : n.getWeightedInputs();
+            if (val == winnerVal) {
+                winners.add(n);
+            } else if (val > winnerVal) {
+                winners.clear();
+                winner = n;
+                winners.add(n);
+            }
+        }
+        if (winners.size() == 1) {
+            return winner;
         } else {
-            winnerIndex = getWinningIndex();
+            return winners.get(rand.nextInt(winners.size()));
         }
 
-        // Set neuron values
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            if (i == winnerIndex) {
-                getNeuronList().get(i).setActivation(winValue);
-            } else {
-                getNeuronList().get(i).setActivation(loseValue);
-            }
-        }
-    }
-
-    /**
-     *
-     * Returns index of random winning neuron.
-     *
-     * @return index of random winner
-     */
-    private int getRandomWinnerIndex() {
-        return new Random().nextInt(getNeuronList().size());
-    }
-
-    /**
-     * Returns the index of the input node with the greatest net input.
-     *
-     * @return winning node's index
-     */
-    private int getWinningIndex() {
-        int winnerIndex = 0;
-        double max = Double.NEGATIVE_INFINITY;
-        double lastVal = getNeuronList().get(0).getWeightedInputs();
-        boolean tie = true;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            double val = n.getWeightedInputs();
-            if (val != lastVal) {
-                tie = false;
-            }
-            lastVal = val;
-            if (val > max) {
-                winnerIndex = i;
-                max = n.getWeightedInputs();
-            }
-        }
-        // Break ties randomly
-        // (TODO: Add a field so use can decide if they want this)
-        if (tie) {
-            winnerIndex = getRandomWinnerIndex();
-        }
-        return winnerIndex;
     }
 
     /**

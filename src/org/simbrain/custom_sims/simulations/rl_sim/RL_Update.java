@@ -115,7 +115,7 @@ public class RL_Update implements NetworkUpdateAction {
 
             // Find the winning output neuron
             sim.outputs.update();
-//            winner = sim.outputs.getWinner();
+            winner = sim.outputs.getWinner();
 
             // Update the reward neuron and the change in reward
             Network.updateNeurons(Collections.singletonList(sim.reward));
@@ -155,7 +155,7 @@ public class RL_Update implements NetworkUpdateAction {
     }
     
     /** 
-     * Set errors on neuron groups
+     * Set errors on neuron groups.
      */
     void setErrors(NeuronGroup inputs, NeuronGroup predictions,
             double[] lastPrediction) {
@@ -173,7 +173,7 @@ public class RL_Update implements NetworkUpdateAction {
     }
 
     /** 
-     * Train synapse groups
+     * Train synapse groups.
      */
     void trainDeltaRule(SynapseGroup group) {
         for (Synapse synapse : group.getAllSynapses()) {
@@ -215,10 +215,10 @@ public class RL_Update implements NetworkUpdateAction {
     void updateCritic() {
         for (Synapse synapse : value.getFanIn()) {
             Neuron sourceNeuron = (Neuron) synapse.getSource();
-//            double newStrength = synapse.getStrength()
-//                    + sim.alpha * tdError.getActivation()
-//                            * sourceNeuron.getLastActivation();
-//            synapse.setStrength(newStrength);
+            double newStrength = synapse.getStrength()
+                    + sim.alpha * tdError.getActivation()
+                            * sourceNeuron.getLastActivation();
+            synapse.setStrength(newStrength);
         }
     }
 
@@ -229,16 +229,16 @@ public class RL_Update implements NetworkUpdateAction {
     void updateActor() {
         for (Neuron neuron : sim.outputs.getNeuronList()) {
             // Just update the last winner
-//            if (neuron.getLastActivation() > 0) {
-//                for (Synapse synapse : neuron.getFanIn()) {
-//                    double previousActivation = getPreviousNeuronValue(
-//                            synapse.getSource());
-//                    double newStrength = synapse.getStrength() + sim.alpha
-//                            * tdError.getActivation() * previousActivation;
-//                    // synapse.setStrength(synapse.clip(newStrength));
-//                    synapse.setStrength(newStrength);
-//                }
-//            }
+            if (neuron.getLastActivation() > 0) {
+                for (Synapse synapse : neuron.getFanIn()) {
+                    double previousActivation = getPreviousNeuronValue(
+                            synapse.getSource());
+                    double newStrength = synapse.getStrength() + sim.alpha
+                            * tdError.getActivation() * previousActivation;
+                    // synapse.setStrength(synapse.clip(newStrength));
+                    synapse.setStrength(newStrength);
+                }
+            }
         }
     }
 

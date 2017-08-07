@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.hippocampus;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
@@ -40,25 +39,25 @@ public class AlvarezSquire extends CompetitiveGroup {
         // For this simulation we can assume that if one neuron is clamped, they
         // all are
         boolean clamped = getNeuronList().get(0).isClamped();
-//        Neuron winner = WinnerTakeAll.getWinner(getNeuronList(), clamped);
+        Neuron winner = WinnerTakeAll.getWinner(getNeuronList(), clamped);
 
         // Update weights on winning neuron
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron neuron = getNeuronList().get(i);
-//            if (neuron == winner) {
-//                // TODO: Allow user to choose update function
-//                //neuron.setActivation(this.getWinValue());
-//                alvarezSquireUpdate(neuron);
-//                updateWeights(neuron);
-//            } else {
-//                neuron.setActivation(this.getLoseValue());
-//            }
+            if (neuron == winner) {
+                // TODO: Allow user to choose update function
+                //neuron.setActivation(this.getWinValue());
+                alvarezSquireUpdate(neuron);
+                updateWeights(neuron);
+            } else {
+                neuron.setActivation(this.getLoseValue());
+            }
         }
         decaySynapses();
     }
 
     /**
-     * Simple decay with random noise
+     * Simple decay with random noise.
      */
     private void alvarezSquireUpdate(Neuron neuron) {
         // TODO: Use library for clipping
@@ -90,7 +89,7 @@ public class AlvarezSquire extends CompetitiveGroup {
     }
 
     /**
-     * Custom weight update
+     * Custom weight update.
      *
      * @param neuron winning neuron whose incoming synapses will be updated
      */

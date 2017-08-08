@@ -194,10 +194,7 @@ public class Simulation {
 
     // TODO: Move to workspace level and improve exception handling.
     /**
-     * Convenience method to add couplings and deal with exceptions (rather
-     * poorly for now).
-     *
-     * @param coupling
+     * Convenience method.  Forwards to workspace.
      */
     public void addCoupling(Coupling<?> coupling) {
         workspace.addCoupling(coupling);

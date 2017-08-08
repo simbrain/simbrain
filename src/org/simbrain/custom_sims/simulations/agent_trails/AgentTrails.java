@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.agent_trails;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,12 +105,17 @@ public class AgentTrails extends RegisteredSimulation {
         world.getWorld().setObjectsBlockMovement(false);
         mouse = world.addAgent(120, 245, "Mouse");
         mouse.setHeading(90);
-        File xmlFile = new File(
-                "src/org/simbrain/custom_sims/simulations/agent_trails/worldDescription.xml");
-        world.loadWorld(xmlFile);
-        cheese = world.getWorld().getEntity("Swiss");
-        flower = world.getWorld().getEntity("Flower");
-        fish = world.getWorld().getEntity("Fish");
+        
+        // Set up world
+        cheese = world.addEntity(120, 180, "Swiss.gif",
+                new double[] { 1, 0, 0 });
+        cheese.getSmellSource().setDispersion(65);
+        flower = world.addEntity(200, 100, "Pansy.gif",
+                new double[] { 0, 1, 0 });
+        cheese.getSmellSource().setDispersion(65);
+        fish = world.addEntity(50, 100, "Fish.gif", 
+                new double[] { 0, 0, 1 });
+        cheese.getSmellSource().setDispersion(65);
 
         // Couple network to agent
         sim.couple(straightNeuron, mouse.getEffector("Go-straight"));

@@ -142,6 +142,7 @@ public class Projector {
      * @param dims dimensionality of the high dimensional dataset
      */
     public void init(final int dims) {
+        // TODO: This seems to be called twice when adding a projection component.
         upstairs = new Dataset(dims);
         downstairs = new Dataset(2);
         fireProjectorDataChanged();

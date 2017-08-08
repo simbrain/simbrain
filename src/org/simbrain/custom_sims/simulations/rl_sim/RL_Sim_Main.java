@@ -208,23 +208,18 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * "sub-simulation."
      */
     private void initializeWorldObjects() {
-        File xmlFile = new File("src/org/simbrain/custom_sims/simulations/rl_sim/world.xml");
-        List<OdorWorldEntity> worldEntities = ob.loadWorld(xmlFile);
-        // Assign these entities to references
-        for (OdorWorldEntity entity : worldEntities) {
-            if (entity instanceof RotatingEntity) {
-                mouse = (RotatingEntity) entity;
-            }
-            if(entity.getName().equalsIgnoreCase("cheese_1")) {
-                cheese_1 = (BasicEntity) entity;
-            }
-            if(entity.getName().equalsIgnoreCase("cheese_2")) {
-                cheese_2 = (BasicEntity) entity;
-            }
-            if(entity.getName().equalsIgnoreCase("flower")) {
-                flower = (BasicEntity) entity;
-            }
-        }
+        mouse = ob.addAgent(43, 110, "Mouse");
+        mouse.setHeading(0);
+        
+        cheese_1 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif",
+                new double[] { 0, 1, 0, 0, 0, 1 });
+        cheese_1.getSmellSource().setDispersion(350);
+        //cheese_2 = (BasicEntity) ob.addEntity(350, 29, "Swiss.gif",
+        //        new double[] { 0, 1, 0, 0, 0, 1 });
+        //cheese_2.getSmellSource().setDispersion(350);
+        flower = (BasicEntity) ob.addEntity(350, 212, "Pansy.gif",
+                new double[] { 0, 0, 0, 0, 1, 1 });
+        flower.getSmellSource().setDispersion(350);
     }
 
     /**

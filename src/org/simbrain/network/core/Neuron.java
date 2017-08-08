@@ -474,7 +474,7 @@ public class Neuron {
     public double getWeightedInputs() {
         double wtdSum = inputValue;
         for (int i = 0, n = fanIn.size(); i < n; i++) {
-        	wtdSum += fanIn.get(i).calcWeightedSum();
+            wtdSum += fanIn.get(i).calcWeightedSum();
         }
         return wtdSum;
     }

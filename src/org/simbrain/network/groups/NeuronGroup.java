@@ -484,6 +484,17 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     }
 
     /**
+     * 
+     * Returns a modifiable list of neuron list. Modifications made to this list
+     * change the group because this is the underlying list of the group.
+     * 
+     * @return the neurons in this group.
+     */
+    public List<Neuron> getNeuronListUnsafe() {
+        return neuronList;
+    }
+
+    /**
      * Set the update rule for the neurons in this group.
      *
      * @param base

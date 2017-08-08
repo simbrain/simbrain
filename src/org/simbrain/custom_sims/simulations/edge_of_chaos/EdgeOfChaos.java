@@ -39,18 +39,21 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  * 1413-1436.
  */
 public class EdgeOfChaos extends RegisteredSimulation {
+    
+    //TODO: Add PCA by default
 
     // Simulation Parameters
-    int NUM_NEURONS = 130;
+    int NUM_NEURONS = 640;
     int GRID_SPACE = 25;
-    private double variance = .5;
+    // Since mean is 0, lower variance means lower average weight strength
+    private double variance = .5; 
     private double u_bar = .5;
     private int kIn = 4;
 
     // References
     Network network;
-    SynapseGroup reservoir;
-    NeuronGroup inputNodes, cheeseNodes, flowerNodes;
+    SynapseGroup reservoir, bitsToRes, cheeseToRes, flowersToRes;
+    NeuronGroup inputNodes, sensorNodes;
     OdorWorldBuilder world;
     RotatingEntity mouse;
     OdorWorldEntity cheese, flower, fish;
@@ -62,51 +65,58 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(237, 10, 450, 450, "Edge of Chaos");
+        NetBuilder net = sim.addNetwork(284, 10, 450, 450, "Edge of Chaos");
         network = net.getNetwork();
         buildNetwork();
 
         // Time series of inputs
-        //PlotBuilder ts = sim.addTimeSeriesPlot(689, 10, 363, 285, "Input");
-        //sim.couple(net.getNetworkComponent(),
-        //       inputNodes.getNeuronList().get(0), ts.getTimeSeriesComponent(), 0);
-        
+        // PlotBuilder ts = sim.addTimeSeriesPlot(689, 10, 363, 285, "Input");
+        // sim.couple(net.getNetworkComponent(),
+        // inputNodes.getNeuronList().get(0), ts.getTimeSeriesComponent(), 0);
+
         // Odor world sim
         buildOdorWorld();
-        
+
         // Set up control panel
         controlPanel();
     }
 
     private void buildOdorWorld() {
-        
+
         // Create the odor world
-        world = sim.addOdorWorld(676,12,416,378, "Two Objects");
+        world = sim.addOdorWorld(725, 12, 416, 378, "Two Objects");
         world.getWorld().setObjectsBlockMovement(false);
         mouse = world.addAgent(165, 245, "Mouse");
         mouse.setHeading(90);
-        
+
         // Set up world
         cheese = world.addEntity(40, 40, "Swiss.gif",
-                new double[] { 1, 0, 0 });
+                new double[] { 1, 0, 0, 0, 0, 0 });
         cheese.getSmellSource().setDispersion(65);
         flower = world.addEntity(290, 40, "Pansy.gif",
-                new double[] { 0, 1, 0 });
+                new double[] { 0, 0, 0, 0, 0, 1 });
         cheese.getSmellSource().setDispersion(65);
 
         // Couple agent to cheese and flower nodes
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), cheeseNodes);
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), flowerNodes);
+        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), sensorNodes);
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Test", 5, 10);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
+        panel.addButton("Bit-stream mode", () -> {
+            bitsToRes.setEnabled(true);
+            cheeseToRes.setEnabled(false);
+            flowersToRes.setEnabled(false);
+        });
+        panel.addButton("Sensor mode", () -> {
+            bitsToRes.setEnabled(false);
+            cheeseToRes.setEnabled(true);
+            flowersToRes.setEnabled(true);
+        });
         panel.addButton("Update", () -> {
-            
-            //TODO: Complain if input strength set to 0.
-            
+
             // Update variance of weight strengths
             double new_variance = Double.parseDouble(tf_stdev.getText());
             for (Synapse synapse : reservoir.getAllSynapses()) {
@@ -114,8 +124,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
                         synapse.getStrength() * (new_variance / variance));
             }
             variance = new_variance;
-            
-            // Update strength of input signals
+
+            // Update strength of bitstream signals
+            // TODO: Complain if input strength set to 0.
             double new_ubar = Double.parseDouble(input_tf.getText());
             for (double[] row : inputNodes.getTestData()) {
                 if (row[0] != 0) {
@@ -155,8 +166,8 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(kIn,
                 (int) (Math.sqrt(NUM_NEURONS) * GRID_SPACE / 2));
-        reservoir = SynapseGroup.createSynapseGroup(reservoirNg, reservoirNg, con, 0.5, exRand,
-                inRand);
+        reservoir = SynapseGroup.createSynapseGroup(reservoirNg, reservoirNg,
+                con, 0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         network.addGroup(reservoir);
 
@@ -164,56 +175,106 @@ public class EdgeOfChaos extends RegisteredSimulation {
         reservoir.setLowerBound(0, Polarity.EXCITATORY);
         reservoir.setLowerBound(-200, Polarity.INHIBITORY);
         reservoir.setUpperBound(0, Polarity.INHIBITORY);
-        
+
         // Offset in pixels of input nodes to right of reservoir
         // TODO offset to left does not look good. Zach?
         int offset = 310;
 
         // Set up "bit-stream" input nodes
         inputNodes = new NeuronGroup(network, 1);
-        inputNodes.setLocation(reservoirNg.getMaxX() + offset, reservoirNg.getMaxY());
+        inputNodes.setLocation(reservoirNg.getMaxX() + offset,
+                reservoirNg.getMaxY());
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         inputNodes.setNeuronType(b);
         inputNodes.setClamped(true);
         inputNodes.setLabel("Bit-stream");
-        inputNodes.setTestData(new double[][] { { u_bar }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { u_bar }, { 0.0 }, { u_bar }, { u_bar }, { 0.0 },
-                { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
+        inputNodes.setTestData(new double[][] { { u_bar }, { 0.0 }, { 0.0 },
+                { 0.0 }, { 0.0 }, { u_bar }, { 0.0 }, { u_bar }, { u_bar },
+                { 0.0 }, { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
         inputNodes.setInputMode(true);
         network.addGroup(inputNodes);
-        SynapseGroup bitsToRes = SynapseGroup.createSynapseGroup(inputNodes, reservoirNg,
+        bitsToRes = SynapseGroup.createSynapseGroup(inputNodes, reservoirNg,
                 new AllToAll());
         bitsToRes.setStrength(1.0, Polarity.BOTH);
         network.addGroup(bitsToRes);
-        
-        // Cheesy nodes
-        cheeseNodes = new NeuronGroup(network, 3);
-        cheeseNodes.setLocation(reservoirNg.getMaxX() + offset, reservoirNg.getCenterY());
-        cheeseNodes.setLabel("Cheeses");
-        cheeseNodes.setClamped(true);
-        network.addGroup(cheeseNodes);
-        SynapseGroup cheeseToRes = SynapseGroup.createSynapseGroup(cheeseNodes, reservoirNg,
-                new AllToAll());
-        cheeseToRes.setStrength(1.0, Polarity.BOTH);
+
+        // Sensor nodes
+        sensorNodes = new NeuronGroup(network, 6);
+        sensorNodes.setLocation(reservoirNg.getMaxX() + offset,
+                reservoirNg.getMinY());
+        sensorNodes.setLabel("Sensors");
+        sensorNodes.setClamped(true);
+        network.addGroup(sensorNodes);        
+        // Make custom connections from sensor nodes to upper-left and
+        // lower-right quadrants of the reservoir network to ensure visually 
+        // distinct patterns.
+        cheeseToRes = sensorConnections(sensorNodes, reservoirNg,
+                new int[] { 0, 1, 2 }, .8, 1);
         network.addGroup(cheeseToRes);
-        
-        // Flowery nodes
-        flowerNodes = new NeuronGroup(network, 3);
-        flowerNodes.setLocation(reservoirNg.getMaxX() + offset, reservoirNg.getMinY());
-        flowerNodes.setLabel("Flowers");
-        flowerNodes.setClamped(true);
-        network.addGroup(flowerNodes);
-        SynapseGroup flowerToRes = SynapseGroup.createSynapseGroup(flowerNodes, reservoirNg,
-                new AllToAll());
-        flowerToRes.setStrength(1.0, Polarity.BOTH);
-        network.addGroup(flowerToRes);
-        
+        flowersToRes = sensorConnections(sensorNodes, reservoirNg,
+                new int[] { 3, 4, 5 }, .8, 3);
+//        network.addGroup(flowersToRes);
+
         // Use concurrent buffered update
         network.getUpdateManager().clear();
         network.getUpdateManager().addAction(ConcurrentBufferedUpdate
                 .createConcurrentBufferedUpdate(network));
     }
 
+    // Possibly export this to a utility class
+    /**
+     * Connect a set of source neurons to a quadrant of the reservoir.
+     *
+     * @param src inputs
+     * @param tar reservoir
+     * @param srcNodeIndices which input nodes to connect
+     * @param sparsity sparsity
+     * @param quadrantNumber 1,2,3 or 4 from upper-left clockwise
+     * @return the resulting synapse group
+     */
+    private SynapseGroup sensorConnections(NeuronGroup src, NeuronGroup tar,
+            int[] srcNodeIndices, double sparsity, int quadrantNumber) {
+
+        double xStart, yStart, xEnd, yEnd;
+
+        if (quadrantNumber < 3) {
+            yStart = tar.getMinY();
+            yEnd = tar.getCenterY();
+        } else {
+            yStart = tar.getCenterY();
+            yEnd = tar.getMaxY();
+        }
+
+        if ((quadrantNumber == 1) || (quadrantNumber == 4)) {
+            xStart = tar.getMinX();
+            xEnd = tar.getCenterX();
+        } else {
+            xStart = tar.getCenterX();
+            xEnd = tar.getMaxX();
+        }
+
+        SynapseGroup src2Res = new SynapseGroup(src, tar);
+        List<Neuron> tarNList = tar.getNeuronList();
+        for (int ii = 0; ii < tar.size(); ++ii) {
+            double x = tarNList.get(ii).getX();
+            double y = tarNList.get(ii).getY();
+            if ((y >= yStart) && (y < yEnd)) {
+                if ((x >= xStart) && (x < xEnd)) {
+                    for (int j = 0; j < srcNodeIndices.length; j++) {
+                        if (Math.random() < sparsity) {
+                            Synapse syn = new Synapse(tarNList.get(ii),
+                                    src.getNeuronListUnsafe().get(j));
+                            syn.setStrength(1);
+                            src2Res.addSynapseUnsafe(syn);
+                        }
+                    }
+                }
+            }
+
+        }
+        return src2Res;
+
+    }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {
         super(desktop);

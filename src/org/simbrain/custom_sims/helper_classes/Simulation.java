@@ -203,39 +203,6 @@ public class Simulation {
         workspace.addCoupling(coupling);
     }
 
-    // Neurons to agent. So far just one to one
-    public void couple(NeuronGroup ng, RotatingEntity entity) {
-        // NetworkComponent nc = netMap.get(ng.getParentNetwork());
-        // OdorWorldComponent ow = odorMap.get(entity.getParentWorld());
-        //
-        // Producer<?> straightProducer = nc
-        // .getProducer(ng.getNeuronList().get(0), "getActivation");
-        // Producer<?> leftProducer = nc.getProducer(ng.getNeuronList().get(1),
-        // "getActivation");
-        // Producer<?> rightProducer = nc.getProducer(ng.getNeuronList().get(2),
-        // "getActivation");
-        //
-        // Consumer<?> straightConsumer = ow.getConsumer(entity, "goStraight");
-        // Consumer<?> leftConsumer = ow.getConsumer(entity, "turnLeft");
-        // Consumer<?> rightConsumer = ow.getConsumer(entity, "turnRight");
-        //
-        // Coupling<?> straightCoupling;
-        // try {
-        // straightCoupling = new Coupling(straightProducer,
-        // straightConsumer);
-        // Coupling<?> leftCoupling = new Coupling(leftProducer,
-        // leftConsumer);
-        // Coupling<?> rightCoupling = new Coupling(rightProducer,
-        // rightConsumer);
-        // addCoupling(straightCoupling);
-        // addCoupling(leftCoupling);
-        // addCoupling(rightCoupling);
-        // } catch (MismatchedAttributesException e) {
-        // e.printStackTrace();
-        // }
-
-    }
-
     /**
      * Couple a specific neuron to a specific time series in a time series plot.
      *
@@ -247,10 +214,11 @@ public class Simulation {
      */
     public Coupling<?> couple(NetworkComponent network, Neuron neuron,
             TimeSeriesPlotComponent plot, int index) {
-        PotentialProducer neuronProducer = network
-                .createPotentialProducer(neuron, "getActivation", double.class);
+        PotentialProducer neuronProducer = network.getNeuronProducer(network,
+                neuron, "getActivation");
         PotentialConsumer timeSeriesConsumer1 = plot.getPotentialConsumers()
                 .get(index);
+        timeSeriesConsumer1.setCustomDescription("Time series " + index);
         Coupling<?> coupling = null;
         coupling = new Coupling(neuronProducer, timeSeriesConsumer1);
         addCoupling(coupling);
@@ -262,11 +230,10 @@ public class Simulation {
      */
     public void couple(NetworkComponent network, NeuronGroup ng,
             ProjectionComponent plot) {
-        PotentialProducer ngProducer = network.createPotentialProducer(ng,
-                "getActivations", double[].class);
+        PotentialProducer ngProducer = network.getNeuronGroupProducer(network,
+                ng, "getActivations");
         PotentialConsumer projConsumer = plot.createPotentialConsumer(plot,
                 "addPoint", double[].class);
-
         addCoupling(new Coupling(ngProducer, projConsumer));
     }
 
@@ -282,9 +249,9 @@ public class Simulation {
                 .get(sensor.getParent().getParentWorld());
 
         PotentialProducer sensoryProducer = ow.createPotentialProducer(sensor,
-                "getCurrentValues", double[].class);
-        PotentialConsumer sensoryConsumer = nc.createPotentialConsumer(ng,
-                "forceSetActivations", double[].class);
+                "getCurrentValue", double[].class);
+        PotentialConsumer sensoryConsumer = nc.getNeuronGroupConsumer(nc, ng,
+                "forceSetActivations");
 
         addCoupling(new Coupling(sensoryProducer, sensoryConsumer));
     }
@@ -310,8 +277,8 @@ public class Simulation {
                         double.class, new Class[] { int.class },
                         new Object[] { stimulusDimension });
 
-        PotentialConsumer sensoryNeuron = nc.createPotentialConsumer(
-                consumingNeuron, "forceSetActivation", double.class);
+        PotentialConsumer sensoryNeuron = nc.getNeuronConsumer(nc,
+                consumingNeuron, "forceSetActivation");
 
         addCoupling(new Coupling(agentSensor, sensoryNeuron));
 
@@ -326,9 +293,8 @@ public class Simulation {
         OdorWorldComponent ow = odorMap
                 .get(effector.getParent().getParentWorld());
 
-        PotentialProducer effectorNeuron = nc.createPotentialProducer(neuron,
-                "getActivation", double.class);
-
+        PotentialProducer effectorNeuron = nc.getNeuronProducer(nc, neuron,
+                "getActivation");
         PotentialConsumer agentEffector = ow.createPotentialConsumer(effector,
                 "addAmount", double.class);
 

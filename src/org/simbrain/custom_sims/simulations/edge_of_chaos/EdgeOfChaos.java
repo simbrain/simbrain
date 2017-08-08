@@ -25,6 +25,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -52,11 +53,15 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         sim.getWorkspace().clearWorkspace();
 
-        NetBuilder net = sim.addNetwork(246, 10, 450, 450, "Edge of Chaos");
+        NetBuilder net = sim.addNetwork(237, 10, 450, 450, "Edge of Chaos");
         network = net.getNetwork();
 
         buildNetwork();
-
+        
+        PlotBuilder ts = sim.addTimeSeriesPlot(689, 10, 363, 285, "Input");
+        Coupling rewardCoupling = sim.couple(net.getNetworkComponent(),
+                input.getNeuronList().get(0), ts.getTimeSeriesComponent(), 0);
+        
         ControlPanel panel = ControlPanel.makePanel(sim, "Test", 5, 10);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
@@ -97,7 +102,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         }
         // TODO: Rename to reservoir
         NeuronGroup ng1 = new NeuronGroup(network, neurons);
-        ng1.setLabel("CorticalBranching");
+        ng1.setLabel("Reservoir");
         network.addGroup(ng1);
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0, 0.0));
@@ -135,9 +140,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
         input.setInputMode(true);
         network.addGroup(input);
-
         AllToAll inp2ResCon = new AllToAll();
-
         SynapseGroup inp2resSG = SynapseGroup.createSynapseGroup(input, ng1,
                 inp2ResCon);
         inp2resSG.setStrength(1.0, Polarity.BOTH);

@@ -24,6 +24,9 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.BasicEntity;
@@ -184,16 +187,12 @@ public class RL_Sim_Main extends RegisteredSimulation {
                 "Sensory states + Predictions");
         plot.getProjectionModel().init(leftInputs.size() + rightInputs.size());
         plot.getProjectionModel().getProjector().setTolerance(.01);
-//        Producer<?> inputProducer = net.getNetworkComponent().getProducer(this,
-//                "getCombinedInputs");
-//        Consumer<?> plotConsumer = plot.getProjectionPlotComponent()
-//                .getConsumer(plot.getProjectionPlotComponent(), "addPoint");
-
-//        try {
-//            sim.addCoupling(new Coupling(inputProducer, plotConsumer));
-//        } catch (MismatchedAttributesException e) {
-//            e.printStackTrace();
-//        }
+        PotentialProducer inputProducer = net.getNetworkComponent()
+                .createPotentialProducer(this, "getCombinedInputs", double[].class);
+        PotentialConsumer plotConsumer = plot.getProjectionPlotComponent()
+                .createPotentialConsumer(plot.getProjectionPlotComponent(),
+                        "addPoint", double[].class);
+        sim.addCoupling(new Coupling(inputProducer, plotConsumer));
 
         // Set custom network update
         updateMethod = new RL_Update(this);
@@ -267,7 +266,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Helper method for "combined input" coupling.
      */
-//    @Producible
+    // @Producible
     public double[] getCombinedInputs() {
         System.arraycopy(leftInputs.getActivations(), 0, combinedInputs, 0,
                 leftInputs.size() - 1);
@@ -280,7 +279,7 @@ public class RL_Sim_Main extends RegisteredSimulation {
     /**
      * Helper method for getting combined prediction.
      */
-//    @Producible
+    // @Producible
     public double[] getCombinedPredicted() {
         System.arraycopy(predictionLeft.getActivations(), 0, combinedPredicted,
                 0, leftInputs.size() - 1);
@@ -423,14 +422,14 @@ public class RL_Sim_Main extends RegisteredSimulation {
         // outputs.getNeuronList().get(5).setLabel(strAvoidCandle);
 
         // Connect output nodes to vehicle nodes
-//         net.connect(outputs.getNeuronByLabel(strPursueCheese),
-//         pursueCheese.getNeuronByLabel("Speed"), 10);
-//         net.connect(outputs.getNeuronByLabel(strAvoidCheese),
-//         avoidCheese.getNeuronByLabel("Speed"), 10);
-//         net.connect(outputs.getNeuronByLabel(strPursueFlower),
-//         pursueFlower.getNeuronByLabel("Speed"), 10);
-//         net.connect(outputs.getNeuronByLabel(strAvoidFlower),
-//         avoidFlower.getNeuronByLabel("Speed"), 10);
+         net.connect(outputs.getNeuronByLabel(strPursueCheese),
+         pursueCheese.getNeuronByLabel("Speed"), 10);
+         net.connect(outputs.getNeuronByLabel(strAvoidCheese),
+         avoidCheese.getNeuronByLabel("Speed"), 10);
+         net.connect(outputs.getNeuronByLabel(strPursueFlower),
+         pursueFlower.getNeuronByLabel("Speed"), 10);
+         net.connect(outputs.getNeuronByLabel(strAvoidFlower),
+         avoidFlower.getNeuronByLabel("Speed"), 10);
 //         net.connect(outputs.getNeuronByLabel(strPursueCandle),
 //         pursueCandle.getNeuronByLabel("Speed"), 10);
 //         net.connect(outputs.getNeuronByLabel(strAvoidCandle),
@@ -443,16 +442,16 @@ public class RL_Sim_Main extends RegisteredSimulation {
      * @param vehicle vehicle to modify
      */
     private void setUpVehicle(NeuronGroup vehicle) {
-//        Neuron toUpdate = vehicle.getNeuronByLabel("Speed");
-//        toUpdate.setUpdateRule("LinearRule");
-//        toUpdate.setActivation(0);
-//        toUpdate.setUpperBound(100);
-//        toUpdate.setClamped(false);
-//        Neuron turnLeft = vehicle.getNeuronByLabel("Left");
-//        turnLeft.setUpperBound(200);
-//        Neuron turnRight = vehicle.getNeuronByLabel("Right");
-//        turnRight.setUpperBound(200);
-//        vehicles.add(vehicle);
+        Neuron toUpdate = vehicle.getNeuronByLabel("Speed");
+        toUpdate.setUpdateRule("LinearRule");
+        toUpdate.setActivation(0);
+        toUpdate.setUpperBound(100);
+        toUpdate.setClamped(false);
+        Neuron turnLeft = vehicle.getNeuronByLabel("Left");
+        turnLeft.setUpperBound(200);
+        Neuron turnRight = vehicle.getNeuronByLabel("Right");
+        turnRight.setUpperBound(200);
+        vehicles.add(vehicle);
     }
 
     /**

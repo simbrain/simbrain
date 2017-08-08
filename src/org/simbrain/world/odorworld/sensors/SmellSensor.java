@@ -46,7 +46,7 @@ public class SmellSensor extends Sensor {
     private double radius = DEFAULT_RADIUS;
 
     /** Current value of this sensor, as an array of doubles. */
-    private double[] currentValue = new double[5];
+    private double[] currentValue = new double[7];
 
     /**
      * Construct a smell sensor.

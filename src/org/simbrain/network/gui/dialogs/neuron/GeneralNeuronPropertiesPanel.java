@@ -33,6 +33,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultFormatter;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -62,7 +63,7 @@ import org.simbrain.util.widgets.YesNoNull;
 @SuppressWarnings("serial")
 public class GeneralNeuronPropertiesPanel extends JPanel
         implements EditablePanel {
-	
+
     /** The neurons being modified. */
     private List<Neuron> neuronList;
 
@@ -73,7 +74,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
     private JFormattedTextField tfActivation = new JFormattedTextField();
 
     /** Label Field. */
-    private final JFormattedTextField tfNeuronLabel = new JFormattedTextField();
+    private final JFormattedTextField tfNeuronLabel;
 
     /** Panel containing fields for upper bound, lower bound, and clipping. */
     private BoundsClippingPanel boundsClippingPanel;
@@ -168,12 +169,17 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         detailTriangle = new DropDownTriangle(UpDirection.LEFT, false,
                 "More", "Less", parent);
         boundsClippingPanel = new BoundsClippingPanel(neuronList, parent);
+        
+        DefaultFormatter format = new DefaultFormatter();
+        format.setOverwriteMode(false);
+        tfNeuronLabel = new JFormattedTextField(format);
+
         initializeLayout();
         fillFieldValues();
     }
 
     /**
-     * Lays out the panel
+     * Lays out the panel.
      */
     private void initializeLayout() {
 
@@ -273,7 +279,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
         if (neuronRef == null) {
             return;
         }
-        
+
         // Handle ID
         if(displayIDInfo == true) {
             idLabel.setText(neuronRef.getId());
@@ -316,7 +322,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
             clamped.setSelected(neuronList.get(0).isClamped());
         }
 
-        // Get list of rules to fill field vales on 
+        // Get list of rules to fill field vales on
         List<NeuronUpdateRule> ruleList = Neuron.getRuleList(neuronList);
 
         // Handle Increment
@@ -410,7 +416,7 @@ public class GeneralNeuronPropertiesPanel extends JPanel
             neuronList.stream().forEach(
                     n -> n.getUpdateRule().setInputType(InputType.SYNAPTIC));
         }
-        
+
         // Update neurons
         if (!neuronList.isEmpty()) {
             neuronList.get(0).getNetwork().fireNeuronsUpdated(neuronList);

@@ -20,11 +20,12 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.GridLayout;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -44,23 +45,24 @@ import org.simbrain.util.widgets.YesNoNull;
  */
 public class SynapsePropertiesExtended extends JPanel {
 
+
     /** Freeze synapse field. */
     private YesNoNull frozenDD = new YesNoNull();
-
+    
     // TODO: Implement...
     // private TristateDropDown clippingDD = new TristateDropDown();
 
     /** Increment field. */
-    private JTextField tfIncrement = new JTextField(10);
+    private JFormattedTextField tfIncrement = new JFormattedTextField();
 
     /** Upper bound field. */
-    private JTextField tfUpBound = new JTextField(10);
+    private JFormattedTextField tfUpBound = new JFormattedTextField();
 
     /** Lower bound field. */
-    private JTextField tfLowBound = new JTextField(10);
+    private JFormattedTextField tfLowBound = new JFormattedTextField();
 
     /** Delay field. */
-    private JTextField tfDelay = new JTextField(10);
+    private JFormattedTextField tfDelay = new JFormattedTextField();
 
     /**
      *
@@ -73,7 +75,7 @@ public class SynapsePropertiesExtended extends JPanel {
     }
 
     /**
-     * Lays out the panel
+     * Lays out the panel.
      */
     private void initializeLayout() {
         GridLayout gl = new GridLayout(0, 2);
@@ -104,32 +106,32 @@ public class SynapsePropertiesExtended extends JPanel {
         // Handle Upper Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getUpperBound")) {
-            tfUpBound.setText(SimbrainConstants.NULL_STRING);
+            tfUpBound.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
+            tfUpBound.setValue(synapseRef.getUpperBound());
         }
         // Handle Lower Bound
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getLowerBound")) {
-            tfLowBound.setText(SimbrainConstants.NULL_STRING);
+            tfLowBound.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
+            tfLowBound.setValue(synapseRef.getLowerBound());
         }
         // Handle Increment
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                 "getIncrement")) {
-            tfIncrement.setText(SimbrainConstants.NULL_STRING);
+            tfIncrement.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
+            tfIncrement.setValue(synapseRef.getIncrement());
         }
         // Handle Delay
         if (synapseRef.getDelay() < 0
                 || !NetworkUtils.isConsistent(synapseCollection, Synapse.class,
                         "getDelay"))
         {
-            tfDelay.setText(SimbrainConstants.NULL_STRING);
+            tfDelay.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfDelay.setText(Integer.toString(synapseRef.getDelay()));
+            tfDelay.setValue(synapseRef.getDelay());
         }
         // Handle Frozen
         if (!NetworkUtils.isConsistent(synapseCollection, Synapse.class,
@@ -150,27 +152,27 @@ public class SynapsePropertiesExtended extends JPanel {
         frozenDD.setSelected(synapseGroup.isFrozen(polarity));
         double increment = synapseGroup.getIncrement(polarity);
         if (!Double.isNaN(increment)) {
-            tfIncrement.setText(Double.toString(increment));
+            tfIncrement.setValue(Double.toString(increment));
         } else {
-            tfIncrement.setText(SimbrainConstants.NULL_STRING);
+            tfIncrement.setValue(SimbrainConstants.NULL_STRING);
         }
         double upBound = synapseGroup.getUpperBound(polarity);
         if (!Double.isNaN(upBound)) {
-            tfUpBound.setText(Double.toString(upBound));
+            tfUpBound.setValue(Double.toString(upBound));
         } else {
-            tfUpBound.setText(SimbrainConstants.NULL_STRING);
+            tfUpBound.setValue(SimbrainConstants.NULL_STRING);
         }
         double lowBound = synapseGroup.getLowerBound(polarity);
         if (!Double.isNaN(lowBound)) {
-            tfLowBound.setText(Double.toString(lowBound));
+            tfLowBound.setValue(Double.toString(lowBound));
         } else {
-            tfLowBound.setText(SimbrainConstants.NULL_STRING);
+            tfLowBound.setValue(SimbrainConstants.NULL_STRING);
         }
         Integer delay = synapseGroup.getDelay(polarity);
         if (delay != null && delay != -1) {
-            tfDelay.setText(delay.toString());
+            tfDelay.setValue(delay.toString());
         } else {
-            tfDelay.setText(SimbrainConstants.NULL_STRING);
+            tfDelay.setValue(SimbrainConstants.NULL_STRING);
         }
     }
 

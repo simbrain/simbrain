@@ -28,10 +28,10 @@ import java.awt.event.MouseListener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -58,7 +58,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
     private final JLabel idLabel = new JLabel();
 
     /** Strength field. */
-    private final JTextField tfStrength = new JTextField(10);
+    private final JFormattedTextField tfStrength = new JFormattedTextField();
 
     /**
      * A switch for determining whether or not the synapse will send a weighted
@@ -173,8 +173,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
     }
 
     /**
-     * Initialize the basic info panel (generic synapse parameters)
-     *
+     * Initialize the basic info panel (generic synapse parameters).
      */
     private void initializeLayout() {
 
@@ -296,9 +295,9 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
         // Handle Strength
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class,
             "getStrength")) {
-            tfStrength.setText(SimbrainConstants.NULL_STRING);
+            tfStrength.setValue(SimbrainConstants.NULL_STRING);
         } else {
-            tfStrength.setText(Double.toString(synapseRef.getStrength()));
+            tfStrength.setValue(synapseRef.getStrength());
         }
 
         // Handle Enabled
@@ -367,7 +366,7 @@ public class SynapsePropertiesSimple extends JPanel implements EditablePanel {
                 break;
             }
         }
-        tfStrength.setText(consistent ? Double.toString(first)
+        tfStrength.setValue(consistent ? Double.toString(first)
             : SimbrainConstants.NULL_STRING);
         extraDataPanel.fillFieldValues(synapseGroup, polarity);
     }

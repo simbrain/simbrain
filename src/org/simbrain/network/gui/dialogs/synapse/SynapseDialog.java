@@ -121,7 +121,7 @@ public final class SynapseDialog extends StandardDialog {
     }
     
     /**
-     * Gets the logical synapses from a list of gui Synapse Nodes
+     * Gets the logical synapses from a list of gui Synapse Nodes.
      *
      * @param selectedSynapses
      *            the selected Synapse Node gui objects
@@ -157,7 +157,7 @@ public final class SynapseDialog extends StandardDialog {
     }
 
     /**
-     * Add listeners to the components of the dialog
+     * Add listeners to the components of the dialog.
      */
     private void addListeners() {
         synapseEditingPanel.getUpdateInfoPanel().getCbSynapseType()

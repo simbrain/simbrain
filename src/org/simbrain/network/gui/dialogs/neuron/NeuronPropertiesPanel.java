@@ -36,7 +36,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.widgets.EditablePanel;
 
 /**
- * Panel for editing the properties of neuron, including general properties 
+ * Panel for editing the properties of neuron, including general properties
  * (e.g. activation and label) and selecting and editing a specific update rule.
  *
  * Called both from neuron dialog and from other dialogs that use it, e.g. the
@@ -59,10 +59,10 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
      * neuron update settings panel.
      */
     private static final int DEFAULT_VGAP = 10;
-    
-    /** Whether to initially display the update rule panel. */ 
+
+    /** Whether to initially display the update rule panel. */
     private static boolean DEFAULT_DISPLAY_UPDATE_RULE_PANEL = true;
-       
+
     /** Static initializer */
     static {
         Properties properties = Utils.getSimbrainProperties();
@@ -71,7 +71,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
                 .getProperty("initializeNeuronDialogToExpandedState"));
         }
     }
-    
+
     /**
      * Creates a neuron property panel with a default display state.
      *
@@ -121,7 +121,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
         updateRulePanel = new UpdateRulePanel(neuronList, parent,
                 displayUpdateRuleProperties);
     }
-    
+
     /**
      * Construct the panel without specifying whether to display id (that is done
      * automatically).
@@ -183,7 +183,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     public UpdateRulePanel getUpdateRulePanel() {
         return updateRulePanel;
     }
-    
+
     @Override
     public JPanel getPanel() {
         return this;
@@ -192,7 +192,7 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     @Override
     public void fillFieldValues() {
     }
-    
+
 //    /**
 //     * Testing main.
 //     */
@@ -212,12 +212,12 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
 //
 //        // Test the test panel!
 //        NeuronDialog dialog = NeuronDialog.createNeuronDialog(neuronList);
-//        
+//
 //        // Show the test dialog
 //        dialog.setLocationRelativeTo(null);
 //        dialog.pack();
 //        dialog.setVisible(true);
-//        
+//
 //        System.out.println("Slope "
 //                + ((LinearRule) neuronList.get(1).getUpdateRule()).getSlope());
 //        System.out.println("Bias "

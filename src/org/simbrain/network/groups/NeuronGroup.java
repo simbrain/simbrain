@@ -136,7 +136,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
     private int[] subsamplingIndices;
     
     /**
-     * Reset the indices used for subsampling
+     * Reset the indices used for subsampling.
      */
     public void resetSubsamplingIndices() {
         if (neuronList != null) {
@@ -248,6 +248,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         for (Neuron neuron : toCopy.getNeuronList()) {
             this.addNeuron(new Neuron(network, neuron), false);
         }
+        this.setLabel(toCopy.getLabel());
         this.updateRule = toCopy.updateRule;
         resetSubsamplingIndices();
     }

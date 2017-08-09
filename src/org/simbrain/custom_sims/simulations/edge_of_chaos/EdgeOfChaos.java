@@ -43,7 +43,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     //TODO: Add PCA by default
 
     // Simulation Parameters
-    int NUM_NEURONS = 640;
+    int NUM_NEURONS = 120;
     int GRID_SPACE = 25;
     // Since mean is 0, lower variance means lower average weight strength
     private double variance = .5; 
@@ -52,8 +52,8 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     // References
     Network network;
-    SynapseGroup reservoir, bitsToRes, cheeseToRes, flowersToRes;
-    NeuronGroup inputNodes, sensorNodes;
+    SynapseGroup reservoir, bitsToRes, cheeseToRes, flowersToRes; // rename reservoir
+    NeuronGroup reservoirNg, bitStreamInputs, sensorNodes;
     OdorWorldBuilder world;
     RotatingEntity mouse;
     OdorWorldEntity cheese, flower, fish;
@@ -105,12 +105,12 @@ public class EdgeOfChaos extends RegisteredSimulation {
         ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
-        panel.addButton("Bit-stream mode", () -> {
+        panel.addButton("Bit-stream mode","Apply", () -> {
             bitsToRes.setEnabled(true);
             cheeseToRes.setEnabled(false);
             flowersToRes.setEnabled(false);
         });
-        panel.addButton("Sensor mode", () -> {
+        panel.addButton("Sensor mode","Apply", () -> {
             bitsToRes.setEnabled(false);
             cheeseToRes.setEnabled(true);
             flowersToRes.setEnabled(true);
@@ -128,11 +128,15 @@ public class EdgeOfChaos extends RegisteredSimulation {
             // Update strength of bitstream signals
             // TODO: Complain if input strength set to 0.
             double new_ubar = Double.parseDouble(input_tf.getText());
-            for (double[] row : inputNodes.getTestData()) {
+            for (double[] row : bitStreamInputs.getTestData()) {
                 if (row[0] != 0) {
                     row[0] = new_ubar;
                 }
             }
+        });
+        panel.addButton("Similarity Study", "Run", () -> {
+            // TODO: Don't allow this to be run twice?
+            cloneReservoir();
         });
     }
 
@@ -149,7 +153,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
             neuron.setUpdateRule(str);
             neurons.add(neuron);
         }
-        NeuronGroup reservoirNg = new NeuronGroup(network, neurons);
+        reservoirNg = new NeuronGroup(network, neurons);
         reservoirNg.setLabel("Reservoir");
         network.addGroup(reservoirNg);
         reservoirNg.setLayout(layout);
@@ -181,19 +185,19 @@ public class EdgeOfChaos extends RegisteredSimulation {
         int offset = 310;
 
         // Set up "bit-stream" input nodes
-        inputNodes = new NeuronGroup(network, 1);
-        inputNodes.setLocation(reservoirNg.getMaxX() + offset,
+        bitStreamInputs = new NeuronGroup(network, 1);
+        bitStreamInputs.setLocation(reservoirNg.getMaxX() + offset,
                 reservoirNg.getMaxY());
         BinaryRule b = new BinaryRule(0, u_bar, .5);
-        inputNodes.setNeuronType(b);
-        inputNodes.setClamped(true);
-        inputNodes.setLabel("Bit-stream");
-        inputNodes.setTestData(new double[][] { { u_bar }, { 0.0 }, { 0.0 },
+        bitStreamInputs.setNeuronType(b);
+        bitStreamInputs.setClamped(true);
+        bitStreamInputs.setLabel("Bit-stream");
+        bitStreamInputs.setTestData(new double[][] { { u_bar }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { u_bar }, { 0.0 }, { u_bar }, { u_bar },
                 { 0.0 }, { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
-        inputNodes.setInputMode(true);
-        network.addGroup(inputNodes);
-        bitsToRes = SynapseGroup.createSynapseGroup(inputNodes, reservoirNg,
+        bitStreamInputs.setInputMode(true);
+        network.addGroup(bitStreamInputs);
+        bitsToRes = SynapseGroup.createSynapseGroup(bitStreamInputs, reservoirNg,
                 new AllToAll());
         bitsToRes.setStrength(1.0, Polarity.BOTH);
         network.addGroup(bitsToRes);
@@ -273,7 +277,35 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         }
         return src2Res;
+    }
+    
+    private void cloneReservoir() {
+        
+        network.removeGroup(sensorNodes);
+        sim.getWorkspace()
+                .removeWorkspaceComponent(world.getOdorWorldComponent());
+        
+        NeuronGroup clonedRes = new NeuronGroup(network, reservoirNg);
+        clonedRes.setLocation(
+                reservoirNg.getMinX() - reservoirNg.getWidth() - 200,
+                reservoirNg.getMinY());
+        network.addGroup(clonedRes);
+        //TODO: Need a  copy constructor and/or copy properties function for synapse groups
 
+        NeuronGroup clonedInputs = new NeuronGroup(network, bitStreamInputs);
+        network.addGroup(clonedInputs);
+
+        bitStreamInputs.setLocation(reservoirNg.getCenterX(),
+                reservoirNg.getMaxY() + 100);
+        clonedInputs.setLocation(clonedRes.getCenterX(),
+                clonedRes.getMaxY() + 100);
+
+        SynapseGroup clonedBitsToRes = SynapseGroup.createSynapseGroup(
+                clonedInputs, clonedRes, new AllToAll());
+        clonedBitsToRes.setStrength(1.0, Polarity.BOTH);
+        network.addGroup(clonedBitsToRes);
+
+        
     }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {

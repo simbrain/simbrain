@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.Group;
@@ -1024,6 +1025,8 @@ public class Network {
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "generator");
+
+        xstream.omitField(AllToAll.class, "selfConnectionAllowed");
 
         // TODO: Backwards compatible
         xstream.omitField(Synapse.class, "sendWeightedInput");

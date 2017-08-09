@@ -141,11 +141,13 @@ public class Synapse {
     static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("weightUpperBound")) {
-            DEFAULT_UPPER_BOUND = Double.parseDouble(properties.getProperty("weightUpperBound"));
+            DEFAULT_UPPER_BOUND = Double
+                    .parseDouble(properties.getProperty("weightUpperBound"));
 
         }
         if (properties.containsKey("weightLowerBound")) {
-            DEFAULT_LOWER_BOUND = Double.parseDouble(properties.getProperty("weightLowerBound"));
+            DEFAULT_LOWER_BOUND = Double
+                    .parseDouble(properties.getProperty("weightLowerBound"));
 
         }
 
@@ -207,7 +209,8 @@ public class Synapse {
      * @param target target neuron
      * @param learningRule update rule for this synapse
      */
-    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule) {
+    public Synapse(Neuron source, Neuron target,
+            SynapseUpdateRule learningRule) {
         this(source.getNetwork(), source, target, learningRule);
     }
 
@@ -241,8 +244,8 @@ public class Synapse {
      * @param learningRule update rule for this synapse
      * @param parent parent network for this synapse.
      */
-    public Synapse(Neuron source, Neuron target,
-            SynapseUpdateRule learningRule, Network parent) {
+    public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule,
+            Network parent) {
         setSourceAndTarget(source, target);
         setLearningRule(learningRule);
         initSpikeResponder();
@@ -251,7 +254,7 @@ public class Synapse {
     }
 
     /**
-     * Copy a synapse with a specified new parent. 
+     * Copy a synapse with a specified new parent.
      *
      * @param newParent new parent network
      * @param synapse synapse to copy
@@ -288,8 +291,8 @@ public class Synapse {
      */
     public static Synapse copyTemplateSynapse(Synapse s) {
         if (s.getSource() != null || s.getTarget() != null) {
-            throw new IllegalArgumentException("Synapse is not template"
-                    + " synapse.");
+            throw new IllegalArgumentException(
+                    "Synapse is not template" + " synapse.");
         }
         return new Synapse(s);
     }
@@ -505,7 +508,7 @@ public class Synapse {
         }
         // target.weightChanged(this); // Maybe?
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -516,7 +519,7 @@ public class Synapse {
             strength -= increment;
         }
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -531,7 +534,7 @@ public class Synapse {
             strength = 0;
         }
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -546,7 +549,7 @@ public class Synapse {
             strength = 0;
         }
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -561,7 +564,7 @@ public class Synapse {
             symmetric.setStrength(strength);
         }
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -590,7 +593,7 @@ public class Synapse {
         strength = (getUpperBound() - getLowerBound()) * Math.random()
                 + getLowerBound();
         if (getNetwork() != null && !isTemplate)
-        	getNetwork().fireSynapseChanged(this);
+            getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -744,7 +747,8 @@ public class Synapse {
         ret += ("  Connects neuron "
                 + (getSource() == null ? "[null]" : getSource().getId())
                 + " to neuron "
-                + (getTarget() == null ? "[null]" : getTarget().getId()) + "\n");
+                + (getTarget() == null ? "[null]" : getTarget().getId())
+                + "\n");
         return ret;
     }
 
@@ -781,11 +785,11 @@ public class Synapse {
      * @return reference to root network.
      */
     public Network getNetwork() {
-    	if (isTemplate) {
-    		return null;
-    	} else {
+        if (isTemplate) {
+            return null;
+        } else {
             return this.getSource().getNetwork();
-    	}
+        }
     }
 
     /**
@@ -949,10 +953,10 @@ public class Synapse {
      */
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
-        //TODO: targeted event
-        if (getNetwork() != null && !isTemplate) {
-            this.getParentNetwork().fireSynapsesUpdated();
-        }
+        // TODO: targeted event
+//        if (getNetwork() != null && !isTemplate) {
+//            this.getParentNetwork().fireSynapsesUpdated();
+//        }
     }
 
     /**

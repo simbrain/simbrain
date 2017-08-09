@@ -232,8 +232,9 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements
     // return closest;
     // }
     //
+    
     /**
-     *
+     * Includes start and end of arrow.
      */
     public void determineProperEndPoints() {
 		if (networkPanel.isRunning()) {

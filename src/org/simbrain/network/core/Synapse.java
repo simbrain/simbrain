@@ -939,6 +939,8 @@ public class Synapse {
      */
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
+        //TODO: targeted event
+        this.getParentNetwork().fireSynapsesUpdated();
     }
 
     /**

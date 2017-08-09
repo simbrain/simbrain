@@ -126,18 +126,10 @@ public class KeyBindings {
         // Shift-U
         inputMap.put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.SHIFT_MASK),
-                "freeze");
-        inputMap.put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.SHIFT_MASK),
-                "unfreeze");
-        panel.getActionMap().put("freeze", new AbstractAction() {
+                "toggleFreeze");
+        panel.getActionMap().put("toggleFreeze", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.freezeSelectedObjects(true);
-            }
-        });
-        panel.getActionMap().put("unfreeze", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                panel.freezeSelectedObjects(false);
             }
         });
         

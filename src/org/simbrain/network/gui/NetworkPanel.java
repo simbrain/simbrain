@@ -2677,12 +2677,21 @@ public class NetworkPanel extends JPanel {
     public void freezeSelectedObjects(boolean freeze) {
         for (PNode node : getSelection()) {
             if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.getNeuron().setClamped(freeze);
+                Neuron neuron = ((NeuronNode) node).getNeuron();
+                if (neuron.isClamped()) {
+                    neuron.setClamped(false);
+                } else {
+                    neuron.setClamped(true);
+                }
             }
             if (node instanceof SynapseNode) {
                 SynapseNode synapseNode = (SynapseNode) node;
-                synapseNode.getSynapse().setFrozen(freeze);
+                Synapse synapse = ((SynapseNode) node).getSynapse();
+                if (synapse.isFrozen()) {
+                    synapse.setFrozen(false);
+                } else {
+                    synapse.setFrozen(true);
+                }
             }
         }
     }

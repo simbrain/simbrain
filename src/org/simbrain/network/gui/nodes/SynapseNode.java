@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
@@ -46,7 +47,7 @@ public final class SynapseNode extends ScreenElement {
     private final double offset = 7;
 
     /** Main circle of synapse. */
-    private PNode circle;
+    private PPath circle;
 
     /** Line connecting nodes. More of a loop for self cocnections. */
     private PPath.Float line;
@@ -77,7 +78,7 @@ public final class SynapseNode extends ScreenElement {
 
     /** Color of lines in synapse representation. */
     private static Color lineColor = Color.black;
-
+    
     /**
      * Create a new synapse node connecting a source and target neuron.
      *
@@ -162,6 +163,17 @@ public final class SynapseNode extends ScreenElement {
             // .setLine(source.getCenter(), localToGlobal(synapseCenter));
         }
     }
+    
+    /**
+     * of a synapse based on whether it is clamped or not.
+     */
+    public void updateClampStatus() {
+        if (synapse.isFrozen()) {
+            circle.setStrokePaint(Color.black);
+        } else {
+            circle.setStrokePaint(null);
+        }
+    }
 
     /**
      * Whether this synapse connects a neuron to itself or not.
@@ -205,6 +217,8 @@ public final class SynapseNode extends ScreenElement {
         } else {
             line.setStrokePaint(lineColor);
         }
+        // Todo: give this its own event 
+        this.updateClampStatus();
     }
 
     /**
@@ -437,13 +451,6 @@ public final class SynapseNode extends ScreenElement {
         updateColor();
         updateDiameter();
     }
-
-    /**
-     * @return the publicLine
-     */
-    // public Line2D.Double getLine() {
-    // return publicLine;
-    // }
 
     /**
      * @return the excitatoryColor

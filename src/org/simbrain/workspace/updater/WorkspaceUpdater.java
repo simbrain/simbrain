@@ -19,13 +19,11 @@
 package org.simbrain.workspace.updater;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Workspace;
@@ -58,10 +56,7 @@ public class WorkspaceUpdater {
     private final Workspace workspace;
 
     /** The executor service for managing workspace updates. */
-    private final ExecutorService workspaceUpdates;
-
-    /** The executor service for doing the component updates. */
-    private ExecutorService componentUpdates;
+    private final ExecutorService workspaceUpdateExecutor;
 
     /** The executor service for notifying listeners. */
     private final ExecutorService notificationEvents;
@@ -100,12 +95,7 @@ public class WorkspaceUpdater {
         this.numThreads = threads;
 
         // A single thread updates the workspace
-        workspaceUpdates = Executors.newSingleThreadExecutor();
-
-        // In some cases components can be updated in parallel. So
-        // a thread pool with a configurable number of threads is used
-        componentUpdates = Executors.newFixedThreadPool(threads,
-                new UpdaterThreadFactory());
+        workspaceUpdateExecutor = Executors.newSingleThreadExecutor();
 
         // A single thread to fire notification events
         notificationEvents = Executors.newSingleThreadExecutor();
@@ -187,80 +177,71 @@ public class WorkspaceUpdater {
     public void run() {
         run = true;
 
-        workspaceUpdates.submit(new Runnable() {
-            public void run() {
-                notifyWorkspaceUpdateStarted();
+        workspaceUpdateExecutor.submit(() -> {
+            notifyWorkspaceUpdateStarted();
 
-                synchManager.queueTasks();
+            synchManager.queueTasks();
 
-                while (run) {
-                    try {
-                        doUpdate();
-                    } catch (Exception e) {
-                        // TODO exception handler
-                        e.printStackTrace();
-                    }
-                }
-
-                synchManager.releaseTasks();
-                synchManager.runTasks();
-
-                notifyWorkspaceUpdateCompleted();
-            }
-        });
-
-    }
-
-    /**
-     * Submits a single task to the queue, and counts down a latch when done.
-     * Used when iterating the workspace for a set number of times.
-     *
-     * @param latch the latch to count down.
-     */
-    public void runOnce(final CountDownLatch latch) {
-        workspaceUpdates.submit(new Runnable() {
-            public void run() {
-                notifyWorkspaceUpdateStarted();
-                synchManager.queueTasks();
-
+            while (run) {
                 try {
                     doUpdate();
                 } catch (Exception e) {
-                    // TODO exception handler
                     e.printStackTrace();
                 }
-
-                synchManager.releaseTasks();
-                synchManager.runTasks();
-                notifyWorkspaceUpdateCompleted();
-                latch.countDown();
-
             }
+
+            synchManager.releaseTasks();
+            synchManager.runTasks();
+
+            notifyWorkspaceUpdateCompleted();
         });
+
     }
 
     /**
      * Submits a single task to the queue.
      */
     public void runOnce() {
-        workspaceUpdates.submit(new Runnable() {
-            public void run() {
-                notifyWorkspaceUpdateStarted();
-                synchManager.queueTasks();
+        workspaceUpdateExecutor.submit(() -> {
+            notifyWorkspaceUpdateStarted();
+            synchManager.queueTasks();
 
+            try {
+                doUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            synchManager.releaseTasks();
+            synchManager.runTasks();
+
+            notifyWorkspaceUpdateCompleted();
+        });
+    }
+
+    /**
+     * Iterate a set number of iterations against a latch.
+     *
+     * See {@link Workspace#iterate(CountDownLatch, int)}
+     *
+     * @param latch the latch to count down
+     * @param numIterations the number of iterations to update
+     */
+    public void iterate(final CountDownLatch latch, final int numIterations) {
+        workspaceUpdateExecutor.submit(() -> {
+            notifyWorkspaceUpdateStarted();
+            for (int i = 0; i < numIterations; i++) {
+                synchManager.queueTasks();
                 try {
                     doUpdate();
                 } catch (Exception e) {
-                    // TODO exception handler
                     e.printStackTrace();
                 }
-
                 synchManager.releaseTasks();
                 synchManager.runTasks();
-
-                notifyWorkspaceUpdateCompleted();
-
             }
+            latch.countDown();
+            notifyWorkspaceUpdateCompleted();
         });
     }
 
@@ -278,6 +259,7 @@ public class WorkspaceUpdater {
             e.printStackTrace();
         }
 
+        // TODO: Test to make sure these actions occur in the proper order
         for (UpdateAction action : updateActionManager.getActionList()) {
             action.invoke();
         }
@@ -312,7 +294,8 @@ public class WorkspaceUpdater {
      *
      * @param listener The listener to add.
      */
-    public void removeComponentListener(final ComponentUpdateListener listener) {
+    public void removeComponentListener(
+            final ComponentUpdateListener listener) {
         componentListeners.remove(listener);
     }
 
@@ -437,20 +420,6 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Called when update controller is changed.
-     */
-    private void notifyUpdateControllerChanged() {
-
-        notificationEvents.submit(new Runnable() {
-            public void run() {
-                for (WorkspaceUpdaterListener listener : updaterListeners) {
-                    listener.changedUpdateController();
-                }
-            }
-        });
-    }
-
-    /**
      * @return the numThreads
      */
     public int getNumThreads() {
@@ -467,66 +436,12 @@ public class WorkspaceUpdater {
             stop();
         }
         this.numThreads = numThreads;
-        this.componentUpdates = Executors.newFixedThreadPool(numThreads,
-                new UpdaterThreadFactory());
+        // this.componentUpdates = Executors.newFixedThreadPool(numThreads,
+        // new UpdaterThreadFactory());
         for (WorkspaceUpdaterListener listener : updaterListeners) {
             listener.changeNumThreads();
         }
 
-    }
-
-    /**
-     * Iterate the updater for a specified number of iterations.
-     *
-     * @param numIterations number of times to iterate updater.
-     */
-    public void iterate(final int numIterations) {
-        workspaceUpdates.submit(new Runnable() {
-            public void run() {
-                notifyWorkspaceUpdateStarted();
-                for (int i = 0; i < numIterations; i++) {
-                    synchManager.queueTasks();
-
-                    try {
-                        doUpdate();
-                    } catch (Exception e) {
-                        // TODO exception handler
-                        e.printStackTrace();
-                    }
-                    synchManager.releaseTasks();
-                    synchManager.runTasks();
-                }
-                notifyWorkspaceUpdateCompleted();
-            }
-        });
-    }
-
-    /**
-     * Iterate a set number of iterations against a latch.
-     *
-     * See {@link Workspace#iterate(CountDownLatch, int)}
-     *
-     * @param latch the latch to count down
-     * @param numIterations the number of iteration to update
-     */
-    public void iterate(final CountDownLatch latch, final int numIterations) {
-        workspaceUpdates.submit(new Runnable() {
-            public void run() {
-                notifyWorkspaceUpdateStarted();
-                for (int i = 0; i < numIterations; i++) {
-                    synchManager.queueTasks();
-                    try {
-                        doUpdate();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    synchManager.releaseTasks();
-                    synchManager.runTasks();
-                }
-                latch.countDown();
-                notifyWorkspaceUpdateCompleted();
-            }
-        });
     }
 
     /** A synch-manager where the methods do nothing. */
@@ -543,30 +458,6 @@ public class WorkspaceUpdater {
             /* no implementation */
         }
     };
-
-    /**
-     * Creates the threads used in the ExecutorService. Used to create a custom
-     * thread class that will be generated inside the executor. This allows for
-     * a clean way to capture the events using the thread instances themselves
-     * which 'know' their thread number.
-     */
-    private class UpdaterThreadFactory implements ThreadFactory {
-        /** Numbers the threads sequentially. */
-        private int nextThread = 1;
-
-        /**
-         * Creates a new UpdateThread with the current thread number.
-         *
-         * @param runnable The runnable this thread will execute.
-         * @return current thread number
-         */
-        public Thread newThread(final Runnable runnable) {
-            synchronized (this) {
-                return new UpdateThread(WorkspaceUpdater.this, runnable,
-                        nextThread++);
-            }
-        }
-    }
 
     /**
      * Returns a reference to the update manager.
@@ -590,53 +481,6 @@ public class WorkspaceUpdater {
         }
 
         return components;
-    }
-
-    /**
-     * Update the provided workspace component.
-     *
-     * @param component the component to update.
-     * @param signal completion signal
-     */
-    public void updateComponent(final WorkspaceComponent component,
-            final CompletionSignal signal) {
-
-        // If update is turned off on this component, return
-        if (component.getUpdateOn() == false) {
-            signal.done();
-            return;
-        }
-
-        Collection<ComponentUpdatePart> parts = component.getUpdateParts();
-
-        final LatchCompletionSignal partsSignal = new LatchCompletionSignal(
-                parts.size()) {
-            public void done() {
-                super.done();
-
-                /*
-                 * I'm not 100% sure this is safe. The JavaDocs don't say it
-                 * isn't but they don't say it is either. If a deadlock occurs
-                 * in the caller to updateComponent, this may be the issue.
-                 */
-                if (getLatch().getCount() <= 0) {
-                    signal.done();
-                }
-            }
-        };
-
-        for (ComponentUpdatePart part : parts) {
-            componentUpdates.submit(part.getUpdate(partsSignal));
-        }
-    }
-
-    /**
-     * Update couplings.
-     */
-    public void updateCouplings() {
-        workspace.getCouplingManager().updateAllCouplings();
-        LOGGER.trace("couplings updated");
-        workspace.getUpdater().notifyCouplingsUpdated();
     }
 
     /**

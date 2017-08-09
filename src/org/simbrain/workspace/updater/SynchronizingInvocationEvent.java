@@ -53,13 +53,8 @@ class SynchronizingInvocationEvent extends InvocationEvent {
         super(event.getSource(), new Runnable() {
             public void run() {
                 try {
-                    workspace.syncOnAllComponents(new Callable<Object>() {
-                        public Object call() throws Exception {
-                            event.dispatch();
-                            signal.done();
-                            return null;
-                        }
-                    });
+                    event.dispatch();
+                    signal.done();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

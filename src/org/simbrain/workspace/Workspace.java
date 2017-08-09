@@ -283,22 +283,37 @@ public class Workspace {
     }
 
     /**
+     * Iterates all couplings on all components until halted by user.
+     */
+    public void run() {        
+        for (WorkspaceComponent wc : getComponentList()) {
+            wc.start();
+        }
+        synchronized (updaterLock) {
+            updater.run();
+        }
+    }
+
+    /**
+     * Stops iteration of all couplings on all components.
+     */
+    public void stop() {
+        for (WorkspaceComponent wc : getComponentList()) {
+            wc.stop();
+        }
+        synchronized (updaterLock) {
+            updater.stop();
+        }
+        updateStopped();
+    }
+
+    /**
      * Update the workspace a single time.
      */
     public void iterate() {
         synchronized (updaterLock) {
             updater.runOnce();
         }
-        updateStopped();
-    }
-
-    /**
-     * Iterate for a specified number of steps.
-     *
-     * @param numIterations number of times to iterate the workspace.
-     */
-    public void iterate(final int numIterations) {
-        updater.iterate(numIterations);
         updateStopped();
     }
 
@@ -347,42 +362,6 @@ public class Workspace {
     }
 
     /**
-     * Iterate using a latch, which is counted down after the iteration
-     * completes. Use this in applications where it is important to perform
-     * additional operations after each workspace update.
-     *
-     * NOTE-1: The latch must be initialized with a count of 1. NOTE-2: This
-     * function should be called from a separate thread.
-     *
-     * @param latch the latch to count down after successful iteration.
-     */
-    public void iterate(CountDownLatch latch) {
-        synchronized (updaterLock) {
-            updater.runOnce(latch);
-        }
-        updateStopped();
-    }
-
-    /**
-     * Iterates all couplings on all components until halted by user.
-     */
-    public void run() {
-        synchronized (updaterLock) {
-            updater.run();
-        }
-    }
-
-    /**
-     * Stops iteration of all couplings on all components.
-     */
-    public void stop() {
-        synchronized (updaterLock) {
-            updater.stop();
-        }
-        updateStopped();
-    }
-
-    /**
      * Remove all components (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
@@ -392,7 +371,7 @@ public class Workspace {
         this.setWorkspaceChanged(false);
         currentFile = null;
         fireWorkspaceCleared();
-        manager.clearCouplings();
+        // manager.clearCouplings();
         this.getUpdater().getUpdateManager().setDefaultUpdateActions();
     }
 
@@ -529,75 +508,6 @@ public class Workspace {
     public void setTaskSynchronizationManager(
             final TaskSynchronizationManager manager) {
         updater.setTaskSynchronizationManager(manager);
-    }
-
-    /**
-     * Synchronizes on all components and executes task, returning the result of
-     * that callable.
-     *
-     * @param <E> The return type of task.
-     * @param task The task to synchronize.
-     * @return The result of task.
-     * @throws Exception if an exception occurs.
-     */
-    public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
-        synchronized (componentLock) {
-
-            Iterator<Object> locks = new Iterator<Object>() {
-
-                Iterator<? extends WorkspaceComponent> components = getComponentList()
-                        .iterator();
-                Iterator<? extends Object> current = null;
-
-                public boolean hasNext() {
-                    if (current == null || !current.hasNext()) {
-                        return components.hasNext();
-                    } else {
-                        return true;
-                    }
-                }
-
-                public Object next() {
-                    if (current == null || !current.hasNext()) {
-                        if (components.hasNext()) {
-                            current = components.next().getLocks().iterator();
-                        } else {
-                            throw new IllegalStateException("no more elements");
-                        }
-                    }
-
-                    return current.next();
-                }
-
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-
-            return syncRest(locks, task);
-        }
-    }
-
-    /**
-     * Recursively synchronizes on the components in the provided iterator and
-     * executes the provided task if there are no more components.
-     *
-     * @param <E> The return type of task.
-     * @param iterator The iterator of the remaining components to synchronize
-     *            on.
-     * @param task The task to synchronize.
-     * @return The result of the task.
-     * @throws Exception if an exception occurs.
-     */
-    public static <E> E syncRest(final Iterator<? extends Object> iterator,
-            final Callable<E> task) throws Exception {
-        if (iterator.hasNext()) {
-            synchronized (iterator.next()) {
-                return syncRest(iterator, task);
-            }
-        } else {
-            return task.call();
-        }
     }
 
     /**

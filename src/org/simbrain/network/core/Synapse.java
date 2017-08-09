@@ -275,7 +275,7 @@ public class Synapse {
         setSpikeResponder(s.getSpikeResponder());
         setEnabled(s.isEnabled());
         setDelay(s.getDelay());
-        setFrozen(s.isFrozen());
+        this.frozen = s.frozen;
         s.initSpikeResponder();
         isTemplate = s.isTemplate;
     }
@@ -504,7 +504,8 @@ public class Synapse {
             strength += increment;
         }
         // target.weightChanged(this); // Maybe?
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -514,7 +515,8 @@ public class Synapse {
         if (strength > lowerBound) {
             strength -= increment;
         }
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -528,7 +530,8 @@ public class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -542,7 +545,8 @@ public class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -556,7 +560,8 @@ public class Synapse {
         if (symmetric != null) {
             symmetric.setStrength(strength);
         }
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -584,7 +589,8 @@ public class Synapse {
     public void randomize() {
         strength = (getUpperBound() - getLowerBound()) * Math.random()
                 + getLowerBound();
-        getNetwork().fireSynapseChanged(this);
+        if (getNetwork() != null && !isTemplate)
+        	getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -775,7 +781,11 @@ public class Synapse {
      * @return reference to root network.
      */
     public Network getNetwork() {
-        return this.getSource().getNetwork();
+    	if (isTemplate) {
+    		return null;
+    	} else {
+            return this.getSource().getNetwork();
+    	}
     }
 
     /**
@@ -940,7 +950,9 @@ public class Synapse {
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
         //TODO: targeted event
-        this.getParentNetwork().fireSynapsesUpdated();
+        if (getNetwork() != null && !isTemplate) {
+            this.getParentNetwork().fireSynapsesUpdated();
+        }
     }
 
     /**

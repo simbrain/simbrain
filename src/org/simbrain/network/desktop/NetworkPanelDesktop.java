@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -132,6 +133,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
                     .getInt("networkSynapseMaxSize"));
             SynapseNode.setMinDiameter(SimbrainPreferences
                     .getInt("networkSynapseMinSize"));
+            AllToAll.setSelfConnectionAllowed(
+                    SimbrainPreferences.getBoolean("selfConnectionAllowed"));
             resetColors();
         } catch (PropertyNotFoundException e) {
             e.printStackTrace();

@@ -23,10 +23,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.SimbrainPreferences;
@@ -80,11 +82,13 @@ public class DesktopNetworkDialog extends NetworkDialog {
         SimbrainPreferences.restoreDefaultSetting("networkSynapseMinSize");
         SimbrainPreferences.restoreDefaultSetting("networkNudgeAmount");
         SimbrainPreferences.restoreDefaultSetting("networkSynapseVisibilityThreshold");
+        SimbrainPreferences.restoreDefaultSetting("selfConnectionAllowed");
 
         //Make sure new settings are visible
         ((NetworkPanelDesktop) networkPanel).applyUserPrefsToNetwork();
         networkPropertiesPanel.fillFieldValues();
         networkPropertiesPanel.setIndicatorColor();
+        quickConnectPanel.fillFieldValues();
         networkPanel.resetColors();
 
     }
@@ -119,6 +123,8 @@ public class DesktopNetworkDialog extends NetworkDialog {
                 SynapseNode.getMinDiameter());
         SimbrainPreferences.putInt("networkSynapseMaxSize",
                 SynapseNode.getMaxDiameter());
+        SimbrainPreferences.putBoolean("selfConnectionAllowed",
+                AllToAll.isSelfConnectionAllowed());
     }
 
     /**

@@ -52,7 +52,7 @@ public class NetworkDialog extends StandardDialog {
     protected NetworkPropertiesPanel networkPropertiesPanel;
 
     /** Connection preferences panel. */
-    private QuickConnectPreferencesPanel quickConnectPanel;
+    protected QuickConnectPreferencesPanel quickConnectPanel;
 
     /** Random panel. */
     private NetworkRandomizerPanel randomPanel;

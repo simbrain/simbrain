@@ -87,6 +87,7 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("projectorSammonEpsilon", .5);
         DEFAULT_MAP.put("textWorldDictionaryDirectory", ".");
         DEFAULT_MAP.put("visionWorldDirectory", ".");
+        DEFAULT_MAP.put("selfConnectionAllowed", false);
     }
 
     /**
@@ -106,6 +107,8 @@ public class SimbrainPreferences {
                 SIMBRAIN_PREFERENCES.putInt(key, (Integer) object);
             } else if (object instanceof Float) {
                 SIMBRAIN_PREFERENCES.putFloat(key, (Float) object);
+            } else if (object instanceof Boolean) {
+                SIMBRAIN_PREFERENCES.putBoolean(key, (Boolean) object);
             }
         }
     }
@@ -168,6 +171,40 @@ public class SimbrainPreferences {
             defVal = 0d;
         }
         Double value = SIMBRAIN_PREFERENCES.getDouble(property, defVal);
+        if (value == null) {
+            throw new PropertyNotFoundException("Property " + property
+                    + "not found.");
+        } else {
+            return value;
+        }
+    }
+    
+    /**
+     * Set a property whose value is a boolean.
+     *
+     * @param property the property name
+     * @param val the boolean value
+     */
+    public static void putBoolean(String property, boolean val) {
+        SIMBRAIN_PREFERENCES.putBoolean(property, val);
+    }
+    
+
+    /**
+     * Retrieve a property whose value is a boolean.
+     *
+     * @param property the property name
+     * @return the retrieved value
+     * @throws PropertyNotFoundException exception thrown when the property is
+     *             not found
+     */
+    public static boolean getBoolean(String property)
+            throws PropertyNotFoundException {
+        Boolean defVal = (Boolean) DEFAULT_MAP.get(property);
+        if (defVal == null) {
+            defVal = false;
+        }
+        Boolean value = SIMBRAIN_PREFERENCES.getBoolean(property, defVal);
         if (value == null) {
             throw new PropertyNotFoundException("Property " + property
                     + "not found.");

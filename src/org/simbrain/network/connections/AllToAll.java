@@ -39,7 +39,7 @@ public class AllToAll implements ConnectNeurons {
      * neuron are allowed. Only applicable if the source and target neuron sets
      * are the same.
      */
-    private boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
+    private static boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
 
     /**
      * Construct to all to all connector.
@@ -164,7 +164,7 @@ public class AllToAll implements ConnectNeurons {
      *         where the source and target neuron are the same neuron is
      *         allowed.
      */
-    public boolean isSelfConnectionAllowed() {
+    public static boolean isSelfConnectionAllowed() {
         return selfConnectionAllowed;
     }
 
@@ -173,8 +173,8 @@ public class AllToAll implements ConnectNeurons {
      *
      * @param allowSelfConnect Neurons are allowed to connect to themselves.
      */
-    public void setSelfConnectionAllowed(boolean allowSelfConnect) {
-        this.selfConnectionAllowed = allowSelfConnect;
+    public static void setSelfConnectionAllowed(boolean allowSelfConnect) {
+        selfConnectionAllowed = allowSelfConnect;
     }
 
 }

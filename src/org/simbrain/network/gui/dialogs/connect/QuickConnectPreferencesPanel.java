@@ -107,7 +107,7 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
         // Set up main panel
         JLabel infoLabel = new JLabel(
-                "Set preferences for making \"quick connections\"");
+                "Set preferences for making \"Quick connections\" using keyboard shortucts");
         infoLabel.setAlignmentX(CENTER_ALIGNMENT);
         mainPanel.add(infoLabel);
         mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -128,6 +128,18 @@ public class QuickConnectPreferencesPanel extends JPanel {
 
         initCardPanel();
 
+    }
+    
+    /**
+     * Fill field values (used e.g. when restoring defaults so the panel
+     * properly displays changed values).
+     */
+    public void fillFieldValues() {
+        connectorPanels[0].fillFieldValues();
+        connectorPanels[1].fillFieldValues();
+        connectorPanels[2].fillFieldValues();
+        // ratioPanel
+        // Others here?
     }
 
     /**

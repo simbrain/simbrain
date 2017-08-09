@@ -338,7 +338,7 @@ public class NetworkPropertiesPanel extends JPanel {
         }
         networkPanel.setShowTime(showTimeBox.isSelected());
         networkPanel.repaint();
-        
+
         NeuronGroup.setUseSubSampling(cbUseSubSampling.isSelected());
         NeuronGroup.setNumSubSamples(Integer.parseInt(tfNumSubSamples
                 .getText()));

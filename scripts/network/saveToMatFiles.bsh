@@ -13,7 +13,7 @@ import com.jmatio.types.MLDouble;
 
 {
 
-	List<Group> groups = network.getFlatGroupListNoSubnets();
+	List<Group> groups = network.getGroupList();
 	List<MLArray> vecData = new ArrayList<MLArray>();
 	for (Group g : groups) {
 		String name = g.getLabel();
@@ -21,7 +21,7 @@ import com.jmatio.types.MLDouble;
 		if (g instanceof NeuronGroup) {
 			vecData.add(new MLDouble(name+"_activations",
 				((NeuronGroup)g).getActivations(), 1));
-		} else {
+		} else if (g instanceof SynapseGroup) {
 			vecData.add(new MLDouble(name+"_weights",
 				((SynapseGroup) g).getWeightMatrix()));
 		}

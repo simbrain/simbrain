@@ -73,10 +73,16 @@ public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
         interpreter.getNameSpace().importPackage(
                 "org.simbrain.network.neuron_update_rules");
         interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.neuron_update_rules");
+        interpreter.getNameSpace().importPackage(
                 "org.simbrain.network.synapse_update_rules");
+        interpreter.getNameSpace().importPackage(
+                "org.simbrain.network.synapse_update_rules.spikeresponders");
         interpreter.getNameSpace().importPackage(
                 "org.simbrain.network.trainers");
         interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
+        interpreter.getNameSpace().importPackage("org.simbrain.custom_sims");
+        interpreter.getNameSpace().importPackage("org.simbrain.custom_sims.simulations");
         interpreter.getNameSpace().importPackage("org.simbrain.workspace");
         interpreter.getNameSpace().importCommands(".");
         interpreter.getNameSpace().importCommands(

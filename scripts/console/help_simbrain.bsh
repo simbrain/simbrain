@@ -5,6 +5,7 @@ help_simbrain() {
     print("");
 
     print("---- SOME SAMPLE COMMANDS ----");
+    print("componentBounds();");
     print("print(workspace);");
     print("workspace.iterate(100);");
     print("workspace.run();");

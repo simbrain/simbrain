@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.workspace.updater.ComponentUpdatePart;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
@@ -274,22 +273,6 @@ public abstract class WorkspaceComponent {
      */
     public String getKeyFromObject(Object object) {
         return null;
-    }
-
-    /**
-     * Returns the collection of update parts for this component.
-     *
-     * @return The collection of update parts for this component.
-     */
-    public Collection<ComponentUpdatePart> getUpdateParts() {
-        Runnable callable = new Runnable() {
-            public void run() {
-                update();
-            }
-        };
-
-        return Collections.singleton(
-                new ComponentUpdatePart(this, callable, toString(), this));
     }
 
     /**
@@ -642,5 +625,20 @@ public abstract class WorkspaceComponent {
                 dataType);
     }
 
+    /**
+     * Called when a simulation begins, e.g. when the "run" button is pressed.
+     * Subclasses should override this if special events need to occur at the
+     * start of a simulation.
+     */
+    public void start() {
+    }
+
+    /**
+     * Called when a simulation stops, e.g. when the "stop" button is pressed.
+     * Subclasses should override this if special events need to occur at the
+     * start of a simulation.
+     */
+    public void stop() {
+    }
 
 }

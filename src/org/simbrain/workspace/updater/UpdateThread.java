@@ -1,5 +1,7 @@
 package org.simbrain.workspace.updater;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 /**
  * This thread class adds some special methods specific to this class.
  *
@@ -29,18 +31,18 @@ class UpdateThread extends Thread {
     /**
      * Sets the current component update that is being executed.
      *
-     * @param update the component update that is executing.
+     * @param component the component update that is executing.
      */
-    void setCurrentTask(final ComponentUpdatePart update) {
-        updater.notifyComponentUpdateStarted(update.getParent(), thread);
+    void setCurrentTask(final WorkspaceComponent component) {
+        updater.notifyComponentUpdateStarted(component, thread);
     }
 
     /**
      * Clears the current component update.
      *
-     * @param update The component update to be cleared.
+     * @param component The component update to be cleared.
      */
-    void clearCurrentTask(final ComponentUpdatePart update) {
-        updater.notifyComponentUpdateFinished(update.getParent(), thread);
+    void clearCurrentTask(final WorkspaceComponent component) {
+        updater.notifyComponentUpdateFinished(component, thread);
     }
 }

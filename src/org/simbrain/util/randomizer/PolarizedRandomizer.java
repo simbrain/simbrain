@@ -23,8 +23,7 @@ import org.simbrain.util.math.ProbDistribution;
 
 /**
  *
- * A tentative solution to some of the issues involving randomizers....
- * Creaties a randomizer that returns either positive or negative values
+ * Creates a randomizer that returns either positive or negative values
  * exclusively depending on its polarity. It is meant to be the case that no
  * parameters should ever be negative since they represent absolute values and
  * the sign of the output is wholly determined by the polarity.

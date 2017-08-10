@@ -63,6 +63,9 @@ public class ConnectionDialog extends StandardDialog {
     /** The excitatory ratio and randomizer panel. */
     private SynapsePolarityAndRandomizerPanel eirPanel;
 
+    /** Drop down triangle for synapse properties. */
+    private DropDownTriangle detailTriangle;
+
     /**
      * Create an instance of a connection dialog.
      *
@@ -92,8 +95,6 @@ public class ConnectionDialog extends StandardDialog {
         this.networkPanel = networkPanel;
         this.connectionPanel = optionsPanel;
     }
-
-    DropDownTriangle detailTriangle;
 
     /**
      * Initialize the connection panel.

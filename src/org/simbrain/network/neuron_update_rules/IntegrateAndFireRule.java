@@ -24,7 +24,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.randomizer.Randomizer;
 
 /**
- * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
+ * Linear <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
  * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
@@ -53,6 +53,9 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
     /** Background Current (nA) . */
     private double backgroundCurrent = 13.5;
+
+    /** Refractor Period (ms) . */
+    private double refractoryPeriod = 3;
 
     /** Noise dialog. */
     private Randomizer noiseGenerator = new Randomizer();
@@ -88,10 +91,13 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
      */
     public void update(Neuron neuron) {
 
-        double iSyn = inputType.getInput(neuron);
+        // Incoming current is 0 during the refractory period, otherwise it's
+        // equal to input and background current
+        double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 
+                0 : inputType.getInput(neuron) + backgroundCurrent;
 
         if (addNoise) {
-            iSyn += noiseGenerator.getRandom();
+            synCurrent += noiseGenerator.getRandom();
         }
 
         double timeStep = neuron.getNetwork().getTimeStep();
@@ -112,13 +118,13 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
         double dVm =
             timeStep
-                * (-(memPotential - restingPotential) + resistance
-                    * (iSyn + backgroundCurrent))
+                * (-(memPotential - restingPotential) + resistance * synCurrent)
                 / timeConstant;
 
         memPotential += dVm;
 
-        if (memPotential >= threshold) {
+        if ((memPotential >= threshold) && (neuron.getNetwork()
+                .getTime() > (getLastSpikeTime() + refractoryPeriod))) {
             neuron.setSpkBuffer(true);
             setHasSpiked(true, neuron);
             memPotential = resetPotential;

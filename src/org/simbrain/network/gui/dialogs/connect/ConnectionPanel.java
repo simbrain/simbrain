@@ -124,6 +124,9 @@ public final class ConnectionPanel {
         JPanel cbPanel = new JPanel(new FlowLayout());
         cbPanel.add(new JLabel("Connection Manager: "));
         cbPanel.add(cbConnectionType);
+        // Sparse by default
+        cbConnectionType.setSelectedIndex(2);
+        updateComboBox();
 
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -149,16 +152,23 @@ public final class ConnectionPanel {
         cbConnectionType.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent arg0) {
-                CardLayout cl = (CardLayout) connectPanel.getLayout();
-                cl.show(connectPanel, cbConnectionType.getSelectedItem()
-                        .toString());
-                connectPanel.setPreferredSize(getSelectedPanel()
-                        .getPreferredSize());
-                mainPanel.revalidate();
-                mainPanel.repaint();
-                parentFrame.pack();
+                updateComboBox();
             }
         });
+    }
+    
+    /**
+     * Update state of combo box.
+     */
+    private void updateComboBox() {
+        CardLayout cl = (CardLayout) connectPanel.getLayout();
+        cl.show(connectPanel, cbConnectionType.getSelectedItem()
+                .toString());
+        connectPanel.setPreferredSize(getSelectedPanel()
+                .getPreferredSize());
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        parentFrame.pack();
     }
 
     /**

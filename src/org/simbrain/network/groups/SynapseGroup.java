@@ -74,11 +74,11 @@ public class SynapseGroup extends Group {
     /**
      * The default ratio (all excitatory) for all synapse groups.
      */
-    public static final double DEFAULT_EXCITATORY_RATIO = 1.0;
+    public static final double DEFAULT_EXCITATORY_RATIO = .5;
 
     /** All to All. */
-    public static final ConnectNeurons DEFAULT_CONNECTION_MANAGER =
-            new AllToAll();
+    public static final ConnectNeurons DEFAULT_CONNECTION_MANAGER = new Sparse(
+            .1, false, false);
 
     /** A set containing all the excitatory (wt > 0) synapses in the group. */
     private Set<Synapse> exSynapseSet = new HashSet<Synapse>();
@@ -220,7 +220,7 @@ public class SynapseGroup extends Group {
 
     /**
      * A byte-encoded representation of all relevant synapse parameters of
-     * all synapses in the group. The compressed rep only stores snyapse
+     * all synapses in the group. The compressed rep only stores synapse
      * weights, relying on the prototype synapses ({@link #excitatoryPrototype}
      * and {@link #inhibitoryPrototype}) to fill in the remaining values. But
      * if the synapses also all have different delays, PSRs, etc. This

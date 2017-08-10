@@ -73,7 +73,7 @@ public class Sparse implements ConnectNeurons {
      * (changing the number of connecitions) after construction.
      */
     private boolean permitDensityEditing = true;
-    
+
     /**
      * A map of permutations governing in what order connections to target
      * neurons will be added if the connection density is raised for each source

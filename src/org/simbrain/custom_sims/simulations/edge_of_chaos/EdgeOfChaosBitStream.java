@@ -15,7 +15,7 @@ import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionAdapter;
 
 /**
  * Demonstration of representational capacities of recurrent networks based on
@@ -24,8 +24,6 @@ import org.simbrain.workspace.updater.UpdateAction;
  * 1413-1436.
  */
 public class EdgeOfChaosBitStream extends RegisteredSimulation {
-
-    // TODO: Add PCA by default
 
     // Simulation Parameters
     int NUM_NEURONS = 120;
@@ -56,7 +54,6 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         // Set up control panel
         controlPanel();
     }
-
 
     private void controlPanel() {
         ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
@@ -140,37 +137,25 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         network.addGroup(bitStreamInputs);
         return bitStreamInputs;
     }
-    
+
     private void setUpTimeSeries() {
         // Set up the plot
         PlotBuilder ts = sim.addTimeSeriesPlot(674, 11, 363, 285, "Difference");
-        // Add update action to transfer info
-        sim.getWorkspace().addUpdateAction(new UpdateAction() {
-
-            @Override
-            public void invoke() {
-                double inputDiff = 
-                        bitStream1.getNeuronList().get(0).getActivation() -
-                        bitStream2.getNeuronList().get(0).getActivation();
-                double activationDiff = SimbrainMath.distance(
-                        res1.getActivations(), res2.getActivations());
-                ts.getTimeSeriesComponent().setValue(inputDiff, 1);
-                ts.getTimeSeriesComponent().setValue(activationDiff, 1);
-            }
-
-            @Override
-            public String getDescription() {
-                return "Update time series";
-            }
-
-            @Override
-            public String getLongDescription() {
-                return "Update time series";
-            }
-            
-        });
+        sim.getWorkspace()
+                .addUpdateAction(new UpdateActionAdapter("Update time series") {
+                    @Override
+                    public void invoke() {
+                        double inputDiff = bitStream1.getNeuronList().get(0)
+                                .getActivation()
+                                - bitStream2.getNeuronList().get(0)
+                                        .getActivation();
+                        double activationDiff = SimbrainMath.distance(
+                                res1.getActivations(), res2.getActivations());
+                        ts.getTimeSeriesComponent().setValue(inputDiff, 1);
+                        ts.getTimeSeriesComponent().setValue(activationDiff, 1);
+                    }
+                });
     }
-
 
     public EdgeOfChaosBitStream(SimbrainDesktop desktop) {
         super(desktop);

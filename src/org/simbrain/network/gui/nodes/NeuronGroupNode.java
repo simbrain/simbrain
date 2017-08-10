@@ -261,7 +261,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 
 	/**
 	 * Helper class to create the neuron group property dialog (since it is
-	 * needed in two places.)
+	 * needed in two places.).
 	 *
 	 * @return the neuron group property dialog.
 	 */
@@ -485,7 +485,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	};
 
 	/**
-	 * Action for removing this group
+	 * Action for removing this group.
 	 */
 	protected Action removeAction = new AbstractAction() {
 
@@ -532,7 +532,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	};
 
 	/**
-	 * Action for unclamping neurons
+	 * Action for unclamping neurons.
 	 */
 	protected Action unclampNeuronsAction = new AbstractAction() {
 

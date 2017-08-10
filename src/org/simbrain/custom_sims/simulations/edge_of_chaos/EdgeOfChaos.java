@@ -11,7 +11,6 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
-import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialSimpleConstrainedKIn;
 import org.simbrain.network.core.Network;
@@ -27,7 +26,6 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -39,20 +37,21 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  * 1413-1436.
  */
 public class EdgeOfChaos extends RegisteredSimulation {
-    
-    //TODO: Add PCA by default
+
+    // TODO: Add PCA by default
 
     // Simulation Parameters
     int NUM_NEURONS = 120;
     int GRID_SPACE = 25;
     // Since mean is 0, lower variance means lower average weight strength
-    private double variance = .5; 
+    private double variance = .5;
     private double u_bar = .5;
-    private int kIn = 4;
+    private int kIn = 4; // in-degree (num connections to each neuron)
 
     // References
     Network network;
-    SynapseGroup reservoir, bitsToRes, cheeseToRes, flowersToRes; // rename reservoir
+    SynapseGroup reservoir, bitsToRes, cheeseToRes, flowersToRes; // rename
+                                                                  // reservoir
     NeuronGroup reservoirNg, bitStreamInputs, sensorNodes;
     OdorWorldBuilder world;
     RotatingEntity mouse;
@@ -95,7 +94,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         cheese.getSmellSource().setDispersion(65);
         flower = world.addEntity(290, 40, "Pansy.gif",
                 new double[] { 0, 0, 0, 0, 0, 1 });
-        cheese.getSmellSource().setDispersion(65);
+        flower.getSmellSource().setDispersion(65);
 
         // Couple agent to cheese and flower nodes
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), sensorNodes);
@@ -105,12 +104,12 @@ public class EdgeOfChaos extends RegisteredSimulation {
         ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
-        panel.addButton("Bit-stream mode","Apply", () -> {
+        panel.addButton("Bit-stream mode", "Apply", () -> {
             bitsToRes.setEnabled(true);
             cheeseToRes.setEnabled(false);
             flowersToRes.setEnabled(false);
         });
-        panel.addButton("Sensor mode","Apply", () -> {
+        panel.addButton("Sensor mode", "Apply", () -> {
             bitsToRes.setEnabled(false);
             cheeseToRes.setEnabled(true);
             flowersToRes.setEnabled(true);
@@ -134,10 +133,10 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 }
             }
         });
-        panel.addButton("Similarity Study", "Run", () -> {
-            // TODO: Don't allow this to be run twice?
-            cloneReservoir();
-        });
+//        panel.addButton("Similarity Study", "Run", () -> {
+//            // TODO: Don't allow this to be run twice?
+//            cloneReservoir();
+//        });
     }
 
     void buildNetwork() {
@@ -192,13 +191,14 @@ public class EdgeOfChaos extends RegisteredSimulation {
         bitStreamInputs.setNeuronType(b);
         bitStreamInputs.setClamped(true);
         bitStreamInputs.setLabel("Bit-stream");
-        bitStreamInputs.setTestData(new double[][] { { u_bar }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 }, { u_bar }, { 0.0 }, { u_bar }, { u_bar },
-                { 0.0 }, { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
+        bitStreamInputs.setTestData(
+                new double[][] { { u_bar }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
+                        { u_bar }, { 0.0 }, { u_bar }, { u_bar }, { 0.0 },
+                        { u_bar }, { u_bar }, { 0.0 }, { 0.0 }, { u_bar } });
         bitStreamInputs.setInputMode(true);
         network.addGroup(bitStreamInputs);
-        bitsToRes = SynapseGroup.createSynapseGroup(bitStreamInputs, reservoirNg,
-                new AllToAll());
+        bitsToRes = SynapseGroup.createSynapseGroup(bitStreamInputs,
+                reservoirNg, new AllToAll());
         bitsToRes.setStrength(1.0, Polarity.BOTH);
         network.addGroup(bitsToRes);
 
@@ -208,16 +208,16 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 reservoirNg.getMinY());
         sensorNodes.setLabel("Sensors");
         sensorNodes.setClamped(true);
-        network.addGroup(sensorNodes);        
+        network.addGroup(sensorNodes);
         // Make custom connections from sensor nodes to upper-left and
-        // lower-right quadrants of the reservoir network to ensure visually 
+        // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
         cheeseToRes = sensorConnections(sensorNodes, reservoirNg,
                 new int[] { 0, 1, 2 }, .8, 1);
         network.addGroup(cheeseToRes);
         flowersToRes = sensorConnections(sensorNodes, reservoirNg,
                 new int[] { 3, 4, 5 }, .8, 3);
-//        network.addGroup(flowersToRes);
+        network.addGroup(flowersToRes);
 
         // Use concurrent buffered update
         network.getUpdateManager().clear();
@@ -266,46 +266,50 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 if ((x >= xStart) && (x < xEnd)) {
                     for (int j = 0; j < srcNodeIndices.length; j++) {
                         if (Math.random() < sparsity) {
-                            Synapse syn = new Synapse(tarNList.get(ii),
-                                    src.getNeuronListUnsafe().get(j));
+                            Synapse syn = new Synapse(
+                                    src.getNeuronListUnsafe()
+                                            .get(srcNodeIndices[j]),
+                                    tarNList.get(ii));
                             syn.setStrength(1);
                             src2Res.addSynapseUnsafe(syn);
                         }
                     }
                 }
             }
-
         }
         return src2Res;
     }
-    
+
+    // NOT WORKING
     private void cloneReservoir() {
-        
-        network.removeGroup(sensorNodes);
-        sim.getWorkspace()
-                .removeWorkspaceComponent(world.getOdorWorldComponent());
-        
+
+//        network.removeGroup(sensorNodes);
+//        sim.getWorkspace()
+//                .removeWorkspaceComponent(world.getOdorWorldComponent());
+
         NeuronGroup clonedRes = new NeuronGroup(network, reservoirNg);
-        clonedRes.setLocation(
-                reservoirNg.getMinX() - reservoirNg.getWidth() - 200,
-                reservoirNg.getMinY());
+//        clonedRes.setLocation(
+//                reservoirNg.getMinX() - reservoirNg.getWidth() - 200,
+//                reservoirNg.getMinY());
+
         network.addGroup(clonedRes);
-        //TODO: Need a  copy constructor and/or copy properties function for synapse groups
 
-        NeuronGroup clonedInputs = new NeuronGroup(network, bitStreamInputs);
-        network.addGroup(clonedInputs);
+        // // TODO: Need a copy constructor and/or copy properties function for
+        // // synapse groups
+        //
+        // NeuronGroup clonedInputs = new NeuronGroup(network, bitStreamInputs);
+        // network.addGroup(clonedInputs);
+        //
+        // bitStreamInputs.setLocation(reservoirNg.getCenterX(),
+        // reservoirNg.getMaxY() + 100);
+        // clonedInputs.setLocation(clonedRes.getCenterX(),
+        // clonedRes.getMaxY() + 100);
+        //
+        // SynapseGroup clonedBitsToRes = SynapseGroup
+        // .createSynapseGroup(clonedInputs, clonedRes, new AllToAll());
+        // clonedBitsToRes.setStrength(1.0, Polarity.BOTH);
+        // network.addGroup(clonedBitsToRes);
 
-        bitStreamInputs.setLocation(reservoirNg.getCenterX(),
-                reservoirNg.getMaxY() + 100);
-        clonedInputs.setLocation(clonedRes.getCenterX(),
-                clonedRes.getMaxY() + 100);
-
-        SynapseGroup clonedBitsToRes = SynapseGroup.createSynapseGroup(
-                clonedInputs, clonedRes, new AllToAll());
-        clonedBitsToRes.setStrength(1.0, Polarity.BOTH);
-        network.addGroup(clonedBitsToRes);
-
-        
     }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {

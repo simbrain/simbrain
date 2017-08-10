@@ -50,15 +50,13 @@ public class Cerebellum extends RegisteredSimulation {
     public Cerebellum() {super();}
     
     /**
-     * Set up the simulation object
+     * Set up the simulation object.
      */
     public Cerebellum(SimbrainDesktop desktop) {
         super(desktop);
     }
 
-    /**
-     * Run the simulation!
-     */
+    @Override
     public void run() {
 
         // Clear workspace

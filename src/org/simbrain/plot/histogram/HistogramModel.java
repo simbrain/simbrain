@@ -35,8 +35,13 @@ public class HistogramModel extends ChartModel {
     /** The default number of bins. **/
     public static final int DEFAULT_BINS = 15;
 
+    // Note that if there are more data sources than are currently
+    // used that the unused data sources will print a single bar.
+    // A solution for now is to only have the user have as many
+    // data sources are they used.  But a solution before that is 
+    // just to have one data source :)
     /** Default number of data sources for plot initialization. */
-    public static final int INITIAL_DATA_SOURCES = 4;
+    public static final int INITIAL_DATA_SOURCES = 1;
 
     /**
      * An array containing all the data series to be plotted. This is redundant
@@ -64,17 +69,16 @@ public class HistogramModel extends ChartModel {
     /**
      * Creates a histogram with no data and a specified number of datsets.
      *
-     * @param numSources
-     *            number of datasets to add
+     * @param numSources number of datasets to add
      */
     public HistogramModel(int numSources) {
         this.addDataSources(numSources);
         redraw();
     }
-    
+
     public HistogramModel(int numSources, int bins) {
-    	this(numSources);
-    	this.bins = bins;
+        this(numSources);
+        this.bins = bins;
     }
 
     /**
@@ -82,14 +86,12 @@ public class HistogramModel extends ChartModel {
      * data name(s), but does not include titles for the histogram, the x axis
      * or the y axis.
      *
-     * @param data
-     *            the data set(s) to be plotted
-     * @param dataNames
-     *            the name(s) of the data set(s)
-     * @param bins
-     *            the number of bins used in the histogram
+     * @param data the data set(s) to be plotted
+     * @param dataNames the name(s) of the data set(s)
+     * @param bins the number of bins used in the histogram
      */
-    public HistogramModel(List<double[]> data, List<String> dataNames, int bins) {
+    public HistogramModel(List<double[]> data, List<String> dataNames,
+            int bins) {
         this(data, dataNames, bins, "", "", "");
     }
 
@@ -97,21 +99,15 @@ public class HistogramModel extends ChartModel {
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
      *
-     * @param data
-     *            the data set(s) to be plotted
-     * @param dataNames
-     *            the name(s) of the data set(s)
-     * @param bins
-     *            the number of bins used in the histogram
-     * @param title
-     *            the title of the histogram
-     * @param xAxisName
-     *            the title of the x axis
-     * @param yAxisName
-     *            the title of the y axis
+     * @param data the data set(s) to be plotted
+     * @param dataNames the name(s) of the data set(s)
+     * @param bins the number of bins used in the histogram
+     * @param title the title of the histogram
+     * @param xAxisName the title of the x axis
+     * @param yAxisName the title of the y axis
      */
-    public HistogramModel(List<double[]> data, List<String> dataNames,
-            int bins, String title, String xAxisName, String yAxisName) {
+    public HistogramModel(List<double[]> data, List<String> dataNames, int bins,
+            String title, String xAxisName, String yAxisName) {
         this(data, dataNames, bins, title, xAxisName, yAxisName, null);
     }
 
@@ -119,20 +115,13 @@ public class HistogramModel extends ChartModel {
      * Creates a histogram with the provided number of bins, data set(s), data
      * name(s), title, and x and y axis titles.
      *
-     * @param newData
-     *            the data set(s) to be plotted
-     * @param dataNames
-     *            the name(s) of the data set(s)
-     * @param bins
-     *            the number of bins used in the histogram
-     * @param title
-     *            the title of the histogram
-     * @param xAxisName
-     *            the title of the x axis
-     * @param yAxisName
-     *            the title of the y axis
-     * @param colorPallet
-     *            a custom color pallete
+     * @param newData the data set(s) to be plotted
+     * @param dataNames the name(s) of the data set(s)
+     * @param bins the number of bins used in the histogram
+     * @param title the title of the histogram
+     * @param xAxisName the title of the x axis
+     * @param yAxisName the title of the y axis
+     * @param colorPallet a custom color pallete
      */
     public HistogramModel(List<double[]> newData, List<String> dataNames,
             int bins, String title, String xAxisName, String yAxisName,
@@ -177,14 +166,15 @@ public class HistogramModel extends ChartModel {
     public void redraw() {
         // First time draws data as is
         dataSet.resetData(dataNames, data, bins);
-        // Second time redraws based on maximum range amoung sets.
+        // Second time redraws based on maximum range among sets.
         dataSet.resetData(dataNames, data, bins);
     }
 
     /**
      * Reset the data in the model.
+     * 
      * @param data the data to set
-     * @param names 
+     * @param names
      */
     public void resetData(List<double[]> data, List<String> names) {
         this.data = data;
@@ -205,8 +195,7 @@ public class HistogramModel extends ChartModel {
      * Create specified number of set of data sources. Adds these two existing
      * data sources.
      *
-     * @param numDataSources
-     *            number of data sources to initialize plot with
+     * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
         for (int i = 0; i < numDataSources; i++) {
@@ -229,8 +218,7 @@ public class HistogramModel extends ChartModel {
      * Sets the number of bins. Also automatically updates the number of bins
      * text field, but does NOT redraw the histogram.
      *
-     * @param bins
-     *            the new number of bins
+     * @param bins the new number of bins
      */
     public void setBins(int bins) {
         this.bins = bins;

@@ -1097,7 +1097,8 @@ public class Neuron {
 
     /**
      * Return the upper bound for the the underlying rule, if it is bounded.
-     * Else it simply returns 1. Used to color neuron activations.
+     * Else it simply returns a "graphical" upper bound. Used to color neuron
+     * activations.
      *
      * @return the upper bound, if applicable, and 1 otherwise.
      */
@@ -1105,13 +1106,14 @@ public class Neuron {
         if (updateRule instanceof BoundedUpdateRule) {
             return ((BoundedUpdateRule) updateRule).getUpperBound();
         } else {
-            return 1;
+            return updateRule.getGraphicalUpperBound();
         }
     }
 
     /**
      * Return the lower bound for the the underlying rule, if it is bounded.
-     * Else it simply returns -1. Used to color neuron activations.
+     * Else it simply returns the "graphical" lower bound. Used to color neuron
+     * activations.
      *
      * @return the upper bound, if applicable, and -1 otherwise.
      */
@@ -1119,7 +1121,7 @@ public class Neuron {
         if (updateRule instanceof BoundedUpdateRule) {
             return ((BoundedUpdateRule) updateRule).getLowerBound();
         } else {
-            return -1;
+            return updateRule.getGraphicalLowerBound();
         }
     }
 

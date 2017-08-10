@@ -109,7 +109,6 @@ public class CortexSimple extends RegisteredSimulation {
             rule.setTimeConstant(30);
             rule.setBackgroundCurrent(0);
             neuron.setUpdateRule(rule);
-            neuron.setUpperBound(50); // For wand
             neurons.add(neuron);
         }
         NeuronGroup ng = new NeuronGroup(network, neurons);
@@ -124,9 +123,13 @@ public class CortexSimple extends RegisteredSimulation {
 
         PolarizedRandomizer exRand = new PolarizedRandomizer(
                 Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
+        exRand.setParam1(-2.4);
+        exRand.setParam2(.35);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
                 Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-
+        inRand.setParam1(-2.2);
+        inRand.setParam2(.35);
+        
         Sparse con = new Sparse(sparsity, false, false);
 
         SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.5,

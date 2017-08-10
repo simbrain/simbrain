@@ -23,6 +23,7 @@ import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
+import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -100,9 +101,6 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Connect reservoir
         sgReservoir = connectReservoir(network, reservoir);
-
-        // Set up "bit-stream" input nodes
-        //buildBitStream();
 
         // Set up sensor nodes
         buildSensorNodes();

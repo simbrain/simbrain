@@ -22,7 +22,6 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistribution;
 
 /**
- *
  * Creates a randomizer that returns either positive or negative values
  * exclusively depending on its polarity. It is meant to be the case that no
  * parameters should ever be negative since they represent absolute values and
@@ -33,8 +32,10 @@ import org.simbrain.util.math.ProbDistribution;
  */
 public class PolarizedRandomizer extends Randomizer {
 
+    /** Default polarity for this randomizer. */
     public static final Polarity DEFAULT_POLARITY = Polarity.EXCITATORY;
 
+    /** Is this randomizer exciatory, inhibitory, or both. */
     public Polarity polarity;
 
     /**
@@ -46,8 +47,9 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
+     * Construct a randomizer with a specified polarity.
      *
-     * @param polarity
+     * @param polarity initial polarity.
      */
     public PolarizedRandomizer(Polarity polarity) {
         super();
@@ -55,16 +57,18 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
+     * Construct a randomizer with a specified polarity and probability
+     * distribution.
      * 
-     * @param polarity
-     * @param pdf
+     * @param polarity the polarity
+     * @param pdf the prob. distribution
      */
     public PolarizedRandomizer(Polarity polarity, ProbDistribution pdf) {
-    	super();
-    	this.pdf = pdf;
-    	this.polarity = polarity;
+        super();
+        this.pdf = pdf;
+        this.polarity = polarity;
     }
-    
+
     /**
      * Copy constructor.
      *
@@ -81,7 +85,8 @@ public class PolarizedRandomizer extends Randomizer {
 
     /**
      * Checks to make sure that there are no negative parameters.
-     * @return
+     * 
+     * @return 
      */
     public String checkParamsNonNegative() {
         String ret = "";
@@ -162,6 +167,8 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
+     * See the javadoc at {@link Randomizer#param1}.
+     *
      * @return the param1
      */
     public double getParam1() {
@@ -169,6 +176,8 @@ public class PolarizedRandomizer extends Randomizer {
     }
 
     /**
+     * See the javadoc at {@link Randomizer#param2}.
+     *
      * @return the param2
      */
     public double getParam2() {
@@ -185,7 +194,7 @@ public class PolarizedRandomizer extends Randomizer {
     /**
      * @param polarity the polarity to set
      */
-    public void setPolarity(Polarity polarity) {
+    public void setPolarity(final Polarity polarity) {
         this.polarity = polarity;
     }
 

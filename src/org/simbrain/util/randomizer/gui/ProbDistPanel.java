@@ -204,12 +204,12 @@ public class ProbDistPanel {
 
         double param1 = Utils.doubleParsable(tfParam1);
         if (tfParam1.isEnabled() && !Double.isNaN(param1)) {
-            rand.setParam1Consistent(pdf.getParam1Name(), param1);
+            rand.setParam1ByName(pdf.getParam1Name(), param1);
         }
 
         double param2 = Utils.doubleParsable(tfParam2);
         if (tfParam2.isEnabled() && !Double.isNaN(param2)) {
-            rand.setParam2Consistent(pdf.getParam2Name(), param2);
+            rand.setParam2ByName(pdf.getParam2Name(), param2);
         }
         if (!tsClipping.isNull()) {
             rand.setClipping(tsClipping.isSelected());

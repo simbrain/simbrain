@@ -440,6 +440,15 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 			return getDefaultContextMenu();
 		}
 
+	    @Override
+	    protected String getToolTipText() {
+	        return "Neurons: " + neuronGroup.size();
+	    }
+
+	    @Override
+	    protected boolean hasToolTipText() {
+	       return true;
+	    }
 	}
 
 	/**
@@ -956,5 +965,5 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	 public List<InteractionBox> getInteractionBoxes() {
 		 return Collections.singletonList((InteractionBox) interactionBox);
 	 }
-	 
+
 }

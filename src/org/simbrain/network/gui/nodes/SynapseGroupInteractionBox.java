@@ -65,7 +65,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         this.synapseGroup = synapseGroup;
 
     }
-    
+
     /**
      * @return the synapse group associated with this interaction box.
      */
@@ -408,5 +408,18 @@ public class SynapseGroupInteractionBox extends InteractionBox {
             synapseGroup.setEnabled(false, Polarity.BOTH);
         }
     };
+
+    @Override
+    protected String getToolTipText() {
+        return "Synapses: " + synapseGroup.size() + " Density: "
+                + (double) synapseGroup.size()
+                        / (synapseGroup.getSourceNeuronGroup().size()
+                                * synapseGroup.getTargetNeuronGroup().size());
+    }
+
+    @Override
+    protected boolean hasToolTipText() {
+       return true;
+    }
 
 }

@@ -49,6 +49,8 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
+    // TODO: Add group level polarity
+
     /**
      * The default for how often {@link #writeActsToFile()} should flush
      * the output stream when writing to a file.

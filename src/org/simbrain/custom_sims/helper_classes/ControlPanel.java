@@ -40,11 +40,6 @@ public class ControlPanel extends JPanel {
      */
     private JPanel centralPanel;
 
-    /** Number of tabs in this panel. If the index is 0 don't use tabs. */
-    private int numTabs;
-
-    // TODO: Add a version that does not use runnables?
-
     /**
      * Construct the control panel with a specified number of tabs. Each
      * contains a labeled item panel.
@@ -66,37 +61,10 @@ public class ControlPanel extends JPanel {
      * @param component the component to display
      */
     public void addItem(String text, JComponent component) {
-        getPanel(0).addItem(text, component);
-    }
-
-    //TODO: Machinery below is for adding multiple tabs to a control panel.
-    //  I created it but have not yet used it, so I'm commenting it out.
-//    public void addItem(String text, JComponent component, int tabIndex) {
-//        getPanel(tabIndex).addItem(text, component);
-//    }
-//
-//    public void addTab(String tabName) {
-//        if (numTabs == 0) {
-//            // Note does not preserve an existing panel. Meant to be used
-//            // right after construction
-//            centralPanel.remove(mainPanel);
-//            tabbedPane = new JTabbedPane();
-//        }
-//        tabbedPane.add(tabName, new LabelledItemPanel());
-//        numTabs++;
-//    }
-
-    /**
-     * Return the labeled item panel at the specified index.
-     *
-     * @param index index of the panel
-     * @return the indexed panel
-     */
-    private LabelledItemPanel getPanel(int index) {
-        if (numTabs == 0) {
-            return mainPanel;
+        if (text.equals("")) {
+            mainPanel.addSpanningItem(component);
         } else {
-            return (LabelledItemPanel) tabbedPane.getTabComponentAt(index);
+            mainPanel.addItem(text, component);
         }
     }
 
@@ -201,8 +169,7 @@ public class ControlPanel extends JPanel {
     }
 
     /**
-     * Embed a controlpanel in an internal frame
-     * and get a reference to it.
+     * Embed a controlpanel in an internal frame and get a reference to it.
      *
      * @param sim reference to parent simulation
      * @param name title to display in panel frame
@@ -233,6 +200,5 @@ public class ControlPanel extends JPanel {
             internalFrame.pack();
         }
     }
-
 
 }

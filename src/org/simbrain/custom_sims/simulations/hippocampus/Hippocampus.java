@@ -198,7 +198,7 @@ public class Hippocampus extends RegisteredSimulation {
             initWeights();
         });
 
-        //panel.addSeparator();
+        panel.addSeparator();
 
         // Show pattern one
         panel.addButton("Test 1", () -> {
@@ -220,7 +220,7 @@ public class Hippocampus extends RegisteredSimulation {
             test(network, pattern4);
         });
 
-        //panel.addSeparator();
+        panel.addSeparator();
 
         ControlPanel bottomPanel = new ControlPanel();
         errorLabel = bottomPanel.addLabel("Error:", "");

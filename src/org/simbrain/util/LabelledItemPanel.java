@@ -32,6 +32,7 @@ import javax.swing.JPanel;
  *
  * @author David Fraser
  * @author Michael Harris
+ * @author Jeff Yoshimi
  * @author Zach Tosi
  *
  */
@@ -207,6 +208,28 @@ public class LabelledItemPanel extends JPanel {
 
         myNextItemRow++;
     }
+    
+    /**
+     * Add an item which spans the columns.
+     *
+     * @param item the item to add
+     */
+    public void addSpanningItem(final JComponent item) {
+        GridBagConstraints itemConstraints = new GridBagConstraints();
+
+        itemConstraints.gridx = 0;
+        itemConstraints.gridwidth = 3;
+        itemConstraints.gridy = myNextItemRow;
+        itemConstraints.insets = new Insets(10, 10, 0, 10);
+        itemConstraints.weightx = 1.0;
+        itemConstraints.anchor = GridBagConstraints.EAST;
+        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+        add(item, itemConstraints);
+
+        myNextItemRow++;
+    }
+
 
     /**
      * A function which adds an item without a label. This function works with
@@ -227,6 +250,9 @@ public class LabelledItemPanel extends JPanel {
         itemConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         add(item, itemConstraints);
+ 
+        myNextItemRow++;
+
     }
 
     /**

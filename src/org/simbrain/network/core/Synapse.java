@@ -953,10 +953,11 @@ public class Synapse {
      */
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
-        // TODO: targeted event
-//        if (getNetwork() != null && !isTemplate) {
-//            this.getParentNetwork().fireSynapsesUpdated();
-//        }
+        // Trying to fire an event from here causes problems relating to
+        // template synapses
+        //if (getNetwork() != null && !isTemplate) {
+        //    this.getParentNetwork().fireSynapseChanged(this);
+        //}
     }
 
     /**

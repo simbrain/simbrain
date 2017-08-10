@@ -611,6 +611,9 @@ public class NetworkPanel extends JPanel {
 
             @Override
             public void synapseChanged(final NetworkEvent<Synapse> e) {
+                //SynapseNode node = (SynapseNode) objectNodeMap
+                //        .get(e.getObject());
+                // node.updateClampStatus();
             }
 
             @Override
@@ -2671,10 +2674,8 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Clamped / unclamped or freeze / unfreeze selected nodes.
-     *
-     * @param freeze whether to clamp/freeze or not.
      */
-    public void freezeSelectedObjects(boolean freeze) {
+    public void toggleClamping() {
         for (PNode node : getSelection()) {
             if (node instanceof NeuronNode) {
                 Neuron neuron = ((NeuronNode) node).getNeuron();
@@ -2685,15 +2686,19 @@ public class NetworkPanel extends JPanel {
                 }
             }
             if (node instanceof SynapseNode) {
-                SynapseNode synapseNode = (SynapseNode) node;
                 Synapse synapse = ((SynapseNode) node).getSynapse();
                 if (synapse.isFrozen()) {
                     synapse.setFrozen(false);
                 } else {
                     synapse.setFrozen(true);
                 }
+                // TODO: this should happen via an event
+                //   but firing events from setFrozen causes problems
+                //   when opening saved networks
+                ((SynapseNode) node).updateClampStatus();
             }
         }
+        this.revalidate();
     }
 
     /**

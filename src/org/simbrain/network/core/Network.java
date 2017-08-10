@@ -1274,9 +1274,9 @@ public class Network {
      *            the synapses whose state has changed
      */
     public void fireSynapsesUpdated(Collection<Synapse> synapses) {
-    	for (int i = 0, n = networkListeners.size(); i < n; i++) {
-    		networkListeners.get(i).updateSynapses(synapses);
-    	}
+        for (int i = 0, n = networkListeners.size(); i < n; i++) {
+            networkListeners.get(i).updateSynapses(synapses);
+        }
     }
 
     /**

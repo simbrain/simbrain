@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
@@ -27,7 +26,6 @@ import java.awt.geom.Point2D;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
@@ -217,8 +215,6 @@ public final class SynapseNode extends ScreenElement {
         } else {
             line.setStrokePaint(lineColor);
         }
-        // Todo: give this its own event 
-        this.updateClampStatus();
     }
 
     /**

@@ -123,11 +123,11 @@ public class CortexSimple extends RegisteredSimulation {
 
         PolarizedRandomizer exRand = new PolarizedRandomizer(
                 Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(-2.4);
+        exRand.setParam1(-2.1);
         exRand.setParam2(.35);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
                 Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        inRand.setParam1(-2.2);
+        inRand.setParam1(-2.1);
         inRand.setParam2(.35);
         
         Sparse con = new Sparse(sparsity, false, false);

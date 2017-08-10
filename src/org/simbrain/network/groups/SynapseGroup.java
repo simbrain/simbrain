@@ -61,15 +61,15 @@ public class SynapseGroup extends Group {
      *
      * synapse strengths for all synapse groups.
      */
-    private static final PolarizedRandomizer DEFAULT_EX_RANDOMIZER =
-            new PolarizedRandomizer(Polarity.EXCITATORY);
+    private static final PolarizedRandomizer DEFAULT_EX_RANDOMIZER = new PolarizedRandomizer(
+            Polarity.EXCITATORY);
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory
      * synapse strengths for all synapse groups.
      */
-    private static final PolarizedRandomizer DEFAULT_IN_RANDOMIZER =
-            new PolarizedRandomizer(Polarity.INHIBITORY);
+    private static final PolarizedRandomizer DEFAULT_IN_RANDOMIZER = new PolarizedRandomizer(
+            Polarity.INHIBITORY);
 
     /**
      * The default ratio (all excitatory) for all synapse groups.
@@ -87,17 +87,17 @@ public class SynapseGroup extends Group {
     private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
 
     /**
-     * A temporary set containing all the excitatory synapses in the group.
-     * Used when saving synapse groups since the regular set is destroyed. If
-     * the group is going to continue being used after saving the values in this
+     * A temporary set containing all the excitatory synapses in the group. Used
+     * when saving synapse groups since the regular set is destroyed. If the
+     * group is going to continue being used after saving the values in this
      * temporary holder are used to repopulate the excitatory synapse set.
      */
     private Set<Synapse> exTemp;
 
     /**
-     * A temporary set containing all the inhibitory synapses in the group.
-     * Used when saving synapse groups since the regular set is destroyed. If
-     * the group is going to continue being used after saving the values in this
+     * A temporary set containing all the inhibitory synapses in the group. Used
+     * when saving synapse groups since the regular set is destroyed. If the
+     * group is going to continue being used after saving the values in this
      * temporary holder are used to repopulate the inhibitory synapse set.
      */
     private Set<Synapse> inTemp;
@@ -219,14 +219,14 @@ public class SynapseGroup extends Group {
     private byte[] compressedMatrixRep = null;
 
     /**
-     * A byte-encoded representation of all relevant synapse parameters of
-     * all synapses in the group. The compressed rep only stores synapse
-     * weights, relying on the prototype synapses ({@link #excitatoryPrototype}
-     * and {@link #inhibitoryPrototype}) to fill in the remaining values. But
-     * if the synapses also all have different delays, PSRs, etc. This
-     * representation saves all of those.
+     * A byte-encoded representation of all relevant synapse parameters of all
+     * synapses in the group. The compressed rep only stores synapse weights,
+     * relying on the prototype synapses ({@link #excitatoryPrototype} and
+     * {@link #inhibitoryPrototype}) to fill in the remaining values. But if the
+     * synapses also all have different delays, PSRs, etc. This representation
+     * saves all of those.
      */
-    private byte [] fullSynapseRep = null;
+    private byte[] fullSynapseRep = null;
 
     /** Whether or not to use the compressed rep or the full rep. */
     private boolean useFullRepOnSave = false;
@@ -237,8 +237,8 @@ public class SynapseGroup extends Group {
      *
      * @param source the source neuron group.
      * @param target the target neuron group.
-     * @return a synapse group with all default values connecting the source
-     * and target neuron groups.
+     * @return a synapse group with all default values connecting the source and
+     *         target neuron groups.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source,
             final NeuronGroup target) {
@@ -250,10 +250,9 @@ public class SynapseGroup extends Group {
      * the connections (individual synapses) are created along with the group.
      *
      * @param source the source neuron group.
-     * @param target the target neuron group.
-     * neurons in the group are connected
-     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses
-     * [0, 1].
+     * @param target the target neuron group. neurons in the group are connected
+     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses [0,
+     *            1].
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source,
@@ -284,8 +283,8 @@ public class SynapseGroup extends Group {
      * @param source the source neuron group.
      * @param target the target neuron group.
      * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses
-     * [0, 1].
+     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses [0,
+     *            1].
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source,
@@ -302,12 +301,12 @@ public class SynapseGroup extends Group {
      * @param source the source neuron group.
      * @param target the target neuron group.
      * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses
-     * [0, 1].
-     * @param exciteRand the randomizer to be used to determine the weights
-     * of excitatory synapses.
+     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses [0,
+     *            1].
+     * @param exciteRand the randomizer to be used to determine the weights of
+     *            excitatory synapses.
      * @param inhibRand the randomizer to be used to determine the weights of
-     * inhibitory synapses.
+     *            inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(final NeuronGroup source,
@@ -349,12 +348,9 @@ public class SynapseGroup extends Group {
      * will not be added to the source or target neuron groups' respective
      * outgoing and incoming synapse group sets.
      *
-     * @param source
-     *            source neuron group
-     * @param target
-     *            target neuron group
-     * @param connectionManager
-     *            a connection object which builds this group
+     * @param source source neuron group
+     * @param target target neuron group
+     * @param connectionManager a connection object which builds this group
      */
     public SynapseGroup(final NeuronGroup source, final NeuronGroup target,
             final ConnectNeurons connectionManager) {
@@ -394,9 +390,9 @@ public class SynapseGroup extends Group {
      * having to perform any operations related to expanding the list size.
      *
      * @param expectedNumSynapses the number of synapses the connection manager
-     * predicts will be created.
+     *            predicts will be created.
      * @throws IllegalStateException if the synapse group has already been
-     * initialized.
+     *             initialized.
      */
     public void preAllocateSynapses(int expectedNumSynapses)
             throws IllegalStateException {
@@ -409,10 +405,10 @@ public class SynapseGroup extends Group {
         }
         // Using /0.8 instead of /0.75 because expected number is _expected_
         // but not precisely known.
-        exSynapseSet = new HashSet<Synapse>((int) (expectedNumSynapses
-                * excitatoryRatio / 0.8));
-        inSynapseSet = new HashSet<Synapse>((int) (expectedNumSynapses
-                * (1 - excitatoryRatio) / 0.8));
+        exSynapseSet = new HashSet<Synapse>(
+                (int) (expectedNumSynapses * excitatoryRatio / 0.8));
+        inSynapseSet = new HashSet<Synapse>(
+                (int) (expectedNumSynapses * (1 - excitatoryRatio) / 0.8));
     }
 
     /**
@@ -544,9 +540,8 @@ public class SynapseGroup extends Group {
     public String toString() {
         String ret = new String();
         ret += ("Synapse Group [" + getLabel() + "]. Contains " + this.size()
-                + " synapse(s)." + " Connects "
-                + getSourceNeuronGroup().getId() + " ["
-                + getSourceNeuronGroup().getLabel() + "]" + " to "
+                + " synapse(s)." + " Connects " + getSourceNeuronGroup().getId()
+                + " [" + getSourceNeuronGroup().getLabel() + "]" + " to "
                 + getTargetNeuronGroup().getId() + " ["
                 + getTargetNeuronGroup().getLabel() + "]\n");
 
@@ -578,8 +573,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * @param displaySynapses
-     *            the displaySynapses to set
+     * @param displaySynapses the displaySynapses to set
      */
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
@@ -595,8 +589,7 @@ public class SynapseGroup extends Group {
     /**
      * Remove the provided synapse from the group, but not the network.
      *
-     * @param toDelete
-     *            the synapse to delete
+     * @param toDelete the synapse to delete
      * @return the deleted synapse
      */
     public Synapse removeSynapse(Synapse toDelete) {
@@ -658,21 +651,20 @@ public class SynapseGroup extends Group {
      * synapse conform to the global parameters of this synapse group.
      *
      * @param synapse the blank synapse to be added and assigned new values
-     * based on the parameters of this group.
+     *            based on the parameters of this group.
      */
     public void addNewSynapse(final Synapse synapse) {
         if (synapse.getSource().isPolarized()) {
             if (Polarity.EXCITATORY.equals(synapse.getSource().getPolarity())) {
                 addNewExcitatorySynapse(synapse);
-            } else if (Polarity.INHIBITORY.equals(synapse.getSource()
-                    .getPolarity()))
-            {
+            } else if (Polarity.INHIBITORY
+                    .equals(synapse.getSource().getPolarity())) {
                 addNewInhibitorySynapse(synapse);
             }
         } else {
             double rand = Math.random();
-            double correctionTerm = size() == 0 ? 0 : excitatoryRatio
-                    - (exSynapseSet.size() / (double) size());
+            double correctionTerm = size() == 0 ? 0
+                    : excitatoryRatio - (exSynapseSet.size() / (double) size());
             if (rand < (excitatoryRatio + correctionTerm)) {
                 addNewExcitatorySynapse(synapse);
             } else {
@@ -683,7 +675,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @param synapse the blank excitatory synapse which will be added to the
-     * group and have its parameters set based on the parameters of this group.
+     *            group and have its parameters set based on the parameters of
+     *            this group.
      */
     public void addNewExcitatorySynapse(final Synapse synapse) {
         getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
@@ -692,11 +685,11 @@ public class SynapseGroup extends Group {
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
         } else {
-            synapse.setStrength(ConnectionUtilities
-                    .DEFAULT_EXCITATORY_STRENGTH);
+            synapse.setStrength(
+                    ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
         }
-        synapse.setLearningRule(excitatoryPrototype.getLearningRule()
-                .deepCopy());
+        synapse.setLearningRule(
+                excitatoryPrototype.getLearningRule().deepCopy());
         synapse.setFrozen(excitatoryPrototype.isFrozen());
         synapse.setEnabled(excitatoryPrototype.isEnabled());
         synapse.setDelay(excitatoryPrototype.getDelay());
@@ -709,7 +702,8 @@ public class SynapseGroup extends Group {
 
     /**
      * @param synapse the blank inhibitory synapse which will be added to the
-     * group and have its parameters set based on the parameters of this group.
+     *            group and have its parameters set based on the parameters of
+     *            this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
         getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
@@ -718,11 +712,11 @@ public class SynapseGroup extends Group {
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());
         } else {
-            synapse.setStrength(ConnectionUtilities
-                    .DEFAULT_INHIBITORY_STRENGTH);
+            synapse.setStrength(
+                    ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
         }
-        synapse.setLearningRule(inhibitoryPrototype.getLearningRule()
-                .deepCopy());
+        synapse.setLearningRule(
+                inhibitoryPrototype.getLearningRule().deepCopy());
         synapse.setFrozen(inhibitoryPrototype.isFrozen());
         synapse.setEnabled(inhibitoryPrototype.isEnabled());
         synapse.setDelay(inhibitoryPrototype.getDelay());
@@ -748,8 +742,7 @@ public class SynapseGroup extends Group {
      * Possible Use Case: When it is known beforehand that the synapse(s) being
      * added all conform to the parameters of this synapse group.
      *
-     * @param synapse
-     *            synapse to add
+     * @param synapse synapse to add
      */
     public void addSynapseUnsafe(final Synapse synapse) {
         if (synapse.getStrength() > 0) {
@@ -765,8 +758,7 @@ public class SynapseGroup extends Group {
      * synapses. This is even less safe however because an inhibitory synapse
      * could potentially be added to the excitatory set.
      *
-     * @param synapse
-     *            the synapse to add.
+     * @param synapse the synapse to add.
      */
     public void addExcitatorySynapseUnsafe(final Synapse synapse) {
         exSynapseSet.add(synapse);
@@ -782,8 +774,7 @@ public class SynapseGroup extends Group {
      * synapses. This is even less safe however because an excitatory synapse
      * could potentially be added to the inhibitory set.
      *
-     * @param synapse
-     *            the synapse to add.
+     * @param synapse the synapse to add.
      */
     public void addInhibitorySynapseUnsafe(final Synapse synapse) {
         inSynapseSet.add(synapse);
@@ -805,9 +796,8 @@ public class SynapseGroup extends Group {
      * desired excitatoryRatio will result from sign changes to synapses. The
      * absolute value of synapse strengths will not be changed.
      *
-     * @param excitatoryRatio
-     *            the ratio of synapses which will be made excitatory, value
-     *            must be in the range [0, 1]
+     * @param excitatoryRatio the ratio of synapses which will be made
+     *            excitatory, value must be in the range [0, 1]
      * @throws IllegalArgumentException if the ratio is not on [0, 1].
      */
     public void setExcitatoryRatio(double excitatoryRatio)
@@ -838,19 +828,19 @@ public class SynapseGroup extends Group {
                     if (inhibRand != null) {
                         s.setStrength(inhibRand.getRandom());
                     } else {
-                        s.setStrength(ConnectionUtilities
-                                .DEFAULT_INHIBITORY_STRENGTH);
+                        s.setStrength(
+                                ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
                     }
-                    s.setLearningRule(inhibitoryPrototype.getLearningRule()
-                            .deepCopy());
+                    s.setLearningRule(
+                            inhibitoryPrototype.getLearningRule().deepCopy());
                     s.setFrozen(inhibitoryPrototype.isFrozen());
                     s.setEnabled(inhibitoryPrototype.isEnabled());
                     s.setDelay(inhibitoryPrototype.getDelay());
                     s.setIncrement(inhibitoryPrototype.getIncrement());
                     s.setUpperBound(inhibitoryPrototype.getUpperBound());
                     s.setLowerBound(inhibitoryPrototype.getLowerBound());
-                    s.setSpikeResponder(inhibitoryPrototype
-                            .getSpikeResponder());
+                    s.setSpikeResponder(
+                            inhibitoryPrototype.getSpikeResponder());
                     inSynapseSet.add(s);
                     numSwitch--;
                 }
@@ -866,19 +856,19 @@ public class SynapseGroup extends Group {
                     if (exciteRand != null) {
                         s.setStrength(exciteRand.getRandom());
                     } else {
-                        s.setStrength(ConnectionUtilities
-                                .DEFAULT_EXCITATORY_STRENGTH);
+                        s.setStrength(
+                                ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
                     }
-                    s.setLearningRule(excitatoryPrototype.getLearningRule()
-                            .deepCopy());
+                    s.setLearningRule(
+                            excitatoryPrototype.getLearningRule().deepCopy());
                     s.setFrozen(excitatoryPrototype.isFrozen());
                     s.setEnabled(excitatoryPrototype.isEnabled());
                     s.setDelay(excitatoryPrototype.getDelay());
                     s.setIncrement(excitatoryPrototype.getIncrement());
                     s.setUpperBound(excitatoryPrototype.getUpperBound());
                     s.setLowerBound(excitatoryPrototype.getLowerBound());
-                    s.setSpikeResponder(excitatoryPrototype
-                            .getSpikeResponder());
+                    s.setSpikeResponder(
+                            excitatoryPrototype.getSpikeResponder());
                     exSynapseSet.add(s);
                     numSwitch--;
                 }
@@ -972,20 +962,20 @@ public class SynapseGroup extends Group {
         return retArray;
     }
 
-    //TODO: Consider putting some of the below methods or part of their bodies
+    // TODO: Consider putting some of the below methods or part of their bodies
     // into SimbrainMath or Utils
-    
+
     /**
      * For large, sparse synapse groups this will cause a heap overflow. Use
      * {@link #getRowCompressedMatrixRepresentation()} instead.
      *
      * @return a representation of the synapse strengths in this synapse group
-     * as a weight matrix between two activation vectors (neuron groups).
+     *         as a weight matrix between two activation vectors (neuron
+     *         groups).
      */
     public double[][] getWeightMatrix() {
-        double[][] weightMatrix =
-                new double[getSourceNeurons().size()][getTargetNeurons()
-                        .size()];
+        double[][] weightMatrix = new double[getSourceNeurons()
+                .size()][getTargetNeurons().size()];
         int i = 0;
         int j = 0;
         // Create numbers for neurons... less expensive than constant
@@ -1011,25 +1001,20 @@ public class SynapseGroup extends Group {
         }
         return weightMatrix;
     }
-    
+
     /**
      * A more compressed version of a weight matrix for cases where a weight
      * matrix is needed, but may cause memory issues if fully instantiated. Eg,
      * for very sparse synapse groups between very large neuron groups.
+     * 
      * @return a 2D array with a number of rows equal to the total number of
-     * synapses and a number of columns equal to 3. Each row contains the
-     * the source index number, the target index number, and the strength in
-     * that order. This array is then sorted by source index then target index.
-     * Ex:  
-     *      1   2   .9
-     *      0   3   5.3
-     *      0   1   -.1
-     * Becomes:
-     *      0   1   -.1
-     *      0   3   5.3
-     *      1   2   .9
+     *         synapses and a number of columns equal to 3. Each row contains
+     *         the the source index number, the target index number, and the
+     *         strength in that order. This array is then sorted by source index
+     *         then target index. Ex: 1 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0
+     *         3 5.3 1 2 .9
      */
-    public double [][] getNumericIndices() {
+    public double[][] getNumericIndices() {
         double[][] pairs = new double[size()][3];
         int i = 0;
         int j = 0;
@@ -1049,7 +1034,7 @@ public class SynapseGroup extends Group {
         }
         // Put each synapse strength into a table [i, j, w], where i is the
         // source neuron index in a weight matrix, j is the target index and
-        // w is the synapse strength. 
+        // w is the synapse strength.
         int k = 0;
         for (Synapse s : getAllSynapses()) {
             pairs[k++] = new double[] { sourceMap.get(s.getSource()),
@@ -1079,26 +1064,21 @@ public class SynapseGroup extends Group {
         Arrays.sort(pairs, rowColOrderer);
         return pairs;
     }
-    
+
     /**
      * A more compressed version of a weight matrix for cases where a weight
      * matrix is needed, but may cause memory issues if fully instantiated. Eg,
      * for very sparse synapse groups between very large neuron groups.
+     * 
      * @return a 2D array with a number of rows equal to the total number of
-     * synapses and a number of columns equal to 3. Each row contains the
-     * the source index number, the target index number, and the strength in
-     * that order. This array is then sorted by source index then target index.
-     * Ex:  
-     *      1   2   .9
-     *      0   3   5.3
-     *      0   1   -.1
-     * Becomes:
-     *      0   1   -.1
-     *      0   3   5.3
-     *      1   2   .9
+     *         synapses and a number of columns equal to 3. Each row contains
+     *         the the source index number, the target index number, and the
+     *         strength in that order. This array is then sorted by source index
+     *         then target index. Ex: 1 2 .9 0 3 5.3 0 1 -.1 Becomes: 0 1 -.1 0
+     *         3 5.3 1 2 .9
      */
-    public Number [][] getNumericIndices(SynapseParameterGetter<Number> getter) {
-        Number [][] pairs = new Number[size()][3];
+    public Number[][] getNumericIndices(SynapseParameterGetter<Number> getter) {
+        Number[][] pairs = new Number[size()][3];
         int i = 0;
         int j = 0;
         // Create numbers for neurons... less expensive than constant
@@ -1117,7 +1097,7 @@ public class SynapseGroup extends Group {
         }
         // Put each synapse strength into a table [i, j, w], where i is the
         // source neuron index in a weight matrix, j is the target index and
-        // w is the synapse strength. 
+        // w is the synapse strength.
         int k = 0;
         for (Synapse s : getAllSynapses()) {
             pairs[k++] = new Number[] { sourceMap.get(s.getSource()),
@@ -1170,8 +1150,8 @@ public class SynapseGroup extends Group {
                 currRow++;
             } else {
                 compRowRep[l] = (long) pairs[m][1];
-                compRowRep[numSyns + numSrc + m] = Double.doubleToLongBits(
-                        pairs[m][2]);
+                compRowRep[numSyns + numSrc + m] = Double
+                        .doubleToLongBits(pairs[m][2]);
                 m++;
             }
         }
@@ -1179,13 +1159,12 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Saves the synapse group to a file in linked list format which can be
-     * read by most graph analysis software, in particular as of 6/27/2015
-     * the author is aware of both OSLOM and Infomap which can interpret the 
-     * linked list format. 
+     * Saves the synapse group to a file in linked list format which can be read
+     * by most graph analysis software, in particular as of 6/27/2015 the author
+     * is aware of both OSLOM and Infomap which can interpret the linked list
+     * format.
      * 
-     * Format is as follows:
-     * source index    target index    weight
+     * Format is as follows: source index target index weight
      * 
      * By default ".dat" is appended to the given filename since .dat is the
      * standard extension for linked lists.
@@ -1195,7 +1174,7 @@ public class SynapseGroup extends Group {
     public void saveToFileAsLinkedList(String filename) {
         try (FileWriter fw = new FileWriter(filename + ".dat");
                 PrintWriter pw = new PrintWriter(fw);) {
-            double [][] pairs = getNumericIndices();
+            double[][] pairs = getNumericIndices();
             int offset = this.isRecurrent() ? 0 : sourceNeuronGroup.size();
             for (int i = 0, n = pairs.length; i < n; i++) {
                 pw.print((int) pairs[i][0]);
@@ -1209,27 +1188,27 @@ public class SynapseGroup extends Group {
             System.out.println("Synapse group linked-list write failed.");
         }
     }
-    
+
     /**
-     * See: {@link #saveToFileAsLinkedList(String)}
-     * Uses the default name which is: label + date & time
+     * See: {@link #saveToFileAsLinkedList(String)} Uses the default name which
+     * is: label + date & time
      */
     public void saveToFileAsLinkedList() {
         saveToFileAsLinkedList(getLabel() + "_" + Utils.getTimeString());
     }
-    
+
     /**
      * Saves the weight matrix represented by this synapse group to a file.
+     * 
      * @param filename the name of the file to be used
-     * @throws OutOfMemoryError if {@link #getWeightMatrix()} causes an
-     * out of memory error for being to large.
+     * @throws OutOfMemoryError if {@link #getWeightMatrix()} causes an out of
+     *             memory error for being to large.
      */
     public void saveToFileAsMatrix(String filename) throws OutOfMemoryError {
         try (FileWriter fw = new FileWriter(filename);
-                PrintWriter pw = new PrintWriter(fw);)
-        {
-            double [][] wtMat = getWeightMatrix();
-            for (double [] row : wtMat) {
+                PrintWriter pw = new PrintWriter(fw);) {
+            double[][] wtMat = getWeightMatrix();
+            for (double[] row : wtMat) {
                 for (double col : row) {
                     pw.print(col + ", ");
                 }
@@ -1248,10 +1227,8 @@ public class SynapseGroup extends Group {
      * the this makes the synapse change polarity it will be removed from its
      * current set and added to the appropriate set.
      *
-     * @param synapse
-     *            sets the strength of an individual synapse in the group
-     * @param newWeight
-     *            the new weight to set it to
+     * @param synapse sets the strength of an individual synapse in the group
+     * @param newWeight the new weight to set it to
      * @return true if this group contained the specified synapse, and false if
      *         it did not and thus failed to set the strength value.
      */
@@ -1318,7 +1295,7 @@ public class SynapseGroup extends Group {
      * creating an entirely new synapse group.
      *
      * @param connection the connection manager to be used by this synapse group
-     * for making synaptic connections.
+     *            for making synaptic connections.
      */
     public void setConnectionManager(ConnectNeurons connection) {
         if (this.connectionManager == null) {
@@ -1340,7 +1317,8 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param excitatoryRandomizer the randomizer to be used to determine the weights of excitatory synapses.
+     * @param excitatoryRandomizer the randomizer to be used to determine the
+     *            weights of excitatory synapses.
      */
     public void setExcitatoryRandomizer(
             PolarizedRandomizer excitatoryRandomizer) {
@@ -1349,7 +1327,8 @@ public class SynapseGroup extends Group {
 
     /**
      *
-     * @param inhibitoryRandomizer the randomizer to be used to determine the weights of inbihitory synapses.
+     * @param inhibitoryRandomizer the randomizer to be used to determine the
+     *            weights of inbihitory synapses.
      */
     public void setInhibitoryRandomizer(
             PolarizedRandomizer inhibitoryRandomizer) {
@@ -1357,7 +1336,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * @param excitatoryRandomizer 
+     * @param excitatoryRandomizer
      * @param inhibitoryRandomizer
      */
     public void setRandomizers(PolarizedRandomizer excitatoryRandomizer,
@@ -1410,7 +1389,7 @@ public class SynapseGroup extends Group {
      * neuron groups are the same).
      *
      * @return if this synapse group's source neuron group and target neuron
-     * group are the same group.
+     *         group are the same group.
      */
     private boolean testRecurrent() {
         return sourceNeuronGroup == targetNeuronGroup;
@@ -1501,7 +1480,7 @@ public class SynapseGroup extends Group {
     /**
      *
      * @param template the set synapse template
-     * @param polarity 
+     * @param polarity
      */
     public void setAndConformToTemplate(Synapse template, Polarity polarity) {
         setDelay(template.getDelay(), polarity);
@@ -1545,7 +1524,6 @@ public class SynapseGroup extends Group {
     public void setEnabled(boolean enabled) {
         setEnabled(enabled, Polarity.BOTH);
     }
-
 
     /**
      *
@@ -1639,7 +1617,8 @@ public class SynapseGroup extends Group {
     public void setSpikeResponder(SpikeResponder spr, Polarity polarity) {
         SynapseParameterSetter<SpikeResponder> setSPR = new SynapseParameterSetter<SpikeResponder>() {
             @Override
-            public void setSynapseParameter(Synapse synapse, SpikeResponder val) {
+            public void setSynapseParameter(Synapse synapse,
+                    SpikeResponder val) {
                 synapse.setSpikeResponder(val.deepCopy());
             }
         };
@@ -1927,8 +1906,8 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * The pre-save init to be used to save all relevant synapse parameters
-     * in the byte array.
+     * The pre-save init to be used to save all relevant synapse parameters in
+     * the byte array.
      */
     public void preSaveInitFull() {
         Map<Neuron, Integer> srcMap = new HashMap<Neuron, Integer>(
@@ -1943,11 +1922,11 @@ public class SynapseGroup extends Group {
         for (Neuron n : targetNeuronGroup.getNeuronList()) {
             tarMap.put(n, i++);
         }
-        byte [][] synBytes = new byte[size()][];
+        byte[][] synBytes = new byte[size()][];
         i = 0;
         int totalBytes = 0;
         for (Synapse s : this.getAllSynapses()) {
-            byte [] synCode = s.getNumericValuesAsByteArray();
+            byte[] synCode = s.getNumericValuesAsByteArray();
             ByteBuffer indices = ByteBuffer.allocate(8);
             indices.putInt(srcMap.get(s.getSource()).intValue());
             indices.putInt(tarMap.get(s.getTarget()).intValue());
@@ -1959,7 +1938,7 @@ public class SynapseGroup extends Group {
             totalBytes += synCode.length;
         }
         ByteBuffer buff = ByteBuffer.allocate(totalBytes);
-        for (byte [] synCodes : synBytes) {
+        for (byte[] synCodes : synBytes) {
             buff.put(synCodes);
         }
         fullSynapseRep = buff.array();
@@ -2018,7 +1997,7 @@ public class SynapseGroup extends Group {
                 int codeBuffSize = 20 + (delay * 8) + 4 + 1;
                 ByteBuffer codeBuff = ByteBuffer.allocate(codeBuffSize);
                 codeBuff.putInt(delay);
-                byte [] data = new byte[codeBuffSize - 4];
+                byte[] data = new byte[codeBuffSize - 4];
                 bigBuff.get(data);
                 codeBuff.put(data);
                 Neuron src = srcMap.get(bigBuff.getInt());
@@ -2056,5 +2035,40 @@ public class SynapseGroup extends Group {
         if (connectionManager instanceof Sparse) {
             ((Sparse) connectionManager).setPermitDensityEditing(false);
         }
+    }
+
+    /**
+     * Take another synapse group and copy it's synapses in to this one.
+     *
+     * @param sgToCopy
+     */
+    public void copySynapses(SynapseGroup sgToCopy) {
+        if ((this.getTargetNeuronGroup().size() != sgToCopy
+                .getTargetNeuronGroup().size())
+                || (this.getSourceNeuronGroup().size() != sgToCopy
+                        .getSourceNeuronGroup().size())) {
+            
+            throw new IllegalArgumentException(
+                    "Size of source and target neuron groups of this synapse group do not match size "
+                    + "of source and target neuron groups of this synapse group.");
+        }
+        
+        clear();
+        
+        List<Neuron> srcNeurons = sgToCopy.sourceNeuronGroup.getNeuronListUnsafe();
+        List<Neuron> tarNeurons = sgToCopy.targetNeuronGroup.getNeuronListUnsafe();
+        for (int ii = 0; ii < sourceNeuronGroup.size(); ii++) {
+            for (int jj = 0; jj < targetNeuronGroup.size(); jj++) {
+                // Does a synapse exist here?
+                if(srcNeurons.get(ii).getFanOut().containsKey(tarNeurons.get(jj))) {
+                    //TODO: Check that such a synapse actually exists in this group
+                    Synapse newSyn = new Synapse(sourceNeuronGroup.getNeuronListUnsafe().get(ii),
+                            targetNeuronGroup.getNeuronListUnsafe().get(jj));
+                    newSyn.setStrength(srcNeurons.get(ii).getFanOut()
+                            .get(tarNeurons.get(jj)).getStrength());
+                    this.addSynapseUnsafe(newSyn);
+                }
+            }
+        }        
     }
 }

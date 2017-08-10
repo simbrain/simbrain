@@ -621,13 +621,15 @@ public class SimbrainMath {
      * @return the distance between them.
      */
     public static double distance(final double[] src, final double[] tar) {
-        double x1 = src[0];
-        double x2 = tar[0];
-        double y1 = src[1];
-        double y2 = tar[1];
-
-        return (double) Math.sqrt(Math.pow((x1 - x2), 2)
-                + Math.pow((y1 - y2), 2));
+        if (src.length != tar.length) {
+            throw new IllegalArgumentException(
+                    "Source and target vector lengths do not match");
+        }
+        double distance = 0;
+        for (int ii = 0; ii < src.length; ii++) {
+            distance += (src[ii] - tar[ii]) * (src[ii] - tar[ii]);
+        }
+        return Math.sqrt(distance);
     }
 
     /**

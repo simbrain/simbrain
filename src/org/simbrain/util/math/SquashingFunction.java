@@ -18,7 +18,8 @@
  */
 package org.simbrain.util.math;
 
-import org.simbrain.util.widgets.ChoicesWithNull;
+import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
 
 /**
  * An enumerated type containing methods for calculating values of different
@@ -72,6 +73,24 @@ public enum SquashingFunction {
             return DEFAULT_ARCTAN_FLOOR;
         }
 
+		@Override
+		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
     },
 
     /** Logistic Function. */
@@ -116,6 +135,23 @@ public enum SquashingFunction {
             return DEFAULT_LOGISTIC_FLOOR;
         }
 
+		@Override
+		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			logistic(valIn, valOut, ceil, floor, slope);
+		}
+
+		@Override
+		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
     },
 
     /** Hyperbolic Tangent. */
@@ -159,6 +195,24 @@ public enum SquashingFunction {
         public double getDefaultLowerBound() {
             return DEFAULT_TANH_FLOOR;
         }
+
+		@Override
+		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
     },
 
     /**
@@ -200,6 +254,24 @@ public enum SquashingFunction {
         public double getDefaultLowerBound() {
             return 0;
         }
+
+		@Override
+		public void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+			// TODO Auto-generated method stub
+			
+		}
     };
 
     /*
@@ -221,6 +293,9 @@ public enum SquashingFunction {
     public abstract double valueOf(double val, double ceil, double floor,
             double slope);
 
+    public abstract void valueOf(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
+            double slope);
+    
     /**
      * Gives the value of the inverse of the given squashing function for some
      * input value, a ceiling, floor, and slope.
@@ -232,6 +307,9 @@ public enum SquashingFunction {
      * @return the output of the given squashing function's inverse
      */
     public abstract double inverseVal(double val, double ceil, double floor,
+            double slope);
+    
+    public abstract void inverseVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
             double slope);
 
     /**
@@ -248,6 +326,8 @@ public enum SquashingFunction {
      */
     public abstract double derivVal(double val, double ceil, double floor,
             double slope);
+    
+    public abstract void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope);
 
     /**
      * @return the default upper boundary (ceiling) of this particular squashing
@@ -284,6 +364,17 @@ public enum SquashingFunction {
         double a = (2 * slope) / diff;
         return (diff / 2) * Math.tanh(a * val) + ((ceil + floor) / 2);
     }
+    
+    public static void tanh(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+        double diff = ceil - floor;
+        double a = (2 * slope) / diff;
+        if (valIn != valOut) {
+        	valOut.copy(valIn);
+        }
+        MatrixFunctions.tanhi(valOut.muli(a));
+        valOut.muli(diff/2);
+        valOut.addi((ceil+floor)/2);
+    }
 
     /**
      * The logistic function given an upper and lower limit and slope for a
@@ -302,6 +393,20 @@ public enum SquashingFunction {
         return diff * logisticFunc(slope * val / diff) + floor;
     }
 
+    public static void logistic(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor,
+            double slope) {
+        double diff = ceil - floor; 
+        if (valIn != valOut) {
+        	valOut.copy(valIn);
+        }
+        valOut.muli(-slope/diff);
+        MatrixFunctions.expi(valOut);
+        valOut.addi(1);
+        valOut.rdivi(diff);
+        valOut.addi(floor);
+    }
+    
+    
     /**
      * Returns the standard logistic. Helper method so that the full logistic
      * function doesn't have to be written out every time it's invoked.
@@ -331,6 +436,18 @@ public enum SquashingFunction {
         return (diff / Math.PI) * Math.atan(a * val) + ((ceil + floor) / 2);
     }
 
+    public static void atan(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+        double diff = ceil - floor;
+        double a = (Math.PI * slope) / diff;
+    	if (valIn != valOut) {
+    		valOut.copy(valIn);
+    	}
+    	valOut.muli(a);
+    	MatrixFunctions.atani(valOut);
+    	valOut.muli(diff/Math.PI);
+    	valOut.addi((ceil+floor)/2);
+    }
+    
     /*
      * ****************************************************************
      * _____________________Inverse Functions ________________________*
@@ -355,6 +472,25 @@ public enum SquashingFunction {
             double slope) {
         double z = 0.5 * (((val - floor) / (ceil - floor)) - 0.5);
         return (Math.log((1 + z)) / (1 - z));
+    }
+    
+    public static void invTan(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+    	if (valIn != valOut) {
+    		valOut.copy(valIn);
+    	}
+    	valOut.addi(-floor);
+    	valOut.rdivi(ceil-floor);
+    	valOut.addi(-0.5);
+    	valOut.muli(0.5);
+    	DoubleMatrix temp;
+    	if(valOut.isVector())
+    		temp = new DoubleMatrix(valOut.toArray());
+    	else
+    		temp = new DoubleMatrix(valOut.toArray2());
+    	valOut.addi(1);
+    	temp.rsubi(1);
+    	valOut.rdivi(temp);
+    	MatrixFunctions.logi(valOut);
     }
 
     /**

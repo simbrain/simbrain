@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.jblas.DoubleMatrix;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.math.SquashingFunction;
@@ -33,7 +34,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * @author Zach Tosi
  * @author Jeff Yoshimi
  */
-public class SigmoidalRule extends AbstractSigmoidalRule {
+public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunction {
 
     /**
      * Default sigmoidal.
@@ -118,5 +119,15 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
     public final String getName() {
         return "Sigmoidal (Discrete)";
     }
+
+	@Override
+	public void applyFunctionInPlace(DoubleMatrix input) {
+		applyFunction(input, input);		
+	}
+
+	@Override
+	public void applyFunction(DoubleMatrix input, DoubleMatrix output) {
+		this.sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
+	}
 
 }

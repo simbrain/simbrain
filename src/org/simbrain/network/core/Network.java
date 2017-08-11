@@ -1010,8 +1010,11 @@ public class Network {
         xstream.omitField(ConcurrentBufferedUpdate.class, "network");
         xstream.omitField(ConcurrentBufferedUpdate.class, "producer");
         xstream.omitField(ConcurrentBufferedUpdate.class, "collectorThread");
+//        xstream.omitField(ConcurrentBufferedUpdate.class,
+//                "synchronizingBarrier");
         xstream.omitField(ConcurrentBufferedUpdate.class,
-                "synchronizingBarrier");
+                "executors");
+        
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 

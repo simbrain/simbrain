@@ -60,6 +60,7 @@ import org.simbrain.util.math.SimbrainMath;
  * outlined objects (neuron nodes) as children. Compare {@link SubnetworkNode}.
  *
  * @author Jeff Yoshimi
+ * @author Zach Tosi
  */
 @SuppressWarnings("serial")
 public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeListener {
@@ -476,7 +477,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	 */
 	public void updateText() {
 		if (neuronGroup.isRecording()) {
-	        interactionBox.setText(neuronGroup.getLabel() + " -- RECORDING");		    
+	        interactionBox.setText(neuronGroup.getLabel() + " -- RECORDING");
 		} else {
 		    interactionBox.setText(neuronGroup.getLabel());
 		}
@@ -524,7 +525,7 @@ public class NeuronGroupNode extends PNode implements GroupNode, PropertyChangeL
 	}
 
 	/**
-	 * Action for clamping neurons
+	 * Action for clamping neurons.
 	 */
 	protected Action clampNeuronsAction = new AbstractAction() {
 

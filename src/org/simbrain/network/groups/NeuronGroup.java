@@ -49,7 +49,10 @@ import org.simbrain.util.math.SimbrainMath;
  */
 public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
-    // TODO: Add group level polarity
+    // TODO: If 3.x is developed and neurongroup sticks around:
+    //  Add prototype neuron as in synapse group
+    //  Add group level polarity
+    //  Fix isSpiking
 
     /**
      * The default for how often {@link #writeActsToFile()} should flush
@@ -1554,7 +1557,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
 
     /**
      * Whether to use subsampling (for large neuron groups, only using a sample
-     * of activations for external components)
+     * of activations for external components).
      */
     private static boolean useSubSampling = true;
 
@@ -1633,4 +1636,22 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         }
         return null;
     }
+    
+    
+    /**
+     * A hack to guess that the neuron group is spiking and thus that spike
+     * indices menu should be shown.   The isSpikingNeuronGroup field is 
+     * not currently being maintained, though we may bring it back.
+     *
+     * @return true if the first node in the group is spiking, false otherwise.
+     */
+    public boolean isSpiking2() {
+        if (neuronList.size() > 0) {
+            if(neuronList.get(0).getUpdateRule().isSpikingNeuron()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }

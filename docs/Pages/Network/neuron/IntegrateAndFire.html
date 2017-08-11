@@ -23,6 +23,9 @@
         <p>
             Activation of the neuron is interpreted as voltage potential. When that voltage potential passes a threshold value, the neuron spikes (resulting in the flash of yellow), and then the voltage is reset to a reset value, typically below the threshold potential. Below threshold, the neuron behaves like the <a href="additive.html">additive neuron</a>. It decays to a steady state value at a rate proporitional to its time constant. </p>
         <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
+
+<!-- Redo the equations here -->
+
         <p><img src="../equations/intFire.png" height="65" width="190">
         </p>
         <p>&nbsp;</p>
@@ -39,6 +42,10 @@
         <p class="heading">Reset potential</p>
         <blockquote>
             <p>The activation value which the neuron is reset to after a spiking event. </p>
+        </blockquote>
+        <p class="heading">Refractory period</p>
+        <blockquote>
+            <p>The time period in millisconds after a spike, during which no spikes can occur. During this period inputs to the neuron have no effect. </p>
         </blockquote>
         <p class="heading">Resistance</p>
         <blockquote>

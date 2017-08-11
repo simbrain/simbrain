@@ -48,6 +48,9 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
     /** Resistance field. */
     private JTextField tfResistance;
 
+    /** Refractory priod field. */
+    private JTextField tfRefractory;
+
     /** Resting potential field. */
     private JTextField tfRestingPotential;
 
@@ -80,6 +83,10 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
                 (r) -> ((IntegrateAndFireRule) r).getResistance(),
                 (r, val) -> ((IntegrateAndFireRule) r)
                         .setResistance((double) val));
+        tfRefractory = createTextField(
+                (r) -> ((IntegrateAndFireRule) r).getRefractoryPeriod(),
+                (r, val) -> ((IntegrateAndFireRule) r)
+                        .setRefractoryPeriod((double) val));
         tfRestingPotential = createTextField(
                 (r) -> ((IntegrateAndFireRule) r).getRestingPotential(),
                 (r, val) -> ((IntegrateAndFireRule) r)
@@ -92,6 +99,7 @@ public class IntegrateAndFireRulePanel extends AbstractNeuronRulePanel {
         mainTab.addItem("Threshold (mV)", tfThreshold);
         mainTab.addItem("Resting potential (mV)", tfRestingPotential);
         mainTab.addItem("Reset potential (mV)", tfReset);
+        mainTab.addItem("Refractory period (ms)", tfRefractory);
         mainTab.addItem("Resistance (M\u03A9)", tfResistance);
         mainTab.addItem("Background Current (nA)", tfBackgroundCurrent);
         mainTab.addItem("Time constant (ms)", tfTimeConstant);

@@ -289,4 +289,18 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
     public double getGraphicalUpperBound() {
         return restingPotential + 30;
     }
+
+    /**
+     * @return the refractoryPeriod
+     */
+    public double getRefractoryPeriod() {
+        return refractoryPeriod;
+    }
+
+    /**
+     * @param refractoryPeriod the refractoryPeriod to set
+     */
+    public void setRefractoryPeriod(double refractoryPeriod) {
+        this.refractoryPeriod = refractoryPeriod;
+    }
 }

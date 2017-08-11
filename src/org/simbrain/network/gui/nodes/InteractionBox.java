@@ -36,10 +36,10 @@ import org.simbrain.network.gui.NetworkPanel;
  */
 public class InteractionBox extends ScreenElement {
 
-    /** Width of interaction  */
+    /** Width of interaction box.  */
     private final static float DEFAULT_WIDTH = 20;
 
-    /** Height of interaction  */
+    /** Height of interaction box.  */
     private final static float DEFAULT_HEIGHT = 10;
 
     /** Text label. */
@@ -119,6 +119,9 @@ public class InteractionBox extends ScreenElement {
      * Update the text label bounds.
      */
     public void updateText() {
+    // TODO: Appears to be one source of performance drains.
+    // This is called multiple times at each iteration and it calls repaint
+    // Reduce number of times this is called
     	SwingUtilities.invokeLater(new Runnable() {
     		@Override
     		public void run() {

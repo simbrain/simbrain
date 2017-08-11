@@ -193,23 +193,25 @@ public class Network {
      * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
-    	for (int i = 0, n = networkListeners.size(); i < n; i++) {
-    		networkListeners.get(i).setUpdateComplete(false);
-    	}
+        for (int i = 0, n = networkListeners.size(); i < n; i++) {
+            networkListeners.get(i).setUpdateComplete(false);
+        }
         // Perform update
-    	for (int i = 0, n = updateManager.getActionList().size(); i < n;
-    			i++) {
-    		updateManager.getActionList().get(i).invoke();
-    	}
+        for (int i = 0, n = updateManager.getActionList().size(); i < n; i++) {
+            updateManager.getActionList().get(i).invoke();
+        }
 
-    	if (fireUpdates) {
-    	    // Fire update events for GUI update. Loose items, then groups.
-    	    fireSynapsesUpdated(synapseList); // Loose synapses
-    	    fireNeuronsUpdated(neuronList); // Loose neurons
-    	    for (int i = 0, n = groupList.size(); i < n; i++) {
-    	        fireGroupUpdated(groupList.get(i)); // Groups
-    	    }
-    	}
+        if (fireUpdates) {
+            // Fire update events for GUI update. Loose items, then groups.
+
+            // Todo: fireSynapsesUpdated(synapseList) is a performance drain,
+            // but needed e.g. to view Hebbian dynamics
+            fireSynapsesUpdated(synapseList); // Loose synapses
+            fireNeuronsUpdated(neuronList); // Loose neurons
+            for (int i = 0, n = groupList.size(); i < n; i++) {
+                fireGroupUpdated(groupList.get(i)); // Groups
+            }
+        }
 
         // Clear input nodes
         clearInputs();

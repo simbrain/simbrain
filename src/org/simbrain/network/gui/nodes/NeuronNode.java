@@ -205,6 +205,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (!currentTextVisibility) {
             return;
         }
+        // Todo: a bit of a performance drain.
         
         double act = neuron.getActivation();
         activationText.setScale(1);

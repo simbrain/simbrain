@@ -282,12 +282,12 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements
 
     @Override
     public double getGraphicalLowerBound() {
-        return resetPotential - 30;
+        return resetPotential - 10;
     }
 
     @Override
     public double getGraphicalUpperBound() {
-        return restingPotential + 30;
+        return threshold + 10;
     }
 
     /**

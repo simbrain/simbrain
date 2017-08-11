@@ -116,6 +116,7 @@ public class AllToAll implements ConnectNeurons {
                 for (Neuron target : targetNeurons) {
                     if (!(source.equals(target))) {
                         Synapse s = new Synapse(source, target);
+                        s.setStrength(1);
                         syns.add(s);
                     }
                 }
@@ -125,6 +126,7 @@ public class AllToAll implements ConnectNeurons {
             for (Neuron source : sourceNeurons) {
                 for (Neuron target : targetNeurons) {
                     Synapse s = new Synapse(source, target);
+                    s.setStrength(1);
                     syns.add(s);
                 }
             }
@@ -132,6 +134,7 @@ public class AllToAll implements ConnectNeurons {
         // If loose add directly to the network.
         if (looseSynapses) {
             for (Synapse s : syns) {
+                s.setStrength(1);
                 s.getSource().getNetwork().addSynapse(s);
             }
         }

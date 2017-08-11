@@ -28,9 +28,12 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     // Simulation Parameters
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
+    
+    // For 120 neurons.   .5 ordered.  1.9 or so edge.
+    
     // Since mean is 0, lower variance means lower average weight strength
     private static double variance = .5;
-    private double u_bar = .5;
+    private double u_bar = .5; // I want to try defaulting to 1 so "bits" are obvious
 
     // References
     Network network;
@@ -44,7 +47,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(229, 10, 450, 450, "Edge of Chaos");
+        NetBuilder net = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
         network = net.getNetwork();
         buildNetwork();
 
@@ -118,9 +121,9 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
                 res2.getNeuronList());
 
         // Use concurrent buffered update
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(network));
+//        network.getUpdateManager().clear();
+//        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
+//                .createConcurrentBufferedUpdate(network));
     }
 
     private NeuronGroup buildBitStream(NeuronGroup reservoir) {
@@ -143,7 +146,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        PlotBuilder ts = sim.addTimeSeriesPlot(674, 11, 363, 285, "Difference");
+        PlotBuilder ts = sim.addTimeSeriesPlot(609, 11, 363, 285, "Difference");
         sim.getWorkspace()
                 .addUpdateAction(new UpdateActionAdapter("Update time series") {
                     @Override

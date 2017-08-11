@@ -10,6 +10,7 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
+import org.simbrain.custom_sims.helper_classes.PlotBuilder;
 import org.simbrain.network.connections.RadialSimpleConstrainedKIn;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -21,9 +22,9 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.environment.SmellSource.DecayFunction;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.randomizer.PolarizedRandomizer;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
@@ -37,13 +38,14 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  */
 public class EdgeOfChaos extends RegisteredSimulation {
 
-    // TODO: Add PCA by default
+    // TODO: Add more objects
 
     // Simulation Parameters
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
     // Since mean is 0, lower variance means lower average weight strength
-    private static double variance = .5;
+    //  For 120 neurons: .01,.1, and > .4
+    private static double variance = .01;
     private static int kIn = 4; // in-degree (num connections to each neuron)
 
     // References
@@ -52,7 +54,6 @@ public class EdgeOfChaos extends RegisteredSimulation {
     NeuronGroup reservoir, sensorNodes;
     OdorWorldBuilder world;
     RotatingEntity mouse;
-    OdorWorldEntity cheese, flower, fish;
 
     @Override
     public void run() {
@@ -61,14 +62,14 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetBuilder net = sim.addNetwork(284, 10, 450, 450, "Edge of Chaos");
+        NetBuilder net = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
         network = net.getNetwork();
         buildNetwork();
 
-        // Time series of inputs
-        // PlotBuilder ts = sim.addTimeSeriesPlot(689, 10, 363, 285, "Input");
-        // sim.couple(net.getNetworkComponent(),
-        // inputNodes.getNeuronList().get(0), ts.getTimeSeriesComponent(), 0);
+        // Projection plot
+        PlotBuilder plot = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
+        sim.couple(net.getNetworkComponent(), reservoir,
+                plot.getProjectionPlotComponent());
 
         // Odor world sim
         buildOdorWorld();
@@ -78,7 +79,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 847, 10);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -117,8 +118,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Sensor nodes
         sensorNodes = new NeuronGroup(network, 6);
-        sensorNodes.setLocation(reservoir.getMaxX() + offset,
-                reservoir.getMinY());
+        sensorNodes.setLocation(229, 561);
         sensorNodes.setLabel("Sensors");
         sensorNodes.setClamped(true);
         network.addGroup(sensorNodes);
@@ -152,8 +152,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         return ng;
     }
 
-    static SynapseGroup connectReservoir(Network parentNet,
-            NeuronGroup res) {
+    static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res) {
 
         PolarizedRandomizer exRand = new PolarizedRandomizer(
                 Polarity.EXCITATORY, ProbDistribution.NORMAL);
@@ -237,18 +236,37 @@ public class EdgeOfChaos extends RegisteredSimulation {
     private void buildOdorWorld() {
 
         // Create the odor world
-        world = sim.addOdorWorld(725, 12, 416, 378, "Two Objects");
+        world = sim.addOdorWorld(440, 9, 413, 248, "Two Objects");
         world.getWorld().setObjectsBlockMovement(false);
-        mouse = world.addAgent(165, 245, "Mouse");
+        mouse = world.addAgent(165, 110, "Mouse");
         mouse.setHeading(90);
 
         // Set up world
-        cheese = world.addEntity(40, 40, "Swiss.gif",
+        double dispersion = 65;
+        OdorWorldEntity cheese1 = world.addEntity(40, 40, "Swiss.gif",
                 new double[] { 1, 0, 0, 0, 0, 0 });
-        cheese.getSmellSource().setDispersion(65);
-        flower = world.addEntity(290, 40, "Pansy.gif",
+        OdorWorldEntity cheese2 = world.addEntity(60, 40, "Gouda.gif",
+                new double[] { 0, 1, 0, 0, 0, 0 });
+        OdorWorldEntity cheese3 = world.addEntity(80, 40, "Bluecheese.gif",
+                new double[] { 1, 0, 1, 0, 0, 0 });
+        OdorWorldEntity flower1 = world.addEntity(290, 40, "Pansy.gif",
                 new double[] { 0, 0, 0, 0, 0, 1 });
-        flower.getSmellSource().setDispersion(65);
+        OdorWorldEntity flower2 = world.addEntity(310, 40, "Flax.gif",
+                new double[] { 0, 0, 0, 0, 0, 1 });
+        OdorWorldEntity flower3 = world.addEntity(330, 40, "Tulip.gif",
+                new double[] { 0, 0, 0, 0, 0, 1 });
+        cheese1.getSmellSource().setDispersion(dispersion);
+        cheese2.getSmellSource().setDispersion(dispersion);
+        cheese3.getSmellSource().setDispersion(dispersion);
+        flower1.getSmellSource().setDispersion(dispersion);
+        flower2.getSmellSource().setDispersion(dispersion);
+        flower3.getSmellSource().setDispersion(dispersion);
+        cheese1.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        cheese2.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        cheese3.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        flower1.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        flower2.getSmellSource().setDecayFunction(DecayFunction.STEP);
+        flower3.getSmellSource().setDecayFunction(DecayFunction.STEP);
 
         // Couple agent to cheese and flower nodes
         sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), sensorNodes);

@@ -36,6 +36,11 @@ public class CortexSimple extends RegisteredSimulation {
     // Simulation Parameters
     int NUM_NEURONS = 120;
     int GRID_SPACE = 25;
+
+    // Location and scale params for lognormal dist of all synapse groups
+    double location = -1.0;
+    double scale = .35;
+
     // TODO: Membrane properties
     // TODO: Build using z coordinates
 
@@ -55,7 +60,7 @@ public class CortexSimple extends RegisteredSimulation {
         buildNetwork();
 
         // Set up control panel
-        //controlPanel();
+        // controlPanel();
     }
 
     private void controlPanel() {
@@ -66,17 +71,19 @@ public class CortexSimple extends RegisteredSimulation {
 
     void buildNetwork() {
 
-        network.setTimeStep(0.5);
+        network.setTimeStep(0.1);
 
-        // Make the layers
+        // Make the layers.  Params from Petersen, 2009.
         int btwnLayerSpacing = 150;
-        NeuronGroup layer_23 = buildLayer(10, 10, 100);
+        NeuronGroup layer_23 = buildLayer(10, 10, 100, -71.5, 29, -38.4, 190);
         layer_23.setLabel("Layer 2/3");
         NeuronGroup layer_4 = buildLayer(-500,
-                (int) layer_23.getMaxY() + btwnLayerSpacing, 100);
+                (int) layer_23.getMaxY() + btwnLayerSpacing, 100, -66, 35,
+                -39.7, 302-50);
         layer_4.setLabel("Layer 4");
         NeuronGroup layer_56 = buildLayer(10,
-                (int) layer_4.getMaxY() + btwnLayerSpacing, 100);
+                (int) layer_4.getMaxY() + btwnLayerSpacing, 100, -62.8, 28, -40,
+                200);
         layer_56.setLabel("Layer 5/6");
 
         // Connect layers
@@ -90,14 +97,16 @@ public class CortexSimple extends RegisteredSimulation {
         SynapseGroup sg_23_56 = connectLayers(layer_23, layer_56, .08);
         SynapseGroup sg_56_23 = connectLayers(layer_56, layer_23, .03);
         // Todo; Add labels
-        
+
         // Use concurrent buffered update
         network.getUpdateManager().clear();
         network.getUpdateManager().addAction(ConcurrentBufferedUpdate
                 .createConcurrentBufferedUpdate(network));
     }
 
-    private NeuronGroup buildLayer(int x, int y, int numNeurons) {
+    private NeuronGroup buildLayer(int x, int y, int numNeurons,
+            double restingPotential, double timeConstant, double threshold,
+            double resistance) {
 
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
                 (int) Math.sqrt(numNeurons));
@@ -105,16 +114,21 @@ public class CortexSimple extends RegisteredSimulation {
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(network);
             IntegrateAndFireRule rule = new IntegrateAndFireRule();
-            rule.setResistance(200);
-            rule.setTimeConstant(30);
+            rule.setRestingPotential(restingPotential);
+            rule.setTimeConstant(timeConstant);
+            rule.setThreshold(threshold);
+            rule.setResistance(resistance);
             rule.setBackgroundCurrent(0);
+            rule.setResetPotential(restingPotential);
             neuron.setUpdateRule(rule);
+            neuron.setLowerBound(restingPotential-10);
+            neuron.setUpperBound(threshold);
             neurons.add(neuron);
         }
         NeuronGroup ng = new NeuronGroup(network, neurons);
         network.addGroup(ng);
         ng.setLayout(layout);
-        ng.applyLayout(new Point2D.Double(x,y));
+        ng.applyLayout(new Point2D.Double(x, y));
         return ng;
     }
 
@@ -123,13 +137,13 @@ public class CortexSimple extends RegisteredSimulation {
 
         PolarizedRandomizer exRand = new PolarizedRandomizer(
                 Polarity.EXCITATORY, ProbDistribution.LOGNORMAL);
-        exRand.setParam1(-2.1);
-        exRand.setParam2(.35);
+        exRand.setParam1(location);
+        exRand.setParam2(scale);
         PolarizedRandomizer inRand = new PolarizedRandomizer(
                 Polarity.INHIBITORY, ProbDistribution.LOGNORMAL);
-        inRand.setParam1(-2.1);
-        inRand.setParam2(.35);
-        
+        inRand.setParam1(location);
+        inRand.setParam2(scale);
+
         Sparse con = new Sparse(sparsity, false, false);
 
         SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.5,

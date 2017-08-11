@@ -120,7 +120,7 @@ public class SynapseGroupNode extends PNode implements GroupNode,
     public void updateConstituentNodes() {
         // Do nothing since there are no constituent nodes. Synapses are
         // invisible.
-    }    
+    }
 
     @Override
     public List<InteractionBox> getInteractionBoxes() {

@@ -148,8 +148,7 @@ public enum SquashingFunction {
 
 		@Override
 		public void derivVal(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-			// TODO Auto-generated method stub
-			
+			derivLogistic(valIn, valOut, ceil, floor, slope);
 		}
 
     },
@@ -486,7 +485,7 @@ public enum SquashingFunction {
     	if(valOut.isVector())
     		temp = new DoubleMatrix(valOut.toArray());
     	else
-    		temp = new DoubleMatrix(valOut.toArray2());
+    		temp = new DoubleMatrix(valOut.toArray2()); // TODO: make this not dumb
     	valOut.addi(1);
     	temp.rsubi(1);
     	valOut.rdivi(temp);
@@ -560,6 +559,15 @@ public enum SquashingFunction {
         double a = (2 * slope) / diff;
         return diff / 2 * a * Math.pow(1 / Math.cosh(a * val), 2);
     }
+    
+    public static void derivTanh(DoubleMatrix valIn, DoubleMatrix valOut,  double ceil, double floor, double slope) {
+        double diff = ceil - floor;
+        double a = (2 * slope) / diff;
+        if(valIn != valOut) {
+        	valOut.copy(valIn);
+        	
+        }
+    }
 
     /**
      * The derivative of the logistic function given the original function's
@@ -581,6 +589,26 @@ public enum SquashingFunction {
         return slope * logisticFunc(slope * val / diff)
                 * (1 - logisticFunc(slope * val / diff));
     }
+    
+    
+    /**
+     * ASSUMES valIn is the ACTIVATION NOT NET input since this is how the derivative of the logistic sigmoid works...
+     * for this reason ceil and floor do nothing.
+     * @param valIn
+     * @param valOut
+     * @param ceil
+     * @param floor
+     * @param slope
+     */
+    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
+    	if (valIn != valOut) {
+    		valOut.copy(valIn);
+    	}
+    	for(int ii=0; ii < valOut.data.length; ++ii) {
+    		valOut.data[ii] = slope * valOut.data[ii] * (1 - valOut.data[ii]);
+    	}
+    }
+    
 
     /**
      * The derivative of the arc tangent given the original function's upper and

@@ -130,4 +130,9 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
 		this.sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
 	}
 
+	@Override
+	public void getDerivative(DoubleMatrix input, DoubleMatrix output) {
+		this.sFunction.derivVal(input, output, getUpperBound(), getLowerBound(), slope);
+	}
+
 }

@@ -9,4 +9,6 @@ public interface TransferFunction {
 	
 	public void applyFunction(DoubleMatrix input, DoubleMatrix output);
 	
+	public void getDerivative(DoubleMatrix input, DoubleMatrix output);
+	
 }

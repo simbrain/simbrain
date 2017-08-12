@@ -18,10 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer;
+import org.simbrain.network.trainers.BackpropTrainer2;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
@@ -32,7 +35,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     private BackpropNetwork backprop;
     
     /** Reference to backprop trainer. */
-    private BackpropTrainer trainer;
+    private BackpropTrainer2 trainer;
 
     /**
      * Default constructor.
@@ -55,12 +58,16 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        trainer = new BackpropTrainer(backprop,
-            backprop.getNeuronGroupsAsList());
+        trainer = new BackpropTrainer2(backprop);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
             networkPanel, trainer);
         addTab("Train", iterativeControls);
-
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                trainer.commitChanges();
+            }
+        });
     }
 
     @Override

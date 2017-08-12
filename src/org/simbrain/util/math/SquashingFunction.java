@@ -600,15 +600,15 @@ public enum SquashingFunction {
      * @param floor
      * @param slope
      */
-    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut, double ceil, double floor, double slope) {
-    	if (valIn != valOut) {
-    		valOut.copy(valIn);
-    	}
-    	for(int ii=0; ii < valOut.data.length; ++ii) {
-    		valOut.data[ii] = slope * valOut.data[ii] * (1 - valOut.data[ii]);
-    	}
+    public static void derivLogistic(DoubleMatrix valIn, DoubleMatrix valOut,
+            double ceil, double floor, double slope) {
+        if (valIn != valOut) {
+            valOut.copy(valIn);
+        }
+        for (int ii = 0; ii < valOut.data.length; ++ii) {
+            valOut.data[ii] = slope * valOut.data[ii] * (1 - valOut.data[ii]);
+        }
     }
-    
 
     /**
      * The derivative of the arc tangent given the original function's upper and

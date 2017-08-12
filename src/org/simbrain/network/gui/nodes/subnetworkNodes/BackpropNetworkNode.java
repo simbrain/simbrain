@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,7 +34,7 @@ import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer;
+import org.simbrain.network.trainers.BackpropTrainer2;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
@@ -89,28 +91,5 @@ public class BackpropNetworkNode extends SubnetworkNode {
             (BackpropNetwork) getSubnetwork());
     }
 
-    /**
-     * Action to train Backprop.  No longer used.
-     */
-    private Action trainAction = new AbstractAction() {
-
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-            putValue(NAME, "Train network...");
-            putValue(SHORT_DESCRIPTION, "Train network...");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            BackpropNetwork network = (BackpropNetwork) getSubnetwork();
-            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(
-                getNetworkPanel(), new BackpropTrainer(network,
-                    network.getNeuronGroupsAsList()));
-            JDialog frame = getNetworkPanel().displayPanelInWindow(
-                trainingPanel, "Trainer");
-            trainingPanel.setFrame(frame);
-        }
-    };
 
 }

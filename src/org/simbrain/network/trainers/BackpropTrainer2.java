@@ -42,16 +42,10 @@ public class BackpropTrainer2 extends IterableTrainer {
     private double mse;
 
     /** Default learning rate. */
-    private static final double DEFAULT_LEARNING_RATE = .01;
+    private static final double DEFAULT_LEARNING_RATE = .1;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
-
-    /** Default momentum. */
-    private static final double DEFAULT_MOMENTUM = .9;
-
-    /** Momentum. Must be between 0 and 1. */
-    private double momentum = DEFAULT_MOMENTUM;
 
     /** The backprop network to be trained. */
     private BackpropNetwork net;
@@ -120,7 +114,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         for (NeuronGroup ng : net.getNeuronGroupList()) {
             layers.add(DoubleMatrix.zeros(ng.size()));
             if (ii > 0) {
-                biases.add(DoubleMatrix.zeros(ng.size()));
+                biases.add(new DoubleMatrix(ng.getBiases()));
                 netInputs.add(DoubleMatrix.zeros(ng.size()));
                 errors.add(DoubleMatrix.zeros(ng.size()));
             }
@@ -143,12 +137,11 @@ public class BackpropTrainer2 extends IterableTrainer {
     public void apply() throws DataNotInitializedException {
         int numRows = getMinimumNumRows(network); // Ignore extra rows
         int row = ThreadLocalRandom.current().nextInt(numRows);
-        
+
         mse = 0;
-        
+
         // Inputs are transposed for input dataset so "rows" are now columns
-        DoubleMatrix inputVector = inputs
-                .getColumn(row);
+        DoubleMatrix inputVector = inputs.getColumn(row);
         // Set activations on input layer
         layers.get(0).copy(inputVector);
         System.out.println("-------\nInput: " + inputVector);
@@ -194,29 +187,34 @@ public class BackpropTrainer2 extends IterableTrainer {
         // input)
         // Update biases: learning rate * (error * f'(netinput))
 
-        int wm_index = 1;
+        int layerIndex = 1;
         for (DoubleMatrix wm : weightMatrices) {
-            DoubleMatrix prevLayer = layers.get(wm_index - 1);
-            DoubleMatrix error = errors.get(wm_index - 1);
+            DoubleMatrix prevLayer = layers.get(layerIndex - 1);
+            DoubleMatrix error = errors.get(layerIndex - 1);
+            DoubleMatrix biasVector = biases.get(layerIndex - 1);
 
             // TODO: Can't use activations for non-logistic
-            DoubleMatrix currentLayer = layers.get(wm_index);
+            DoubleMatrix currentLayer = layers.get(layerIndex);
             DoubleMatrix derivs = DoubleMatrix.zeros(currentLayer.length);
-            ((TransferFunction) net.getNeuronGroup(wm_index)
+            ((TransferFunction) net.getNeuronGroup(layerIndex)
                     .getNeuronListUnsafe().get(0).getUpdateRule())
                             .getDerivative(currentLayer, derivs);
 
             // TODO: Optimize with matrix operations
             // JBlas data laid out in a 1-d array
             int kk = 0;
-            for (int jj = 0; jj < prevLayer.length; jj++) {
-                for (int ii = 0; ii < currentLayer.length; ii++) {
+            for (int ii = 0; ii < currentLayer.length; ii++) {
+                for (int jj = 0; jj < prevLayer.length; jj++) {
                     wm.data[kk] -= learningRate * error.data[ii]
                             * derivs.data[ii] * prevLayer.data[jj];
                     kk++;
                 }
             }
-            wm_index++;
+            for (int ii = 0; ii < biasVector.length; ii++) {
+                biasVector.data[ii] -= learningRate * error.data[ii]
+                        * derivs.data[ii];
+            }
+            layerIndex++;
 
         }
 
@@ -268,6 +266,11 @@ public class BackpropTrainer2 extends IterableTrainer {
         for (DoubleMatrix dm : weightMatrices) {
             for (int ii = 0; ii < dm.data.length; ii++) {
                 dm.data[ii] = rand.getRandom();
+            }
+        }
+        for (DoubleMatrix biasVector : biases) {
+            for (int ii = 0; ii < biasVector.length; ii++) {
+                biasVector.data[ii] = rand.getRandom();
             }
         }
         // TODO: Must push random values back to network afterwards

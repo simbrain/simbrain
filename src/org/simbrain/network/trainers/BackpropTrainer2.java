@@ -66,8 +66,14 @@ public class BackpropTrainer2 extends IterableTrainer {
     /** Error. */
     private List<DoubleMatrix> errors = new ArrayList<DoubleMatrix>();
 
-    /** Input layer. Separate for simpler indexing on other lists. */
+    /**
+     * Input layer. Holds current input vector from input dataset. Separate for
+     * simpler indexing on other lists.
+     */
     private DoubleMatrix inputLayer;
+
+    /** Current target vector. */
+    private DoubleMatrix targetVector;
 
     /** Inputs. */
     private DoubleMatrix inputData;
@@ -117,23 +123,10 @@ public class BackpropTrainer2 extends IterableTrainer {
         rand.setParam1(0);
         rand.setParam2(1);
     }
-    
-    public void initData() {
-        // Initialize input and target datasets. Store data as columns
-        // since that's what everything else deals with
-        if (network.getTrainingSet().getInputData() != null) {
-            inputData = new DoubleMatrix(
-                    network.getTrainingSet().getInputData()).transpose();
-        }
-        if (network.getTrainingSet().getTargetData() != null) {
-            targetData = new DoubleMatrix(
-                    network.getTrainingSet().getTargetData()).transpose();
-        }
-    }
 
     @Override
     public void apply() throws DataNotInitializedException {
-        int numTrainingExamples = getMinimumNumRows(network); 
+        int numTrainingExamples = getMinimumNumRows(network);
         int exampleNum = ThreadLocalRandom.current()
                 .nextInt(numTrainingExamples);
 
@@ -141,23 +134,20 @@ public class BackpropTrainer2 extends IterableTrainer {
 
         inputLayer = inputData.getColumn(exampleNum);
 
-        System.out.println("-------\nInput: " + inputLayer);
-
         // Update network
         updateNetwork();
 
         // Backpropagate error
-        DoubleMatrix targetVector = targetData.getColumn(exampleNum);
+        targetVector = targetData.getColumn(exampleNum);
         DoubleMatrix outputError = errors.get(errors.size() - 1);
         targetVector.subi(getOutputLayer(), outputError);
         backpropagateError();
 
+        // Print stats
+        printStatus();
+
         // Update weights and biases
         updateParameters();
-
-        System.out.println("Weights after: " + weightMatrices);
-        System.out.println("Outputs: " + getOutputLayer());
-        System.out.println("Targets: " + targetVector);
 
         // Update MSE
         for (int j = 0; j < outputError.length; j++) {
@@ -168,6 +158,10 @@ public class BackpropTrainer2 extends IterableTrainer {
         fireErrorUpdated();
     }
 
+    /**
+     * Set error values using backprop (roughly output errors times intervening
+     * weights, going "backwards" from output towards input.
+     */
     private void backpropagateError() {
 
         // From output layer backwards to input layer
@@ -178,6 +172,9 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     }
 
+    /**
+     * Apply weight and bias updates.
+     */
     private void updateParameters() {
 
         // Update weights: learning rate * (error * f'(netin) * last layer
@@ -202,8 +199,7 @@ public class BackpropTrainer2 extends IterableTrainer {
                     .getNeuronListUnsafe().get(0).getUpdateRule())
                             .getDerivative(currentLayer, derivs);
 
-            System.out.println("Error: " + error);
-            System.out.println("Deriv: " + derivs);
+            // System.out.println("Deriv: " + derivs);
 
             // TODO: Optimize with matrix operations
             // JBlas data laid out in a 1-d array
@@ -220,13 +216,12 @@ public class BackpropTrainer2 extends IterableTrainer {
                         * derivs.data[ii];
             }
             layerIndex++;
-
         }
 
     }
 
     /**
-     * Update the shadow array-based network.
+     * Update the array-based "shadow" network.
      */
     private void updateNetwork() {
 
@@ -252,8 +247,6 @@ public class BackpropTrainer2 extends IterableTrainer {
             ((TransferFunction) net.getNeuronGroup(ii + 1).getNeuronListUnsafe()
                     .get(0).getUpdateRule()).applyFunctionInPlace(activations);
 
-            System.out.println("Weights: " + wm);
-            System.out.println("Activations: " + activations);
             ii++;
         }
 
@@ -283,7 +276,27 @@ public class BackpropTrainer2 extends IterableTrainer {
                 biasVector.data[ii] = rand.getRandom();
             }
         }
-        // TODO: Must push random values back to network afterwards
+    }
+
+    /**
+     * Print debug info.
+     */
+    private void printStatus() {
+        System.out.println("---------------------------");
+        System.out.println("Targets: " + targetVector);
+        System.out.println("Node Layer 1");
+        System.out.println("\tActivations:" + inputLayer);
+        for (int i = 0; i < layers.size(); i++) {
+            System.out.println("Weight Layer " + (i + 1) + " --> "
+                    + (i + 2));
+            System.out.println("\tWeights:" + weightMatrices.get(i));
+            System.out.println("Node Layer " + (i + 2));
+            System.out.println("\tActivations: " + layers.get(i));
+            System.out.println("\tBiases: " + biases.get(i));
+            System.out.println("\tErrors: " + errors.get(i));
+            System.out.println("\tNet inputs: " + netInputs.get(i));
+        }
+
     }
 
     /**
@@ -291,6 +304,28 @@ public class BackpropTrainer2 extends IterableTrainer {
      * network.
      */
     public void commitChanges() {
+        for (int ii = 0; ii < net.getNeuronGroupList().size(); ii++) {
+            // net.getNeuronGroupList().get(ii).setBiases(biases.get(ii).data);
+            if (ii > 0) {
+                // net.getSynapseGroupList().get(ii-1).setWeights(weightMatrices.get(ii-1).data);
+            }
+        }
     }
-    
+
+    /**
+     * Initialize input and target datasets as JBlas arrays.
+     */
+    public void initData() {
+        // Store data as columns since that's what everything else deals with
+        // So no need to do tranposes later.
+        if (network.getTrainingSet().getInputData() != null) {
+            inputData = new DoubleMatrix(
+                    network.getTrainingSet().getInputData()).transpose();
+        }
+        if (network.getTrainingSet().getTargetData() != null) {
+            targetData = new DoubleMatrix(
+                    network.getTrainingSet().getTargetData()).transpose();
+        }
+    }
+
 }

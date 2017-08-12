@@ -64,7 +64,7 @@ public class IterativeControlsPanel extends JPanel {
     private final NetworkPanel panel;
 
     /** Flag for showing updates in GUI. */
-    private final JCheckBox showUpdates = new JCheckBox("Show updates");
+    //private final JCheckBox showUpdates = new JCheckBox("Show updates");
 
     /** Error progress bar. */
     private JProgressBar errorBar;
@@ -122,9 +122,9 @@ public class IterativeControlsPanel extends JPanel {
         runTools.add(new JLabel("Iterate: "));
         runTools.add(new JButton(runAction));
         runTools.add(new JButton(stepAction));
-        showUpdates
-                .setToolTipText("Update display of network while iterating trainer (slows performance but didactically useful)");
-        runTools.add(showUpdates);
+        //showUpdates
+        //        .setToolTipText("Update display of network while iterating trainer (slows performance but didactically useful)");
+        //runTools.add(showUpdates);
         JButton propertiesButton = new JButton(setPropertiesAction);
         propertiesButton.setHideActionText(true);
         runTools.add(propertiesButton);
@@ -238,21 +238,21 @@ public class IterativeControlsPanel extends JPanel {
                         try {
                             while (!trainer.isUpdateCompleted()) {
                                 trainer.iterate();
-                                if (showUpdates.isSelected()) {
-                                    panel.getNetwork()
-                                            .setUpdateCompleted(false);
-                                    panel.getNetwork().fireGroupUpdated(
-                                            trainer.getTrainableNetwork()
-                                                    .getNetwork());
-                                    while (!panel.getNetwork()
-                                            .isUpdateCompleted()) {
-                                        try {
-                                            Thread.sleep(1);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
+//                                if (showUpdates.isSelected()) {
+//                                    panel.getNetwork()
+//                                            .setUpdateCompleted(false);
+//                                    panel.getNetwork().fireGroupUpdated(
+//                                            trainer.getTrainableNetwork()
+//                                                    .getNetwork());
+//                                    while (!panel.getNetwork()
+//                                            .isUpdateCompleted()) {
+//                                        try {
+//                                            Thread.sleep(1);
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }
                             }
                         } catch (DataNotInitializedException e) {
                             JOptionPane.showOptionDialog(null, e.getMessage(),
@@ -295,10 +295,10 @@ public class IterativeControlsPanel extends JPanel {
             }
             try {
                 trainer.iterate();
-                if (showUpdates.isSelected()) {
-                    panel.getNetwork().fireGroupUpdated(
-                            trainer.getTrainableNetwork().getNetwork());
-                }
+//                if (showUpdates.isSelected()) {
+//                    panel.getNetwork().fireGroupUpdated(
+//                            trainer.getTrainableNetwork().getNetwork());
+//                }
                 trainer.revalidateSynapseGroups();
             } catch (DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning",

@@ -189,7 +189,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
         if (columnIndex == 0) {
             return "#";
         } else {
-            // System.out.println(Arrays.asList(columnHeadings));
+            //System.out.println(columnHeadings + "," + columnIndex);
             if (columnHeadings != null) {
                 return columnHeadings.get(columnIndex - 1);
             } else {

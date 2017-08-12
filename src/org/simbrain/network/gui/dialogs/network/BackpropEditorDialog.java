@@ -49,6 +49,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         this.backprop = backprop;
         init();
         initDefaultTabs();
+        updateData();
     }
 
     /**
@@ -75,5 +76,10 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         if (trainer != null) {
             trainer.setUpdateCompleted(true);
         }
+    }
+    
+    @Override
+    void updateData() {
+        trainer.initData();
     }
 }

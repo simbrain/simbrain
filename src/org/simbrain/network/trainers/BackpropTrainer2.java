@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.log4j.chainsaw.Main;
 import org.jblas.DoubleMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -42,7 +43,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     private double mse;
 
     /** Default learning rate. */
-    private static final double DEFAULT_LEARNING_RATE = .01;
+    private static final double DEFAULT_LEARNING_RATE = .1;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
@@ -111,17 +112,23 @@ public class BackpropTrainer2 extends IterableTrainer {
             ii++;
         }
 
-        // Initialize input and target datasets. Store data as columns
-        // since that's what everything else deals with
-        inputData = new DoubleMatrix(network.getTrainingSet().getInputData())
-                .transpose();
-        targetData = new DoubleMatrix(network.getTrainingSet().getTargetData())
-                .transpose();
-
         // Initialize randomizer
         rand.setPdf(ProbDistribution.NORMAL);
         rand.setParam1(0);
         rand.setParam2(1);
+    }
+    
+    public void initData() {
+        // Initialize input and target datasets. Store data as columns
+        // since that's what everything else deals with
+        if (network.getTrainingSet().getInputData() != null) {
+            inputData = new DoubleMatrix(
+                    network.getTrainingSet().getInputData()).transpose();
+        }
+        if (network.getTrainingSet().getTargetData() != null) {
+            targetData = new DoubleMatrix(
+                    network.getTrainingSet().getTargetData()).transpose();
+        }
     }
 
     @Override
@@ -195,18 +202,21 @@ public class BackpropTrainer2 extends IterableTrainer {
                     .getNeuronListUnsafe().get(0).getUpdateRule())
                             .getDerivative(currentLayer, derivs);
 
+            System.out.println("Error: " + error);
+            System.out.println("Deriv: " + derivs);
+
             // TODO: Optimize with matrix operations
             // JBlas data laid out in a 1-d array
             int kk = 0;
             for (int ii = 0; ii < currentLayer.length; ii++) {
                 for (int jj = 0; jj < prevLayer.length; jj++) {
-                    wm.data[kk] -= learningRate * error.data[ii]
+                    wm.data[kk] += learningRate * error.data[ii]
                             * derivs.data[ii] * prevLayer.data[jj];
                     kk++;
                 }
             }
             for (int ii = 0; ii < biasVector.length; ii++) {
-                biasVector.data[ii] -= learningRate * error.data[ii]
+                biasVector.data[ii] += learningRate * error.data[ii]
                         * derivs.data[ii];
             }
             layerIndex++;
@@ -282,5 +292,5 @@ public class BackpropTrainer2 extends IterableTrainer {
      */
     public void commitChanges() {
     }
-
+    
 }

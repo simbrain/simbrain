@@ -160,6 +160,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
                             .getTable().getData()).asDoubleArray());
                     }
                 }
+                updateData();
                 pack();
             }
         };
@@ -177,6 +178,13 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
             addButton(new JButton(helpAction));
         }
 
+    }
+    
+    
+    /**
+     * Called when switching tabs.  Intended to be overridden.
+     */
+    void updateData() {
     }
 
     /**

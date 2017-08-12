@@ -39,12 +39,12 @@ public class TrainingSet {
     /**
      * Input data.
      */
-    private double[][] inputData;
+    private double[][] inputData = new double[5][5];
 
     /**
-     * Target Data
+     * Target Data.
      */
-    private double[][] targetData;
+    private double[][] targetData = new double[5][5];;
 
     /** Percentage of data to use for validation. */
     private double percentValidation = .25;

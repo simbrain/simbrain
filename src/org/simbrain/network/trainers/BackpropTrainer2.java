@@ -42,7 +42,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     private double mse;
 
     /** Default learning rate. */
-    private static final double DEFAULT_LEARNING_RATE = .1;
+    private static final double DEFAULT_LEARNING_RATE = .01;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
@@ -51,28 +51,28 @@ public class BackpropTrainer2 extends IterableTrainer {
     private BackpropNetwork net;
 
     /** Weight matrices ordered input to output. */
-    private List<DoubleMatrix> weightMatrices;
+    private List<DoubleMatrix> weightMatrices = new ArrayList<DoubleMatrix>();
 
-    // TODO: Consider not representing input layer so that
-    // indexing is consistent. So far causing headaches and
-    // source of future bugs.
-    /** Activation vectors ordered input to output. */
-    private List<DoubleMatrix> layers;
+    /** Activation vectors. */
+    private List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
 
-    /** Net inputs for hidden through output layers. */
-    private List<DoubleMatrix> netInputs;
+    /** Net inputs. */
+    private List<DoubleMatrix> netInputs = new ArrayList<DoubleMatrix>();
 
-    /** Biases for hidden through output layers. */
-    private List<DoubleMatrix> biases;
+    /** Biases. */
+    private List<DoubleMatrix> biases = new ArrayList<DoubleMatrix>();
 
-    /** Errors for hidden through output layers. */
-    private List<DoubleMatrix> errors;
+    /** Error. */
+    private List<DoubleMatrix> errors = new ArrayList<DoubleMatrix>();
+
+    /** Input layer. Separate for simpler indexing on other lists. */
+    private DoubleMatrix inputLayer;
 
     /** Inputs. */
-    private DoubleMatrix inputs;
+    private DoubleMatrix inputData;
 
     /** Targets. */
-    private DoubleMatrix targets;
+    private DoubleMatrix targetData;
 
     /** Parameter randomizer. */
     Randomizer rand = new Randomizer();
@@ -91,17 +91,6 @@ public class BackpropTrainer2 extends IterableTrainer {
         }
         net = (BackpropNetwork) network;
 
-        // Initialize list capacities
-        layers = new ArrayList<DoubleMatrix>(net.getNeuronGroupList().size());
-        netInputs = new ArrayList<DoubleMatrix>(
-                net.getNeuronGroupList().size() - 1);
-        biases = new ArrayList<DoubleMatrix>(
-                net.getNeuronGroupList().size() - 1);
-        errors = new ArrayList<DoubleMatrix>(
-                net.getNeuronGroupList().size() - 1);
-        weightMatrices = new ArrayList<DoubleMatrix>(
-                net.getSynapseGroupList().size());
-
         // Given construction can assume that synapse group list is ordered from
         // input to output layers
         for (SynapseGroup sg : net.getSynapseGroupList()) {
@@ -112,45 +101,46 @@ public class BackpropTrainer2 extends IterableTrainer {
         // Initialize layers
         int ii = 0;
         for (NeuronGroup ng : net.getNeuronGroupList()) {
-            layers.add(DoubleMatrix.zeros(ng.size()));
+            inputLayer = DoubleMatrix.zeros(ng.size());
             if (ii > 0) {
-                biases.add(new DoubleMatrix(ng.getBiases()));
+                layers.add(DoubleMatrix.zeros(ng.size()));
                 netInputs.add(DoubleMatrix.zeros(ng.size()));
                 errors.add(DoubleMatrix.zeros(ng.size()));
+                biases.add(new DoubleMatrix(ng.getBiases()));
             }
             ii++;
         }
 
-        // Initialize input and target datasets
-        inputs = new DoubleMatrix(network.getTrainingSet().getInputData())
+        // Initialize input and target datasets. Store data as columns
+        // since that's what everything else deals with
+        inputData = new DoubleMatrix(network.getTrainingSet().getInputData())
                 .transpose();
-        targets = new DoubleMatrix(network.getTrainingSet().getTargetData())
+        targetData = new DoubleMatrix(network.getTrainingSet().getTargetData())
                 .transpose();
 
         // Initialize randomizer
         rand.setPdf(ProbDistribution.NORMAL);
         rand.setParam1(0);
-        rand.setParam2(.5);
+        rand.setParam2(1);
     }
 
     @Override
     public void apply() throws DataNotInitializedException {
-        int numRows = getMinimumNumRows(network); // Ignore extra rows
-        int row = ThreadLocalRandom.current().nextInt(numRows);
+        int numTrainingExamples = getMinimumNumRows(network); 
+        int exampleNum = ThreadLocalRandom.current()
+                .nextInt(numTrainingExamples);
 
         mse = 0;
 
-        // Inputs are transposed for input dataset so "rows" are now columns
-        DoubleMatrix inputVector = inputs.getColumn(row);
-        // Set activations on input layer
-        layers.get(0).copy(inputVector);
-        System.out.println("-------\nInput: " + inputVector);
+        inputLayer = inputData.getColumn(exampleNum);
+
+        System.out.println("-------\nInput: " + inputLayer);
 
         // Update network
         updateNetwork();
 
         // Backpropagate error
-        DoubleMatrix targetVector = targets.getColumn(row);
+        DoubleMatrix targetVector = targetData.getColumn(exampleNum);
         DoubleMatrix outputError = errors.get(errors.size() - 1);
         targetVector.subi(getOutputLayer(), outputError);
         backpropagateError();
@@ -164,7 +154,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
         // Update MSE
         for (int j = 0; j < outputError.length; j++) {
-            mse += outputError.get(j) * outputError.get(j);
+            mse += (outputError.get(j) * outputError.get(j));
         }
         mse = mse / network.getOutputNeurons().size();
         incrementIteration();
@@ -173,10 +163,10 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     private void backpropagateError() {
 
-        // From second to last hidden layer backwards to first
-        // hidden layer
-        for (int ii = layers.size() - 2; ii > 0; ii--) {
-            errors.get(ii).mmuli(weightMatrices.get(ii), errors.get(ii - 1));
+        // From output layer backwards to input layer
+        for (int ii = layers.size() - 1; ii > 0; ii--) {
+            errors.get(ii).transpose().mmuli(
+                    weightMatrices.get(ii - 1).transpose(), errors.get(ii - 1));
         }
 
     }
@@ -187,16 +177,21 @@ public class BackpropTrainer2 extends IterableTrainer {
         // input)
         // Update biases: learning rate * (error * f'(netinput))
 
-        int layerIndex = 1;
+        int layerIndex = 0;
         for (DoubleMatrix wm : weightMatrices) {
-            DoubleMatrix prevLayer = layers.get(layerIndex - 1);
-            DoubleMatrix error = errors.get(layerIndex - 1);
-            DoubleMatrix biasVector = biases.get(layerIndex - 1);
+            DoubleMatrix prevLayer;
+            if (layerIndex == 0) {
+                prevLayer = inputLayer;
+            } else {
+                prevLayer = layers.get(layerIndex - 1);
+            }
+            DoubleMatrix error = errors.get(layerIndex);
+            DoubleMatrix biasVector = biases.get(layerIndex);
 
             // TODO: Can't use activations for non-logistic
             DoubleMatrix currentLayer = layers.get(layerIndex);
             DoubleMatrix derivs = DoubleMatrix.zeros(currentLayer.length);
-            ((TransferFunction) net.getNeuronGroup(layerIndex)
+            ((TransferFunction) net.getNeuronGroup(layerIndex + 1)
                     .getNeuronListUnsafe().get(0).getUpdateRule())
                             .getDerivative(currentLayer, derivs);
 
@@ -225,21 +220,26 @@ public class BackpropTrainer2 extends IterableTrainer {
      */
     private void updateNetwork() {
 
-        int ii = 1;
+        int ii = 0;
         for (DoubleMatrix wm : weightMatrices) {
 
             // Set up variables for easy reading
-            DoubleMatrix inputs = layers.get(ii - 1);
+            DoubleMatrix inputs;
+            if (ii == 0) {
+                inputs = inputLayer;
+            } else {
+                inputs = layers.get(ii - 1);
+            }
             DoubleMatrix activations = layers.get(ii);
-            DoubleMatrix netInput = netInputs.get(ii - 1);
-            DoubleMatrix biasVec = biases.get(ii - 1);
+            DoubleMatrix netInput = netInputs.get(ii);
+            DoubleMatrix biasVec = biases.get(ii);
 
             // Activations = actFunction(matrix * inputs + biases)
             wm.mmuli(inputs, netInput);
             activations.copy(netInput);
             activations.addi(biasVec);
             // TODO: Maybe store a list of these for convenience
-            ((TransferFunction) net.getNeuronGroup(ii).getNeuronListUnsafe()
+            ((TransferFunction) net.getNeuronGroup(ii + 1).getNeuronListUnsafe()
                     .get(0).getUpdateRule()).applyFunctionInPlace(activations);
 
             System.out.println("Weights: " + wm);
@@ -281,7 +281,6 @@ public class BackpropTrainer2 extends IterableTrainer {
      * network.
      */
     public void commitChanges() {
-        System.out.println("here");
     }
 
 }

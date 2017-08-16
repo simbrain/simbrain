@@ -24,7 +24,7 @@ import java.awt.event.WindowEvent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.trainers.BackpropTrainer2;
+import org.simbrain.network.trainers.*;
 
 /**
  * <b>BackpropDialog</b> is a dialog box for editing a Backprop network.
@@ -34,8 +34,13 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     /** Reference to the backprop network being edited. */
     private BackpropNetwork backprop;
     
-    /** Reference to backprop trainer. */
-    private BackpropTrainer2 trainer;
+    /**
+     * Make it easy to switch between the new, experimental trainer
+     * (BackpropTrainer2), and the old one. Once that's stabilized this code can
+     * be removed.
+     */
+    private boolean useExperimentalTrainer = true;
+    private IterableTrainer currentTrainer;
 
     /**
      * Default constructor.
@@ -59,27 +64,31 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        trainer = new BackpropTrainer2(backprop);
+        if(useExperimentalTrainer) {
+            currentTrainer = new BackpropTrainer2(backprop);
+        } else {
+            currentTrainer = new BackpropTrainer(backprop);
+        }
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(
-            networkPanel, trainer);
+            networkPanel, currentTrainer);
         addTab("Train", iterativeControls);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                trainer.commitChanges();
+                currentTrainer.commitChanges();
             }
         });
     }
 
     @Override
     protected void stopTrainer() {
-        if (trainer != null) {
-            trainer.setUpdateCompleted(true);
+        if (currentTrainer != null) {
+            currentTrainer.setUpdateCompleted(true);
         }
     }
     
     @Override
     void updateData() {
-        trainer.initData();
+        currentTrainer.initData();
     }
 }

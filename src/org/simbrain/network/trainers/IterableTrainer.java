@@ -340,4 +340,17 @@ public abstract class IterableTrainer extends Trainer {
         this.errorThreshold = errorThreshold;
     }
 
+    /**
+     * Called when datatables are changed. Override if the trainer needs to
+     * initialize any internal variables when this happens.
+     */
+    public void initData() {
+    }
+
+    /**
+     * Called when the trainer is closed.  Override if needed.
+     */
+    public void commitChanges() {
+    }
+
 }

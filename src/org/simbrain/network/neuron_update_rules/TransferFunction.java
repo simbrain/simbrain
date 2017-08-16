@@ -6,7 +6,6 @@ public interface TransferFunction {
 
 	public void applyFunctionInPlace(DoubleMatrix input);
 	
-	
 	public void applyFunction(DoubleMatrix input, DoubleMatrix output);
 	
 	public void getDerivative(DoubleMatrix input, DoubleMatrix output);

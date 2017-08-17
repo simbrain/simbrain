@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -190,14 +191,29 @@ public final class NeuronDialog extends StandardDialog {
      * Set the help page based on the currently selected neuron type.
      */
     private void updateHelp() {
+        
         if (neuronPropertiesPanel.getUpdateRulePanel().getCbNeuronType()
                 .getSelectedItem() == SimbrainConstants.NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
+            
+            // Use combo box label (with spaces removed) for doc page.
             String name = (String) neuronPropertiesPanel.getUpdateRulePanel()
                     .getCbNeuronType().getSelectedItem();
-            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
-                    + ".html");
+            name = name.replaceAll("\\s", ""); // Remove white space
+            
+            // Docs are in different places for activity generators and neurons
+            String docFolder = "";
+            if (neuronList.get(0)
+                    .getUpdateRule() instanceof ActivityGenerator) {
+                docFolder = "activity_generator";
+            } else {
+                docFolder = "neuron";
+            }
+            
+            // Create the help action
+            helpAction = new ShowHelpAction(
+                    "Pages/Network/" + docFolder + "/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }

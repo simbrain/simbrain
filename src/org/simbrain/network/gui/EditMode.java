@@ -165,7 +165,12 @@ public final class EditMode {
         // Draw wand itself
         g2.setColor(Color.YELLOW);
         g2.setStroke(new BasicStroke(1));
-        float alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        float alpha;
+        if (System.getProperty("os.name").startsWith("Windows")) {
+        	alpha = 1.0f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        } else {
+        	alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        }
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                 alpha));
         g2.fillOval(0, 0, wandRadius, wandRadius);

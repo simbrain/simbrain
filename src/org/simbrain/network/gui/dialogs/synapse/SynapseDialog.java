@@ -184,6 +184,7 @@ public final class SynapseDialog extends StandardDialog {
         } else {
             String name = (String) synapseEditingPanel.getUpdateInfoPanel()
                     .getCbSynapseType().getSelectedItem();
+            name = name.replaceAll("\\s", ""); // Remove white space
             helpAction = new ShowHelpAction("Pages/Network/synapse/" + name
                     + ".html");
         }

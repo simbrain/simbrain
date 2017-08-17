@@ -195,6 +195,13 @@ public class EffectorPanel extends JPanel {
      * Edit an effector.
      */
     private void editEffector(Effector effector) {
+        
+        // Cheap null fix.  Panel is null when no item is selected on opening.
+        // Should disable the edit button in this case.
+        if (effector == null) {
+            return;
+        }
+
         StandardDialog dialog = new StandardDialog();
         dialog.setTitle("Edit Effector");
         AbstractEffectorPanel effectorPanel = null;

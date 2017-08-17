@@ -194,6 +194,12 @@ public class SensorPanel extends JPanel {
      * Edit a sensor.
      */
     private void editSensor(Sensor sensor) {
+        // Cheap null fix.  Panel is null when no item is selected on opening.
+        // Should disable the edit button in this case.
+        if (sensor == null) {
+            return;
+        }
+
         StandardDialog dialog = new StandardDialog();
         dialog.setTitle("Edit Sensor");
         AbstractSensorPanel sensorPanel = null;

@@ -35,6 +35,7 @@ import org.simbrain.util.randomizer.Randomizer;
  * Array-backed backprop, currently using JBlas.
  *
  * 50-50 co-authors
+ * 
  * @author Jeff Yoshimi
  * @author Zach Tosi
  */
@@ -48,9 +49,9 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
-    
+
     /** Default momentum. */
-    private static final double DEFAULT_MOMENTUM = .99;
+    private static final double DEFAULT_MOMENTUM = 0; // .99  0 For now while debugging
 
     /** Momentum. Must be between 0 and 1. */
     private double momentum = DEFAULT_MOMENTUM;
@@ -62,8 +63,7 @@ public class BackpropTrainer2 extends IterableTrainer {
     private List<DoubleMatrix> weightMatrices = new ArrayList<DoubleMatrix>();
 
     /** Memory of last weight updates for momentum. */
-    private List<DoubleMatrix> lastWeightUpdates = 
-            new ArrayList<DoubleMatrix>();
+    private List<DoubleMatrix> lastWeightUpdates = new ArrayList<DoubleMatrix>();
 
     /** Memory of last bias updates for momentum. */
     private List<DoubleMatrix> lastBiasUpdates = new ArrayList<DoubleMatrix>();
@@ -123,8 +123,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         }
         net = (BackpropNetwork) network;
 
-        // Given construction can assume that synapse group list is ordered from
-        // input to output layers
+        // Synapse group list is ordered from input to output layers
         for (SynapseGroup sg : net.getSynapseGroupList()) {
             DoubleMatrix weights = new DoubleMatrix(sg.getWeightMatrix())
                     .transpose();
@@ -153,14 +152,18 @@ public class BackpropTrainer2 extends IterableTrainer {
         // Initialize randomizer
         rand.setPdf(ProbDistribution.NORMAL);
         rand.setParam1(0);
-        rand.setParam2(1);
+        rand.setParam2(.1);
     }
 
     @Override
-    public void apply() throws DataNotInitializedException {
+    public void apply() {
 
         int numTrainingExamples = getMinimumNumRows(network);
 
+        //System.out.println("=== Before: ===\n");
+        //printDebugInfo();
+
+        // One "iteration" of the network according to some method
         mse = 0;
         if (updateMethod == UpdateMethod.EPOCH) {
             for (int row = 0; row < numTrainingExamples; row++) {
@@ -172,10 +175,10 @@ public class BackpropTrainer2 extends IterableTrainer {
                     .nextInt(numTrainingExamples);
             mse = updateBackprop(rowNum);
         }
-        // TODO: Other types
+        // TODO: Other update types
 
-        // Print stats
-        // printDebugInfo();
+        //System.out.println("=== After: ===\n");
+        //printDebugInfo();
 
         incrementIteration();
         fireErrorUpdated();
@@ -197,7 +200,8 @@ public class BackpropTrainer2 extends IterableTrainer {
         // Backpropagate error
         targetVector = targetData.getColumn(rowNum);
         DoubleMatrix outputError = errors.get(errors.size() - 1);
-        getOutputLayer().subi(targetVector, outputError);
+        targetVector.subi(getOutputLayer(), outputError);
+        errors.set(errors.size() - 1, outputError);
         backpropagateError();
 
         // Update weights and biases
@@ -234,7 +238,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
             // Activations = actFunction(matrix * inputs + biases)
             wm.mmuli(inputs, netInput);
-            activations.copy(netInput);
+            activations.copy(netInput); 
             activations.addi(biasVec);
             updateRules.get(ii).applyFunctionInPlace(activations);
             ii++;
@@ -248,15 +252,11 @@ public class BackpropTrainer2 extends IterableTrainer {
      */
     private void backpropagateError() {
 
-        // From output layer backwards to input layer
+        // From output weight layer backwards, not including the first weight
+        // layer
         for (int ii = layers.size() - 1; ii > 0; ii--) {
-            errors.get(ii).transpose().mmuli(
-                    weightMatrices.get(ii - 1).transpose(), errors.get(ii - 1));
-            // Todo: below different? performance seems worse but have not
-            // formally tested.
-            // errors.get(ii).mmuli(weightMatrices.get(ii - 1),
-            // errors.get(ii - 1));
-
+            errors.get(ii).transpose().mmuli(weightMatrices.get(ii),
+                    errors.get(ii - 1));
         }
 
     }
@@ -291,23 +291,25 @@ public class BackpropTrainer2 extends IterableTrainer {
 
             // System.out.println("Deriv: " + derivs);
 
+            // Update the weights 
+            // Note: JBlas data laid out in a 1-d array
             // TODO: Optimize with matrix operations
-            // JBlas data laid out in a 1-d array
             int kk = 0;
             for (int ii = 0; ii < currentLayer.length; ii++) {
                 for (int jj = 0; jj < prevLayer.length; jj++) {
                     double deltaVal = learningRate * error.data[ii]
-                            * derivs.data[ii] * prevLayer.data[jj]
-                            + momentum * lastDeltas.data[kk];
-                    wm.data[kk] -= deltaVal;
+                            * derivs.data[ii] * prevLayer.data[jj];
+
+                    wm.data[kk] += deltaVal;
                     lastDeltas.data[kk] = deltaVal;
                     kk++;
                 }
             }
             for (int ii = 0; ii < biasVector.length; ii++) {
                 double deltaVal = learningRate * error.data[ii]
-                        * derivs.data[ii] + momentum * lastBiasDeltas.data[ii];
-                biasVector.data[ii] -= deltaVal;
+                        * derivs.data[ii] + (momentum * lastBiasDeltas.data[ii]);
+                 //System.out.println(deltaVal);
+                biasVector.data[ii] += deltaVal;
                 lastBiasDeltas.data[ii] = deltaVal;
             }
             layerIndex++;
@@ -353,9 +355,9 @@ public class BackpropTrainer2 extends IterableTrainer {
             System.out.println("Weight Layer " + (i + 1) + " --> " + (i + 2));
             System.out.println("\tWeights:" + weightMatrices.get(i));
             System.out.println("Node Layer " + (i + 2));
-            System.out.println("\tNet inputs: " + netInputs.get(i));
-            System.out.println("\tBiases: " + biases.get(i));
             System.out.println("\tActivations: " + layers.get(i));
+            System.out.println("\tBiases: " + biases.get(i));
+            System.out.println("\tNet inputs: " + netInputs.get(i));
             System.out.println("\tErrors: " + errors.get(i));
             DoubleMatrix derivs = DoubleMatrix.zeros(layers.get(i).length);
             updateRules.get(i).getDerivative(layers.get(i), derivs);
@@ -366,6 +368,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     @Override
     public void commitChanges() {
+        // TODO
         // Push the parameters of the array-based shadow network out to the
         // Simbrain network.
         for (int ii = 0; ii < net.getNeuronGroupList().size(); ii++) {
@@ -446,4 +449,5 @@ public class BackpropTrainer2 extends IterableTrainer {
     public void setMomentum(double momentum) {
         this.momentum = momentum;
     }
+    
 }

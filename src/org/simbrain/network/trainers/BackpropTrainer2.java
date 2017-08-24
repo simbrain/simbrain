@@ -401,7 +401,7 @@ public class BackpropTrainer2 extends IterableTrainer {
                 }
             }
             for (int ii = 0; ii < biasVector.length; ii++) {
-                double deltaVal = learningRate * learningRate * error.data[ii]
+                double deltaVal = learningRate * error.data[ii]
                         * derivs.data[ii] + (momentum * lastBiasDeltas.data[ii]);
                  //System.out.println(deltaVal);
                 biasVector.data[ii] += deltaVal;

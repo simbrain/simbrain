@@ -481,6 +481,10 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
             return nur.getName();
         }
     }
+    
+    public Neuron getNeuron(int neuNo) {
+    	return neuronList.get(neuNo);
+    }
 
     /**
      * @return the neurons in this group.

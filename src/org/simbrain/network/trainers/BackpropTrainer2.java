@@ -19,6 +19,7 @@
 package org.simbrain.network.trainers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -27,6 +28,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.TransferFunction;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.math.ProbDistribution;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.util.randomizer.Randomizer;
@@ -61,6 +63,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Weight matrices ordered input to output. */
     private List<DoubleMatrix> weightMatrices = new ArrayList<DoubleMatrix>();
+    private List<SynapseGroup> synGrps = new ArrayList<SynapseGroup>();
 
     /** Memory of last weight updates for momentum. */
     private List<DoubleMatrix> lastWeightUpdates = new ArrayList<DoubleMatrix>();
@@ -70,6 +73,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     /** Activation vectors. */
     private List<DoubleMatrix> layers = new ArrayList<DoubleMatrix>();
+    private List<NeuronGroup> ngroups = new ArrayList<NeuronGroup>();
 
     /** Net inputs. */
     private List<DoubleMatrix> netInputs = new ArrayList<DoubleMatrix>();
@@ -105,7 +109,67 @@ public class BackpropTrainer2 extends IterableTrainer {
     private enum UpdateMethod {
         EPOCH, BATCH, STOCHASTIC, MINI_BATCH;
     }
+    
+    public static void forwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
+    	boolean wasRowX = false;
+    	boolean wasRowY = false;
+    	if(_x.isRowVector()) {
+    		// Fast transpose
+    		_x.rows = _x.columns;
+    		_x.columns = 1;
+    		wasRowX = true;
+    	}
+    	if (_x != _y && _y.isRowVector()) {
+    		// Fast transpose
+    		_y.rows = _y.columns;
+    		_y.columns = 1;
+    		wasRowY = true;
+    	}
+    	
+    	_A.mmuli(_x, _y);
+    	
+    	if (wasRowX) {
+    		// Fast transpose back
+    		_x.columns = _x.rows;
+    		_x.rows = 1;
+    	}
+    	if (wasRowY) {
+    		// Fast transpose back
+    		_y.columns = _y.rows;
+    		_y.rows = 1;
+    	}
+    }
 
+    public static void backwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
+    	boolean wasColX = false;
+    	boolean wasColY = false;
+    	if(_x.isColumnVector()) {
+    		// Fast transpose
+    		_x.columns = _x.rows;
+    		_x.rows = 1;
+    		wasColX = true;
+    	}
+    	if (_x != _y && _y.isColumnVector()) {
+    		// Fast transpose
+    		_y.columns = _y.rows;
+    		_y.rows = 1;
+    		wasColY = true;
+    	}
+    	
+    	_x.mmuli(_A, _y);
+    	
+    	if (wasColX) {
+    		// Fast transpose back
+    		_x.rows = _x.columns;
+    		_x.columns = 1;
+    	}
+    	if (wasColY) {
+    		// Fast transpose back
+    		_y.rows = _y.columns;
+    		_y.columns = 1;
+    	}
+    }
+    
     /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.EPOCH;
 
@@ -130,12 +194,12 @@ public class BackpropTrainer2 extends IterableTrainer {
             weightMatrices.add(weights);
             lastWeightUpdates
                     .add(DoubleMatrix.zeros(weights.rows, weights.columns));
+            synGrps.add(sg);
         }
 
         // Initialize layers
         int ii = 0;
         for (NeuronGroup ng : net.getNeuronGroupList()) {
-            inputLayer = DoubleMatrix.zeros(ng.size());
             if (ii > 0) {
                 layers.add(DoubleMatrix.zeros(ng.size()));
                 netInputs.add(DoubleMatrix.zeros(ng.size()));
@@ -145,6 +209,9 @@ public class BackpropTrainer2 extends IterableTrainer {
                 lastBiasUpdates.add(DoubleMatrix.zeros(bs.rows, bs.columns));
                 updateRules.add((TransferFunction) ng.getNeuronList().get(0)
                         .getUpdateRule());
+                ngroups.add(ng);
+            } else {
+            	inputLayer = DoubleMatrix.zeros(ng.size());
             }
             ii++;
         }
@@ -153,6 +220,25 @@ public class BackpropTrainer2 extends IterableTrainer {
         rand.setPdf(ProbDistribution.NORMAL);
         rand.setParam1(0);
         rand.setParam2(.1);
+    }
+    
+    public void writeBack() {
+    	for(int ii=0; ii< layers.size(); ++ii) {
+    		for(int jj=0; jj<ngroups.get(ii).size(); ++jj) {
+    			ngroups.get(ii).getNeuron(jj).forceSetActivation(layers.get(ii).data[jj]);
+    			((BiasedUpdateRule)ngroups.get(ii).getNeuron(jj).getUpdateRule()).setBias(biases.get(ii).get(jj));
+    		}
+    	}
+    	for(int kk = 0; kk<weightMatrices.size(); ++kk) {
+    		DoubleMatrix wm = weightMatrices.get(kk);
+    		NeuronGroup src = synGrps.get(kk).getSourceNeuronGroup();
+    		NeuronGroup tar = synGrps.get(kk).getTargetNeuronGroup();
+    		for(int ii=0; ii<wm.rows; ++ii) {
+    			for(int jj=0; jj<wm.columns; ++jj) {
+    				src.getNeuron(jj).getFanOutUnsafe().get(tar.getNeuron(ii)).forceSetStrength(wm.get(ii, jj));
+    			}
+    		}
+    	}
     }
 
     @Override
@@ -182,6 +268,7 @@ public class BackpropTrainer2 extends IterableTrainer {
 
         incrementIteration();
         fireErrorUpdated();
+        writeBack();
     }
 
     /**
@@ -201,7 +288,7 @@ public class BackpropTrainer2 extends IterableTrainer {
         targetVector = targetData.getColumn(rowNum);
         DoubleMatrix outputError = errors.get(errors.size() - 1);
         targetVector.subi(getOutputLayer(), outputError);
-        errors.set(errors.size() - 1, outputError);
+        //errors.set(errors.size() - 1, outputError);
         backpropagateError();
 
         // Update weights and biases
@@ -235,12 +322,16 @@ public class BackpropTrainer2 extends IterableTrainer {
             DoubleMatrix activations = layers.get(ii);
             DoubleMatrix netInput = netInputs.get(ii);
             DoubleMatrix biasVec = biases.get(ii);
-
+            
+            forwardPropagate(inputs, wm, netInput);
+            netInput.addi(biasVec);
+            updateRules.get(ii).applyFunction(netInput, activations);
+            
             // Activations = actFunction(matrix * inputs + biases)
-            wm.mmuli(inputs, netInput);
-            activations.copy(netInput); 
-            activations.addi(biasVec);
-            updateRules.get(ii).applyFunctionInPlace(activations);
+//            wm.mmuli(inputs, netInput);
+//            activations.copy(netInput); 
+//            activations.addi(biasVec);
+//            updateRules.get(ii).applyFunctionInPlace(activations);
             ii++;
         }
 
@@ -255,8 +346,9 @@ public class BackpropTrainer2 extends IterableTrainer {
         // From output weight layer backwards, not including the first weight
         // layer
         for (int ii = layers.size() - 1; ii > 0; ii--) {
-            errors.get(ii).transpose().mmuli(weightMatrices.get(ii),
-                    errors.get(ii - 1));
+        	backwardPropagate(errors.get(ii), weightMatrices.get(ii), errors.get(ii-1));
+//            errors.get(ii).transpose().mmuli(weightMatrices.get(ii),
+//                    errors.get(ii - 1));
         }
 
     }
@@ -286,8 +378,11 @@ public class BackpropTrainer2 extends IterableTrainer {
 
             // TODO: Can't use activations for non-logistic
             DoubleMatrix currentLayer = layers.get(layerIndex);
-            DoubleMatrix derivs = DoubleMatrix.zeros(currentLayer.length);
-            updateRules.get(layerIndex).getDerivative(currentLayer, derivs);
+            DoubleMatrix derivs = currentLayer.rsub(1);
+            derivs.muli(currentLayer);
+            
+            //updateRules.get(layerIndex).getDerivative(currentLayer, derivs);
+            
 
             // System.out.println("Deriv: " + derivs);
 
@@ -306,7 +401,7 @@ public class BackpropTrainer2 extends IterableTrainer {
                 }
             }
             for (int ii = 0; ii < biasVector.length; ii++) {
-                double deltaVal = learningRate * error.data[ii]
+                double deltaVal = learningRate * learningRate * error.data[ii]
                         * derivs.data[ii] + (momentum * lastBiasDeltas.data[ii]);
                  //System.out.println(deltaVal);
                 biasVector.data[ii] += deltaVal;
@@ -331,18 +426,22 @@ public class BackpropTrainer2 extends IterableTrainer {
 
     @Override
     public void randomize() {
-        for (DoubleMatrix dm : weightMatrices) {
-            for (int ii = 0; ii < dm.data.length; ii++) {
-                dm.data[ii] = rand.getRandom();
+        for (int kk=0; kk < weightMatrices.size(); ++kk) {
+            for (int ii = 0; ii < weightMatrices.get(kk).data.length; ii++) {
+                weightMatrices.get(kk).data[ii] = rand.getRandom();
+                lastWeightUpdates.get(kk).data[ii] = weightMatrices.get(kk).data[ii];
             }
+           
         }
-        for (DoubleMatrix biasVector : biases) {
-            for (int ii = 0; ii < biasVector.length; ii++) {
-                biasVector.data[ii] = rand.getRandom();
+        
+        for (int kk=0; kk<biases.size(); ++kk) {
+            for (int ii = 0; ii < biases.get(kk).length; ii++) {
+                biases.get(kk).data[ii] = rand.getRandom();
+                lastBiasUpdates.get(kk).data[ii] = biases.get(kk).data[ii];
             }
         }
     }
-
+    
     /**
      * Print debug info.
      */
@@ -392,7 +491,13 @@ public class BackpropTrainer2 extends IterableTrainer {
         if (network.getTrainingSet().getTargetData() != null) {
             targetData = new DoubleMatrix(
                     network.getTrainingSet().getTargetData()).transpose();
+            targetData.muli(0.6);
+            targetData.addi(0.2);
+            
         }
+//        double [][] tars = targetData.toArray2();
+//        for (int ii=0; ii<tars.length; ii++)
+//        System.out.println(Arrays.toString(tars[ii]));
     }
 
     /**

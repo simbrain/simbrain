@@ -400,6 +400,10 @@ public class Neuron {
     public Map<Neuron, Synapse> getFanOut() {
         return Collections.unmodifiableMap(fanOut);
     }
+    
+    public Map<Neuron, Synapse> getFanOutUnsafe() {
+    	return fanOut;
+    }
 
     /**
      * Adds an efferent synapse to this neuron, i.e. adds a synapse to

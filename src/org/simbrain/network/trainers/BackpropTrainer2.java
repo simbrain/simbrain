@@ -110,6 +110,18 @@ public class BackpropTrainer2 extends IterableTrainer {
         EPOCH, BATCH, STOCHASTIC, MINI_BATCH;
     }
     
+    /**
+     * Convenience method for in place "Forward" matrix multiplication (forward
+     * if vectors are assumed to be column-major) e.g.: Ax=y
+     * Transposes x and/or y if needed to make this the specific operation that happens (right multiply),
+     * and then transposes them back afterward. Thus the operation is unambiguous and 
+     * one does not have to care if x/y are rows or columns. That is, regardless of if
+     * x or y are rows/columns Ax=y is performed, which can be considered a "forward"
+     * propagation in a column-major paradigm.
+     * @param _x the right-hand vector MUST be a vector
+     * @param _A the matrix
+     * @param _y the result of a matrix-vector multiply MUST be a vector of the same number of elements as _x, can be equal to _x.
+     */
     public static void forwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
     	boolean wasRowX = false;
     	boolean wasRowY = false;
@@ -140,6 +152,18 @@ public class BackpropTrainer2 extends IterableTrainer {
     	}
     }
 
+    /**
+     * Convenience method for in place "Backward" matrix multiplication (backward
+     * if vectors are assumed to be column-major) e.g.: x^TA=y^T
+     * Transposes x and/or y if needed to make this the specific operation that happens (left multiply),
+     * and then transposes them back afterward. Thus the operation is unambiguous and 
+     * one does not have to care if x/y are rows or columns. That is, regardless of if
+     * x or y are rows/columns xA=y is performed, which can be considered a "backward"
+     * propagation in a column-major paradigm.
+     * @param _x the left-hand vector MUST be a vector
+     * @param _A the matrix
+     * @param _y the result of a matrix-vector multiply MUST be a vector of the same number of elements as _x, can be equal to _x.
+     */
     public static void backwardPropagate(DoubleMatrix _x, DoubleMatrix _A, DoubleMatrix _y) {
     	boolean wasColX = false;
     	boolean wasColY = false;
@@ -288,7 +312,13 @@ public class BackpropTrainer2 extends IterableTrainer {
         targetVector = targetData.getColumn(rowNum);
         DoubleMatrix outputError = errors.get(errors.size() - 1);
         targetVector.subi(getOutputLayer(), outputError);
+        
+        // In place subtraction with the result being stored in outputError
+        // means that the DoubleMatrix object in the list represented by 
+        // "outputError" does not have to be reset. It's still there, but 
+        // now with different entries.
         //errors.set(errors.size() - 1, outputError);
+        
         backpropagateError();
 
         // Update weights and biases
@@ -323,14 +353,21 @@ public class BackpropTrainer2 extends IterableTrainer {
             DoubleMatrix netInput = netInputs.get(ii);
             DoubleMatrix biasVec = biases.get(ii);
             
+            // Take the inputs multiply them by the weight matrix
+            // get the netInput for the next layer
             forwardPropagate(inputs, wm, netInput);
+            // Add biases to the net input
+            // before biases were not part of the net input...
             netInput.addi(biasVec);
+            // Apply the transfer function to net input to get the
+            // activation values for the next layer and store that 
+            // value in the activations vector
             updateRules.get(ii).applyFunction(netInput, activations);
             
             // Activations = actFunction(matrix * inputs + biases)
 //            wm.mmuli(inputs, netInput);
 //            activations.copy(netInput); 
-//            activations.addi(biasVec);
+//            activations.addi(biasVec); 
 //            updateRules.get(ii).applyFunctionInPlace(activations);
             ii++;
         }
@@ -346,6 +383,8 @@ public class BackpropTrainer2 extends IterableTrainer {
         // From output weight layer backwards, not including the first weight
         // layer
         for (int ii = layers.size() - 1; ii > 0; ii--) {
+        	// Multiply errors in the next layer by the weight matrix in the opposite direction
+        	// to get error in the previous layer.
         	backwardPropagate(errors.get(ii), weightMatrices.get(ii), errors.get(ii-1));
 //            errors.get(ii).transpose().mmuli(weightMatrices.get(ii),
 //                    errors.get(ii - 1));
@@ -377,10 +416,13 @@ public class BackpropTrainer2 extends IterableTrainer {
             DoubleMatrix biasVector = biases.get(layerIndex);
 
             // TODO: Can't use activations for non-logistic
+            
+            // TODO: Recode this!!!!!
+            // The derivative for the logistic function has been
+            // HARD CODED here!!!!
             DoubleMatrix currentLayer = layers.get(layerIndex);
             DoubleMatrix derivs = currentLayer.rsub(1);
             derivs.muli(currentLayer);
-            
             //updateRules.get(layerIndex).getDerivative(currentLayer, derivs);
             
 

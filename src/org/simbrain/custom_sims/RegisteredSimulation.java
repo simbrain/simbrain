@@ -67,7 +67,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new CortexSimple());
-        //REGISTERED_SIMS.add(new Creatures());
+        REGISTERED_SIMS.add(new Creatures());
 
         // Alphabetize
         REGISTERED_SIMS

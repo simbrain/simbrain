@@ -166,8 +166,10 @@ public final class EditMode {
         g2.setColor(Color.YELLOW);
         g2.setStroke(new BasicStroke(1));
         float alpha;
+        // Alpha levels do not display properly on modern Windows operating systems.
+        // On Windows, values between >0.0f and 1.0f gives the color a different brightness, with 1.0f being the brightest.
         if (System.getProperty("os.name").startsWith("Windows")) {
-        	alpha = 1.0f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        	alpha = 1.0f; // 0.0f is 100% transparent, 0.1f is almost 100% black, and 1.0f is 100% bright.
         } else {
         	alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
         }

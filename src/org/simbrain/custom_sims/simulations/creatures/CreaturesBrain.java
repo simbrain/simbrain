@@ -17,6 +17,11 @@ import org.simbrain.network.groups.NeuronGroup;
  *
  */
 public class CreaturesBrain {
+    
+    //TODO: General OOP principle.  Anything common across all creature brains
+    //  should be here.Also any methods for easily customizing
+    // creature brains should be here. Then at Creatures.java level
+    // individual brains can be further customized.
 
     // TODO: Make private then add accessor
     public List<NeuronGroup> lobes = new ArrayList();
@@ -48,6 +53,8 @@ public class CreaturesBrain {
                 new CreaturesNeuronRule());
         stimulusLobe.setLabel("Object Lobe");
         lobes.add(stimulusLobe);
+        
+        // set up standard node labels
 
     }
 

@@ -26,21 +26,22 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 public class Creatures extends RegisteredSimulation {
 
 	/**
-	 * Stolen from the Simulation class: Associate networks and worlds with their
-	 * respective components. Entries are added when networks or worlds are added
-	 * using the sim object. Facilitates making couplings using methods with fewer
-	 * arguments.
-	 */
+     * Stolen from the Simulation class: Associate networks and worlds with
+     * their respective components. Entries are added when networks or worlds
+     * are added using the sim object. Facilitates making couplings using
+     * methods with fewer arguments.
+     */
 	Hashtable<Network, NetworkComponent> netMap = new Hashtable();
 	Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
 	/**
 	 * A list of brains. Good for updating and maintaining multiple brains
 	 */
-	List<CreaturesBrain> brainList = new ArrayList(); // TODO: lobelist?
+	List<CreaturesBrain> brainList = new ArrayList();
 
 	@Override
 	public void run() {
+
 		// Clear workspace
 		sim.getWorkspace().clearWorkspace();
 
@@ -51,9 +52,22 @@ public class Creatures extends RegisteredSimulation {
 		// Create starting brain
 		CreaturesBrain brain1 = createBrain(451, 0, 550, 600, "Ron");
 		brainList.add(brain1);
-	
+			
+		// TODO: Rename / redesign as you like
+		initBrain1(brain1);
 		
-		// Assign a neuron a label then access the neuron using that label 
+		// Create update action
+		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
+			@Override
+			public void invoke() {
+				updateCreaturesSim();
+			}
+		});
+
+	}
+
+    private void initBrain1(CreaturesBrain brain1) {
+        // Assign a neuron a label then access the neuron using that label 
         brain1.lobes.get(0).getNeuronList().get(0).setLabel("Hungry");
         brain1.lobes.get(0).getNeuronList().get(1).setLabel("Happy");
         Neuron hungerNeuron = brain1.lobes.get(0).getNeuronByLabel("Hungry");
@@ -65,16 +79,7 @@ public class Creatures extends RegisteredSimulation {
         Synapse happyToHungry = brain1.builder.connect(hungerNeuron,
                 happyNeuron, new CreaturesSynapseRule(), 1);
 		brain1.getNetwork().fireSynapseAdded(happyToHungry);
-		
-		// Create update action
-		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
-			@Override
-			public void invoke() {
-				updateCreaturesSim();
-			}
-		});
-
-	}
+    }
 
 	/**
 	 * Update function for the Creatures simulation.
@@ -107,17 +112,8 @@ public class Creatures extends RegisteredSimulation {
 	}
 
 	public CreaturesBrain createBrain(int x, int y, int width, int height) {
-		NetworkComponent networkComponent = new NetworkComponent("Brain");
-		sim.getWorkspace().addWorkspaceComponent(networkComponent);
-		sim.getDesktop().getDesktopComponent(networkComponent).getParentFrame().setBounds(x, y, width, height);
-		netMap.put(networkComponent.getNetwork(), networkComponent);
-
-		CreaturesBrain brain = new CreaturesBrain(networkComponent);
-
-		brain.setUp();
-		return brain;
+	    return createBrain(x,y,width,height,"Brain");
 	}
-
 	
     public Creatures(SimbrainDesktop desktop) {
         super(desktop);

@@ -1,17 +1,12 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.NeuronGroup;
 
 /**
  * A helper class of Creatures for filling in networks, from either a base
@@ -21,42 +16,43 @@ import org.simbrain.network.NetworkComponent;
  * @author Sharai
  *
  */
-public class CreaturesBrain extends NetBuilder {
+public class CreaturesBrain {
 
-	private List<NeuronGroup> lobes = new ArrayList();
+    // TODO: Make private then add accessor
+    public List<NeuronGroup> lobes = new ArrayList();
+    public NetBuilder builder;
 
-	public CreaturesBrain(NetworkComponent brain) {
-		super(brain);
-	}
+    public CreaturesBrain(NetworkComponent component) {
+        this.builder = new NetBuilder(component);
+    }
 
-	/**
-	 * Sets up a "brain" network from a template
-	 * 
-	 * @param brain
-	 *            The network to set up the brain in
-	 */
-	public void setUp() {
-		System.out.println("One empty thinkpan, coming up!");
+    /**
+     * Sets up a "brain" network from a template.
+     * 
+     * @param brain The network to set up the brain in
+     */
+    public void setUp() {
+        System.out.println("One empty thinkpan, coming up!");
 
-		// Set up Lobe #1: Drive Lobe
-		NeuronGroup driveLobe = addNeuronGroup(0, 0, 12, "grid", "LinearRule");
-		driveLobe.setLabel("Drive Lobe");
-		lobes.add(driveLobe);
+        // Set up Lobe #1: Drive Lobe
+        NeuronGroup driveLobe = builder.addNeuronGroup(0, 0, 12, "grid",
+                new CreaturesNeuronRule());
+        driveLobe.setLabel("Drive Lobe");
+        lobes.add(driveLobe);
 
-		// Label drive lobe neurons
-		driveLobe.getNeuronList().get(0).setLabel("Myself");
+        // Label drive lobe neurons
+        driveLobe.getNeuronList().get(0).setLabel("Myself");
 
-		// Set up Lobe #2: Stimulus Source Lobe
-		NeuronGroup stimulusLobe = addNeuronGroup(150, 0, 10, "grid", "LinearRule");
-		stimulusLobe.setLabel("Object Lobe");
-		lobes.add(stimulusLobe);
+        // Set up Lobe #2: Stimulus Source Lobe
+        NeuronGroup stimulusLobe = builder.addNeuronGroup(150, 0, 10, "grid",
+                new CreaturesNeuronRule());
+        stimulusLobe.setLabel("Object Lobe");
+        lobes.add(stimulusLobe);
 
-		// Label stimulus source lobe neurons
+    }
 
-		// Test
-		SynapseGroup testSynapse = addSynapseGroup(driveLobe, stimulusLobe);
-		testSynapse.setLabel("Test");
-
-	}
+    public Network getNetwork() {
+        return builder.getNetwork();
+    }
 
 }

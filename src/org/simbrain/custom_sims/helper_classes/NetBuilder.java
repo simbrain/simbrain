@@ -11,7 +11,9 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -91,7 +93,8 @@ public class NetBuilder {
      * @param lowerBound lower bound for synapse
      * @param upperBound upper bound for synapse
      */
-    public void connect(Neuron source, Neuron target, double value, double lowerBound, double upperBound) {
+    public void connect(Neuron source, Neuron target, double value,
+            double lowerBound, double upperBound) {
         Synapse synapse = new Synapse(source, target);
         synapse.setStrength(value);
         synapse.setLowerBound(lowerBound);
@@ -105,10 +108,20 @@ public class NetBuilder {
      * @param source the source neuron
      * @param target the target neuron
      */
-    public void connect(Neuron source, Neuron target, double value) {
+    public Synapse connect(Neuron source, Neuron target, double value) {
         Synapse synapse = new Synapse(source, target);
         synapse.setStrength(value);
         source.getNetwork().addSynapse(synapse);
+        return synapse;
+    }
+
+    
+    //TODO
+    public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
+        Synapse synapse = new Synapse(source, target, rule);
+        synapse.setStrength(value);
+        source.getNetwork().addSynapse(synapse);
+        return synapse;
     }
 
     public void connectOneToOne(NeuronGroup source, NeuronGroup target) {
@@ -136,17 +149,47 @@ public class NetBuilder {
         return sg;
     }
 
+    // TODO: Consolidate with method below
+    public NeuronGroup addNeuronGroup(double x, double y, int numNeurons,
+            String layoutName, NeuronUpdateRule rule) {
+        NeuronGroup ng;
+
+        ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons, rule);
+        //ng.setNeuronType(rule); //TODO: Why won't this work?
+        network.addGroup(ng);
+
+        // Lay out neurons
+        if (layoutName.toLowerCase().contains("line")) {
+            if (layoutName.equalsIgnoreCase("vertical line")) {
+                LineLayout lineLayout = new LineLayout(x, y, 50,
+                        LineOrientation.VERTICAL);
+                ng.setLayout(lineLayout);
+            } else {
+                LineLayout lineLayout = new LineLayout(x, y, 50,
+                        LineOrientation.HORIZONTAL);
+                ng.setLayout(lineLayout);
+            }
+        } else if (layoutName.equalsIgnoreCase("grid")) {
+            GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE,
+                    (int) Math.sqrt(numNeurons));
+            ng.setLayout(gridLayout);
+        }
+        ng.applyLayout();
+        return ng;
+
+    }
+
     public NeuronGroup addNeuronGroup(double x, double y, int numNeurons,
             String layoutName, String type) {
 
         NeuronGroup ng;
 
-        if(type.equalsIgnoreCase("wta")) {
+        // TODO: Fishy...
+        if (type.equalsIgnoreCase("wta")) {
             ng = new WinnerTakeAll(network, numNeurons);
             ng.setLocation(x, y);
         } else {
-            ng = new NeuronGroup(network, new Point2D.Double(x, y),
-                    numNeurons);
+            ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons);
             ng.setNeuronType(type);
         }
         network.addGroup(ng);
@@ -175,13 +218,14 @@ public class NetBuilder {
         return (WinnerTakeAll) addNeuronGroup(x, y, numNeurons, "line", "wta");
     }
 
-    public Group addSubnetwork(double x, double y, int numNeurons, String type) {
-        if(type.equalsIgnoreCase("wta")) {
+    public Group addSubnetwork(double x, double y, int numNeurons,
+            String type) {
+        if (type.equalsIgnoreCase("wta")) {
             WinnerTakeAll ret = new WinnerTakeAll(network, numNeurons);
             network.addGroup(ret);
             return ret;
         }
-        return  null;
+        return null;
 
     }
 

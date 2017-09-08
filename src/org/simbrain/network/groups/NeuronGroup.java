@@ -213,6 +213,23 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         resetSubsamplingIndices();
     }
 
+    //TODO
+    public NeuronGroup(final Network net, Point2D initialPosition,
+            final int numNeurons, final NeuronUpdateRule rule) {
+        super(net);
+        neuronList = new ArrayList<Neuron>(numNeurons);
+        for (int i = 0; i < numNeurons; i++) {
+            addNeuron(new Neuron(net, rule), false);
+        }
+        //this.setNeuronType(rule); erases the rule in creatures case
+        // Very slow to add to a copy on write array list so do it this way
+        neuronList = new CopyOnWriteArrayList<Neuron>(neuronList);
+        layout.setInitialLocation(initialPosition);
+        layout.layoutNeurons(this.getNeuronList());
+        updateRule = getNeuronType();
+        resetSubsamplingIndices();
+    }
+
     /**
      * Create a neuron group without any initial neurons and an initial
      * position.

@@ -4,20 +4,15 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetBuilder;
-//import org.simbrain.custom_sims.helper_classes.Simulation;
-
-import org.simbrain.custom_sims.simulations.creatures.CreaturesBrain;
 
 /**
  * A simulation of an A-Life agent based off of the Creatures entertainment
@@ -42,34 +37,35 @@ public class Creatures extends RegisteredSimulation {
 	/**
 	 * A list of brains. Good for updating and maintaining multiple brains
 	 */
-	List<CreaturesBrain> brainList = new ArrayList();
-
-	/**
-	 * This is a constructor.
-	 * 
-	 * @param desktop
-	 *            The Simbrain application
-	 */
-	public Creatures(SimbrainDesktop desktop) {
-		super(desktop);
-	}
-
-	public Creatures() {
-		super();
-	}
+	List<CreaturesBrain> brainList = new ArrayList(); // TODO: lobelist?
 
 	@Override
 	public void run() {
 		// Clear workspace
 		sim.getWorkspace().clearWorkspace();
 
-		// Add doc viewer
+		// Add doc viewer // TODO: Rename to creaturesDocs.html or something
 		sim.addDocViewer(0, 0, 450, 600, "Doc",
 				"src/org/simbrain/custom_sims/simulations/creatures/CreaturesMain.html");
 
 		// Create starting brain
-		createBrain(451, 0, 550, 600, "Ron");
+		CreaturesBrain brain1 = createBrain(451, 0, 550, 600, "Ron");
+		brainList.add(brain1);
+	
+		
+		// Assign a neuron a label then access the neuron using that label 
+        brain1.lobes.get(0).getNeuronList().get(0).setLabel("Hungry");
+        brain1.lobes.get(0).getNeuronList().get(1).setLabel("Happy");
+        Neuron hungerNeuron = brain1.lobes.get(0).getNeuronByLabel("Hungry");
+        Neuron happyNeuron = brain1.lobes.get(0).getNeuronByLabel("Happy");
+		hungerNeuron.setActivation(4);
+		brain1.getNetwork().fireNeuronsUpdated(); // So the activation is visible
 
+		// Adding a custom synapse.   Prob. not necessary to give them names in most cases...
+        Synapse happyToHungry = brain1.builder.connect(hungerNeuron,
+                happyNeuron, new CreaturesSynapseRule(), 1);
+		brain1.getNetwork().fireSynapseAdded(happyToHungry);
+		
 		// Create update action
 		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
 			@Override
@@ -81,34 +77,19 @@ public class Creatures extends RegisteredSimulation {
 	}
 
 	/**
-	 * Update function for the Creatures simulation
+	 * Update function for the Creatures simulation.
 	 */
 	void updateCreaturesSim() {
 		// Update all brains
 		for (CreaturesBrain b : brainList) {
-			b.getNetworkComponent().update();
+			b.getNetwork().update();
 		}
 
 	}
-
+	//TODO: Refactor below.
+	
 	/**
-	 * Runs the constructor for the simulation.
-	 */
-	@Override
-	public Creatures instantiate(SimbrainDesktop desktop) {
-		return new Creatures(desktop);
-	}
-
-	/**
-	 * Supplies the name of the simulation.
-	 */
-	@Override
-	public String getName() {
-		return "Creatures";
-	}
-
-	/**
-	 * Creates a brain network and displays it in the workspace
+	 * Creates a brain network and displays it in the workspace.
 	 * 
 	 * @param name
 	 * @return a CreaturesBrain object
@@ -122,7 +103,6 @@ public class Creatures extends RegisteredSimulation {
 		CreaturesBrain brain = new CreaturesBrain(networkComponent);
 
 		brain.setUp();
-		brainList.add(brain);
 		return brain;
 	}
 
@@ -135,8 +115,32 @@ public class Creatures extends RegisteredSimulation {
 		CreaturesBrain brain = new CreaturesBrain(networkComponent);
 
 		brain.setUp();
-		brainList.add(brain);
 		return brain;
 	}
+
+	
+    public Creatures(SimbrainDesktop desktop) {
+        super(desktop);
+    }
+
+    public Creatures() {
+        super();
+    }
+
+    /**
+     * Runs the constructor for the simulation.
+     */
+    @Override
+    public Creatures instantiate(SimbrainDesktop desktop) {
+        return new Creatures(desktop);
+    }
+
+    /**
+     * Supplies the name of the simulation.
+     */
+    @Override
+    public String getName() {
+        return "Creatures";
+    }
 
 }

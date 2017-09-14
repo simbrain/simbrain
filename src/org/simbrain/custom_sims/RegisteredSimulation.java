@@ -31,6 +31,7 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
+import org.simbrain.custom_sims.simulations.creatures.Creatures;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -66,6 +67,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new CortexSimple());
+        REGISTERED_SIMS.add(new Creatures());
 
         // Alphabetize
         REGISTERED_SIMS

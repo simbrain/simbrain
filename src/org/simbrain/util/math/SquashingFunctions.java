@@ -85,7 +85,8 @@ public class SquashingFunctions {
             valOut.copy(valIn);
         }
         for (int ii = 0; ii < valIn.length; ii++) {
-            valOut.data[ii] = logistic(valOut.data[ii], ceil, floor, slope);
+            valOut.data[ii] = logistic(valOut.data[ii]);  //TODO: For testing Mazur
+            //valOut.data[ii] = logistic(valOut.data[ii], ceil, floor, slope);
         }
         // valOut.muli(-slope/diff);
         // MatrixFunctions.expi(valOut);

@@ -3,6 +3,12 @@
 
 <head>
     <title>Simbrain Documentation</title>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -17,50 +23,66 @@
             <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Integrate and Fire</p>
         </div>
         <p></p>
-        <h1>Integrate and and Fire</h1>
-        <p>The (leaky) integrate and fire model is perhaps the most prevalent <a href="https://en.wikipedia.org/wiki/Biological_neuron_model">biologically realistic model neuron</a> currently in use. It simulates all the basic aspects of neural conduction in a relatively simple framework.</p>
-        <p> Simbrain's Integrate and Fire neuron is a <a href="../spikingnetworks.html">spiking neuron</a>. As a result, when it spikes, a ring of yellow flashes around it and the axon protruding from it turns yellow as well. </p>
-        <p>
-            Activation of the neuron is interpreted as voltage potential. When that voltage potential passes a threshold value, the neuron spikes (resulting in the flash of yellow), and then the voltage is reset to a reset value, typically below the threshold potential. Below threshold, the neuron behaves like the <a href="additive.html">additive neuron</a>. It decays to a steady state value at a rate proporitional to its time constant. </p>
+        <h1>Integrate-and-Fire</h1>
+        <p>The linear, leaky integrate-and-fire model is perhaps the most prevalent <a href="https://en.wikipedia.org/wiki/Biological_neuron_model">biologically realistic model neuron</a> currently in use owing to its simplicity, computational efficiency, and the presence of a closed-form solution. The term "integrate-and-fire" actually refers to any neuron model (of varying complexity) which aims to simulate the integration of synaptic inputs specifically as they pertain to the membrane voltage and production of action potentials, that is, how neurons <i>integrate their inputs and fire in response</i>. The underlying assumption is that this relationship represents the most important aspect of how neurons function making it an ideal abstraction when considering the interactions between neurons in large groups or networks (as opposed to simulating individual or small numbers of neurons in detail). Here we follow the convention of referring to linear, leaky, integrate-and-fire models simply as "integrate-and-fire" due to their ubiquity and simplicity among the greater class of integrate and fire models (other examples include  <a href="./Izhikevich.html">Izhikevich's</a> adaptive version of the quadratic integrate and fire model and Brette and Gerstner's <a href="./AdExIntegrateandFire.html">Adaptive exponential integrate-and-fire [AdEx] model</a>). </p>
+
+        <p>Integrate-and-fire simulates how the combination of external currents (synaptic or otherwise), which are not tied to any specific ion channel (excitatory or inhibitory only), alter a membrane potential whose only dynamics consist of the exponential decay or growth toward some pre-determined resting state. This makes the form of the derivative linear, and therefore the simplest way to represent/simulate a neuron's return to a resting state after perturbation of the voltage. The simple simulation of voltage is then used to determine when an action potential is fired through comparison to some threshold value. After an action potential is fired the voltage is maintained at a reset value for some set refractory period regardless of external currents impinging on the neuron. </p>
+
+        <p> Simbrain's Integrate and Fire neuron is a <a href="../spikingnetworks.html">spiking neuron</a>. The displayed "Activation value" of this type of neuron represents its membrane potential. A yellow flash indicates the occurrence of a spike at that time, indicating that the membrane potential exceeded the threshold.
+        </p>
+
         <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
 
-<!-- Redo the equations here -->
+        <p class="heading">Equations</p>
+        <blockquote>
+            <br>
+            <p>
+                $$ \tau_m \frac{dV}{dt} = (E_l - V) \, + \, R_m I(t)$$ 
+            <br>
+                $$ V > \theta \,?\; V \leftarrow V_{reset} $$
+            </p>
 
-        <p><img src="../equations/intFire.png" height="65" width="190">
+        </blockquote>
+        <p class="heading"> $V$: Membrane Potential (mV)</p>
+        <blockquote>
+            <p> The stand in which represents the voltage across the cell membrane generated by differences in ion concentrations in living cells. For integrate-and-fire it is the only dynamic variable, and in particular those dynamics have been reduced to responding to externally generated currents (e.g. synaptic responses) and voltage leak toward some resting state. </p>
+        </blockquote>
+
+        <p class="heading">$E_l$: Leak Reversal (mV)</p>
+        <blockquote>
+            <p>This value represents the resting potential of the cell. That is, in the absence of further perturbation the voltage will exponentially return to this value.</p>
+        </blockquote>
+        <p class="heading">$I(t)$: External current (nA/pA)</p>
+        <blockquote>
+            <p>The electrical current impinging on the cell from all sources: $I_{noise} \;+\; I_{background} \;+\; I_{Exc.\, Syn} \;+\; I_{Inh.\, Syn} \;+\; ...$</p>
+        </blockquote>
+                <p class="heading">$R_m$: Membrane Resistance (M$\Omega$)</p>
+        <blockquote>
+            <p>The resistance across the cell's membrane determines how much of an effect currents have of the membrane potential.  </p>
+        </blockquote>
+        <p class="heading">$\tau_m$: Time-Constant (ms)</p>
+        <blockquote>
+            <p>How quickly/slowly the neuron responds to external change and returns to its resting potential. A neuron with a large time constant responds more slowly than one with a small time-constant. </p>
+        </blockquote>
+        <p class="heading">$\theta$: Threshold (mV)</p>
+        <blockquote>
+            <p>The value of the membrane potential that if met or exceeded triggers an action-potential as well as the onset of the refractory period. </p>
+        </blockquote>
+        <p class="heading">$V_{reset}\,$: Reset Potential (mV)</p>
+        <blockquote>
+            <p>The value of the membrane potential to which it is set and held at immediately after firing an action potential.</p>
+        </blockquote>
+        <p class="heading">Refractory period (ms)</p>
+        <blockquote>
+            <p>The time period after a spike, during which no spikes can occur. During this period inputs to the neuron have no effect and it is held at its reset potential. </p>
+        </blockquote>
+        <p class="heading">$I_{background}\,$: Background Current (nA/pA)
         </p>
-        <p>&nbsp;</p>
-        <p>where <em>r</em> is resting potential,<em> R</em> is resistance, &#964; is a time constant, and <em>W</em> is the weighted inputs.</p>
-        <p>&nbsp;</p>
-        <p class="heading">Threshold</p>
         <blockquote>
-            <p>The value beyond which the neuron spikes. </p>
+            <p>A constant background current to the neuron. Affects the baseline activation rule of the neuron. Simulates a high conductance state which reflects the fact that <i>en vivo</i> neurons are constantly bombarded by inputs from other neurons.</p>
         </blockquote>
-        <p class="heading">Resting potential</p>
-        <blockquote>
-            <p>The activation value which the neuron decays to over time.</p>
-        </blockquote>
-        <p class="heading">Reset potential</p>
-        <blockquote>
-            <p>The activation value which the neuron is reset to after a spiking event. </p>
-        </blockquote>
-        <p class="heading">Refractory period</p>
-        <blockquote>
-            <p>The time period in millisconds after a spike, during which no spikes can occur. During this period inputs to the neuron have no effect. </p>
-        </blockquote>
-        <p class="heading">Resistance</p>
-        <blockquote>
-            <p>A constant factor multiplied by weighted inputs. </p>
-        </blockquote>
-        <p class="heading">Background Current
-        </p>
-        <blockquote>
-            <p>A constant background curent to the neuron.   Affects the baseline activation rule of the neuron.   Simulates a high conductance state which reflects the fact that <i>en vivo</i> neurons are constantly bombarded by inputs from other neurons.</p>
-        </blockquote>
-        <p class="heading">Time constant</p>
-        <blockquote>
-            <p>Controls the rate at which the neuron attains its resting potential. As one increases this value, things become relatively slower; conversely, as one decreases this value, things become relatively faster.</p>
-        </blockquote>
-        <p class="heading">Add Noise</p>
+
+        <p class="heading">$I_{noise}$: Add Noise (nA/pA)</p>
         <blockquote>
             <p>If this is set to true, random values are added to the activation via a noise generator. For details how the noise generator works, click <a href="../../Utils/Randomizers/Randomizers.html">here</a>. </p>
         </blockquote>

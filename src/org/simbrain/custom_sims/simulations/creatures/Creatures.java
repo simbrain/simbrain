@@ -39,21 +39,19 @@ public class Creatures extends RegisteredSimulation {
 		sim.getWorkspace().clearWorkspace();
 
 		// Add doc viewer
-		sim.addDocViewer(0, 0, 450, 600, "Doc",
-				"src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
+		sim.addDocViewer(0, 0, 450, 600, "Doc", "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
 
 		// Create starting brain
 		CreaturesBrain ronBrain = createBrain(451, 0, 550, 600, "Ron");
 		initDefaultBrain(ronBrain);
 
 		// Create update action
-		sim.getWorkspace().addUpdateAction(
-				new UpdateActionAdapter("Update Creatures Sim") {
-					@Override
-					public void invoke() {
-						updateCreaturesSim();
-					}
-				});
+		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
+			@Override
+			public void invoke() {
+				updateCreaturesSim();
+			}
+		});
 
 	}
 
@@ -70,12 +68,12 @@ public class Creatures extends RegisteredSimulation {
 
 	/**
 	 * Gives an empty creature's brain a network from a template.
+	 * 
 	 * @param brain
 	 */
 	private void initDefaultBrain(CreaturesBrain brain) {
 		// Init Lobe #1: Drives
-		NeuronGroup drives =
-				brain.createLobe(1580, 1300, 12, "grid", "Lobe #1: Drives");
+		NeuronGroup drives = brain.createLobe(1580, 1300, 12, "grid", "Lobe #1: Drives");
 		brain.setLobeColumns(drives, 6);
 		brain.nameNeuron(drives, 0, "Pain");
 		brain.nameNeuron(drives, 1, "Comfort");
@@ -91,9 +89,9 @@ public class Creatures extends RegisteredSimulation {
 		brain.nameNeuron(drives, 11, "Arousal");
 
 		// Init Lobe #2: Stimulus Source
-		NeuronGroup stimulus =
-				brain.createLobe(610, 995, 7,
-						"line", "Lobe #2: Stimulus Source");
+		// TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork or make
+		// our own?)
+		NeuronGroup stimulus = brain.createLobe(610, 995, 7, "line", "Lobe #2: Stimulus Source");
 		brain.nameNeuron(stimulus, 0, "Toy");
 		brain.nameNeuron(stimulus, 1, "Fish");
 		brain.nameNeuron(stimulus, 2, "Cheese");
@@ -103,8 +101,8 @@ public class Creatures extends RegisteredSimulation {
 		brain.nameNeuron(stimulus, 6, "Mouse");
 
 		// Init Lobe #3: Verbs
-		NeuronGroup verbs =
-				brain.createLobe(1715, 1000, 13, "grid", "Lobe #3: Verbs");
+		// TODO: Make this a WTA lobe.
+		NeuronGroup verbs = brain.createLobe(1715, 1000, 13, "grid", "Lobe #3: Verbs");
 		brain.setLobeColumns(verbs, 7);
 		brain.nameNeuron(verbs, 0, "Wait");
 		brain.nameNeuron(verbs, 1, "Left");
@@ -121,15 +119,12 @@ public class Creatures extends RegisteredSimulation {
 		brain.nameNeuron(verbs, 12, "Mate");
 
 		// Init Lobe #4: Nouns
-		NeuronGroup nouns =
-				brain.createLobe(910, -40, stimulus.size(), "line",
-						"Lobe #4: Nouns");
+		// TODO: Make this a WTA lobe.
+		NeuronGroup nouns = brain.createLobe(910, -40, stimulus.size(), "line", "Lobe #4: Nouns");
 		brain.copyLabels(stimulus, nouns);
 
 		// Init Lobe #5: General Senses
-		NeuronGroup senses =
-				brain.createLobe(1490, 1550, 14,
-						"grid", "Lobe #5: General Senses");
+		NeuronGroup senses = brain.createLobe(1490, 1550, 14, "grid", "Lobe #5: General Senses");
 		brain.setLobeColumns(senses, 7);
 		brain.nameNeuron(senses, 0, "Attacked");
 		brain.nameNeuron(senses, 1, "Playing");
@@ -147,53 +142,41 @@ public class Creatures extends RegisteredSimulation {
 		brain.nameNeuron(senses, 13, "Audible Event");
 
 		// Init Lobe #6: Decisions
-		NeuronGroup decisions =
-				brain.createLobe(2510, 440, verbs.size(),
-						"vertical line", "Lobe #6: Decisions");
+		// TODO: Make this a WTA lobe.
+		NeuronGroup decisions = brain.createLobe(2510, 440, verbs.size(), "vertical line", "Lobe #6: Decisions");
 		brain.copyLabels(verbs, decisions);
 
 		// Init Lobe #7: Attention
-		NeuronGroup attention =
-				brain.createLobe(2090, 1260, stimulus.size(),
-						"vertical line", "Lobe #7: Attention");
+		// TODO: Make this a WTA lobe.
+		NeuronGroup attention = brain.createLobe(2090, 1260, stimulus.size(), "vertical line", "Lobe #7: Attention");
 		brain.copyLabels(stimulus, attention);
 
 		// Init Lobe #8: Concepts
-		NeuronGroup concepts =
-				brain.createLobe(460, 95, 640, "grid", "Lobe #8: Concepts");
+		NeuronGroup concepts = brain.createLobe(460, 95, 640, "grid", "Lobe #8: Concepts");
 		brain.setLobeColumns(concepts, 40);
 
 		// Init Lobe #0: Perception
-		NeuronGroup perception =
-				brain.createLobe(65, 440,
-							(drives.size() + verbs.size()
-							+ senses.size() + attention.size()),
-							"grid", "Lobe #0: Perception");
+		NeuronGroup perception = brain.createLobe(65, 440,
+				(drives.size() + verbs.size() + senses.size() + attention.size()), "grid", "Lobe #0: Perception");
 		brain.setLobeColumns(perception, 7);
 		// Copy labels from multiple lobes to this one
 		for (int i = 0; i < perception.size(); i++) {
 			// Labeling after Lobe #1
 			if (i < drives.size()) {
-				brain.nameNeuron(perception, i,
-						brain.getNeuronLabel(drives, i));
+				brain.nameNeuron(perception, i, brain.getNeuronLabel(drives, i));
 			}
 			// Labeling after Lobe #3
 			else if (i < (drives.size() + verbs.size())) {
-				brain.nameNeuron(perception, i,
-						brain.getNeuronLabel(verbs, i - drives.size()));
+				brain.nameNeuron(perception, i, brain.getNeuronLabel(verbs, i - drives.size()));
 			}
 			// Labeling after Lobe #5
 			else if (i < (drives.size() + verbs.size() + senses.size())) {
-				brain.nameNeuron(perception, i,
-						brain.getNeuronLabel(senses,
-								i - (drives.size() + verbs.size())));
+				brain.nameNeuron(perception, i, brain.getNeuronLabel(senses, i - (drives.size() + verbs.size())));
 			}
 			// Labeling after Lobe #7
 			else {
 				brain.nameNeuron(perception, i,
-						brain.getNeuronLabel(attention, i
-								- (drives.size()
-										+ verbs.size() + senses.size())));
+						brain.getNeuronLabel(attention, i - (drives.size() + verbs.size() + senses.size())));
 			}
 		}
 
@@ -201,6 +184,7 @@ public class Creatures extends RegisteredSimulation {
 
 	/**
 	 * Creates a brain network and displays it in the workspace.
+	 * 
 	 * @param x
 	 * @param y
 	 * @param width
@@ -208,21 +192,20 @@ public class Creatures extends RegisteredSimulation {
 	 * @param name
 	 * @return a CreaturesBrain object
 	 */
-	public CreaturesBrain createBrain(int x, int y,
-			int width, int height, String name) {
+	public CreaturesBrain createBrain(int x, int y, int width, int height, String name) {
 		NetBuilder net = sim.addNetwork(x, y, width, height, name + "'s Brain");
 		CreaturesBrain brain = new CreaturesBrain(net);
 		brainList.add(brain);
 		return brain;
 	}
 
-	public CreaturesBrain createBrain(int x, int y,
-			int width, int height) {
+	public CreaturesBrain createBrain(int x, int y, int width, int height) {
 		return createBrain(x, y, width, height, "Creature");
 	}
 
 	/**
 	 * Constructor.
+	 * 
 	 * @param desktop
 	 */
 	public Creatures(SimbrainDesktop desktop) {

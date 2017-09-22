@@ -29,17 +29,16 @@ public class CreaturesNeuronRule extends LinearRule {
 	 * doesn't fire.
 	 */
 	private double leakageRate;
-	
+
 	/**
 	 * The value that the state value rests at.
 	 */
 	private double restState;
 
 	/**
-	 * 
+	 * Modulates inputs. With high gain, the effects of input values are increased;
+	 * with low gain, the effects of input values are reduced.
 	 */
-	// TODO: Figure out what Input Gain does in the original Creatures game
-	// (assuming anyone knows).
 	private double inputGain;
 
 	/**
@@ -77,8 +76,14 @@ public class CreaturesNeuronRule extends LinearRule {
 
 		// SVRule stuff goes here.
 
+		// Get input and modulate it with inputGain.
+		double input = inputType.getInput(neuron);
+		// TODO: Find an algorithm that can modulate input with inputGain. (In
+		// the default genome in Creatures, input gain is always set at max (255),
+		// except for the decisions lobe (#6), which is set at 128)
+
 		// Placeholder until SVRule stuff is implemented
-		stateValue += inputType.getInput(neuron);
+		stateValue += input;
 
 		// Clip values
 		if (isClipped()) {

@@ -299,7 +299,7 @@ public class Neuron {
      *            the neuronUpdateRule to set
      */
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
-        NeuronUpdateRule oldRule = updateRule;
+        NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
         for (Synapse s : getFanOut().values()) {
             s.initSpikeResponder();

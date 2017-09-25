@@ -46,7 +46,7 @@ public class MpfsSOM extends RegisteredSimulation {
         buildNetwork();
 
         // Set up control panel
-        // controlPanel();
+         controlPanel();
     }
 
     private void controlPanel() {
@@ -58,8 +58,6 @@ public class MpfsSOM extends RegisteredSimulation {
 
     void buildNetwork() {
         // Basic setup
-        NetBuilder net = sim.addNetwork(10, 10, 450, 450, "Test network");
-        Network network = net.getNetwork();
         network.addGroup(
                 new SOMNetwork(network, 20, 29, new Point2D.Double(0, 0)));
 

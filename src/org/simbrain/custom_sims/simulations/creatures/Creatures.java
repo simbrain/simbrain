@@ -13,8 +13,11 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
+import org.simbrain.custom_sims.helper_classes.OdorWorldBuilder;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.environment.SmellSource;
 
 /**
  * A simulation of an A-Life agent based off of the Creatures entertainment
@@ -27,229 +30,102 @@ import org.simbrain.network.groups.NeuronGroup;
  */
 public class Creatures extends RegisteredSimulation {
 
-    /**
-     * A list of brains. Good for updating and maintaining multiple brains
-     */
-    private List<CreaturesBrain> brainList = new ArrayList();
+	/**
+	 * A list of creatures. Good for updating and maintaining multiple creatures.
+	 */
+	private List<CreatureInstance> creatureList = new ArrayList<CreatureInstance>();
 
-    @Override
-    public void run() {
+	private OdorWorldBuilder world;
 
-        // Clear workspace
-        sim.getWorkspace().clearWorkspace();
+	@Override
+	public void run() {
 
-        // Add doc viewer
-        sim.addDocViewer(0, 0, 450, 600, "Doc",
-                "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
+		// Clear workspace
+		sim.getWorkspace().clearWorkspace();
 
-        // Create starting brain
-        CreaturesBrain ronBrain = createBrain(451, 0, 550, 600, "Ron");
-        initDefaultBrain(ronBrain);
+		// Add doc viewer
+		sim.addDocViewer(0, 0, 450, 600, "Doc", "src/org/simbrain/custom_sims/simulations/creatures/CreaturesDoc.html");
 
-        // Create update action
-        sim.getWorkspace().addUpdateAction(
-                new UpdateActionAdapter("Update Creatures Sim") {
-                    @Override
-                    public void invoke() {
-                        updateCreaturesSim();
-                    }
-                });
+		// Create odor world
+		world = sim.addOdorWorld(1052, 0, 600, 600, "World");
 
-    }
+		// Create starting creature.
+		CreatureInstance ron = createCreature(451, 0, 600, 600, "Ron");
 
-    /**
-     * Update function for the Creatures simulation.
-     */
-    void updateCreaturesSim() {
-        // Update all brains
-        for (CreaturesBrain b : brainList) {
-            b.getNetwork().update();
-        }
+		// Create update action
+		sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
+			@Override
+			public void invoke() {
+				updateCreaturesSim();
+			}
+		});
 
-    }
+	}
 
-    /**
-     * Gives an empty creature's brain a network from a template.
-     * 
-     * @param brain
-     */
-    private void initDefaultBrain(CreaturesBrain brain) {
-        // Init Lobe #1: Drives
-        NeuronGroup drives = brain.createLobe(1580, 1300, 12, "grid",
-                "Lobe #1: Drives");
-        brain.setLobeColumns(drives, 6);
-        brain.nameNeuron(drives, 0, "Pain");
-        brain.nameNeuron(drives, 1, "Comfort");
-        brain.nameNeuron(drives, 2, "Hunger");
-        brain.nameNeuron(drives, 3, "Temperature");
-        brain.nameNeuron(drives, 4, "Fatigue");
-        brain.nameNeuron(drives, 5, "Drowsiness");
-        brain.nameNeuron(drives, 6, "Lonliness");
-        brain.nameNeuron(drives, 7, "Crowdedness");
-        brain.nameNeuron(drives, 8, "Fear");
-        brain.nameNeuron(drives, 9, "Boredom");
-        brain.nameNeuron(drives, 10, "Anger");
-        brain.nameNeuron(drives, 11, "Arousal");
+	/**
+	 * Update function for the Creatures simulation.
+	 */
+	// TODO: Should we have each world agent update after everyone's brains are
+	// updated (as we do now), or should we update each agent right after their
+	// brain does?
+	void updateCreaturesSim() {
+		for (CreatureInstance c : creatureList) {
+			c.update();
+		}
 
-        // Init Lobe #2: Stimulus Source
-        // TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork
-        // or make
-        // our own?)
-        NeuronGroup stimulus = brain.createLobe(610, 995, 7, "line",
-                "Lobe #2: Stimulus Source");
-        brain.nameNeuron(stimulus, 0, "Toy");
-        brain.nameNeuron(stimulus, 1, "Fish");
-        brain.nameNeuron(stimulus, 2, "Cheese");
-        brain.nameNeuron(stimulus, 3, "Poison");
-        brain.nameNeuron(stimulus, 4, "Hazard");
-        brain.nameNeuron(stimulus, 5, "Flower");
-        brain.nameNeuron(stimulus, 6, "Mouse");
+		world.getOdorWorldComponent().update();
+	}
 
-        // Init Lobe #3: Verbs
-        // TODO: Make this a WTA lobe.
-        NeuronGroup verbs = brain.createLobe(1715, 1000, 13, "grid",
-                "Lobe #3: Verbs");
-        brain.setLobeColumns(verbs, 7);
-        brain.nameNeuron(verbs, 0, "Wait");
-        brain.nameNeuron(verbs, 1, "Left");
-        brain.nameNeuron(verbs, 2, "Right");
-        brain.nameNeuron(verbs, 3, "Forward");
-        brain.nameNeuron(verbs, 4, "Backward");
-        brain.nameNeuron(verbs, 5, "Sleep");
-        brain.nameNeuron(verbs, 6, "Approach");
-        brain.nameNeuron(verbs, 7, "Ingest");
-        brain.nameNeuron(verbs, 8, "Look");
-        brain.nameNeuron(verbs, 9, "Smell");
-        brain.nameNeuron(verbs, 10, "Attack");
-        brain.nameNeuron(verbs, 11, "Play");
-        brain.nameNeuron(verbs, 12, "Mate");
+	/**
+	 * Creates a new creature.
+	 *
+	 * @param x
+	 *            X position of brain network.
+	 * @param y
+	 *            Y position of brain network.
+	 * @param width
+	 *            Width of brain network.
+	 * @param height
+	 *            Height of brain network.
+	 * @param name
+	 *            Name of creature.
+	 * @return A new creature.
+	 */
+	public CreatureInstance createCreature(int x, int y, int width, int height, String name) {
+		NetBuilder net = sim.addNetwork(x, y, 600, 600, name + "'s Brain");
+		RotatingEntity agent = world.addAgent(250, 250, "Mouse");
+		return new CreatureInstance(name, net, agent);
+	}
 
-        // Init Lobe #4: Nouns
-        // TODO: Make this a WTA lobe.
-        NeuronGroup nouns = brain.createLobe(910, -40, stimulus.size(), "line",
-                "Lobe #4: Nouns");
-        brain.copyLabels(stimulus, nouns);
+	/**
+	 * Constructor.
+	 *
+	 * @param desktop
+	 */
+	public Creatures(SimbrainDesktop desktop) {
+		super(desktop);
+	}
 
-        // Init Lobe #5: General Senses
-        NeuronGroup senses = brain.createLobe(1490, 1550, 14, "grid",
-                "Lobe #5: General Senses");
-        brain.setLobeColumns(senses, 7);
-        brain.nameNeuron(senses, 0, "Attacked");
-        brain.nameNeuron(senses, 1, "Playing");
-        brain.nameNeuron(senses, 2, "User Talked");
-        brain.nameNeuron(senses, 3, "Mouse Talked");
-        brain.nameNeuron(senses, 4, "It Approaches");
-        brain.nameNeuron(senses, 5, "It is Near");
-        brain.nameNeuron(senses, 6, "It Retreats");
-        brain.nameNeuron(senses, 7, "Is Object");
-        brain.nameNeuron(senses, 8, "Is Mouse");
-        brain.nameNeuron(senses, 9, "Is Parent");
-        brain.nameNeuron(senses, 10, "Is Sibling");
-        brain.nameNeuron(senses, 11, "Is Child");
-        brain.nameNeuron(senses, 12, "Opposite Sex");
-        brain.nameNeuron(senses, 13, "Audible Event");
+	public Creatures() {
+		super();
+	}
 
-        // Init Lobe #6: Decisions
-        // TODO: Make this a WTA lobe.
-        NeuronGroup decisions = brain.createLobe(2510, 440, verbs.size(),
-                "vertical line", "Lobe #6: Decisions");
-        brain.copyLabels(verbs, decisions);
+	/**
+	 * Runs the constructor for the simulation.
+	 */
+	@Override
+	public Creatures instantiate(SimbrainDesktop desktop) {
+		return new Creatures(desktop);
+	}
 
-        // Init Lobe #7: Attention
-        // TODO: Make this a WTA lobe.
-        NeuronGroup attention = brain.createLobe(2090, 1260, stimulus.size(),
-                "vertical line", "Lobe #7: Attention");
-        brain.copyLabels(stimulus, attention);
+	// Accessor methods below this point
+	@Override
+	public String getName() {
+		return "Creatures";
+	}
 
-        // Init Lobe #8: Concepts
-        NeuronGroup concepts = brain.createLobe(460, 95, 640, "grid",
-                "Lobe #8: Concepts");
-        brain.setLobeColumns(concepts, 40);
-
-        // Init Lobe #0: Perception
-        NeuronGroup perception = brain
-                .createLobe(65, 440,
-                        (drives.size() + verbs.size() + senses.size()
-                                + attention.size()),
-                        "grid", "Lobe #0: Perception");
-        brain.setLobeColumns(perception, 7);
-        // Copy labels from multiple lobes to this one
-        for (int i = 0; i < perception.size(); i++) {
-            // Labeling after Lobe #1
-            if (i < drives.size()) {
-                brain.nameNeuron(perception, i,
-                        brain.getNeuronLabel(drives, i));
-            }
-            // Labeling after Lobe #3
-            else if (i < (drives.size() + verbs.size())) {
-                brain.nameNeuron(perception, i,
-                        brain.getNeuronLabel(verbs, i - drives.size()));
-            }
-            // Labeling after Lobe #5
-            else if (i < (drives.size() + verbs.size() + senses.size())) {
-                brain.nameNeuron(perception, i, brain.getNeuronLabel(senses,
-                        i - (drives.size() + verbs.size())));
-            }
-            // Labeling after Lobe #7
-            else {
-                brain.nameNeuron(perception, i, brain.getNeuronLabel(attention,
-                        i - (drives.size() + verbs.size() + senses.size())));
-            }
-        }
-
-    }
-
-    /**
-     * Creates a brain network and displays it in the workspace.
-     * 
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param name
-     * @return a CreaturesBrain object
-     */
-    public CreaturesBrain createBrain(int x, int y, int width, int height,
-            String name) {
-        NetBuilder net = sim.addNetwork(x, y, width, height, name + "'s Brain");
-        CreaturesBrain brain = new CreaturesBrain(net);
-        brainList.add(brain);
-        return brain;
-    }
-
-    public CreaturesBrain createBrain(int x, int y, int width, int height) {
-        return createBrain(x, y, width, height, "Creature");
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param desktop
-     */
-    public Creatures(SimbrainDesktop desktop) {
-        super(desktop);
-    }
-
-    public Creatures() {
-        super();
-    }
-
-    /**
-     * Runs the constructor for the simulation.
-     */
-    @Override
-    public Creatures instantiate(SimbrainDesktop desktop) {
-        return new Creatures(desktop);
-    }
-
-    // Accessor methods below this point
-    @Override
-    public String getName() {
-        return "Creatures";
-    }
-
-    public List<CreaturesBrain> getBrainlist() {
-        return brainList;
-    }
+	public List<CreatureInstance> getCreatureList() {
+		return creatureList;
+	}
 
 }

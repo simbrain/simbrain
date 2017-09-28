@@ -219,7 +219,7 @@ public class NeuronGroup extends Group implements CopyableGroup<NeuronGroup> {
         super(net);
         neuronList = new ArrayList<Neuron>(numNeurons);
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(net, rule), false);
+            addNeuron(new Neuron(net, rule.deepCopy()), false);
         }
         //this.setNeuronType(rule); erases the rule in creatures case
         // Very slow to add to a copy on write array list so do it this way

@@ -1,24 +1,13 @@
 package org.simbrain.custom_sims.simulations.mpfs_som;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetBuilder;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.subnetworks.SOMNetwork;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistribution;
-import org.simbrain.util.randomizer.PolarizedRandomizer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
